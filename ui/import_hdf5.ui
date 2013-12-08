@@ -15,38 +15,17 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="HistoryCheck" name="hdfreadallcheck">
-       <property name="text">
-        <string>Import all datasets from file</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="hdfimportstatus">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QLabel" name="hdfimportstatus">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QTreeView" name="hdftreeview"/>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>HistoryCheck</class>
-   <extends>QCheckBox</extends>
-   <header>historycheck.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -26,9 +26,11 @@ from . import defn_hdf5
 def _(text, disambiguation=None, context="Import_HDF5"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+# lazily imported
 h5py = None
 
 class Node(object):
+    """Generic Node used by tree model."""
     def __init__(self, parent):
         self.parent = parent
         self.children = []
@@ -116,25 +118,86 @@ class ErrorNode(Node):
             return self.name
         return None
 
+# name for the columns
+_ColName = 0
+_ColDataType = 1
+_ColShape = 2
+_ColToImport = 3
+_ColImportName = 4
+
 class HDFNode(Node):
+    def grpDisabled(self):
+        """Is this disabled because of a group import?"""
+        p = self.parent
+        while p is not None:
+            if p.grpimport:
+                return True
+            p = p.parent
+        return False
+
+class HDFGroupNode(HDFNode):
     def __init__(self, parent, grp):
         Node.__init__(self, parent)
         self.name = grp.name.split("/")[-1]
         if self.name == '':
             self.name = '/'
+        self.grpimport = False
 
     def data(self, column, role):
-        if column == 0 and role == qt4.Qt.DisplayRole:
+        if column == _ColName and role == qt4.Qt.DisplayRole:
             return self.name
+        elif role == qt4.Qt.CheckStateRole and column == _ColToImport:
+            return ( qt4.Qt.Checked
+                     if self.grpimport or self.grpDisabled()
+                     else qt4.Qt.Unchecked )
+
+        elif role == qt4.Qt.ToolTipRole and column == _ColToImport:
+            return _("Check to import all datasets under\n"
+                     "this group under their original names")
+
         return None
 
-class HDFDataNode(Node):
-    ColName = 0
-    ColDataType = 1
-    ColShape = 2
-    ColToImport = 3
-    ColImportName = 4
+    def setData(self, model, index, value, role):
+        """Enable selection of group for importing. This prevents
+        importing child items individually."""
+        column = index.column()
+        if column == _ColToImport and role == qt4.Qt.CheckStateRole:
+            # import check has changed
+            self.grpimport = value == qt4.Qt.Checked
 
+            # disable importing of child nodes
+            def recursivedisable(node):
+                if isinstance(node, HDFDataNode):
+                    node.toimport = False
+                    node.importname = ""
+                else:
+                    if node is not self:
+                        node.grpimport = False
+                    for c in node.children:
+                        recursivedisable(c)
+            if self.grpimport:
+                recursivedisable(self)
+
+            # this is messy - inform view that this row has changed
+            par = model.parent(index)
+            row = index.row()
+            idx1 = model.index(row, 0, par)
+            idx2 = model.index(row+1, model.columnCount(index)-1, par)
+            model.dataChanged.emit(idx1, idx2)
+
+            return True
+        return False
+
+    def flags(self, column, defflags):
+        if self.grpDisabled():
+            defflags &= ~qt4.Qt.ItemIsEnabled
+            return defflags
+
+        if column == _ColToImport:
+            defflags |= qt4.Qt.ItemIsUserCheckable
+        return defflags
+
+class HDFDataNode(HDFNode):
     def __init__(self, parent, ds):
         Node.__init__(self, parent)
         self.name = ds.name.split("/")[-1]
@@ -142,7 +205,7 @@ class HDFDataNode(Node):
         self.rawdatatype = str(ds.dtype)
         self.shape = ds.shape
         self.toimport = False
-        self.importname = ''
+        self.importname = ""
         self.numeric = False
 
         k = ds.dtype.kind
@@ -165,36 +228,38 @@ class HDFDataNode(Node):
             self.valid = False
 
     def data(self, column, role):
+        """Return data for column"""
         if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
-            if column == self.ColName:
+            if column == _ColName:
                 return self.name
-            elif column == self.ColDataType:
+            elif column == _ColDataType:
                 return self.datatype
-            elif column == self.ColShape:
+            elif column == _ColShape:
                 return u'\u00d7'.join([str(x) for x in self.shape])
-            elif column == self.ColImportName:
+            elif column == _ColImportName:
                 return self.importname
 
         elif role == qt4.Qt.ToolTipRole:
-            if column == self.ColName:
+            if column == _ColName:
                 return self.fullname
-            elif column == self.ColDataType:
+            elif column == _ColDataType:
                 return self.rawdatatype
-            elif column == self.ColToImport:
+            elif column == _ColToImport and not self.grpDisabled():
                 return _('Check to import this dataset')
-            elif column == self.ColImportName:
+            elif column == _ColImportName and not self.grpDisabled():
                 return _('Name to assign after import.\nSpecial suffixes '
                          '(+), (-), (+-) and (1D) can be used.')
 
-        elif role == qt4.Qt.CheckStateRole:
-            if column == self.ColToImport:
-                return qt4.Qt.Checked if self.toimport else qt4.Qt.Unchecked
+        elif role == qt4.Qt.CheckStateRole and column == _ColToImport:
+            return ( qt4.Qt.Checked
+                     if self.toimport or self.grpDisabled()
+                     else qt4.Qt.Unchecked )
         return None
 
     def setData(self, model, index, value, role):
         # enable selection of dataset for importing
         column = index.column()
-        if column == self.ColToImport and role == qt4.Qt.CheckStateRole:
+        if column == _ColToImport and role == qt4.Qt.CheckStateRole:
             # import check has changed
             self.toimport = value == qt4.Qt.Checked
             if self.toimport:
@@ -212,18 +277,24 @@ class HDFDataNode(Node):
 
             return True
 
-        elif column == self.ColImportName and self.toimport:
+        elif column == _ColImportName and self.toimport:
             # update name if changed
             self.importname = value
             return True
         return False
 
     def flags(self, column, defflags):
-        if column == self.ColToImport and self.valid:
-            # this is the to import column
+        disabled = False
+
+        if self.grpDisabled():
+            defflags &= ~qt4.Qt.ItemIsEnabled
+            return defflags
+
+        if column == _ColToImport and self.valid:
+            # allow import column to be clicked
             defflags |= qt4.Qt.ItemIsUserCheckable
-        if column == self.ColImportName and self.toimport:
-            # this is the import name column
+        if column == _ColImportName and self.toimport:
+            # allow name to be clicked
             defflags |= qt4.Qt.ItemIsEditable
         return defflags
 
@@ -303,14 +374,14 @@ def constructTree(hdf5file):
             except KeyError:
                 continue
             if isinstance(hchild, h5py.Group):
-                childnode = HDFNode(parent, hchild)
+                childnode = HDFGroupNode(parent, hchild)
                 addsub(childnode, hchild)
             elif isinstance(hchild, h5py.Dataset):
                 childnode = HDFDataNode(parent, hchild)
                 datanodes.append(childnode)
             parent.children.append(childnode)
 
-    root = HDFNode(None, hdf5file)
+    root = HDFGroupNode(None, hdf5file)
     addsub(root, hdf5file)
     return root, datanodes
 
@@ -327,15 +398,6 @@ class ImportTabHDF5(importdialog.ImportTab):
     def loadUi(self):
         importdialog.ImportTab.loadUi(self)
         self.datanodes = []
-        self.hdfreadallcheck.default = False
-        self.hdfreadallcheck.stateChanged.connect(self.slotReadAllChecked)
-
-    def reset(self):
-        self.hdfreadallcheck.setChecked(False)
-
-    def slotReadAllChecked(self, state):
-        """Disable or enable the tree if read all is checked."""
-        self.hdftreeview.setEnabled(state == qt4.Qt.Unchecked)
 
     def doPreview(self, filename, encoding):
         """Show file as tree."""
@@ -350,17 +412,17 @@ class ImportTabHDF5(importdialog.ImportTab):
 
         try:
             with h5py.File(filename, "r") as f:
-                rootnode, self.datanodes = constructTree(f)
+                self.rootnode, self.datanodes = constructTree(f)
         except IOError as e:
             self.showError(_("Cannot open file"))
             return False
 
         self.importnamedeligate = ImportNameDeligate(self, self.datanodes)
         self.hdftreeview.setItemDelegateForColumn(
-            HDFDataNode.ColImportName, self.importnamedeligate)
+            _ColImportName, self.importnamedeligate)
 
         mod = GenericTreeModel(
-            self, rootnode,
+            self, self.rootnode,
             [_('Name'), _('Type'), _('Size'), _('Import'),
              _('Import as')])
         self.hdftreeview.setModel(mod)
@@ -371,26 +433,31 @@ class ImportTabHDF5(importdialog.ImportTab):
     def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import file."""
 
+        singledatasets = {}
+        for node in self.datanodes:
+            if node.toimport:
+                inname = node.importname.strip()
+                if inname:
+                    singledatasets[node.fullname] = inname
 
-        readall = self.hdfreadallcheck.isChecked()
-        if readall:
-            toimport=None
-        else:
-            toimport = {}
-            for node in self.datanodes:
-                if node.toimport:
-                    inname = node.importname.strip()
-                    if inname:
-                        toimport[node.fullname] = inname
+        groups = []
+        def recursivegroups(node):
+            if isinstance(node, HDFGroupNode):
+                if node.grpimport:
+                    groups.append(node.name)
+                else:
+                    for c in node.children:
+                        recursivegroups(c)
+        recursivegroups(self.rootnode)
 
         prefix, suffix = self.dialog.getPrefixSuffix(filename)
         params = defn_hdf5.ImportParamsHDF5(
             filename=filename,
-            toimport=toimport,
+            groups=groups,
+            singledatasets=singledatasets,
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,
-            readall=readall,
             )
 
         op = defn_hdf5.OperationDataImportHDF5(params)

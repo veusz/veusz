@@ -43,12 +43,12 @@ class ImportParamsHDF5(base.ImportParamsBase):
     """HDF5 file import parameters.
 
     Additional parameters:
-     toimport: map of dataset names to veusz names
+     singledatasets: map of dataset names to veusz names
     """
 
     defaults = {
-        'toimport': None,
-        'readall': False,
+        'singledatasets': None,
+        'groups': None,
         }
     defaults.update(base.ImportParamsBase.defaults)
 
@@ -64,13 +64,13 @@ class LinkedFileHDF5(base.LinkedFileBase):
 
         p = self.params
         args = [ crepr(self._getSaveFilename(relpath)) ]
-        if p.toimport:
+        if p.singledatasets:
             # sorted to ensure ordering in dict here
-            toimport = [ "%s: %s" % (crepr(k), crepr(p.toimport[k]))
-                         for k in sorted(p.toimport) ]
-            args.append("toimport={%s}" % ", ".join(toimport))
-        if p.readall:
-            args.append("readall=True")
+            singles = [ "%s: %s" % (crepr(k), crepr(p.singledatasets[k]))
+                        for k in sorted(p.singledatasets) ]
+            args.append("singledatasets={%s}" % ", ".join(singles))
+        if p.groups:
+            args.append("groups=%s" % crepr(p.groups))
         if p.prefix:
             args.append("prefix=%s" % crepr(p.prefix))
         if p.suffix:
@@ -110,45 +110,31 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
     descr = _("import HDF5 file")
 
-    def readSpecificData(self):
-        """Return read datasets."""
+    def readSingleDatasets(self, hdff, singledatasets, dsread):
+        for hdfname, vzname in citems(singledatasets):
+            data = hdff[hdfname]
+            vzname = vzname.strip()
+            dsread[vzname] = convertDataset(data)
 
-        p = self.params
-        dsread = {}
-        with h5py.File(p.filename) as hdff:
-            for hdfname, vzname in citems(p.toimport):
-                data = hdff[hdfname]
-                vzname = vzname.strip()
-                dsread[vzname] = convertDataset(data)
-        return dsread
+    def walkGroup(self, grp, dsread):
+        """Walk a group in the hdf file, adding datasets to dsread."""
 
-    def readAllData(self):
-        """Read data with original names in file."""
-        dsread = {}
-
-        def walkgrp(grp):
-            for dsname in sorted(grp.keys()):
+        for dsname in sorted(grp.keys()):
+            try:
+                child = grp[dsname]
+            except KeyError:
+                # this does happen!
+                continue
+            if isinstance(child, h5py.Group):
+                self.walkGroup(child, dsread)
+            elif isinstance(child, h5py.Dataset):
+                name = dsname.split("/")[-1].strip()
+                if name in dsread:
+                    name = dsname.strip()
                 try:
-                    child = grp[dsname]
-                except KeyError:
-                    # this does happen!
-                    continue
-                if isinstance(child, h5py.Group):
-                    walkgrp(child)
-                elif isinstance(child, h5py.Dataset):
-                    name = dsname.split("/")[-1].strip()
-                    if name in dsread:
-                        name = dsname.strip()
-                    try:
-                        dsread[name] = convertDataset(child)
-                    except _ConvertError:
-                        pass
-
-        p = self.params
-        with h5py.File(p.filename) as hdff:
-            walkgrp(hdff)
-
-        return dsread
+                    dsread[name] = convertDataset(child)
+                except _ConvertError:
+                    pass
 
     def collectErrorDatasets(self, dsread):
         """Identify error bar datasets and separate out.
@@ -181,12 +167,16 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         inith5py()
         p = self.params
 
-        if p.toimport:
-            dsread = self.readSpecificData()
-        elif p.readall:
-            dsread = self.readAllData()
-        else:
-            dsread = {}
+        # read the data
+        dsread = {}
+        with h5py.File(p.filename) as hdff:
+            if p.singledatasets is not None:
+                self.readSingleDatasets(hdff, p.singledatasets, dsread)
+            if p.groups is not None:
+                for grp in p.groups:
+                    self.walkGroup(hdff[grp], dsread)
+
+        # find datasets which are error datasets
         errordatasets = self.collectErrorDatasets(dsread)
 
         if p.linked:
@@ -194,6 +184,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         else:
             linkedfile = None
 
+        # create the veusz output datasets
         for name, data in citems(dsread):
             ds = None
             if isinstance(data, N.ndarray):
@@ -242,12 +233,14 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             doc.setData(fullname, ds)
             self.outdatasets.append(fullname)
 
-def ImportFileHDF5(comm, filename, toimport={}, readall=False,
+def ImportFileHDF5(comm, filename,
+                   singledatasets=None,
+                   groups=None,
                    prefix='', suffix='',
                    linked=False):
     """Import data from a HDF5 file
 
-    toimport is a dict, mapping of HDF5 dataset names to Veusz dataset
+    singledatasets is a dict, mapping of HDF5 dataset names to Veusz dataset
     names. Veusz dataset names can be given special suffixes to denote
     how they are imported:
 
@@ -257,8 +250,11 @@ def ImportFileHDF5(comm, filename, toimport={}, readall=False,
     'foo (1D)': import 2D dataset as 1D dataset with errors
       (for Nx2 or Nx3 datasets)
 
-    readall can be set instead. This reads all datasets with their
-    original names.
+    groups can also be set. This is a list of groups to import with
+    all their child datasets and child groups. Child datasets retain
+    the same names, although the special suffixes are used.
+
+    Do not duplicate datasets between singledatasets and groups.
 
     linked specfies that the dataset is linked to the file
     """
@@ -267,8 +263,8 @@ def ImportFileHDF5(comm, filename, toimport={}, readall=False,
     realfilename = comm.findFileOnImportPath(filename)
     params = ImportParamsHDF5(
         filename=realfilename,
-        readall=readall,
-        toimport=toimport,
+        groups=groups,
+        singledatasets=singledatasets,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImportHDF5(params)
