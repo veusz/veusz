@@ -146,8 +146,8 @@ def formatLocals(exception):
             outlines.append(' %s = %s' % (key, v))
 
             # print out attributes if item is self
-            if key == 'self' and value not in alreadyself:
-                alreadyself.add(value)
+            if key == 'self' and id(value) not in alreadyself:
+                alreadyself.add(id(value))
                 for attr in sorted( dir(value) ):
                     try:
                         v = getattr(value, attr)
