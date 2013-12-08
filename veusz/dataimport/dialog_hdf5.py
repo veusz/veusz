@@ -21,7 +21,7 @@ from __future__ import division, print_function
 from .. import qtall as qt4
 from ..dialogs import importdialog
 from ..compat import crange
-#from . import defn_fits
+from . import defn_hdf5
 
 def _(text, disambiguation=None, context="Import_HDF5"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -134,21 +134,23 @@ class HDFDataNode(Node):
     ColShape = 2
     ColToImport = 3
     ColImportName = 4
-    ColMax = 4
 
     def __init__(self, parent, ds):
         Node.__init__(self, parent)
         self.name = ds.name.split("/")[-1]
+        self.fullname = ds.name
         self.rawdatatype = str(ds.dtype)
         self.shape = ds.shape
         self.toimport = False
         self.importname = ''
+        self.numeric = False
 
         k = ds.dtype.kind
         self.valid = False
         if k in ('b', 'i', 'u', 'f'):
             self.datatype = _('Numeric')
             self.valid = True
+            self.numeric = True
         elif k in ('S', 'a'):
             self.datatype = _('Text')
             self.valid = True
@@ -157,6 +159,10 @@ class HDFDataNode(Node):
             self.valid = True
         else:
             self.datatype = _('Unsupported')
+
+        # currently only 1D or 2D
+        if len(self.shape) not in (1, 2):
+            self.valid = False
 
     def data(self, column, role):
         if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
@@ -170,12 +176,15 @@ class HDFDataNode(Node):
                 return self.importname
 
         elif role == qt4.Qt.ToolTipRole:
-            if column == self.ColDataType:
+            if column == self.ColName:
+                return self.fullname
+            elif column == self.ColDataType:
                 return self.rawdatatype
             elif column == self.ColToImport:
                 return _('Check to import this dataset')
             elif column == self.ColImportName:
-                return _('Name to assign after import')
+                return _('Name to assign after import.\nSpecial suffixes '
+                         '(+), (-), (+-) and (1D) can be used.')
 
         elif role == qt4.Qt.CheckStateRole:
             if column == self.ColToImport:
@@ -198,7 +207,7 @@ class HDFDataNode(Node):
             par = model.parent(index)
             row = index.row()
             idx1 = model.index(row, 0, par)
-            idx2 = model.index(row, self.ColMax, par)
+            idx2 = model.index(row, model.columnCount(index)-1, par)
             model.dataChanged.emit(idx1, idx2)
 
             return True
@@ -218,8 +227,73 @@ class HDFDataNode(Node):
             defflags |= qt4.Qt.ItemIsEditable
         return defflags
 
+class ImportNameDeligate(qt4.QItemDelegate):
+    """This class is for choosing the import name."""
+
+    def __init__(self, parent, datanodes):
+        qt4.QItemDelegate.__init__(self, parent)
+        self.datanodes = datanodes
+
+    def createEditor(self, parent, option, index):
+        """Create combobox for editing type."""
+        w = qt4.QComboBox(parent)
+        w.setEditable(True)
+
+        node = index.internalPointer()
+        out = []
+        for dn in self.datanodes:
+            if dn.toimport:
+                name = dn.importname
+                out.append(name)
+                if ( len(dn.shape) == 1 and node is not dn and dn.numeric and
+                     name[-4:] != ' (+)' and name[-4:] != ' (-)' and
+                     name[-5:] != ' (+-)' ):
+                    # add error bars for other datasets
+                    out.append('%s (+)' % name)
+                    out.append('%s (-)' % name)
+                    out.append('%s (+-)' % name)
+
+        out.sort()
+
+        # remove duplicates
+        last = None
+        i = 0
+        while i < len(out):
+            if out[i] == last:
+                del out[i]
+            else:
+                last = out[i]
+                i += 1
+
+        w.addItems(out)
+        return w
+
+    def setEditorData(self, editor, index):
+        """Update data in editor."""
+        text = index.data()
+
+        i = editor.findText(text)
+        if i != -1:
+            editor.setCurrentIndex(i)
+        else:
+            editor.setEditText(text)
+
+    def setModelData(self, editor, model, index):
+        """Update data in model."""
+        model.setData(index, editor.currentText(),
+                      qt4.Qt.EditRole)
+
+    def updateEditorGeometry(self, editor, option, index):
+        """Update editor geometry."""
+        editor.setGeometry(option.rect)
+
 def constructTree(hdf5file):
-    """Turn hdf5 file into a tree of nodes."""
+    """Turn hdf5 file into a tree of nodes.
+
+    Returns root and list of nodes showing datasets
+    """
+
+    datanodes = []
 
     def addsub(parent, grp):
         """To recursively iterate over each parent."""
@@ -233,11 +307,12 @@ def constructTree(hdf5file):
                 addsub(childnode, hchild)
             elif isinstance(hchild, h5py.Dataset):
                 childnode = HDFDataNode(parent, hchild)
+                datanodes.append(childnode)
             parent.children.append(childnode)
 
     root = HDFNode(None, hdf5file)
     addsub(root, hdf5file)
-    return root
+    return root, datanodes
 
 class ImportTabHDF5(importdialog.ImportTab):
     """Tab for importing HDF5 file."""
@@ -251,8 +326,19 @@ class ImportTabHDF5(importdialog.ImportTab):
 
     def loadUi(self):
         importdialog.ImportTab.loadUi(self)
+        self.datanodes = []
+        self.hdfreadallcheck.default = False
+        self.hdfreadallcheck.stateChanged.connect(self.slotReadAllChecked)
+
+    def reset(self):
+        self.hdfreadallcheck.setChecked(False)
+
+    def slotReadAllChecked(self, state):
+        """Disable or enable the tree if read all is checked."""
+        self.hdftreeview.setEnabled(state == qt4.Qt.Unchecked)
 
     def doPreview(self, filename, encoding):
+        """Show file as tree."""
 
         global h5py
         if h5py is None:
@@ -264,10 +350,14 @@ class ImportTabHDF5(importdialog.ImportTab):
 
         try:
             with h5py.File(filename, "r") as f:
-                rootnode = constructTree(f)
+                rootnode, self.datanodes = constructTree(f)
         except IOError as e:
             self.showError(_("Cannot open file"))
             return False
+
+        self.importnamedeligate = ImportNameDeligate(self, self.datanodes)
+        self.hdftreeview.setItemDelegateForColumn(
+            HDFDataNode.ColImportName, self.importnamedeligate)
 
         mod = GenericTreeModel(
             self, rootnode,
@@ -277,5 +367,39 @@ class ImportTabHDF5(importdialog.ImportTab):
         self.hdftreeview.expandAll()
 
         return True
+
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
+        """Import file."""
+
+
+        readall = self.hdfreadallcheck.isChecked()
+        if readall:
+            toimport=None
+        else:
+            toimport = {}
+            for node in self.datanodes:
+                if node.toimport:
+                    inname = node.importname.strip()
+                    if inname:
+                        toimport[node.fullname] = inname
+
+        prefix, suffix = self.dialog.getPrefixSuffix(filename)
+        params = defn_hdf5.ImportParamsHDF5(
+            filename=filename,
+            toimport=toimport,
+            tags=tags,
+            prefix=prefix, suffix=suffix,
+            linked=linked,
+            readall=readall,
+            )
+
+        op = defn_hdf5.OperationDataImportHDF5(params)
+
+        # inform user
+        self.hdfimportstatus.setText(_("Import complete"))
+        qt4.QTimer.singleShot(2000, self.hdfimportstatus.clear)
+
+        # actually do the import
+        doc.applyOperation(op)
 
 importdialog.registerImportTab(_('HDF&5'), ImportTabHDF5)

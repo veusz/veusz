@@ -63,7 +63,7 @@ class ImportTab(qt4.QWidget):
         should be attempted."""
         pass
 
-    def doImport(self, filename, linked, encoding, prefix, suffix, tags):
+    def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Do the import iteself."""
         pass
 
