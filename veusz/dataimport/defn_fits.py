@@ -179,12 +179,9 @@ class OperationDataImportFITS(base.OperationDataImportBase):
 
         if p.linked:
             ds.linked = LinkedFileFITS(self.params)
-        if p.dsname in document.data:
-            self.olddataset = document.data[p.dsname]
-        else:
-            self.olddataset = None
-        document.setData(p.dsname.strip(), ds)
-        self.outdatasets.append(p.dsname)
+        outname = p.dsname.strip()
+        document.setData(outname, ds)
+        self.outdatasets.append(outname)
 
 def ImportFITSFile(comm, dsname, filename, hdu,
                    datacol = None, symerrcol = None,
