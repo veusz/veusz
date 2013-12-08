@@ -36,6 +36,12 @@ class Node(object):
     def data(self, column, role):
         return None
 
+    def flags(self, column, defflags):
+        return defflags
+
+    def setData(self, model, index, value, role):
+        return False
+
 class GenericTreeModel(qt4.QAbstractItemModel):
     """A generic tree model, operating on Node objects."""
 
@@ -76,6 +82,20 @@ class GenericTreeModel(qt4.QAbstractItemModel):
         node = index.internalPointer()
         return node.data(index.column(), role)
 
+    def setData(self, index, value, role):
+        if not index.isValid():
+            return False
+        node = index.internalPointer()
+        return node.setData(self, index, value, role)
+
+    def flags(self, index):
+        defflags = qt4.QAbstractItemModel.flags(self, index)
+        if not index.isValid():
+            return defflags
+        else:
+            node = index.internalPointer()
+            return node.flags(index.column(), defflags)
+
     def columnCount(self, parent):
         return len(self.columnheads)
 
@@ -86,15 +106,117 @@ class GenericTreeModel(qt4.QAbstractItemModel):
             return self.columnheads[section]
         return None
 
-class HDFNode(Node):
-    def __init__(self, parent, text):
+class ErrorNode(Node):
+    def __init__(self, parent, name):
         Node.__init__(self, parent)
-        self.text = text
+        self.name = name
 
     def data(self, column, role):
         if column == 0 and role == qt4.Qt.DisplayRole:
-            return self.text
+            return self.name
         return None
+
+class HDFNode(Node):
+    def __init__(self, parent, grp):
+        Node.__init__(self, parent)
+        self.name = grp.name.split("/")[-1]
+        if self.name == '':
+            self.name = '/'
+
+    def data(self, column, role):
+        if column == 0 and role == qt4.Qt.DisplayRole:
+            return self.name
+        return None
+
+class HDFDataNode(Node):
+    ColName = 0
+    ColDataType = 1
+    ColShape = 2
+    ColToImport = 3
+    ColImportName = 4
+    ColMax = 4
+
+    def __init__(self, parent, ds):
+        Node.__init__(self, parent)
+        self.name = ds.name.split("/")[-1]
+        self.rawdatatype = str(ds.dtype)
+        self.shape = ds.shape
+        self.toimport = False
+        self.importname = ''
+
+        k = ds.dtype.kind
+        self.valid = False
+        if k in ('b', 'i', 'u', 'f'):
+            self.datatype = _('Numeric')
+            self.valid = True
+        elif k in ('S', 'a'):
+            self.datatype = _('Text')
+            self.valid = True
+        elif k == 'O' and h5py.check_dtype(vlen=ds.dtype):
+            self.datatype = _('Text')
+            self.valid = True
+        else:
+            self.datatype = _('Unsupported')
+
+    def data(self, column, role):
+        if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
+            if column == self.ColName:
+                return self.name
+            elif column == self.ColDataType:
+                return self.datatype
+            elif column == self.ColShape:
+                return u'\u00d7'.join([str(x) for x in self.shape])
+            elif column == self.ColImportName:
+                return self.importname
+
+        elif role == qt4.Qt.ToolTipRole:
+            if column == self.ColDataType:
+                return self.rawdatatype
+            elif column == self.ColToImport:
+                return _('Check to import this dataset')
+            elif column == self.ColImportName:
+                return _('Name to assign after import')
+
+        elif role == qt4.Qt.CheckStateRole:
+            if column == self.ColToImport:
+                return qt4.Qt.Checked if self.toimport else qt4.Qt.Unchecked
+        return None
+
+    def setData(self, model, index, value, role):
+        # enable selection of dataset for importing
+        column = index.column()
+        if column == self.ColToImport and role == qt4.Qt.CheckStateRole:
+            # import check has changed
+            self.toimport = value == qt4.Qt.Checked
+            if self.toimport:
+                # create default name
+                self.importname = self.name
+            else:
+                self.importname = ''
+
+            # this is messy - inform view that this row has changed
+            par = model.parent(index)
+            row = index.row()
+            idx1 = model.index(row, 0, par)
+            idx2 = model.index(row, self.ColMax, par)
+            model.dataChanged.emit(idx1, idx2)
+
+            return True
+
+        elif column == self.ColImportName and self.toimport:
+            # update name if changed
+            self.importname = value
+            return True
+        return False
+
+    def flags(self, column, defflags):
+        if column == self.ColToImport and self.valid:
+            # this is the to import column
+            defflags |= qt4.Qt.ItemIsUserCheckable
+        if column == self.ColImportName and self.toimport:
+            # this is the import name column
+            defflags |= qt4.Qt.ItemIsEditable
+        return defflags
 
 def constructTree(hdf5file):
     """Turn hdf5 file into a tree of nodes."""
@@ -103,15 +225,17 @@ def constructTree(hdf5file):
         """To recursively iterate over each parent."""
         for child in sorted(grp.keys()):
             try:
-                cgrp = grp[child]
+                hchild = grp[child]
             except KeyError:
                 continue
-            childnode = HDFNode(parent, cgrp.name.split("/")[-1])
-            if isinstance(cgrp, h5py.Group):
-                addsub(childnode, cgrp)
+            if isinstance(hchild, h5py.Group):
+                childnode = HDFNode(parent, hchild)
+                addsub(childnode, hchild)
+            elif isinstance(hchild, h5py.Dataset):
+                childnode = HDFDataNode(parent, hchild)
             parent.children.append(childnode)
 
-    root = HDFNode(None, "/")
+    root = HDFNode(None, hdf5file)
     addsub(root, hdf5file)
     return root
 
@@ -121,7 +245,7 @@ class ImportTabHDF5(importdialog.ImportTab):
     resource = "import_hdf5.ui"
 
     def showError(self, err):
-        node = HDFNode(None, err)
+        node = ErrorNode(None, err)
         model = GenericTreeModel(self, node, [''])
         self.hdftreeview.setModel(model)
 
@@ -145,7 +269,10 @@ class ImportTabHDF5(importdialog.ImportTab):
             self.showError(_("Cannot open file"))
             return False
 
-        mod = GenericTreeModel(self, rootnode, [_('Name')])
+        mod = GenericTreeModel(
+            self, rootnode,
+            [_('Name'), _('Type'), _('Size'), _('Import'),
+             _('Import as')])
         self.hdftreeview.setModel(mod)
         self.hdftreeview.expandAll()
 
