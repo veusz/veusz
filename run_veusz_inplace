@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 # Run veusz here without installation, to make development easier
 # automatically sets the resource directory to be this directory

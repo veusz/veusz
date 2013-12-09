@@ -111,9 +111,19 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
     descr = _("import HDF5 file")
 
-    def readSingleDatasets(self, hdff, singledatasets, dsread):
+    def readSingleDatasets(self, hdff, singledatasets, singledatasets_extras, dsread):
         for hdfname, vzname in citems(singledatasets):
             # this needs to be modified if custom slicing is used
+            if singledatasets_extras[vzname]['custom_slice']:
+                # parse the custom slice, to use when reading from the file
+                vals = singledatasets_extras[vzname]['custom_slice'].split(',')
+                if len(vals) == len(hdff[hdfname].shape):
+                    # there are the correct number of slice params given the shape
+                    for ind in vals:
+                        test = ind.split(':')
+                        # length -> number of :'s, ''s are empties...
+                        pass
+                    pass
             data = hdff[hdfname]
             vzname = vzname.strip()
             dsread[vzname] = convertDataset(data)
@@ -173,7 +183,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         dsread = {}
         with h5py.File(p.filename) as hdff:
             if p.singledatasets is not None:
-                self.readSingleDatasets(hdff, p.singledatasets, dsread)
+                self.readSingleDatasets(hdff, p.singledatasets, p.singledatasets_extras, dsread)
             if p.groups is not None:
                 for grp in p.groups:
                     self.walkGroup(hdff[grp], dsread)
