@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>294</height>
+    <height>492</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,65 @@
    </item>
    <item>
     <widget class="QTreeView" name="hdftreeview"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Additional Parameters</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>X Min:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="hdfxminlineedit"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="hdfxmaxlineedit"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>X Max:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Y Min:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Y Max:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="hdfyminlineedit"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="hdfymaxlineedit"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Custom Slicing:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="hdfslicinglineedit"/>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
