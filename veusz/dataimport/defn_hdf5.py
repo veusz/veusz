@@ -48,6 +48,7 @@ class ImportParamsHDF5(base.ImportParamsBase):
 
     defaults = {
         'singledatasets': None,
+        'singledatasets_extras': None,
         'groups': None,
         }
     defaults.update(base.ImportParamsBase.defaults)
@@ -106,12 +107,13 @@ def convertDataset(data):
                         data.name)
 
 class OperationDataImportHDF5(base.OperationDataImportBase):
-    """Import 1d or 2d data from a fits file."""
+    """Import 1d or 2d data from an HDF5 file."""
 
     descr = _("import HDF5 file")
 
     def readSingleDatasets(self, hdff, singledatasets, dsread):
         for hdfname, vzname in citems(singledatasets):
+            # this needs to be modified if custom slicing is used
             data = hdff[hdfname]
             vzname = vzname.strip()
             dsread[vzname] = convertDataset(data)
@@ -221,7 +223,14 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                                 linked=linkedfile)
                     else:
                         # this really is a 2D dataset
-                        ds = document.Dataset2D(data)
+                        # Add xrange, yrange here if custom params are specified
+                        xrange = None
+                        yrange = None
+                        if 'xrange' in p.singledatasets_extras[name]:
+                            xrange = p.singledatasets_extras[name]['xrange']
+                        if 'yrange' in p.singledatasets_extras[name]:
+                            yrange = p.singledatasets_extras[name]['yrange']
+                        ds = document.Dataset2D(data,xrange,yrange) 
                         ds.linked = linkedfile
 
             else:
