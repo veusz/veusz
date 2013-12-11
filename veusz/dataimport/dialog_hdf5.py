@@ -465,13 +465,23 @@ class ImportTabHDF5(importdialog.ImportTab):
         ymin = self.hdfyminlineedit.text().strip()
         ymax = self.hdfymaxlineedit.text().strip()
         custom_slice = self.hdfslicinglineedit.text().strip()
-        extraparams = {} # this will hold xrange,yrange,custom_slice
+        extraparams = {'xrange':None, 'yrange':None, 'custom_slice':None}
         if xmin and xmax:
             extraparams['xrange'] = (float(xmin), float(xmax))
         if ymin and ymax:
             extraparams['yrange'] = (float(ymin), float(ymax))
         if custom_slice:
-            extraparams['custom_slice'] = custom_slice
+            tmp = [t.split(':') for t in custom_slice.split(',')]
+            def fn(x): return None if not x else int(x) # like int, but gives None for ''
+            tmp = [map(fn,t) for t in tmp]
+            # need to convert single indices to (start,stop) slice form
+            for i,t in enumerate(tmp):
+                if len(t)==1:
+                    t2 = t*2
+                    t2[-1] += 1
+                    tmp[i] = t2
+            custom_slice_obj = [slice(*t) for t in tmp]
+            extraparams['custom_slice'] = custom_slice_obj
 
         singledatasets = {}
         singledatasets_extras = {} # this will hold extra params

@@ -113,19 +113,18 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
     def readSingleDatasets(self, hdff, singledatasets, singledatasets_extras, dsread):
         for hdfname, vzname in citems(singledatasets):
-            # this needs to be modified if custom slicing is used
-            if singledatasets_extras[vzname]['custom_slice']:
-                # parse the custom slice, to use when reading from the file
-                vals = singledatasets_extras[vzname]['custom_slice'].split(',')
-                if len(vals) == len(hdff[hdfname].shape):
-                    # there are the correct number of slice params given the shape
-                    for ind in vals:
-                        test = ind.split(':')
-                        # length -> number of :'s, ''s are empties...
-                        pass
-                    pass
-            data = hdff[hdfname]
             vzname = vzname.strip()
+            cs = singledatasets_extras[vzname]['custom_slice']
+            if cs:
+                if len(cs) == len(hdff[hdfname].shape) == 2:
+                    # there are the correct number of slice params given the shape
+                    # this doesn't work... 
+                    # data = hdff[hdfname][cs]
+                    data = hdff[hdfname][cs[0].start:cs[0].stop:cs[0].step,cs[1].start:cs[1].stop:cs[1].step]
+                else:
+                    data = hdff[hdfname]
+            else:
+                data = hdff[hdfname]
             dsread[vzname] = convertDataset(data)
 
     def walkGroup(self, grp, dsread):
