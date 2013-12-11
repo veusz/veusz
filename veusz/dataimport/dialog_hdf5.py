@@ -124,6 +124,7 @@ _ColDataType = 1
 _ColShape = 2
 _ColToImport = 3
 _ColImportName = 4
+_ColApplyParams = 5
 
 class HDFNode(Node):
     def grpDisabled(self):
@@ -207,6 +208,7 @@ class HDFDataNode(HDFNode):
         self.toimport = False
         self.importname = ""
         self.numeric = False
+        self.applyparams = False
 
         k = ds.dtype.kind
         self.valid = False
@@ -249,11 +251,20 @@ class HDFDataNode(HDFNode):
             elif column == _ColImportName and not self.grpDisabled():
                 return _('Name to assign after import.\nSpecial suffixes '
                          '(+), (-), (+-) and (1D) can be used.')
+            elif column == _ColApplyParams:
+                return _('Check to apply custom import parameters')
 
         elif role == qt4.Qt.CheckStateRole and column == _ColToImport:
             return ( qt4.Qt.Checked
                      if self.toimport or self.grpDisabled()
                      else qt4.Qt.Unchecked )
+
+        elif role == qt4.Qt.CheckStateRole and column == _ColApplyParams:
+            return ( qt4.Qt.Checked
+                     if self.applyparams or self.grpDisabled()
+                     else qt4.Qt.Unchecked )
+
+                     
         return None
 
     def setData(self, model, index, value, role):
@@ -276,6 +287,20 @@ class HDFDataNode(HDFNode):
             model.dataChanged.emit(idx1, idx2)
 
             return True
+        
+        elif column == _ColApplyParams and role == qt4.Qt.CheckStateRole:
+            # "apply params" has changed
+            self.applyparams = value == qt4.Qt.Checked
+
+            # this is messy - inform view that this row has changed
+            par = model.parent(index)
+            row = index.row()
+            idx1 = model.index(row, 0, par)
+            idx2 = model.index(row, model.columnCount(index)-1, par)
+            model.dataChanged.emit(idx1, idx2)
+
+            return True
+            
 
         elif column == _ColImportName and self.toimport:
             # update name if changed
@@ -292,6 +317,8 @@ class HDFDataNode(HDFNode):
 
         if column == _ColToImport and self.valid:
             # allow import column to be clicked
+            defflags |= qt4.Qt.ItemIsUserCheckable
+        if column == _ColApplyParams and self.valid:
             defflags |= qt4.Qt.ItemIsUserCheckable
         if column == _ColImportName and self.toimport:
             # allow name to be clicked
@@ -424,7 +451,7 @@ class ImportTabHDF5(importdialog.ImportTab):
         mod = GenericTreeModel(
             self, self.rootnode,
             [_('Name'), _('Type'), _('Size'), _('Import'),
-             _('Import as')])
+             _('Import as'), _('Apply Parameters')])
         self.hdftreeview.setModel(mod)
         self.hdftreeview.expandAll()
 
@@ -433,12 +460,40 @@ class ImportTabHDF5(importdialog.ImportTab):
     def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import file."""
 
+        xmin = self.hdfxminlineedit.text().strip()
+        xmax = self.hdfxmaxlineedit.text().strip()
+        ymin = self.hdfyminlineedit.text().strip()
+        ymax = self.hdfymaxlineedit.text().strip()
+        custom_slice = self.hdfslicinglineedit.text().strip()
+        extraparams = {'xrange':None, 'yrange':None, 'custom_slice':None}
+        if xmin and xmax:
+            extraparams['xrange'] = (float(xmin), float(xmax))
+        if ymin and ymax:
+            extraparams['yrange'] = (float(ymin), float(ymax))
+        if custom_slice:
+            tmp = [t.split(':') for t in custom_slice.split(',')]
+            def fn(x): return None if not x else int(x) # like int, but gives None for ''
+            tmp = [map(fn,t) for t in tmp]
+            # need to convert single indices to (start,stop) slice form
+            for i,t in enumerate(tmp):
+                if len(t)==1:
+                    t2 = t*2
+                    t2[-1] += 1
+                    tmp[i] = t2
+            custom_slice_obj = [slice(*t) for t in tmp]
+            extraparams['custom_slice'] = custom_slice_obj
+
         singledatasets = {}
+        singledatasets_extras = {} # this will hold extra params
         for node in self.datanodes:
             if node.toimport:
                 inname = node.importname.strip()
                 if inname:
                     singledatasets[node.fullname] = inname
+                    if node.applyparams:
+                        singledatasets_extras[inname] = extraparams
+                    else:
+                        singledatasets_extras[inname] = {}
 
         groups = []
         def recursivegroups(node):
@@ -450,11 +505,13 @@ class ImportTabHDF5(importdialog.ImportTab):
                         recursivegroups(c)
         recursivegroups(self.rootnode)
 
+
         prefix, suffix = self.dialog.getPrefixSuffix(filename)
         params = defn_hdf5.ImportParamsHDF5(
             filename=filename,
             groups=groups,
             singledatasets=singledatasets,
+            singledatasets_extras=singledatasets_extras,
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,

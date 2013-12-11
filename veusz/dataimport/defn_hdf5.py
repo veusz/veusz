@@ -48,6 +48,7 @@ class ImportParamsHDF5(base.ImportParamsBase):
 
     defaults = {
         'singledatasets': None,
+        'singledatasets_extras': None,
         'groups': None,
         }
     defaults.update(base.ImportParamsBase.defaults)
@@ -69,6 +70,11 @@ class LinkedFileHDF5(base.LinkedFileBase):
             singles = [ "%s: %s" % (crepr(k), crepr(p.singledatasets[k]))
                         for k in sorted(p.singledatasets) ]
             args.append("singledatasets={%s}" % ", ".join(singles))
+        if p.singledatasets_extras:
+            # sorted to ensure ordering in dict here
+            extras = [ "%s: %s" % (crepr(k), crepr(p.singledatasets_extras[k]))
+                        for k in sorted(p.singledatasets_extras) ]
+            args.append("singledatasets_extras={%s}" % ", ".join(extras))        
         if p.groups:
             args.append("groups=%s" % crepr(p.groups))
         if p.prefix:
@@ -106,14 +112,26 @@ def convertDataset(data):
                         data.name)
 
 class OperationDataImportHDF5(base.OperationDataImportBase):
-    """Import 1d or 2d data from a fits file."""
+    """Import 1d or 2d data from an HDF5 file."""
 
     descr = _("import HDF5 file")
 
-    def readSingleDatasets(self, hdff, singledatasets, dsread):
+    def readSingleDatasets(self, hdff, singledatasets, singledatasets_extras, dsread):
         for hdfname, vzname in citems(singledatasets):
-            data = hdff[hdfname]
             vzname = vzname.strip()
+            cs = None
+            if 'custom_slice' in singledatasets_extras[vzname]:
+                cs = singledatasets_extras[vzname]['custom_slice']
+            if cs:
+                # check that there are the correct number of slice params given the shape
+                if len(cs) == len(hdff[hdfname].shape):
+                    # Thanks to hpaulj on stackoverflow for the tip that using `tuple`
+                    # here makes this work.
+                    data = hdff[hdfname][tuple(cs)]
+                else:
+                    data = hdff[hdfname]
+            else:
+                data = hdff[hdfname]
             dsread[vzname] = convertDataset(data)
 
     def walkGroup(self, grp, dsread):
@@ -171,7 +189,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         dsread = {}
         with h5py.File(p.filename) as hdff:
             if p.singledatasets is not None:
-                self.readSingleDatasets(hdff, p.singledatasets, dsread)
+                self.readSingleDatasets(hdff, p.singledatasets, p.singledatasets_extras, dsread)
             if p.groups is not None:
                 for grp in p.groups:
                     self.walkGroup(hdff[grp], dsread)
@@ -221,7 +239,14 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                                 linked=linkedfile)
                     else:
                         # this really is a 2D dataset
-                        ds = document.Dataset2D(data)
+                        # Add xrange, yrange here if custom params are specified
+                        xrange = None
+                        yrange = None
+                        if 'xrange' in p.singledatasets_extras[name]:
+                            xrange = p.singledatasets_extras[name]['xrange']
+                        if 'yrange' in p.singledatasets_extras[name]:
+                            yrange = p.singledatasets_extras[name]['yrange']
+                        ds = document.Dataset2D(data,xrange,yrange) 
                         ds.linked = linkedfile
 
             else:
@@ -235,6 +260,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
 def ImportFileHDF5(comm, filename,
                    singledatasets=None,
+                   singledatasets_extras=None,
                    groups=None,
                    prefix='', suffix='',
                    linked=False):
@@ -265,6 +291,7 @@ def ImportFileHDF5(comm, filename,
         filename=realfilename,
         groups=groups,
         singledatasets=singledatasets,
+        singledatasets_extras=singledatasets_extras,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImportHDF5(params)
