@@ -70,6 +70,11 @@ class LinkedFileHDF5(base.LinkedFileBase):
             singles = [ "%s: %s" % (crepr(k), crepr(p.singledatasets[k]))
                         for k in sorted(p.singledatasets) ]
             args.append("singledatasets={%s}" % ", ".join(singles))
+        if p.singledatasets_extras:
+            # sorted to ensure ordering in dict here
+            extras = [ "%s: %s" % (crepr(k), crepr(p.singledatasets_extras[k]))
+                        for k in sorted(p.singledatasets_extras) ]
+            args.append("singledatasets_extras={%s}" % ", ".join(extras))        
         if p.groups:
             args.append("groups=%s" % crepr(p.groups))
         if p.prefix:
@@ -114,13 +119,15 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
     def readSingleDatasets(self, hdff, singledatasets, singledatasets_extras, dsread):
         for hdfname, vzname in citems(singledatasets):
             vzname = vzname.strip()
-            cs = singledatasets_extras[vzname]['custom_slice']
+            cs = None
+            if 'custom_slice' in singledatasets_extras[vzname]:
+                cs = singledatasets_extras[vzname]['custom_slice']
             if cs:
-                if len(cs) == len(hdff[hdfname].shape) == 2:
-                    # there are the correct number of slice params given the shape
-                    # this doesn't work... 
-                    # data = hdff[hdfname][cs]
-                    data = hdff[hdfname][cs[0].start:cs[0].stop:cs[0].step,cs[1].start:cs[1].stop:cs[1].step]
+                # check that there are the correct number of slice params given the shape
+                if len(cs) == len(hdff[hdfname].shape):
+                    # Thanks to hpaulj on stackoverflow for the tip that using `tuple`
+                    # here makes this work.
+                    data = hdff[hdfname][tuple(cs)]
                 else:
                     data = hdff[hdfname]
             else:
@@ -253,6 +260,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
 def ImportFileHDF5(comm, filename,
                    singledatasets=None,
+                   singledatasets_extras=None,
                    groups=None,
                    prefix='', suffix='',
                    linked=False):
@@ -283,6 +291,7 @@ def ImportFileHDF5(comm, filename,
         filename=realfilename,
         groups=groups,
         singledatasets=singledatasets,
+        singledatasets_extras=singledatasets_extras,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImportHDF5(params)
