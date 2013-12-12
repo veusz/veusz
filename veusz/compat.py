@@ -146,7 +146,7 @@ else:
 
     # convert strerror exception to string
     def cstrerror(ex):
-        if isinstance(ex, str):
+        if isinstance(ex.strerror, str):
             return ex.strerror.decode(locale.getdefaultlocale()[1])
         else:
             return ex.strerror
