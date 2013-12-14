@@ -126,7 +126,7 @@ _ColToImport = 3
 _ColImportName = 4
 
 class HDFNode(Node):
-    def grpDisabled(self):
+    def grpImport(self):
         """Is this disabled because of a group import?"""
         p = self.parent
         while p is not None:
@@ -148,7 +148,7 @@ class HDFGroupNode(HDFNode):
             return self.name
         elif role == qt4.Qt.CheckStateRole and column == _ColToImport:
             return ( qt4.Qt.Checked
-                     if self.grpimport or self.grpDisabled()
+                     if self.grpimport or self.grpImport()
                      else qt4.Qt.Unchecked )
 
         elif role == qt4.Qt.ToolTipRole and column == _ColToImport:
@@ -169,7 +169,6 @@ class HDFGroupNode(HDFNode):
             def recursivedisable(node):
                 if isinstance(node, HDFDataNode):
                     node.toimport = False
-                    node.importname = ""
                 else:
                     if node is not self:
                         node.grpimport = False
@@ -189,7 +188,7 @@ class HDFGroupNode(HDFNode):
         return False
 
     def flags(self, column, defflags):
-        if self.grpDisabled():
+        if self.grpImport():
             defflags &= ~qt4.Qt.ItemIsEnabled
             return defflags
 
@@ -236,23 +235,27 @@ class HDFDataNode(HDFNode):
                 return self.datatype
             elif column == _ColShape:
                 return u'\u00d7'.join([str(x) for x in self.shape])
+
             elif column == _ColImportName:
-                return self.importname
+                if role == qt4.Qt.EditRole and not self.importname:
+                    return self.name
+                else:
+                    return self.importname
 
         elif role == qt4.Qt.ToolTipRole:
             if column == _ColName:
                 return self.fullname
             elif column == _ColDataType:
                 return self.rawdatatype
-            elif column == _ColToImport and not self.grpDisabled():
+            elif column == _ColToImport and not self.grpImport():
                 return _('Check to import this dataset')
-            elif column == _ColImportName and not self.grpDisabled():
+            elif column == _ColImportName and not self.grpImport():
                 return _('Name to assign after import.\nSpecial suffixes '
                          '(+), (-), (+-) and (1D) can be used.')
 
         elif role == qt4.Qt.CheckStateRole and column == _ColToImport:
             return ( qt4.Qt.Checked
-                     if self.toimport or self.grpDisabled()
+                     if self.toimport or self.grpImport()
                      else qt4.Qt.Unchecked )
         return None
 
@@ -262,10 +265,7 @@ class HDFDataNode(HDFNode):
         if column == _ColToImport and role == qt4.Qt.CheckStateRole:
             # import check has changed
             self.toimport = value == qt4.Qt.Checked
-            if self.toimport:
-                # create default name
-                self.importname = self.name
-            else:
+            if not self.toimport:
                 self.importname = ''
 
             # this is messy - inform view that this row has changed
@@ -277,23 +277,18 @@ class HDFDataNode(HDFNode):
 
             return True
 
-        elif column == _ColImportName and self.toimport:
+        elif column == _ColImportName and (self.toimport or self.grpImport()):
             # update name if changed
             self.importname = value
             return True
         return False
 
     def flags(self, column, defflags):
-        disabled = False
 
-        if self.grpDisabled():
-            defflags &= ~qt4.Qt.ItemIsEnabled
-            return defflags
-
-        if column == _ColToImport and self.valid:
+        if column == _ColToImport and self.valid and not self.grpImport():
             # allow import column to be clicked
             defflags |= qt4.Qt.ItemIsUserCheckable
-        if column == _ColImportName and self.toimport:
+        if (column == _ColImportName and self.toimport) or self.grpImport():
             # allow name to be clicked
             defflags |= qt4.Qt.ItemIsEditable
         return defflags
@@ -312,17 +307,25 @@ class ImportNameDeligate(qt4.QItemDelegate):
 
         node = index.internalPointer()
         out = []
-        for dn in self.datanodes:
-            if dn.toimport:
-                name = dn.importname
-                out.append(name)
-                if ( len(dn.shape) == 1 and node is not dn and dn.numeric and
-                     name[-4:] != ' (+)' and name[-4:] != ' (-)' and
-                     name[-5:] != ' (+-)' ):
-                    # add error bars for other datasets
-                    out.append('%s (+)' % name)
-                    out.append('%s (-)' % name)
-                    out.append('%s (+-)' % name)
+        tooltips = []
+        for dn in (n for n in self.datanodes if n.toimport):
+            name = dn.name
+            out.append( (name, '') )
+            if ( len(dn.shape) == 1 and node is not dn and
+                 dn.shape == node.shape and
+                 node.numeric and dn.numeric and
+                 name[-4:] != ' (+)' and name[-4:] != ' (-)' and
+                 name[-5:] != ' (+-)' ):
+                # add error bars for other datasets
+                out.append(
+                    ('%s (+-)' % name,
+                     _("Import as symmetric error bar for '%s'" % name)) )
+                out.append(
+                    ('%s (+)' % name,
+                     _("Import as positive error bar for '%s'" % name)) )
+                out.append(
+                    ('%s (-)' % name,
+                     _("Import as negative error bar for '%s'" % name)) )
 
         out.sort()
 
@@ -336,12 +339,14 @@ class ImportNameDeligate(qt4.QItemDelegate):
                 last = out[i]
                 i += 1
 
-        w.addItems(out)
+        w.addItems([i[0] for i in out])
+        for i, item in enumerate(out):
+            w.setItemData(i, item[1], qt4.Qt.ToolTipRole)
         return w
 
     def setEditorData(self, editor, index):
         """Update data in editor."""
-        text = index.data()
+        text = index.data(qt4.Qt.EditRole)
 
         i = editor.findText(text)
         if i != -1:
@@ -410,6 +415,10 @@ class ImportTabHDF5(importdialog.ImportTab):
                 self.showError(_("Cannot load h5py module"))
                 return False
 
+        if not filename:
+            self.showError(_("Cannot open file"))
+            return False
+
         try:
             with h5py.File(filename, "r") as f:
                 self.rootnode, self.datanodes = constructTree(f)
@@ -424,7 +433,7 @@ class ImportTabHDF5(importdialog.ImportTab):
         mod = GenericTreeModel(
             self, self.rootnode,
             [_('Name'), _('Type'), _('Size'), _('Import'),
-             _('Import as')])
+             _('Import as'), _('Options')])
         self.hdftreeview.setModel(mod)
         self.hdftreeview.expandAll()
 
@@ -433,28 +442,31 @@ class ImportTabHDF5(importdialog.ImportTab):
     def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import file."""
 
-        singledatasets = {}
+        namemap = {}
         for node in self.datanodes:
-            if node.toimport:
-                inname = node.importname.strip()
-                if inname:
-                    singledatasets[node.fullname] = inname
+            inname = node.importname.strip()
+            if inname:
+                namemap[node.fullname] = inname
 
-        groups = []
-        def recursivegroups(node):
+        items = []
+        def recursiveitems(node):
             if isinstance(node, HDFGroupNode):
                 if node.grpimport:
-                    groups.append(node.name)
+                    items.append(node.name)
                 else:
                     for c in node.children:
-                        recursivegroups(c)
-        recursivegroups(self.rootnode)
+                        recursiveitems(c)
+            else:
+                if node.toimport:
+                    items.append(node.fullname)
+
+        recursiveitems(self.rootnode)
 
         prefix, suffix = self.dialog.getPrefixSuffix(filename)
         params = defn_hdf5.ImportParamsHDF5(
             filename=filename,
-            groups=groups,
-            singledatasets=singledatasets,
+            items=items,
+            namemap=namemap,
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,
