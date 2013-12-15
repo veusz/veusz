@@ -37,7 +37,6 @@ def inith5py():
         raise RuntimeError(
             "Cannot load Python h5py module. "
             "Please install before loading documents using HDF5 data.")
-    return h5py
 
 class ImportParamsHDF5(base.ImportParamsBase):
     """HDF5 file import parameters.
@@ -113,21 +112,21 @@ def convertDataset(data, slices):
     if kind in ('b', 'i', 'u', 'f'):
         data = N.array(data, dtype=N.float64)
         if len(data.shape) > 2:
-            raise _ConvertError("HDF5 dataset %s has more than"
-                                " 2 dimensions" % data.name)
+            raise _ConvertError(_("HDF5 dataset %s has more than"
+                                  " 2 dimensions" % data.name))
         return data
 
     elif kind in ('S', 'a') or (
         kind == 'O' and h5py.check_dtype(vlen=data.dtype)):
         if len(data.shape) != 1:
-            raise _ConvertError("HDF5 dataset %s has more than"
-                                " 1 dimension" % data.name)
+            raise _ConvertError(_("HDF5 dataset %s has more than"
+                                  " 1 dimension" % data.name))
 
         strcnv = list(data)
         return strcnv
 
-    raise _ConvertError("HDF5 dataset %s has an invalid type" %
-                        data.name)
+    raise _ConvertError(_("HDF5 dataset %s has an invalid type" %
+                          data.name))
 
 class OperationDataImportHDF5(base.OperationDataImportBase):
     """Import 1d or 2d data from a fits file."""

@@ -210,6 +210,14 @@ class HDFNode(Node):
             p = p.parent
         return False
 
+    def _updateRow(self, model, index):
+        """This is messy - inform view that this row has changed."""
+        par = model.parent(index)
+        row = index.row()
+        idx1 = model.index(row, 0, par)
+        idx2 = model.index(row, model.columnCount(index)-1, par)
+        model.dataChanged.emit(idx1, idx2)
+
 class HDFGroupNode(HDFNode):
     def __init__(self, parent, grp):
         Node.__init__(self, parent)
@@ -252,13 +260,7 @@ class HDFGroupNode(HDFNode):
             if self.grpimport:
                 recursivedisable(self)
 
-            # this is messy - inform view that this row has changed
-            par = model.parent(index)
-            row = index.row()
-            idx1 = model.index(row, 0, par)
-            idx2 = model.index(row+1, model.columnCount(index)-1, par)
-            model.dataChanged.emit(idx1, idx2)
-
+            self._updateRow(model, index)
             return True
 
         return False
@@ -285,23 +287,33 @@ class HDFDataNode(HDFNode):
         self.slice = None
 
         k = ds.dtype.kind
-        self.valid = False
         if k in ('b', 'i', 'u', 'f'):
             self.datatype = _('Numeric')
-            self.valid = True
+            self.datatypevalid = True
             self.numeric = True
         elif k in ('S', 'a'):
             self.datatype = _('Text')
-            self.valid = True
+            self.datatypevalid = True
         elif k == 'O' and h5py.check_dtype(vlen=ds.dtype):
             self.datatype = _('Text')
-            self.valid = True
+            self.datatypevalid = True
         else:
             self.datatype = _('Unsupported')
+            self.datatypevalid = False
 
-        # currently only 1D or 2D
-        if len(self.shape) not in (1, 2):
-            self.valid = False
+    def dimsOkForImport(self):
+        """Are dimensions ok to import?
+        Need to count dimensions where slice is not fixed
+        """
+        shape = list(self.shape)
+        if self.slice:
+            shapei = 0
+            for s in self.slice:
+                if isinstance(s, int):
+                    del shape[shapei]
+                else:
+                    shapei += 1
+        return len(shape) in (1, 2)
 
     def data(self, column, role):
         """Return data for column"""
@@ -336,16 +348,18 @@ class HDFDataNode(HDFNode):
                 return _('Slice data to create a subset to import.\n'
                          'This should be ranges for each dimension\n'
                          'separated by commas.\n'
-                         'Ranges can be empty (:), half (:10)\n'
-                         ' or full (4:10) or with steps (1:10:2)\n'
+                         'Ranges can be empty (:), half (:10),\n'
+                         ' full (4:10), with steps (1:10:2)\n'
+                         ' or negative steps (::-1).\n'
                          'Example syntax: 2:20\n'
                          '   :10,:,2:20\n'
                          '   1:10:5,::5')
 
         elif role == qt4.Qt.CheckStateRole and column == _ColToImport:
-            return ( qt4.Qt.Checked
-                     if self.toimport or self.grpImport()
-                     else qt4.Qt.Unchecked )
+            if ( (self.toimport or self.grpImport()) and
+                 self.dimsOkForImport() ):
+                return qt4.Qt.Checked
+            return qt4.Qt.Unchecked
         return None
 
     def setData(self, model, index, value, role):
@@ -357,12 +371,7 @@ class HDFDataNode(HDFNode):
             if not self.toimport:
                 self.importname = ''
 
-            # this is messy - inform view that this row has changed
-            par = model.parent(index)
-            row = index.row()
-            idx1 = model.index(row, 0, par)
-            idx2 = model.index(row, model.columnCount(index)-1, par)
-            model.dataChanged.emit(idx1, idx2)
+            self._updateRow(model, index)
             return True
 
         elif column == _ColImportName and (self.toimport or self.grpImport()):
@@ -374,19 +383,24 @@ class HDFDataNode(HDFNode):
             slice = convertTextToSlice(value, len(self.shape))
             if slice != -1:
                 self.slice = slice
+                self._updateRow(model, index)
                 return True
 
         return False
 
     def flags(self, column, defflags):
 
-        if column == _ColToImport and self.valid and not self.grpImport():
+        if ( column == _ColToImport and self.datatypevalid and
+             not self.grpImport() and self.dimsOkForImport() ):
             # allow import column to be clicked
             defflags |= qt4.Qt.ItemIsUserCheckable
-        if ((column == _ColImportName or column == _ColSlice)
-            and self.toimport) or self.grpImport():
+        elif ( column == _ColImportName and (self.toimport or self.grpImport())
+               and self.dimsOkForImport() ):
+            defflags |= qt4.Qt.ItemIsEditable
+        elif column == _ColSlice and self.datatypevalid:
             # allow name to be edited
             defflags |= qt4.Qt.ItemIsEditable
+
         return defflags
 
 class ImportNameDeligate(qt4.QItemDelegate):
