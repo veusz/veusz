@@ -20,85 +20,11 @@ from __future__ import division, print_function
 
 from .. import qtall as qt4
 from ..dialogs import importdialog
-from ..compat import crange
+from ..compat import crange, cstr
 from . import defn_hdf5
 
 def _(text, disambiguation=None, context="Import_HDF5"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
-
-def convertTextToSlice(slicetxt, numdims):
-    """Convert a value like 0:1:3,:,::-1 to a tuple slice
-    ((0,1,3), (None, None, None), (None, None, -1))
-    or reduce dimensions such as :,3 -> ((None,None,None),3)
-
-    Also checks number of dimensions (including reduced) is numdims.
-
-    Return -1 on error
-    """
-
-    slicearray = slicetxt.split(',')
-    if len(slicearray) != numdims:
-        # slice needs same dimensions as data
-        return -1
-
-    allsliceout = []
-    for sliceap_idx, sliceap in enumerate(slicearray):
-        sliceparts = sliceap.strip().split(':')
-
-        if len(sliceparts) == 1:
-            # reduce dimensions with single index
-            try:
-                allsliceout.append(int(sliceparts[0]))
-            except ValueError:
-                # invalid index
-                return -1
-        elif len(sliceparts) not in (2, 3):
-            return -1
-        else:
-            sliceout = []
-            for p in sliceparts:
-                p = p.strip()
-                if not p:
-                    sliceout.append(None)
-                else:
-                    try:
-                        sliceout.append(int(p))
-                    except ValueError:
-                        return -1
-            if len(sliceout) == 2:
-                sliceout.append(None)
-            allsliceout.append(tuple(sliceout))
-
-    allempty = True
-    for s in allsliceout:
-        if s != (None, None, None):
-            allempty = False
-    if allempty:
-        return None
-
-    return tuple(allsliceout)
-
-def convertSliceToText(slice):
-    """Convert tuple slice into text."""
-    if slice is None:
-        return ''
-    out = []
-    for spart in slice:
-        if isinstance(spart, int):
-            # single index
-            out.append(str(spart))
-            continue
-
-        sparttxt = []
-        for p in spart:
-            if p is not None:
-                sparttxt.append(str(p))
-            else:
-                sparttxt.append('')
-        if sparttxt[-1] == '':
-            del sparttxt[-1]
-        out.append(':'.join(sparttxt))
-    return ', '.join(out)
 
 # lazily imported
 h5py = None
@@ -286,6 +212,11 @@ class HDFDataNode(HDFNode):
         self.numeric = False
         self.slice = None
 
+        # override import name
+        self.defimportname = None
+        if "vz_name" in ds.attrs:
+            self.defimportname = cstr(ds.attrs["vz_name"])
+
         k = ds.dtype.kind
         if k in ('b', 'i', 'u', 'f'):
             self.datatype = _('Numeric')
@@ -329,10 +260,12 @@ class HDFDataNode(HDFNode):
                 if role == qt4.Qt.EditRole and not self.importname:
                     return self.name
                 else:
+                    if self.defimportname is not None:
+                        return self.defimportname
                     return self.importname
 
             elif column == _ColSlice:
-                return convertSliceToText(self.slice)
+                return defn_hdf5.convertSliceToText(self.slice)
 
         elif role == qt4.Qt.ToolTipRole:
             if column == _ColName:
@@ -380,7 +313,7 @@ class HDFDataNode(HDFNode):
             return True
 
         elif column == _ColSlice:
-            slice = convertTextToSlice(value, len(self.shape))
+            slice = defn_hdf5.convertTextToSlice(value, len(self.shape))
             if slice != -1:
                 self.slice = slice
                 self._updateRow(model, index)

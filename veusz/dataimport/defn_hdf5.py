@@ -38,6 +38,83 @@ def inith5py():
             "Cannot load Python h5py module. "
             "Please install before loading documents using HDF5 data.")
 
+def convertTextToSlice(slicetxt, numdims):
+    """Convert a value like 0:1:3,:,::-1 to a tuple slice
+    ((0,1,3), (None, None, None), (None, None, -1))
+    or reduce dimensions such as :,3 -> ((None,None,None),3)
+
+    Also checks number of dimensions (including reduced) is numdims.
+
+    Return -1 on error
+    """
+
+    if slicetxt.strip() == '':
+        return None
+
+    slicearray = slicetxt.split(',')
+    if len(slicearray) != numdims:
+        # slice needs same dimensions as data
+        return -1
+
+    allsliceout = []
+    for sliceap_idx, sliceap in enumerate(slicearray):
+        sliceparts = sliceap.strip().split(':')
+
+        if len(sliceparts) == 1:
+            # reduce dimensions with single index
+            try:
+                allsliceout.append(int(sliceparts[0]))
+            except ValueError:
+                # invalid index
+                return -1
+        elif len(sliceparts) not in (2, 3):
+            return -1
+        else:
+            sliceout = []
+            for p in sliceparts:
+                p = p.strip()
+                if not p:
+                    sliceout.append(None)
+                else:
+                    try:
+                        sliceout.append(int(p))
+                    except ValueError:
+                        return -1
+            if len(sliceout) == 2:
+                sliceout.append(None)
+            allsliceout.append(tuple(sliceout))
+
+    allempty = True
+    for s in allsliceout:
+        if s != (None, None, None):
+            allempty = False
+    if allempty:
+        return None
+
+    return tuple(allsliceout)
+
+def convertSliceToText(slice):
+    """Convert tuple slice into text."""
+    if slice is None:
+        return ''
+    out = []
+    for spart in slice:
+        if isinstance(spart, int):
+            # single index
+            out.append(str(spart))
+            continue
+
+        sparttxt = []
+        for p in spart:
+            if p is not None:
+                sparttxt.append(str(p))
+            else:
+                sparttxt.append('')
+        if sparttxt[-1] == '':
+            del sparttxt[-1]
+        out.append(':'.join(sparttxt))
+    return ', '.join(out)
+
 class ImportParamsHDF5(base.ImportParamsBase):
     """HDF5 file import parameters.
 
@@ -91,6 +168,7 @@ def convertDataset(data, slices):
     """Convert dataset to suitable data for veusz.
     Raise RuntimeError if cannot."""
 
+    name = data.name
     if slices:
         # build up list of slice objects and apply to data
         slist = []
@@ -113,20 +191,20 @@ def convertDataset(data, slices):
         data = N.array(data, dtype=N.float64)
         if len(data.shape) > 2:
             raise _ConvertError(_("HDF5 dataset %s has more than"
-                                  " 2 dimensions" % data.name))
+                                  " 2 dimensions" % name))
         return data
 
     elif kind in ('S', 'a') or (
         kind == 'O' and h5py.check_dtype(vlen=data.dtype)):
         if len(data.shape) != 1:
             raise _ConvertError(_("HDF5 dataset %s has more than"
-                                  " 1 dimension" % data.name))
+                                  " 1 dimension" % name))
 
         strcnv = list(data)
         return strcnv
 
     raise _ConvertError(_("HDF5 dataset %s has an invalid type" %
-                          data.name))
+                          name))
 
 class OperationDataImportHDF5(base.OperationDataImportBase):
     """Import 1d or 2d data from a fits file."""
@@ -141,12 +219,24 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 item.name in self.params.namemap ):
                 name = self.params.namemap[item.name]
             else:
-                name = item.name.split("/")[-1].strip()
+                if "vz_name" in item.attrs:
+                    # override
+                    name = item.attrs["vz_name"]
+                else:
+                    name = item.name.split("/")[-1].strip()
+
             if name in dsread:
                 name = item.name.strip()
             try:
-                dsread[name] = convertDataset(
-                    item, self.params.slices.get(item.name))
+                aslice = None
+                if "vz_slice" in item.attrs:
+                    s = convertTextToSlice(item.attrs["vz_slice"],
+                                           item.shape)
+                    if s != -1:
+                        aslice = s
+                if self.params.slices and item.name in self.params.slices:
+                    aslice = self.params.slices[item.name]
+                dsread[name] = convertDataset(item, aslice)
             except _ConvertError:
                 pass
         elif isinstance(item, h5py.Group):
@@ -280,6 +370,10 @@ def ImportFileHDF5(comm, filename,
     where the entries are integers or None.
 
     linked specfies that the dataset is linked to the file
+
+    Attributes can be used in datasets to override defaults:
+     'vz_name': set to override name for dataset in veusz
+     'vz_slice': slice on importing (use format "start:stop:step,...")
     """
 
     # lookup filename
