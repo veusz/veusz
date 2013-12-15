@@ -26,6 +26,80 @@ from . import defn_hdf5
 def _(text, disambiguation=None, context="Import_HDF5"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+def convertTextToSlice(slicetxt, numdims):
+    """Convert a value like 0:1:3,:,::-1 to a tuple slice
+    ((0,1,3), (None, None, None), (None, None, -1))
+    or reduce dimensions such as :,3 -> ((None,None,None),3)
+
+    Also checks number of dimensions (including reduced) is numdims.
+
+    Return -1 on error
+    """
+
+    slicearray = slicetxt.split(',')
+    if len(slicearray) != numdims:
+        # slice needs same dimensions as data
+        return -1
+
+    allsliceout = []
+    for sliceap_idx, sliceap in enumerate(slicearray):
+        sliceparts = sliceap.strip().split(':')
+
+        if len(sliceparts) == 1:
+            # reduce dimensions with single index
+            try:
+                allsliceout.append(int(sliceparts[0]))
+            except ValueError:
+                # invalid index
+                return -1
+        elif len(sliceparts) not in (2, 3):
+            return -1
+        else:
+            sliceout = []
+            for p in sliceparts:
+                p = p.strip()
+                if not p:
+                    sliceout.append(None)
+                else:
+                    try:
+                        sliceout.append(int(p))
+                    except ValueError:
+                        return -1
+            if len(sliceout) == 2:
+                sliceout.append(None)
+            allsliceout.append(tuple(sliceout))
+
+    allempty = True
+    for s in allsliceout:
+        if s != (None, None, None):
+            allempty = False
+    if allempty:
+        return None
+
+    return tuple(allsliceout)
+
+def convertSliceToText(slice):
+    """Convert tuple slice into text."""
+    if slice is None:
+        return ''
+    out = []
+    for spart in slice:
+        if isinstance(spart, int):
+            # single index
+            out.append(str(spart))
+            continue
+
+        sparttxt = []
+        for p in spart:
+            if p is not None:
+                sparttxt.append(str(p))
+            else:
+                sparttxt.append('')
+        if sparttxt[-1] == '':
+            del sparttxt[-1]
+        out.append(':'.join(sparttxt))
+    return ', '.join(out)
+
 # lazily imported
 h5py = None
 
@@ -124,6 +198,7 @@ _ColDataType = 1
 _ColShape = 2
 _ColToImport = 3
 _ColImportName = 4
+_ColSlice = 5
 
 class HDFNode(Node):
     def grpImport(self):
@@ -185,6 +260,7 @@ class HDFGroupNode(HDFNode):
             model.dataChanged.emit(idx1, idx2)
 
             return True
+
         return False
 
     def flags(self, column, defflags):
@@ -206,6 +282,7 @@ class HDFDataNode(HDFNode):
         self.toimport = False
         self.importname = ""
         self.numeric = False
+        self.slice = None
 
         k = ds.dtype.kind
         self.valid = False
@@ -242,6 +319,9 @@ class HDFDataNode(HDFNode):
                 else:
                     return self.importname
 
+            elif column == _ColSlice:
+                return convertSliceToText(self.slice)
+
         elif role == qt4.Qt.ToolTipRole:
             if column == _ColName:
                 return self.fullname
@@ -252,6 +332,15 @@ class HDFDataNode(HDFNode):
             elif column == _ColImportName and not self.grpImport():
                 return _('Name to assign after import.\nSpecial suffixes '
                          '(+), (-), (+-) and (1D) can be used.')
+            elif column == _ColSlice:
+                return _('Slice data to create a subset to import.\n'
+                         'This should be ranges for each dimension\n'
+                         'separated by commas.\n'
+                         'Ranges can be empty (:), half (:10)\n'
+                         ' or full (4:10) or with steps (1:10:2)\n'
+                         'Example syntax: 2:20\n'
+                         '   :10,:,2:20\n'
+                         '   1:10:5,::5')
 
         elif role == qt4.Qt.CheckStateRole and column == _ColToImport:
             return ( qt4.Qt.Checked
@@ -274,13 +363,19 @@ class HDFDataNode(HDFNode):
             idx1 = model.index(row, 0, par)
             idx2 = model.index(row, model.columnCount(index)-1, par)
             model.dataChanged.emit(idx1, idx2)
-
             return True
 
         elif column == _ColImportName and (self.toimport or self.grpImport()):
             # update name if changed
             self.importname = value
             return True
+
+        elif column == _ColSlice:
+            slice = convertTextToSlice(value, len(self.shape))
+            if slice != -1:
+                self.slice = slice
+                return True
+
         return False
 
     def flags(self, column, defflags):
@@ -288,8 +383,9 @@ class HDFDataNode(HDFNode):
         if column == _ColToImport and self.valid and not self.grpImport():
             # allow import column to be clicked
             defflags |= qt4.Qt.ItemIsUserCheckable
-        if (column == _ColImportName and self.toimport) or self.grpImport():
-            # allow name to be clicked
+        if ((column == _ColImportName or column == _ColSlice)
+            and self.toimport) or self.grpImport():
+            # allow name to be edited
             defflags |= qt4.Qt.ItemIsEditable
         return defflags
 
@@ -326,6 +422,10 @@ class ImportNameDeligate(qt4.QItemDelegate):
                 out.append(
                     ('%s (-)' % name,
                      _("Import as negative error bar for '%s'" % name)) )
+            elif len(dn.shape) == 2 and dn.shape[1] in (2, 3):
+                out.append(
+                    ('%s (1D)' % name,
+                     _("Import at 1D dataset with error bars")) )
 
         out.sort()
 
@@ -433,7 +533,7 @@ class ImportTabHDF5(importdialog.ImportTab):
         mod = GenericTreeModel(
             self, self.rootnode,
             [_('Name'), _('Type'), _('Size'), _('Import'),
-             _('Import as'), _('Options')])
+             _('Import as'), _('Slice')])
         self.hdftreeview.setModel(mod)
         self.hdftreeview.expandAll()
 
@@ -443,10 +543,13 @@ class ImportTabHDF5(importdialog.ImportTab):
         """Import file."""
 
         namemap = {}
+        slices = {}
         for node in self.datanodes:
             inname = node.importname.strip()
             if inname:
                 namemap[node.fullname] = inname
+            if node.slice:
+                slices[node.fullname] = node.slice
 
         items = []
         def recursiveitems(node):
@@ -467,6 +570,7 @@ class ImportTabHDF5(importdialog.ImportTab):
             filename=filename,
             items=items,
             namemap=namemap,
+            slices=slices,
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,

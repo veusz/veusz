@@ -45,11 +45,13 @@ class ImportParamsHDF5(base.ImportParamsBase):
     Additional parameters:
      items: list of datasets and items to import
      namemap: map hdf datasets to veusz names
+     none: dict to map objects to slices
     """
 
     defaults = {
         'items': None,
         'namemap': None,
+        'slices': None,
         }
     defaults.update(base.ImportParamsBase.defaults)
 
@@ -63,14 +65,19 @@ class LinkedFileHDF5(base.LinkedFileBase):
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
 
+        def reprdict(d):
+            """Reproducable repr for dict (alphabetical)."""
+            v = [ "%s: %s" % (crepr(k), crepr(d[k]))
+                  for k in sorted(d) ]
+            return "{%s}" % " ".join(v)
+
         p = self.params
         args = [ crepr(self._getSaveFilename(relpath)),
                  crepr(p.items) ]
         if p.namemap:
-            # sorted to ensure ordering in dict here
-            nmap = [ "%s: %s" % (crepr(k), crepr(p.namemap[k]))
-                     for k in sorted(p.namemap) ]
-            args.append("namemap={%s}" % ", ".join(nmap))
+            args.append("namemap=%s" % reprdict(p.namemap))
+        if p.slices:
+            args.append("slices=%s" % reprdict(p.slices))
         if p.prefix:
             args.append("prefix=%s" % crepr(p.prefix))
         if p.suffix:
@@ -81,9 +88,26 @@ class LinkedFileHDF5(base.LinkedFileBase):
 class _ConvertError(RuntimeError):
     pass
 
-def convertDataset(data):
+def convertDataset(data, slices):
     """Convert dataset to suitable data for veusz.
     Raise RuntimeError if cannot."""
+
+    if slices:
+        # build up list of slice objects and apply to data
+        slist = []
+        for s in slices:
+            if isinstance(s, int):
+                slist.append(s)
+            else:
+                slist.append(slice(*s))
+                if s[2] < 0:
+                    # negative slicing doesn't work in h5py, so we
+                    # make a copy
+                    data = N.array(data)
+        try:
+            data = data[tuple(slist)]
+        except (ValueError, IndexError):
+            data = N.array([], dtype=N.float64)
 
     kind = data.dtype.kind
     if kind in ('b', 'i', 'u', 'f'):
@@ -114,14 +138,16 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         """Walk an hdf file, adding datasets to dsread."""
 
         if isinstance(item, h5py.Dataset):
-            if item.name in self.params.namemap:
+            if (self.params.namemap is not None and
+                item.name in self.params.namemap ):
                 name = self.params.namemap[item.name]
             else:
                 name = item.name.split("/")[-1].strip()
             if name in dsread:
                 name = item.name.strip()
             try:
-                dsread[name] = convertDataset(item)
+                dsread[name] = convertDataset(
+                    item, self.params.slices.get(item.name))
             except _ConvertError:
                 pass
         elif isinstance(item, h5py.Group):
@@ -194,7 +220,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     minlen = min([len(d) for d in cvalues(args)
                                   if d is not None])
                     for a in list(ckeys(args)):
-                        if a is not None and len(a) > minlen:
+                        if args[a] is not None and len(args[a]) > minlen:
                             args[a] = args[a][:minlen]
 
                     args['linked'] = linkedfile
@@ -230,6 +256,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 def ImportFileHDF5(comm, filename,
                    items,
                    namemap=None,
+                   slices=None,
                    prefix='', suffix='',
                    linked=False):
     """Import data from a HDF5 file
@@ -247,6 +274,12 @@ def ImportFileHDF5(comm, filename,
     'foo (1D)': import 2D dataset as 1D dataset with errors
       (for Nx2 or Nx3 datasets)
 
+    slices is an optional dict specifying slices to be selected when
+    importing. For each dataset to be sliced, provide a tuple of
+    values, one for each dimension. The values should be a single
+    integer to select that index, or a tuple (start, stop, step),
+    where the entries are integers or None.
+
     linked specfies that the dataset is linked to the file
     """
 
@@ -256,6 +289,7 @@ def ImportFileHDF5(comm, filename,
         filename=realfilename,
         items=items,
         namemap=namemap,
+        slices=slices,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImportHDF5(params)
