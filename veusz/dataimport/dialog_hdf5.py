@@ -483,6 +483,8 @@ class ImportTabHDF5(importdialog.ImportTab):
              _('Import as'), _('Slice')])
         self.hdftreeview.setModel(mod)
         self.hdftreeview.expandAll()
+        for c in _ColName, _ColDataType, _ColShape:
+            self.hdftreeview.resizeColumnToContents(c)
 
         return True
 
