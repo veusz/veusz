@@ -112,27 +112,17 @@ class ImportDialog(VeuszDialog):
                 w = ImportTabPlugins(self, promote=p.name)
                 self.methodtab.addTab(w, p.promote_tab)
 
-        self.connect( self.methodtab, qt4.SIGNAL('currentChanged(int)'),
-                      self.slotUpdatePreview )
+        self.methodtab.currentChanged.connect(self.slotUpdatePreview)
+        self.browsebutton.clicked.connect(self.slotBrowseClicked)
+        self.filenameedit.editTextChanged.connect(self.slotUpdatePreview)
 
-        self.connect(self.browsebutton, qt4.SIGNAL('clicked()'),
-                     self.slotBrowseClicked)
+        self.importbutton = self.buttonBox.addButton(
+            _("&Import"), qt4.QDialogButtonBox.ApplyRole)
+        self.importbutton.clicked.connect(self.slotImport)
 
-        self.connect( self.filenameedit,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.slotUpdatePreview )
-
-        self.importbutton = self.buttonBox.addButton(_("&Import"),
-                                                     qt4.QDialogButtonBox.ApplyRole)
-        self.connect( self.importbutton, qt4.SIGNAL('clicked()'),
-                      self.slotImport)
-
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
-                      qt4.SIGNAL('clicked()'), self.slotReset )
-
-        self.connect( self.encodingcombo,
-                      qt4.SIGNAL('currentIndexChanged(int)'),
-                      self.slotUpdatePreview )
+        self.buttonBox.button(qt4.QDialogButtonBox.Reset).clicked.connect(
+            self.slotReset)
+        self.encodingcombo.currentIndexChanged.connect(self.slotUpdatePreview)
 
         # change to tab last used
         self.methodtab.setCurrentIndex(
@@ -158,10 +148,9 @@ class ImportDialog(VeuszDialog):
 
         # load icon for clipboard
         self.clipbutton.setIcon( utils.getIcon('kde-clipboard') )
-        self.connect(qt4.QApplication.clipboard(), qt4.SIGNAL('dataChanged()'),
-                     self.updateClipPreview)
-        self.connect(
-            self.clipbutton, qt4.SIGNAL("clicked()"), self.slotClipButtonClicked)
+        qt4.QApplication.clipboard().dataChanged.connect(
+            self.updateClipPreview)
+        self.clipbutton.clicked.connect(self.slotClipButtonClicked)
         self.updateClipPreview()
 
     def slotBrowseClicked(self):
