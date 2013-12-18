@@ -201,12 +201,14 @@ class HDFGroupNode(HDFNode):
         return defflags
 
 class HDFDataNode(HDFNode):
-    def __init__(self, parent, ds):
+    """Represent an HDF dataset."""
+
+    def __init__(self, parent, dsname, dsattrs, dsdtype, dsshape):
         Node.__init__(self, parent)
-        self.name = ds.name.split("/")[-1]
-        self.fullname = ds.name
-        self.rawdatatype = str(ds.dtype)
-        self.shape = ds.shape
+        self.name = dsname.split("/")[-1]
+        self.fullname = dsname
+        self.rawdatatype = str(dsdtype)
+        self.shape = tuple(list(dsshape) + list(dsdtype.shape))
         self.toimport = False
         self.importname = ""
         self.numeric = False
@@ -214,10 +216,10 @@ class HDFDataNode(HDFNode):
 
         # override import name
         self.defimportname = None
-        if "vz_name" in ds.attrs:
-            self.defimportname = cstr(ds.attrs["vz_name"])
+        if "vz_name" in dsattrs:
+            self.defimportname = cstr(dsattrs["vz_name"])
 
-        k = ds.dtype.kind
+        k = dsdtype.kind
         if k in ('b', 'i', 'u', 'f'):
             self.datatype = _('Numeric')
             self.datatypevalid = True
@@ -225,7 +227,7 @@ class HDFDataNode(HDFNode):
         elif k in ('S', 'a'):
             self.datatype = _('Text')
             self.datatypevalid = True
-        elif k == 'O' and h5py.check_dtype(vlen=ds.dtype):
+        elif k == 'O' and h5py.check_dtype(vlen=dsdtype):
             self.datatype = _('Text')
             self.datatypevalid = True
         else:
@@ -336,6 +338,35 @@ class HDFDataNode(HDFNode):
 
         return defflags
 
+class HDFCompoundNode(HDFGroupNode):
+    """Node representing a table (Compound data type)."""
+
+    def __init__(self, parent, ds):
+        HDFGroupNode.__init__(self, parent, ds)
+        self.shape = ds.shape
+
+    def data(self, column, role):
+        """Return data for column"""
+        if role == qt4.Qt.DisplayRole:
+            if column == _ColDataType:
+                return _("Table")
+            elif column == _ColShape:
+                return u'\u00d7'.join([str(x) for x in self.shape])
+        return HDFGroupNode.data(self, column, role)
+
+class HDFCompoundSubNode(HDFDataNode):
+    """Sub-data of compound table."""
+
+    def __init__(self, parent, ds, name):
+        attrs = {}
+        for a in ds.attrs:
+            # attributes with _dsname suffixes are copied
+            if a[:3] == "vz_" and a[-len(name)-1:] == "_"+name:
+                attrs[a[:-len(name)-1]] = ds.attrs[a]
+
+        HDFDataNode.__init__(self, parent, ds.name + '/' + name,
+                             attrs, ds.dtype[name], ds.shape)
+
 class ImportNameDeligate(qt4.QItemDelegate):
     """This class is for choosing the import name."""
 
@@ -429,8 +460,20 @@ def constructTree(hdf5file):
                 childnode = HDFGroupNode(parent, hchild)
                 addsub(childnode, hchild)
             elif isinstance(hchild, h5py.Dataset):
-                childnode = HDFDataNode(parent, hchild)
-                datanodes.append(childnode)
+                if hchild.dtype.kind == 'V':
+                    # compound data type - add a special group for
+                    # the compound, then its children
+                    childnode = HDFCompoundNode(parent, hchild)
+
+                    for field in list(hchild.dtype.fields.keys()):
+                        fnode = HDFCompoundSubNode(childnode, hchild, field)
+                        childnode.children.append(fnode)
+                        datanodes.append(fnode)
+
+                else:
+                    childnode = HDFDataNode(parent, hchild.name, hchild.attrs,
+                                            hchild.dtype, hchild.shape)
+                    datanodes.append(childnode)
             parent.children.append(childnode)
 
     root = HDFGroupNode(None, hdf5file)
