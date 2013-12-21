@@ -38,6 +38,18 @@ def inith5py():
             "Cannot load Python h5py module. "
             "Please install before loading documents using HDF5 data.")
 
+def filterAttrsByName(attrs, name):
+    """For compound datasets, attributes can be given on a per-column basis.
+    This filters the attributes by the column name."""
+
+    name = name.strip()
+    attrsout = {}
+    for a in attrs:
+        # attributes with _dsname suffixes are copied
+        if a[:3] == "vz_" and a[-len(name)-1:] == "_"+name:
+            attrsout[a[:-len(name)-1]] = attrs[a]
+    return attrsout
+
 def convertTextToSlice(slicetxt, numdims):
     """Convert a value like 0:1:3,:,::-1 to a tuple slice
     ((0,1,3), (None, None, None), (None, None, -1))
@@ -115,6 +127,48 @@ def convertSliceToText(slice):
         out.append(':'.join(sparttxt))
     return ', '.join(out)
 
+def applySlices(data, slices):
+    """Given hdf/numpy dataset, apply slicing tuple to it and return data."""
+    slist = []
+    for s in slices:
+        if isinstance(s, int):
+            slist.append(s)
+        else:
+            slist.append(slice(*s))
+            if s[2] < 0:
+                # negative slicing doesn't work in h5py, so we
+                # make a copy
+                data = N.array(data)
+    try:
+        data = data[tuple(slist)]
+    except (ValueError, IndexError):
+        data = N.array([], dtype=N.float64)
+    return data
+
+def convertDatasetToObject(data, slices):
+    """Convert numpy/hdf dataset to suitable data for veusz.
+    Raise _ConvertError if cannot."""
+
+    if slices:
+        data = applySlices(data, slices)
+
+    kind = data.dtype.kind
+    if kind in ('b', 'i', 'u', 'f'):
+        data = N.array(data, dtype=N.float64)
+        if len(data.shape) > 2:
+            raise _ConvertError(_("HDF5 dataset has more than 2 dimensions"))
+        return data
+
+    elif kind in ('S', 'a') or (
+        kind == 'O' and h5py.check_dtype(vlen=data.dtype)):
+        if len(data.shape) != 1:
+            raise _ConvertError(_("HDF5 dataset has more than 1 dimension"))
+
+        strcnv = list(data)
+        return strcnv
+
+    raise _ConvertError(_("HDF5 dataset has an invalid type"))
+
 class ImportParamsHDF5(base.ImportParamsBase):
     """HDF5 file import parameters.
 
@@ -164,81 +218,52 @@ class LinkedFileHDF5(base.LinkedFileBase):
 class _ConvertError(RuntimeError):
     pass
 
-def convertDataset(data, slices):
-    """Convert dataset to suitable data for veusz.
-    Raise RuntimeError if cannot."""
-
-    name = data.name
-    if slices:
-        # build up list of slice objects and apply to data
-        slist = []
-        for s in slices:
-            if isinstance(s, int):
-                slist.append(s)
-            else:
-                slist.append(slice(*s))
-                if s[2] < 0:
-                    # negative slicing doesn't work in h5py, so we
-                    # make a copy
-                    data = N.array(data)
-        try:
-            data = data[tuple(slist)]
-        except (ValueError, IndexError):
-            data = N.array([], dtype=N.float64)
-
-    kind = data.dtype.kind
-    if kind in ('b', 'i', 'u', 'f'):
-        data = N.array(data, dtype=N.float64)
-        if len(data.shape) > 2:
-            raise _ConvertError(_("HDF5 dataset %s has more than"
-                                  " 2 dimensions" % name))
-        return data
-
-    elif kind in ('S', 'a') or (
-        kind == 'O' and h5py.check_dtype(vlen=data.dtype)):
-        if len(data.shape) != 1:
-            raise _ConvertError(_("HDF5 dataset %s has more than"
-                                  " 1 dimension" % name))
-
-        strcnv = list(data)
-        return strcnv
-
-    raise _ConvertError(_("HDF5 dataset %s has an invalid type" %
-                          name))
-
 class OperationDataImportHDF5(base.OperationDataImportBase):
     """Import 1d or 2d data from a fits file."""
 
     descr = _("import HDF5 file")
 
+    def readDataset(self, dataset, dsattrs, dsname, dsread):
+        """Given hdf5 dataset, its attributes and name, get data and
+        set it in dict dsread."""
+
+        if (self.params.namemap is not None and
+            dsname in self.params.namemap ):
+            name = self.params.namemap[dsname]
+        else:
+            if "vz_name" in dsattrs:
+                # override
+                name = dsattrs["vz_name"]
+            else:
+                name = dsname.split("/")[-1].strip()
+
+        if name in dsread:
+            name = dsname.strip()
+        try:
+            aslice = None
+            if "vz_slice" in dsattrs:
+                s = convertTextToSlice(dsattrs["vz_slice"],
+                                       dataset.shape)
+                if s != -1:
+                    aslice = s
+            if self.params.slices and dsname in self.params.slices:
+                aslice = self.params.slices[dsname]
+            dsread[name] = convertDatasetToObject(dataset, aslice)
+        except _ConvertError:
+            pass
+
     def walkFile(self, item, dsread):
         """Walk an hdf file, adding datasets to dsread."""
 
         if isinstance(item, h5py.Dataset):
-            if (self.params.namemap is not None and
-                item.name in self.params.namemap ):
-                name = self.params.namemap[item.name]
+            if item.dtype.kind == 'V':
+                # compound dataset - walk columns
+                for name in item.dtype.names:
+                    attrs = filterAttrsByName(item.attrs, name)
+                    self.readDataset(item[name], attrs, item.name+"/"+name, dsread)
             else:
-                if "vz_name" in item.attrs:
-                    # override
-                    name = item.attrs["vz_name"]
-                else:
-                    name = item.name.split("/")[-1].strip()
+                self.readDataset(item, item.attrs, item.name, dsread)
 
-            if name in dsread:
-                name = item.name.strip()
-            try:
-                aslice = None
-                if "vz_slice" in item.attrs:
-                    s = convertTextToSlice(item.attrs["vz_slice"],
-                                           item.shape)
-                    if s != -1:
-                        aslice = s
-                if self.params.slices and item.name in self.params.slices:
-                    aslice = self.params.slices[item.name]
-                dsread[name] = convertDataset(item, aslice)
-            except _ConvertError:
-                pass
         elif isinstance(item, h5py.Group):
             for dsname in sorted(item.keys()):
                 try:
@@ -247,6 +272,25 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     # this does happen!
                     continue
                 self.walkFile(child, dsread)
+
+    def readDataFromFile(self):
+        """Read data from hdf5 file and return a dict of names to data."""
+
+        dsread = {}
+        with h5py.File(self.params.filename) as hdff:
+            for hi in self.params.items:
+                node = hdff
+                # lookup group/dataset in file
+                for namepart in [x for x in hi.split("/") if x != ""]:
+                    # using unicode column names does not work!
+                    try:
+                        namepart = str(namepart)
+                    except ValueError:
+                        pass
+                    node = node[namepart]
+
+                self.walkFile(node, dsread)
+        return dsread
 
     def collectErrorDatasets(self, dsread):
         """Identify error bar datasets and separate out.
@@ -273,72 +317,70 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
         return errordatasets
 
+    def numericDataToDataset(self, name, data, errordatasets):
+        """Convert numeric data to a veusz dataset."""
+
+        if len(data.shape) == 1:
+            # handle any possible error bars
+            args = { 'data': data,
+                     'serr': errordatasets[name]['+-'],
+                     'nerr': errordatasets[name]['-'],
+                     'perr': errordatasets[name]['+'] }
+
+            # find minimum length and cut down if necessary
+            minlen = min([len(d) for d in cvalues(args)
+                          if d is not None])
+            for a in list(ckeys(args)):
+                if args[a] is not None and len(args[a]) > minlen:
+                    args[a] = args[a][:minlen]
+
+            ds = document.Dataset(**args)
+
+        elif len(data.shape) == 2:
+            # 2D dataset
+            if name[-5:] == ' (1D)' and data.shape[1] in (2,3):
+                # actually a 1D dataset in disguise
+                name = name[:-5].strip()
+                if data.shape[1] == 2:
+                    ds = document.Dataset(data=data[:,0], serr=data[:,1])
+                else:
+                    ds = document.Dataset(
+                        data=data[:,0], perr=data[:,1], nerr=data[:,2])
+            else:
+                # this really is a 2D dataset
+                ds = document.Dataset2D(data)
+
+        return ds
+
     def doImport(self, doc):
         """Do the import."""
 
         inith5py()
-        p = self.params
+        par = self.params
 
-        # read the data
-        dsread = {}
-        with h5py.File(p.filename) as hdff:
-            for hi in p.items:
-                self.walkFile(hdff[hi], dsread)
+        dsread = self.readDataFromFile()
 
         # find datasets which are error datasets
         errordatasets = self.collectErrorDatasets(dsread)
 
-        if p.linked:
-            linkedfile = LinkedFileHDF5(p)
+        if par.linked:
+            linkedfile = LinkedFileHDF5(par)
         else:
             linkedfile = None
 
         # create the veusz output datasets
         for name, data in citems(dsread):
-            ds = None
             if isinstance(data, N.ndarray):
                 # numeric
-                if len(data.shape) == 1:
-                    # handle any possible error bars
-                    args = { 'data': data,
-                             'serr': errordatasets[name]['+-'],
-                             'nerr': errordatasets[name]['-'],
-                             'perr': errordatasets[name]['+'] }
-
-                    # find minimum length and cut down if necessary
-                    minlen = min([len(d) for d in cvalues(args)
-                                  if d is not None])
-                    for a in list(ckeys(args)):
-                        if args[a] is not None and len(args[a]) > minlen:
-                            args[a] = args[a][:minlen]
-
-                    args['linked'] = linkedfile
-                    ds = document.Dataset(**args)
-
-                elif len(data.shape) == 2:
-                    # 2D dataset
-                    if name[-5:] == ' (1D)' and data.shape[1] in (2,3):
-                        # actually a 1D dataset in disguise
-                        name = name[:-5].strip()
-                        if data.shape[1] == 2:
-                            ds = document.Dataset(
-                                data=data[:,0], serr=data[:,1],
-                                linked=linkedfile)
-                        else:
-                            ds = document.Dataset(
-                                data=data[:,0], perr=data[:,1], nerr=data[:,2],
-                                linked=linkedfile)
-                    else:
-                        # this really is a 2D dataset
-                        ds = document.Dataset2D(data)
-                        ds.linked = linkedfile
-
+                ds = self.numericDataToDataset(name, data, errordatasets)
             else:
                 # text dataset
-                ds = document.DatasetText(data, linked=linkedfile)
+                ds = document.DatasetText(data)
+
+            ds.linked = linkedfile
 
             # finally set dataset in document
-            fullname = p.prefix + name + p.suffix
+            fullname = par.prefix + name + par.suffix
             doc.setData(fullname, ds)
             self.outdatasets.append(fullname)
 
@@ -374,6 +416,10 @@ def ImportFileHDF5(comm, filename,
     Attributes can be used in datasets to override defaults:
      'vz_name': set to override name for dataset in veusz
      'vz_slice': slice on importing (use format "start:stop:step,...")
+
+    For compound datasets these attributes can be given on a
+    per-column basis using attribute names
+    vz_attributename_columnname.
     """
 
     # lookup filename

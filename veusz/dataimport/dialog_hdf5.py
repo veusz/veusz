@@ -358,12 +358,7 @@ class HDFCompoundSubNode(HDFDataNode):
     """Sub-data of compound table."""
 
     def __init__(self, parent, ds, name):
-        attrs = {}
-        for a in ds.attrs:
-            # attributes with _dsname suffixes are copied
-            if a[:3] == "vz_" and a[-len(name)-1:] == "_"+name:
-                attrs[a[:-len(name)-1]] = ds.attrs[a]
-
+        attrs = defn_hdf5.filterAttrsByName(ds.attrs, name)
         HDFDataNode.__init__(self, parent, ds.name + '/' + name,
                              attrs, ds.dtype[name], ds.shape)
 
