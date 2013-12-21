@@ -46,7 +46,7 @@ def filterAttrsByName(attrs, name):
     attrsout = {}
     for a in attrs:
         # attributes with _dsname suffixes are copied
-        if a[:3] == "vz_" and a[-len(name)-1:] == "_"+name:
+        if a[:4] == "vsz_" and a[-len(name)-1:] == "_"+name:
             attrsout[a[:-len(name)-1]] = attrs[a]
     return attrsout
 
@@ -182,6 +182,7 @@ class ImportParamsHDF5(base.ImportParamsBase):
         'items': None,
         'namemap': None,
         'slices': None,
+        'twodranges': None,
         }
     defaults.update(base.ImportParamsBase.defaults)
 
@@ -208,6 +209,8 @@ class LinkedFileHDF5(base.LinkedFileBase):
             args.append("namemap=%s" % reprdict(p.namemap))
         if p.slices:
             args.append("slices=%s" % reprdict(p.slices))
+        if p.twodranges:
+            args.append("twodranges=%s" % reprdict(p.twodranges))
         if p.prefix:
             args.append("prefix=%s" % crepr(p.prefix))
         if p.suffix:
@@ -218,6 +221,17 @@ class LinkedFileHDF5(base.LinkedFileBase):
 class _ConvertError(RuntimeError):
     pass
 
+class _DataRead:
+    """Data read from file during import.
+
+    This is so we can store the original name and options stored in
+    attributes from the file.
+    """
+    def __init__(self, origname, data, options):
+        self.origname = origname
+        self.data = data
+        self.options = options
+
 class OperationDataImportHDF5(base.OperationDataImportBase):
     """Import 1d or 2d data from a fits file."""
 
@@ -225,30 +239,45 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
     def readDataset(self, dataset, dsattrs, dsname, dsread):
         """Given hdf5 dataset, its attributes and name, get data and
-        set it in dict dsread."""
+        set it in dict dsread.
 
+        dsread maps names to _DataRead object
+        """
+
+        # find name for dataset
         if (self.params.namemap is not None and
             dsname in self.params.namemap ):
             name = self.params.namemap[dsname]
         else:
-            if "vz_name" in dsattrs:
-                # override
-                name = dsattrs["vz_name"]
+            if "vsz_name" in dsattrs:
+                # override name using attribute
+                name = dsattrs["vsz_name"]
             else:
                 name = dsname.split("/")[-1].strip()
-
         if name in dsread:
             name = dsname.strip()
+
+        # store options associated with dataset
+        options = {}
+        for a in ckeys(dsattrs):
+            if a[:4] == "vsz_":
+                options[a] = dsattrs[a]
+
         try:
+            # implement slicing
             aslice = None
-            if "vz_slice" in dsattrs:
-                s = convertTextToSlice(dsattrs["vz_slice"],
+            if "vsz_slice" in dsattrs:
+                s = convertTextToSlice(dsattrs["vsz_slice"],
                                        dataset.shape)
                 if s != -1:
                     aslice = s
             if self.params.slices and dsname in self.params.slices:
                 aslice = self.params.slices[dsname]
-            dsread[name] = convertDatasetToObject(dataset, aslice)
+
+            # finally return data
+            objdata = convertDatasetToObject(dataset, aslice)
+            dsread[name] = _DataRead(dsname, objdata, options)
+
         except _ConvertError:
             pass
 
@@ -301,7 +330,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         errordatasets = collections.defaultdict(
             lambda: collections.defaultdict(lambda: None))
         for name in list(ckeys(dsread)):
-            ds = dsread[name]
+            dr = dsread[name]
+            ds = dr.data
             if not isinstance(ds, N.ndarray) or len(ds.shape) != 1:
                 # skip non-numeric or 2d datasets
                 continue
@@ -317,9 +347,10 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
         return errordatasets
 
-    def numericDataToDataset(self, name, data, errordatasets):
+    def numericDataToDataset(self, name, dread, errordatasets):
         """Convert numeric data to a veusz dataset."""
 
+        data = dread.data
         if len(data.shape) == 1:
             # handle any possible error bars
             args = { 'data': data,
@@ -348,7 +379,21 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                         data=data[:,0], perr=data[:,1], nerr=data[:,2])
             else:
                 # this really is a 2D dataset
-                ds = document.Dataset2D(data)
+                # find any ranges
+                rangex = rangey = None
+
+                if "vsz_range" in dread.options:
+                    r = dread.options["vsz_range"]
+                    rangex = (r[0], r[2])
+                    rangey = (r[1], r[3])
+                if ( self.params.twodranges and
+                     dread.origname in self.params.twodranges ):
+                    r = self.params.twodranges[dread.origname]
+                    rangex = (r[0], r[2])
+                    rangey = (r[1], r[3])
+
+                # create the object
+                ds = document.Dataset2D(data, xrange=rangex, yrange=rangey)
 
         return ds
 
@@ -369,13 +414,13 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             linkedfile = None
 
         # create the veusz output datasets
-        for name, data in citems(dsread):
-            if isinstance(data, N.ndarray):
+        for name, dread in citems(dsread):
+            if isinstance(dread.data, N.ndarray):
                 # numeric
-                ds = self.numericDataToDataset(name, data, errordatasets)
+                ds = self.numericDataToDataset(name, dread, errordatasets)
             else:
                 # text dataset
-                ds = document.DatasetText(data)
+                ds = document.DatasetText(dread.data)
 
             ds.linked = linkedfile
 
@@ -388,6 +433,7 @@ def ImportFileHDF5(comm, filename,
                    items,
                    namemap=None,
                    slices=None,
+                   twodranges=None,
                    prefix='', suffix='',
                    linked=False):
     """Import data from a HDF5 file
@@ -411,15 +457,20 @@ def ImportFileHDF5(comm, filename,
     integer to select that index, or a tuple (start, stop, step),
     where the entries are integers or None.
 
+    twodranges is an optional dict giving data ranges for 2d
+    datasets. It maps names to (minx, miny, maxx, maxy).
+
     linked specfies that the dataset is linked to the file
 
     Attributes can be used in datasets to override defaults:
-     'vz_name': set to override name for dataset in veusz
-     'vz_slice': slice on importing (use format "start:stop:step,...")
+     'vsz_name': set to override name for dataset in veusz
+     'vsz_slice': slice on importing (use format "start:stop:step,...")
+     'vsz_range': should be 4 item array to specify x and y ranges:
+                  [minx, miny, maxx, maxy]
 
     For compound datasets these attributes can be given on a
     per-column basis using attribute names
-    vz_attributename_columnname.
+    vsz_attributename_columnname.
     """
 
     # lookup filename
@@ -429,6 +480,7 @@ def ImportFileHDF5(comm, filename,
         items=items,
         namemap=namemap,
         slices=slices,
+        twodranges=twodranges,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImportHDF5(params)
