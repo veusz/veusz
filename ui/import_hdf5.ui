@@ -25,6 +25,41 @@
     <widget class="QTreeView" name="hdftreeview"/>
    </item>
    <item>
+    <widget class="QGroupBox" name="hdfonedgrp">
+     <property name="title">
+      <string>1D options</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Import as date/time</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="hdfoneddate">
+        <item>
+         <property name="text">
+          <string>No</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Veusz format (seconds since start of 2009)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Unix format (seconds since start of 1970)</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="hdftwodgrp">
      <property name="title">
       <string>2D options</string>

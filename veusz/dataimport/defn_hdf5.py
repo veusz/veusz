@@ -176,7 +176,10 @@ class ImportParamsHDF5(base.ImportParamsBase):
     Additional parameters:
      items: list of datasets and items to import
      namemap: map hdf datasets to veusz names
-     none: dict to map objects to slices
+     slices: dict to map hdf names to slices
+     twodranges: map hdf names to 2d range (minx, miny, maxx, maxy)
+     twod_as_oned: set of hdf names to read 2d dataset as 1d dataset
+     convert_datetime: map float or strings to datetime
     """
 
     defaults = {
@@ -185,6 +188,7 @@ class ImportParamsHDF5(base.ImportParamsBase):
         'slices': None,
         'twodranges': None,
         'twod_as_oned': None,
+        'convert_datetime': None,
         }
     defaults.update(base.ImportParamsBase.defaults)
 
@@ -201,18 +205,11 @@ class LinkedFileHDF5(base.LinkedFileBase):
         p = self.params
         args = [ utils.rrepr(self._getSaveFilename(relpath)),
                  utils.rrepr(p.items) ]
-        if p.namemap:
-            args.append("namemap=%s" % utils.rrepr(p.namemap))
-        if p.slices:
-            args.append("slices=%s" % utils.rrepr(p.slices))
-        if p.twodranges:
-            args.append("twodranges=%s" % utils.rrepr(p.twodranges))
-        if p.twod_as_oned:
-            args.append("twod_as_oned=%s" % utils.rrepr(p.twod_as_oned))
-        if p.prefix:
-            args.append("prefix=%s" % utils.rrepr(p.prefix))
-        if p.suffix:
-            args.append("suffix=%s" % utils.rrepr(p.suffix))
+        for k in ('namemap', 'slices', 'twodranges', 'twod_as_oned',
+                  'convert_datetime',
+                  'prefix', 'suffix'):
+            if getattr(p, k):
+                args.append("%s=%s" % (k, utils.rrepr(getattr(p, k))) )
         args.append("linked=True")
         fileobj.write("ImportFileHDF5(%s)\n" % ", ".join(args))
 
@@ -349,21 +346,38 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         """Convert numeric data to a veusz dataset."""
 
         data = dread.data
+        print(dread.options)
+
         if len(data.shape) == 1:
-            # handle any possible error bars
-            args = { 'data': data,
-                     'serr': errordatasets[name]['+-'],
-                     'nerr': errordatasets[name]['-'],
-                     'perr': errordatasets[name]['+'] }
+            if ( (self.params.convert_datetime and
+                  dread.origname in self.params.convert_datetime) or
+                 "vsz_convert_datetime" in dread.options ):
 
-            # find minimum length and cut down if necessary
-            minlen = min([len(d) for d in cvalues(args)
-                          if d is not None])
-            for a in list(ckeys(args)):
-                if args[a] is not None and len(args[a]) > minlen:
-                    args[a] = args[a][:minlen]
+                try:
+                    mode = self.params.convert_datetime[dread.origname]
+                except (TypeError, KeyError):
+                    mode = dread.options["vsz_convert_datetime"]
 
-            ds = document.Dataset(**args)
+                if mode == 'unix':
+                    data = utils.floatUnixToVeusz(data)
+                ds = document.DatasetDateTime(data)
+
+            else:
+                # Standard 1D Import
+                # handle any possible error bars
+                args = { 'data': data,
+                         'serr': errordatasets[name]['+-'],
+                         'nerr': errordatasets[name]['-'],
+                         'perr': errordatasets[name]['+'] }
+
+                # find minimum length and cut down if necessary
+                minlen = min([len(d) for d in cvalues(args)
+                              if d is not None])
+                for a in list(ckeys(args)):
+                    if args[a] is not None and len(args[a]) > minlen:
+                        args[a] = args[a][:minlen]
+
+                ds = document.Dataset(**args)
 
         elif len(data.shape) == 2:
             # 2D dataset
@@ -437,6 +451,7 @@ def ImportFileHDF5(comm, filename,
                    slices=None,
                    twodranges=None,
                    twod_as_oned=None,
+                   convert_datetime=None,
                    prefix='', suffix='',
                    linked=False):
     """Import data from a HDF5 file
@@ -464,6 +479,8 @@ def ImportFileHDF5(comm, filename,
     twod_as_oned: optional set containing 2d datasets to attempt to
     read as 1d
 
+    convert_datetime should be a dict mapping to xxx.....
+
     linked specifies that the dataset is linked to the file.
 
     Attributes can be used in datasets to override defaults:
@@ -472,6 +489,11 @@ def ImportFileHDF5(comm, filename,
      'vsz_range': should be 4 item array to specify x and y ranges:
                   [minx, miny, maxx, maxy]
      'vsz_twod_as_oned': treat 2d dataset as 1d dataset with errors
+     'vsz_convert_datetime': for a 1d numeric dataset, treat as a datetime
+       if this is set to 'veusz', this is the number of seconds since
+         2009-01-01
+       if this is set to 'unix', this is the number of seconds since
+         1970-01-01
 
     For compound datasets these attributes can be given on a
     per-column basis using attribute names
@@ -487,6 +509,7 @@ def ImportFileHDF5(comm, filename,
         slices=slices,
         twodranges=twodranges,
         twod_as_oned=twod_as_oned,
+        convert_datetime=convert_datetime,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImportHDF5(params)

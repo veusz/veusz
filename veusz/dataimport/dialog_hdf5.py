@@ -541,6 +541,15 @@ class ImportTabHDF5(importdialog.ImportTab):
 
         return True
 
+    def showOptionsOneD(self, node):
+        """Show options for 1d datasets on dialog."""
+
+        dt = node.options.get('convert_datetime')
+        self.hdfoneddate.setCurrentIndex({
+            None: 0,
+            'veusz': 1,
+            'unix': 2}[dt])
+
     def showOptionsTwoD(self, node):
         """Update options for 2d datasets on dialog."""
         ranges = node.options.get('twodranges')
@@ -556,6 +565,20 @@ class ImportTabHDF5(importdialog.ImportTab):
 
         readas1d = node.options.get('twod_as_oned')
         self.hdftwodimport1d.setChecked(bool(readas1d))
+
+    def updateOptionsOneD(self, node):
+        """Read options for 1d datasets on dialog."""
+
+        idx = self.hdfoneddate.currentIndex()
+        if idx == 0:
+            try:
+                del node.options['convert_datetime']
+            except KeyError:
+                pass
+        else:
+            node.options['convert_datetime'] = {
+                1: 'veusz',
+                2: 'unix'}[idx]
 
     def updateOptionsTwoD(self, node):
         """Read options for 2d datasets on dialog."""
@@ -592,7 +615,9 @@ class ImportTabHDF5(importdialog.ImportTab):
         if self.oldselection[0] is not None:
             node, name = self.oldselection
             # update node options
-            if name == 'twod':
+            if name == 'oned':
+                self.updateOptionsOneD(node)
+            elif name == 'twod':
                 self.updateOptionsTwoD(node)
 
     def newCurrentSel(self, new, old):
@@ -608,11 +633,15 @@ class ImportTabHDF5(importdialog.ImportTab):
                 if node.getDims() == 2 and node.numeric:
                     toshow = 'twod'
                     self.showOptionsTwoD(node)
+                elif node.getDims() == 1 and node.numeric:
+                    toshow = 'oned'
+                    self.showOptionsOneD(node)
 
         # so we know which options to update next
         self.oldselection = (node, toshow)
 
         for widget, name in (
+            (self.hdfonedgrp, 'oned'),
             (self.hdftwodgrp, 'twod'),
             ):
             if name == toshow:
@@ -629,6 +658,7 @@ class ImportTabHDF5(importdialog.ImportTab):
         slices = {}
         twodranges = {}
         twod_as_oned = set()
+        convert_datetime = {}
 
         for node in self.datanodes:
             inname = node.importname.strip()
@@ -640,6 +670,8 @@ class ImportTabHDF5(importdialog.ImportTab):
                 twodranges[node.fullname]= node.options['twodranges']
             if 'twod_as_oned' in node.options:
                 twod_as_oned.add(node.fullname)
+            if 'convert_datetime' in node.options:
+                convert_datetime[node.fullname] = node.options['convert_datetime']
 
         items = []
         def recursiveitems(node):
@@ -662,7 +694,8 @@ class ImportTabHDF5(importdialog.ImportTab):
             namemap=namemap,
             slices=slices,
             twodranges=twodranges,
-            twod_as_oned = twod_as_oned,
+            twod_as_oned=twod_as_oned,
+            convert_datetime=convert_datetime,
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,

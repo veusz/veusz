@@ -101,6 +101,11 @@ def dateStringToDate(datestr):
     else:
         return N.nan
 
+def floatUnixToVeusz(f):
+    """Convert unix float to veusz float."""
+    delta = datetime.datetime(1970,1,1) - offsetdate
+    return f + delta.total_seconds()
+
 def floatToDateTime(f):
     """Convert float to datetime."""
     days = int(f/24/60/60)
