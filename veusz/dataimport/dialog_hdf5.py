@@ -19,6 +19,7 @@
 from __future__ import division, print_function
 
 from .. import qtall as qt4
+from .. import setting
 from ..dialogs import importdialog
 from ..compat import crange, cstr
 from . import defn_hdf5
@@ -213,11 +214,12 @@ class HDFDataNode(HDFNode):
         self.importname = ""
         self.numeric = False
         self.slice = None
+        self.options = {}
 
         # override import name
         self.defimportname = None
-        if "vz_name" in dsattrs:
-            self.defimportname = cstr(dsattrs["vz_name"])
+        if "vsz_name" in dsattrs:
+            self.defimportname = cstr(dsattrs["vsz_name"])
 
         k = dsdtype.kind
         if k in ('b', 'i', 'u', 'f'):
@@ -234,10 +236,8 @@ class HDFDataNode(HDFNode):
             self.datatype = _('Unsupported')
             self.datatypevalid = False
 
-    def dimsOkForImport(self):
-        """Are dimensions ok to import?
-        Need to count dimensions where slice is not fixed
-        """
+    def getDims(self):
+        """Return dimensions after slice."""
         shape = list(self.shape)
         if self.slice:
             shapei = 0
@@ -246,7 +246,13 @@ class HDFDataNode(HDFNode):
                     del shape[shapei]
                 else:
                     shapei += 1
-        return len(shape) in (1, 2)
+        return len(shape)
+
+    def dimsOkForImport(self):
+        """Are dimensions ok to import?
+        Need to count dimensions where slice is not fixed
+        """
+        return self.getDims() in (1, 2)
 
     def data(self, column, role):
         """Return data for column"""
@@ -489,6 +495,12 @@ class ImportTabHDF5(importdialog.ImportTab):
         importdialog.ImportTab.loadUi(self)
         self.datanodes = []
 
+        valid = qt4.QDoubleValidator(self)
+        valid.setNotation(qt4.QDoubleValidator.ScientificNotation)
+        for w in (self.hdftwodminx, self.hdftwodminy,
+                  self.hdftwodmaxx, self.hdftwodmaxy):
+            w.setValidator(valid)
+
     def doPreview(self, filename, encoding):
         """Show file as tree."""
 
@@ -524,19 +536,114 @@ class ImportTabHDF5(importdialog.ImportTab):
         for c in _ColName, _ColDataType, _ColShape:
             self.hdftreeview.resizeColumnToContents(c)
 
+        self.hdftreeview.selectionModel().currentChanged.connect(
+            self.newCurrentSel)
+
+        # update widgets for options at bottom
+        self.oldselection = (None, None)
+        self.newCurrentSel(None, None)
+
         return True
+
+    def showOptionsTwoD(self, node):
+        """Update options for 2d datasets on dialog."""
+        ranges = node.options.get('twodranges')
+        if ranges is None:
+            ranges = [None]*4
+
+        for w, v in zip((self.hdftwodminx, self.hdftwodminy,
+                         self.hdftwodmaxx, self.hdftwodmaxy), ranges):
+            if v is None:
+                w.clear()
+            else:
+                w.setText(setting.uilocale.toString(v))
+
+        readas1d = node.options.get('twod_as_oned')
+        self.hdftwodimport1d.setChecked(bool(readas1d))
+
+    def updateOptionsTwoD(self, node):
+        """Read options for 2d datasets on dialog."""
+
+        rangeout = []
+        for w in (self.hdftwodminx, self.hdftwodminy,
+                  self.hdftwodmaxx, self.hdftwodmaxy):
+            txt = w.text()
+            val, ok = setting.uilocale.toDouble(txt)
+            if not ok: val = None
+            rangeout.append(val)
+
+        if rangeout == [None, None, None, None]:
+            try:
+                del node.options['twodranges']
+            except KeyError:
+                pass
+
+        elif None not in rangeout:
+            # update
+            node.options['twodranges'] = tuple(rangeout)
+
+        readas1d = self.hdftwodimport1d.isChecked()
+        if readas1d:
+            node.options['twod_as_oned'] = True
+        else:
+            try:
+                del node.options['twod_as_oned']
+            except KeyError:
+                pass
+
+    def updateOptions(self):
+        """Update options for nodes from dialog."""
+        if self.oldselection[0] is not None:
+            node, name = self.oldselection
+            # update node options
+            if name == 'twod':
+                self.updateOptionsTwoD(node)
+
+    def newCurrentSel(self, new, old):
+        """New item selected in the tree."""
+
+        self.updateOptions()
+
+        # show appropriate widgets at bottom for editing options
+        toshow = node = None
+        if new is not None and new.isValid():
+            node = new.internalPointer()
+            if isinstance(node, HDFDataNode):
+                if node.getDims() == 2 and node.numeric:
+                    toshow = 'twod'
+                    self.showOptionsTwoD(node)
+
+        # so we know which options to update next
+        self.oldselection = (node, toshow)
+
+        for widget, name in (
+            (self.hdftwodgrp, 'twod'),
+            ):
+            if name == toshow:
+                widget.show()
+            else:
+                widget.hide()
 
     def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
         """Import file."""
 
+        self.updateOptions()
+
         namemap = {}
         slices = {}
+        twodranges = {}
+        twod_as_oned = set()
+
         for node in self.datanodes:
             inname = node.importname.strip()
             if inname:
                 namemap[node.fullname] = inname
             if node.slice:
                 slices[node.fullname] = node.slice
+            if 'twodranges' in node.options:
+                twodranges[node.fullname]= node.options['twodranges']
+            if 'twod_as_oned' in node.options:
+                twod_as_oned.add(node.fullname)
 
         items = []
         def recursiveitems(node):
@@ -558,6 +665,8 @@ class ImportTabHDF5(importdialog.ImportTab):
             items=items,
             namemap=namemap,
             slices=slices,
+            twodranges=twodranges,
+            twod_as_oned = twod_as_oned,
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,

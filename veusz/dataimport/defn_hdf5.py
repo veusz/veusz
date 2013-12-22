@@ -21,8 +21,9 @@ from __future__ import division, print_function
 import collections
 import numpy as N
 from .. import qtall as qt4
-from ..compat import citems, ckeys, cvalues, cstr, crepr
+from ..compat import citems, ckeys, cvalues, cstr
 from .. import document
+from .. import utils
 from . import base
 
 def _(text, disambiguation=None, context="Import_HDF5"):
@@ -183,6 +184,7 @@ class ImportParamsHDF5(base.ImportParamsBase):
         'namemap': None,
         'slices': None,
         'twodranges': None,
+        'twod_as_oned': None,
         }
     defaults.update(base.ImportParamsBase.defaults)
 
@@ -196,25 +198,21 @@ class LinkedFileHDF5(base.LinkedFileBase):
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
 
-        def reprdict(d):
-            """Reproducable repr for dict (alphabetical)."""
-            v = [ "%s: %s" % (crepr(k), crepr(d[k]))
-                  for k in sorted(d) ]
-            return "{%s}" % " ".join(v)
-
         p = self.params
-        args = [ crepr(self._getSaveFilename(relpath)),
-                 crepr(p.items) ]
+        args = [ utils.rrepr(self._getSaveFilename(relpath)),
+                 utils.rrepr(p.items) ]
         if p.namemap:
-            args.append("namemap=%s" % reprdict(p.namemap))
+            args.append("namemap=%s" % utils.rrepr(p.namemap))
         if p.slices:
-            args.append("slices=%s" % reprdict(p.slices))
+            args.append("slices=%s" % utils.rrepr(p.slices))
         if p.twodranges:
-            args.append("twodranges=%s" % reprdict(p.twodranges))
+            args.append("twodranges=%s" % utils.rrepr(p.twodranges))
+        if p.twod_as_oned:
+            args.append("twod_as_oned=%s" % utils.rrepr(p.twod_as_oned))
         if p.prefix:
-            args.append("prefix=%s" % crepr(p.prefix))
+            args.append("prefix=%s" % utils.rrepr(p.prefix))
         if p.suffix:
-            args.append("suffix=%s" % crepr(p.suffix))
+            args.append("suffix=%s" % utils.rrepr(p.suffix))
         args.append("linked=True")
         fileobj.write("ImportFileHDF5(%s)\n" % ", ".join(args))
 
@@ -369,9 +367,11 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
         elif len(data.shape) == 2:
             # 2D dataset
-            if name[-5:] == ' (1D)' and data.shape[1] in (2,3):
+            if ( ((self.params.twod_as_oned and
+                   dread.origname in self.params.twod_as_oned) or
+                  "vsz_twod_as_oned" in dread.options) and
+                 data.shape[1] in (2,3) ):
                 # actually a 1D dataset in disguise
-                name = name[:-5].strip()
                 if data.shape[1] == 2:
                     ds = document.Dataset(data=data[:,0], serr=data[:,1])
                 else:
@@ -434,6 +434,7 @@ def ImportFileHDF5(comm, filename,
                    namemap=None,
                    slices=None,
                    twodranges=None,
+                   twod_as_oned=None,
                    prefix='', suffix='',
                    linked=False):
     """Import data from a HDF5 file
@@ -448,8 +449,6 @@ def ImportFileHDF5(comm, filename,
     'foo (+)': import as +ve error for dataset foo
     'foo (-)': import as -ve error for dataset foo
     'foo (+-)': import as symmetric error for dataset foo
-    'foo (1D)': import 2D dataset as 1D dataset with errors
-      (for Nx2 or Nx3 datasets)
 
     slices is an optional dict specifying slices to be selected when
     importing. For each dataset to be sliced, provide a tuple of
@@ -460,6 +459,9 @@ def ImportFileHDF5(comm, filename,
     twodranges is an optional dict giving data ranges for 2d
     datasets. It maps names to (minx, miny, maxx, maxy).
 
+    twod_as_oned: optional set containing 2d datasets to attempt to
+    read as 1d
+
     linked specfies that the dataset is linked to the file
 
     Attributes can be used in datasets to override defaults:
@@ -467,6 +469,7 @@ def ImportFileHDF5(comm, filename,
      'vsz_slice': slice on importing (use format "start:stop:step,...")
      'vsz_range': should be 4 item array to specify x and y ranges:
                   [minx, miny, maxx, maxy]
+     'vsz_twod_as_oned': treat 2d dataset as 1d dataset with errors
 
     For compound datasets these attributes can be given on a
     per-column basis using attribute names
@@ -481,6 +484,7 @@ def ImportFileHDF5(comm, filename,
         namemap=namemap,
         slices=slices,
         twodranges=twodranges,
+        twod_as_oned=twod_as_oned,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImportHDF5(params)
