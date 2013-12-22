@@ -323,7 +323,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         """Identify error bar datasets and separate out.
         Returns error bar datasets."""
 
-        # separate out datsets with error bars
+        # separate out datasets with error bars
         # this a defaultdict of defaultdict with None as default
         errordatasets = collections.defaultdict(
             lambda: collections.defaultdict(lambda: None))
@@ -462,7 +462,7 @@ def ImportFileHDF5(comm, filename,
     twod_as_oned: optional set containing 2d datasets to attempt to
     read as 1d
 
-    linked specfies that the dataset is linked to the file
+    linked specifies that the dataset is linked to the file.
 
     Attributes can be used in datasets to override defaults:
      'vsz_name': set to override name for dataset in veusz

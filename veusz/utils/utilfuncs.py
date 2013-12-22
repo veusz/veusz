@@ -549,7 +549,7 @@ def round2delt(fin1, fin2):
     return fout if fin1 > 0 else -fout
 
 def rrepr(val):
-    """Reproducable repr.
+    """Reproducible repr.
 
     The idea is to make a repr which won't change. We sort dict and
     set entries."""
