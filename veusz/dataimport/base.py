@@ -195,7 +195,7 @@ class OperationDataImportBase(object):
         self.oldconst = None
 
         # do actual import
-        self.doImport(document)
+        retn = self.doImport(document)
 
         # only remember the parts we need
         self.olddatasets = [ (n, olddatasets.get(n)) for n in self.outdatasets ]
@@ -204,6 +204,8 @@ class OperationDataImportBase(object):
         if self.params.tags:
             for n in self.outdatasets:
                 document.data[n].tags.update(self.params.tags)
+
+        return retn
 
     def undo(self, document):
         """Undo import."""

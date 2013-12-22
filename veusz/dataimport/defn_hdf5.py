@@ -429,6 +429,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             doc.setData(fullname, ds)
             self.outdatasets.append(fullname)
 
+        return list(dsread.keys())
+
 def ImportFileHDF5(comm, filename,
                    items,
                    namemap=None,

@@ -283,8 +283,9 @@ class HDFDataNode(HDFNode):
             elif column == _ColToImport and not self.grpImport():
                 return _('Check to import this dataset')
             elif column == _ColImportName and not self.grpImport():
-                return _('Name to assign after import.\nSpecial suffixes '
-                         '(+), (-), (+-) and (1D) can be used.')
+                return _('Name to assign after import.\n'
+                         'Special suffixes (+), (-) and (+-) can be used to\n'
+                         'assign error bars to datasets with the same name.')
             elif column == _ColSlice:
                 return _('Slice data to create a subset to import.\n'
                          'This should be ranges for each dimension\n'
@@ -401,11 +402,6 @@ class ImportNameDeligate(qt4.QItemDelegate):
                 out.append(
                     ('%s (-)' % name,
                      _("Import as negative error bar for '%s'" % name)) )
-            elif len(dn.shape) == 2 and dn.shape[1] in (2, 3):
-                out.append(
-                    ('%s (1D)' % name,
-                     _("Import at 1D dataset with error bars")) )
-
         out.sort()
 
         # remove duplicates
@@ -674,11 +670,13 @@ class ImportTabHDF5(importdialog.ImportTab):
 
         op = defn_hdf5.OperationDataImportHDF5(params)
 
+        # actually do the import
+        datasets = doc.applyOperation(op)
+
         # inform user
-        self.hdfimportstatus.setText(_("Import complete"))
+        self.hdfimportstatus.setText(_("Import complete (%i datasets)") %
+                                     len(datasets))
         qt4.QTimer.singleShot(2000, self.hdfimportstatus.clear)
 
-        # actually do the import
-        doc.applyOperation(op)
 
 importdialog.registerImportTab(_('HDF&5'), ImportTabHDF5)
