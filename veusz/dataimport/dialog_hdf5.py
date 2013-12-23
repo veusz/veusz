@@ -491,6 +491,8 @@ class ImportTabHDF5(importdialog.ImportTab):
         node = ErrorNode(None, err)
         model = GenericTreeModel(self, node, [''])
         self.hdftreeview.setModel(model)
+        self.oldselection = (None, None)
+        self.newCurrentSel(None, None)
 
     def loadUi(self):
         importdialog.ImportTab.loadUi(self)
