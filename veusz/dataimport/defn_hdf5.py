@@ -19,6 +19,9 @@
 from __future__ import division, print_function
 
 import collections
+import re
+import sys
+
 import numpy as N
 from .. import qtall as qt4
 from ..compat import citems, ckeys, cvalues, cstr
@@ -346,7 +349,6 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         """Convert numeric data to a veusz dataset."""
 
         data = dread.data
-        print(dread.options)
 
         if len(data.shape) == 1:
             if ( (self.params.convert_datetime and
@@ -411,6 +413,45 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
         return ds
 
+    def textDataToDataset(self, name, dread):
+        """Convert textual data to a veusz dataset."""
+
+        data = dread.data
+
+        if ( (self.params.convert_datetime and
+              dread.origname in self.params.convert_datetime) or
+             "vsz_convert_datetime" in dread.options ):
+
+            try:
+                fmt = self.params.convert_datetime[dread.origname]
+            except (TypeError, KeyError):
+                fmt = dread.options["vsz_convert_datetime"]
+
+            try:
+                datere = re.compile(utils.dateStrToRegularExpression(fmt))
+            except Exception:
+                sys.stderr.write(
+                    "HDF5 import: could not interpret date-time syntax '%s'\n" %
+                    fmt)
+                return None
+
+            dout = N.empty(len(data), dtype=N.float64)
+            for i, ditem in enumerate(data):
+                try:
+                    match = datere.match(ditem)
+                    val = utils.dateREMatchToDate(match)
+                except ValueError:
+                    val = N.nan
+                dout[i] = val
+
+            ds = document.DatasetDateTime(dout)
+
+        else:
+            # standard text dataset
+            ds = document.DatasetText(dread.data)
+
+        return ds
+
     def doImport(self, doc):
         """Do the import."""
 
@@ -433,8 +474,12 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 # numeric
                 ds = self.numericDataToDataset(name, dread, errordatasets)
             else:
-                # text dataset
-                ds = document.DatasetText(dread.data)
+                # text
+                ds = self.textDataToDataset(name, dread)
+
+            if ds is None:
+                # error above
+                continue
 
             ds.linked = linkedfile
 
@@ -479,8 +524,16 @@ def ImportFileHDF5(comm, filename,
     twod_as_oned: optional set containing 2d datasets to attempt to
     read as 1d
 
-    convert_datetime should be a dict mapping to xxx.....
-
+    convert_datetime should be a dict mapping hdf name to specify
+    date/time importing
+      for a 1d numeric dataset
+        if this is set to 'veusz', this is the number of seconds since
+          2009-01-01
+        if this is set to 'unix', this is the number of seconds since
+          1970-01-01
+       for a text dataset, this should give the format of the date/time,
+          e.g. 'YYYY-MM-DD|T|hh:mm:ss'
+ 
     linked specifies that the dataset is linked to the file.
 
     Attributes can be used in datasets to override defaults:
@@ -489,12 +542,9 @@ def ImportFileHDF5(comm, filename,
      'vsz_range': should be 4 item array to specify x and y ranges:
                   [minx, miny, maxx, maxy]
      'vsz_twod_as_oned': treat 2d dataset as 1d dataset with errors
-     'vsz_convert_datetime': for a 1d numeric dataset, treat as a datetime
-       if this is set to 'veusz', this is the number of seconds since
-         2009-01-01
-       if this is set to 'unix', this is the number of seconds since
-         1970-01-01
-
+     'vsz_convert_datetime': treat as date/time, set to one of the values
+                             above.
+ 
     For compound datasets these attributes can be given on a
     per-column basis using attribute names
     vsz_attributename_columnname.

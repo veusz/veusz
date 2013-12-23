@@ -213,6 +213,7 @@ class HDFDataNode(HDFNode):
         self.toimport = False
         self.importname = ""
         self.numeric = False
+        self.text = False
         self.slice = None
         self.options = {}
 
@@ -229,9 +230,11 @@ class HDFDataNode(HDFNode):
         elif k in ('S', 'a'):
             self.datatype = _('Text')
             self.datatypevalid = True
+            self.text = True
         elif k == 'O' and h5py.check_dtype(vlen=dsdtype):
             self.datatype = _('Text')
             self.datatypevalid = True
+            self.text = True
         else:
             self.datatype = _('Unsupported')
             self.datatypevalid = False
@@ -497,6 +500,13 @@ class ImportTabHDF5(importdialog.ImportTab):
                   self.hdftwodmaxx, self.hdftwodmaxy):
             w.setValidator(valid)
 
+        self.hdftextdate.addItems([
+            _('No'),
+            'YYYY-MM-DD|T|hh:mm:ss',
+            'DD/MM/YY| |hh:mm:ss',
+            'M/D/YY| |hh:mm:ss',
+            ])
+
     def doPreview(self, filename, encoding):
         """Show file as tree."""
 
@@ -566,6 +576,17 @@ class ImportTabHDF5(importdialog.ImportTab):
         readas1d = node.options.get('twod_as_oned')
         self.hdftwodimport1d.setChecked(bool(readas1d))
 
+    def showOptionsText(self, node):
+        """Update options for text datasets on dialog."""
+
+        text = node.options.get('convert_datetime')
+        if not text:
+            self.hdftextdate.setCurrentIndex(0)
+        else:
+            if self.hdftextdate.findText(text) == -1:
+                self.hdftextdate.addItem(text)
+            self.hdftextdate.lineEdit().setText(text)
+
     def updateOptionsOneD(self, node):
         """Read options for 1d datasets on dialog."""
 
@@ -610,6 +631,18 @@ class ImportTabHDF5(importdialog.ImportTab):
             except KeyError:
                 pass
 
+    def updateOptionsText(self, node):
+        """Read options for text datasets on dialog."""
+
+        dtext = self.hdftextdate.currentText().strip()
+        if self.hdftextdate.currentIndex() == 0 or dtext == '':
+            try:
+                del node.options['convert_datetime']
+            except KeyError:
+                pass
+        else:
+            node.options['convert_datetime'] = dtext
+
     def updateOptions(self):
         """Update options for nodes from dialog."""
         if self.oldselection[0] is not None:
@@ -619,6 +652,8 @@ class ImportTabHDF5(importdialog.ImportTab):
                 self.updateOptionsOneD(node)
             elif name == 'twod':
                 self.updateOptionsTwoD(node)
+            elif name == 'text':
+                self.updateOptionsText(node)
 
     def newCurrentSel(self, new, old):
         """New item selected in the tree."""
@@ -636,6 +671,9 @@ class ImportTabHDF5(importdialog.ImportTab):
                 elif node.getDims() == 1 and node.numeric:
                     toshow = 'oned'
                     self.showOptionsOneD(node)
+                elif node.text:
+                    toshow = 'text'
+                    self.showOptionsText(node)
 
         # so we know which options to update next
         self.oldselection = (node, toshow)
@@ -643,6 +681,7 @@ class ImportTabHDF5(importdialog.ImportTab):
         for widget, name in (
             (self.hdfonedgrp, 'oned'),
             (self.hdftwodgrp, 'twod'),
+            (self.hdftextgrp, 'text'),
             ):
             if name == toshow:
                 widget.show()

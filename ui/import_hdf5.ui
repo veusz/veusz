@@ -25,6 +25,32 @@
     <widget class="QTreeView" name="hdftreeview"/>
    </item>
    <item>
+    <widget class="QGroupBox" name="hdftextgrp">
+     <property name="title">
+      <string>Text options</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Import as date/time</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="hdftextdate">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If you want to treat this dataset as date/times, choose a text format for this.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="hdfonedgrp">
      <property name="title">
       <string>1D options</string>
