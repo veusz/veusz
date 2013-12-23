@@ -22,6 +22,8 @@ from .. import qtall as qt4
 from .. import setting
 from ..dialogs import importdialog
 from ..compat import crange, cstr
+
+from . import base
 from . import defn_hdf5
 
 def _(text, disambiguation=None, context="Import_HDF5"):
@@ -742,13 +744,17 @@ class ImportTabHDF5(importdialog.ImportTab):
 
         op = defn_hdf5.OperationDataImportHDF5(params)
 
-        # actually do the import
-        datasets = doc.applyOperation(op)
+        try:
+            # actually do the import
+            datasets = doc.applyOperation(op)
 
-        # inform user
-        self.hdfimportstatus.setText(_("Import complete (%i datasets)") %
+            # inform user
+            self.hdfimportstatus.setText(_("Import complete (%i datasets)") %
                                      len(datasets))
-        qt4.QTimer.singleShot(2000, self.hdfimportstatus.clear)
 
+        except base.ImportingError as e:
+            self.hdfimportstatus.setText(_("Error: %s") % cstr(e))
+
+        qt4.QTimer.singleShot(4000, self.hdfimportstatus.clear)
 
 importdialog.registerImportTab(_('HDF&5'), ImportTabHDF5)

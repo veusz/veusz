@@ -430,10 +430,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             try:
                 datere = re.compile(utils.dateStrToRegularExpression(fmt))
             except Exception:
-                sys.stderr.write(
-                    "HDF5 import: could not interpret date-time syntax '%s'\n" %
-                    fmt)
-                return None
+                raise base.ImportingError(
+                    _("Could not interpret date-time syntax '%s'") % fmt)
 
             dout = N.empty(len(data), dtype=N.float64)
             for i, ditem in enumerate(data):

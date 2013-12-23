@@ -24,6 +24,9 @@ import sys
 from ..compat import citems, cstr
 from .. import utils
 
+class ImportingError(RuntimeError):
+    """Common error when import fails."""
+
 class ImportParamsBase(object):
     """Import parameters for the various imports.
 
