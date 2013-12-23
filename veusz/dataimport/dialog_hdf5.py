@@ -487,6 +487,9 @@ class ImportTabHDF5(importdialog.ImportTab):
 
     resource = "import_hdf5.ui"
 
+    def isFiletypeSupported(self, filetype):
+        return filetype in ('.hdf', '.hdf5', '.h5', '.he5')
+
     def showError(self, err):
         node = ErrorNode(None, err)
         model = GenericTreeModel(self, node, [''])

@@ -178,10 +178,10 @@ class ImportDialog(VeuszDialog):
         """Guess import tab based on filename."""
         filename = self.filenameedit.text()
 
-        fname, ftype = os.path.splitext(filename)
+        ftype = os.path.splitext(filename)[1]
         # strip off any gz, bz2 extensions to get real extension
-        while ftype.lower() in ('gz', 'bz2'):
-            fname, ftype = os.path.splitext(fname)
+        while ftype.lower() in ('.gz', '.bz2'):
+            ftype = os.path.splitext(fname)[1]
         ftype = ftype.lower()
 
         # examine from left to right
