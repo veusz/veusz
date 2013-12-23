@@ -15,7 +15,7 @@
     </author>
 
     <copyright>
-      <year>2011</year>
+      <year>2013</year>
     </copyright>
 
     <legalnotice>
@@ -77,7 +77,7 @@
 	the font to be used and the line thickness. In addition they
 	have actions, which perform some sort of activity on the
 	widget or its children, like "fit" for a fit widget.</para>
-	
+
 	<para>As an aside, using the scripting interface, widgets are
 	specified with a "path", like a file in Unix or Windows. These
 	can be relative to the current widget (do not start with a
@@ -85,7 +85,7 @@
 	paths include, "/page1/graph1/x", "x" and ".".</para>
 
 	<para>The widget types include</para>
-	
+
 	<orderedlist>
 	  <listitem>
 	    <para><command>document</command> - representing a
@@ -93,7 +93,7 @@
 	      addition it contains a setting giving the page size for
 	      the document.</para>
 	  </listitem>
-	  
+
 	  <listitem>
 	    <para><command>page</command> - representing a page in a
 	      document. One or more graphs can be placed on a page, or
@@ -360,7 +360,7 @@
 	</orderedlist>
 
       </section>
-      
+
       <section>
 	<title>Settings: properties and formatting</title>
 
@@ -425,7 +425,7 @@
 	 line. This can be used for simple tables. For example "{a\\b}
 	 {c\\d}" shows "a c" over "b d". The command "\frac{a}{b}"
 	 shows a vertical fraction a/b.</para>
-	 
+
 	<para>Also supported are commands to change font. The command
 	"\font{name}{text}" changes the font text is written in to
 	name. This may be useful if a symbol is missing from the
@@ -462,7 +462,7 @@
 
       <section>
 	<title>Axis numeric scales</title>
-	
+
 	<para>The way in which numbers are formatted in axis scales is
 	chosen automatically. For standard numerical axes, values are
 	shown with the "%Vg" formatting (see below). For date axes, an
@@ -637,7 +637,7 @@
 1     0.1   -0.12   1.1    0.1
 2.05  0.12  -0.14   4.08   0.12
 2.98  0.08  -0.1    2.9    0.11
-4.02  0.04  -0.1    15.3   1.0   
+4.02  0.04  -0.1    15.3   1.0
 </programlisting>
 	  </informalexample>
 
@@ -674,185 +674,177 @@
   <chapter>
     <title>Reading data</title>
 
-    <para>Currently Veusz supports reading data from a text file, FITS
-    format files, CSV files, QDP files, binary files and NPY/NPZ
-    files. Reading data is supported using the "Data, Import" dialog,
-    or using the <link linkend="Command.ImportFile">ImportFile</link>
-    and <link linkend="Command.ImportString">ImportString</link>
-    commands which read data from files or an existing Python string
-    (allowing data to be embedded in a Python script).  In addition,
-    the user can load or write plugins in Python which load data into
-    Veusz in an arbitrary format. At the moment QDP, binary and
-    NPY/NPZ files are supported with this method.
+    <para>
+      Currently Veusz supports reading data from files with text, CSV,
+      HDF5, FITS, 2D text, QDP, binary and NPY/NPZ formats. Use the
+      <menuchoice><guimenu>Data</guimenu><guimenuitem>Import</guimenuitem></menuchoice>
+      dialog to read data, or the importing commands in the API can be
+      used.  In addition, the user can load or write import plugins in
+      Python which load data into Veusz in an arbitrary format. At the
+      moment QDP, binary and NPY/NPZ files are supported with this
+      method. The HDF5 file format is the most sophisticated, and is
+      recommended for complex datasets.
     </para>
-    
-      <mediaobject>
-	<imageobject>
-	  <imagedata fileref="manimages/importdialog.png" format="PNG" />
-	</imageobject>
-      </mediaobject>
 
-    <para>CSV files are intuitive to use and are described
-    below.</para>
+    <para>
+      By default, data are "linked" to the file imported from. This
+      means that the data are not stored in the Veusz saved file and
+      are reloaded from the original data file when opening. In
+      addition, the user can use the
+      <menuchoice><guimenu>Data</guimenu><guimenuitem>Reload</guimenuitem></menuchoice>
+      menu option to reload data from linked files. Unselect the
+      linked option when importing to remove the association with the
+      data file and to store the data in the Veusz saved document.
+    </para>
 
-    <para>In addition data may also be read in from FITS files if the
-    PyFITS Python module is installed. FITS is a widespread
-    astronomical data format. FITS files are read using the FITS tab
-    on the import dialog or using the <link
-    linkend="Command.ImportFITSFile">ImportFITSFile</link>
-    command.</para>
+    <para>
+      Note that a <symbol>prefix</symbol> and
+      <symbol>suffix</symbol> can be given when importing. These are
+      added to the front or back of each dataset name imported. They
+      are convenient for grouping data together.
+    </para>
 
-    <para>Two dimensional data are also supported using the 2D tab on
-    the Import dialog box, <link
-    linkend="Command.ImportFile2D">ImportFile2D</link> and <link
-    linkend="Command.ImportString2D">ImportString2D</link>
-    commands.</para>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="manimages/importdialog.png" format="PNG" />
+      </imageobject>
+    </mediaobject>
+
+    <para>We list the various types of import below.</para>
 
     <section>
-      <title><anchor id="Descriptors" />Descriptors</title>
-      
-      <para>The "Data, Import" dialog
-	box, <link linkend="Command.ImportFile">ImportFile</link>
-	and <link linkend="Command.ImportString">ImportString</link>
-	commands use a "Descriptor", or list of dataset names, to
-	describe how the data are formatted in the import file. The
-	descriptor at its simplest is a list of the names of the
-	datasets to import (which are columns in the
-	file). Additionally modifiers are added if error bars are also
-	read in. Examples of descriptors are below:</para>
-      
-      <orderedlist>
-	<listitem>
-	  <para><command>x y</command> two columns are present in the
-	    file, they will be read in as datasets "x" and "y".</para>
-	</listitem>
-	
-	<listitem>
-	  <para><command>x,+- y,+,-</command> or <command>x +- y +
-	    -</command> two datasets are in the file. Dataset "x"
-	    consists of the first two columns. The first column are
-	    the values and the second are the symmetric errors. "y"
-	    consists of three columns (note the comma between + and
-	    -). The first column are the values, the second positive
-	    asymmetric errors, and the third negative asymmetric
-	    errors.</para>
+      <title>Standard text import</title>
 
-	  <para>Suppose the input file contains:</para>
-	  <informalexample>
-	    <programlisting>
-1.0  0.3  2   0.1  -0.2
-1.5  0.2  2.3 2e-2 -0.3E0
-2.19 0.02 5    0.1 -0.1 
-</programlisting>
-	  </informalexample>
-	  
-	  <para>Then x will contain "1+-0.3", "1.5+-0.2",
-	    "2.19+-0.02". y will contain "2 +0.1 -0.2", "2.3 +0.02
-	    -0.3", "5 +0.1 -0.1".</para>
-	</listitem>
-	
-	<listitem>
-	  <para><command>x[1:2] y[:]</command> the first column is
-	    the data "x_1", the second "x_2". Subsequent columns are
-	    read as "y[1]" to "y[n]".</para>
-	</listitem>
-	
-	<listitem>
-	  <para><command>y[:]+-</command>  read each pair of
-	    columns as a dataset and its symmetric error, calling them
-	    "y[1]" to "y[n]".</para>
-	</listitem>
-
-	<listitem>
-	  <para><command>foo,,+-</command>  read the first column as
-	  the foo dataset, skip a column, and read the third column as
-	  its symmetric error.</para>
-	</listitem>
-      </orderedlist>
-
-      <para>The dataset names given here x and y, are just
-      representative. Dataset names can contain virtually any
-      character, even unicode characters. If the name contains non
-      alpha-numeric characters (characters outside of A-Z, a-z and
-      0-9), then the dataset name should be contained within back-tick
-      characters. An example descriptor is <command>`length data
-      (m)`,+- `speed (mps)`,+,-</command>, for two datasets with
-      spaces and brackets in their names.</para>
-
-      <para>The special
-      names <command>+-</command>, <command>+</command>
-      or <command>-</command> specify that the datasets before are
-      followed by columns containing symmetric, positive or negative
-      errors. The signs on positive or negative errors are
-      automatically set to be correct.</para>
-
-      <para>If a descriptor is left blank, Veusz will automatically
-      create dataset names. If the prefix and suffix settings are
-      blank, they are assigned names col1, col2, etc. If prefix and
-      suffix are not blank, the datasets are called
-      prefix+number+suffix.</para>
-
-      <para>When reading in data, Veusz treats any whitespace as
-	separating columns. The columns do not actually need to be in
-	columns! Furthermore a "\" symbol can be placed at the end of
-	a line to mark a continuation. Veusz will read the next line
-	as if it were placed at the end of the current line. In
-	addition comments and blank lines are ignored. Comments start
-	with a "#", ";", "!" or "%", and continue until the end of the
-	line. The special value "nan" can be used to specify a break
-	in a dataset.</para>
-
-      <para>Veusz supports reading in other types of data. The type of
-      data can be added in round brackets after the name. Veusz will
-      try to guess the type of data based on the first value, so you
-      should specify it if there is any form of ambiguity (e.g. is 3
-      text or a number). Supported types are numbers (use numeric in
-      brackets) and text (use text in brackets). An example descriptor
-      would be "x(numeric) +- y(numeric) + - label(text)" for an x
-      dataset followed by its symmetric errors, a y dataset followed
-      by two columns of asymmetric errors, and a final column of text
-      for the label dataset.</para>
-
-      <para>A text column does not need quotation unless it contains
-      space characters or escape characters. However make sure you
-      deselect the "ignore text" option in the import dialog. This
-      ignores lines of text to ease the import of data from other
-      applications.  Quotation marks are recommended around text if
-      you wish to avoid ambiguity. Text is quoted according to the
-      Python rules for text. Double or single quotation marks can be
-      used, e.g. "A 'test'", 'A second "test"'. Quotes can be escaped
-      by prefixing them with a backslash, e.g. "A new \"test\"". If
-      the data are generated from a Python script, the repr function
-      provides the text in a suitable form.</para>
-
-      <para>Dates and times are also supported with the syntax
-      "dataset(date)". Dates must be in ISO format YYYY-MM-DD. Times
-      are in 24 hour format hh:mm:ss.ss. Dates with times are written
-      YYYY-MM-DDThh:mm:ss.ss (this is a standard ISO format, see
-      <ulink url="http://www.w3.org/TR/NOTE-datetime" />). Dates are
-      stored within Veusz as a number which is the number of seconds
-      since the start of January 1st 2009. Veusz also supports dates
-      and times in the local format, though take note that the same
-      file and data may not work on a system in a different location.
+      <para>
+	The default text import operates on simple text files. The
+	data are assumed to be in columns separated by
+	whitespace. Each column corresponds to dataset (or its error
+	bars). Each row is an entry in the dataset.
       </para>
 
-      <para>Data may be optionally split into "blocks" of data
-      separated by blank lines (or the word "no" on a line, for
-      obscure reasons). The name of each read in dataset has an
-      underscore and the number of the block (starting from 1)
-      added. This is specified by clicking the blocks checkbox in the
-      import dialog, or by using the useblocks=True option on the
-      <link linkend="Command.ImportFile">ImportFile</link> or <link
-      linkend="Command.ImportString">ImportString</link>
-      commands.</para>
+      <para>
+	The way the data are read is goverened by a simple
+	"descriptor". This can simply be a list of dataset names
+	separated by spaces. If no descriptor is given, the columns
+	are treated as separate datasets and are given names
+	<symbol>col1</symbol>, <symbol>col2</symbol>, etc. Veusz
+	attempts to automatically determine the type of the data.
+      </para>
 
-      <para>Instead of specifying the descriptor in the import dialog,
-      the descriptor can be placed in the data file using a descriptor
-      statement on a separate line, consisting of "descriptor"
-      followed by the descriptor. Multiple descriptors can be placed
-      in a single file, for example:</para>
-	  <informalexample>
-	    <programlisting>
+      <para>
+	When reading in data, Veusz treats any whitespace as
+	separating columns. The columns do not actually need to be
+	aligned. Furthermore a "\" symbol can be placed at the end of
+	a line to mark a continuation. Veusz will read the next line
+	as if it were placed at the end of the current line. In
+	addition comments and blank lines are ignored (unless in block
+	mode). Comments start with a "#", ";", "!" or "%", and
+	continue until the end of the line. The special value "nan"
+	can be used to specify a break in a dataset.
+      </para>
+
+      <para>
+	If the option to read data in blocks is enabled, Veusz treats
+	blank lines (or lines starting with the word "no") as block
+	separators. For each dataset in the descriptor, separate
+	datasets are created for each block, using a numeric suffix
+	giving the block number, e.g. <symbol>_1</symbol>,
+	<symbol>_2</symbol>.
+      </para>
+
+      <section>
+	<title>Data types in text import</title>
+
+	<para>
+	  Veusz supports reading in several types of data. The type of
+	  data can be added in round brackets after the name in the
+	  descriptor. Veusz will try to guess the type of data based
+	  on the first value, so you should specify it if there is any
+	  form of ambiguity (e.g. is 3 text or a number). Supported
+	  types are numbers (use numeric in brackets) and text (use
+	  text in brackets). An example descriptor would be
+	  "x(numeric) +- y(numeric) + - label(text)" for an x dataset
+	  followed by its symmetric errors, a y dataset followed by
+	  two columns of asymmetric errors, and a final column of text
+	  for the label dataset.
+	</para>
+
+	<para>
+	  A text column does not need quotation unless it contains
+	  space characters or escape characters. However make sure you
+	  deselect the "ignore text" option in the import dialog. This
+	  ignores lines of text to ease the import of data from other
+	  applications.  Quotation marks are recommended around text
+	  if you wish to avoid ambiguity. Text is quoted according to
+	  the Python rules for text. Double or single quotation marks
+	  can be used, e.g. "A 'test'", 'A second "test"'. Quotes can
+	  be escaped by prefixing them with a backslash, e.g. "A new
+	  \"test\"". If the data are generated from a Python script,
+	  the repr function provides the text in a suitable form.
+	</para>
+
+	<para>
+	  Dates and times are also supported with the syntax
+	  "dataset(date)". Dates must be in ISO format
+	  YYYY-MM-DD. Times are in 24 hour format hh:mm:ss.ss. Dates
+	  with times are written YYYY-MM-DDThh:mm:ss.ss (this is a
+	  standard ISO format, see <ulink
+	  url="http://www.w3.org/TR/NOTE-datetime" />). Dates are
+	  stored within Veusz as a number which is the number of
+	  seconds since the start of January 1st 2009. Veusz also
+	  supports dates and times in the local format, though take
+	  note that the same file and data may not work on a system in
+	  a different location.
+	</para>
+      </section>
+
+      <section>
+	<title><anchor id="Descriptors" />Descriptors</title>
+
+	<para>
+	  A list of datasets, or a "Descriptor", is given in the
+	  Import dialog to describe how the data are formatted in the
+	  import file. The descriptor at its simplest is a space or
+	  comma-separated list of the names of the datasets to import.
+	  These are columns in the file.
+	</para>
+
+	<para>
+	  Following a dataset name the text "+", "-", or "+-" can be
+	  given to say that the following column is a positive error
+	  bar, negative error bar or symmetric error bar for the
+	  previous (non error bar) dataset. These symbols should be
+	  separated from the dataset name or previous symbol with a
+	  space or a comma symbol.
+	</para>
+
+	<para>
+	  In addition, if multiple numbered columns should be
+	  imported, the dataset name can be followed by square
+	  brackets containing a range in the form "[a:b]" to number
+	  columns a to b, or [:] to number remaining columns. See
+	  below for examples of this use.
+	</para>
+
+	<para>
+	  Dataset names can contain virtually any character, even
+	  unicode characters. If the name contains non alpha-numeric
+	  characters (characters outside of A-Z, a-z and 0-9), then
+	  the dataset name should be contained within back-tick
+	  characters. An example descriptor is <command>`length data
+	  (m)`,+- `speed (mps)`,+,-</command>, for two datasets with
+	  spaces and brackets in their names.
+	</para>
+
+	<para>
+	  Instead of specifying the descriptor in the Import dialog,
+	  the descriptor can be placed in the data file using a
+	  descriptor statement on a separate line, consisting of
+	  "descriptor" followed by the descriptor. Multiple
+	  descriptors can be placed in a single file, for example:
+	</para>
+	<informalexample>
+	  <programlisting>
 # here is one section
 descriptor x,+- y,+,-
 1 0.5  2 0.1 -0.1
@@ -866,65 +858,264 @@ descriptor alpha beta gamma
 
 # etc...
 </programlisting>
+	</informalexample>
+
+	<section>
+	 <title>Descriptor examples</title>
+	 <orderedlist>
+	   <listitem>
+	     <para>
+	       <command>x y</command> two columns are present in the
+	       file, they will be read in as datasets "x" and "y".
+	     </para>
+	   </listitem>
+
+	   <listitem>
+	     <para>
+	       <command>x,+- y,+,-</command> or <command>x +- y +
+	       -</command> two datasets are in the file. Dataset "x"
+	       consists of the first two columns. The first column are
+	       the values and the second are the symmetric errors. "y"
+	       consists of three columns (note the comma between + and
+	       -). The first column are the values, the second
+	       positive asymmetric errors, and the third negative
+	       asymmetric errors.
+	     </para>
+
+	  <para>
+	    Suppose the input file contains:
+	  </para>
+	  <informalexample>
+	    <programlisting>
+1.0  0.3  2   0.1  -0.2
+1.5  0.2  2.3 2e-2 -0.3E0
+2.19 0.02 5    0.1 -0.1
+</programlisting>
 	  </informalexample>
 
-      <para>If data are imported from a file, Veusz will normally save
-      the data in its saved document format. If the data are changing,
-      quite often one wants to reread the data from the input
-      file. This can be achieved using the "linked=True" option on the
-      ImportFile command, or by clicking the "Link" checkbox in the
-      import dialog.</para>
-    </section>
+	  <para>
+	    Then x will contain "1+-0.3", "1.5+-0.2",
+	    "2.19+-0.02". y will contain "2 +0.1 -0.2", "2.3 +0.02
+	    -0.3", "5 +0.1 -0.1".
+	  </para>
+	</listitem>
 
-    <section>
-    <title>Reading CSV files</title>
+	<listitem>
+	  <para>
+	    <command>x[1:2] y[:]</command> the first column is the
+	    data "x_1", the second "x_2". Subsequent columns are read
+	    as "y[1]" to "y[n]".
+	  </para>
+	</listitem>
 
-    <para>CVS (comma separated variable) files are often written from
-    other programs, such as spreadsheets, including Excel and
-    Gnumeric. Veusz supports reading from these files.</para>
+	<listitem>
+	  <para>
+	    <command>y[:]+-</command> read each pair of columns as
+	    a dataset and its symmetric error, calling them "y[1]" to
+	    "y[n]".
+	  </para>
+	</listitem>
 
-    <para>In the import dialog choose "CSV", then choose a filename to
-    import from. In the CSV file the user should place the data in
-    either rows or columns. Veusz will use a name above a column or to
-    the left of a row to specify what the dataset name should be. The
-    user can use new names further down in columns or right in rows to
-    specify a different dataset name. Names do not have to be used,
-    and Veusz will assign default "col" and "row" names if not
-    given. You can also specify a prefix which is prepended to each
-    dataset name read from the file.</para>
+	<listitem>
+	  <para>
+	    <command>foo,,+-</command>  read the first column as
+	    the foo dataset, skip a column, and read the third column as
+	    its symmetric error.
+	  </para>
+	</listitem>
+	 </orderedlist>
+	</section>
 
-    <para>To specify symmetric errors for a column, put "+-" as the
-    dataset name in the next column or row. Asymmetric errors can be
-    stated with "+" and "-" in the columns.</para>
-
-    <para>The data can be linked with the CSV file so that it can be
-    updated when the file changes. See the example CSV import for
-    details.</para>
-
-    <para>The data type in CSV files are automatically detected unless
-    specified. The data type can be given in brackets after the column
-    name, e.g. "name (text)", where the data type is "date", "numeric"
-    or "text". Explicit data types are needed if the data look like a
-    different data type (e.g. a text item of "1.23"). The date format
-    in CSV files can be specified in the import dialog box - see the
-    examples given. In addition CSV files support numbers in European
-    format (e.g. 2,34 rather than 2.34), depending on the setting in
-    the dialog box.</para>
+      </section>
 
     </section>
 
     <section>
-      <title>Reading FITS files</title>
+      <title>CSV files</title>
+
+      <para>
+	CVS (comma separated variable) files are often written from
+	other programs, such as spreadsheets, including Excel and
+	Gnumeric. Veusz supports reading from these files.
+      </para>
+
+      <para>
+	In the import dialog choose "CSV", then choose a filename to
+	import from. In the CSV file the user should place the data in
+	either rows or columns. Veusz will use a name above a column
+	or to the left of a row to specify what the dataset name
+	should be. The user can use new names further down in columns
+	or right in rows to specify a different dataset name. Names do
+	not have to be used, and Veusz will assign default "col" and
+	"row" names if not given. You can also specify a prefix which
+	is prepended to each dataset name read from the file.
+      </para>
+
+      <para>
+	To specify symmetric errors for a column, put "+-" as the
+	dataset name in the next column or row. Asymmetric errors can
+	be stated with "+" and "-" in the columns.
+      </para>
+
+      <para>
+	The data type in CSV files are automatically detected unless
+	specified. The data type can be given in brackets after the
+	column name, e.g. "name (text)", where the data type is
+	"date", "numeric" or "text". Explicit data types are needed if
+	the data look like a different data type (e.g. a text item of
+	"1.23"). The date format in CSV files can be specified in the
+	import dialog box - see the examples given. In addition CSV
+	files support numbers in European format (e.g. 2,34 rather
+	than 2.34), depending on the setting in the dialog box.
+      </para>
+    </section>
+
+    <section>
+      <title>HDF5 files</title>
+
+      <para>
+	HDF5 is a flexible data format. Datasets and tables can be
+	stored in a hierarchical arrangements of groups within a
+	file. Veusz supports reading 1D numeric, text, date-time or 2D
+	numeric data from HDF files. The <command>h5py</command>
+	Python module must be installed to use HDF5 files (included in
+	binary releases).
+      </para>
+
+      <para>
+	In the import dialog box, choose which individual datasets to
+	import, or selecting a group to import all the datasets within
+	the group. If selecting a group, datasets in the group
+	incompatible with Veusz are ignored.
+      </para>
+
+      <para>
+	A name can be provided for each dataset imported by entering
+	one under "Import as". If one is not given, the dataset or
+	column name is used. The name can also be specified by setting
+	the HDF5 dataset attribute <varname>vsz_name</varname> to the
+	name. Note that for compound datasets (tables),
+	<varname>vsz_</varname> attributes for columns are given by
+	appending the suffix <varname>_columnname</varname> to the
+	attribute.
+      </para>
+
+      <section>
+	<title>Error bars</title>
+	<para>
+	  Error bars are supported in two ways. The first way is to
+	  combine 1D datasets. For the datasets which are error bars,
+	  use a name which is the same as the main dataset but with
+	  the suffix "(+-)", "(+)" or "(-)", for symmetric, postive or
+	  negative error bars, respectively. The second method is to
+	  use a 2D dataset with two or three columns, for symmetric or
+	  asymmetric error bars, respectively. Click on the dataset in
+	  the dialog and choose the option to import as a 1D
+	  dataset. This second method can also be enabled by adding an
+	  HDF5 attribute <varname>vsz_twod_as_oned</varname> set to a
+	  non-zero value for the dataset.
+	</para>
+      </section>
+
+      <section>
+	<title>Slices</title>
+	<para>
+	  As Veusz only supports 1D and 2D datasets, you may wish to
+	  reduce the dimensions of a dataset before importing by
+	  slicing. You can also give a slice to import a subset of a
+	  dataset. When importing, in the slice column you can give a
+	  slice expression. This should have the same number of
+	  entries as the dataset has dimensions, separated by
+	  commas. An entry can be a single number, to select a
+	  particular row or column. Alternatively it could be an
+	  expression like <literal>a:b:c</literal> or
+	  <literal>a:b</literal>, where <literal>a</literal> is the
+	  starting index, <literal>b</literal> is one beyond the
+	  stopping index and optionally <literal>c</literal> is the
+	  step size. A slice can also be specified by providing an
+	  HDF5 attribute <varname>vsz_slice</varname> for the dataset.
+	</para>
+      </section>
+
+      <section>
+	<title>2D data ranges</title>
+	<para>
+	  2D data have an associated X and Y range. By default the
+	  number of pixels of the image are used to give this range.
+	  A range can be specified by clicking on the dataset and
+	  entering a minimum and maximum X and Y
+	  coordinates. Alternatively, provide the HDF5 attribute for
+	  the dataset <varname>vsz_range</varname>, which should be set
+	  to an array of four values (minimum x, minimum y, maximum x,
+	  maximum y).
+	</para>
+      </section>
+
+      <section>
+	<title>Dates</title>
+	<para>
+	  Date/time datasets can be made from a 1D numeric dataset or
+	  from a text dataset. For the 1D dataset, use the number of
+	  seconds relative to the start of the year 2009 (this is
+	  Veusz format) or the year 1970 (this is Unix format). In the
+	  import dialog, click on the name of the dataset and choose
+	  the date option. To specify a date format in the HDF5 file,
+	  set the attribute <varname>vsz_convert_datetime</varname> to
+	  either <literal>veusz</literal> or <literal>unix</literal>.
+	</para>
+
+	<para>
+	  For text datasets, dates must be given in the right format,
+	  selected in the import dialog after clicking on the dataset
+	  name. As in other file formats, by default Veusz uses ISO
+	  8601 format, which looks like "2013-12-22T21:08:07", where
+	  the date and time parts are optional. The T is also
+	  optional. You can also provide your own format when
+	  importing by giving a date expression using YYYY, MM, DD,
+	  hh, mm and ss (e.g. "YYYY-MM-DD|T|hh:mm:ss"), where vertical
+	  bars mark optional parts of the expression. To automate
+	  this, set the attribute
+	  <varname>vsz_convert_datetime</varname> to the format
+	  expression or <literal>iso</literal> to specify ISO format.
+	</para>
+      </section>
+    </section>
+
+    <section>
+      <title>FITS files</title>
       <para>
 	1D or 2D data can be read from FITS files. 1D data, with
 	optional errors bars, can be read from table extensions, and
-	2D data from image or primary extensions.
+	2D data from image or primary extensions.  Note that pyfits or
+	astropy must be installed to get FITS support.
+      </para>
+
+      <para>
+	To read 1D data, choose a tabular HDU for to import from,
+	enter the name to give the imported data, and choose the
+	columns to assign to the data. Multiple sets of data can be
+	read by repeatedly importing.
+      </para>
+
+      <para>
+	For 2D data, choose an image HDU. Enter the name of the
+	dataset. The data are imported with pixel coordinates by
+	default (i.e. the pixels are numbered with integers). Other
+	modes can be selected under <guilabel>Image WCS
+	mode</guilabel>. These include fractional, where the pixels
+	are numbered between 0 and 1. <guilabel>Pixel (WCS)</guilabel>
+	assigns the pixel coordinate calculated relative to the
+	<varname>CRPIX1/2</varname> header keywords. <guilabel>Linear
+	(WCS)</guilabel> uses linear coordinates where the Pixel (WCS)
+	coordinates are multiplied by the respective
+	<varname>CDELT1/2</varname> values and added to the
+	<varname>CRVAL1/2</varname> values.
       </para>
     </section>
 
     <section>
       <title>Reading other data formats</title>
-      
+
       <para>As mentioned above, a user may write some Python code to
       read a data file or set of data files. To write a plugin which
       is incorportated into Veusz, see
@@ -1040,7 +1231,7 @@ SetData('y', y)
       dataset changes with it, like in a spreadsheet.</para>
       </section>
 
-      
+
       <section>
 	<title>Splitting data</title>
 	<para>Data can also be chopped in this method, for example
@@ -1127,15 +1318,15 @@ SetData('y', y)
 
     <section>
       <title>Commands</title>
-      
+
       <para>We list the allowed set of commands below</para>
-      
+
       <section>
 	<title><anchor id="Command.Action" />Action</title>
-	
+
 	<para><command>Action('actionname',
 	componentpath='.')</command></para>
-	
+
 	<para>Initiates the specified action on the widget (component)
 	given the action name. Actions perform certain automated
 	routines. These include "fit" on a fit widget, and
@@ -1143,14 +1334,14 @@ SetData('y', y)
 
       <section>
 	<title><anchor id="Command.Add" />Add</title>
-	
+
 	<para><command>Add('widgettype', name='nameforwidget',
         autoadd=True, optionalargs)</command></para>
-	
+
 	<para>The Add command adds a graph into the current widget
         (See the <link linkend="Command.To">To</link> command to change
         the current position).</para>
-	
+
 	<para>The first argument is the type of widget to add. These
         include "graph", "page", "axis", "xy" and
         "grid". <command>name</command> is the name of the new widget
@@ -1158,11 +1349,11 @@ SetData('y', y)
         widget plus a number). The <command>autoadd</command>
         parameter if set, constructs the default sub-widgets this
         widget has (for example, axes in a graph).</para>
-	
+
 	<para>Optionally, default values for the graph settings may be
         given, for example <command>Add('axis', name='y',
         direction='vertical')</command>.</para>
-	
+
 	<para>Subsettings may be set by using double underscores, for
 	example <command>Add('xy',
 	MarkerFill__color='red', ErrorBarLine__hide=True)</command>.</para>
@@ -1172,9 +1363,9 @@ SetData('y', y)
 
       <section>
 	<title><anchor id="Command.AddCustom" />AddCustom</title>
-	
+
 	<para><command>AddCustom(type, name, value)</command></para>
-	
+
 	<para>Add a custom definition for evaluation of
 	expressions. This can define a constant (can be in terms of
 	other constants), a function of 1 or more variables, or a
@@ -1199,7 +1390,7 @@ SetData('y', y)
 
       <section>
 	<title><anchor id="Command.AddImportPath" />AddImportPath</title>
-	
+
 	<para><command>AddImportPath(directory)</command></para>
 
 	<para>Add a directory to the list of directories to try to
@@ -1208,10 +1399,10 @@ SetData('y', y)
 
       <section>
 	<title><anchor id="Command.CloneWidget" />CloneWidget</title>
-	
+
 	<para><command>CloneWidget(widget, newparent,
 	newname=None)</command></para>
-	
+
 	<para>Clone the widget given, placing the copy in newparent
         and the name given.  newname is an optional new name to give
         it Returns new widget path.</para>
@@ -1219,21 +1410,21 @@ SetData('y', y)
 
       <section>
 	<title><anchor id="Command.Close" />Close</title>
-	
+
 	<para><command>Close()</command></para>
-	
+
 	<para>Closes the plotwindow. This is only supported in
 	embedded mode.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.CreateHistogram" />CreateHistogram</title>
-	
+
 	<para><command>CreateHistogram(inexpr, outbinsds,
                         outvalsds, binparams=None, binmanual=None,
                         method='counts', cumulative = 'none',
                         errors=False)</command></para>
-	
+
 	<para>
 	  Histogram an input expression.  inexpr is input expression.
         outbinds is the name of the dataset to create giving bin
@@ -1249,7 +1440,7 @@ SetData('y', y)
 
       <section>
 	<title><anchor id="Command.DatasetPlugin" />DatasetPlugin</title>
-	
+
 	<para><command>DatasetPlugin(pluginname, fields,
 	datasetnames={})></command></para>
 
@@ -1264,9 +1455,9 @@ SetData('y', y)
       <section>
 	<title><anchor id="Command.EnableToolbar"
 	/>EnableToolbar</title>
-	
+
 	<para><command>EnableToolbar(enable=True)</command></para>
-	
+
 	<para>Enable/disable the zooming toolbar in the
 	plotwindow. This command is only supported in embedded mode or
 	from veusz_listen.</para>
@@ -1404,14 +1595,14 @@ SetData('x', data[0]*0.1, *data[1:])
 
       <section>
 	<title><anchor id="Command.ImportFile" />ImportFile</title>
-	
+
 	<para><command>ImportFile('filename', 'descriptor',
 	    linked=False, prefix='', suffix='',
 	    encoding='utf_8')</command></para>
-	
+
 	<para>Imports data from a file. The arguments are the filename
 	to load data from and the descriptor.</para>
-	
+
 	<para>The format of the descriptor is a list of variable names
         representing the columns of the data. For more information see
         <link linkend="Descriptors">Descriptors</link>.</para>
@@ -1432,16 +1623,16 @@ SetData('x', data[0]*0.1, *data[1:])
 	<para>Changed in version 0.5: A tuple is returned rather than
 	just the number of imported variables.</para>
       </section>
-      
+
       <section>
 	<title><anchor id="Command.ImportFile2D" />ImportFile2D</title>
-	
+
 	<para><command>ImportFile2D('filename', datasets,
 xrange=(a,b), yrange=(c,d), invertrows=True/False,
 invertcols=True/False, transpose=True/False,
 prefix='', suffix='', linked=False,
 encoding='utf8')</command></para>
-	
+
 	<para>Imports two-dimensional data from a file. The required
 	arguments are the filename to load data from and the dataset
 	name, or a list of names to use.</para>
@@ -1492,7 +1683,7 @@ encoding='utf8')</command></para>
 
       <section>
 	<title><anchor id="Command.ImportFileCSV" />ImportFileCSV</title>
-	
+
 	<para><command>ImportFileCSV('filename', readrows=False,
 	    dsprefix='', dssuffix='', linked=False, encoding='utf_8')
 	</command></para>
@@ -1511,8 +1702,8 @@ encoding='utf8')</command></para>
 
       <section>
 	<title><anchor id="Command.ImportFilePlugin" />ImportFilePlugin</title>
-	
-	<para><command>ImportFilePlugin('pluginname', 'filename', 
+
+	<para><command>ImportFilePlugin('pluginname', 'filename',
 	    **pluginargs, linked=False, encoding='utf_8',
 	    prefix='', suffix='')</command></para>
 
@@ -1528,7 +1719,7 @@ encoding='utf8')</command></para>
       <section>
 	<title><anchor id="Command.ImportFITSFile" />
 	    ImportFITSFile</title>
-	
+
 	<para><command>ImportFITSFile(datasetname, filename, hdu,
 	    datacol='A', symerrcol='B', poserrcol='C', negerrcol='D',
 	    linked=True/False)</command></para>
@@ -1559,19 +1750,19 @@ name).</para>
 	saved document, but is reread from the data file each time the
 	document is loaded.</para>
       </section>
-	
+
       <section>
 	<title><anchor id="Command.ImportString" />ImportString</title>
-	
+
 	<para><command>ImportString('descriptor',
 	'data')</command></para>
-	
+
 	<para>Like, <link
 	linkend="Command.ImportFile">ImportFile</link>, but loads the
 	data from the specfied string rather than a file. This allows
 	data to be easily embedded within a document. The data string is
 	usually a multi-line Python string.</para>
-	
+
 	<para>Returns: A tuple containing a list of the imported
 	datasets and the number of conversions which failed for a
 	dataset.</para>
@@ -1590,11 +1781,11 @@ ImportString('x y', '''
 	</informalexample>
 
       </section>
-      
+
       <section>
 	<title><anchor
 	id="Command.ImportString2D" />ImportString2D</title>
-	
+
 	<para><command>ImportString2D(datasets,	string)</command></para>
 
 	<para>Imports a two-dimensional dataset from the string
@@ -1610,7 +1801,7 @@ ImportString('x y', '''
 
       <section>
 	<title><anchor id="Command.IsClosed" />IsClosed</title>
-	
+
 	<para><command>IsClosed()</command></para>
 
 	<para>Returns a boolean value telling the caller whether the
@@ -1623,9 +1814,9 @@ ImportString('x y', '''
 
       <section>
 	<title><anchor id="Command.List" />List</title>
-	
+
 	<para><command>List(where='.')</command></para>
-	
+
 	<para>List the widgets which are contained within the widget
       with the path given, the type of widgets, and a brief
       description.</para>
@@ -1633,13 +1824,13 @@ ImportString('x y', '''
 
       <section>
 	<title><anchor id="Command.Load" />Load</title>
-	
+
 	<para><command>Load('filename.vsz')</command></para>
-	
+
 	<para>Loads the veusz script file given. The script file can
 	be any Python code. The code is executed using the Veusz
 	interpreter.</para>
-	
+
 	<para>Note: this command is only supported at the command line
 	and not in a script. Scripts may use the python
 	<command>execfile</command> function instead.</para>
@@ -1647,12 +1838,12 @@ ImportString('x y', '''
 
       <section>
 	<title><anchor id="Command.MoveToPage" />MoveToPage</title>
-	
+
 	<para><command>MoveToPage(pagenum)</command></para>
-	
+
 	<para>Updates window to show the page number given of the
 	document.</para>
-	
+
 	<para>Note: this command is only supported in the embedding
 	interface or veusz_listen.</para>
       </section>
@@ -1669,12 +1860,12 @@ ImportString('x y', '''
 	datasets and the number of conversions which failed for a
 	dataset.</para>
       </section>
-      
+
       <section>
 	<title><anchor id="Command.Rename" />Rename</title>
-	
+
 	<para><command>Remove('widgetpath', 'newname')</command></para>
-	
+
 	<para>Rename the widget at the path given to a new name. This
 	command does not move widgets.  See <link
 	linkend="Command.To">To</link> for a description of the path
@@ -1683,9 +1874,9 @@ ImportString('x y', '''
 
       <section>
 	<title><anchor id="Command.Remove" />Remove</title>
-	
+
 	<para><command>Remove('widgetpath')</command></para>
-	
+
 	<para>Remove the widget selected using the path. See <link
 	linkend="Command.To">To</link> for a description of the path
 	syntax.</para>
@@ -1693,29 +1884,29 @@ ImportString('x y', '''
 
       <section>
 	<title><anchor id="Command.ResizeWindow" />ResizeWindow</title>
-	
+
 	<para><command>ResizeWindow(width, height)</command></para>
-	
+
 	<para>Resizes window to be width by height pixels.</para>
-	
+
 	<para>Note: this command is only supported in the embedding
 	interface or veusz_listen.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.Save" />Save</title>
-	
+
 	<para><command>Save('filename.vsz')</command></para>
-	
+
 	<para>Save the current document under the filename
 	given.</para>
       </section>
-      
+
       <section>
 	<title><anchor id="Command.Set" />Set</title>
-	
+
 	<para><command>Set('settingpath', val)</command></para>
-	
+
 	<para>Set the setting given by the path to the value given. If
 	the type of <command>val</command> is incorrect, an
 	<command>InvalidType</command> exception is thrown. The path
@@ -1733,16 +1924,16 @@ Set('page1/graph1/x/min', -10.)
 
       <section>
 	<title><anchor id="Command.SetAntiAliasing" />SetAntiAliasing</title>
-	
+
 	<para><command>SetAntiAliasing(on)</command></para>
-	
+
 	<para>Enable or disable anti aliasing in the plot
 	window, replotting the image.</para>
       </section>
-      
+
       <section>
 	<title><anchor id="Command.SetData" />SetData</title>
-	
+
 	<para><command>SetData(name, val, symerr=None, negerr=None,
       poserr=None)</command></para>
 
@@ -1755,7 +1946,7 @@ Set('page1/graph1/x/min', -10.)
 
       <section>
 	<title><anchor id="Command.SetDataExpression" />SetDataExpression</title>
-	
+
 	<para><command>SetDataExpression(name, val, symerr=None, negerr=None,
       poserr=None, linked=False, parametric=None)</command></para>
 
@@ -1788,10 +1979,10 @@ Set('page1/graph1/x/min', -10.)
 	document as a SetDataRange, otherwise it is expanded to the
 	values which would make it up.</para>
       </section>
-      
+
       <section>
 	<title><anchor id="Command.SetData2D" />SetData2D</title>
-	
+
 	<para><command>SetData2D('name', val, xrange=(A,B),
 	yrange=(C,D))</command></para>
 
@@ -1806,7 +1997,7 @@ Set('page1/graph1/x/min', -10.)
 
       <section>
 	<title><anchor id="Command.SetData2DExpression" />SetData2DExpression</title>
-	
+
 	<para><command>SetData2D('name', expr, linked=False)</command></para>
 
 	<para>Create a 2D dataset based on expressions.  name is the
@@ -1858,7 +2049,7 @@ Set('page1/graph1/x/min', -10.)
 
       <section>
 	<title><anchor id="Command.SetDataText" />SetDataText</title>
-	
+
 	<para><command>SetDataText(name, val)</command></para>
 
 	<para>Set the text dataset name with the values given.
@@ -1871,12 +2062,12 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
 </programlisting>
 	</informalexample>
       </section>
-      
+
       <section>
 	<title><anchor id="Command.SetToReference" />SetToReference</title>
-	
+
 	<para><command>SetToReference(setting, refval)</command></para>
-	
+
 	<para>Set setting to match other setting refval
 	always..</para>
       </section>
@@ -1884,9 +2075,9 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
       <section>
 	<title><anchor id="Command.SetUpdateInterval"
 	/>SetUpdateInterval</title>
-	
+
 	<para><command>SetUpdateInterval(interval)</command></para>
-	
+
 	<para>Tells window to update every interval milliseconds at
 	most. The value 0 disables updates until this function is
 	called with a non-zero. The value -1 tells Veusz to update the
@@ -1894,71 +2085,71 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
 	things slow if repeated changes are made to the
 	document. Disabling updates and using the ForceUpdate command
 	will allow the user to control updates directly.</para>
-	
+
 	<para>Note: this command is only supported in the embedding
 	interface or veusz_listen.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.SetVerbose" />SetVerbose</title>
-	
+
 	<para><command>SetVerbose(v=True)</command></para>
-	
+
 	<para>If <command>v</command> is <command>True</command>, then extra
 	information is printed out by commands.</para>
       </section>
-      
+
       <section>
 	<title><anchor id="Command.StartSecondView"
 	/>StartSecondView</title>
-	
+
 	<para><command>StartSecondView(name = 'window title')</command></para>
-	
+
 	<para>In the embedding interface, this method will open a new
 	Embedding interface onto the same document, returning the
 	object. This new window provides a second view onto the
 	document. It can, for instance, show a different page to the
 	primary view. name is a window title for the new
 	window.</para>
-	
+
 	<para>Note: this command is only supported in the embedding
 	interface.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.TagDatasets" />TagDatasets</title>
-	
+
 	<para><command>TagDatasets('tag', ['ds1', 'ds2'...])</command></para>
-	
+
 	<para>Adds the tag to the list of datasets given..</para>
       </section>
 
       <section>
 	<title><anchor id="Command.To" />To</title>
-	
+
 	<para><command>To('widgetpath')</command></para>
-	
+
 	<para>The To command takes a path to a widget and moves to
         that widget. For example, this may be "/", the root widget,
         "graph1", "/page1/graph1/x", "../x". The syntax is designed to
         mimic Unix paths for files. "/" represents the base widget
         (where the pages reside), and ".." represents the widget next
         up the tree.</para>
-	
+
       </section>
 
       <section>
 	<title><anchor id="Command.Quit" />Quit</title>
-	
+
 	<para><command>Quit()</command></para>
-	
+
 	<para>Quits Veusz. This is only supported in
 	veusz_listen.</para>
       </section>
 
       <section>
 	<title><anchor id="Command.WaitForClose" />WaitForClose</title>
-	
+
 	<para><command>WaitForClose()</command></para>
 
 	<para>Wait until the plotting window has been closed.
@@ -1970,9 +2161,9 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
 
       <section>
 	<title><anchor id="Command.Zoom" />Zoom</title>
-	
+
 	<para><command>Zoom(factor)</command></para>
-	
+
 	<para>Sets the plot zoom factor, relative to a 1:1
 	scaling. factor can also be "width", "height" or "page", to zoom
 	to the page width, height or page, respectively.</para>
@@ -2002,7 +2193,7 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
     </section>
 
   </chapter>
-  
+
   <chapter>
     <title>Using Veusz from other programs</title>
 
@@ -2033,7 +2224,7 @@ SetDataText('mylabel', ['oranges', 'apples', 'pears', 'spam'])
 import time
 import numpy
 import veusz.embed as veusz
- 
+
 g = veusz.Embedded('new window title')
 g.To( g.Add('page') )
 g.To( g.Add('graph') )
@@ -2041,7 +2232,7 @@ g.SetData('x', numpy.arange(20))
 g.SetData('y', numpy.arange(20)**2)
 g.Add('xy')
 g.Zoom(0.5)
- 
+
 # wait 20 seconds
 time.sleep(20)
 
