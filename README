@@ -14,48 +14,7 @@ external sources such as Internet sockets or other programs.
 
 Changes in 1.20:
  * Allow expressions to be edited for linked 2D datasets
-
-Changes in 1.19.1:
- * Add option to disable scaling of marker border with point scaling
- * Implement label at-minimum/at-maximum for ternary plot
- * Add border and background fill settings for text label widget
- * Enable FITS support with astropy
-
-Bug fixes:
- * Fix broken drag and drop in documents
- * Fix deleted C/C++ object crash when using undo and in tutorial
- * Fix compilation in MSVC for Python 3
- * Remove warning/error in compilation in gcc in SUSE
- * Add Python version classifiers
- * Fix document icons in Windows binary
- * Error bars can be plotted incorrectly for histogrammed data
-
-Changes in 1.19:
- * Make code compatible with python3
- * Separation of python module and resources in source package
-   (packagers may need to consult INSTALL)
- * Move to v2 of PyQt API
- * Remove deprecated numpy API from helpers module
- * Allow FITS dataset names to be blank if prefix/suffix are not
- * New ast-based code security checker
- * Picker uses 1-based index for consistency
- * Allow non-text datasets to be used for labels
- * Add number->text conversion dataset plugin
- * Add binning dataset plugin
- * Allow more significant figures in float values
- * Intelligent choice of significant figures when interactively
-   changing axis range
- * Decrease minimum range of axis
- * Add notes setting to document, pages and graphs
-
-Bug fixes:
- * Fix crash if other linked axis not initialized
- * Fix crash if trying to edit non-editable datasets
- * Make ignore exception work in error reporting dialog
- * Renaming datasets, widgets and editing data now allow original
-   text to be edited, rather than being cleared
- * Fix line positions on broken axes
- * OS X Mavericks - fixes for opening files from finder and fonts
+ * Add HDF5 import
 
 Features of package:
  Plotting features:
@@ -85,7 +44,7 @@ Features of package:
   * EPS/PDF/PNG/SVG/EMF export
   * Dataset creation/manipulation
   * Embed Veusz within other programs
-  * Text, CSV, FITS, NPY/NPZ, QDP, binary and user-plugin importing
+  * Text, HDF5, CSV, FITS, NPY/NPZ, QDP, binary and user-plugin importing
   * Data can be captured from external sources
  Extending:
   * Use as a Python module
@@ -104,7 +63,7 @@ Features of package:
 Requirements for source install:
  Python 2.x (2.6 or greater required) or 3.x (3.3 or greater required)
    http://www.python.org/
- Qt >= 4.4 (free edition)
+ Qt >= 4.6 (free edition)
    http://www.trolltech.com/products/qt/
  PyQt >= 4.5 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/software/pyqt/
@@ -112,15 +71,16 @@ Requirements for source install:
  numpy >= 1.0
    http://numpy.scipy.org/
 
-Optional:
- PyFITS >= 1.1 (optional for FITS import)
+Optional requirements:
+ h5py (optional for HDF5 support)
+   http://www.h5py.org/
+ astropy >= 0.2 or PyFITS >= 1.1 (optional for FITS import)
    http://www.stsci.edu/resources/software_hardware/pyfits
+   http://www.astropy.org/
  pyemf >= 2.0.0 (optional for EMF export)
    http://pyemf.sourceforge.net/
  PyMinuit >= 1.1.2 (optional improved fitting)
    http://code.google.com/p/pyminuit/
- For EMF and better SVG export, PyQt >= 4.6 or better is
-   required, to fix a bug in the C++ wrapping
  dbus-python, for dbus interface
    http://dbus.freedesktop.org/doc/dbus-python/
  astropy (optional for VO table import)
@@ -128,9 +88,9 @@ Optional:
  SAMPy (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
 
-Veusz is Copyright (C) 2003-2013 Jeremy Sanders
-<jeremy@jeremysanders.net> and contributors. It is licenced under the
-GPL (version 2 or greater).
+Veusz is Copyright (C) 2003-2013 Jeremy Sanders <jeremy@jeremysanders.net>
+ and contributors.
+It is licenced under the GPL (version 2 or greater).
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
