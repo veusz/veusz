@@ -385,7 +385,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             # 2D dataset
             if ( ((self.params.twod_as_oned and
                    dread.origname in self.params.twod_as_oned) or
-                  "vsz_twod_as_oned" in dread.options) and
+                  dread.options.get("vsz_twod_as_oned") ) and
                  data.shape[1] in (2,3) ):
                 # actually a 1D dataset in disguise
                 if data.shape[1] == 2:
@@ -426,6 +426,9 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 fmt = self.params.convert_datetime[dread.origname]
             except (TypeError, KeyError):
                 fmt = dread.options["vsz_convert_datetime"]
+
+            if fmt.strip() == 'iso':
+                fmt = 'YYYY-MM-DD|T|hh:mm:ss'
 
             try:
                 datere = re.compile(utils.dateStrToRegularExpression(fmt))
@@ -530,7 +533,7 @@ def ImportFileHDF5(comm, filename,
         if this is set to 'unix', this is the number of seconds since
           1970-01-01
        for a text dataset, this should give the format of the date/time,
-          e.g. 'YYYY-MM-DD|T|hh:mm:ss'
+          e.g. 'YYYY-MM-DD|T|hh:mm:ss' or 'iso' for iso format
  
     linked specifies that the dataset is linked to the file.
 
