@@ -557,7 +557,7 @@ def rrepr(val):
     if isinstance(val, dict):
         l = [ "%s: %s" % (rrepr(k), rrepr(val[k]))
               for k in sorted(val) ]
-        return "{%s}" % " ".join(l)
+        return "{%s}" % ", ".join(l)
     elif isinstance(val, set):
         l = [rrepr(v) for v in sorted(val)]
         return "set([%s])" % ", ".join(l)
