@@ -1,0 +1,72 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="531.4px" height="531.4px" version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+<desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
+</clipPath>
+<clipPath id="c1">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</clipPath>
+</defs>
+<g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</g>
+</g>
+<g clip-path="url(#c1)">
+<g fill="none" stroke-width="0.6">
+<polyline fill="none" points="385.1,99.9 338.7,146.3 292.3,239.1"/>
+</g>
+<g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(385.1,99.9)">
+<path d="m3.7,0c0,2,-1.6,3.7,-3.7,3.7c-2,0,-3.7,-1.6,-3.7,-3.7c0,-2,1.6,-3.7,3.7,-3.7c2,0,3.7,1.6,3.7,3.7" id="p0"/>
+</g>
+<use xlink:href="#p0" x="338.7" y="146.3"/>
+<use xlink:href="#p0" x="292.3" y="239.1"/>
+</g>
+<g fill="#000000" stroke-width="1">
+<text x="390.7" y="108.6" font-size="14pt" fill="#000000">silver</text>
+<text x="344.3" y="155" font-size="14pt" fill="#000000">ho</text>
+<text x="297.9" y="247.9" font-size="14pt" fill="#000000">hi</text>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l0,-464.1"/>
+<path d="M60.2,471.2l3.7,0M60.2,448l3.7,0M60.2,424.8l3.7,0M60.2,401.6l3.7,0M60.2,378.4l3.7,0M60.2,355.2l3.7,0M60.2,332l3.7,0M60.2,308.7l3.7,0M60.2,285.5l3.7,0M60.2,262.3l3.7,0M60.2,239.1l3.7,0M60.2,215.9l3.7,0M60.2,192.7l3.7,0M60.2,169.5l3.7,0M60.2,146.3l3.7,0M60.2,123.1l3.7,0M60.2,99.9l3.7,0M60.2,76.7l3.7,0M60.2,53.5l3.7,0M60.2,30.2l3.7,0M60.2,7l3.7,0"/>
+<path d="M60.2,471.2l7.5,0M60.2,355.2l7.5,0M60.2,239.1l7.5,0M60.2,123.1l7.5,0M60.2,7l7.5,0"/>
+<path d="M524.4,471.2l0,-464.1"/>
+<path d="M524.4,471.2l-3.7,0M524.4,448l-3.7,0M524.4,424.8l-3.7,0M524.4,401.6l-3.7,0M524.4,378.4l-3.7,0M524.4,355.2l-3.7,0M524.4,332l-3.7,0M524.4,308.7l-3.7,0M524.4,285.5l-3.7,0M524.4,262.3l-3.7,0M524.4,239.1l-3.7,0M524.4,215.9l-3.7,0M524.4,192.7l-3.7,0M524.4,169.5l-3.7,0M524.4,146.3l-3.7,0M524.4,123.1l-3.7,0M524.4,99.9l-3.7,0M524.4,76.7l-3.7,0M524.4,53.5l-3.7,0M524.4,30.2l-3.7,0M524.4,7l-3.7,0"/>
+<path d="M524.4,471.2l-7.5,0M524.4,355.2l-7.5,0M524.4,239.1l-7.5,0M524.4,123.1l-7.5,0M524.4,7l-7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="47.9" y="480" font-size="14pt" fill="#000000">0</text>
+<text x="30.4" y="363.9" font-size="14pt" fill="#000000">0.5</text>
+<text x="47.9" y="247.9" font-size="14pt" fill="#000000">1</text>
+<text x="30.4" y="131.8" font-size="14pt" fill="#000000">1.5</text>
+<text x="47.9" y="21" font-size="14pt" fill="#000000">2</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l464.1,0"/>
+<path d="M60.2,471.2l0,-3.7M83.4,471.2l0,-3.7M106.6,471.2l0,-3.7M129.8,471.2l0,-3.7M153,471.2l0,-3.7M176.2,471.2l0,-3.7M199.4,471.2l0,-3.7M222.6,471.2l0,-3.7M245.9,471.2l0,-3.7M269.1,471.2l0,-3.7M292.3,471.2l0,-3.7M315.5,471.2l0,-3.7M338.7,471.2l0,-3.7M361.9,471.2l0,-3.7M385.1,471.2l0,-3.7M408.3,471.2l0,-3.7M431.5,471.2l0,-3.7M454.7,471.2l0,-3.7M477.9,471.2l0,-3.7M501.2,471.2l0,-3.7M524.4,471.2l0,-3.7"/>
+<path d="M60.2,471.2l0,-7.5M176.2,471.2l0,-7.5M292.3,471.2l0,-7.5M408.3,471.2l0,-7.5M524.4,471.2l0,-7.5"/>
+<path d="M60.2,7l464.1,0"/>
+<path d="M60.2,7l0,3.7M83.4,7l0,3.7M106.6,7l0,3.7M129.8,7l0,3.7M153,7l0,3.7M176.2,7l0,3.7M199.4,7l0,3.7M222.6,7l0,3.7M245.9,7l0,3.7M269.1,7l0,3.7M292.3,7l0,3.7M315.5,7l0,3.7M338.7,7l0,3.7M361.9,7l0,3.7M385.1,7l0,3.7M408.3,7l0,3.7M431.5,7l0,3.7M454.7,7l0,3.7M477.9,7l0,3.7M501.2,7l0,3.7M524.4,7l0,3.7"/>
+<path d="M60.2,7l0,7.5M176.2,7l0,7.5M292.3,7l0,7.5M408.3,7l0,7.5M524.4,7l0,7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="55.8" y="476.5" font-size="14pt" fill="#000000">0</text>
+<text x="163.1" y="476.5" font-size="14pt" fill="#000000">0.5</text>
+<text x="287.9" y="476.5" font-size="14pt" fill="#000000">1</text>
+<text x="395.2" y="476.5" font-size="14pt" fill="#000000">1.5</text>
+<text x="520" y="476.5" font-size="14pt" fill="#000000">2</text>
+</g>
+</g>
+</g>
+</svg>

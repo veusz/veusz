@@ -56,6 +56,11 @@ import veusz.document.svg_export as svg_export
 # required to get structures initialised
 import veusz.windows.mainwindow
 
+try:
+    import h5py
+except ImportError:
+    h5py = None
+
 # these tests fail for some reason which haven't been debugged
 # it appears the failures aren't important however
 excluded_tests = set([
@@ -154,11 +159,17 @@ def runTests():
 
     fails = 0
     passes = 0
+    skipped = 0
 
     d = Dirs()
     for vsz in sorted(d.invszfiles):
         base = os.path.basename(vsz)
         print(base)
+
+        if base[:5] == 'hdf5_' and h5py is None:
+            print(" SKIPPED (no h5py installed)")
+            skipped += 1
+            continue
 
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
         renderTest(vsz, outfile)
@@ -180,6 +191,8 @@ def runTests():
             os.unlink(outfile)
 
     print()
+    if skipped != 0:
+        print('Skipped %i tests' % skipped)
     if fails == 0:
         print("All tests %i/%i PASSED" % (passes, passes))
         sys.exit(0)
