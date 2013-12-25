@@ -29,7 +29,7 @@ import codecs
 import csv
 from collections import defaultdict
 
-from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes
+from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes, crepr
 from .. import qtall as qt4
 import numpy as N
 
@@ -554,3 +554,22 @@ def checkAscending(v):
     if not N.all( N.isfinite(v) ):
         return False
     return N.all( (v[1:] - v[:-1]) > 0 )
+
+def rrepr(val):
+    """Reproducible repr.
+
+    The idea is to make a repr which won't change. We sort dict and
+    set entries."""
+
+    if isinstance(val, dict):
+        l = [ "%s: %s" % (rrepr(k), rrepr(val[k]))
+              for k in sorted(val) ]
+        return "{%s}" % ", ".join(l)
+    elif isinstance(val, set):
+        l = [rrepr(v) for v in sorted(val)]
+        return "set([%s])" % ", ".join(l)
+    elif isinstance(val, list):
+        l = [rrepr(v) for v in val]
+        return "[%s]" % ", ".join(l)
+    else:
+        return crepr(val)

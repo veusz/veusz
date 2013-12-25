@@ -1,6 +1,4 @@
-# document __init__.py
-
-#    Copyright (C) 2004 Jeremy S. Sanders
+#    Copyright (C) 2013 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -16,16 +14,13 @@
 #    You should have received a copy of the GNU General Public License along
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-##############################################################################
+###############################################################################
 
-from .widgetfactory import *
-from .doc import *
-from .datasets import *
-from .commandinterface import *
-from .commandinterpreter import *
-from .operations import *
-from .mime import *
-from .dataset_histo import *
-from .painthelper import *
-from .export import Export, printDialog
-from .dbusinterface import *
+# hooks to allow different datatypes to be imported
+
+from . import defn_standard, dialog_standard
+from . import defn_csv, dialog_csv
+from . import defn_fits, dialog_fits
+from . import defn_twod, dialog_twod
+from . import defn_hdf5, dialog_hdf5
+from . import defn_plugin, dialog_plugin

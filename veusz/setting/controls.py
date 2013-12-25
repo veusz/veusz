@@ -651,6 +651,7 @@ class Dataset(qt4.QWidget):
             utils.populateCombo(self.choice, datasets)
             self.lastdatasets = datasets
 
+    @qt4.pyqtSlot(int)          
     def slotModified(self, modified):
         """Update the list of datasets if the document is modified."""
         self._populateEntries()
@@ -988,7 +989,8 @@ class WidgetSelector(Choice):
 
     def _populateEntries(self):
         pass
-    
+
+    @qt4.pyqtSlot(int)          
     def slotModified(self, modified):
         """Update list of axes."""
         self._populateEntries()

@@ -71,6 +71,8 @@ class HistoryValueCombo(qt4.QComboBox):
     def showEvent(self, event):
         """Show HistoryCombo and load history."""
         qt4.QComboBox.showEvent(self, event)
+        if self.hasshown:
+            return
 
         self.clear()
         self.addItems(self.defaultlist)

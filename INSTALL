@@ -14,10 +14,11 @@ Requirements:
 
 PyQt requires
  Qt4             http://www.trolltech.com/products/qt/ (free version)
-                 version >= 4.4 recommended
+                 lates version recommended
  SIP >= 4.12     http://www.riverbankcomputing.co.uk/software/sip/
 
 Optional requirements:
+ h5py            http://www.h5py.org/
  Astropy >= 0.2  http://www.astropy.org
  pyemf >= 2.0.0  http://pyemf.sourceforge.net/
  PyMinuit        http://code.google.com/p/pyminuit/
