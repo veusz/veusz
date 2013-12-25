@@ -21,7 +21,7 @@ from __future__ import division, print_function
 from .. import qtall as qt4
 from .. import setting
 from ..dialogs import importdialog
-from ..compat import crange, cstr
+from ..compat import crange, cstr, ckeys
 
 from . import base
 from . import defn_hdf5
@@ -219,10 +219,11 @@ class HDFDataNode(HDFNode):
         self.slice = None
         self.options = {}
 
-        # override import name
-        self.defimportname = None
-        if "vsz_name" in dsattrs:
-            self.defimportname = cstr(dsattrs["vsz_name"])
+        # keep track of vsz attributes for data item
+        self.attrs = {}
+        for attr in ckeys(dsattrs):
+            if attr[:4] == "vsz_":
+                self.attrs[attr] = dsattrs[attr]
 
         k = dsdtype.kind
         if k in ('b', 'i', 'u', 'f'):
@@ -244,9 +245,17 @@ class HDFDataNode(HDFNode):
     def getDims(self):
         """Return dimensions after slice."""
         shape = list(self.shape)
+
+        slice = None
+        if "vsz_slice" in self.attrs:
+            slice = defn_hdf5.convertTextToSlice(
+                self.attrs["vsz_slice"], len(self.shape))
         if self.slice:
+            slice = self.slice
+
+        if slice:
             shapei = 0
-            for s in self.slice:
+            for s in slice:
                 if isinstance(s, int):
                     del shape[shapei]
                 else:
@@ -273,12 +282,19 @@ class HDFDataNode(HDFNode):
                 if role == qt4.Qt.EditRole and not self.importname:
                     return self.name
                 else:
-                    if self.defimportname is not None:
-                        return self.defimportname
-                    return self.importname
+                    if self.importname:
+                        return self.importname
+                    elif "vsz_name" in self.attrs:
+                        # needs to be converted to unicode to work!
+                        return cstr(self.attrs["vsz_name"])
+                    return None
 
             elif column == _ColSlice:
-                return defn_hdf5.convertSliceToText(self.slice)
+                if self.slice:
+                    return defn_hdf5.convertSliceToText(self.slice)
+                elif "vsz_slice" in self.attrs:
+                    return cstr(self.attrs["vsz_slice"])
+                return None
 
         elif role == qt4.Qt.ToolTipRole:
             if column == _ColName:

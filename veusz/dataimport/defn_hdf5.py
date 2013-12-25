@@ -265,8 +265,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             # implement slicing
             aslice = None
             if "vsz_slice" in dsattrs:
-                s = convertTextToSlice(dsattrs["vsz_slice"],
-                                       dataset.shape)
+                s = convertTextToSlice(dsattrs["vsz_slice"], len(dataset.shape))
                 if s != -1:
                     aslice = s
             if self.params.slices and dsname in self.params.slices:
@@ -287,7 +286,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 # compound dataset - walk columns
                 for name in item.dtype.names:
                     attrs = filterAttrsByName(item.attrs, name)
-                    self.readDataset(item[name], attrs, item.name+"/"+name, dsread)
+                    self.readDataset(item[name], attrs, item.name+"/"+name,
+                                     dsread)
             else:
                 self.readDataset(item, item.attrs, item.name, dsread)
 
