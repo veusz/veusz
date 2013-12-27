@@ -573,3 +573,31 @@ def rrepr(val):
         return "[%s]" % ", ".join(l)
     else:
         return crepr(val)
+
+def binEdgesFromCentres(vals, logmode=False):
+    """Given a set of bin centres, calculate the edges, assuming that
+    the bin edges are half way between the centres.
+
+    If logmode, do this in log space."""
+
+    if logmode:
+        vals = N.log(vals)
+
+    if len(vals) == 0:
+        edges = []
+    elif len(vals) == 1:
+        if vals[0] != 0:
+            edges = [0, vals[0]*2]
+        else:
+            edges = [-1, 1]
+    else:
+        edges = N.concatenate((
+            [vals[0] - 0.5*(vals[1]-vals[0])],
+            0.5*(vals[:-1] + vals[1:]),
+            [vals[-1] + 0.5*(vals[-1]-vals[-2])]
+        ))
+
+    if logmode:
+        return N.exp(edges)
+    else:
+        return N.array(edges)

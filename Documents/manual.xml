@@ -1116,16 +1116,28 @@ descriptor alpha beta gamma
       </listitem>
 
       <listitem>
-	<para><command>xgrid A B C...</command> - rather than assume
-	the pixels have the same spacing, give the coordinates of the
-	edges of the pixels in the x-axis. The numbers should be
-	space-separated and there should be one more number than
-	pixels. Do not give <command>xrange</command> if this is
-	given.</para>
+	<para><command>xgrid [cen|cen_log] A B C...</command> - rather
+	than assume the pixels have the same spacing, give the
+	coordinates of the edges of the pixels in the x-axis. The
+	numbers should be space-separated and there should be one more
+	number than pixels. Do not give <command>xrange</command> if
+	this is given.</para>
+
+	<para>
+	  If the optional argument <literal>cen</literal> or
+	  <literal>cen_log</literal> is given, then give the centres
+	  of the pixels. In this case the edges are assumed to lie to
+	  half way between the centres (in log space for
+	  <literal>cen_log</literal>). The edges of the outer pixels
+	  are calculated by assuming that they have the same width
+	  from their centres to either edge. Note that the calculated
+	  edges will not necessarily give the correct centres when
+	  plotting.
+	</para>
       </listitem>
 
       <listitem>
-	<para><command>ygrid A B C...</command> - rather than assume
+	<para><command>ygrid [cen|cen_log] A B C...</command> - rather than assume
 	the pixels have the same spacing, give the coordinates of the
 	edges of the pixels in the y-axis.</para>
       </listitem>

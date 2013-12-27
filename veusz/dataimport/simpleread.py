@@ -48,6 +48,7 @@ import numpy as N
 from ..compat import crange, cnext, CStringIO, citems
 from .. import utils
 from .. import document
+from .import base
 
 # a regular expression for splitting descriptor into tokens
 descrtokens_split_re = re.compile(r'''
@@ -604,7 +605,7 @@ class SimpleRead(object):
 #####################################################################
 # 2D data reading
 
-class Read2DError(ValueError):
+class Read2DError(base.ImportingError):
     pass
 
 class SimpleRead2D(object):
@@ -630,9 +631,18 @@ class SimpleRead2D(object):
         except ValueError:
             raise Read2DError("yrange is not two numerical values")
 
+    def getGridEdges(self, cols):
+        """Return grid edges."""
+        if cols[1] in ('cen', 'cen_log'):
+            data = N.array([float(v) for v in cols[2:]])
+            return utils.binEdgesFromCentres(
+                data, logmode = cols[1]=='cen_log')
+        else:
+            return [float(v) for v in cols[1:]]
+
     def _paramXGrid(self, cols):
         try:
-            g = self.params.xgrid = [float(v) for v in cols[1:]]
+            g = self.params.xgrid = self.getGridEdges(cols)
         except ValueError:
             raise Read2DError("xgrid is not a list of numerical values")
         if not utils.checkAscending(g):
@@ -640,7 +650,7 @@ class SimpleRead2D(object):
 
     def _paramYGrid(self, cols):
         try:
-            g = self.params.ygrid = [float(v) for v in cols[1:]]
+            g = self.params.ygrid = self.getGridEdges(cols)
         except ValueError:
             raise Read2DError("ygrid is not a list of numerical values")
         if not utils.checkAscending(g):
@@ -667,8 +677,8 @@ class SimpleRead2D(object):
         optional:
          xrange A B   - set the range of x from A to B
          yrange A B   - set the range of y from A to B
-         xgrid A B... - set list of x values (instead of xrange)
-         ygrid A B... - set list oy y values (instead of yrange)
+         xgrid [cen|cen_log] A B... - list of x values (instead of xrange)
+         ygrid [cen|cen_log] A B... - list of y values (instead of yrange)
          invertrows   - invert order of the rows
          invertcols   - invert order of the columns
          transpose    - swap rows and columns
@@ -723,7 +733,7 @@ class SimpleRead2D(object):
 
         if self.params.gridatedge:
             if self.params.xgrid is not None or self.params.ygrid is not None:
-                raise ValueError("xgrid/ygrid are incompatible with gridatedge")
+                raise Read2DError("xgrid/ygrid are incompatible with gridatedge")
 
             # calculate grid from values at edge of rows
             oldxgrid = N.array(rows[-1])
@@ -791,7 +801,7 @@ class SimpleRead2D(object):
               len(self.xgrid) != self.data.shape[1]+1) or
              (self.params.ygrid is not None and
               len(self.ygrid) != self.data.shape[0]+1) ):
-            raise ValueError("xgrid and ygrid lengths must be data shape+1")
+            raise Read2DError("xgrid and ygrid lengths must be data shape+1")
 
     def setInDocument(self, doc, linkedfile=None):
         """Set the data in the document.
