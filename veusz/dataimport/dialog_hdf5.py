@@ -223,7 +223,7 @@ class HDFDataNode(HDFNode):
         self.attrs = {}
         for attr in ckeys(dsattrs):
             if attr[:4] == "vsz_":
-                self.attrs[attr] = dsattrs[attr]
+                self.attrs[attr] = defn_hdf5.bconv(dsattrs[attr])
 
         k = dsdtype.kind
         if k in ('b', 'i', 'u', 'f'):

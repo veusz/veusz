@@ -24,7 +24,7 @@ import sys
 
 import numpy as N
 from .. import qtall as qt4
-from ..compat import citems, ckeys, cvalues, cstr
+from ..compat import citems, ckeys, cvalues, cstr, cbytes, cpy3
 from .. import document
 from .. import utils
 from . import base
@@ -41,6 +41,16 @@ def inith5py():
         raise RuntimeError(
             "Cannot load Python h5py module. "
             "Please install before loading documents using HDF5 data.")
+
+def bconv(s):
+    """Hack for h5py byte problem with python3.
+    https://github.com/h5py/h5py/issues/379
+
+    Byte string attributes are not converted to normal strings."""
+
+    if cpy3 and isinstance(s, cbytes):
+        return s.decode('utf-8', 'replace')
+    return s
 
 def filterAttrsByName(attrs, name):
     """For compound datasets, attributes can be given on a per-column basis.
@@ -139,7 +149,7 @@ def applySlices(data, slices):
             slist.append(s)
         else:
             slist.append(slice(*s))
-            if s[2] < 0:
+            if s[2] is not None and s[2] < 0:
                 # negative slicing doesn't work in h5py, so we
                 # make a copy
                 data = N.array(data)
@@ -242,30 +252,30 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         dsread maps names to _DataRead object
         """
 
+        # store options associated with dataset
+        options = {}
+        for a in ckeys(dsattrs):
+            if a[:4] == "vsz_":
+                options[a] = bconv(dsattrs[a])
+
         # find name for dataset
         if (self.params.namemap is not None and
             dsname in self.params.namemap ):
             name = self.params.namemap[dsname]
         else:
-            if "vsz_name" in dsattrs:
+            if "vsz_name" in options:
                 # override name using attribute
-                name = dsattrs["vsz_name"]
+                name = options["vsz_name"]
             else:
                 name = dsname.split("/")[-1].strip()
         if name in dsread:
             name = dsname.strip()
 
-        # store options associated with dataset
-        options = {}
-        for a in ckeys(dsattrs):
-            if a[:4] == "vsz_":
-                options[a] = dsattrs[a]
-
         try:
             # implement slicing
             aslice = None
-            if "vsz_slice" in dsattrs:
-                s = convertTextToSlice(dsattrs["vsz_slice"], len(dataset.shape))
+            if "vsz_slice" in options:
+                s = convertTextToSlice(options["vsz_slice"], len(dataset.shape))
                 if s != -1:
                     aslice = s
             if self.params.slices and dsname in self.params.slices:
@@ -438,6 +448,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
             dout = N.empty(len(data), dtype=N.float64)
             for i, ditem in enumerate(data):
+                ditem = bconv(ditem)
                 try:
                     match = datere.match(ditem)
                     val = utils.dateREMatchToDate(match)
@@ -448,8 +459,11 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             ds = document.DatasetDateTime(dout)
 
         else:
+            # unfortunately byte strings are returned in py3
+            tdata = [bconv(d) for d in dread.data]
+
             # standard text dataset
-            ds = document.DatasetText(dread.data)
+            ds = document.DatasetText(tdata)
 
         return ds
 
