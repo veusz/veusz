@@ -532,7 +532,8 @@ class CommandInterface(qt4.QObject):
                                                  data.data.shape[1]))
 
     def SetData2D(self, name, data, xrange=None, yrange=None,
-                  xgrid=None, ygrid=None):
+                  xgrid=None, ygrid=None,
+                  xcent=None, ycent=None):
         """Create a 2D dataset.
 
         name: name of dataset
@@ -541,6 +542,8 @@ class CommandInterface(qt4.QObject):
         yrange: optional tuple with Y range of data (min, max)
         xgrid: x values for grid (instead of rangex)
         ygrid: y values for grid (instead of rangey)
+        xcent: x values for pixel centres (instead of rangex)
+        ycent: y values for pixel centres (instead of rangey)
         """
 
         data = N.array(data)
@@ -548,13 +551,20 @@ class CommandInterface(qt4.QObject):
         if ( (xgrid is not None and not utils.checkAscending(xgrid)) or
              (ygrid is not None and not utils.checkAscending(ygrid)) ):
             raise ValueError("xgrid and ygrid must be ascending, if given")
+        if ( (xcent is not None and not utils.checkAscending(xcent)) or
+             (ycent is not None and not utils.checkAscending(ycent)) ):
+            raise ValueError("xcent and ycent must be ascending, if given")
 
         if ( (xgrid is not None and len(xgrid) != data.shape[1]+1) or
              (ygrid is not None and len(ygrid) != data.shape[0]+1) ):
             raise ValueError("xgrid and ygrid lengths must be data shape+1")
+        if ( (xcent is not None and len(xcent) != data.shape[1]) or
+             (ycent is not None and len(ycent) != data.shape[0]) ):
+            raise ValueError("xcent and ycent lengths must be data shape")
 
         data = datasets.Dataset2D(data, xrange=xrange, yrange=yrange,
-                                  xgrid=xgrid, ygrid=ygrid)
+                                  xgrid=xgrid, ygrid=ygrid,
+                                  xcent=xcent, ycent=ycent)
         op = operations.OperationDatasetSet(name, data)
         self.document.applyOperation(op)
 

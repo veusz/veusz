@@ -616,6 +616,9 @@ class SimpleRead2D(object):
         self.name = name
         self.params = params.copy()
 
+        # not present in ImportParams2D
+        self.xgrid = self.ygrid = self.xcent = self.ycent = None
+
     ####################################################################
     # Follow functions are for setting parameters during reading of data
 
@@ -631,30 +634,15 @@ class SimpleRead2D(object):
         except ValueError:
             raise Read2DError("yrange is not two numerical values")
 
-    def getGridEdges(self, cols):
-        """Return grid edges."""
-        if cols[1] in ('cen', 'cen_log'):
-            data = N.array([float(v) for v in cols[2:]])
-            return utils.binEdgesFromCentres(
-                data, logmode = cols[1]=='cen_log')
-        else:
-            return [float(v) for v in cols[1:]]
-
-    def _paramXGrid(self, cols):
+    def _getNumList(self, attr, cols):
+        """Generic conversion of a list of numbers."""
         try:
-            g = self.params.xgrid = self.getGridEdges(cols)
+            g = [float(v) for v in cols[1:]]
         except ValueError:
-            raise Read2DError("xgrid is not a list of numerical values")
+            raise Read2DError("%s is not a list of numerical values" % attr)
         if not utils.checkAscending(g):
-            raise Read2DError("xgrid values are not ascending")
-
-    def _paramYGrid(self, cols):
-        try:
-            g = self.params.ygrid = self.getGridEdges(cols)
-        except ValueError:
-            raise Read2DError("ygrid is not a list of numerical values")
-        if not utils.checkAscending(g):
-            raise Read2DError("ygrid values are not ascending")
+            raise Read2DError("%s values are not ascending" % attr)
+        setattr(self, attr, g)
 
     def _paramInvertRows(self, cols):
         self.params.invertrows = True
@@ -677,8 +665,10 @@ class SimpleRead2D(object):
         optional:
          xrange A B   - set the range of x from A to B
          yrange A B   - set the range of y from A to B
-         xgrid [cen|cen_log] A B... - list of x values (instead of xrange)
-         ygrid [cen|cen_log] A B... - list of y values (instead of yrange)
+         xgrid A B... - list of x values (instead of xrange)
+         ygrid A B... - list of y values (instead of yrange)
+         xcent A B... - list of x centres (instead of xrange)
+         ycent A B... - list of y centres (instead of yrange)
          invertrows   - invert order of the rows
          invertcols   - invert order of the columns
          transpose    - swap rows and columns
@@ -692,8 +682,10 @@ class SimpleRead2D(object):
         settings = {
             'xrange': self._paramXRange,
             'yrange': self._paramYRange,
-            'xgrid': self._paramXGrid,
-            'ygrid': self._paramYGrid,
+            'xgrid': lambda cols: self._getNumList('xgrid', cols),
+            'ygrid': lambda cols: self._getNumList('ygrid', cols),
+            'xcent': lambda cols: self._getNumList('xcent', cols),
+            'ycent': lambda cols: self._getNumList('ycent', cols),
             'invertrows': self._paramInvertRows,
             'invertcols': self._paramInvertCols,
             'transpose': self._paramTranspose,
@@ -732,30 +724,17 @@ class SimpleRead2D(object):
             rows.insert(0, line)
 
         if self.params.gridatedge:
-            if self.params.xgrid is not None or self.params.ygrid is not None:
-                raise Read2DError("xgrid/ygrid are incompatible with gridatedge")
 
-            # calculate grid from values at edge of rows
-            oldxgrid = N.array(rows[-1])
-            xgrid = 0.5*(oldxgrid[1:]+oldxgrid[:-1])
-            if len(oldxgrid) >= 2:
-                xgrid = N.hstack( (xgrid[0]  - (oldxgrid[1]-oldxgrid[0]),
-                                   xgrid,
-                                   xgrid[-1] + (oldxgrid[-1]-oldxgrid[-2])) )
-            self.xgrid = xgrid
+            if any( [getattr(self, x) is not None
+                     for x in ("xgrid", "ygrid", "xcent", "ycent")] ):
+                raise Read2DError(
+                    "x|y grid|cent are incompatible with gridatedge")
 
-            oldygrid = N.array([r[0] for r in rows[:-1]])
-            ygrid = 0.5*(oldygrid[1:]+oldygrid[:-1])
-            if len(oldygrid) >= 2:
-                ygrid = N.hstack( (ygrid[0]  - (oldygrid[1]-oldygrid[0]),
-                                   ygrid,
-                                   ygrid[-1] + (oldygrid[-1]-oldygrid[-2])) )
-            self.ygrid = ygrid
+            self.xcent = N.array(rows[-1])
+            self.ycent = N.array([r[0] for r in rows[-2::-1]])
 
             # chop out grid
             rows = [ r[1:] for r in rows[:-1] ]
-        else:
-            self.xgrid = self.ygrid = None
 
         # dodgy formatting probably...
         if len(rows) == 0:
@@ -774,34 +753,37 @@ class SimpleRead2D(object):
             self.data = self.data[:,::-1]
             if self.xgrid is not None:
                 self.xgrid = self.xgrid[::-1]
+            if self.xcent is not None:
+                self.xcent = self.xcent[::-1]
         if self.params.invertrows:
             self.data = self.data[::-1,:]
             if self.ygrid is not None:
                 self.ygrid = self.ygrid[::-1]
+            if self.ycent is not None:
+                self.ycent = self.ycent[::-1]
 
         # transpose matrix if requested
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
             self.xgrid, self.ygrid = self.xgrid, self.ygrid
 
-        # copy grid, if not given at edge
-        if self.params.xgrid is not None:
-            self.xgrid = self.params.xgrid
-        if self.params.ygrid is not None:
-            self.ygrid = self.params.ygrid
-
-        # sanity check
-        if ( (self.xgrid is not None and
-              not utils.checkAscending(self.xgrid)) or
-             (self.ygrid is not None and
-              not utils.checkAscending(self.ygrid)) ):
-            raise Read2DError("xgrid and ygrid must be ascending")
+        # sanity checks
+        for a in 'xgrid', 'ygrid', 'xcent', 'ycent':
+            v = getattr(self, a)
+            if v is not None and not utils.checkAscending(v):
+                raise Read2DError("%s must be ascending" % a)
 
         if ( (self.xgrid is not None and
               len(self.xgrid) != self.data.shape[1]+1) or
-             (self.params.ygrid is not None and
+             (self.ygrid is not None and
               len(self.ygrid) != self.data.shape[0]+1) ):
             raise Read2DError("xgrid and ygrid lengths must be data shape+1")
+
+        if ( (self.xcent is not None and
+              len(self.xcent) != self.data.shape[1]) or
+             (self.ycent is not None and
+              len(self.ycent) != self.data.shape[0]) ):
+            raise Read2DError("xcent and ycent lengths must be data shape")
 
     def setInDocument(self, doc, linkedfile=None):
         """Set the data in the document.
@@ -812,7 +794,8 @@ class SimpleRead2D(object):
         ds = document.Dataset2D(self.data,
                                 xrange=self.params.xrange,
                                 yrange=self.params.yrange,
-                                xgrid=self.xgrid, ygrid=self.ygrid)
+                                xgrid=self.xgrid, ygrid=self.ygrid,
+                                xcent=self.xcent, ycent=self.ycent)
 
         ds.linked = linkedfile
 

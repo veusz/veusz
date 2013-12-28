@@ -439,23 +439,9 @@ class Contour(plotters.GenericPlotter):
         if xw == 0 or yw == 0:
             return
 
-        # arrays containing coordinates of pixels in x and y
-        if data.xgrid is not None:
-            # FIXME: for log axis, we should find the value in log space
-            xgr = 0.5*(data.xgrid[:-1] + data.xgrid[1:])
-            xpts = N.reshape( N.tile(xgr, yw), (yw, xw) )
-        else:
-            xpts = N.fromfunction(lambda y,x: (x+0.5)*((rangex[1]-rangex[0])
-                                                       /xw) + rangex[0],
-                                  (yw, xw))
-        if data.ygrid is not None:
-            # FIXME: for log axis, we should find the value in log space
-            ygr = 0.5*(data.ygrid[:-1] + data.ygrid[1:])
-            ypts = N.tile(ygr[:, N.newaxis], xw)
-        else:
-            ypts = N.fromfunction(lambda y,x: (y+0.5)*((rangey[1]-rangey[0])
-                                                       /yw) + rangey[0],
-                                  (yw, xw))
+        xc, yc = data.getPixelCentres()
+        xpts = N.reshape( N.tile(xc, yw), (yw, xw) )
+        ypts = N.tile(yc[:, N.newaxis], xw)
 
         # only keep finite data points
         mask = N.logical_not(N.isfinite(data.data))

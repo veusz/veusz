@@ -44,6 +44,8 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
+        self.updatePixelCoords()
+
         document.signalModified.connect(self.slotDocumentModified)
 
     def rowCount(self, parent):
@@ -56,10 +58,11 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             return len(self.document.data[self.dsname].data)+1
         except (KeyError, AttributeError):
             return 0
-        
+
     def slotDocumentModified(self):
         """Called when document modified."""
-        self.emit( qt4.SIGNAL('layoutChanged()') )
+        self.updatePixelCoordinates()
+        self.layoutChanged.emit()
 
     def columnCount(self, parent):
         """Return number of columns."""
@@ -233,7 +236,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
 
     def slotDocumentModified(self):
         self.updateCounts()
-        self.emit( qt4.SIGNAL('layoutChanged()') )
+        self.layoutChanged.emit()
 
     def data(self, index, role):
         """Return data for index."""
@@ -341,7 +344,16 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
+        self.updatePixelCoords()
         document.signalModified.connect(self.slotDocumentModified)
+
+    def updatePixelCoords(self):
+        """Get coordinates at edge of grid."""
+        self.xgrid = self.ygrid = self.xcent = self.ycent = []
+        ds = self.document.data.get(self.dsname)
+        if ds:
+            self.xcent, self.ycent = ds.getPixelCentres()
+            self.xgrid, self.ygrid = ds.getPixelEdges()
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -378,11 +390,12 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         axis = 'x' if orientation == qt4.Qt.Horizontal else 'y'
         if ds is not None and role == qt4.Qt.DisplayRole:
-            v = ds.pixMidPointFromIndex(section, axis)
+            v = self.xcent[section] if 'x' else self.ycent[section]
             return '%i (%s)' % (section+1, setting.uilocale.toString(v))
 
         elif ds is not None and role == qt4.Qt.ToolTipRole:
-            v1, v2 = ds.pixRangeFromIndex(section, axis)
+            v1 = self.xgrid[section] if 'x' else self.ygrid[section]
+            v2 = self.xgrid[section+1] if 'x' else self.ygrid[section+1]
             return u'%s\u2013%s' % (setting.uilocale.toString(v1),
                                     setting.uilocale.toString(v2))
 
@@ -401,7 +414,8 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
     def slotDocumentModified(self):
         """Called when document modified."""
-        self.emit( qt4.SIGNAL('layoutChanged()') )
+        self.updatePixelCoords()
+        self.layoutChanged.emit()
 
     def setData(self, index, value, role):
         """Called to set the data."""

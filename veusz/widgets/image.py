@@ -307,9 +307,7 @@ class Image(plotters.GenericPlotter):
             datavaluerange[0], datavaluerange[1],
             s.transparency, transimg=transimg)
 
-        xgrid = data.xgrid
-        ygrid = data.ygrid
-        if xgrid is None and ygrid is None:
+        if data.isLinearImage():
             # linearly spaced grid
 
             if ( pltrangex[0] < posn[0] or pltrangex[1] > posn[2] or
@@ -319,18 +317,9 @@ class Image(plotters.GenericPlotter):
                     image, pltrangex, pltrangey, posn)
 
         else:
-            # non-linear grid
-            if xgrid is None:
-                xgridp = N.linspace(pltrangex[0], pltrangex[1],
-                                    data.data.shape[1]+1)
-            else:
-                xgridp = axes[0].dataToPlotterCoords(posn, xgrid)
-
-            if ygrid is None:
-                ygridp = N.linspace(pltrangey[1], pltrangey[0],
-                                    data.data.shape[0]+1)
-            else:
-                ygridp = axes[1].dataToPlotterCoords(posn, ygrid)
+            xgrid, ygrid = data.getPixelEdges()
+            xgridp = axes[0].dataToPlotterCoords(posn, xgrid)
+            ygridp = axes[1].dataToPlotterCoords(posn, ygrid)
 
             # crop any pixels completely outside posn
             xgridp, ygridp, image = cropGridImageToBox(

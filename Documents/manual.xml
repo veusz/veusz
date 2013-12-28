@@ -1104,9 +1104,10 @@ descriptor alpha beta gamma
 	<para><command>xrange A B</command> - make the 2D dataset span
 	the coordinate range A to B in the x-axis (where A and B are
 	numbers). Note that the range is inclusive, so a 1 pixel wide
-	image with A=0 and B=1 would have the pixel centre at
-	0.5. The pixels are assumed to have the same spacing. Do not
-	use this as the same time as <command>xgrid</command>.</para>
+	image with A=0 and B=1 would have the pixel centre at 0.5. The
+	pixels are assumed to have the same spacing. Do not use this
+	as the same time as the <command>xgrid</command> or
+	<command>xcent</command> options.</para>
       </listitem>
 
       <listitem>
@@ -1116,30 +1117,32 @@ descriptor alpha beta gamma
       </listitem>
 
       <listitem>
-	<para><command>xgrid [cen|cen_log] A B C...</command> - rather
-	than assume the pixels have the same spacing, give the
-	coordinates of the edges of the pixels in the x-axis. The
-	numbers should be space-separated and there should be one more
-	number than pixels. Do not give <command>xrange</command> if
-	this is given.</para>
-
-	<para>
-	  If the optional argument <literal>cen</literal> or
-	  <literal>cen_log</literal> is given, then give the centres
-	  of the pixels. In this case the edges are assumed to lie to
-	  half way between the centres (in log space for
-	  <literal>cen_log</literal>). The edges of the outer pixels
-	  are calculated by assuming that they have the same width
-	  from their centres to either edge. Note that the calculated
-	  edges will not necessarily give the correct centres when
-	  plotting.
-	</para>
+	<para><command>xgrid A B C...</command> - rather than assume
+	the pixels have the same spacing, give the coordinates of the
+	edges of the pixels in the x-axis. The numbers should be
+	space-separated and there should be one more number than
+	pixels. Do not give <command>xrange</command> or
+	<command>xcent</command> if this is given.</para>
       </listitem>
 
       <listitem>
-	<para><command>ygrid [cen|cen_log] A B C...</command> - rather than assume
+	<para><command>ygrid A B C...</command> - rather than assume
 	the pixels have the same spacing, give the coordinates of the
 	edges of the pixels in the y-axis.</para>
+      </listitem>
+
+      <listitem>
+	<para><command>xcent A B C...</command> - rather than give a
+	total range or pixel edges, give the centres of the
+	pixels. There should be the same number of values as pixels in
+	the image. Do not give <command>xrange</command> or
+	<command>xgrid</command> if this is given.</para>
+      </listitem>
+
+      <listitem>
+	<para><command>ycent A B C...</command> - rather than give a
+	total range or pixel edges, give the centres of the
+	pixels.</para>
       </listitem>
 
       <listitem>

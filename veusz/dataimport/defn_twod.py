@@ -44,8 +44,6 @@ class ImportParams2D(base.ImportParamsBase):
         'datastr': None,
         'xrange': None,
         'yrange': None,
-        'xgrid': None,
-        'ygrid': None,
         'invertrows': False,
         'invertcols': False,
         'transpose': False,
@@ -70,6 +68,7 @@ class LinkedFile2D(base.LinkedFileBase):
             v = getattr(self.params, par)
             if v is not None and v != "" and v != self.params.defaults[par]:
                 args.append( "%s=%s" % (par, crepr(v)) )
+
         args.append("linked=True")
 
         fileobj.write("ImportFile2D(%s)\n" % ", ".join(args))
