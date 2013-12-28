@@ -317,19 +317,19 @@ class Image(plotters.GenericPlotter):
                     image, pltrangex, pltrangey, posn)
 
         else:
-            xgrid, ygrid = data.getPixelEdges()
-            xgridp = axes[0].dataToPlotterCoords(posn, xgrid)
-            ygridp = axes[1].dataToPlotterCoords(posn, ygrid)
+            xedge, yedge = data.getPixelEdges()
+            xedgep = axes[0].dataToPlotterCoords(posn, xedge)
+            yedgep = axes[1].dataToPlotterCoords(posn, yedge)
 
             # crop any pixels completely outside posn
-            xgridp, ygridp, image = cropGridImageToBox(
-                image, xgridp, ygridp, posn)
+            xedgep, yedgep, image = cropGridImageToBox(
+                image, xedgep, yedgep, posn)
 
             # make image on linear grid
-            image = utils.resampleLinearImage(image, xgridp, ygridp)
+            image = utils.resampleLinearImage(image, xedgep, yedgep)
 
-            pltrangex = xgridp[0], xgridp[-1]
-            pltrangey = ygridp[0], ygridp[-1]
+            pltrangex = xedgep[0], xedgep[-1]
+            pltrangey = yedgep[0], yedgep[-1]
 
         # optionally smooth images before displaying
         if s.smooth:

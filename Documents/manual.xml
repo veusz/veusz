@@ -1106,7 +1106,7 @@ descriptor alpha beta gamma
 	numbers). Note that the range is inclusive, so a 1 pixel wide
 	image with A=0 and B=1 would have the pixel centre at 0.5. The
 	pixels are assumed to have the same spacing. Do not use this
-	as the same time as the <command>xgrid</command> or
+	as the same time as the <command>xedge</command> or
 	<command>xcent</command> options.</para>
       </listitem>
 
@@ -1117,7 +1117,7 @@ descriptor alpha beta gamma
       </listitem>
 
       <listitem>
-	<para><command>xgrid A B C...</command> - rather than assume
+	<para><command>xedge A B C...</command> - rather than assume
 	the pixels have the same spacing, give the coordinates of the
 	edges of the pixels in the x-axis. The numbers should be
 	space-separated and there should be one more number than
@@ -1126,7 +1126,7 @@ descriptor alpha beta gamma
       </listitem>
 
       <listitem>
-	<para><command>ygrid A B C...</command> - rather than assume
+	<para><command>yedge A B C...</command> - rather than assume
 	the pixels have the same spacing, give the coordinates of the
 	edges of the pixels in the y-axis.</para>
       </listitem>
@@ -1136,7 +1136,7 @@ descriptor alpha beta gamma
 	total range or pixel edges, give the centres of the
 	pixels. There should be the same number of values as pixels in
 	the image. Do not give <command>xrange</command> or
-	<command>xgrid</command> if this is given.</para>
+	<command>xedge</command> if this is given.</para>
       </listitem>
 
       <listitem>

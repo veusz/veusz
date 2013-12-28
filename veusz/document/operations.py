@@ -713,7 +713,7 @@ class OperationDataset2DBase(object):
             # unlink if necessary
             ds = datasets.Dataset2D(ds.data,
                                     xrange=ds.xrange, yrange=ds.yrange,
-                                    xgrid=ds.xgrid, ygrid=ds.ygrid,
+                                    xedge=ds.xedge, yedge=ds.yedge,
                                     xcent=ds.xcent, ycent=ds.ycent)
         document.setData(self.datasetname, ds)
         return ds

@@ -532,7 +532,7 @@ class CommandInterface(qt4.QObject):
                                                  data.data.shape[1]))
 
     def SetData2D(self, name, data, xrange=None, yrange=None,
-                  xgrid=None, ygrid=None,
+                  xedge=None, yedge=None,
                   xcent=None, ycent=None):
         """Create a 2D dataset.
 
@@ -540,30 +540,30 @@ class CommandInterface(qt4.QObject):
         data: 2d array
         xrange: optional tuple with X range of data (min, max)
         yrange: optional tuple with Y range of data (min, max)
-        xgrid: x values for grid (instead of rangex)
-        ygrid: y values for grid (instead of rangey)
+        xedge: x values for grid (instead of rangex)
+        yedge: y values for grid (instead of rangey)
         xcent: x values for pixel centres (instead of rangex)
         ycent: y values for pixel centres (instead of rangey)
         """
 
         data = N.array(data)
 
-        if ( (xgrid is not None and not utils.checkAscending(xgrid)) or
-             (ygrid is not None and not utils.checkAscending(ygrid)) ):
-            raise ValueError("xgrid and ygrid must be ascending, if given")
+        if ( (xedge is not None and not utils.checkAscending(xedge)) or
+             (yedge is not None and not utils.checkAscending(yedge)) ):
+            raise ValueError("xedge and yedge must be ascending, if given")
         if ( (xcent is not None and not utils.checkAscending(xcent)) or
              (ycent is not None and not utils.checkAscending(ycent)) ):
             raise ValueError("xcent and ycent must be ascending, if given")
 
-        if ( (xgrid is not None and len(xgrid) != data.shape[1]+1) or
-             (ygrid is not None and len(ygrid) != data.shape[0]+1) ):
-            raise ValueError("xgrid and ygrid lengths must be data shape+1")
+        if ( (xedge is not None and len(xedge) != data.shape[1]+1) or
+             (yedge is not None and len(yedge) != data.shape[0]+1) ):
+            raise ValueError("xedge and yedge lengths must be data shape+1")
         if ( (xcent is not None and len(xcent) != data.shape[1]) or
              (ycent is not None and len(ycent) != data.shape[0]) ):
             raise ValueError("xcent and ycent lengths must be data shape")
 
         data = datasets.Dataset2D(data, xrange=xrange, yrange=yrange,
-                                  xgrid=xgrid, ygrid=ygrid,
+                                  xedge=xedge, yedge=yedge,
                                   xcent=xcent, ycent=ycent)
         op = operations.OperationDatasetSet(name, data)
         self.document.applyOperation(op)

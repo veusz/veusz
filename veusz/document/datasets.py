@@ -282,7 +282,7 @@ class Dataset2D(DatasetBase):
     isstable = True
 
     def __init__(self, data, xrange=None, yrange=None,
-                 xgrid=None, ygrid=None,
+                 xedge=None, yedge=None,
                  xcent=None, ycent=None):
         '''Create a two dimensional dataset based on data.
 
@@ -292,8 +292,8 @@ class Dataset2D(DatasetBase):
          xrange: a tuple of (start, end) coordinates for x
          yrange: a tuple of (start, end) coordinates for y
         _or_
-         xgrid: list of values start..end (npix+1 values)
-         ygrid: list of values start..end (npix+1 values)
+         xedge: list of values start..end (npix+1 values)
+         yedge: list of values start..end (npix+1 values)
         _or_
          xcent: list of values (npix values)
          ycent: list of values (npix values)
@@ -305,12 +305,12 @@ class Dataset2D(DatasetBase):
         self._data = d = convertNumpy(data, dims=2)
 
         self._xrange = self._yrange = None
-        self._xgrid = self._ygrid = self._xcent = self._ycent = None
+        self._xedge = self._yedge = self._xcent = self._ycent = None
 
         if xrange is not None:
             self._xrange = tuple(xrange)
-        elif xgrid is not None:
-            self._xgrid = N.array(xgrid)
+        elif xedge is not None:
+            self._xedge = N.array(xedge)
         elif xcent is not None:
             self._xcent = N.array(xcent)
         elif d is not None:
@@ -320,8 +320,8 @@ class Dataset2D(DatasetBase):
 
         if yrange is not None:
             self._yrange = tuple(yrange)
-        elif ygrid is not None:
-            self._ygrid = N.array(ygrid)
+        elif yedge is not None:
+            self._yedge = N.array(yedge)
         elif ycent is not None:
             self._ycent = N.array(ycent)
         elif d is not None:
@@ -336,9 +336,9 @@ class Dataset2D(DatasetBase):
     @property
     def yrange(self): return self._yrange
     @property
-    def xgrid(self): return self._xgrid
+    def xedge(self): return self._xedge
     @property
-    def ygrid(self): return self._ygrid
+    def yedge(self): return self._yedge
     @property
     def xcent(self): return self._xcent
     @property
@@ -346,7 +346,7 @@ class Dataset2D(DatasetBase):
 
     def isLinearImage(self):
         """Are these simple linear pixels?"""
-        return ( self.xgrid is None and self.ygrid is None and
+        return ( self.xedge is None and self.yedge is None and
                  self.xcent is None and self.ycent is None )
 
     def getPixelEdges(self):
@@ -369,16 +369,16 @@ class Dataset2D(DatasetBase):
                 ))
             return N.array(e)
 
-        if self.xgrid is not None:
-            xg = self.xgrid
+        if self.xedge is not None:
+            xg = self.xedge
         elif self.xcent is not None:
             xg = fromcentres(self.xcent)
         else:
             xg = N.linspace(self.xrange[0], self.xrange[1],
                             self.data.shape[1]+1)
 
-        if self.ygrid is not None:
-            yg = self.ygrid
+        if self.yedge is not None:
+            yg = self.yedge
         elif self.ycent is not None:
             yg = fromcentres(self.ycent)
         else:
@@ -394,16 +394,16 @@ class Dataset2D(DatasetBase):
 
         if self.xcent is not None:
             xc = self.xcent
-        elif self.xgrid is not None:
-            xc = 0.5*(self.xgrid[:-1]+self.xgrid[1:])
+        elif self.xedge is not None:
+            xc = 0.5*(self.xedge[:-1]+self.xedge[1:])
         else:
             xc = (N.arange(xw) + 0.5) * (
                 (self.xrange[1]-self.xrange[0])/xw) + self.xrange[0]
 
         if self.ycent is not None:
             yc = self.ycent
-        elif self.ygrid is not None:
-            yc = 0.5*(self.ygrid[:-1]+self.ygrid[1:])
+        elif self.yedge is not None:
+            yc = 0.5*(self.yedge[:-1]+self.yedge[1:])
         else:
             yc = (N.arange(yw) + 0.5) * (
                 (self.yrange[1]-self.yrange[0])/yw) + self.yrange[0]
@@ -426,18 +426,18 @@ class Dataset2D(DatasetBase):
         if self.xcent is not None:
             fileobj.write("xcent %s\n" %
                           " ".join(("%e" % v for v in self.xcent)) )
-        elif self.xgrid is not None:
-            fileobj.write("xgrid %s\n" %
-                          " ".join(("%e" % v for v in self.xgrid)) )
+        elif self.xedge is not None:
+            fileobj.write("xedge %s\n" %
+                          " ".join(("%e" % v for v in self.xedge)) )
         else:
             fileobj.write("xrange %e %e\n" % tuple(self.xrange))
 
         if self.ycent is not None:
             fileobj.write("ycent %s\n" %
                           " ".join(("%e" % v for v in self.ycent)) )
-        elif self.ygrid is not None:
-            fileobj.write("ygrid %s\n" %
-                          " ".join(("%e" % v for v in self.ygrid)) )
+        elif self.yedge is not None:
+            fileobj.write("yedge %s\n" %
+                          " ".join(("%e" % v for v in self.yedge)) )
         else:
             fileobj.write("yrange %e %e\n" % tuple(self.yrange))
 
@@ -481,7 +481,7 @@ class Dataset2D(DatasetBase):
     def returnCopy(self):
         return Dataset2D( N.array(self.data),
                           xrange=self.xrange, yrange=self.yrange,
-                          xgrid=self.xgrid, ygrid=self.ygrid,
+                          xedge=self.xedge, yedge=self.yedge,
                           xcent=self.xcent, ycent=self.ycent )
 
 def dsPreviewHelper(d):
@@ -990,7 +990,7 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
             for ds in subdatasets:
                 d = doc.data[ds]
                 if d.dimensions == 2:
-                    for p in ('xrange', 'yrange', 'xgrid', 'ygrid',
+                    for p in ('xrange', 'yrange', 'xedge', 'yedge',
                               'xcent', 'ycent'):
                         dsrange[p] = getattr(d, p)
                     break
@@ -1530,16 +1530,16 @@ class Dataset2DExpression(Dataset2D):
         return ds.yrange if ds is not None else [0., 1.]
 
     @property
-    def xgrid(self):
+    def xedge(self):
         """Return x grid points."""
         ds = self.evalDataset()
-        return ds.xgrid if ds is not None else None
+        return ds.xedge if ds is not None else None
 
     @property
-    def ygrid(self):
+    def yedge(self):
         """Return y grid points."""
         ds = self.evalDataset()
-        return ds.ygrid if ds is not None else None
+        return ds.yedge if ds is not None else None
 
     @property
     def xcent(self):
@@ -1765,7 +1765,7 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
 
     def __getitem__(self, key):
         return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange,
-                         xgrid=self.xgrid, ygrid=self.ygrid,
+                         xedge=self.xedge, yedge=self.yedge,
                          xcent=self.xcent, ycent=self.ycent)
 
     data   = property( lambda self: self.getPluginData('data'),
@@ -1774,9 +1774,9 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
                        lambda self, val: None )
     yrange = property( lambda self: self.getPluginData('rangey'),
                        lambda self, val: None )
-    xgrid  = property( lambda self: self.getPluginData('xgrid'),
+    xedge  = property( lambda self: self.getPluginData('xedge'),
                        lambda self, val: None )
-    ygrid  = property( lambda self: self.getPluginData('ygrid'),
+    yedge  = property( lambda self: self.getPluginData('yedge'),
                        lambda self, val: None )
     xcent  = property( lambda self: self.getPluginData('xcent'),
                        lambda self, val: None )

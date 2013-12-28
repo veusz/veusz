@@ -617,7 +617,7 @@ class SimpleRead2D(object):
         self.params = params.copy()
 
         # not present in ImportParams2D
-        self.xgrid = self.ygrid = self.xcent = self.ycent = None
+        self.xedge = self.yedge = self.xcent = self.ycent = None
 
     ####################################################################
     # Follow functions are for setting parameters during reading of data
@@ -665,8 +665,8 @@ class SimpleRead2D(object):
         optional:
          xrange A B   - set the range of x from A to B
          yrange A B   - set the range of y from A to B
-         xgrid A B... - list of x values (instead of xrange)
-         ygrid A B... - list of y values (instead of yrange)
+         xedge A B... - list of x values (instead of xrange)
+         yedge A B... - list of y values (instead of yrange)
          xcent A B... - list of x centres (instead of xrange)
          ycent A B... - list of y centres (instead of yrange)
          invertrows   - invert order of the rows
@@ -682,8 +682,8 @@ class SimpleRead2D(object):
         settings = {
             'xrange': self._paramXRange,
             'yrange': self._paramYRange,
-            'xgrid': lambda cols: self._getNumList('xgrid', cols),
-            'ygrid': lambda cols: self._getNumList('ygrid', cols),
+            'xedge': lambda cols: self._getNumList('xedge', cols),
+            'yedge': lambda cols: self._getNumList('yedge', cols),
             'xcent': lambda cols: self._getNumList('xcent', cols),
             'ycent': lambda cols: self._getNumList('ycent', cols),
             'invertrows': self._paramInvertRows,
@@ -726,7 +726,7 @@ class SimpleRead2D(object):
         if self.params.gridatedge:
 
             if any( [getattr(self, x) is not None
-                     for x in ("xgrid", "ygrid", "xcent", "ycent")] ):
+                     for x in ("xedge", "yedge", "xcent", "ycent")] ):
                 raise Read2DError(
                     "x|y grid|cent are incompatible with gridatedge")
 
@@ -751,33 +751,33 @@ class SimpleRead2D(object):
 
         if self.params.invertcols:
             self.data = self.data[:,::-1]
-            if self.xgrid is not None:
-                self.xgrid = self.xgrid[::-1]
+            if self.xedge is not None:
+                self.xedge = self.xedge[::-1]
             if self.xcent is not None:
                 self.xcent = self.xcent[::-1]
         if self.params.invertrows:
             self.data = self.data[::-1,:]
-            if self.ygrid is not None:
-                self.ygrid = self.ygrid[::-1]
+            if self.yedge is not None:
+                self.yedge = self.yedge[::-1]
             if self.ycent is not None:
                 self.ycent = self.ycent[::-1]
 
         # transpose matrix if requested
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
-            self.xgrid, self.ygrid = self.xgrid, self.ygrid
+            self.xedge, self.yedge = self.xedge, self.yedge
 
         # sanity checks
-        for a in 'xgrid', 'ygrid', 'xcent', 'ycent':
+        for a in 'xedge', 'yedge', 'xcent', 'ycent':
             v = getattr(self, a)
             if v is not None and not utils.checkAscending(v):
                 raise Read2DError("%s must be ascending" % a)
 
-        if ( (self.xgrid is not None and
-              len(self.xgrid) != self.data.shape[1]+1) or
-             (self.ygrid is not None and
-              len(self.ygrid) != self.data.shape[0]+1) ):
-            raise Read2DError("xgrid and ygrid lengths must be data shape+1")
+        if ( (self.xedge is not None and
+              len(self.xedge) != self.data.shape[1]+1) or
+             (self.yedge is not None and
+              len(self.yedge) != self.data.shape[0]+1) ):
+            raise Read2DError("xedge and yedge lengths must be data shape+1")
 
         if ( (self.xcent is not None and
               len(self.xcent) != self.data.shape[1]) or
@@ -794,7 +794,7 @@ class SimpleRead2D(object):
         ds = document.Dataset2D(self.data,
                                 xrange=self.params.xrange,
                                 yrange=self.params.yrange,
-                                xgrid=self.xgrid, ygrid=self.ygrid,
+                                xedge=self.xedge, yedge=self.yedge,
                                 xcent=self.xcent, ycent=self.ycent)
 
         ds.linked = linkedfile

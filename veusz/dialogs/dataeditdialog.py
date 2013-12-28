@@ -349,11 +349,11 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
     def updatePixelCoords(self):
         """Get coordinates at edge of grid."""
-        self.xgrid = self.ygrid = self.xcent = self.ycent = []
+        self.xedge = self.yedge = self.xcent = self.ycent = []
         ds = self.document.data.get(self.dsname)
         if ds:
             self.xcent, self.ycent = ds.getPixelCentres()
-            self.xgrid, self.ygrid = ds.getPixelEdges()
+            self.xedge, self.yedge = ds.getPixelEdges()
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -394,8 +394,8 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             return '%i (%s)' % (section+1, setting.uilocale.toString(v))
 
         elif ds is not None and role == qt4.Qt.ToolTipRole:
-            v1 = self.xgrid[section] if 'x' else self.ygrid[section]
-            v2 = self.xgrid[section+1] if 'x' else self.ygrid[section+1]
+            v1 = self.xedge[section] if 'x' else self.yedge[section]
+            v2 = self.xedge[section+1] if 'x' else self.yedge[section+1]
             return u'%s\u2013%s' % (setting.uilocale.toString(v1),
                                     setting.uilocale.toString(v2))
 
