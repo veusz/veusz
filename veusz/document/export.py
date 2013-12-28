@@ -22,7 +22,7 @@ from __future__ import division
 import os.path
 import random
 import math
-import codecs
+import io
 
 from ..compat import crange
 from .. import qtall as qt4
@@ -252,7 +252,7 @@ class Export(object):
         dpi = svg_export.dpi * 1.
         size = self.doc.pageSize(
             self.pagenumber, dpi=(dpi,dpi), integer=False)
-        with codecs.open(self.filename, 'w', encoding='utf-8') as f:
+        with io.open(self.filename, 'w', encoding='utf-8') as f:
             paintdev = svg_export.SVGPaintDevice(
                 f, size[0]/dpi, size[1]/dpi, writetextastext=self.svgtextastext)
             painter = painthelper.DirectPainter(paintdev)

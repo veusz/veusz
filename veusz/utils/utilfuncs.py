@@ -26,6 +26,7 @@ import re
 import os.path
 import threading
 import codecs
+import io
 import csv
 from collections import defaultdict
 
@@ -333,7 +334,7 @@ def openEncoding(filename, encoding, mode='r'):
         text = qt4.QApplication.clipboard().text()
         return CStringIO(text)
     else:
-        return codecs.open(filename, mode, encoding, 'ignore')
+        return io.open(filename, mode, encoding=encoding, errors='ignore')
 
 # The following two classes are adapted from the Python documentation
 # they are modified to turn off encoding errors

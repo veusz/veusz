@@ -28,7 +28,7 @@ because some operations cannot restore references (e.g. add object)
 
 from __future__ import division, print_function
 import os.path
-import codecs
+import io
 
 import numpy as N
 
@@ -1063,8 +1063,8 @@ class OperationLoadStyleSheet(OperationMultiple):
         # fire up interpreter to read file
         interpreter = commandinterpreter.CommandInterpreter(document)
         try:
-            interpreter.runFile( codecs.open(self.filename, 'rU',
-                                             encoding='utf8') )
+            interpreter.runFile( io.open(self.filename, 'rU',
+                                         encoding='utf8') )
         except:
             document.batchHistory(None)
             raise
