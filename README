@@ -16,6 +16,9 @@ Changes in 1.20:
  * Allow expressions to be edited for linked 2D datasets
  * Add HDF5 import
 
+Bug fixes:
+ * Windows binary fixes problem mangling text from saved files
+
 Features of package:
  Plotting features:
   * X-Y plots (with errorbars)
