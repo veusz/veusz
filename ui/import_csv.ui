@@ -63,7 +63,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QComboBox" name="csvdirectioncombo">
+         <widget class="HistoryValueCombo" name="csvdirectioncombo">
           <property name="toolTip">
            <string>Are the data arranged in columns or rows?</string>
           </property>
@@ -229,14 +229,14 @@ separated by |</string>
    <header>historycombo.h</header>
   </customwidget>
   <customwidget>
-   <class>HistorySpinBox</class>
-   <extends>QSpinBox</extends>
-   <header>historyspinbox.h</header>
-  </customwidget>
-  <customwidget>
    <class>HistoryCheck</class>
    <extends>QCheckBox</extends>
    <header>historycheck.h</header>
+  </customwidget>
+  <customwidget>
+   <class>HistorySpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>historyspinbox.h</header>
   </customwidget>
   <customwidget>
    <class>HistoryValueCombo</class>

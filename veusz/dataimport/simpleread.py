@@ -42,12 +42,14 @@ x +- y + -
 
 from __future__ import division
 import re
+import csv
 
 import numpy as N
 
 from ..compat import crange, cnext, CStringIO, citems
 from .. import utils
 from .. import document
+from .. import qtall as qt4
 from .import base
 
 # a regular expression for splitting descriptor into tokens
@@ -431,6 +433,47 @@ class StringStream(FileStream):
         """A stream which reads in from a text string."""
         
         FileStream.__init__( self, CStringIO(text) )
+
+class CSVStream(Stream):
+    """Read text from csv file."""
+
+    def __init__(self, filename, delim, textdelim, locale, encoding):
+        Stream.__init__(self)
+
+        self.csvfile = utils.get_unicode_csv_reader(
+            filename,
+            delimiter=delim,
+            quotechar=textdelim,
+            encoding=encoding )
+        self.localename = locale
+        self.locale = qt4.QLocale(locale)
+
+    def newLine(self):
+        """Get next line from CSV file."""
+        try:
+            line = self.csvfile.next()
+        except StopIteration:
+            return False
+
+        # delete empty cells on left, to make compatible with normal
+        # text stream
+        i = 0
+        while i < len(line) and not line[i]:
+            i += 1
+        line = line[i:]
+
+        if self.localename == 'en_US':
+            # no conversion
+            self.remainingline += line
+        else:
+            for t in line:
+                v, ok = self.locale.toDouble(t)
+                if ok:
+                    # add on converted text - yuck - double conversion
+                    self.remainingline.append('%e' % v)
+                else:
+                    self.remainingline.append(v)
+        return True
 
 class SimpleRead(object):
     '''Class to read in datasets from a stream.

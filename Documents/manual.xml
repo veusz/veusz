@@ -676,7 +676,8 @@
 
     <para>
       Currently Veusz supports reading data from files with text, CSV,
-      HDF5, FITS, 2D text, QDP, binary and NPY/NPZ formats. Use the
+      HDF5, FITS, 2D text or CSV, QDP, binary and NPY/NPZ formats. Use
+      the
       <menuchoice><guimenu>Data</guimenu><guimenuitem>Import</guimenuitem></menuchoice>
       dialog to read data, or the importing commands in the API can be
       used.  In addition, the user can load or write import plugins in
@@ -1082,12 +1083,12 @@ descriptor alpha beta gamma
     </section>
 
     <section>
-      <title>2D text</title>
+      <title>2D text or CSV format</title>
       <para>
-	Veusz can import 2D data from standard text files. In this
-	case the data should consist of a matrix of data values, with
-	the columns separated by one or more spaces or tabs and the
-	rows on different lines.
+	Veusz can import 2D data from standard text or CSV files. In
+	this case the data should consist of a matrix of data values,
+	with the columns separated by one or more spaces or tabs and
+	the rows on different lines.
       </para>
 
     <para>
@@ -1095,8 +1096,9 @@ descriptor alpha beta gamma
       which affect the import. Such specifiers are used, for example,
       to change the coordinates of the pixels in the file. By default
       the first pixels coordinates is between 0 and 1, with the centre
-      at 0.5. Subsequent pixels are 1 greater. Below are listed the
-      specifiers:
+      at 0.5. Subsequent pixels are 1 greater. When using specifiers
+      in CSV files, put the different parts (separated by spaces) in
+      separate columns. Below are listed the specifiers:
     </para>
 
     <orderedlist>
@@ -1158,6 +1160,13 @@ descriptor alpha beta gamma
       <listitem>
 	<para><command>transpose</command> - swap rows and columns
 	after importing data.</para>
+      </listitem>
+
+      <listitem>
+	<para><command>gridatedge</command> - the first row and
+	leftmost column give the positions of the centres of the
+	pixels. This is also an option in the import dialog. The
+	values should be increasing.</para>
       </listitem>
     </orderedlist>
 

@@ -6,11 +6,11 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>509</width>
-    <height>475</height>
+    <width>623</width>
+    <height>646</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QLabel" name="label_9">
      <property name="text">
@@ -19,17 +19,219 @@
     </widget>
    </item>
    <item>
-    <widget class="QTextEdit" name="twod_previewedit">
-     <property name="lineWrapMode">
-      <enum>QTextEdit::NoWrap</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,2">
+     <item>
+      <widget class="QTextEdit" name="twod_previewedit">
+       <property name="lineWrapMode">
+        <enum>QTextEdit::NoWrap</enum>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QGroupBox" name="twodoptionsgrp">
+         <property name="title">
+          <string>Options</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="1">
+           <widget class="HistoryCombo" name="twod_csvdelim">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="HistoryCheck" name="twod_invertrowscheck">
+            <property name="text">
+             <string>Invert &amp;rows</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="HistoryCombo" name="twod_csvtextdelim">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>CSV text delimeter</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="HistoryValueCombo" name="twod_mode">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use text mode, with space-separated values or CSV mode. When using CSV mode, the delimiters and numeric locale are given below.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="HistoryCheck" name="twod_invertcolscheck">
+            <property name="text">
+             <string>Invert &amp;columns</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="HistoryCheck" name="twod_transposecheck">
+            <property name="toolTip">
+             <string>Transpose rows and columns</string>
+            </property>
+            <property name="text">
+             <string>Trans&amp;pose</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>CSV delimeter</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>CSV locale</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="HistoryValueCombo" name="twod_csvlocale">
+            <property name="toolTip">
+             <string>Numerical format of numbers in file:
+ System - what this computer is set to use
+ English - format 123,456.78
+ European - format 123.456,78</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="twodrangegrp">
+         <property name="title">
+          <string>X, Y Ranges</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="HistoryCheck" name="twod_gridatedge">
+            <property name="toolTip">
+             <string>The centres of the pixels are given in the top row and the left column</string>
+            </property>
+            <property name="text">
+             <string>Grid points at edges</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Range of X:</string>
+              </property>
+              <property name="buddy">
+               <cstring>twod_xminedit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="HistoryCombo" name="twod_xminedit">
+              <property name="toolTip">
+               <string>Enter a number for the minimum coordinate of the X axis (default 0)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_16">
+              <property name="text">
+               <string>to</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="HistoryCombo" name="twod_xmaxedit">
+              <property name="toolTip">
+               <string>Enter a value for a maximum coordinate of the X axis (default is number of columns in file)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label_18">
+              <property name="text">
+               <string>Range of Y:</string>
+              </property>
+              <property name="buddy">
+               <cstring>twod_yminedit</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="HistoryCombo" name="twod_yminedit">
+              <property name="toolTip">
+               <string>Enter a number for the minimum coordinate of the Y axis (default 0)</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_17">
+              <property name="text">
+               <string>to</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="HistoryCombo" name="twod_ymaxedit">
+              <property name="toolTip">
+               <string>Enter a number for the maximum coordinate of the Y axis (default number of rows in file)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QLabel" name="label_20">
        <property name="text">
@@ -41,117 +243,6 @@
       <widget class="HistoryCombo" name="twod_datasetsedit">
        <property name="toolTip">
         <string>A space separated list of dataset names to import from the file</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="twod_helpbutton">
-       <property name="text">
-        <string>Help</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label_15">
-       <property name="text">
-        <string>Range of &amp;X:</string>
-       </property>
-       <property name="buddy">
-        <cstring>twod_xminedit</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="HistoryCombo" name="twod_xminedit">
-       <property name="toolTip">
-        <string>Enter a number for the minimum coordinate of the X axis (default 0)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_16">
-       <property name="text">
-        <string>to</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="HistoryCombo" name="twod_xmaxedit">
-       <property name="toolTip">
-        <string>Enter a value for a maximum coordinate of the X axis (default is number of columns in file)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_18">
-       <property name="text">
-        <string>Range of &amp;Y:</string>
-       </property>
-       <property name="buddy">
-        <cstring>twod_yminedit</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="HistoryCombo" name="twod_yminedit">
-       <property name="toolTip">
-        <string>Enter a number for the minimum coordinate of the Y axis (default 0)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_17">
-       <property name="text">
-        <string>to</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="HistoryCombo" name="twod_ymaxedit">
-       <property name="toolTip">
-        <string>Enter a number for the maximum coordinate of the Y axis (default number of rows in file)</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="HistoryCheck" name="twod_invertrowscheck">
-       <property name="text">
-        <string>Invert &amp;rows</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="HistoryCheck" name="twod_transposecheck">
-       <property name="toolTip">
-        <string>Transpose rows and columns</string>
-       </property>
-       <property name="text">
-        <string>Trans&amp;pose</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="HistoryCheck" name="twod_invertcolscheck">
-       <property name="text">
-        <string>Invert &amp;columns</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="HistoryCheck" name="twod_gridatedge">
-       <property name="toolTip">
-        <string>The centres of the pixels are given in the top row and the left column</string>
-       </property>
-       <property name="text">
-        <string>Grid at edge</string>
        </property>
       </widget>
      </item>
@@ -169,6 +260,11 @@
    <class>HistoryCheck</class>
    <extends>QCheckBox</extends>
    <header>historycheck.h</header>
+  </customwidget>
+  <customwidget>
+   <class>HistoryValueCombo</class>
+   <extends>QComboBox</extends>
+   <header>historyvaluecombo.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

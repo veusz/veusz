@@ -28,6 +28,19 @@ from . import defn_csv
 def _(text, disambiguation=None, context="Import_CSV"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+csv_delimiters = [',', '{tab}', '{space}', '|', ':', ';']
+csv_text_delimiters = ['"', "'"]
+csv_locales = [_('System'), _('English'), _('European')]
+
+csv_delimiter_map = {
+    '{tab}': '\t',
+    '{space}': ' '
+}
+
+def csvLocaleIndexToLocale(idx):
+    """Convert index to text locale."""
+    return (qt4.QLocale().name(), 'en_US', 'de_DE')[idx]
+
 class ImportTabCSV(importdialog.ImportTab):
     """For importing data from CSV files."""
 
@@ -36,23 +49,19 @@ class ImportTabCSV(importdialog.ImportTab):
     def loadUi(self):
         """Load user interface and setup panel."""
         importdialog.ImportTab.loadUi(self)
-        self.connect( self.csvhelpbutton, qt4.SIGNAL('clicked()'),
-                      self.slotHelp )
-        self.connect( self.csvdelimitercombo,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.dialog.slotUpdatePreview )
-        self.connect( self.csvtextdelimitercombo,
-                      qt4.SIGNAL('editTextChanged(const QString&)'),
-                      self.dialog.slotUpdatePreview )
-        self.csvdelimitercombo.default = [
-            ',', '{tab}', '{space}', '|', ':', ';']
-        self.csvtextdelimitercombo.default = ['"', "'"]
+        self.csvhelpbutton.clicked.connect(self.slotHelp)
+        self.csvdelimitercombo.editTextChanged.connect(
+            self.dialog.slotUpdatePreview)
+        self.csvtextdelimitercombo.editTextChanged.connect(
+            self.dialog.slotUpdatePreview)
+        self.csvdelimitercombo.default = csv_delimiters
+        self.csvtextdelimitercombo.default = csv_text_delimiters
         self.csvdatefmtcombo.default = [
             'YYYY-MM-DD|T|hh:mm:ss',
             'DD/MM/YY| |hh:mm:ss',
             'M/D/YY| |hh:mm:ss'
             ]
-        self.csvnumfmtcombo.defaultlist = [_('System'), _('English'), _('European')]
+        self.csvnumfmtcombo.defaultlist = csv_locales
         self.csvheadermodecombo.defaultlist = [_('Multiple'), _('1st row'), _('None')]
 
     def reset(self):
@@ -76,10 +85,8 @@ class ImportTabCSV(importdialog.ImportTab):
     def getCSVDelimiter(self):
         """Get CSV delimiter, converting friendly names."""
         delim = str( self.csvdelimitercombo.text() )
-        if delim == '{space}':
-            delim = ' '
-        elif delim == '{tab}':
-            delim = '\t'
+        if delim in csv_delimiter_map:
+            delim = csv_delimiter_map[delim]
         return delim
 
     def doPreview(self, filename, encoding):
@@ -151,9 +158,8 @@ class ImportTabCSV(importdialog.ImportTab):
         except UnicodeEncodeError:
             return
 
-        numericlocale = ( str(qt4.QLocale().name()),
-                          'en_US',
-                          'de_DE' )[self.csvnumfmtcombo.currentIndex()]
+        numericlocale = csvLocaleIndexToLocale(
+            self.csvnumfmtcombo.currentIndex() )
         headerignore = self.csvignorehdrspin.value()
         rowsignore = self.csvignoretopspin.value()
         blanksaredata = self.csvblanksdatacheck.isChecked()

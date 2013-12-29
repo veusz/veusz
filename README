@@ -16,6 +16,7 @@ Changes in 1.20:
  * Add HDF5 import
  * Allow expressions to be edited for linked 2D datasets
  * Add non-regular 2D datasets
+ * Add CSV support to 2D import
 
 Features of package:
  Plotting features:
