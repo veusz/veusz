@@ -96,10 +96,6 @@ class Document( qt4.QObject ):
         # change tracking of document as a whole
         self.changeset = 0            # increased when the document changes
 
-        # change tracking of datasets
-        self.datachangeset = 0        # increased whan any dataset changes
-        self.datachangesets = dict()  # each ds has an associated change set
-
         # map tags to dataset names
         self.datasettags = defaultdict(list)
 
@@ -291,27 +287,18 @@ class Document( qt4.QObject ):
         dataset.document = self
         
         # update the change tracking
-        cs = self.datachangesets.get(name, 0)
-        self.datachangesets[name] = cs + 1
-        self.datachangeset += 1
         self.setModified()
     
     def deleteData(self, name):
         """Remove a dataset"""
         if name in self.data:
             del self.data[name]
-            
-            # don't remove the changeset tracker, in case this action is later undone
-            self.datachangesets[name] += 1
-            self.datachangeset += 1
             self.setModified()
 
     def modifiedData(self, dataset):
         """The named dataset was modified"""
         for name, ds in citems(self.data):
             if ds is dataset:
-                self.datachangesets[name] += 1
-                self.datachangeset += 1
                 self.setModified()
 
     def getLinkedFiles(self, filenames=None):
@@ -367,8 +354,6 @@ class Document( qt4.QObject ):
         d = self.data[oldname]
         del self.data[oldname]
         self.data[newname] = d
-        # transfer change set to new name
-        self.datachangesets[newname] = self.datachangesets[oldname]
 
         self.setModified()
 

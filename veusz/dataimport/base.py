@@ -37,6 +37,7 @@ class ImportParamsBase(object):
      prefix: prefix for output dataset names
      suffix: suffix for output dataset names
      tags: list of tags to apply to output datasets
+     renames: dict map of names to renamed datasets
     """
 
     defaults = {
@@ -46,6 +47,7 @@ class ImportParamsBase(object):
         'prefix': '',
         'suffix': '',
         'tags': None,
+        'renames': None,
         }
 
     def __init__(self, **argsv):
@@ -122,7 +124,14 @@ class LinkedFileBase(object):
         for name, ds in list(tempdoc.data.items()):
             if name not in document.data:
                 read.append(name)
-                document.setData(name, ds)
+
+                # rename any renamed datasets
+                outname = name
+                print(name, self.params.renames)
+                if self.params.renames and name in self.params.renames:
+                    outname = self.params.renames[name]
+
+                document.setData(outname, ds)
                 ds.document = document
                 ds.linked = self
         return read
@@ -166,6 +175,8 @@ class OperationDataImportBase(object):
 
         # list of returned datasets
         self.outdatasets = []
+        # map of names to datasets
+        self.outdatasetsmap = {}
         # list of returned custom variables
         self.outcustoms = []
         # invalid conversions
@@ -173,7 +184,7 @@ class OperationDataImportBase(object):
 
     def doImport(self, document):
         """Do import, override this.
-        Return list of names of datasets read
+        Set outdatasetsmap
         """
 
     def addCustoms(self, document, consts):
@@ -194,19 +205,28 @@ class OperationDataImportBase(object):
         """Do import."""
 
         # remember datasets in document for undo
-        olddatasets = dict(document.data)
         self.oldconst = None
 
         # do actual import
-        retn = self.doImport(document)
+        retn = self.doImport()
+
+        # handle tagging/renaming
+        for name, ds in list(citems(self.outdatasetsmap)):
+            if self.params.tags:
+                ds.tags.update(self.params.tags)
+            if self.params.renames and name in self.params.renames:
+                del self.outdatasetsmap[name]
+                self.outdatasetsmap[self.params.renames[name]] = ds
 
         # only remember the parts we need
-        self.olddatasets = [ (n, olddatasets.get(n)) for n in self.outdatasets ]
+        self.olddatasets = [ (n, document.data.get(n))
+                             for n in self.outdatasetsmap ]
 
-        # apply tags
-        if self.params.tags:
-            for n in self.outdatasets:
-                document.data[n].tags.update(self.params.tags)
+        self.olddatasets = []
+        for name, ds in citems(self.outdatasetsmap):
+            self.olddatasets.append( (name, document.data.get(name)) )
+            ds.document = document
+            document.data[name] = ds
 
         return retn
 

@@ -456,29 +456,55 @@ class OperationDatasetDelete(object):
     def undo(self, document):
         """Put dataset back"""
         document.setData(self.datasetname, self.olddata)
-    
+
 class OperationDatasetRename(object):
     """Rename the dataset.
-    
+
     Assumes newname doesn't already exist
     """
-    
+
     descr = _('rename dataset')
-    
+
     def __init__(self, oldname, newname):
         self.oldname = oldname
         self.newname = newname
-    
+
     def do(self, document):
         """Rename dataset from oldname to newname."""
-        
+        ds = document.data[self.oldname]
+        self.origname = self.origrename = None
+
+        if ds.linked:
+            p = ds.linked.params
+            if p.renames is None:
+                p.renames = {}
+
+            # dataset might have been renamed before, so we have to
+            # remove that entry and remember how to put it back
+            origname = self.oldname
+            for o, n in list(citems(p.renames)):
+                if n == self.oldname:
+                    origname = o
+                    # store in case of undo
+                    self.origrename = (o, n)
+                    break
+            p.renames[origname] = self.newname
+            self.origname = origname
+
         document.renameDataset(self.oldname, self.newname)
-        
+
     def undo(self, document):
         """Change name back."""
-        
+
+        ds = document.data[self.newname]
+        if ds.linked:
+            p = ds.linked.params
+            del p.renames[self.origname]
+            if self.origrename:
+                p.renames[self.origrename[0]] = self.origrename[1]
+
         document.renameDataset(self.newname, self.oldname)
-        
+
 class OperationDatasetDuplicate(object):
     """Duplicate a dataset.
     

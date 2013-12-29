@@ -349,19 +349,14 @@ class ReadCSV(object):
                 except _NextValue:
                     pass
 
-    def setData(self, doc, linkedfile=None):
-        """Set the read-in datasets in the document."""
-
-        # iterate over each read-in dataset
-        dsnames = []
+    def setData(self, outmap, linkedfile=None):
+        """Set the read-in datasets in the dict outmap."""
 
         for name in ckeys(self.data):
             # skip error data here, they are used below
             # error data name contains \0
             if name.find('\0') >= 0:
                 continue
-
-            dsnames.append(name)
 
             # get data and errors (if any)
             data = []
@@ -386,7 +381,6 @@ class ReadCSV(object):
                                       perr=data[2], nerr=data[3],
                                       linked=linkedfile)
 
-            doc.setData(name, ds)
+            outmap[name] = ds
 
-        dsnames.sort()
-        return dsnames
+        return sorted(ckeys(outmap))

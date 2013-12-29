@@ -76,6 +76,8 @@ class LinkedFile(base.LinkedFileBase):
             params.append("prefix=" + crepr(p.prefix))
         if p.suffix:
             params.append("suffix=" + crepr(p.suffix))
+        if p.renames:
+            params.append("renames=" + utils.rrepr(p.renames))
 
         fileobj.write("ImportFile(%s)\n" % (", ".join(params)))
 
@@ -91,7 +93,7 @@ class OperationDataImport(base.OperationDataImportBase):
         base.OperationDataImportBase.__init__(self, params)
         self.simpleread = simpleread.SimpleRead(params.descriptor)
 
-    def doImport(self, doc):
+    def doImport(self):
         """Import data.
 
         Returns a list of datasets which were imported.
@@ -119,12 +121,15 @@ class OperationDataImport(base.OperationDataImportBase):
             LF = LinkedFile(p)
 
         # actually set the data in the document
-        self.outdatasets = self.simpleread.setInDocument(
-            doc, linkedfile=LF, prefix=p.prefix, suffix=p.suffix)
+        self.outdatasetsmap = {}
+        self.outdatasets = self.simpleread.setOutput(
+            self.outdatasetsmap,
+            linkedfile=LF, prefix=p.prefix, suffix=p.suffix)
         self.outinvalids = self.simpleread.getInvalidConversions()
 
 def ImportFile(comm, filename, descriptor, useblocks=False, linked=False,
-               prefix='', suffix='', ignoretext=False, encoding='utf_8'):
+               prefix='', suffix='', ignoretext=False, encoding='utf_8',
+               renames=None):
     """Read data from file with filename using descriptor.
     If linked is True, the data won't be saved in a saved document,
     the data will be reread from the file.
@@ -136,6 +141,9 @@ def ImportFile(comm, filename, descriptor, useblocks=False, linked=False,
     If prefix is set, prefix is prepended to each dataset name
     Suffix is added to each dataset name
     ignoretext ignores lines of text in the file
+
+    encoding is name of text file encoding
+    renames is a dict mapping existing to new names after import
 
     Returned is a tuple (datasets, errors)
      where datasets is a list of datasets read
@@ -149,7 +157,9 @@ def ImportFile(comm, filename, descriptor, useblocks=False, linked=False,
         descriptor=descriptor, filename=realfilename,
         useblocks=useblocks, linked=linked,
         prefix=prefix, suffix=suffix,
-        ignoretext=ignoretext)
+        ignoretext=ignoretext,
+        encoding=encoding,
+        renames=renames)
     op = OperationDataImport(params)
     comm.document.applyOperation(op)
 

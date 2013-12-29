@@ -282,9 +282,9 @@ class DescriptorPart(object):
                 # add data into dataset
                 dataset.append(dat)
 
-    def setInDocument(self, thedatasets, doc, block=None,
-                      linkedfile=None,
-                      prefix="", suffix="", tail=None):
+    def setOutput(self, thedatasets, outmap, block=None,
+                  linkedfile=None,
+                  prefix="", suffix="", tail=None):
         """Set the read-in data in the document."""
 
         # we didn't read any data
@@ -342,7 +342,7 @@ class DescriptorPart(object):
                     raise RuntimeError("Invalid data type")
 
                 finalname = prefix + name + suffix
-                doc.setData( finalname, ds )
+                outmap[finalname] = ds
                 names.append(finalname)
             else:
                 break
@@ -616,8 +616,8 @@ class SimpleRead(object):
                 out[name[:-2]] = len(data)
         return out
 
-    def setInDocument(self, document, linkedfile=None,
-                      prefix='', suffix=''):
+    def setOutput(self, outmap, linkedfile=None,
+                  prefix='', suffix=''):
         """Set the data in the document.
 
         Returns list of variable names read.
@@ -636,8 +636,8 @@ class SimpleRead(object):
         names = []
         for block in blocks:
             for part in self.parts:
-                names += part.setInDocument(
-                    self.datasets, document,
+                names += part.setOutput(
+                    self.datasets, outmap,
                     block=block,
                     linkedfile=linkedfile,
                     prefix=prefix, suffix=suffix,

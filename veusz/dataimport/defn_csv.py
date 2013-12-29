@@ -21,6 +21,7 @@ from __future__ import division, print_function
 from ..compat import citems, cstr, crepr
 from .. import qtall as qt4
 from .. import document
+from .. import utils
 from . import readcsv
 from . import base
 
@@ -65,7 +66,7 @@ class OperationDataImportCSV(base.OperationDataImportBase):
 
     descr = _('import CSV data')
 
-    def doImport(self, document):
+    def doImport(self):
         """Do the data import."""
 
         csvr = readcsv.ReadCSV(self.params)
@@ -76,7 +77,8 @@ class OperationDataImportCSV(base.OperationDataImportBase):
             LF = LinkedFileCSV(self.params)
 
         # set the data
-        self.outdatasets = csvr.setData(document, linkedfile=LF)
+        self.outdatasets = csvr.setData(
+            self.outdatasetsmap, linkedfile=LF)
 
 class LinkedFileCSV(base.LinkedFileBase):
     """A CSV file linked to datasets."""
@@ -96,7 +98,7 @@ class LinkedFileCSV(base.LinkedFileBase):
             if param == 'prefix' or param == 'suffix':
                 param = 'ds' + param
             if param != 'filename' and param != 'tags' and v != default:
-                paramsout.append("%s=%s" % (param, crepr(v)))
+                paramsout.append("%s=%s" % (param, utils.rrepr(v)))
 
         fileobj.write("ImportFileCSV(%s)\n" % (", ".join(paramsout)))
 
@@ -110,6 +112,7 @@ def ImportFileCSV(comm, filename,
                   dateformat='YYYY-MM-DD|T|hh:mm:ss',
                   headermode='multi',
                   dsprefix='', dssuffix='', prefix=None,
+                  renames=None,
                   linked=False):
     """Read data from a comma separated file (CSV).
 
@@ -133,6 +136,8 @@ def ImportFileCSV(comm, filename,
      (prefix is backware compatibility only, it adds an underscore
       relative to dsprefix)
 
+    renames is a map of old names to new names to rename on import
+
     If linked is True the data are linked with the file."""
 
     # backward compatibility
@@ -151,6 +156,7 @@ def ImportFileCSV(comm, filename,
         numericlocale=numericlocale, dateformat=dateformat,
         headermode=headermode,
         prefix=dsprefix, suffix=dssuffix,
+        renames=renames,
         linked=linked,
         )
     op = OperationDataImportCSV(params)
