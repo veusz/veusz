@@ -451,7 +451,7 @@ class CSVStream(Stream):
     def newLine(self):
         """Get next line from CSV file."""
         try:
-            line = self.csvfile.next()
+            line = cnext(self.csvfile)
         except StopIteration:
             return False
 
