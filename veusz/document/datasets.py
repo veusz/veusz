@@ -374,11 +374,18 @@ class Dataset2D(DatasetBase):
         return ( self.xedge is None and self.yedge is None and
                  self.xcent is None and self.ycent is None )
 
-    def getPixelEdges(self):
-        """Return edges for x and y pixels."""
+    def getPixelEdges(self, scalefnx=None, scalefny=None):
+        """Return edges for x and y pixels.
 
-        def fromcentres(vals):
+        scalefnx/y: function to convert values to plotted pixel scale
+                    (used to calculate edges from centres on screen)
+        """
+
+        def fromcentres(vals, scalefn):
             """Calculate edges from centres."""
+            if scalefn:
+                vals = scalefn(vals)
+
             if len(vals) == 0:
                 e = []
             elif len(vals) == 1:
@@ -396,19 +403,27 @@ class Dataset2D(DatasetBase):
 
         if self.xedge is not None:
             xg = self.xedge
+            if scalefnx:
+                xg = scalefnx(xg)
         elif self.xcent is not None:
-            xg = fromcentres(self.xcent)
+            xg = fromcentres(self.xcent, scalefnx)
         else:
             xg = N.linspace(self.xrange[0], self.xrange[1],
                             self.data.shape[1]+1)
+            if scalefnx:
+                xg = scalefnx(xg)
 
         if self.yedge is not None:
             yg = self.yedge
+            if scalefny:
+                yg = scalefny(yg)
         elif self.ycent is not None:
-            yg = fromcentres(self.ycent)
+            yg = fromcentres(self.ycent, scalefny)
         else:
             yg = N.linspace(self.yrange[0], self.yrange[1],
                             self.data.shape[0]+1)
+            if scalefny:
+                yg = scalefny(yg)
 
         return xg, yg
 
