@@ -348,14 +348,15 @@ class Contour(plotters.GenericPlotter):
         if data is None or data.dimensions != 2:
             return
 
+        xr, yr = data.getDataRanges()
         if depname == 'sx':
-            dxrange = data.xrange
-            axrange[0] = min( axrange[0], dxrange[0] )
-            axrange[1] = max( axrange[1], dxrange[1] )
+            dxrange = xr
+            axrange[0] = min( axrange[0], xr[0] )
+            axrange[1] = max( axrange[1], xr[1] )
         elif depname == 'sy':
-            dyrange = data.yrange
-            axrange[0] = min( axrange[0], dyrange[0] )
-            axrange[1] = max( axrange[1], dyrange[1] )
+            dyrange = yr
+            axrange[0] = min( axrange[0], yr[0] )
+            axrange[1] = max( axrange[1], yr[1] )
 
     def getNumberKeys(self):
         """How many keys to show."""
@@ -438,13 +439,9 @@ class Contour(plotters.GenericPlotter):
         if xw == 0 or yw == 0:
             return
 
-        # arrays containing coordinates of pixels in x and y
-        xpts = N.fromfunction(lambda y,x:
-                              (x+0.5)*((rangex[1]-rangex[0])/xw) + rangex[0],
-                              (yw, xw))
-        ypts = N.fromfunction(lambda y,x:
-                              (y+0.5)*((rangey[1]-rangey[0])/yw) + rangey[0],
-                              (yw, xw))
+        xc, yc = data.getPixelCentres()
+        xpts = N.reshape( N.tile(xc, yw), (yw, xw) )
+        ypts = N.tile(yc[:, N.newaxis], xw)
 
         # only keep finite data points
         mask = N.logical_not(N.isfinite(data.data))

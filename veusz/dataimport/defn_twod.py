@@ -37,6 +37,10 @@ class ImportParams2D(base.ImportParamsBase):
      invertrows: invert rows when reading
      invertcols: invert columns when reading
      transpose: swap rows and columns
+     gridatedge: use left column and top row for pixel centres
+     mode: text or csv
+     csvdelimiter/csvtextdelimiter: csv text delimiters
+     csvlocale: locale when importing csv
     """
 
     defaults = {
@@ -47,6 +51,11 @@ class ImportParams2D(base.ImportParamsBase):
         'invertrows': False,
         'invertcols': False,
         'transpose': False,
+        'gridatedge': False,
+        'mode': 'text',
+        'csvdelimiter': ',',
+        'csvtextdelimiter': '"',
+        'csvlocale': 'en_US',
         }
     defaults.update(base.ImportParamsBase.defaults)
 
@@ -62,11 +71,15 @@ class LinkedFile2D(base.LinkedFileBase):
 
         args = [ crepr(self._getSaveFilename(relpath)),
                  crepr(self.params.datasetnames) ]
-        for par in ("xrange", "yrange", "invertrows", "invertcols", "transpose",
+        for par in ("xrange", "yrange", "invertrows", "invertcols",
+                    "transpose", "gridatedge",
+                    "mode",
+                    "csvdelimiter", "csvtextdelimiter", "csvlocale",
                     "prefix", "suffix", "encoding"):
             v = getattr(self.params, par)
             if v is not None and v != "" and v != self.params.defaults[par]:
                 args.append( "%s=%s" % (par, crepr(v)) )
+
         args.append("linked=True")
 
         fileobj.write("ImportFile2D(%s)\n" % ", ".join(args))
@@ -82,13 +95,17 @@ class OperationDataImport2D(base.OperationDataImportBase):
         p = self.params
 
         # get stream
-        if p.filename is not None:
+        if p.mode == 'csv':
+            stream = simpleread.CSVStream(
+                p.filename, p.csvdelimiter, p.csvtextdelimiter,
+                p.csvlocale, p.encoding)
+        elif p.filename is not None:
             stream = simpleread.FileStream(
                 utils.openEncoding(p.filename, p.encoding) )
         elif p.datastr is not None:
             stream = simpleread.StringStream(p.datastr)
         else:
-            assert False
+            raise RuntimeError("Invalid combination of paramters")
 
         # linked file
         LF = None
@@ -103,6 +120,9 @@ class OperationDataImport2D(base.OperationDataImportBase):
 
 def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
                  invertrows=None, invertcols=None, transpose=None,
+                 gridatedge=None,
+                 mode='text', csvdelimiter=',', csvtextdelimiter='"',
+                 csvlocale='en_US',
                  prefix="", suffix="", encoding='utf_8',
                  linked=False):
     """Import two-dimensional data from a file.
@@ -115,6 +135,12 @@ def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
     if invertrows=True, then rows are inverted when read
     if invertcols=True, then cols are inverted when read
     if transpose=True, then rows and columns are swapped
+    if gridatedge=True, use top row and left column for pixel positions
+
+    mode is either 'text' or 'csv'
+    csvdelimiter is the csv delimiter for csv
+    csvtextdelimiter is the csv text delimiter for csv
+    csvlocale is locale to use when reading csv data
 
     prefix and suffix are prepended and appended to dataset names
 
@@ -134,6 +160,11 @@ def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
         filename=realfilename, xrange=xrange,
         yrange=yrange, invertrows=invertrows,
         invertcols=invertcols, transpose=transpose,
+        gridatedge=gridatedge,
+        mode=mode,
+        csvdelimiter=csvdelimiter,
+        csvtextdelimiter=csvtextdelimiter,
+        csvlocale=csvlocale,
         prefix=prefix, suffix=suffix,
         linked=linked)
     op = OperationDataImport2D(params)

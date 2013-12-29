@@ -711,8 +711,10 @@ class OperationDataset2DBase(object):
         ds.document = document
         if not self.link:
             # unlink if necessary
-            ds = datasets.Dataset2D(ds.data, xrange=ds.xrange,
-                                    yrange=ds.yrange)
+            ds = datasets.Dataset2D(ds.data,
+                                    xrange=ds.xrange, yrange=ds.yrange,
+                                    xedge=ds.xedge, yedge=ds.yedge,
+                                    xcent=ds.xcent, ycent=ds.ycent)
         document.setData(self.datasetname, ds)
         return ds
 
@@ -724,7 +726,7 @@ class OperationDataset2DBase(object):
 
 class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
     descr = _('create 2D dataset from x, y and z expressions')
-    
+
     def __init__(self, datasetname, xexpr, yexpr, zexpr, link):
         OperationDataset2DBase.__init__(self, datasetname, link)
         self.xexpr = xexpr
@@ -737,7 +739,7 @@ class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
 
 class OperationDataset2DCreateExpression(OperationDataset2DBase):
     descr = _('create 2D dataset from expression')
-    
+
     def __init__(self, datasetname, expr, link):
         OperationDataset2DBase.__init__(self, datasetname, link)
         self.expr = expr

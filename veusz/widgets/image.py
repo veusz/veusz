@@ -21,6 +21,7 @@
 from __future__ import division
 
 from .. import qtall as qt4
+from ..compat import crange
 import numpy as N
 
 from .. import setting
@@ -32,6 +33,110 @@ from . import plotters
 def _(text, disambiguation=None, context='Image'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+def cropLinearImageToBox(image, pltx, plty, posn):
+    """Given a plotting range pltx[0]->pltx[1], plty[0]->plty[1] and
+    plotting bounds posn, return an image which is cropped to posn.
+
+    Returns:
+     - updated pltx range
+     - updated plty range
+     - cropped image
+    """
+
+    x1, y1, x2, y2 = posn
+    pltx1, pltx2 = pltx
+    pltw = pltx2-pltx1
+    plty2, plty1 = plty
+    plth = plty2-plty1
+
+    imw = image.width()
+    imh = image.height()
+    pixw = pltw / imw
+    pixh = plth / imh
+    cutr = [0, 0, imw-1, imh-1]
+
+    # work out where image intercepts posn, and make sure image
+    # fills at least that area
+
+    # need to chop left
+    if pltx1 < x1:
+        d = int((x1-pltx1) / pixw)
+        cutr[0] += d
+        pltx[0] += d*pixw
+
+    # need to chop right
+    if pltx2 > x2:
+        d = max(0, int((pltx2-x2) / pixw) - 1)
+        cutr[2] -= d
+        pltx[1] -= d*pixw
+
+    # chop top
+    if plty1 < y1:
+        d = int((y1-plty1) / pixh)
+        cutr[1] += d
+        plty[1] += d*pixh
+
+    # chop bottom
+    if plty2 > y2:
+        d = max(0, int((plty2-y2) / pixh) - 1)
+        cutr[3] -= d
+        plty[0] -= d*pixh
+
+    # create chopped-down image
+    newimage = image.copy(
+        cutr[0], cutr[1], cutr[2]-cutr[0]+1, cutr[3]-cutr[1]+1)
+
+    # return new image coordinates and image
+    return pltx, plty, newimage
+
+def cropGridImageToBox(image, gridx, gridy, posn):
+    """Given an image, pixel coordinates and box, crop image to box."""
+
+    def trimGrid(grid, p1, p2):
+        """Trim grid to bounds given, returning index range."""
+
+        if grid[0] < grid[-1]:
+            # fwd order
+            i1 = max(N.searchsorted(grid, p1, side='right')-1, 0)
+            i2 = min(N.searchsorted(grid, p2, side='left'), len(grid)) + 1
+
+        else:
+            # reverse order of grid
+            gridr = grid[::-1]
+
+            t1 = max(N.searchsorted(gridr, p1, side='right')-1, 0)
+            t2 = min(N.searchsorted(gridr, p2, side='left'), len(gridr)) + 1
+
+            i1 = len(grid) - t2
+            i2 = len(grid)+1 - t1
+
+        return i1, i2
+
+    def trimEdge(grid, minval, maxval):
+        """Trim outer gridpoints to minval and maxval."""
+        if grid[0] < grid[-1]:
+            grid[0] = max(grid[0], minval)
+            grid[-1] = min(grid[-1], maxval)
+        else:
+            grid[0] = min(grid[0], maxval)
+            grid[-1] = max(grid[-1], minval)
+
+    # see whether cropping necessary
+    x1, x2 = trimGrid(gridx, posn[0], posn[2])
+    y1, y2 = trimGrid(gridy, posn[1], posn[3])
+
+    if x1 > 0 or y1 > 0 or x2 < len(gridx)-1 or y2 < len(gridy)-1:
+        # do cropping
+        image = image.copy(x1, y1, x2-x1-1, y2-y1-1)
+        gridx = N.array(gridx[x1:x2])
+        gridy = N.array(gridy[y1:y2])
+
+        # trim outer grid point to viewable range
+        trimEdge(gridx, posn[0], posn[2])
+        trimEdge(gridy, posn[1], posn[3])
+
+    return gridx, gridy, image
 
 class Image(plotters.GenericPlotter):
     """A class which plots an image on a graph with a specified
@@ -45,14 +150,6 @@ class Image(plotters.GenericPlotter):
         """Initialise plotter with axes."""
 
         plotters.GenericPlotter.__init__(self, parent, name=name)
-
-        self.lastcolormap = None
-        self.lastdataset = None
-        self.schangeset = -1
-
-        # this is the range of data plotted, computed when plot is changed
-        # the ColorBar object needs this later
-        self.cacheddatarange = (0, 1)
 
         if type(self) == Image:
             self.readDefaults()
@@ -131,33 +228,19 @@ class Image(plotters.GenericPlotter):
         out += [s.colorScaling, s.colorMap]
         return ', '.join(out)
 
-    def updateImage(self):
-        """Update the image with new contents."""
+    def getDataValueRange(self, data):
+        """Update data range from data."""
 
         s = self.settings
-        d = self.document
-        data = s.get('data').getData(d)
-
-        transimg = s.get('transparencyData').getData(d)
-        if transimg is not None:
-            transimg = transimg.data
-
         minval = s.min
-        if minval == 'Auto':
+        if minval == 'Auto' and data is not None:
             minval = N.nanmin(data.data)
         maxval = s.max
-        if maxval == 'Auto':
+        if maxval == 'Auto' and data is not None:
             maxval = N.nanmax(data.data)
 
         # this is used currently by colorbar objects
-        self.cacheddatarange = (minval, maxval)
-
-        # get color map
-        cmap = self.document.getColormap(s.colorMap, s.colorInvert)
-
-        self.image = utils.applyColorMap(
-            cmap, s.colorScaling, data.data, minval, maxval,
-            s.transparency, transimg=transimg)
+        return (minval, maxval)
 
     def affectsAxisRange(self):
         """Range information provided by widget."""
@@ -176,138 +259,94 @@ class Image(plotters.GenericPlotter):
         if data is None or data.dimensions != 2:
             return
 
+        xr, yr = data.getDataRanges()
         if depname == 'sx':
-            dxrange = data.xrange
-            axrange[0] = min( axrange[0], dxrange[0] )
-            axrange[1] = max( axrange[1], dxrange[1] )
+            dxrange = xr
+            axrange[0] = min( axrange[0], xr[0] )
+            axrange[1] = max( axrange[1], xr[1] )
         elif depname == 'sy':
-            dyrange = data.yrange
-            axrange[0] = min( axrange[0], dyrange[0] )
-            axrange[1] = max( axrange[1], dyrange[1] )
-
-    def cutImageToFit(self, pltx, plty, posn):
-        x1, y1, x2, y2 = posn
-        pltx1, pltx2 = pltx
-        pltw = pltx2-pltx1
-        plty2, plty1 = plty
-        plth = plty2-plty1
-
-        imw = self.image.width()
-        imh = self.image.height()
-        pixw = pltw / imw
-        pixh = plth / imh
-        cutr = [0, 0, imw-1, imh-1]
-
-        # work out where image intercepts posn, and make sure image
-        # fills at least that area
-
-        # need to chop left
-        if pltx1 < x1:
-            d = int((x1-pltx1) / pixw)
-            cutr[0] += d
-            pltx[0] += d*pixw
-
-        # need to chop right
-        if pltx2 > x2:
-            d = max(0, int((pltx2-x2) / pixw) - 1)
-            cutr[2] -= d
-            pltx[1] -= d*pixw
-
-        # chop top
-        if plty1 < y1:
-            d = int((y1-plty1) / pixh)
-            cutr[1] += d
-            plty[1] += d*pixh
-
-        # chop bottom
-        if plty2 > y2:
-            d = max(0, int((plty2-y2) / pixh) - 1)
-            cutr[3] -= d
-            plty[0] -= d*pixh
-
-        # create chopped-down image
-        newimage = self.image.copy(cutr[0], cutr[1],
-                                   cutr[2]-cutr[0]+1, cutr[3]-cutr[1]+1)
-
-        # return new image coordinates and image
-        return pltx, plty, newimage
+            dyrange = yr
+            axrange[0] = min( axrange[0], yr[0] )
+            axrange[1] = max( axrange[1], yr[1] )
 
     def getColorbarParameters(self):
         """Return parameters for colorbar."""
 
-        self.recomputeInternals()
-        minval, maxval = self.cacheddatarange
         s = self.settings
+        d = self.document
+        data = s.get('data').getData(d)
+        minval, maxval = self.getDataValueRange(data)
 
         return (minval, maxval, s.colorScaling, s.colorMap,
                 s.transparency, s.colorInvert)
 
-    def recomputeInternals(self):
-        """Recompute the internals if required.
-
-        This is used by colorbar as it needs to know data range when plotting
-        """
+    def dataDraw(self, painter, axes, posn, clip):
+        """Draw image."""
 
         s = self.settings
         d = self.document
 
-        # return if the dataset isn't two dimensional
         data = s.get('data').getData(d)
-        if data is not None and data.dimensions == 2:
-            if data != self.lastdataset or self.schangeset != d.changeset:
-                self.updateImage()
-                self.lastdataset = data
-                self.schangeset = d.changeset
-            return data
-
-        return None
-
-    def dataDraw(self, painter, axes, posn, clip):
-        """Draw the image."""
-
-        s = self.settings
-
-        # get data and update internal computations
-        data = self.recomputeInternals()
-        if not data or s.hide:
+        if s.hide or data is None or data.dimensions != 2:
             return
 
-        # find coordinates of image coordinate bounds
+        transimg = s.get('transparencyData').getData(d)
+        if transimg is not None:
+            transimg = transimg.data
+
         rangex, rangey = data.getDataRanges()
+        pltrangex = axes[0].dataToPlotterCoords(posn, N.array(rangex))
+        pltrangey = axes[1].dataToPlotterCoords(posn, N.array(rangey))
 
-        # translate coordinates to plotter coordinates
-        coordsx = axes[0].dataToPlotterCoords(posn, N.array(rangex))
-        coordsy = axes[1].dataToPlotterCoords(posn, N.array(rangey))
+        # make QImage from data
+        cmap = d.getColormap(s.colorMap, s.colorInvert)
+        datavaluerange = self.getDataValueRange(data)
+        image = utils.applyColorMap(
+            cmap, s.colorScaling, data.data,
+            datavaluerange[0], datavaluerange[1],
+            s.transparency, transimg=transimg)
 
-        # truncate image down if necessary
-        # This assumes linear pixels!
-        x1, y1, x2, y2 = posn
-        if ( coordsx[0] < x1 or coordsx[1] > x2 or
-             coordsy[0] < y1 or coordsy[1] > y2 ):
+        if data.isLinearImage():
+            # linearly spaced grid
 
-            coordsx, coordsy, image = self.cutImageToFit(coordsx, coordsy,
-                                                         posn)
+            if ( pltrangex[0] < posn[0] or pltrangex[1] > posn[2] or
+                 pltrangey[0] < posn[1] or pltrangey[1] > posn[3] ):
+                # need to crop image
+                pltrangex, pltrangey, image = cropLinearImageToBox(
+                    image, pltrangex, pltrangey, posn)
+
         else:
-            image = self.image
+            # get pixel edges, converted to plotter coordinates
+            xedgep, yedgep = data.getPixelEdges(
+                scalefnx=lambda v: axes[0].dataToPlotterCoords(posn, v),
+                scalefny=lambda v: axes[1].dataToPlotterCoords(posn, v))
+
+            # crop any pixels completely outside posn
+            xedgep, yedgep, image = cropGridImageToBox(
+                image, xedgep, yedgep, posn)
+
+            # make image on linear grid
+            image = utils.resampleLinearImage(image, xedgep, yedgep)
+
+            pltrangex = xedgep[0], xedgep[-1]
+            pltrangey = yedgep[0], yedgep[-1]
 
         # optionally smooth images before displaying
         if s.smooth:
-            image = image.scaled( coordsx[1]-coordsx[0], coordsy[0]-coordsy[1],
-                                  qt4.Qt.IgnoreAspectRatio,
-                                  qt4.Qt.SmoothTransformation )
+            image = image.scaled(
+                pltrangex[1]-pltrangex[0], pltrangey[0]-pltrangey[1],
+                qt4.Qt.IgnoreAspectRatio, qt4.Qt.SmoothTransformation)
 
         # get position and size of output image
-        xp, yp = coordsx[0], coordsy[1]
-        xw = coordsx[1]-coordsx[0]
-        yw = coordsy[0]-coordsy[1]
+        xp, yp = pltrangex[0], pltrangey[1]
+        xw = pltrangex[1]-pltrangex[0]
+        yw = pltrangey[0]-pltrangey[1]
 
         # invert output drawing if axes go from positive->negative
         # we only translate the coordinate system if this is the case
-        xscale = yscale = 1
-        if xw < 0:
-            xscale = -1
-        if yw < 0:
-            yscale = -1
+        xscale = 1 if xw > 0 else -1
+        yscale = 1 if yw > 0 else -1
+
         if xscale != 1 or yscale != 1:
             painter.save()
             painter.translate(xp, yp)
@@ -315,6 +354,7 @@ class Image(plotters.GenericPlotter):
             painter.scale(xscale, yscale)
 
         # draw image
+        #image = image.copy(qt4.QRect(qt4.QPoint(0, 0), qt4.QPoint(20, 20)))
         painter.drawImage(qt4.QRectF(xp, yp, abs(xw), abs(yw)), image)
 
         # restore painter if image was inverted
@@ -322,4 +362,4 @@ class Image(plotters.GenericPlotter):
             painter.restore()
 
 # allow the factory to instantiate an image
-document.thefactory.register( Image )
+document.thefactory.register(Image)

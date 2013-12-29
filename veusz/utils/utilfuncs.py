@@ -549,6 +549,13 @@ def round2delt(fin1, fin2):
     fout = float(out1)
     return fout if fin1 > 0 else -fout
 
+def checkAscending(v):
+    """Check list of values is finite and ascending."""
+    v = N.array(v)
+    if not N.all( N.isfinite(v) ):
+        return False
+    return N.all( (v[1:] - v[:-1]) > 0 )
+
 def rrepr(val):
     """Reproducible repr.
 

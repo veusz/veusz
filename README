@@ -13,8 +13,10 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Changes in 1.20:
- * Allow expressions to be edited for linked 2D datasets
  * Add HDF5 import
+ * Allow expressions to be edited for linked 2D datasets
+ * Add non-regular 2D datasets
+ * Add CSV support to 2D import
 
 Bug fixes:
  * Windows binary fixes problem mangling text from saved files

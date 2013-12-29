@@ -269,6 +269,14 @@ class DatasetBase(object):
         """Is the dataset editable?"""
         return True
 
+def regularGrid(vals):
+    '''Are the values equally spaced?'''
+    if len(vals) < 2:
+        return False
+    vals = N.array(vals)
+    deltas = vals[1:] - vals[:-1]
+    return N.all(N.abs(deltas - deltas[0]) < (deltas[0]*1e-5))
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -281,43 +289,171 @@ class Dataset2D(DatasetBase):
     # the dataset is recreated if its data changes
     isstable = True
 
-    def __init__(self, data, xrange=None, yrange=None):
+    def __init__(self, data, xrange=None, yrange=None,
+                 xedge=None, yedge=None,
+                 xcent=None, ycent=None):
         '''Create a two dimensional dataset based on data.
 
         data: 2d numpy of imaging data
-        xrange: a tuple of (start, end) coordinates for x
-        yrange: a tuple of (start, end) coordinates for y
+
+        Range specfied by:
+         xrange: a tuple of (start, end) coordinates for x
+         yrange: a tuple of (start, end) coordinates for y
+        _or_
+         xedge: list of values start..end (npix+1 values)
+         yedge: list of values start..end (npix+1 values)
+        _or_
+         xcent: list of values (npix values)
+         ycent: list of values (npix values)
         '''
 
         DatasetBase.__init__(self)
 
         # we don't want these set if a inheriting class uses properties instead
-        if not hasattr(self, 'data'):
-            try:
-                self.data = convertNumpy(data, dims=2)
-                self.xrange = (0, self.data.shape[1])
-                self.yrange = (0, self.data.shape[0])
+        self._data = d = convertNumpy(data, dims=2)
 
-                if xrange:
-                    self.xrange = xrange
-                if yrange:
-                    self.yrange = yrange
-            except AttributeError:
-                # for some reason hasattr doesn't always work
-                pass
+        self._xrange = self._yrange = None
+        self._xedge = self._yedge = self._xcent = self._ycent = None
 
-    def indexToPoint(self, xidx, yidx):
-        """Convert a set of indices to pixels in integers to
-        floating point vals using xrange and yrange."""
+        # try to regularise data if possible
+        # by converting regular grids to ranges
+        if xedge is not None and regularGrid(xedge):
+            xrange = (xedge[0], xedge[-1])
+            xedge = None
+        if yedge is not None and regularGrid(yedge):
+            yrange = (yedge[0], yedge[-1])
+            yedge = None
+        if xcent is not None and regularGrid(xcent):
+            delta = 0.5*(xcent[1]-xcent[0])
+            xrange = (xcent[0]-delta, xcent[-1]+delta)
+            xcent = None
+        if ycent is not None and regularGrid(ycent):
+            delta = 0.5*(ycent[1]-ycent[0])
+            yrange = (ycent[0]-delta, ycent[-1]+delta)
+            ycent = None
 
-        xfracpix = (xidx+0.5) * (1./self.data.shape[1])
-        xfloat = xfracpix * (self.xrange[1] - self.xrange[0]) + self.xrange[0]
-        yfracpix = (yidx+0.5) * (1./self.data.shape[0])
-        yfloat = yfracpix * (self.yrange[1] - self.yrange[0]) + self.yrange[0]
-        return xfloat, yfloat
+        if xrange is not None:
+            self._xrange = tuple(xrange)
+        elif xedge is not None:
+            self._xedge = N.array(xedge)
+        elif xcent is not None:
+            self._xcent = N.array(xcent)
+        elif d is not None:
+            self._xrange = (0, d.shape[1])
+        else:
+            self._xrange = (0., 1.)
+
+        if yrange is not None:
+            self._yrange = tuple(yrange)
+        elif yedge is not None:
+            self._yedge = N.array(yedge)
+        elif ycent is not None:
+            self._ycent = N.array(ycent)
+        elif d is not None:
+            self._yrange = (0, d.shape[0])
+        else:
+            self._yrange = (0., 1.)
+
+    @property
+    def data(self): return self._data
+    @property
+    def xrange(self): return self._xrange
+    @property
+    def yrange(self): return self._yrange
+    @property
+    def xedge(self): return self._xedge
+    @property
+    def yedge(self): return self._yedge
+    @property
+    def xcent(self): return self._xcent
+    @property
+    def ycent(self): return self._ycent
+
+    def isLinearImage(self):
+        """Are these simple linear pixels?"""
+        return ( self.xedge is None and self.yedge is None and
+                 self.xcent is None and self.ycent is None )
+
+    def getPixelEdges(self, scalefnx=None, scalefny=None):
+        """Return edges for x and y pixels.
+
+        scalefnx/y: function to convert values to plotted pixel scale
+                    (used to calculate edges from centres on screen)
+        """
+
+        def fromcentres(vals, scalefn):
+            """Calculate edges from centres."""
+            if scalefn:
+                vals = scalefn(vals)
+
+            if len(vals) == 0:
+                e = []
+            elif len(vals) == 1:
+                if vals[0] != 0:
+                    e = [0, vals[0]*2]
+                else:
+                    e = [0, 1]
+            else:
+                e = N.concatenate((
+                    [vals[0] - 0.5*(vals[1]-vals[0])],
+                    0.5*(vals[:-1] + vals[1:]),
+                    [vals[-1] + 0.5*(vals[-1]-vals[-2])]
+                ))
+            return N.array(e)
+
+        if self.xedge is not None:
+            xg = self.xedge
+            if scalefnx:
+                xg = scalefnx(xg)
+        elif self.xcent is not None:
+            xg = fromcentres(self.xcent, scalefnx)
+        else:
+            xg = N.linspace(self.xrange[0], self.xrange[1],
+                            self.data.shape[1]+1)
+            if scalefnx:
+                xg = scalefnx(xg)
+
+        if self.yedge is not None:
+            yg = self.yedge
+            if scalefny:
+                yg = scalefny(yg)
+        elif self.ycent is not None:
+            yg = fromcentres(self.ycent, scalefny)
+        else:
+            yg = N.linspace(self.yrange[0], self.yrange[1],
+                            self.data.shape[0]+1)
+            if scalefny:
+                yg = scalefny(yg)
+
+        return xg, yg
+
+    def getPixelCentres(self):
+        """Return lists of pixel centres in x and y."""
+
+        yw, xw = self.data.shape
+
+        if self.xcent is not None:
+            xc = self.xcent
+        elif self.xedge is not None:
+            xc = 0.5*(self.xedge[:-1]+self.xedge[1:])
+        else:
+            xc = (N.arange(xw) + 0.5) * (
+                (self.xrange[1]-self.xrange[0])/xw) + self.xrange[0]
+
+        if self.ycent is not None:
+            yc = self.ycent
+        elif self.yedge is not None:
+            yc = 0.5*(self.yedge[:-1]+self.yedge[1:])
+        else:
+            yc = (N.arange(yw) + 0.5) * (
+                (self.yrange[1]-self.yrange[0])/yw) + self.yrange[0]
+
+        return xc, yc
 
     def getDataRanges(self):
-        return self.xrange, self.yrange
+        """Return ranges of x and y data (as tuples)."""
+        xe, ye = self.getPixelEdges()
+        return (xe[0], xe[-1]), (ye[0], ye[-1])
 
     def saveToFile(self, fileobj, name):
         """Write the 2d dataset to the file given."""
@@ -327,8 +463,24 @@ class Dataset2D(DatasetBase):
             return
 
         fileobj.write("ImportString2D(%s, '''\n" % crepr(name))
-        fileobj.write("xrange %e %e\n" % tuple(self.xrange))
-        fileobj.write("yrange %e %e\n" % tuple(self.yrange))
+        if self.xcent is not None:
+            fileobj.write("xcent %s\n" %
+                          " ".join(("%e" % v for v in self.xcent)) )
+        elif self.xedge is not None:
+            fileobj.write("xedge %s\n" %
+                          " ".join(("%e" % v for v in self.xedge)) )
+        else:
+            fileobj.write("xrange %e %e\n" % tuple(self.xrange))
+
+        if self.ycent is not None:
+            fileobj.write("ycent %s\n" %
+                          " ".join(("%e" % v for v in self.ycent)) )
+        elif self.yedge is not None:
+            fileobj.write("yedge %s\n" %
+                          " ".join(("%e" % v for v in self.yedge)) )
+        else:
+            fileobj.write("yrange %e %e\n" % tuple(self.yrange))
+
         fileobj.write(self.datasetAsText(fmt='%e', join=' '))
         fileobj.write("''')\n")
 
@@ -356,16 +508,21 @@ class Dataset2D(DatasetBase):
 
     def description(self, showlinked=True):
         """Get description of dataset."""
+
         text = self.name()
         text += u' (%i×%i)' % self.data.shape
-        text += ', x=%g->%g' % tuple(self.xrange)
-        text += ', y=%g->%g' % tuple(self.yrange)
+        xr, yr = self.getDataRanges()
+        text += ', x=%g->%g' % tuple(xr)
+        text += ', y=%g->%g' % tuple(yr)
         if self.linked and showlinked:
             text += ', linked to %s' % self.linked.filename
         return text
 
     def returnCopy(self):
-        return Dataset2D( N.array(self.data), self.xrange, self.yrange)
+        return Dataset2D( N.array(self.data),
+                          xrange=self.xrange, yrange=self.yrange,
+                          xedge=self.xedge, yedge=self.yedge,
+                          xcent=self.xcent, ycent=self.ycent )
 
 def dsPreviewHelper(d):
     """Get preview of numpy data d."""
@@ -869,14 +1026,16 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
                     err = _('Expression has wrong dimensions')
         elif dimensions == 2 and vals.ndim == 2:
             # try to use dimensions of first-substituted dataset
-            dsdim = ((0.,1.), (0.,1.))
+            dsrange = {}
             for ds in subdatasets:
                 d = doc.data[ds]
                 if d.dimensions == 2:
-                    dsdim = (d.xrange, d.yrange)
+                    for p in ('xrange', 'yrange', 'xedge', 'yedge',
+                              'xcent', 'ycent'):
+                        dsrange[p] = getattr(d, p)
                     break
 
-            return Dataset2D(vals, xrange=dsdim[0], yrange=dsdim[1])
+            return Dataset2D(vals, **dsrange)
         else:
             err = _('Expression has wrong dimensions')
 
@@ -1255,7 +1414,7 @@ class Dataset2DXYZExpression(Dataset2D):
 
         self.lastchangeset = -1
         self.cacheddata = None
-        
+
         # copy parameters
         self.exprx = exprx
         self.expry = expry
@@ -1396,25 +1555,43 @@ class Dataset2DExpression(Dataset2D):
     def data(self):
         """Return data, or empty array if error."""
         ds = self.evalDataset()
-        if ds is None:
-            return N.array([[]])
-        return ds.data
+        return ds.data if ds is not None else N.array([[]])
 
     @property
     def xrange(self):
         """Return x range."""
         ds = self.evalDataset()
-        if ds is None:
-            return [0., 1.]
-        return ds.xrange
+        return ds.xrange if ds is not None else [0., 1.]
 
     @property
     def yrange(self):
         """Return y range."""
         ds = self.evalDataset()
-        if ds is None:
-            return [0., 1.]
-        return ds.yrange
+        return ds.yrange if ds is not None else [0., 1.]
+
+    @property
+    def xedge(self):
+        """Return x grid points."""
+        ds = self.evalDataset()
+        return ds.xedge if ds is not None else None
+
+    @property
+    def yedge(self):
+        """Return y grid points."""
+        ds = self.evalDataset()
+        return ds.yedge if ds is not None else None
+
+    @property
+    def xcent(self):
+        """Return x cent points."""
+        ds = self.evalDataset()
+        return ds.xcent if ds is not None else None
+
+    @property
+    def ycent(self):
+        """Return y cent points."""
+        ds = self.evalDataset()
+        return ds.ycent if ds is not None else None
 
     def evalDataset(self):
         """Do actual evaluation."""
@@ -1455,10 +1632,10 @@ class Dataset2DXYFunc(Dataset2D):
         self.ystep = ystep
         self.expr = expr
 
-        self.xrange = (self.xstep[0] - self.xstep[2]*0.5,
-                       self.xstep[1] + self.xstep[2]*0.5)
-        self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
-                       self.ystep[1] + self.ystep[2]*0.5)
+        self._xrange = (self.xstep[0] - self.xstep[2]*0.5,
+                        self.xstep[1] + self.xstep[2]*0.5)
+        self._yrange = (self.ystep[0] - self.ystep[2]*0.5,
+                        self.ystep[1] + self.ystep[2]*0.5)
 
         self.cacheddata = None
         self.lastchangeset = -1
@@ -1620,20 +1797,30 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
-        Dataset2D.__init__(self, [[]])
+        Dataset2D.__init__(self, None)
 
     def editable(self):
         """Is the dataset editable?"""
         return False
 
     def __getitem__(self, key):
-        return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange)
-        
+        return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange,
+                         xedge=self.xedge, yedge=self.yedge,
+                         xcent=self.xcent, ycent=self.ycent)
+
     data   = property( lambda self: self.getPluginData('data'),
                        lambda self, val: None )
     xrange = property( lambda self: self.getPluginData('rangex'),
                        lambda self, val: None )
     yrange = property( lambda self: self.getPluginData('rangey'),
+                       lambda self, val: None )
+    xedge  = property( lambda self: self.getPluginData('xedge'),
+                       lambda self, val: None )
+    yedge  = property( lambda self: self.getPluginData('yedge'),
+                       lambda self, val: None )
+    xcent  = property( lambda self: self.getPluginData('xcent'),
+                       lambda self, val: None )
+    ycent  = property( lambda self: self.getPluginData('ycent'),
                        lambda self, val: None )
 
 class DatasetTextPlugin(_DatasetPlugin, DatasetText):
