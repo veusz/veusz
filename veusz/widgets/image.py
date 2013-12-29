@@ -294,7 +294,6 @@ class Image(plotters.GenericPlotter):
         if transimg is not None:
             transimg = transimg.data
 
-        # translate coordinates to plotter coordinates
         rangex, rangey = data.getDataRanges()
         pltrangex = axes[0].dataToPlotterCoords(posn, N.array(rangex))
         pltrangey = axes[1].dataToPlotterCoords(posn, N.array(rangey))
@@ -317,9 +316,10 @@ class Image(plotters.GenericPlotter):
                     image, pltrangex, pltrangey, posn)
 
         else:
-            xedge, yedge = data.getPixelEdges()
-            xedgep = axes[0].dataToPlotterCoords(posn, xedge)
-            yedgep = axes[1].dataToPlotterCoords(posn, yedge)
+            # get pixel edges, converted to plotter coordinates
+            xedgep, yedgep = data.getPixelEdges(
+                scalefnx=lambda v: axes[0].dataToPlotterCoords(posn, v),
+                scalefny=lambda v: axes[1].dataToPlotterCoords(posn, v))
 
             # crop any pixels completely outside posn
             xedgep, yedgep, image = cropGridImageToBox(
