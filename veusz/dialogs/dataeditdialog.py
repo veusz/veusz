@@ -44,7 +44,6 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
-        self.updatePixelCoords()
 
         document.signalModified.connect(self.slotDocumentModified)
 
@@ -61,7 +60,6 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
     def slotDocumentModified(self):
         """Called when document modified."""
-        self.updatePixelCoordinates()
         self.layoutChanged.emit()
 
     def columnCount(self, parent):
