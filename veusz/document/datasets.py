@@ -269,6 +269,14 @@ class DatasetBase(object):
         """Is the dataset editable?"""
         return True
 
+def regularGrid(vals):
+    '''Are the values equally spaced?'''
+    if len(vals) < 2:
+        return False
+    vals = N.array(vals)
+    deltas = vals[1:] - vals[:-1]
+    return N.all(N.abs(deltas - deltas[0]) < (deltas[0]*1e-5))
+
 class Dataset2D(DatasetBase):
     '''Represents a two-dimensional dataset.'''
 
@@ -306,6 +314,23 @@ class Dataset2D(DatasetBase):
 
         self._xrange = self._yrange = None
         self._xedge = self._yedge = self._xcent = self._ycent = None
+
+        # try to regularise data if possible
+        # by converting regular grids to ranges
+        if xedge is not None and regularGrid(xedge):
+            xrange = (xedge[0], xedge[-1])
+            xedge = None
+        if yedge is not None and regularGrid(yedge):
+            yrange = (yedge[0], yedge[-1])
+            yedge = None
+        if xcent is not None and regularGrid(xcent):
+            delta = 0.5*(xcent[1]-xcent[0])
+            xrange = (xcent[0]-delta, xcent[-1]+delta)
+            xcent = None
+        if ycent is not None and regularGrid(ycent):
+            delta = 0.5*(ycent[1]-ycent[0])
+            yrange = (ycent[0]-delta, ycent[-1]+delta)
+            ycent = None
 
         if xrange is not None:
             self._xrange = tuple(xrange)
