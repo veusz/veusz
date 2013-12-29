@@ -387,20 +387,20 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         """Return headers at top."""
 
         ds = self.document.data[self.dsname]
+        xaxis = orientation == qt4.Qt.Horizontal
 
-        axis = 'x' if orientation == qt4.Qt.Horizontal else 'y'
         if ds is not None and role == qt4.Qt.DisplayRole:
-            v = self.xcent[section] if 'x' else self.ycent[section]
+            v = self.xcent[section] if xaxis else self.ycent[section]
             return '%i (%s)' % (section+1, setting.uilocale.toString(v))
 
         elif ds is not None and role == qt4.Qt.ToolTipRole:
-            v1 = self.xedge[section] if 'x' else self.yedge[section]
-            v2 = self.xedge[section+1] if 'x' else self.yedge[section+1]
+            v1 = self.xedge[section] if xaxis else self.yedge[section]
+            v2 = self.xedge[section+1] if xaxis else self.yedge[section+1]
             return u'%s\u2013%s' % (setting.uilocale.toString(v1),
                                     setting.uilocale.toString(v2))
 
         return None
-    
+
     def flags(self, index):
         """Update flags to say that items are editable."""
         if not index.isValid():
