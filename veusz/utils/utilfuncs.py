@@ -28,6 +28,7 @@ import threading
 import codecs
 import io
 import csv
+import time
 from collections import defaultdict
 
 from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes, crepr
@@ -251,15 +252,19 @@ class NonBlockingReaderThread(threading.Thread):
 
     This is used mainly because windows doesn't properly support
     non-blocking pipes as files.
+
+    If exiteof is True, then exit capturing when we can capture no
+    more data.
     """
 
-    def __init__(self, fileobject):
+    def __init__(self, fileobject, exiteof=True):
         """Create the thread object."""
         threading.Thread.__init__(self)
         self.fileobject = fileobject
         self.lock = threading.Lock()
         self.data = ''
         self.done = False
+        self.exiteof = exiteof
 
     def getNewData(self):
         """Get any data waiting to be read, and whether
@@ -293,14 +298,17 @@ class NonBlockingReaderThread(threading.Thread):
 
             # no more data: end of file
             if len(data) == 0:
+                if self.exiteof:
+                    self.lock.acquire()
+                    self.done = True
+                    self.lock.release()
+                    break
+                else:
+                    time.sleep(0.1)
+            else:
                 self.lock.acquire()
-                self.done = True
+                self.data += data
                 self.lock.release()
-                break
-
-            self.lock.acquire()
-            self.data += data
-            self.lock.release()
 
 # standard python encodings
 encodings = [

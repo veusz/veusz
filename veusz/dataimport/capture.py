@@ -116,7 +116,8 @@ class FileCaptureStream(CaptureStream):
         self.fileobj = open(filename, 'rU')
 
         # make new thread to read file
-        self.readerthread = utils.NonBlockingReaderThread(self.fileobj)
+        self.readerthread = utils.NonBlockingReaderThread(
+            self.fileobj, exiteof=False)
         self.readerthread.start()
 
         self.name = filename

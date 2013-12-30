@@ -20,6 +20,8 @@ Changes in 1.20:
  * Allow safe renaming of linked datasets
 
 Bug fixes:
+ * When capturing data from a file/named pipe, do not stop when no
+   more data are available
  * Fixes mangling of text in saved files using Windows binary
 
 Features of package:
