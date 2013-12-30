@@ -167,7 +167,6 @@ class LinkedFileBase(object):
 
                 # rename any renamed datasets
                 outname = name
-                print(name, self.params.renames)
                 if self.params.renames and name in self.params.renames:
                     outname = self.params.renames[name]
 
