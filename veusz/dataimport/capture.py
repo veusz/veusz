@@ -24,7 +24,7 @@ import socket
 import platform
 import signal
 
-from ..compat import cstr
+from ..compat import cstr, ckeys
 from .. import qtall as qt4
 from .. import utils
 from . import simpleread
@@ -193,7 +193,7 @@ class SocketCaptureStream(CaptureStream):
         self.name = '%s:%i' % (host, port)
         try:
             self.socket = socket.socket( socket.AF_INET,
-                                          socket.SOCK_STREAM )
+                                         socket.SOCK_STREAM )
             self.socket.connect( (host, port) )
         except socket.error as e:
             self._handleSocketError(e)
@@ -232,7 +232,7 @@ class SocketCaptureStream(CaptureStream):
 
 class OperationDataCaptureSet(object):
     """An operation for setting the results from a SimpleRead into the
-    docunment's data from a data capture.
+    document's data from a data capture.
 
     This is a bit primative, but it is not obvious how to isolate the capturing
     functionality elsewhere."""
@@ -245,17 +245,18 @@ class OperationDataCaptureSet(object):
 
     def do(self, doc):
         """Set the data in the document."""
-        # before replacing data, get a backup of document's data
-        databackup = dict(doc.data)
 
         # set the data to the document and keep a list of what's changed
-        self.nameschanged = self.simplereadobject.setInDocument(doc)
+        readdata = {}
+        self.simplereadobject.setOutput(readdata)
 
         # keep a copy of datasets which have changed from backup
+        self.nameschanged = list(ckeys(readdata))
         self.olddata = {}
         for name in self.nameschanged:
-            if name in databackup:
-                self.olddata[name] = databackup[name]
+            if name in doc.data:
+                self.olddata[name] = doc.data[name]
+            doc.setData(name, readdata[name])
 
     def undo(self, doc):
         """Undo the results of the capture."""
