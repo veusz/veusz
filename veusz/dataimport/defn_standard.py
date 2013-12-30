@@ -17,7 +17,7 @@
 ##############################################################################
 
 from __future__ import division, print_function
-from ..compat import citems, cstr, crepr
+from ..compat import citems
 from .. import qtall as qt4
 from .. import utils
 from .. import document

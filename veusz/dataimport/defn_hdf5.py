@@ -24,7 +24,7 @@ import sys
 
 import numpy as N
 from .. import qtall as qt4
-from ..compat import citems, ckeys, cvalues, cstr, cbytes, cpy3
+from ..compat import citems, ckeys, cvalues, cbytes, cpy3
 from .. import document
 from .. import utils
 from . import base

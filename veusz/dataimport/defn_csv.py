@@ -18,7 +18,6 @@
 
 from __future__ import division, print_function
 
-from ..compat import citems, cstr, crepr
 from .. import qtall as qt4
 from .. import document
 from .. import utils

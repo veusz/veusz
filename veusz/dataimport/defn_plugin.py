@@ -19,7 +19,7 @@
 from __future__ import division, print_function
 import traceback
 
-from ..compat import citems, cstr, crepr
+from ..compat import citems
 from .. import document
 from .. import plugins
 from .. import qtall as qt4
