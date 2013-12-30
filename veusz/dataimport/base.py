@@ -170,9 +170,8 @@ class LinkedFileBase(object):
                 if self.params.renames and name in self.params.renames:
                     outname = self.params.renames[name]
 
-                document.setData(outname, ds)
-                ds.document = document
                 ds.linked = self
+                document.setData(outname, ds)
         return read
 
     def reloadLinks(self, document):
@@ -268,8 +267,7 @@ class OperationDataImportBase(object):
         self.olddatasets = []
         for name, ds in citems(self.outdatasets):
             self.olddatasets.append( (name, document.data.get(name)) )
-            ds.document = document
-            document.data[name] = ds
+            document.setData(name, ds)
 
         self.outnames = sorted(self.outdatasets)
 

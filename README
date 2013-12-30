@@ -3,8 +3,8 @@ Veusz 1.20
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
-publication-ready Postscript/PDF/SVG output. Graphs are built-up by
-combining plotting widgets. The user interface aims to be simple,
+publication-ready Postscript, PDF or SVG output. Graphs are built-up
+by combining plotting widgets. The user interface aims to be simple,
 consistent and powerful.
 
 Veusz provides GUI, Python module, command line, scripting, DBUS and
@@ -13,13 +13,14 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Changes in 1.20:
- * Add HDF5 import
+ * Add HDF5 file import
  * Allow expressions to be edited for linked 2D datasets
- * Add non-regular 2D datasets
- * Add CSV support to 2D import
+ * Add support for 2D datasets with irregular gridpoints
+ * Add CSV file support to 2D data import
+ * Allow safe renaming of linked datasets
 
 Bug fixes:
- * Windows binary fixes problem mangling text from saved files
+ * Fixes mangling of text in saved files using Windows binary
 
 Features of package:
  Plotting features:
@@ -100,7 +101,7 @@ It is licenced under the GPL (version 2 or greater).
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
 examples are also useful documentation. Please also see and contribute
-to the Veusz wiki: http://barmag.net/veusz-wiki/
+to the Veusz wiki: https://github.com/jeremysanders/veusz/wiki
 
 Issues with the current version:
 
