@@ -173,7 +173,7 @@ class ImportTab2D(importdialog.ImportTab):
             doc.applyOperation(op)
 
             output = [_('Successfully read datasets:')]
-            for ds in op.outdatasets:
+            for ds in op.outnames:
                 output.append(' %s' % doc.data[ds].description(
                         showlinked=False))
 

@@ -216,6 +216,7 @@ class LinkedFileHDF5(base.LinkedFileBase):
         """Save the link to the document file."""
         self._saveHelper(
             fileobj,
+            'ImportFileHDF5',
             ('filename', 'items'),
             relpath=relpath)
 
@@ -322,7 +323,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 self.walkFile(node, dsread)
         return dsread
 
-    def collectErrorDatasets(self, dsread):
+    def collectErrorBarDatasets(self, dsread):
         """Identify error bar datasets and separate out.
         Returns error bar datasets."""
 
@@ -460,7 +461,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
         return ds
 
-    def doImport(self, doc):
+    def doImport(self):
         """Do the import."""
 
         inith5py()
@@ -468,8 +469,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
         dsread = self.readDataFromFile()
 
-        # find datasets which are error datasets
-        errordatasets = self.collectErrorDatasets(dsread)
+        # find datasets which are error bars
+        errordatasets = self.collectErrorBarDatasets(dsread)
 
         if par.linked:
             linkedfile = LinkedFileHDF5(par)
@@ -493,10 +494,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
             # finally set dataset in document
             fullname = par.prefix + name + par.suffix
-            doc.setData(fullname, ds)
-            self.outdatasets.append(fullname)
-
-        return list(dsread.keys())
+            self.outdatasets[fullname] = ds
 
 def ImportFileHDF5(comm, filename,
                    items,
@@ -506,6 +504,7 @@ def ImportFileHDF5(comm, filename,
                    twod_as_oned=None,
                    convert_datetime=None,
                    prefix='', suffix='',
+                   renames=None,
                    linked=False):
     """Import data from a HDF5 file
 
@@ -542,6 +541,9 @@ def ImportFileHDF5(comm, filename,
        for a text dataset, this should give the format of the date/time,
           e.g. 'YYYY-MM-DD|T|hh:mm:ss' or 'iso' for iso format
  
+    renames is a dict mapping old to new dataset names, to be renamed
+    after importing
+
     linked specifies that the dataset is linked to the file.
 
     Attributes can be used in datasets to override defaults:
@@ -556,10 +558,13 @@ def ImportFileHDF5(comm, filename,
     For compound datasets these attributes can be given on a
     per-column basis using attribute names
     vsz_attributename_columnname.
+
+    Returns: list of imported datasets
     """
 
     # lookup filename
     realfilename = comm.findFileOnImportPath(filename)
+
     params = ImportParamsHDF5(
         filename=realfilename,
         items=items,
@@ -569,8 +574,13 @@ def ImportFileHDF5(comm, filename,
         twod_as_oned=twod_as_oned,
         convert_datetime=convert_datetime,
         prefix=prefix, suffix=suffix,
+        renames=renames,
         linked=linked)
     op = OperationDataImportHDF5(params)
     comm.document.applyOperation(op)
+
+    if comm.verbose:
+        print("Imported datasets %s" % ', '.join(op.outnames))
+    return op.outnames
 
 document.registerImportCommand("ImportFileHDF5", ImportFileHDF5)

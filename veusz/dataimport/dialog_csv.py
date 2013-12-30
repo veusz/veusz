@@ -190,7 +190,7 @@ class ImportTabCSV(importdialog.ImportTab):
         doc.applyOperation(op)
 
         # update output, showing what datasets were imported
-        lines = self.dialog.retnDatasetInfo(op.outdatasets, linked, filename)
+        lines = self.dialog.retnDatasetInfo(op.outnames, linked, filename)
 
         t = self.previewtablecsv
         t.verticalHeader().hide()

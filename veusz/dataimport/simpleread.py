@@ -289,9 +289,8 @@ class DescriptorPart(object):
 
         # we didn't read any data
         if self.datatype is None:
-            return []
+            return
 
-        names = []
         for index in crange(self.startindex, self.stopindex+1):
             # name for variable
             if self.single:
@@ -343,11 +342,8 @@ class DescriptorPart(object):
 
                 finalname = prefix + name + suffix
                 outmap[finalname] = ds
-                names.append(finalname)
             else:
                 break
-
-        return names
 
 class Stream(object):
     """This object reads through an input data source (override
@@ -616,11 +612,9 @@ class SimpleRead(object):
                 out[name[:-2]] = len(data)
         return out
 
-    def setOutput(self, outmap, linkedfile=None,
+    def setOutput(self, out, linkedfile=None,
                   prefix='', suffix=''):
-        """Set the data in the document.
-
-        Returns list of variable names read.
+        """Set the data in the out dict.
         """
 
         # iterate over blocks used
@@ -633,17 +627,14 @@ class SimpleRead(object):
         if self.autodescr and prefix == '' and suffix == '':
             prefix = 'col'
 
-        names = []
         for block in blocks:
             for part in self.parts:
-                names += part.setOutput(
-                    self.datasets, outmap,
+                part.setOutput(
+                    self.datasets, out,
                     block=block,
                     linkedfile=linkedfile,
                     prefix=prefix, suffix=suffix,
                     tail=self.tail)
-
-        return names
 
 #####################################################################
 # 2D data reading
@@ -828,10 +819,8 @@ class SimpleRead2D(object):
               len(self.ycent) != self.data.shape[0]) ):
             raise Read2DError("xcent and ycent lengths must be data shape")
 
-    def setInDocument(self, doc, linkedfile=None):
-        """Set the data in the document.
-
-        Returns list containing name of dataset read
+    def setOutput(self, out, linkedfile=None):
+        """Set the data in the output dict out
         """
 
         ds = document.Dataset2D(self.data,
@@ -843,6 +832,4 @@ class SimpleRead2D(object):
         ds.linked = linkedfile
 
         fullname = self.params.prefix + self.name + self.params.suffix
-        doc.setData(fullname, ds)
-
-        return [fullname]
+        out[fullname] = ds

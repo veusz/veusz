@@ -108,7 +108,7 @@ class ImportTabStandard(importdialog.ImportTab):
         if len(lines) != 0:
             lines.append('')
 
-        lines += self.dialog.retnDatasetInfo(op.outdatasets, linked, filename)
+        lines += self.dialog.retnDatasetInfo(op.outnames, linked, filename)
 
         self.previewedit.setPlainText( '\n'.join(lines) )
 

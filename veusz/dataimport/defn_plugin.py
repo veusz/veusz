@@ -71,14 +71,14 @@ class LinkedFilePlugin(base.LinkedFileBase):
             'ImportFilePlugin',
             ('plugin', 'filename'),
             relpath=relpath,
-            extraargs=p.pluginpars)
+            extraargs=self.params.pluginpars)
 
 class OperationDataImportPlugin(base.OperationDataImportBase):
     """Import data using a plugin."""
 
     descr = _('import using plugin')
 
-    def doImport(self, doc):
+    def doImport(self):
         """Do import."""
 
         pluginnames = [p.name for p in plugins.importpluginregistry]
@@ -103,10 +103,7 @@ class OperationDataImportPlugin(base.OperationDataImportBase):
         if p.linked:
             LF = LinkedFilePlugin(p)
 
-        customs = []
-
         # convert results to real datasets
-        names = []
         for d in results:
             if isinstance(d, plugins.Dataset1D):
                 ds = document.Dataset(data=d.data, serr=d.serr, perr=d.perr,
@@ -120,10 +117,10 @@ class OperationDataImportPlugin(base.OperationDataImportBase):
             elif isinstance(d, plugins.DatasetDateTime):
                 ds = document.DatasetDateTime(data=d.data)
             elif isinstance(d, plugins.Constant):
-                customs.append( ['constant', d.name, d.val] )
+                self.outcustoms.append( ['constant', d.name, d.val] )
                 continue
             elif isinstance(d, plugins.Function):
-                customs.append( ['function', d.name, d.val] )
+                self.outcustoms.append( ['function', d.name, d.val] )
                 continue
             else:
                 raise RuntimeError("Invalid data set in plugin results")
@@ -136,15 +133,7 @@ class OperationDataImportPlugin(base.OperationDataImportBase):
             name = p.prefix + d.name + p.suffix
 
             # actually make dataset
-            doc.setData(name, ds)
-
-            names.append(name)
-
-        # add constants, functions to doc, if any
-        self.addCustoms(doc, customs)
-
-        self.outdatasets = names
-        self.outcustoms = list(customs)
+            self.outdatasets[name] = ds
 
 def ImportFilePlugin(comm, plugin, filename, **args):
     """Import file using a plugin.
@@ -154,6 +143,7 @@ def ImportFilePlugin(comm, plugin, filename, **args):
     suffix: add to end of dataset name (default '')
     linked: link import to file (default False)
     encoding: file encoding (may not be used, default 'utf_8')
+    renames: renamed datasets after import
     plus arguments to plugin
 
     returns: list of imported datasets, list of imported customs
@@ -170,6 +160,6 @@ def ImportFilePlugin(comm, plugin, filename, **args):
         comm.document.log("Error in plugin %s" % plugin)
         exc =  ''.join(traceback.format_exc())
         comm.document.log(exc)
-    return op.outdatasets, op.outcustoms
+    return op.outnames, op.outcustoms
 
 document.registerImportCommand('ImportFilePlugin', ImportFilePlugin)

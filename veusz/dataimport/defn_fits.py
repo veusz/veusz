@@ -136,7 +136,7 @@ class OperationDataImportFITS(base.OperationDataImportBase):
 
         return document.Dataset2D(data, xrange=rangex, yrange=rangey)
 
-    def doImport(self, document):
+    def doImport(self):
         """Do the import."""
 
         try:
@@ -170,13 +170,13 @@ class OperationDataImportFITS(base.OperationDataImportBase):
         if p.linked:
             ds.linked = LinkedFileFITS(self.params)
         outname = p.dsname.strip()
-        document.setData(outname, ds)
-        self.outdatasets.append(outname)
+        self.outdatasets[outname] = ds
 
 def ImportFITSFile(comm, dsname, filename, hdu,
                    datacol = None, symerrcol = None,
                    poserrcol = None, negerrcol = None,
                    wcsmode = None,
+                   renames = None,
                    linked = False):
     """Import data from a FITS file
 
@@ -195,11 +195,17 @@ def ImportFITSFile(comm, dsname, filename, hdu,
     assuming a linear coordinate system. 'fraction' assumes
     fractional values from 0 to 1.
 
+    renames: dict mapping old to new names if datasets are to
+      be renamed after import
+
     linked specfies that the dataset is linked to the file
+
+    Returns: list of imported datasets
     """
 
     # lookup filename
     realfilename = comm.findFileOnImportPath(filename)
+
     params = ImportParamsFITS(
         dsname=dsname, filename=realfilename, hdu=hdu,
         datacol=datacol, symerrcol=symerrcol,
@@ -208,5 +214,9 @@ def ImportFITSFile(comm, dsname, filename, hdu,
         linked=linked)
     op = OperationDataImportFITS(params)
     comm.document.applyOperation(op)
+
+    if comm.verbose:
+        print("Imported datasets %s" % ', '.join(op.outnames))
+    return op.outnames
 
 document.registerImportCommand('ImportFITSFile', ImportFITSFile)

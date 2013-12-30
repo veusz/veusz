@@ -76,9 +76,8 @@ class OperationDataImportCSV(base.OperationDataImportBase):
         if self.params.linked:
             LF = LinkedFileCSV(self.params)
 
-        # set the data
-        self.outdatasets = csvr.setData(
-            self.outdatasetsmap, linkedfile=LF)
+        # set the data in the output structure
+        csvr.setData(self.outdatasets, linkedfile=LF)
 
 class LinkedFileCSV(base.LinkedFileBase):
     """A CSV file linked to datasets."""
@@ -132,7 +131,10 @@ def ImportFileCSV(comm, filename,
 
     renames is a map of old names to new names to rename on import
 
-    If linked is True the data are linked with the file."""
+    If linked is True the data are linked with the file.
+
+    Returns: list of imported datasets
+    """
 
     # backward compatibility
     if prefix:
@@ -157,8 +159,7 @@ def ImportFileCSV(comm, filename,
     comm.document.applyOperation(op)
 
     if comm.verbose:
-        print("Imported datasets %s" % (' '.join(op.outdatasets),))
-
-    return op.outdatasets
+        print("Imported datasets %s" % ' '.join(op.outnames))
+    return op.outnames
 
 document.registerImportCommand('ImportFileCSV', ImportFileCSV)

@@ -180,7 +180,7 @@ class ImportTabPlugins(importdialog.ImportTab):
             return
 
         out = [_('Imported data for datasets:')]
-        for ds in op.outdatasets:
+        for ds in op.outnames:
             out.append( doc.data[ds].description(showlinked=False) )
         if op.outcustoms:
             out.append('')

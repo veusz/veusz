@@ -103,23 +103,24 @@ class LinkedFileBase(object):
         extraargs: other options to add to command line
         """
 
+        p = self.params
         args = []
 
         # arguments without names at command start
         for par in fixedparams:
             if par == 'filename':
-                args.append( utils.rrepr(self._getSaveFilename(relpath)) )
+                v = self._getSaveFilename(relpath)
             else:
-                args.append( utils.rrepr(getattr(self.params, par)) )
+                v = getattr(p, par)
+            args.append(utils.rrepr(v))
 
         # parameters key, values to put in command line
-        plist = sorted( [(p, getattr(self.params, p))
-                         for p in self.params.defaults] +
+        plist = sorted( [(par, getattr(p, par)) for par in p.defaults] +
                         list(citems(extraargs)) )
 
         for par, val in plist:
             if ( val is not None and
-                 self.params.defaults[par] != val and
+                 (par not in p.defaults or p.defaults[par] != val) and
                  par not in fixedparams and
                  par != 'tags' ):
 
@@ -212,27 +213,18 @@ class OperationDataImportBase(object):
     def __init__(self, params):
         self.params = params
 
-        # list of returned datasets
-        self.outdatasets = []
-        # map of names to datasets
-        self.outdatasetsmap = {}
-        # list of returned custom variables
-        self.outcustoms = []
-        # invalid conversions
-        self.outinvalids = {}
-
     def doImport(self, document):
         """Do import, override this.
-        Set outdatasetsmap
+        Set outdatasets
         """
 
-    def addCustoms(self, document, consts):
+    def addCustoms(self, document, customs):
         """Optionally, add the customs return by plugins to document."""
 
-        if len(consts) > 0:
+        if len(customs) > 0:
             self.oldconst = list(document.customs)
             cd = document.customDict()
-            for item in consts:
+            for item in customs:
                 if item[1] in cd:
                     idx, ctype, val = cd[item[1]]
                     document.customs[idx] = item
@@ -243,29 +235,44 @@ class OperationDataImportBase(object):
     def do(self, document):
         """Do import."""
 
+        # list of returned dataset names
+        self.outnames = []
+        # map of names to datasets
+        self.outdatasets = {}
+        # list of returned custom variables
+        self.outcustoms = []
+        # invalid conversions
+        self.outinvalids = {}
+
         # remember datasets in document for undo
         self.oldconst = None
 
         # do actual import
         retn = self.doImport()
 
+        # these are custom values returned from the plugin
+        if self.outcustoms:
+            self.addCustoms(document, self.outcustoms)
+
         # handle tagging/renaming
-        for name, ds in list(citems(self.outdatasetsmap)):
+        for name, ds in list(citems(self.outdatasets)):
             if self.params.tags:
                 ds.tags.update(self.params.tags)
             if self.params.renames and name in self.params.renames:
-                del self.outdatasetsmap[name]
-                self.outdatasetsmap[self.params.renames[name]] = ds
+                del self.outdatasets[name]
+                self.outdatasets[self.params.renames[name]] = ds
 
         # only remember the parts we need
         self.olddatasets = [ (n, document.data.get(n))
-                             for n in self.outdatasetsmap ]
+                             for n in self.outdatasets ]
 
         self.olddatasets = []
-        for name, ds in citems(self.outdatasetsmap):
+        for name, ds in citems(self.outdatasets):
             self.olddatasets.append( (name, document.data.get(name)) )
             ds.document = document
             document.data[name] = ds
+
+        self.outnames = sorted(self.outdatasets)
 
         return retn
 

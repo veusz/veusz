@@ -107,9 +107,8 @@ class OperationDataImport(base.OperationDataImportBase):
             LF = LinkedFile(p)
 
         # actually set the data in the document
-        self.outdatasetsmap = {}
-        self.outdatasets = self.simpleread.setOutput(
-            self.outdatasetsmap,
+        self.simpleread.setOutput(
+            self.outdatasets,
             linkedfile=LF, prefix=p.prefix, suffix=p.suffix)
         self.outinvalids = self.simpleread.getInvalidConversions()
 
@@ -150,11 +149,11 @@ def ImportFile(comm, filename, descriptor, useblocks=False, linked=False,
     comm.document.applyOperation(op)
 
     if comm.verbose:
-        print("Imported datasets %s" % (' '.join(op.outdatasets),))
+        print("Imported datasets %s" % ' '.join(op.outnames))
         for name, num in citems(op.outinvalids):
             print("%i errors encountered reading dataset %s" % (num, name))
 
-    return (op.outdatasets, op.outinvalids)
+    return (op.outnames, op.outinvalids)
 
 def ImportString(comm, descriptor, dstring, useblocks=False):
     """Read data from the string using a descriptor.
@@ -177,11 +176,11 @@ def ImportString(comm, descriptor, dstring, useblocks=False):
     comm.document.applyOperation(op)
 
     if comm.verbose:
-        print("Imported datasets %s" % (' '.join(op.outdatasets),))
+        print("Imported datasets %s" % ' '.join(op.outnames))
         for name, num in citems(op.outinvalids):
             print("%i errors encountered reading dataset %s" % (num, name))
 
-    return (op.outdatasets, op.outinvalids)
+    return (op.outnames, op.outinvalids)
 
 document.registerImportCommand('ImportFile', ImportFile)
 document.registerImportCommand('ImportString', ImportString)

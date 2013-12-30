@@ -79,7 +79,7 @@ class OperationDataImport2D(base.OperationDataImportBase):
     
     descr = _('import 2d data')
 
-    def doImport(self, document):
+    def doImport(self):
         """Import data."""
 
         p = self.params
@@ -106,7 +106,7 @@ class OperationDataImport2D(base.OperationDataImportBase):
         for name in p.datasetnames:
             sr = simpleread.SimpleRead2D(name, p)
             sr.readData(stream)
-            self.outdatasets += sr.setInDocument(document, linkedfile=LF)
+            sr.setOutput(self.outdatasets, linkedfile=LF)
 
 def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
                  invertrows=None, invertcols=None, transpose=None,
@@ -137,6 +137,8 @@ def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
     encoding is encoding character set
 
     if linked=True then the dataset is linked to the file
+
+    Returns: list of imported datasets
     """
 
     # look up filename on path
@@ -159,8 +161,10 @@ def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
         linked=linked)
     op = OperationDataImport2D(params)
     comm.document.applyOperation(op)
+
     if comm.verbose:
-        print("Imported datasets %s" % (', '.join(datasetnames)))
+        print("Imported datasets %s" % ', '.join(op.outnames))
+    return op.outnames
 
 def ImportString2D(comm, datasetnames, dstring, xrange=None, yrange=None,
                    invertrows=None, invertcols=None, transpose=None):
@@ -173,6 +177,8 @@ def ImportString2D(comm, datasetnames, dstring, xrange=None, yrange=None,
     if invertrows=True, then rows are inverted when read
     if invertcols=True, then cols are inverted when read
     if transpose=True, then rows and columns are swapped
+
+    Returns: list of imported datasets
     """
 
     if isinstance(datasetnames, cbasestr):
@@ -185,8 +191,10 @@ def ImportString2D(comm, datasetnames, dstring, xrange=None, yrange=None,
         invertcols=invertcols, transpose=transpose)
     op = OperationDataImport2D(params)
     comm.document.applyOperation(op)
+
     if comm.verbose:
-        print("Imported datasets %s" % (', '.join(datasetnames)))
+        print("Imported datasets %s" % ', '.join(op.outnames))
+    return op.outnames
 
 document.registerImportCommand('ImportFile2D', ImportFile2D)
 document.registerImportCommand('ImportString2D', ImportString2D)
