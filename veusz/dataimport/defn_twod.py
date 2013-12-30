@@ -68,21 +68,12 @@ class LinkedFile2D(base.LinkedFileBase):
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
-
-        args = [ crepr(self._getSaveFilename(relpath)),
-                 crepr(self.params.datasetnames) ]
-        for par in ("xrange", "yrange", "invertrows", "invertcols",
-                    "transpose", "gridatedge",
-                    "mode",
-                    "csvdelimiter", "csvtextdelimiter", "csvlocale",
-                    "prefix", "suffix", "encoding"):
-            v = getattr(self.params, par)
-            if v is not None and v != "" and v != self.params.defaults[par]:
-                args.append( "%s=%s" % (par, crepr(v)) )
-
-        args.append("linked=True")
-
-        fileobj.write("ImportFile2D(%s)\n" % ", ".join(args))
+        self._saveHelper(
+            fileobj,
+            'ImportFile2D',
+            ('filename', 'datasetnames'),
+            {},
+            relpath=relpath)
 
 class OperationDataImport2D(base.OperationDataImportBase):
     """Import a 2D matrix from a file."""

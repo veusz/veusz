@@ -61,25 +61,12 @@ class LinkedFile(base.LinkedFileBase):
         """Save the link to the document file.
         If relpath is set, save links relative to path given
         """
-
-        p = self.params
-        params = [ crepr(self._getSaveFilename(relpath)),
-                   crepr(p.descriptor),
-                   "linked=True",
-                   "ignoretext=" + crepr(p.ignoretext) ]
-
-        if p.encoding != "utf_8":
-            params.append("encoding=" + crepr(p.encoding))
-        if p.useblocks:
-            params.append("useblocks=True")
-        if p.prefix:
-            params.append("prefix=" + crepr(p.prefix))
-        if p.suffix:
-            params.append("suffix=" + crepr(p.suffix))
-        if p.renames:
-            params.append("renames=" + utils.rrepr(p.renames))
-
-        fileobj.write("ImportFile(%s)\n" % (", ".join(params)))
+        self._saveHelper(
+            fileobj,
+            'ImportFile',
+            ('filename', 'descriptor'),
+            {},
+            relpath=relpath)
 
 class OperationDataImport(base.OperationDataImportBase):
     """Import 1D data from text files."""

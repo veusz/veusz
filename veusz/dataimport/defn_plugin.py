@@ -66,21 +66,13 @@ class LinkedFilePlugin(base.LinkedFileBase):
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the vsz document file."""
-
-        p = self.params
-        params = [crepr(p.plugin),
-                  crepr(self._getSaveFilename(relpath)),
-                  "linked=True"]
-        if p.encoding != "utf_8":
-            params.append("encoding=" + crepr(p.encoding))
-        if p.prefix:
-            params.append("prefix=" + crepr(p.prefix))
-        if p.suffix:
-            params.append("suffix=" + crepr(p.suffix))
-        for name, val in citems(p.pluginpars):
-            params.append("%s=%s" % (name, crepr(val)))
-
-        fileobj.write("ImportFilePlugin(%s)\n" % (", ".join(params)))
+        self._saveHelper(
+            fileobj,
+            'ImportFilePlugin',
+            ('plugin', 'filename'),
+            {},
+            relpath=relpath,
+            extraargs=p.pluginpars)
 
 class OperationDataImportPlugin(base.OperationDataImportBase):
     """Import data using a plugin."""

@@ -214,17 +214,11 @@ class LinkedFileHDF5(base.LinkedFileBase):
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
-
-        p = self.params
-        args = [ utils.rrepr(self._getSaveFilename(relpath)),
-                 utils.rrepr(p.items) ]
-        for k in ('namemap', 'slices', 'twodranges', 'twod_as_oned',
-                  'convert_datetime',
-                  'prefix', 'suffix'):
-            if getattr(p, k):
-                args.append("%s=%s" % (k, utils.rrepr(getattr(p, k))) )
-        args.append("linked=True")
-        fileobj.write("ImportFileHDF5(%s)\n" % ", ".join(args))
+        self._saveHelper(
+            fileobj,
+            ('filename', 'items'),
+            {},
+            relpath=relpath)
 
 class _ConvertError(RuntimeError):
     pass

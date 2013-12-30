@@ -58,21 +58,12 @@ class LinkedFileFITS(base.LinkedFileBase):
 
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
-
-        p = self.params
-        args = [p.dsname, self._getSaveFilename(relpath), p.hdu]
-        args = [crepr(i) for i in args]
-        for param, val in ( ("datacol", p.datacol),
-                            ("symerrcol", p.symerrcol),
-                            ("poserrcol", p.poserrcol),
-                            ("negerrcol", p.negerrcol),
-                            ("wcsmode", p.wcsmode),
-                            ):
-            if val is not None:
-                args.append("%s=%s" % (param, crepr(val)))
-        args.append("linked=True")
-
-        fileobj.write("ImportFITSFile(%s)\n" % ", ".join(args))
+        self._saveHelper(
+            fileobj,
+            'ImportFITSFile',
+            ('dsname', 'filename', 'hdu'),
+            {},
+            relpath=relpath)
 
 class OperationDataImportFITS(base.OperationDataImportBase):
     """Import 1d or 2d data from a fits file."""

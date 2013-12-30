@@ -91,6 +91,37 @@ class LinkedFileBase(object):
         """Get filename."""
         return self.params.filename
 
+    def _saveHelper(self, fileobj, cmd, fixedparams, renameparams,
+                    relpath=None, extraargs={}):
+        """Helper to write command to reload data."""
+
+        args = []
+
+        # arguments without names at command start
+        for par in fixedparams:
+            if par == 'filename':
+                args.append( utils.rrepr(self._getSaveFilename(relpath)) )
+            else:
+                args.append( utils.rrepr(getattr(self.params, par)) )
+
+        # parameters key, values to put in command line
+        plist = sorted( [(p, getattr(self.params, p))
+                         for p in self.params.defaults] +
+                        list(citems(extraargs)) )
+
+        for par, val in plist:
+            if ( val is not None and
+                 self.params.defaults[par] != val and
+                 par not in fixedparams and
+                 par != 'tags' ):
+
+                if par in renameparams:
+                    par = renameparams[par]
+                args.append('%s=%s' % (par, utils.rrepr(val)))
+
+        # write command using comma-separated list
+        fileobj.write('%s(%s)\n' % (cmd, ', '.join(args)))
+
     def saveToFile(self, fileobj, relpath=None):
         """Save the link to the document file."""
         pass
