@@ -217,7 +217,6 @@ class LinkedFileHDF5(base.LinkedFileBase):
         self._saveHelper(
             fileobj,
             ('filename', 'items'),
-            {},
             relpath=relpath)
 
 class _ConvertError(RuntimeError):

@@ -72,7 +72,6 @@ class LinkedFile2D(base.LinkedFileBase):
             fileobj,
             'ImportFile2D',
             ('filename', 'datasetnames'),
-            {},
             relpath=relpath)
 
 class OperationDataImport2D(base.OperationDataImportBase):

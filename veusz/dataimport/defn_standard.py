@@ -65,7 +65,6 @@ class LinkedFile(base.LinkedFileBase):
             fileobj,
             'ImportFile',
             ('filename', 'descriptor'),
-            {},
             relpath=relpath)
 
 class OperationDataImport(base.OperationDataImportBase):

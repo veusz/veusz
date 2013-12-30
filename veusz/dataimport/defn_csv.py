@@ -93,7 +93,7 @@ class LinkedFileCSV(base.LinkedFileBase):
             fileobj,
             'ImportFileCSV',
             ('filename',),
-            {'prefix': 'dsprefix', 'suffix': 'dssuffix'},
+            renameparams={'prefix': 'dsprefix', 'suffix': 'dssuffix'},
             relpath=relpath)
 
 def ImportFileCSV(comm, filename,

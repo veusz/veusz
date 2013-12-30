@@ -62,7 +62,6 @@ class LinkedFileFITS(base.LinkedFileBase):
             fileobj,
             'ImportFITSFile',
             ('dsname', 'filename', 'hdu'),
-            {},
             relpath=relpath)
 
 class OperationDataImportFITS(base.OperationDataImportBase):

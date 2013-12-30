@@ -91,9 +91,17 @@ class LinkedFileBase(object):
         """Get filename."""
         return self.params.filename
 
-    def _saveHelper(self, fileobj, cmd, fixedparams, renameparams,
-                    relpath=None, extraargs={}):
-        """Helper to write command to reload data."""
+    def _saveHelper(self, fileobj, cmd, fixedparams,
+                    renameparams={}, relpath=None, extraargs={}):
+        """Helper to write command to reload data.
+
+        fileobj: file object to write to
+        cmd: name of command to write
+        fixedparams: list of parameters to list at start of command lines
+        renameparams: optional map of params to command line params
+        relpath: relative path for writing filename
+        extraargs: other options to add to command line
+        """
 
         args = []
 

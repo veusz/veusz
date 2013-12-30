@@ -70,7 +70,6 @@ class LinkedFilePlugin(base.LinkedFileBase):
             fileobj,
             'ImportFilePlugin',
             ('plugin', 'filename'),
-            {},
             relpath=relpath,
             extraargs=p.pluginpars)
 
