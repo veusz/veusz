@@ -119,7 +119,7 @@ class LinkedFileBase(object):
                         list(citems(extraargs)) )
 
         for par, val in plist:
-            if ( val is not None and
+            if ( val and
                  (par not in p.defaults or p.defaults[par] != val) and
                  par not in fixedparams and
                  par != 'tags' ):

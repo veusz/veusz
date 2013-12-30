@@ -767,11 +767,11 @@ class ImportTabHDF5(importdialog.ImportTab):
 
         try:
             # actually do the import
-            datasets = doc.applyOperation(op)
+            doc.applyOperation(op)
 
             # inform user
             self.hdfimportstatus.setText(_("Import complete (%i datasets)") %
-                                     len(datasets))
+                                         len(op.outnames))
 
         except base.ImportingError as e:
             self.hdfimportstatus.setText(_("Error: %s") % cstr(e))
