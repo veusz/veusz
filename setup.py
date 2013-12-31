@@ -106,7 +106,12 @@ if py2app and sys.platform == 'darwin':
         'app': ['veusz/veusz_main.py'],
         'options': { 'py2app': {'argv_emulation': False,
                                 'includes': ('veusz.helpers._nc_cntr',
-                                             'veusz.helpers.qtloops'),
+                                             'veusz.helpers.qtloops',
+                                             'h5py.defs',
+                                             'h5py.h5ac',
+                                             'h5py.utils',
+                                             'h5py._errors',
+                                             'h5py._proxy'),
                                 'plist': plist,
                                 'iconfile': 'icons/veusz.icns',
                                 }
