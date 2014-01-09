@@ -15,7 +15,7 @@
     </author>
 
     <copyright>
-      <year>2013</year>
+      <year>2014</year>
     </copyright>
 
     <legalnotice>
@@ -1749,7 +1749,8 @@ SetData('x', data[0]*0.1, *data[1:])
 
 	<para><command>ImportFile('filename', 'descriptor',
 	    linked=False, prefix='', suffix='',
-	    encoding='utf_8')</command></para>
+	    encoding='utf_8',
+	    renames={})</command></para>
 
 	<para>Imports data from a file. The arguments are the filename
 	to load data from and the descriptor.</para>
@@ -1765,7 +1766,9 @@ SetData('x', data[0]*0.1, *data[1:])
 	optional.</para>
 
 	<para>If prefix and/or suffix are set, then the prefix and
-	suffix are added to each dataset name.</para>
+	suffix are added to each dataset name. If set, renames maps
+	imported dataset names to final dataset names after
+	import.</para>
 
 	<para>Returns: A tuple containing a list of the imported
 	datasets and the number of conversions which failed for a
@@ -1783,7 +1786,7 @@ SetData('x', data[0]*0.1, *data[1:])
 xrange=(a,b), yrange=(c,d), invertrows=True/False,
 invertcols=True/False, transpose=True/False,
 prefix='', suffix='', linked=False,
-encoding='utf8')</command></para>
+encoding='utf8', renames={})</command></para>
 
 	<para>Imports two-dimensional data from a file. The required
 	arguments are the filename to load data from and the dataset
@@ -1805,7 +1808,8 @@ encoding='utf8')</command></para>
 	Veusz. transpose swaps the rows and columns.</para>
 
 	<para>If prefix and/or suffix are set, they are prepended or
-	appended to imported dataset names.</para>
+	appended to imported dataset names. If set, renames maps imported
+	dataset names to final dataset names  after import.</para>
 
 	<para>If the linked parameter is True, then the datasets are
 	linked to the imported file, and are not saved within a saved
@@ -1838,7 +1842,8 @@ encoding='utf8')</command></para>
 	<anchor id="Command.ImportFileCSV" />
 
 	<para><command>ImportFileCSV('filename', readrows=False,
-	    dsprefix='', dssuffix='', linked=False, encoding='utf_8')
+	    dsprefix='', dssuffix='', linked=False, encoding='utf_8',
+	    renames={})
 	</command></para>
 
 	<para>This command imports data from a CSV format file. Data
@@ -1848,7 +1853,87 @@ encoding='utf8')</command></para>
 	  prepended to each dataset name and dssuffix is added (the
 	  prefix option is deprecated and also addeds an underscore to
 	  the dataset name). linked specifies whether the data will be
-	  linked to the file.
+	  linked to the file. renames, if set, provides new names for
+	  datasets after import.
+	</para>
+
+      </section>
+
+      <section>
+	<title>ImportFileHDF5</title>
+	<anchor id="Command.ImportFileHDF5" />
+
+	<para>
+	  <command>ImportFileHDF5(filename, items, namemap={},
+	  slices={}, twodranges={}, twod_as_oned=set([]),
+	  convert_datetime={}, prefix='', suffix='', renames={},
+	  linked=False)</command>
+	</para>
+
+	<para>
+	  Import data from a HDF5 file. items is a list of groups and
+	  datasets which can be imported.  If a group is imported, all
+	  child datasets are imported.  namemap maps an input dataset
+	  to a veusz dataset name. Special suffixes can be used on the
+	  veusz dataset name to indicate that the dataset should be
+	  imported specially.
+	</para>
+
+	<programlisting>
+'foo (+)': import as +ve error for dataset foo
+'foo (-)': import as -ve error for dataset foo
+'foo (+-)': import as symmetric error for dataset foo
+	</programlisting>
+
+	<para>
+	  slices is an optional dict specifying slices to be selected
+	  when importing. For each dataset to be sliced, provide a
+	  tuple of values, one for each dimension. The values should
+	  be a single integer to select that index, or a tuple (start,
+	  stop, step), where the entries are integers or None.
+	</para>
+
+	<para> twodranges is an optional dict giving data ranges for
+	2d datasets. It maps names to (minx, miny, maxx, maxy).
+	twod_as_oned: optional set containing 2d datasets to attempt
+	to read as 1d
+	</para>
+
+	<para>
+	  convert_datetime should be a dict mapping hdf name to
+	  specify date/time importing.  For a 1d numeric dataset: if
+	  this is set to 'veusz', this is the number of seconds since
+	  2009-01-01, if this is set to 'unix', this is the number of
+	  seconds since 1970-01-01.  For a text dataset, this should
+	  give the format of the date/time,
+	  e.g. 'YYYY-MM-DD|T|hh:mm:ss' or 'iso' for iso format.
+	</para>
+
+	<para>
+	  renames is a dict mapping old to new dataset names, to be
+	  renamed after importing.  linked specifies that the dataset
+	  is linked to the file.
+	</para>
+
+	<programlisting>
+    Attributes can be used in datasets to override defaults:
+     'vsz_name': set to override name for dataset in veusz
+     'vsz_slice': slice on importing (use format "start:stop:step,...")
+     'vsz_range': should be 4 item array to specify x and y ranges:
+                  [minx, miny, maxx, maxy]
+     'vsz_twod_as_oned': treat 2d dataset as 1d dataset with errors
+     'vsz_convert_datetime': treat as date/time, set to one of the values
+                             above.
+	</programlisting>
+
+	<para>
+	  For compound datasets these attributes can be given on a
+	  per-column basis using attribute names
+	  vsz_attributename_columnname.
+	</para>
+
+	<para>
+	  Returns: list of imported datasets
 	</para>
 
       </section>
@@ -1859,13 +1944,14 @@ encoding='utf8')</command></para>
 
 	<para><command>ImportFilePlugin('pluginname', 'filename',
 	    **pluginargs, linked=False, encoding='utf_8',
-	    prefix='', suffix='')</command></para>
+	    prefix='', suffix='', renames={})</command></para>
 
 	<para>
 	  Import data from file using import plugin 'pluginname'. The
 	  arguments to the plugin are given, plus optionally a text
 	  encoding, and prefix and suffix to prepend or append to
-	  dataset names.
+	  dataset names.  renames, if set, provides new names for
+	  datasets after import.
 	</para>
 
       </section>
@@ -1876,7 +1962,7 @@ encoding='utf8')</command></para>
 
 	<para><command>ImportFITSFile(datasetname, filename, hdu,
 	    datacol='A', symerrcol='B', poserrcol='C', negerrcol='D',
-	    linked=True/False)</command></para>
+	    linked=True/False, renames={})</command></para>
 
 	<para>This command does a simple import from a FITS file. The
 FITS format is used within the astronomical community to transport
@@ -1902,7 +1988,8 @@ name).</para>
 
 	<para>If linked is True, then the dataset is not saved with a
 	saved document, but is reread from the data file each time the
-	document is loaded.</para>
+	document is loaded.  renames, if set, provides new names for
+	datasets after import.</para>
       </section>
 
       <section>
@@ -2549,7 +2636,7 @@ Root
             \-- contour1      (contour widget)
             \-- x             (axis widget)
             \-- y             (axis widget)
-	</programlisting>        
+	</programlisting>
 	<para>Here the user could access the xData setting node of the
 	xy1 widget using <literal>Root.page1.graph2.xy1.xData</literal>. To
 	actually read or modify the value of a setting, you should get

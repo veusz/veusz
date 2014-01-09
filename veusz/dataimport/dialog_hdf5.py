@@ -164,8 +164,7 @@ class HDFGroupNode(HDFNode):
                      else qt4.Qt.Unchecked )
 
         elif role == qt4.Qt.ToolTipRole and column == _ColToImport:
-            return _("Check to import all datasets under\n"
-                     "this group under their original names")
+            return _("Check to import all datasets under this group")
 
         return None
 

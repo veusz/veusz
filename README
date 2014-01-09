@@ -13,16 +13,17 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Changes in 1.20:
- * Add HDF5 file import
+ * Add HDF5 file data import
  * Allow expressions to be edited for linked 2D datasets
  * Add support for 2D datasets with irregular gridpoints
- * Add CSV file support to 2D data import
+ * Add 2D data CSV import
  * Allow safe renaming of linked datasets
 
 Bug fixes:
  * When capturing data from a file/named pipe, do not stop when no
    more data are available
  * Fixes mangling of text in saved files using Windows binary
+ * Fix encoding for standard file import
 
 Features of package:
  Plotting features:
@@ -96,7 +97,7 @@ Optional requirements:
  SAMPy (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
 
-Veusz is Copyright (C) 2003-2013 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2014 Jeremy Sanders <jeremy@jeremysanders.net>
  and contributors.
 It is licenced under the GPL (version 2 or greater).
 

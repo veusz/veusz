@@ -52,7 +52,7 @@
     <widget class="QLabel" name="copyrightlabel">
      <property name="text">
       <string>&lt;b style=&quot;color:#800080&quot; &gt;Veusz %(version)s&lt;/b&gt;&lt;br&gt;
-Copyright © 2003-2013 Jeremy Sanders and contributors&lt;br&gt;
+Copyright © 2003-2014 Jeremy Sanders and contributors&lt;br&gt;
 &lt;a href=&quot;http://home.gna.org/veusz/&quot;&gt;http://home.gna.org/veusz/&lt;/a&gt;&lt;br&gt;
 &lt;br&gt;
 Main author:&lt;br&gt;
