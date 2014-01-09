@@ -61,6 +61,14 @@ try:
 except ImportError:
     h5py = None
 
+try:
+    from astropy.io import fits as pyfits
+except ImportError:
+    try:
+        import pyfits
+    except ImportError:
+        pyfits = None
+
 # these tests fail for some reason which haven't been debugged
 # it appears the failures aren't important however
 excluded_tests = set([
@@ -166,8 +174,9 @@ def runTests():
         base = os.path.basename(vsz)
         print(base)
 
-        if base[:5] == 'hdf5_' and h5py is None:
-            print(" SKIPPED (no h5py installed)")
+        if ( (base[:5] == 'hdf5_' and h5py is None) or
+             (base[:5] == 'fits_' and pyfits is None) ):
+            print(" SKIPPED")
             skipped += 1
             continue
 
