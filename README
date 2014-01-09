@@ -18,6 +18,7 @@ Changes in 1.20:
  * Add support for 2D datasets with irregular gridpoints
  * Add 2D data CSV import
  * Allow safe renaming of linked datasets
+ * Support importing text from FITS files
 
 Bug fixes:
  * When capturing data from a file/named pipe, do not stop when no

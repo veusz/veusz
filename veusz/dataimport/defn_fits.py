@@ -19,8 +19,11 @@
 from __future__ import division, print_function
 
 from .. import qtall as qt4
+from ..compat import cbasestr, cbytes
 from .. import document
 from . import base
+
+import numpy as N
 
 def _(text, disambiguation=None, context="Import_FITS"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -88,7 +91,14 @@ class OperationDataImportFITS(base.OperationDataImportBase):
         if p.negerrcol is not None:
             negv = data.field(p.negerrcol)
 
-        # actually create the dataset
+        if len(datav) > 1 and isinstance(datav[0], cbasestr):
+            # text dataset
+            return document.DatasetText(list(datav))
+        elif len(datav) > 1 and isinstance(datav[0], cbytes):
+            return document.DatasetText(
+                [x.decode('ascii') for x in datav])
+
+        # numeric dataset
         return document.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
 
     def _import1dimage(self, hdu):
