@@ -154,30 +154,33 @@ class OperationDataImportFITS(base.OperationDataImportBase):
             try:
                 import pyfits
             except ImportError:
-                raise RuntimeError('Either Astropy or PyFITS is required '
-                                   'to import data from FITS files')
+                raise base.ImportingError(
+                    'Either Astropy or PyFITS is required '
+                    'to import data from FITS files')
 
         p = self.params
-        f = pyfits.open( str(p.filename), 'readonly')
-        hdu = f[p.hdu]
 
-        try:
-            # raise an exception if this isn't a table therefore is an image
-            hdu.get_coldefs()
-            ds = self._import1d(hdu)
+        with pyfits.open(str(p.filename), 'readonly') as f:
+            hdu = f[p.hdu]
 
-        except AttributeError:
-            naxis = hdu.header.get('NAXIS')
-            if naxis == 1:
-                ds = self._import1dimage(hdu)
-            elif naxis == 2:
-                ds = self._import2dimage(hdu)
+            if ( isinstance(hdu, pyfits.TableHDU) or
+                 isinstance(hdu, pyfits.BinTableHDU) ):
+                # import table
+                ds = self._import1d(hdu)
+
             else:
-                raise RuntimeError("Cannot import images with %i dimensions" % naxis)
-        f.close()
+                # import image
+                naxis = hdu.header.get('NAXIS')
+                if naxis == 1:
+                    ds = self._import1dimage(hdu)
+                elif naxis == 2:
+                    ds = self._import2dimage(hdu)
+                else:
+                    raise base.ImportingError(
+                        "Cannot import images with %i dimensions" % naxis)
 
         if p.linked:
-            ds.linked = LinkedFileFITS(self.params)
+            ds.linked = LinkedFileFITS(p)
         outname = p.dsname.strip()
         self.outdatasets[outname] = ds
 
