@@ -25,6 +25,7 @@ Bug fixes:
    more data are available
  * Fixes mangling of text in saved files using Windows binary
  * Fix encoding for standard file import
+ * Fix FITS import for python3
 
 Features of package:
  Plotting features:

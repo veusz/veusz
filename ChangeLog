@@ -1,3 +1,18 @@
+Changes in 1.20:
+ * Add HDF5 file data import
+ * Allow expressions to be edited for linked 2D datasets
+ * Add support for 2D datasets with irregular gridpoints
+ * Add 2D data CSV import
+ * Allow safe renaming of linked datasets
+ * Support importing text from FITS files
+
+Bug fixes:
+ * When capturing data from a file/named pipe, do not stop when no
+   more data are available
+ * Fixes mangling of text in saved files using Windows binary
+ * Fix encoding for standard file import
+ * Fix FITS import for python3
+
 Changes in 1.19.1:
  * Add option to disable scaling of marker border with point scaling
  * Implement label at-minimum/at-maximum for ternary plot
