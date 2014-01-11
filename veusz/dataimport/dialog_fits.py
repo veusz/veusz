@@ -117,7 +117,7 @@ class ImportTabFITS(importdialog.ImportTab):
             data = []
             try:
                 # if this fails, show an image
-                cols = hdu.get_coldefs()
+                cols = hdu.columns
 
                 # it's a table
                 data = ['table', cols]
