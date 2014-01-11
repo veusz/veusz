@@ -1,5 +1,5 @@
 # Veusz saved document (version 1.19.1.99)
-# Saved at 2014-01-09T18:46:25.914417
+# Saved at 2014-01-11T10:59:59.168420
 
 ImportFITSFile(u'img', u'fits_test.fits', 0, linked=True, wcsmode='pixel')
 ImportFITSFile(u'mag', u'fits_test.fits', 1, datacol='V_mag', linked=True)
@@ -42,6 +42,8 @@ To('..')
 Add('image', name='image1', autoadd=False)
 To('image1')
 Set('data', u'img')
+Set('min', -0.1)
+Set('max', 12.1)
 Set('colorMap', u'grey-step6')
 To('..')
 To('..')
