@@ -96,6 +96,9 @@ Section "MainSection" SEC01
   File "${PYINST_DIR}\COPYING"
   File "${PYINST_DIR}\VERSION"
 
+  SetOutPath "$INSTDIR\eggs"
+  File "${PYINST_DIR}\eggs\*.egg"
+
   SetOutPath "$INSTDIR\icons"
   File "${PYINST_DIR}\icons\*.png"
   File "${PYINST_DIR}\icons\*.ico"
@@ -169,6 +172,8 @@ Section Uninstall
   Delete "$INSTDIR\embed.py"
   Delete "$INSTDIR\__init__.py"
 
+  Delete "$INSTDIR\eggs\*.egg"
+
   Delete "$INSTDIR\qt4_plugins\iconengines\*.dll"
   Delete "$INSTDIR\qt4_plugins\imageformats\*.dll"
 
@@ -184,6 +189,7 @@ Section Uninstall
   Delete "$SMPROGRAMS\Veusz\Veusz.lnk"
 
   RMDir "$SMPROGRAMS\Veusz"
+  RMDir "$INSTDIR\eggs"
   RMDir "$INSTDIR\qt4_plugins\iconengines"
   RMDIR "$INSTDIR\qt4_plugins\imageformats"
   RMDir "$INSTDIR\qt4_plugins"
