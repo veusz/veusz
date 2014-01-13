@@ -1,7 +1,6 @@
 # Veusz saved document (version 1.19.1)
-# Saved at 2013-12-25T13:33:58.486662
 
-ImportFileHDF5(u'hdftest.hdf5', [u'/twod_as_1d_1', u'/twod_as_1d_2'], twod_as_oned=set([u'/twod_as_1d_2']), linked=True)
+ImportFileHDF5('hdftest.hdf5', ['/twod_as_1d/grp/twod_as_1d_1', u'/twod_as_1d/grp/twod_as_1d_2'], twod_as_oned=set(['/twod_as_1d/grp/twod_as_1d_2']), linked=True)
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)

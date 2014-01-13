@@ -1,7 +1,7 @@
 # Veusz saved document (version 1.19.1)
-# Saved at 2013-12-25T15:27:09.574224
 
-ImportFileHDF5(u'hdftest.hdf5', [u'compound'], namemap={u'/compound/text': u'label'}, slices={u'/compound/text': ((None, None, -1),), u'/compound/xval': ((None, None, -1),)}, linked=True)
+ImportFileHDF5(u'hdftest.hdf5', [u'/compound'], slices={'/compound/xval': ((None, None, -1),)}, linked=True)
+ImportFileHDF5(u'hdftest.hdf5', [u'/compound/text'], namemap={u'/compound/text': u'label'}, slices={u'/compound/text': ((None, None, -1),)}, linked=True)
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)
