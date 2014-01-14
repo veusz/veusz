@@ -150,6 +150,7 @@ class HDFNode(Node):
 class HDFGroupNode(HDFNode):
     def __init__(self, parent, grp):
         Node.__init__(self, parent)
+        self.fullname = grp.name
         self.name = grp.name.split("/")[-1]
         if self.name == '':
             self.name = '/'
@@ -738,7 +739,7 @@ class ImportTabHDF5(importdialog.ImportTab):
         def recursiveitems(node):
             if isinstance(node, HDFGroupNode):
                 if node.grpimport:
-                    items.append(node.name)
+                    items.append(node.fullname)
                 else:
                     for c in node.children:
                         recursiveitems(c)

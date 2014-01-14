@@ -54,6 +54,9 @@ if cpy3:
     # bytes-like object
     cbytes = bytes
 
+    # unicode-like object
+    cunicode = str
+
     # iterate over dict
     def citems(d):
         return d.items()
@@ -111,6 +114,9 @@ else:
 
     # bytes-like object
     cbytes = str
+
+    # unicode-like string
+    cunicode = unicode
 
     # iterate over dict
     def citems(d):

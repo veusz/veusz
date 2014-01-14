@@ -24,7 +24,7 @@ import sys
 
 import numpy as N
 from .. import qtall as qt4
-from ..compat import citems, ckeys, cvalues, cbytes, cpy3
+from ..compat import citems, ckeys, cvalues, cbytes, cunicode, cpy3
 from .. import document
 from .. import utils
 from . import base
@@ -282,13 +282,19 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         except _ConvertError:
             pass
 
-    def walkFile(self, item, dsread):
-        """Walk an hdf file, adding datasets to dsread."""
+    def walkFile(self, item, dsread, names=None):
+        """Walk an hdf file, adding datasets to dsread.
+
+        If names is set to a list, only read names from list given
+        """
 
         if isinstance(item, h5py.Dataset):
             if item.dtype.kind == 'V':
                 # compound dataset - walk columns
-                for name in item.dtype.names:
+                if not names:
+                    names = item.dtype.names 
+
+                for name in names:
                     attrs = filterAttrsByName(item.attrs, name)
                     self.readDataset(item[name], attrs, item.name+"/"+name,
                                      dsread)
@@ -296,7 +302,10 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 self.readDataset(item, item.attrs, item.name, dsread)
 
         elif isinstance(item, h5py.Group):
-            for dsname in sorted(item.keys()):
+            if not names:
+                names = sorted(item.keys())
+
+            for dsname in names:
                 try:
                     child = item[dsname]
                 except KeyError:
@@ -310,17 +319,24 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         dsread = {}
         with h5py.File(self.params.filename) as hdff:
             for hi in self.params.items:
-                node = hdff
-                # lookup group/dataset in file
-                for namepart in [x for x in hi.split("/") if x != ""]:
-                    # using unicode column names does not work!
-                    try:
-                        namepart = str(namepart)
-                    except ValueError:
-                        pass
-                    node = node[namepart]
+                # workaround for h5py bug
+                # using unicode names for groups/datasets does not work
+                if not cpy3 and isinstance(hi, cunicode):
+                    hi = hi.encode("utf-8")
 
-                self.walkFile(node, dsread)
+                # lookup group/dataset in file
+                names = [x for x in hi.split("/") if x != ""]
+                node = hdff
+
+                # Repeat until we get a dataset. Note: if we get a
+                # dataset which names is not empty, this is a table
+                # column, so we pass the remainder of names to
+                # walkFile
+                while names and not isinstance(node, h5py.Dataset):
+                    node = node[names[0]]
+                    names.pop(0)
+
+                self.walkFile(node, dsread, names=names)
         return dsread
 
     def collectErrorBarDatasets(self, dsread):
