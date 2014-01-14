@@ -25,6 +25,7 @@ with a 'c')
 
 import sys
 import itertools
+import locale
 
 cpy3 = sys.version_info[0] == 3
 
