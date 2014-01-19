@@ -85,6 +85,11 @@ class DBusWinInterface(vzdbus.Object):
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
 
+    # this is emitted when a dialog is opened by the main window
+    dialogShown = qt4.pyqtSignal(qt4.QWidget)
+    # emitted when a document is opened
+    documentOpened = qt4.pyqtSignal()
+
     windows = []
     @classmethod
     def CreateWindow(cls, filename=None):
@@ -694,7 +699,7 @@ class MainWindow(qt4.QMainWindow):
         self.connect(dialog, qt4.SIGNAL('dialogFinished'), self.deleteDialog)
         self.dialogs.append(dialog)
         dialog.show()
-        self.emit( qt4.SIGNAL('dialogShown'), dialog )
+        self.dialogShown.emit(dialog)
 
     def deleteDialog(self, dialog):
         """Remove dialog from list of dialogs."""
@@ -1008,28 +1013,8 @@ class MainWindow(qt4.QMainWindow):
             self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
             self.setButtonText(qt4.QMessageBox.No, _("&Ignore command"))
 
-    def openFileInWindow(self, filename):
-        """Actually do the work of loading a new document.
-        """
-
-        # FIXME: This function suffers from spaghetti code
-        # it needs splitting up into bits to make it clearer
-        # the steps are fairly well documented below, however
-        #####################################################
-
-        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
-        # read script
-        try:
-            script = io.open(filename, 'rU', encoding='utf8').read()
-        except EnvironmentError as e:
-            qt4.QApplication.restoreOverrideCursor()
-            qt4.QMessageBox.critical(
-                self, _("Error - Veusz"),
-                _("Cannot open document '%s'\n\n%s") %
-                (filename, cstrerror(e)))
-            self.setupDefaultDoc()
-            return
+    def userExecuteScript(self, filename, script):
+        """Execute script in safe environment."""
 
         def errordialog(e):
             # display error dialog if there is an error loading
@@ -1043,19 +1028,20 @@ class MainWindow(qt4.QMainWindow):
         unsafe = setting.transient_settings['unsafe_mode']
         while True:
             try:
-                compiled = utils.compileChecked(script, mode='exec', filename=filename,
-                                                ignoresecurity=unsafe)
+                compiled = utils.compileChecked(
+                    script, mode='exec', filename=filename,
+                    ignoresecurity=unsafe)
                 break
             except utils.SafeEvalException:
                 # ask the user whether to execute in unsafe mode
                 qt4.QApplication.restoreOverrideCursor()
                 if ( self._unsafeCmdMsgBox(self, filename).exec_() ==
                      qt4.QMessageBox.No ):
-                    return
+                    return -1
                 unsafe = True
             except Exception as e:
                 errordialog(e)
-                return
+                return -1
 
         # set up environment to run script
         env = self.document.eval_context.copy()
@@ -1104,7 +1090,7 @@ class MainWindow(qt4.QMainWindow):
             sys.stdout, sys.stderr = stdout, stderr
             self.document.enableUpdates()
             errordialog(e)
-            return
+            return -1
 
         # need to remember to restore stdout, stderr
         sys.stdout, sys.stderr = stdout, stderr
@@ -1113,6 +1099,29 @@ class MainWindow(qt4.QMainWindow):
         self.document.enableUpdates()
         self.document.setModified(False)
         self.document.clearHistory()
+
+    def openFileInWindow(self, filename):
+        """Actually do the work of loading a new document.
+        """
+
+        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+
+        # read script
+        try:
+            script = io.open(filename, 'rU', encoding='utf8').read()
+        except EnvironmentError as e:
+            qt4.QApplication.restoreOverrideCursor()
+            qt4.QMessageBox.critical(
+                self, _("Error - Veusz"),
+                _("Cannot open document '%s'\n\n%s") %
+                (filename, cstrerror(e)))
+            self.setupDefaultDoc()
+            return
+
+        retn = self.userExecuteScript(filename, script)
+        if retn == -1:
+            # error from above
+            return
 
         # remember file for recent list
         self.addRecentFile(filename)
@@ -1128,7 +1137,7 @@ class MainWindow(qt4.QMainWindow):
             self.dirname_export = self.dirname
 
         # notify cmpts which need notification that doc has finished opening
-        self.emit(qt4.SIGNAL("documentopened"))
+        self.documentOpened.emit()
         qt4.QApplication.restoreOverrideCursor()
 
     def addRecentFile(self, filename):

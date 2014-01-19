@@ -391,7 +391,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         # when documents have finished opening, expand all nodes
         if mainwin is not None:
-            self.connect(mainwin, qt4.SIGNAL("documentopened"), self.expandAll)
+            mainwin.documentOpened.connect(self.expandAll)
 
         # keep track of selection
         self.connect( self.selectionModel(),
