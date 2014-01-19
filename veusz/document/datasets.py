@@ -176,6 +176,22 @@ class DatasetBase(object):
             savedlinks[self.linked] = True
             self.linked.saveToFile(fileobj, relpath=relpath)
 
+    def saveToFile(self, fileobj, name, mode='text'):
+        """Save dataset to file."""
+        if mode == 'text':
+            self.saveDataRelationToText(fileobj, name)
+            if self.linked is None:
+                self.saveDataDumpToText(fileobj, name)
+
+    def saveDataRelationToText(self, fileobj, name):
+        """Save a dataset relation to a text stream fileobj.
+        Not for datasets which are raw data."""
+
+    def saveDataDumpToText(self, fileobj, name):
+        """Save dataset to file if file is text and data
+        is actually a set of data and not a relation
+        """
+
     def name(self):
         """Get dataset name."""
         for name, ds in citems(self.document.data):
@@ -455,12 +471,8 @@ class Dataset2D(DatasetBase):
         xe, ye = self.getPixelEdges()
         return (xe[0], xe[-1]), (ye[0], ye[-1])
 
-    def saveToFile(self, fileobj, name):
+    def saveDataDumpToText(self, fileobj, name):
         """Write the 2d dataset to the file given."""
-
-        # return if there is a link
-        if self.linked is not None:
-            return
 
         fileobj.write("ImportString2D(%s, '''\n" % crepr(name))
         if self.xcent is not None:
@@ -683,13 +695,9 @@ class Dataset(DatasetBase):
         # tell the document that we've changed
         self.document.modifiedData(self)
 
-    def saveToFile(self, fileobj, name):
+    def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
-
-        # return if there is a link
-        if self.linked is not None:
-            return
 
         # build up descriptor
         descriptor = datasetNameToDescriptorName(name) + '(numeric)'
@@ -794,14 +802,9 @@ class DatasetDateTime(Dataset):
         """Return val converted to data."""
         return utils.dateFloatToString(val)
 
-    def saveToFile(self, fileobj, name):
+    def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
-
-        if self.linked is not None:
-            # do not save if linked to a file
-            return
-
         descriptor = datasetNameToDescriptorName(name) + '(date)'
         fileobj.write( "ImportString(%s,'''\n" % crepr(descriptor) )
         fileobj.write( self.datasetAsText() )
@@ -859,14 +862,9 @@ class DatasetText(DatasetBase):
         """Return val converted to data."""
         return cstr(val)
 
-    def saveToFile(self, fileobj, name):
+    def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
-
-        # don't save if a link
-        if self.linked is not None:
-            return
-
         descriptor = datasetNameToDescriptorName(name) + '(text)'
         fileobj.write( "ImportString(%s, ur'''\n" % crepr(descriptor) )
         for line in self.data:
@@ -1237,7 +1235,7 @@ class DatasetExpression(Dataset):
     perr = property(lambda self: self._propValues('perr'))
     nerr = property(lambda self: self._propValues('nerr'))
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         '''Save data to file.
         '''
 
@@ -1340,7 +1338,7 @@ class DatasetRange(Dataset):
         """Size of dataset."""
         return str( self.numsteps )
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         """Save dataset to file."""
 
         parts = [crepr(name), crepr(self.numsteps), crepr(self.range_data)]
@@ -1517,7 +1515,7 @@ class Dataset2DXYZExpression(Dataset2D):
         text += ', x=%g->%g' % tuple(self.xrange)
         text += ', y=%g->%g' % tuple(self.yrange)
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         '''Save expressions to file.
         '''
 
@@ -1597,7 +1595,7 @@ class Dataset2DExpression(Dataset2D):
         """Do actual evaluation."""
         return self.document.evalDatasetExpression(self.expr, dimensions=2)
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         '''Save expression to file.'''
         s = 'SetData2DExpression(%s, %s, linked=True)\n' % (
             crepr(name), crepr(self.expr) )
@@ -1685,7 +1683,7 @@ class Dataset2DXYFunc(Dataset2D):
         self.lastchangeset = self.document.changeset
         return data
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         '''Save expressions to file.
         '''
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
@@ -1740,7 +1738,7 @@ class _DatasetPlugin(object):
     def insertRows(self, row, numrows, rowdata):
         pass
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         """Save plugin to file, if this is the first one."""
 
         # only try to save if this is the 1st dataset of this plugin

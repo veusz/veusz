@@ -170,7 +170,7 @@ class DatasetHistoGenerator(object):
         self.valuedataset = DatasetHistoValues(self, self.document)
         return self.valuedataset
 
-    def saveToFile(self, fileobj):
+    def saveDataRelationToText(self, fileobj):
         """Save two datasets to file."""
         try:
             binname = self.bindataset.name()
@@ -221,7 +221,7 @@ class DatasetHistoBins(Dataset):
             self.changeset = self.generator.document.changeset
         return self.datacache
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         """Save dataset (counterpart does this)."""
         pass
 
@@ -254,9 +254,9 @@ class DatasetHistoValues(Dataset):
             self.changeset = self.generator.document.changeset
         return self.datacache
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         """Save dataset and its counterpart to a file."""
-        self.generator.saveToFile(fileobj)
+        self.generator.saveDataRelationToText(fileobj)
 
     def linkedInformation(self):
         """Informating about linking."""
