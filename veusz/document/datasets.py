@@ -540,7 +540,6 @@ class Dataset2D(Dataset2DBase):
     def saveDataDumpToHDF5(self, group, name):
         """Save 2D data in hdf5 file."""
 
-        print("here")
         tdgrp = group.create_group(name)
         tdgrp.attrs['vsz_datatype'] = '2d'
 
@@ -553,7 +552,8 @@ class Dataset2D(Dataset2DBase):
                 if v != 'data':
                     tdgrp['data'].attrs['vsz_' + v] = tdgrp[v].ref
 
-        tdgrp['data'].attrs['vsz_name'] = name
+        # unicode text not stored properly unless encoded
+        tdgrp['data'].attrs['vsz_name'] = name.encode('utf-8')
 
 def dsPreviewHelper(d):
     """Get preview of numpy data d."""
@@ -743,7 +743,7 @@ class Dataset(DatasetBase):
                 ('perr', ' (+)'), ('nerr', ' (-)')):
             if getattr(self, key) is not None:
                 odgrp[key] = getattr(self, key)
-                odgrp[key].attrs['vsz_name'] = name + suffix
+                odgrp[key].attrs['vsz_name'] = (name + suffix).encode('utf-8')
 
     def datasetAsText(self, fmt='%g', join='\t'):
         """Return data as text."""

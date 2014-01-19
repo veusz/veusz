@@ -546,14 +546,23 @@ class Document( qt4.QObject ):
         for name, dataset in sorted(citems(self.data)):
             dataset.saveToFile(fileobj, name, mode='hdf5', hdfgroup=datagrp)
 
-        # save tags of datasets
-        # self.saveDatasetTags(fileobj)
+        # handle tagging
+        # get a list of all tags and which datasets have them
+        bytag = defaultdict(list)
+        for name, dataset in sorted(citems(self.data)):
+            for t in dataset.tags:
+                bytag[t].append(name)
+
+        # write out tags as datasets
+        tagsgrp = docgrp.create_group('Tags')
+        for tag, datasets in sorted(citems(bytag)):
+            tagsgrp[tag] = [v.encode('utf-8') for v in sorted(datasets)]
 
         # save the actual tree structure
         textstream.write(self.basewidget.getSaveText())
 
         # create single dataset contains document
-        docgrp['document'] = [ textstream.getvalue() ]
+        docgrp['document'] = [ textstream.getvalue().encode('utf-8') ]
 
         self.setModified(False)
 

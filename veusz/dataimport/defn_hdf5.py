@@ -48,7 +48,7 @@ def bconv(s):
 
     Byte string attributes are not converted to normal strings."""
 
-    if cpy3 and isinstance(s, cbytes):
+    if isinstance(s, cbytes):
         return s.decode('utf-8', 'replace')
     return s
 
@@ -588,9 +588,12 @@ def ImportFileHDF5(comm, filename,
      'vsz_range': should be 4 item array to specify x and y ranges:
                   [minx, miny, maxx, maxy]
      'vsz_xrange' / 'vsz_yrange': individual ranges for x and y
+     'vsz_xcent' / 'vsz_ycent': arrays giving the centres of pixels
+     'vsz_xedge' / 'vsz_yedge': arrays giving the edges of pixels
      'vsz_twod_as_oned': treat 2d dataset as 1d dataset with errors
      'vsz_convert_datetime': treat as date/time, set to one of the values
                              above.
+    References to other datasets can be provided in thes attributes.
  
     For compound datasets these attributes can be given on a
     per-column basis using attribute names
