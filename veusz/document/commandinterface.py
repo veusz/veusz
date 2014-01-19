@@ -29,6 +29,11 @@ import os.path
 import traceback
 import numpy as N
 
+try:
+    import h5py
+except ImportError:
+    h5py = None
+
 from ..compat import citems, ckeys, cbasestr, cstr
 from .. import qtall as qt4
 from .. import setting
@@ -358,10 +363,23 @@ class CommandInterface(qt4.QObject):
         else:
             return None
 
-    def Save(self, filename):
-        """Save the state to a file."""
-        f = open(filename, 'w')
-        self.document.saveToFile(f)
+    def Save(self, filename, mode='vsz'):
+        """Save the state to a file.
+
+        mode can be:
+         'vsz': standard veusz text format
+         'hdf5': HDF5 format
+        """
+        if mode == 'vsz':
+            with open(filename, 'w') as f:
+                self.document.saveToFile(f)
+        elif mode == 'hdf5':
+            if h5py is None:
+                raise RuntimeError('Missing h5py module')
+            with h5py.File(filename, 'w') as f:
+                self.document.saveToHDF5File(f)
+        else:
+            raise RuntimeError('Invalid Save mode')
 
     def Set(self, var, val):
         """Set the value of a setting."""

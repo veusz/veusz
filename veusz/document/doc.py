@@ -30,7 +30,7 @@ from collections import defaultdict
 
 import numpy as N
 
-from ..compat import crange, citems, cvalues, cstr, cexec
+from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO
 from .. import qtall as qt4
 
 from . import widgetfactory
@@ -473,7 +473,16 @@ class Document( qt4.QObject ):
         self.saveCustomDefinitions(fileobj)
 
     def saveToFile(self, fileobj):
-        """Save the text representing a document to a file."""
+        """Save the text representing a document to a file.
+
+        The ordering can be important, as some things override
+        previous steps:
+
+         - Tagging doesn't work if the dataset isn't
+           already defined.
+         - Loading from files may bring in new datasets which
+           override defined datasets, so save links first
+        """
 
         self._writeFileHeader(fileobj, 'saved document')
         
@@ -503,6 +512,49 @@ class Document( qt4.QObject ):
         # save the actual tree structure
         fileobj.write(self.basewidget.getSaveText())
         
+        self.setModified(False)
+
+    def saveToHDF5File(self, fileobj):
+        """Save to HDF5 (h5py) output file given."""
+
+        # groups in output hdf5
+        vszgrp = fileobj.create_group('Veusz')
+        datagrp = vszgrp.create_group('Data')
+        docgrp = vszgrp.create_group('Document')
+
+        textstream = CStringIO()
+
+        self._writeFileHeader(textstream, 'saved document')
+
+        # add file directory to import path if we know it
+        reldirname = None
+        if getattr(fileobj, 'filename', False):
+            reldirname = os.path.dirname( os.path.abspath(fileobj.filename) )
+            textstream.write('AddImportPath(%s)\n' % repr(reldirname))
+
+        # add custom definitions
+        self.saveCustomDefinitions(textstream)
+
+        # save those datasets which are linked
+        # we do this first in case the datasets are overridden below
+        savedlinks = {}
+        for name, dataset in sorted(citems(self.data)):
+            dataset.saveLinksToSavedDoc(textstream, savedlinks,
+                                        relpath=reldirname)
+
+        # save the remaining datasets
+        for name, dataset in sorted(citems(self.data)):
+            dataset.saveToFile(fileobj, name, mode='hdf5', hdfgroup=datagrp)
+
+        # save tags of datasets
+        # self.saveDatasetTags(fileobj)
+
+        # save the actual tree structure
+        textstream.write(self.basewidget.getSaveText())
+
+        # create single dataset contains document
+        docgrp['document'] = [ textstream.getvalue() ]
+
         self.setModified(False)
 
     def exportStyleSheet(self, fileobj):
