@@ -175,7 +175,7 @@ class EmbedApplication(qt4.QApplication):
 
     def readLenFromSocket(thesocket, length):
         """Read length bytes from socket."""
-        s = ''
+        s = b''
         while len(s) < length:
             s += thesocket.recv(length-len(s))
         return s
@@ -279,7 +279,7 @@ def runremote():
 
     # get secret from stdin and send back to socket
     # this is a security check
-    secret = sys.stdin.readline()
+    secret = sys.stdin.readline().encode('ascii')
     EmbedApplication.writeToSocket(listensocket, secret)
 
     # finally start listening application

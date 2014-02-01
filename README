@@ -1,5 +1,5 @@
-Veusz 1.20
-----------
+Veusz 1.20.1
+------------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -16,7 +16,8 @@ Changes in 1.20.1:
  * Include free-desktop appdata, MIME and desktop files
 
 Bug fixes:
- * Fix embedding interface
+ * Fix embedding interface (from 1.20)
+ * Additional embedding interface fixes for Python 3
  * Fix crash in tutorial if flashing widget deleted
  * Fix polar plot crash with reverse minumum and maximum radii
  * Fix crash when changing range of broken axes interactively

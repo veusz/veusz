@@ -199,13 +199,7 @@ class Embedded(object):
                 [findexe] ]
 
         else:
-            if sys.version_info[0] != 2:
-                # remote needs to run on python 2
-                executable = findOnPath('python2')
-                if not executable:
-                    executable = findOnPath('python')
-            else:
-                executable = sys.executable
+            executable = sys.executable
 
             # try embed_remote.py in this directory, veusz in this directory
             # or veusz on the path in order
