@@ -1204,6 +1204,9 @@ class SettingLabel(qt4.QWidget):
     access to the context menu
     """
     
+    # this is emitted when widget is clicked
+    signalClicked = qt4.pyqtSignal(qt4.QPoint)
+
     def __init__(self, document, setting, setnsproxy):
         """Initialise button, passing document, setting, and parent widget."""
         
@@ -1229,7 +1232,7 @@ class SettingLabel(qt4.QWidget):
         self.iconlabel = qt4.QLabel()
         self.layout.addWidget(self.iconlabel)
 
-        self.connect(self, qt4.SIGNAL('clicked'), self.settingMenu)
+        self.signalClicked.connect(self.settingMenu)
 
         self.infocus = False
         self.inmouse = False
@@ -1239,16 +1242,15 @@ class SettingLabel(qt4.QWidget):
         self.slotDocModified(True)
 
     def mouseReleaseEvent(self, event):
-        """Emit clicked(pos) on mouse release."""
-        self.emit( qt4.SIGNAL('clicked'),
-                   self.mapToGlobal(event.pos()) )
+        """Emit signalClicked(pos) on mouse release."""
+        self.signalClicked.emit( self.mapToGlobal(event.pos()) )
         return qt4.QWidget.mouseReleaseEvent(self, event)
 
     def keyReleaseEvent(self, event):
-        """Emit clicked(pos) on key release."""
+        """Emit signalClicked(pos) on key release."""
         if event.key() == qt4.Qt.Key_Space:
-            self.emit( qt4.SIGNAL('clicked'),
-                       self.mapToGlobal(self.iconlabel.pos()) )
+            self.signalClicked.emit(
+                self.mapToGlobal(self.iconlabel.pos()) )
             event.accept()
         else:
             return qt4.QWidget.keyReleaseEvent(self, event)
@@ -1351,6 +1353,7 @@ class SettingLabel(qt4.QWidget):
 
             menu.connect(action, qt4.SIGNAL('triggered()'), modify)
 
+    @qt4.pyqtSlot(qt4.QPoint)
     def settingMenu(self, pos):
         """Pop up menu for each setting."""
 
