@@ -4,6 +4,7 @@ include scripts/veusz scripts/veusz_listen
 recursive-include tests *.py *.sh *.vsz *.selftest *.csv *.dat *.npy *.npz *.qdp *.pco *.fits *.hdf5
 recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html *.xsl *.py *.pod *.1
 recursive-include icons *.icns *.png *.ico *.svg README
+recursive-include support *.xml *.desktop
 recursive-include ui *.ui
 recursive-include examples *.vsz *.py *.csv *.dat
 recursive-include veusz/helpers *.c *.cpp *.h README LICENSE_* QtMml*

@@ -13,15 +13,15 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Changes in 1.20.1:
- * Add appdata standard file to support directory
+ * Include free-desktop appdata, MIME and desktop files
 
 Bug fixes:
- * Fix embedding interface (broken in 1.20)
+ * Fix embedding interface
  * Fix crash in tutorial if flashing widget deleted
- * Fix polar plot crash with negative data range
- * Fix crash changing range of broken axes interactively
- * Fix object deleted crash in setting menu
- * Catch output dataset being the same as an input for histograms
+ * Fix polar plot crash with reverse minumum and maximum radii
+ * Fix crash when changing range of broken axes interactively
+ * Fix object deletion crash in setting menu
+ * Check output dataset is not same as an input for histograms
 
 Changes in 1.20:
  * Add HDF5 file data import
@@ -85,7 +85,7 @@ Features of package:
 Requirements for source install:
  Python 2.x (2.6 or greater required) or 3.x (3.3 or greater required)
    http://www.python.org/
- Qt >= 4.6 (free edition)
+ Qt >= 4.7 (free edition)
    http://www.trolltech.com/products/qt/
  PyQt >= 4.5 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/software/pyqt/
