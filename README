@@ -12,6 +12,14 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
+Changes in 1.20.1:
+ * Add appdata standard file to support directory
+
+Bug fixes:
+ * Fix embedding interface (broken in 1.20)
+ * Fix crash in tutorial if flashing widget deleted
+ * Fix polar plot crash with negative data range
+
 Changes in 1.20:
  * Add HDF5 file data import
  * Allow expressions to be edited for linked 2D datasets

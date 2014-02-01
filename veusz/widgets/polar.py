@@ -223,7 +223,10 @@ class Polar(NonOrthGraph):
                 else:
                     self._minradius = self._maxradius / 100.
             else:
-                self._minradius = 0.
+                if datarange[0] >= 0:
+                    self._minradius = 0.
+                else:
+                    self._minradius = datarange[0]
         else:
             self._minradius = s.minradius
 
@@ -258,7 +261,9 @@ class Polar(NonOrthGraph):
         s = self.settings
         t = s.Tick
 
-        atick = AxisTicks(self._minradius, self._maxradius,
+        # handle reversed axes using min and max below
+        r = [self._minradius, self._maxradius]
+        atick = AxisTicks(min(r), max(r),
                           t.number, t.number*4,
                           extendmin=False, extendmax=False,
                           logaxis=s.log)
