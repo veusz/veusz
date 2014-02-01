@@ -76,15 +76,13 @@ class HistoDataDialog(VeuszDialog):
         validator = qt4.QRegExpValidator(regexp, self)
         self.minval.setValidator(validator)
         self.maxval.setValidator(validator)
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Apply),
-                      qt4.SIGNAL("clicked()"), self.applyClicked )
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
-                      qt4.SIGNAL('clicked()'), self.resetClicked )
-        self.connect( self.bingenerate, qt4.SIGNAL('clicked()'),
-                      self.generateManualBins )
-        self.connect( self.binadd, qt4.SIGNAL('clicked()'), self.addManualBins )
-        self.connect( self.binremove, qt4.SIGNAL('clicked()'),
-                      self.removeManualBins )
+        self.buttonBox.button(qt4.QDialogButtonBox.Apply).clicked.connect(
+            self.applyClicked )
+        self.buttonBox.button(qt4.QDialogButtonBox.Reset).clicked.connect(
+            self.resetClicked )
+        self.bingenerate.clicked.connect(self.generateManualBins)
+        self.binadd.clicked.connect(self.addManualBins)
+        self.binremove.clicked.connect(self.removeManualBins)
 
         self.bindata = []
         self.binmodel = ManualBinModel(self.bindata)
@@ -142,9 +140,13 @@ class HistoDataDialog(VeuszDialog):
             islog = dialog.logarithmic.isChecked()
             self.binparams = (numbins, minval, maxval, islog)
 
-            self.expr = dialog.indataset.currentText()
-            self.outdataset = dialog.outdataset.currentText()
-            self.outbins = dialog.outbins.currentText()
+            self.expr = dialog.indataset.currentText().strip()
+            self.outdataset = dialog.outdataset.currentText().strip()
+            self.outbins = dialog.outbins.currentText().strip()
+
+            if self.expr == self.outdataset or self.expr == self.outbins:
+                raise RuntimeError(_("Output datasets cannot be the same as input datasets"))
+
             self.method = dialog.methodGroup.getRadioChecked().objectName()
             self.manualbins = list( dialog.bindata )
             self.manualbins.sort()
