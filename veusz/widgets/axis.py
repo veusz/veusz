@@ -1160,13 +1160,18 @@ class Axis(widget.Widget):
                 c1, c2 = c2, c1
                 c1delt, c2delt = c2delt, c1delt
 
+            round1 = utils.round2delt(c1, c1delt)
+            round2 = utils.round2delt(c2, c2delt)
+
             ops = []
-            if s.min == 'Auto' or not N.allclose(c1, s.min, rtol=1e-8):
+            if ( (s.min == 'Auto' or not N.allclose(c1, s.min, rtol=1e-8))
+                 and N.isfinite(round1) ):
                 ops.append( document.OperationSettingSet(
-                        s.get('min'), utils.round2delt(c1, c1delt)) )
-            if s.max == 'Auto' or not N.allclose(c2, s.max, rtol=1e-8):
+                        s.get('min'), round1) )
+            if ( (s.max == 'Auto' or not N.allclose(c2, s.max, rtol=1e-8))
+                 and N.isfinite(round2) ):
                 ops.append( document.OperationSettingSet(
-                        s.get('max'), utils.round2delt(c2, c2delt)) )
+                        s.get('max'), round2) )
 
             self.document.applyOperation(
                 document.OperationMultiple(ops, descr=_('zoom axis')))

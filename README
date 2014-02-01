@@ -19,6 +19,7 @@ Bug fixes:
  * Fix embedding interface (broken in 1.20)
  * Fix crash in tutorial if flashing widget deleted
  * Fix polar plot crash with negative data range
+ * Fix crash changing range of broken axes interactively
 
 Changes in 1.20:
  * Add HDF5 file data import
