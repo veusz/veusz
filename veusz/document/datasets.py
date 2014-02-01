@@ -857,7 +857,7 @@ class DatasetText(DatasetBase):
 
     def uiDataItemToData(self, val):
         """Return val converted to data."""
-        return cstr(val)
+        return val
 
     def saveToFile(self, fileobj, name):
         '''Save data to file.
