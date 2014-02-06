@@ -24,6 +24,7 @@ Bug fixes:
  * Fix object deletion crash in setting menu
  * Check output dataset is not same as an input for histograms
  * Fix for compilation on Qt 4.6
+ * Catch socket errors on embed client
 
 Changes in 1.20:
  * Add HDF5 file data import

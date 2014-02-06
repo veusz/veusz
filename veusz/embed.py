@@ -308,10 +308,13 @@ class Embedded(object):
     @classmethod
     def exitQt(cls):
         """Exit the Qt thread."""
-        cls.sendCommand( (-1, '_Quit', (), {}) )
-        cls.serv_socket.shutdown(socket.SHUT_RDWR)
-        cls.serv_socket.close()
-        cls.serv_socket, cls.from_pipe = -1, -1
+        try:
+            cls.sendCommand( (-1, '_Quit', (), {}) )
+            cls.serv_socket.shutdown(socket.SHUT_RDWR)
+            cls.serv_socket.close()
+            cls.serv_socket, cls.from_pipe = -1, -1
+        except socket.error:
+            pass
 
 ############################################################################
 # Tree-based interface to Veusz widget tree below

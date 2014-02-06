@@ -164,10 +164,10 @@ class EmbedApplication(qt4.QApplication):
         self.socket = thesocket
 
         # listen to commands on the socket
-        self.notifier = qt4.QSocketNotifier(self.socket.fileno(),
-                                            qt4.QSocketNotifier.Read)
-        self.connect(self.notifier, qt4.SIGNAL('activated(int)'),
-                     self.slotDataToRead)
+        self.notifier = qt4.QSocketNotifier(
+            self.socket.fileno(), qt4.QSocketNotifier.Read)
+        self.notifier.activated.connect(self.slotDataToRead)
+        self.notifier.setEnabled(True)
 
         # keep track of clients (separate veusz documents)
         self.clients = {}
@@ -219,7 +219,25 @@ class EmbedApplication(qt4.QApplication):
         self.writeToSocket( self.socket, struct.pack('<I', len(outstr)) )
         self.writeToSocket( self.socket, outstr )
 
+    def finishRemote(self):
+        """Clean up on exit."""
+        self.notifier.setEnabled(False)
+        try:
+            self.socket.shutdown(socket.SHUT_RDWR)
+        except socket.error:
+            pass
+        self.closeAllWindows()
+        self.quit()
+
     def slotDataToRead(self, socketfd):
+        """Call routine to read data from remote socket."""
+        try:
+            self.readFromSocket()
+        except socket.error:
+            # exit if problem
+            self.finishRemote()
+
+    def readFromSocket(self):
         self.notifier.setEnabled(False)
         self.socket.setblocking(1)
         
@@ -253,9 +271,8 @@ class EmbedApplication(qt4.QApplication):
 
         # do quit after if requested
         if cmd == '_Quit':
-            self.socket.shutdown(socket.SHUT_RDWR)
-            self.closeAllWindows()
-            self.quit()
+            self.finishRemote()
+            return
 
         self.socket.setblocking(0)
         self.notifier.setEnabled(True)
