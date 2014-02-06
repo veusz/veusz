@@ -312,9 +312,9 @@ class Embedded(object):
             cls.sendCommand( (-1, '_Quit', (), {}) )
             cls.serv_socket.shutdown(socket.SHUT_RDWR)
             cls.serv_socket.close()
-            cls.serv_socket, cls.from_pipe = -1, -1
         except socket.error:
             pass
+        cls.serv_socket, cls.from_pipe = -1, -1
 
 ############################################################################
 # Tree-based interface to Veusz widget tree below
