@@ -23,6 +23,7 @@ Bug fixes:
  * Fix crash when changing range of broken axes interactively
  * Fix object deletion crash in setting menu
  * Check output dataset is not same as an input for histograms
+ * Fix for compilation on Qt 4.6
 
 Changes in 1.20:
  * Add HDF5 file data import
@@ -86,7 +87,7 @@ Features of package:
 Requirements for source install:
  Python 2.x (2.6 or greater required) or 3.x (3.3 or greater required)
    http://www.python.org/
- Qt >= 4.7 (free edition)
+ Qt >= 4.6 (free edition)
    http://www.trolltech.com/products/qt/
  PyQt >= 4.5 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/software/pyqt/

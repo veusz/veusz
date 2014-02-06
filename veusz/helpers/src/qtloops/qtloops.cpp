@@ -471,8 +471,7 @@ QImage resampleLinearImage(QImage& img,
 	     iy < ypts.dim-2 )
 	++iy;
 
-      const QRgb* iscanline = reinterpret_cast<const QRgb*>
-	(img.constScanLine(iy));
+      QRgb* iscanline = reinterpret_cast<QRgb*>(img.scanLine(iy));
       QRgb* oscanline = reinterpret_cast<QRgb*>(outimg.scanLine(oy));
 
       int ix = 0;
