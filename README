@@ -14,11 +14,10 @@ external sources such as Internet sockets or other programs.
 
 Changes in 1.20.1:
  * Include free-desktop appdata, MIME and desktop files
- * Draw lines for xy widgets with filled error regions on top of the
-   filled region
+ * When plotting xy widget filled error regions, plot line on top
 
 Bug fixes:
- * Fix embedding interface (from 1.20)
+ * Fix embedding interface startup problem in 1.20
  * Additional embedding interface fixes for Python 3
  * Fix crash in tutorial if flashing widget deleted
  * Fix polar plot crash with reverse minumum and maximum radii
