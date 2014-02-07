@@ -741,6 +741,23 @@ class PointPlotter(GenericPlotter):
             xplotter = axes[0].dataToPlotterCoords(posn, xvals.data)
             yplotter = axes[1].dataToPlotterCoords(posn, yvals.data)
 
+            # points are plotted offset in shift-points modes
+            if s.PlotLine.steps != 'off':
+                xpltpoint = N.array(xplotter)
+                if s.PlotLine.steps == 'right-shift-points':
+                    xpltpoint[1:] = 0.5*(xplotter[:-1] + xplotter[1:])
+                elif s.PlotLine.steps == 'left-shift-points':
+                    xpltpoint[:-1] = 0.5*(xplotter[:-1] + xplotter[1:])
+            else:
+                xpltpoint = xplotter
+            ypltpoint = yplotter
+
+            # plot filled error bars
+            if s.errorStyle in ('fillvert', 'fillhorz'):
+                # filled region errors are painted first
+                self._plotErrors(posn, painter, xpltpoint, ypltpoint,
+                                 axes, xvals, yvals, cliprect)
+
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
@@ -751,18 +768,12 @@ class PointPlotter(GenericPlotter):
                     self._drawPlotLine( painter, xplotter, yplotter, posn,
                                         xvals, yvals, cliprect )
 
-            # shift points if in certain step modes
-            if s.PlotLine.steps != 'off':
-                steps = s.PlotLine.steps
-                if s.PlotLine.steps == 'right-shift-points':
-                    xplotter[1:] = 0.5*(xplotter[:-1] + xplotter[1:])
-                elif s.PlotLine.steps == 'left-shift-points':
-                    xplotter[:-1] = 0.5*(xplotter[:-1] + xplotter[1:])
-
             #print "Painting error bars"
-            # plot errors bars
-            self._plotErrors(posn, painter, xplotter, yplotter,
-                             axes, xvals, yvals, cliprect)
+            # plot normal errors bars
+            if s.errorStyle not in ('fillvert', 'fillhorz'):
+                # normally the error bar is painted after the line
+                self._plotErrors(posn, painter, xpltpoint, ypltpoint,
+                                 axes, xvals, yvals, cliprect)
 
             # plot the points (we do this last so they are on top)
             markersize = s.get('markerSize').convert(painter)
@@ -786,10 +797,10 @@ class PointPlotter(GenericPlotter):
 
                 # thin datapoints as required
                 if s.thinfactor <= 1:
-                    xplt, yplt = xplotter, yplotter
+                    xplt, yplt = xpltpoint, ypltpoint
                 else:
-                    xplt, yplt = (xplotter[::s.thinfactor],
-                                  yplotter[::s.thinfactor])
+                    xplt, yplt = (xpltpoint[::s.thinfactor],
+                                  ypltpoint[::s.thinfactor])
 
                 # whether to scale markers
                 scaling = colorvals = cmap = None
@@ -816,7 +827,7 @@ class PointPlotter(GenericPlotter):
 
             # finally plot any labels
             if tvals and not s.Label.hide:
-                self.drawLabels(painter, xplotter, yplotter,
+                self.drawLabels(painter, xpltpoint, ypltpoint,
                                 tvals, markersize)
 
 # allow the factory to instantiate an x,y plotter

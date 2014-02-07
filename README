@@ -14,6 +14,8 @@ external sources such as Internet sockets or other programs.
 
 Changes in 1.20.1:
  * Include free-desktop appdata, MIME and desktop files
+ * Draw lines for xy widgets with filled error regions on top of the
+   filled region
 
 Bug fixes:
  * Fix embedding interface (from 1.20)
