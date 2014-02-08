@@ -26,6 +26,8 @@ Bug fixes:
  * Check output dataset is not same as an input for histograms
  * Fix for compilation on Qt 4.6
  * Catch socket errors on embed client
+ * Fixes for formatting strings, including fixes for arguments of
+   the extended %Vg format and properly supporting %%
 
 Changes in 1.20:
  * Add HDF5 file data import

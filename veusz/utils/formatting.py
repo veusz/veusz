@@ -37,7 +37,7 @@ def localeFormat(totfmt, args, locale=None):
 
     # substitute all format statements with string format statements
     newfmt = _format_re.sub("%s", totfmt)
-    
+
     # do formatting separately for all statements
     strings = []
     i = 0
@@ -61,6 +61,27 @@ def localeFormat(totfmt, args, locale=None):
 
     return newfmt % tuple(strings)
 
+def sciToHuman(val, cleanup=False):
+    """Convert output from C formatting to human scientific notation.
+    if cleanup, remove zeros after decimal points
+    """
+
+    # split around the exponent
+    leader, exponent = val.split('e')
+
+    # strip off trailing decimal point and zeros if no format args
+    if cleanup and leader.find('.') >= 0:
+        leader = leader.rstrip('0').rstrip('.')
+
+    # trim off leading 1
+    if leader == '1' and cleanup:
+        leader = ''
+    else:
+        # add multiply sign
+        leader += u'\u00d7'
+
+    return '%s10^{%i}' % (leader, int(exponent))
+
 def formatSciNotation(num, formatargs, locale=None):
     """Format number into form X \times 10^{Y}.
     This function trims trailing zeros and decimal point unless a formatting
@@ -75,60 +96,49 @@ def formatSciNotation(num, formatargs, locale=None):
 
     # create an initial formatting string
     if formatargs:
-        format = '%' + formatargs + 'e'
+        formatstr = '%' + formatargs + 'e'
     else:
-        format = '%.10e'
+        formatstr = '%.10e'
 
-    # try to format the number
-    # this may be user-supplied data, so don't crash hard by returning
-    # useless output
+    # do formatting, catching errors
     try:
-        text = format % num
+        text = formatstr % num
     except:
         return _formaterror
 
-    # split around the exponent
-    leader, exponent = text.split('e')
-
-    # strip off trailing decimal point and zeros if no format args
-    if not formatargs:
-        leader = '%.10g' % float(leader)
-
-    # trim off leading 1
-    if leader == '1' and not formatargs:
-        leader = ''
-    else:
-        # the unicode string is a small space, multiply and small space
-        leader += u'\u00d7'
+    text = sciToHuman(text, cleanup=formatargs=='')
 
     # do substitution of decimals
     if locale is not None:
-        leader = leader.replace('.', locale.decimalPoint())
+        text = text.replace('.', locale.decimalPoint())
 
-    return '%s10^{%i}' % (leader, int(exponent))
+    return text
 
 def formatGeneral(num, fmtarg, locale=None):
     """General formatting which switches from normal to scientic
     notation."""
-    
-    a = abs(num)
-    # manually choose when to switch from normal to scientific
-    # as the default isn't very good
-    if a >= 1e4 or (a < 1e-2 and a > 1e-110):
-        retn = formatSciNotation(num, fmtarg, locale=locale)
-    else:
-        if fmtarg:
-            f = '%' + fmtarg + 'g'
-        else:
-            f = '%.10g'
 
+    if fmtarg:
+        # if an argument is given, we convert output
         try:
-            retn = f % num
-        except TypeError:
+            retn = ('%'+fmtarg+'g') % num
+        except ValueError:
             retn = _formaterror
+        if retn.find('e') >= 0:
+            # in scientific notation, so convert
+            retn = sciToHuman(retn, cleanup=False)
+    else:
+        a = abs(num)
+        # manually choose when to switch from normal to scientific
+        # as the default %g isn't very good
+        if a >= 1e4 or (a < 1e-2 and a > 1e-110):
+            retn = formatSciNotation(num, fmtarg, locale=locale)
+        else:
+            retn = '%.10g' % num
 
-        if locale is not None:
-            retn = retn.replace('.', locale.decimalPoint())
+    if locale is not None:
+        # replace decimal point with correct decimal point
+        retn = retn.replace('.', locale.decimalPoint())
     return retn
 
 engsuffixes = ( 'y', 'z', 'a', 'f', 'p', 'n',
@@ -161,29 +171,30 @@ def formatEngineering(num, fmtarg, locale=None):
     return text
 
 # catch general veusz formatting expression
-_formatRE = re.compile(r'%([^A-Za-z]*)(VDVS|VD.|V.|[A-Za-z])')
+_formatRE = re.compile(r'%([-0-9.+# ]*)(VDVS|VD.|V.|[A-Za-z%])')
 
-def formatNumber(num, format, locale=None):
+def formatNumber(num, formatstr, locale=None):
     """ Format a number in different ways.
 
-    format is a standard C format string, with some additions:
+    formatstr is a standard C format string, with some additions:
      %Ve    scientific notation X \times 10^{Y}
      %Vg    switches from normal notation to scientific outside 10^-2 to 10^4
      %VE    engineering suffix option
 
-     %VDx   date formatting, where x is one of the arguments in 
+     %VDx   date formatting, where x is one of the arguments in
             http://docs.python.org/lib/module-time.html in the function
             strftime
     """
 
-    while True:
+    outitems = []
+    while formatstr:
         # repeatedly try to do string format
-        m = _formatRE.search(format)
-        if not m:
+        match = _formatRE.search(formatstr)
+        if not match:
             break
 
         # argument and type of formatting
-        farg, ftype = m.groups()
+        farg, ftype = match.groups()
 
         # special veusz formatting
         if ftype[:1] == 'V':
@@ -209,16 +220,21 @@ def formatNumber(num, format, locale=None):
             else:
                 out = _formaterror
 
-            # replace hyphen with true - and small space
+            # replace hyphen with true minus sign
             out = out.replace('-', u'\u2212')
-
+        elif ftype == '%':
+            out = '%'
         else:
             # standard C formatting
             try:
-                out = localeFormat('%' + farg + ftype, (num,), locale=locale)
+                out = localeFormat('%' + farg + ftype, (num,),
+                                   locale=locale)
             except:
                 out = _formaterror
 
-        format = format[:m.start()] + out + format[m.end():]
+        outitems.append(formatstr[:match.start()])
+        outitems.append(out)
+        formatstr = formatstr[match.end():]
 
-    return format
+    return ''.join(outitems)
+
