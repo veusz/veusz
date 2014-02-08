@@ -37,7 +37,7 @@ def localeFormat(totfmt, args, locale=None):
 
     # substitute all format statements with string format statements
     newfmt = _format_re.sub("%s", totfmt)
-    
+
     # do formatting separately for all statements
     strings = []
     i = 0
@@ -110,11 +110,11 @@ def formatSciNotation(num, formatargs, locale=None):
 def formatGeneral(num, fmtarg, locale=None):
     """General formatting which switches from normal to scientic
     notation."""
-    
+
     a = abs(num)
     # manually choose when to switch from normal to scientific
     # as the default isn't very good
-    if a >= 1e4 or (a < 1e-2 and a > 1e-110):
+    if a >= 1e3 or (a < 1e-2 and a > 1e-110):
         retn = formatSciNotation(num, fmtarg, locale=locale)
     else:
         if fmtarg:
@@ -171,7 +171,7 @@ def formatNumber(num, format, locale=None):
      %Vg    switches from normal notation to scientific outside 10^-2 to 10^4
      %VE    engineering suffix option
 
-     %VDx   date formatting, where x is one of the arguments in 
+     %VDx   date formatting, where x is one of the arguments in
             http://docs.python.org/lib/module-time.html in the function
             strftime
     """
