@@ -860,7 +860,10 @@ class MainWindow(qt4.QMainWindow):
             geometry = setdb['geometry_mainwindow']
             self.resize( qt4.QSize(geometry[2], geometry[3]) )
             if nummain <= 1:
-                self.move( qt4.QPoint(geometry[0], geometry[1]) )
+                geomrect = qt4.QApplication.desktop().availableGeometry()
+                newpos = qt4.QPoint(geometry[0], geometry[1])
+                if geomrect.contains(newpos):
+                    self.move(newpos)
 
         # restore docked window geometry
         if 'geometry_mainwindowstate' in setdb:

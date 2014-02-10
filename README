@@ -28,6 +28,7 @@ Bug fixes:
  * Catch socket errors on embed client
  * Fixes for formatting strings, including fixes for arguments of
    the extended %Vg format and properly supporting %%
+ * When restoring window position, do not restore offscreen
 
 Changes in 1.20:
  * Add HDF5 file data import
