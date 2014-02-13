@@ -150,7 +150,7 @@ setup(name = 'veusz',
                       'License :: OSI Approved :: '
                       'GNU General Public License (GPL)',
                       'Topic :: Scientific/Engineering :: Visualization' ],
-      data_files = [ ('', ['VERSION']),
+      data_files = [ ('', ['VERSION', 'AUTHORS', 'ChangeLog', 'COPYING']),
                      findData('ui', ('ui',)),
                      findData('icons', ('png', 'svg')),
                      findData('examples', ('vsz', 'py', 'csv', 'dat')),
