@@ -233,12 +233,7 @@ def runTests():
 
 oldflt = svg_export.fltStr
 def fltStr(v, prec=1):
-    # this is to get consistent rounding to get the self test correct... yuck
-    # decimal would work, but that drags in loads of code
-    # convert float to string with prec decimal places
-
-    v = round(v, prec+2)
-
+    """Only output floats to 1 dp."""
     return oldflt(v, prec=prec)
 
 if __name__ == '__main__':
