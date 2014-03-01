@@ -243,6 +243,9 @@ class MainWindow(qt4.QMainWindow):
         self.dbuswininterface = DBusWinInterface(
             self.vzactions, self.dbusdocinterface.index)
 
+        # has the document already been setup
+        self.documentsetup = False
+
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
         self.statusBar().showMessage(text, 2000)
@@ -281,12 +284,16 @@ class MainWindow(qt4.QMainWindow):
     def setupDefaultDoc(self):
         """Setup default document."""
 
-        # add page and default graph
-        self.document.makeDefaultDoc()
+        if not self.documentsetup:
+            # add page and default graph
+            self.document.makeDefaultDoc()
 
-        # load defaults if set
-        self.loadDefaultStylesheet()
-        self.loadDefaultCustomDefinitions()
+            # load defaults if set
+            self.loadDefaultStylesheet()
+            self.loadDefaultCustomDefinitions()
+
+            # done setup
+            self.documentsetup = True
 
     def loadDefaultStylesheet(self):
         """Loads the default stylesheet for the new document."""
@@ -1102,6 +1109,7 @@ class MainWindow(qt4.QMainWindow):
         self.document.enableUpdates()
         self.document.setModified(False)
         self.document.clearHistory()
+        self.documentsetup = True
 
     def openFileInWindow(self, filename):
         """Actually do the work of loading a new document.
@@ -1118,6 +1126,14 @@ class MainWindow(qt4.QMainWindow):
                 self, _("Error - Veusz"),
                 _("Cannot open document '%s'\n\n%s") %
                 (filename, cstrerror(e)))
+            self.setupDefaultDoc()
+            return
+        except UnicodeDecodeError:
+            qt4.QApplication.restoreOverrideCursor()
+            qt4.QMessageBox.critical(
+                self, _("Error - Veusz"),
+                _("File '%s' is not a valid Veusz document") %
+                filename)
             self.setupDefaultDoc()
             return
 
