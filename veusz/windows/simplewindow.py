@@ -20,6 +20,7 @@ from __future__ import division
 from .. import qtall as qt4
 
 from .. import document
+from .. import dataimport
 from . import plotwindow
 
 """

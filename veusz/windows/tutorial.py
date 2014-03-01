@@ -832,12 +832,17 @@ class TutorialDock(qt4.QDockWidget):
     def slotFlashTimeout(self):
         '''Handle flashing of UI components.'''
 
-        if self.flash is not self.oldflash and self.oldflash is not None:
+        # because we're flashing random UI components, the C++ object
+        # might be deleted, so we have to check before doing things to
+        # it: hence the qt4.isdeleted
+
+        if ( self.flash is not self.oldflash and self.oldflash is not None
+             and not qt4.isdeleted(self.oldflash) ):
             # clear any flashing on previous widget
             self.oldflash.setStyleSheet('')
             self.oldflash = None
 
-        if self.flash:
+        if self.flash is not None and not qt4.isdeleted(self.flash):
             # set flash state and toggle variable
             if self.flashon:
                 self.flash.setStyleSheet('background: yellow;')

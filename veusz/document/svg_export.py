@@ -44,6 +44,9 @@ def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
 
+    # ensures consistent rounding behaviour on different platforms
+    v = round(v, prec+2)
+
     val = ('% 20.10f' % v)[:10+prec]
 
     # drop any trailing zeros

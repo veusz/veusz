@@ -385,6 +385,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
         data = dread.data
 
+        ds = None
         if len(data.shape) == 1:
             if ( (self.params.convert_datetime and
                   dread.origname in self.params.convert_datetime) or

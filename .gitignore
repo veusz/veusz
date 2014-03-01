@@ -2,8 +2,8 @@
 
 *.pyc
 build/
-helpers/*.pyd
-helpers/*.so
+veusz/helpers/*.pyd
+veusz/helpers/*.so
 *~
 MANIFEST
 dist/

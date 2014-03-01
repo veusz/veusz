@@ -44,6 +44,7 @@ import glob
 import os
 import os.path
 import sys
+import subprocess
 
 from veusz.compat import cexec, cstr
 import veusz.qtall as qt4
@@ -118,7 +119,7 @@ class PartTextAscii(_pt):
     def addText(self, text):
         self.text += text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
 
-def renderTest(invsz, outfile):
+def renderVszTest(invsz, outfile):
     """Render vsz document to create outfile."""
 
     d = document.Document()
@@ -136,6 +137,12 @@ def renderTest(invsz, outfile):
     cexec(compile(open(invsz).read(), invsz, 'exec'), cmds)
     ifc.Export(outfile)
 
+def renderPyTest(inpy, outfile):
+    """Render py embedded script to create outfile."""
+
+    retn = subprocess.call([sys.executable, inpy, outfile])
+    return retn == 0
+
 class Dirs(object):
     """Directories and files object."""
     def __init__(self):
@@ -147,8 +154,9 @@ class Dirs(object):
         files = ( glob.glob( os.path.join(self.exampledir, '*.vsz') ) +
                   glob.glob( os.path.join(self.testdir, '*.vsz') ) )
 
-        self.invszfiles = [ f for f in files if
-                            os.path.basename(f) not in excluded_tests ]
+        self.infiles = [ f for f in files if
+                         os.path.basename(f) not in excluded_tests ]
+        self.infiles += glob.glob(os.path.join(self.testdir, '*.py'))
 
 def renderAllTests():
     """Check documents produce same output as in comparison directory."""
@@ -156,11 +164,15 @@ def renderAllTests():
     print("Regenerating all test output")
 
     d = Dirs()
-    for vsz in d.invszfiles:
-        base = os.path.basename(vsz)
+    for infile in d.infiles:
+        base = os.path.basename(infile)
         print(base)
         outfile = os.path.join(d.comparisondir, base + '.selftest')
-        renderTest(vsz, outfile)
+        ext = os.path.splitext(base)[1]
+        if ext == '.vsz':
+            renderVszTest(infile, outfile)
+        elif ext == '.py':
+            renderPyTest(infile, outfile)
 
 def runTests():
     print("Testing output")
@@ -170,8 +182,8 @@ def runTests():
     skipped = 0
 
     d = Dirs()
-    for vsz in sorted(d.invszfiles):
-        base = os.path.basename(vsz)
+    for infile in sorted(d.infiles):
+        base = os.path.basename(infile)
         print(base)
 
         if ( (base[:5] == 'hdf5_' and h5py is None) or
@@ -181,7 +193,17 @@ def runTests():
             continue
 
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
-        renderTest(vsz, outfile)
+
+        ext = os.path.splitext(infile)[1]
+        if ext == '.vsz':
+            renderVszTest(infile, outfile)
+        elif ext == '.py':
+            if not renderPyTest(infile, outfile):
+                print(" FAIL: did not execute cleanly")
+                fails += 1
+                continue
+        else:
+            raise RuntimeError('Invalid input file')
 
         comparfile = os.path.join(d.thisdir, 'comparison', base + '.selftest')
 
@@ -211,12 +233,7 @@ def runTests():
 
 oldflt = svg_export.fltStr
 def fltStr(v, prec=1):
-    # this is to get consistent rounding to get the self test correct... yuck
-    # decimal would work, but that drags in loads of code
-    # convert float to string with prec decimal places
-
-    v = round(v, prec+2)
-
+    """Only output floats to 1 dp."""
     return oldflt(v, prec=prec)
 
 if __name__ == '__main__':

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Veusz
+GenericName=Scientific plotting
+Comment=Scientific plotting and graphing package
+MimeType=application/x-veusz
+Exec=veusz %F
+Icon=veusz
+Terminal=false
+Type=Application
+Categories=Graphics;
