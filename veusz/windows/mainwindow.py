@@ -19,14 +19,14 @@
 
 """Implements the main window of the application."""
 
-from __future__ import division
+from __future__ import division, print_function
 import os.path
 import sys
 import traceback
 import glob
 import io
 
-from ..compat import citems, ckeys, cstr, cexec, cstrerror
+from ..compat import citems, ckeys, cstr, cstrerror
 from .. import qtall as qt4
 
 from .. import document
@@ -990,138 +990,61 @@ class MainWindow(qt4.QMainWindow):
             # create a new window
             self.CreateWindow(filename)
 
-    class _unsafeCmdMsgBox(qt4.QMessageBox):
-        """Show document is unsafe."""
-        def __init__(self, window, filename):
-            qt4.QMessageBox.__init__(self, _("Unsafe code in document"),
-                                     _("The document '%s' contains potentially "
-                                       "unsafe code which may damage your "
-                                       "computer or data. Please check that the "
-                                       "file comes from a "
-                                       "trusted source.") % filename,
-                                     qt4.QMessageBox.Warning,
-                                     qt4.QMessageBox.Yes,
-                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
-                                     qt4.QMessageBox.NoButton,
-                                     window)
-            self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
-            self.setButtonText(qt4.QMessageBox.No, _("&Stop loading"))
-
-    class _unsafeVeuszCmdMsgBox(qt4.QMessageBox):
-        """Show document has unsafe Veusz commands."""
-        def __init__(self, window):
-            qt4.QMessageBox.__init__(self, _('Unsafe Veusz commands'),
-                                     _('This Veusz document contains potentially'
-                                       ' unsafe Veusz commands for Saving, '
-                                       'Exporting or Printing. Please check that the'
-                                       ' file comes from a trusted source.'),
-                                     qt4.QMessageBox.Warning,
-                                     qt4.QMessageBox.Yes,
-                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
-                                     qt4.QMessageBox.NoButton,
-                                     window)
-            self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
-            self.setButtonText(qt4.QMessageBox.No, _("&Ignore command"))
-
     def userExecuteScript(self, filename, script):
         """Execute script in safe environment."""
 
-        def errordialog(e):
-            # display error dialog if there is an error loading
+        class _unsafeCmdMsgBox(qt4.QMessageBox):
+            """Show document is unsafe."""
+            def __init__(self, window):
+                qt4.QMessageBox.__init__(
+                    self, _("Unsafe code in document"),
+                    _("The document '%s' contains potentially unsafe code "
+                      "which may damage your computer or data. Please check "
+                      "that the file comes from a trusted source.") % filename,
+                    qt4.QMessageBox.Warning,
+                    qt4.QMessageBox.Yes,
+                    qt4.QMessageBox.No | qt4.QMessageBox.Default,
+                    qt4.QMessageBox.NoButton,
+                    window)
+                self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
+                self.setButtonText(qt4.QMessageBox.No, _("&Stop loading"))
+
+        def _callbackunsafe():
             qt4.QApplication.restoreOverrideCursor()
-            i = sys.exc_info()
-            backtrace = traceback.format_exception( *i )
-            d = ErrorLoadingDialog(self, filename, str(e), ''.join(backtrace))
-            d.exec_()
-
-        # compile script and check for security (if reqd)
-        unsafe = setting.transient_settings['unsafe_mode']
-        while True:
-            try:
-                compiled = utils.compileChecked(
-                    script, mode='exec', filename=filename,
-                    ignoresecurity=unsafe)
-                break
-            except utils.SafeEvalException:
-                # ask the user whether to execute in unsafe mode
-                qt4.QApplication.restoreOverrideCursor()
-                if ( self._unsafeCmdMsgBox(self, filename).exec_() ==
-                     qt4.QMessageBox.No ):
-                    return -1
-                unsafe = True
-            except Exception as e:
-                errordialog(e)
-                return -1
-
-        # set up environment to run script
-        env = self.document.eval_context.copy()
-        interface = document.CommandInterface(self.document)
-
-        # allow safe commands as-is
-        for cmd in interface.safe_commands:
-            env[cmd] = getattr(interface, cmd)
-
-        # define root node
-        env['Root'] = interface.Root
-
-        # wrap "unsafe" commands with a message box to check the user
-        safenow = [unsafe]
-        def _unsafeCaller(func):
-            def wrapped(*args, **argsk):
-                if not safenow[0]:
-                    qt4.QApplication.restoreOverrideCursor()
-                    if ( self._unsafeVeuszCmdMsgBox(self).exec_() ==
-                         qt4.QMessageBox.No ):
-                        return
-                safenow[0] = True
-                func(*args, **argsk)
-            return wrapped
-        for name in interface.unsafe_commands:
-            env[name] = _unsafeCaller(getattr(interface, name))
+            v = _unsafeCmdMsgBox(self).exec_()
+            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+            return v == qt4.QMessageBox.Yes
 
         # save stdout and stderr, then redirect to console
         stdout, stderr = sys.stdout, sys.stderr
         sys.stdout = self.console.con_stdout
         sys.stderr = self.console.con_stderr
 
-        # get ready to load document
-        env['__file__'] = os.path.abspath(filename)
-        self.document.wipe()
-        self.document.suspendUpdates()
-
-        # allow import to happen relative to loaded file
-        interface.AddImportPath( os.path.dirname(os.path.abspath(filename)) )
+        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
         try:
-            # actually run script text
-            cexec(compiled, env)
-        except Exception as e:
-            # need to remember to restore stdout, stderr
-            sys.stdout, sys.stderr = stdout, stderr
-            self.document.enableUpdates()
-            errordialog(e)
-            return -1
+            document.executeScript(
+                self.document, filename, script, callbackunsafe=_callbackunsafe)
+        except document.ExecuteError as e:
+            qt4.QApplication.restoreOverrideCursor()
+            d = ErrorLoadingDialog(self, filename, cstr(e), e.backtrace)
+            d.exec_()
+
+        qt4.QApplication.restoreOverrideCursor()
 
         # need to remember to restore stdout, stderr
         sys.stdout, sys.stderr = stdout, stderr
 
-        # document is loaded
-        self.document.enableUpdates()
-        self.document.setModified(False)
-        self.document.clearHistory()
         self.documentsetup = True
 
     def openFileInWindow(self, filename):
         """Actually do the work of loading a new document.
         """
 
-        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
         # read script
         try:
             script = io.open(filename, 'rU', encoding='utf8').read()
         except EnvironmentError as e:
-            qt4.QApplication.restoreOverrideCursor()
             qt4.QMessageBox.critical(
                 self, _("Error - Veusz"),
                 _("Cannot open document '%s'\n\n%s") %
@@ -1129,7 +1052,6 @@ class MainWindow(qt4.QMainWindow):
             self.setupDefaultDoc()
             return
         except UnicodeDecodeError:
-            qt4.QApplication.restoreOverrideCursor()
             qt4.QMessageBox.critical(
                 self, _("Error - Veusz"),
                 _("File '%s' is not a valid Veusz document") %
@@ -1157,7 +1079,6 @@ class MainWindow(qt4.QMainWindow):
 
         # notify cmpts which need notification that doc has finished opening
         self.documentOpened.emit()
-        qt4.QApplication.restoreOverrideCursor()
 
     def addRecentFile(self, filename):
         """Add a file to the recent files list."""
