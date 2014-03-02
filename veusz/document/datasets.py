@@ -845,9 +845,11 @@ class DatasetDateTime(Dataset):
 
     def saveDataDumpToHDF5(self, group, name):
         """Save date data to hdf5 file."""
-        ds = group[name] = self.data
-        ds.attrs['vsz_datatype'] = 'date'
-        ds.attrs['vsz_convert_datetime'] = 1
+        dgrp = group.create_group(name)
+        dgrp.attrs['vsz_datatype'] = 'date'
+        data = dgrp['data'] = self.data
+        data.attrs['vsz_convert_datetime'] = 1
+        data.attrs['vsz_name'] = name.encode('utf-8')
 
     def datasetAsText(self, fmt=None, join=None):
         """Return data as text."""
@@ -914,8 +916,12 @@ class DatasetText(DatasetBase):
 
     def saveDataDumpToHDF5(self, group, name):
         """Save text data to hdf5 file."""
-        ds = group[name] = self.data
-        ds.attrs['vsz_datatype'] = 'text'
+        tgrp = group.create_group(name)
+        tgrp.attrs['vsz_datatype'] = 'text'
+        # make sure data are encoded
+        encdata = [x.encode('utf-8') for x in self.data]
+        tgrp['data'] = encdata
+        tgrp['data'].attrs['vsz_name'] = name.encode('utf-8')
 
     def datasetAsText(self, fmt=None, join=None):
         """Return data as text."""
