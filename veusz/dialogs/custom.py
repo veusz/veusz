@@ -247,8 +247,8 @@ class CustomDialog(VeuszDialog):
 
     def slotSave(self):
         """Save entries."""
-        filename = self.parent()._fileSaveDialog(
-            'vsz', _('Veusz document'), _('Save custom definitions'))
+        filename = self.parent().fileSaveDialog(
+            [_('Veusz document (*.vsz)')], _('Save custom definitions'))
         if filename:
             try:
                 f = open(filename, 'w')
@@ -264,8 +264,8 @@ class CustomDialog(VeuszDialog):
     def slotLoad(self):
         """Load entries."""
 
-        filename = self.parent()._fileOpenDialog(
-            'vsz', _('Veusz document'), _('Load custom definitions'))
+        filename = self.parent().fileOpenDialog(
+            [_('Veusz document (*.vsz)')], _('Load custom definitions'))
         if filename:
             try:
                 self.loadFile(filename)

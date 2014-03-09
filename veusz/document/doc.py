@@ -519,6 +519,9 @@ class Document( qt4.QObject ):
 
         # groups in output hdf5
         vszgrp = fileobj.create_group('Veusz')
+        vszgrp.attrs['vsz_version'] = utils.version()
+        vszgrp.attrs['vsz_saved_at'] = datetime.datetime.utcnow().isoformat()
+        vszgrp.attrs['vsz_format'] = 1  # version number (currently unused)
         datagrp = vszgrp.create_group('Data')
         docgrp = vszgrp.create_group('Document')
 

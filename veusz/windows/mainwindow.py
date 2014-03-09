@@ -24,7 +24,6 @@ import os.path
 import sys
 import traceback
 import glob
-import io
 
 from ..compat import citems, ckeys, cstr, cstrerror
 from .. import qtall as qt4
@@ -921,14 +920,14 @@ class MainWindow(qt4.QMainWindow):
         text = u'•' * self.plotqueuecount
         self.plotqueuelabel.setText(text)
 
-    def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
+    def fileSaveDialog(self, filters, dialogtitle):
         """A generic file save dialog for exporting / saving."""
 
         fd = qt4.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
         fd.setFileMode( qt4.QFileDialog.AnyFile )
         fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
-        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
+        fd.setNameFilters(filters)
 
         # okay was selected (and is okay to overwrite if it exists)
         if fd.exec_() == qt4.QDialog.Accepted:
@@ -942,14 +941,17 @@ class MainWindow(qt4.QMainWindow):
             return filename
         return None
 
-    def _fileOpenDialog(self, filetype, filedescr, dialogtitle):
-        """Display an open dialog and return a filename."""
+    def fileOpenDialog(self, filters, dialogtitle):
+        """Display an open dialog and return a filename.
+
+        filters: list of filters in format "Filetype (*.vsz)"
+        """
 
         fd = qt4.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
         fd.setFileMode( qt4.QFileDialog.ExistingFile )
         fd.setAcceptMode( qt4.QFileDialog.AcceptOpen )
-        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
+        fd.setNameFilters(filters)
 
         # if the user chooses a file
         if fd.exec_() == qt4.QDialog.Accepted:
@@ -958,7 +960,8 @@ class MainWindow(qt4.QMainWindow):
 
             filename = fd.selectedFiles()[0]
             try:
-                open(filename)
+                with open(filename) as f:
+                    pass
             except EnvironmentError as e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
@@ -971,7 +974,10 @@ class MainWindow(qt4.QMainWindow):
     def slotFileSaveAs(self):
         """Save As file."""
 
-        filename = self._fileSaveDialog('vsz', _('Veusz script files'), _('Save as'))
+        filename = self.fileSaveDialog(
+            [_('Veusz document files (*.vsz)'),
+             _('Veusz HDF5 document files (*.vszh5)')],
+            _('Save as'))
         if filename:
             self.filename = filename
             self.updateTitlebar()
@@ -990,8 +996,10 @@ class MainWindow(qt4.QMainWindow):
             # create a new window
             self.CreateWindow(filename)
 
-    def userExecuteScript(self, filename, script):
-        """Execute script in safe environment."""
+    def loadDocument(self, filename):
+        """Load a Veusz document.
+        Return True if loaded ok
+        """
 
         class _unsafeCmdMsgBox(qt4.QMessageBox):
             """Show document is unsafe."""
@@ -1023,12 +1031,33 @@ class MainWindow(qt4.QMainWindow):
         qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
         try:
-            document.executeScript(
-                self.document, filename, script, callbackunsafe=_callbackunsafe)
-        except document.ExecuteError as e:
+            # get loading mode
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in ('.vsz', '.py'):
+                mode = 'vsz'
+            elif ext in ('.h5', '.hdf5', '.he5', '.vszh5'):
+                mode = 'hdf5'
+            else:
+                raise document.LoadError(
+                    _("Did not recognise file type '%s'") % ext)
+
+            # do the actual loading
+            document.loadDocument(
+                self.document,
+                filename,
+                mode=mode,
+                callbackunsafe=_callbackunsafe)
+
+        except document.LoadError as e:
             qt4.QApplication.restoreOverrideCursor()
-            d = ErrorLoadingDialog(self, filename, cstr(e), e.backtrace)
-            d.exec_()
+            if e.backtrace:
+                d = ErrorLoadingDialog(self, filename, cstr(e), e.backtrace)
+                d.exec_()
+            else:
+                qt4.QMessageBox.critical(
+                    self, _("Error opening %s - Veusz") % filename,
+                    cstr(e))
+            return False
 
         qt4.QApplication.restoreOverrideCursor()
 
@@ -1036,32 +1065,14 @@ class MainWindow(qt4.QMainWindow):
         sys.stdout, sys.stderr = stdout, stderr
 
         self.documentsetup = True
+        return True
 
     def openFileInWindow(self, filename):
         """Actually do the work of loading a new document.
         """
 
-        # read script
-        try:
-            script = io.open(filename, 'rU', encoding='utf8').read()
-        except EnvironmentError as e:
-            qt4.QMessageBox.critical(
-                self, _("Error - Veusz"),
-                _("Cannot open document '%s'\n\n%s") %
-                (filename, cstrerror(e)))
-            self.setupDefaultDoc()
-            return
-        except UnicodeDecodeError:
-            qt4.QMessageBox.critical(
-                self, _("Error - Veusz"),
-                _("File '%s' is not a valid Veusz document") %
-                filename)
-            self.setupDefaultDoc()
-            return
-
-        retn = self.userExecuteScript(filename, script)
-        if retn == -1:
-            # error from above
+        ok = self.loadDocument(filename)
+        if not ok:
             return
 
         # remember file for recent list
@@ -1095,7 +1106,9 @@ class MainWindow(qt4.QMainWindow):
     def slotFileOpen(self):
         """Open an existing file in a new window."""
 
-        filename = self._fileOpenDialog('vsz', _('Veusz script files'), _('Open'))
+        filename = self.fileOpenDialog(
+            [_('Veusz document files (*.vsz *.vszh5)')],
+            _('Open'))
         if filename:
             self.openFile(filename)
 

@@ -278,22 +278,22 @@ class PreferencesDialog(VeuszDialog):
 
     def styleBrowseClicked(self):
         """Browse for a stylesheet."""
-        filename = self.parent()._fileOpenDialog(
-            'vst', _('Veusz stylesheet'), _('Choose stylesheet'))
+        filename = self.parent().fileOpenDialog(
+            [_('Veusz stylesheet (*.vst)')], _('Choose stylesheet'))
         if filename:
             self.styleLineEdit.setText(filename)
 
     def customBrowseClicked(self):
         """Browse for a custom definitons."""
-        filename = self.parent()._fileOpenDialog(
-            'vsz', _('Veusz documents'), _('Choose custom definitons'))
+        filename = self.parent().fileOpenDialog(
+            [_('Veusz document (*.vsz)')], _('Choose custom definitons'))
         if filename:
             self.customLineEdit.setText(filename)
 
     def pluginAddClicked(self):
         """Add a new plugin."""
-        filename = self.parent()._fileOpenDialog(
-            'py', _('Python scripts'), _('Choose plugin'))
+        filename = self.parent().fileOpenDialog(
+            [_('Python scripts (*.py)')], _('Choose plugin'))
         if filename:
             self.pluginmodel.insertRows(0, 1)
             self.pluginmodel.setData( self.pluginmodel.index(0),
