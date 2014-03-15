@@ -141,8 +141,8 @@ class _SettingDB(object):
             try:
                 self.database[realkey] = eval(val)
             except:
-                print(('Error interpreting item "%s" in '
-                                     'settings file' % realkey), file=sys.stderr)
+                print('Error interpreting item "%s" in '
+                      'settings file' % realkey, file=sys.stderr)
 
         # set any defaults which haven't been set
         for key, value in citems(defaultValues):

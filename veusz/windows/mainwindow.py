@@ -24,6 +24,7 @@ import os.path
 import sys
 import traceback
 import glob
+import re
 
 from ..compat import citems, ckeys, cstr, cstrerror
 from .. import qtall as qt4
@@ -894,8 +895,9 @@ class MainWindow(qt4.QMainWindow):
             # show busy cursor
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
             try:
-                ofile = open(self.filename, 'w')
-                self.document.saveToFile(ofile)
+                ext = os.path.splitext(self.filename)[1]
+                mode = 'hdf5' if ext == '.vszh5' else 'vsz'
+                self.document.saveDocument(self.filename, mode)
                 self.updateStatusbar(_("Saved to %s") % self.filename)
             except EnvironmentError as e:
                 qt4.QApplication.restoreOverrideCursor()
@@ -921,13 +923,25 @@ class MainWindow(qt4.QMainWindow):
         self.plotqueuelabel.setText(text)
 
     def fileSaveDialog(self, filters, dialogtitle):
-        """A generic file save dialog for exporting / saving."""
+        """A generic file save dialog for exporting / saving.
+
+        filters: list of filters
+        """
 
         fd = qt4.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
-        fd.setFileMode( qt4.QFileDialog.AnyFile )
-        fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
+        fd.setFileMode(qt4.QFileDialog.AnyFile)
+        fd.setAcceptMode(qt4.QFileDialog.AcceptSave)
         fd.setNameFilters(filters)
+
+        # selected filetype is saved under a key constructed here
+        filetype_re = re.compile(r'.*\(\*\.([a-z0-9]+)\)')
+        filtertypes = [filetype_re.match(f).group(1) for f in filters]
+        filterkey = '_'.join(['filterdefault'] + filtertypes)
+        if filterkey in setting.settingdb:
+            filter = setting.settingdb[filterkey]
+            if filter in filters:
+                fd.selectNameFilter(filter)
 
         # okay was selected (and is okay to overwrite if it exists)
         if fd.exec_() == qt4.QDialog.Accepted:
@@ -935,10 +949,12 @@ class MainWindow(qt4.QMainWindow):
             self.dirname = fd.directory().absolutePath()
             # update the edit box
             filename = fd.selectedFiles()[0]
-            if os.path.splitext(filename)[1] == '':
+            filetype = filetype_re.match(fd.selectedNameFilter()).group(1)
+            if os.path.splitext(filename)[1][1:] != filetype:
                 filename += '.' + filetype
-
+            setting.settingdb[filterkey] = fd.selectedNameFilter()
             return filename
+
         return None
 
     def fileOpenDialog(self, filters, dialogtitle):

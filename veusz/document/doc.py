@@ -30,6 +30,11 @@ from collections import defaultdict
 
 import numpy as N
 
+try:
+    import h5py
+except ImportError:
+    h5py = None
+
 from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO
 from .. import qtall as qt4
 
@@ -568,6 +573,22 @@ class Document( qt4.QObject ):
         docgrp['document'] = [ textstream.getvalue().encode('utf-8') ]
 
         self.setModified(False)
+
+    def saveDocument(self, filename, mode='vsz'):
+        """Save to output file.
+
+        mode is 'vsz' or 'hdf5'
+        """
+        if mode == 'vsz':
+            with open(filename, 'w') as f:
+                self.saveToFile(f)
+        elif mode == 'hdf5':
+            if h5py is None:
+                raise RuntimeError('Missing h5py module')
+            with h5py.File(filename, 'w') as f:
+                self.saveToHDF5File(f)
+        else:
+            raise RuntimeError('Invalid save mode')
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""
