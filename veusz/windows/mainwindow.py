@@ -1127,8 +1127,12 @@ class MainWindow(qt4.QMainWindow):
     def slotFileOpen(self):
         """Open an existing file in a new window."""
 
+        filters = ['*.vsz']
+        if h5py is not None:
+            filters.append('*.vszh5')
+
         filename = self.fileOpenDialog(
-            [_('Veusz document files (*.vsz *.vszh5)')],
+            [_('Veusz document files (%s)') % ' '.join(filters)],
             _('Open'))
         if filename:
             self.openFile(filename)
