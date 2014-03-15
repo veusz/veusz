@@ -26,6 +26,11 @@ import traceback
 import glob
 import re
 
+try:
+    import h5py
+except ImportError:
+    h5py = None
+
 from ..compat import citems, ckeys, cstr, cstrerror
 from .. import qtall as qt4
 
@@ -990,10 +995,10 @@ class MainWindow(qt4.QMainWindow):
     def slotFileSaveAs(self):
         """Save As file."""
 
-        filename = self.fileSaveDialog(
-            [_('Veusz document files (*.vsz)'),
-             _('Veusz HDF5 document files (*.vszh5)')],
-            _('Save as'))
+        filters = [_('Veusz document files (*.vsz)')]
+        if h5py is not None:
+            filters += [_('Veusz HDF5 document files (*.vszh5)')]
+        filename = self.fileSaveDialog(filters, _('Save as'))
         if filename:
             self.filename = filename
             self.updateTitlebar()
