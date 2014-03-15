@@ -135,6 +135,17 @@ def renderVszTest(invsz, outfile):
     cexec("from numpy import *", cmds)
     ifc.AddImportPath( os.path.dirname(invsz) )
     cexec(compile(open(invsz).read(), invsz, 'exec'), cmds)
+
+    #ifc.Save('temp.vszh5', mode='hdf5')
+    #d = document.Document()
+    #document.loadDocument(d, 'temp.vszh5', mode='hdf5')
+    #ifc = document.CommandInterface(d)
+
+    #ifc.Save('temp.vsz', mode='vsz')
+    #d = document.Document()
+    #document.loadDocument(d, 'temp.vsz', mode='vsz')
+    #ifc = document.CommandInterface(d)
+
     ifc.Export(outfile)
 
 def renderPyTest(inpy, outfile):

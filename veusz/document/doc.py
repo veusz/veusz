@@ -552,7 +552,7 @@ class Document( qt4.QObject ):
 
         # save the remaining datasets
         for name, dataset in sorted(citems(self.data)):
-            dataset.saveToFile(fileobj, name, mode='hdf5', hdfgroup=datagrp)
+            dataset.saveToFile(textstream, name, mode='hdf5', hdfgroup=datagrp)
 
         # handle tagging
         # get a list of all tags and which datasets have them

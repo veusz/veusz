@@ -221,13 +221,15 @@ class DatasetHistoBins(Dataset):
             self.changeset = self.generator.document.changeset
         return self.datacache
 
-    def saveToFile(self, fileobj, name):
-        """Save dataset (counterpart does this)."""
-        pass
-
     def linkedInformation(self):
         """Informating about linking."""
         return self.generator.linkedInformation() + _(" (bin positions)")
+
+    def saveDataDumpToText(self, fileobj, name):
+        pass
+
+    def saveDataDumpToHDF5(self, group, name):
+        pass
 
     data = property(lambda self: self.getData()[0])
     nerr = property(lambda self: self.getData()[1])
@@ -254,9 +256,15 @@ class DatasetHistoValues(Dataset):
             self.changeset = self.generator.document.changeset
         return self.datacache
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         """Save dataset and its counterpart to a file."""
         self.generator.saveToFile(fileobj)
+
+    def saveDataDumpToText(self, fileobj, name):
+        pass
+
+    def saveDataDumpToHDF5(self, group, name):
+        pass
 
     def linkedInformation(self):
         """Informating about linking."""
