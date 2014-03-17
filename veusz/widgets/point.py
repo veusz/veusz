@@ -144,21 +144,43 @@ def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
         for xp, yp, xmn, ymn, xmx, ymx in czip(
             xplotter, yplotter, xmin, ymin, xmax, ymax):
 
-            # break up curve into four arcs (for asym error bars)
-            # qt geometry means we have to calculate lots
-            # the big numbers are in 1/16 degrees
-            painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
-                                       (xmx-xp)*2, (yp-ymx)*2),
-                            0, 1440)
-            painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
-                                       (xp-xmn)*2, (yp-ymx)*2),
-                            1440, 1440)
-            painter.drawArc(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
-                                       (xp-xmn)*2, (ymn-yp)*2),
-                            2880, 1440)
-            painter.drawArc(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
-                                       (xmx-xp)*2, (ymn-yp)*2),
-                            4320, 1440)
+            p = qt4.QPainterPath()
+            p.moveTo(xp + (xmx-xp), yp)
+            p.arcTo(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
+                               (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
+            p.arcTo(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
+                               (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
+            p.arcTo(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
+                               (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
+            p.arcTo(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
+                               (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
+            painter.drawPath(p)
+
+def _errorBarsCurveFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
+                          s, painter, clip):
+    """Fill area around error region."""
+
+    if None not in (xmin, xmax, ymin, ymax):
+        for xp, yp, xmn, ymn, xmx, ymx in czip(
+            xplotter, yplotter, xmin, ymin, xmax, ymax):
+
+            if not s.FillAbove.hideerror:
+                p = qt4.QPainterPath()
+                p.moveTo(xp + (xmx-xp), yp)
+                p.arcTo(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
+                                   (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
+                p.arcTo(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
+                                   (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
+                utils.brushExtFillPath(painter, s.FillAbove, p, ignorehide=True)
+
+            if not s.FillBelow.hideerror:
+                p = qt4.QPainterPath()
+                p.moveTo(xp + (xp-xmn), yp)
+                p.arcTo(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
+                                   (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
+                p.arcTo(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
+                                   (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
+                utils.brushExtFillPath(painter, s.FillBelow, p, ignorehide=True)
 
 def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                      s, painter, clip):
@@ -217,6 +239,7 @@ _errorBarFunctionMap = {
     'diamond':  (_errorBarsDiamond,),
     'diamondfill':  (_errorBarsDiamond, _errorBarsDiamondFilled),
     'curve': (_errorBarsCurve,),
+    'curvefill': (_errorBarsCurveFilled, _errorBarsCurve,),
     'fillhorz': (_errorBarsFilled,),
     'fillvert': (_errorBarsFilled,),
     'linehorz': (_errorBarsFilled,),

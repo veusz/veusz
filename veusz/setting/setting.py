@@ -1763,7 +1763,7 @@ class ErrorStyle(Choice):
         'none',
         'bar', 'barends', 'box', 'diamond', 'curve',
         'barbox', 'bardiamond', 'barcurve',
-        'boxfill', 'diamondfill',
+        'boxfill', 'diamondfill', 'curvefill',
         'fillvert', 'fillhorz',
         'linevert', 'linehorz',
         'linevertbar', 'linehorzbar'
