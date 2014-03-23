@@ -108,8 +108,8 @@ class StylesheetDialog(VeuszDialog):
     def slotSaveStyleSheet(self):
         """Save stylesheet as a file."""
     
-        filename = self.parent()._fileSaveDialog(
-            'vst', _('Veusz stylesheet'), _('Save stylesheet'))
+        filename = self.parent().fileSaveDialog(
+            [_('Veusz stylesheet (*.vst)')], _('Save stylesheet'))
         if filename:
             try:
                 f = open(filename, 'w')
@@ -125,8 +125,8 @@ class StylesheetDialog(VeuszDialog):
 
     def slotLoadStyleSheet(self):
         """Load a style sheet."""
-        filename = self.parent()._fileOpenDialog(
-            'vst', _('Veusz stylesheet'), _('Load stylesheet'))
+        filename = self.parent().fileOpenDialog(
+            [_('Veusz stylesheet (*.vst)')], _('Load stylesheet'))
         if filename:
             try:
                 self.loadStyleSheet(filename)

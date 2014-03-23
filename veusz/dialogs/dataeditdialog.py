@@ -118,7 +118,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         if index.isValid():
             f = qt4.QAbstractTableModel.flags(self, index)
             ds = self.document.data.get(self.dsname)
-            if ds is not None and ds.editable():
+            if ds is not None and ds.editable:
                 f |= qt4.Qt.ItemIsEditable
             return f
         return qt4.Qt.ItemIsEnabled
@@ -277,7 +277,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
             f = qt4.QAbstractTableModel.flags(self, index)
             dsname, colname, dsidx, colidx = self.colattrs[index.column()]
             ds = self.document.data.get(dsname)
-            if ds is not None and ds.editable():
+            if ds is not None and ds.editable:
                 f |= qt4.Qt.ItemIsEditable
             return f
         return qt4.Qt.ItemIsEnabled
@@ -406,7 +406,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         else:
             f = qt4.QAbstractTableModel.flags(self, index)
             ds = self.document.data.get(self.dsname)
-            if ds is not None and ds.editable():
+            if ds is not None and ds.editable:
                 f |= qt4.Qt.ItemIsEditable
             return f
 

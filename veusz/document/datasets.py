@@ -144,12 +144,11 @@ class DatasetBase(object):
     # use descriptions for columns
     column_descriptions = ()
 
+    # can values be edited
+    editable = False
+
     # class for representing part of this dataset
     subsetclass = None
-
-    # whether this dataset's columns will change without updating the document's
-    # changeset
-    isstable = False
 
     def __init__(self, linked=None):
         """Initialise common members."""
@@ -175,6 +174,29 @@ class DatasetBase(object):
         if self.linked is not None and self.linked not in savedlinks:
             savedlinks[self.linked] = True
             self.linked.saveToFile(fileobj, relpath=relpath)
+
+    def saveToFile(self, fileobj, name, mode='text', hdfgroup=None):
+        """Save dataset to file."""
+        self.saveDataRelationToText(fileobj, name)
+        if self.linked is None:
+            if mode == 'text':
+                self.saveDataDumpToText(fileobj, name)
+            elif mode == 'hdf5':
+                self.saveDataDumpToHDF5(hdfgroup, name)
+
+    def saveDataRelationToText(self, fileobj, name):
+        """Save a dataset relation to a text stream fileobj.
+        Not for datasets which are raw data."""
+
+    def saveDataDumpToText(self, fileobj, name):
+        """Save dataset to file if file is text and data
+        is actually a set of data and not a relation
+        """
+
+    def saveDataDumpToHDF5(self, group, name):
+        """Save dumped dataset to HDF5.
+        group is the group to save it in (h5py group)
+        """
 
     def name(self):
         """Get dataset name."""
@@ -209,7 +231,7 @@ class DatasetBase(object):
     def uiDataItemToData(self, val):
         """Return val converted to data."""
         return float(val)
-    
+
     def _getItemHelper(self, key):
         """Help get arguments to constructor."""
         args = {}
@@ -229,7 +251,7 @@ class DatasetBase(object):
     def __len__(self):
         """Return length of dataset."""
         return len(self.data)
-    
+
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.
         Returns deleted rows as a dict of {column:data, ...}
@@ -265,10 +287,6 @@ class DatasetBase(object):
         """Return dataset as text (for use by user)."""
         return ''
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return True
-
 def regularGrid(vals):
     '''Are the values equally spaced?'''
     if len(vals) < 2:
@@ -277,97 +295,17 @@ def regularGrid(vals):
     deltas = vals[1:] - vals[:-1]
     return N.all(N.abs(deltas - deltas[0]) < (deltas[0]*1e-5))
 
-class Dataset2D(DatasetBase):
-    '''Represents a two-dimensional dataset.'''
+class Dataset2DBase(DatasetBase):
+    """Ancestor for 2D datasets."""
 
     # number of dimensions the dataset holds
     dimensions = 2
 
     # dataset type
     dstype = _('2D')
-    
-    # the dataset is recreated if its data changes
-    isstable = True
 
-    def __init__(self, data, xrange=None, yrange=None,
-                 xedge=None, yedge=None,
-                 xcent=None, ycent=None):
-        '''Create a two dimensional dataset based on data.
-
-        data: 2d numpy of imaging data
-
-        Range specfied by:
-         xrange: a tuple of (start, end) coordinates for x
-         yrange: a tuple of (start, end) coordinates for y
-        _or_
-         xedge: list of values start..end (npix+1 values)
-         yedge: list of values start..end (npix+1 values)
-        _or_
-         xcent: list of values (npix values)
-         ycent: list of values (npix values)
-        '''
-
-        DatasetBase.__init__(self)
-
-        # we don't want these set if a inheriting class uses properties instead
-        self._data = d = convertNumpy(data, dims=2)
-
-        self._xrange = self._yrange = None
-        self._xedge = self._yedge = self._xcent = self._ycent = None
-
-        # try to regularise data if possible
-        # by converting regular grids to ranges
-        if xedge is not None and regularGrid(xedge):
-            xrange = (xedge[0], xedge[-1])
-            xedge = None
-        if yedge is not None and regularGrid(yedge):
-            yrange = (yedge[0], yedge[-1])
-            yedge = None
-        if xcent is not None and regularGrid(xcent):
-            delta = 0.5*(xcent[1]-xcent[0])
-            xrange = (xcent[0]-delta, xcent[-1]+delta)
-            xcent = None
-        if ycent is not None and regularGrid(ycent):
-            delta = 0.5*(ycent[1]-ycent[0])
-            yrange = (ycent[0]-delta, ycent[-1]+delta)
-            ycent = None
-
-        if xrange is not None:
-            self._xrange = tuple(xrange)
-        elif xedge is not None:
-            self._xedge = N.array(xedge)
-        elif xcent is not None:
-            self._xcent = N.array(xcent)
-        elif d is not None:
-            self._xrange = (0, d.shape[1])
-        else:
-            self._xrange = (0., 1.)
-
-        if yrange is not None:
-            self._yrange = tuple(yrange)
-        elif yedge is not None:
-            self._yedge = N.array(yedge)
-        elif ycent is not None:
-            self._ycent = N.array(ycent)
-        elif d is not None:
-            self._yrange = (0, d.shape[0])
-        else:
-            self._yrange = (0., 1.)
-
-    @property
-    def data(self): return self._data
-    @property
-    def xrange(self): return self._xrange
-    @property
-    def yrange(self): return self._yrange
-    @property
-    def xedge(self): return self._xedge
-    @property
-    def yedge(self): return self._yedge
-    @property
-    def xcent(self): return self._xcent
-    @property
-    def ycent(self): return self._ycent
+    # subclasses must define data, x/yrange, x/yedge, x/ycent as
+    # attributes or properties
 
     def isLinearImage(self):
         """Are these simple linear pixels?"""
@@ -455,35 +393,6 @@ class Dataset2D(DatasetBase):
         xe, ye = self.getPixelEdges()
         return (xe[0], xe[-1]), (ye[0], ye[-1])
 
-    def saveToFile(self, fileobj, name):
-        """Write the 2d dataset to the file given."""
-
-        # return if there is a link
-        if self.linked is not None:
-            return
-
-        fileobj.write("ImportString2D(%s, '''\n" % crepr(name))
-        if self.xcent is not None:
-            fileobj.write("xcent %s\n" %
-                          " ".join(("%e" % v for v in self.xcent)) )
-        elif self.xedge is not None:
-            fileobj.write("xedge %s\n" %
-                          " ".join(("%e" % v for v in self.xedge)) )
-        else:
-            fileobj.write("xrange %e %e\n" % tuple(self.xrange))
-
-        if self.ycent is not None:
-            fileobj.write("ycent %s\n" %
-                          " ".join(("%e" % v for v in self.ycent)) )
-        elif self.yedge is not None:
-            fileobj.write("yedge %s\n" %
-                          " ".join(("%e" % v for v in self.yedge)) )
-        else:
-            fileobj.write("yrange %e %e\n" % tuple(self.yrange))
-
-        fileobj.write(self.datasetAsText(fmt='%e', join=' '))
-        fileobj.write("''')\n")
-
     def datasetAsText(self, fmt='%g', join='\t'):
         """Return dataset as text.
         fmt is the format specifier to use
@@ -524,6 +433,118 @@ class Dataset2D(DatasetBase):
                           xedge=self.xedge, yedge=self.yedge,
                           xcent=self.xcent, ycent=self.ycent )
 
+class Dataset2D(Dataset2DBase):
+    '''Represents a two-dimensional dataset.'''
+
+    editable = True
+
+    def __init__(self, data, xrange=None, yrange=None,
+                 xedge=None, yedge=None,
+                 xcent=None, ycent=None):
+        '''Create a two dimensional dataset based on data.
+
+        data: 2d numpy of imaging data
+
+        Range specfied by:
+         xrange: a tuple of (start, end) coordinates for x
+         yrange: a tuple of (start, end) coordinates for y
+        _or_
+         xedge: list of values start..end (npix+1 values)
+         yedge: list of values start..end (npix+1 values)
+        _or_
+         xcent: list of values (npix values)
+         ycent: list of values (npix values)
+        '''
+
+        Dataset2DBase.__init__(self)
+
+        self.data = convertNumpy(data, dims=2)
+
+        # try to regularise data if possible
+        # by converting regular grids to ranges
+        if xedge is not None and regularGrid(xedge):
+            xrange = (xedge[0], xedge[-1])
+            xedge = None
+        if yedge is not None and regularGrid(yedge):
+            yrange = (yedge[0], yedge[-1])
+            yedge = None
+        if xcent is not None and regularGrid(xcent):
+            delta = 0.5*(xcent[1]-xcent[0])
+            xrange = (xcent[0]-delta, xcent[-1]+delta)
+            xcent = None
+        if ycent is not None and regularGrid(ycent):
+            delta = 0.5*(ycent[1]-ycent[0])
+            yrange = (ycent[0]-delta, ycent[-1]+delta)
+            ycent = None
+
+        self.xrange = self.yrange = None
+        self.xedge = self.yedge = self.xcent = self.ycent = None
+
+        if xrange is not None:
+            self.xrange = tuple(xrange)
+        elif xedge is not None:
+            self.xedge = N.array(xedge)
+        elif xcent is not None:
+            self.xcent = N.array(xcent)
+        elif self.data is not None:
+            self.xrange = (0, self.data.shape[1])
+        else:
+            self.xrange = (0., 1.)
+
+        if yrange is not None:
+            self.yrange = tuple(yrange)
+        elif yedge is not None:
+            self.yedge = N.array(yedge)
+        elif ycent is not None:
+            self.ycent = N.array(ycent)
+        elif self.data is not None:
+            self.yrange = (0, self.data.shape[0])
+        else:
+            self.yrange = (0., 1.)
+
+    def saveDataDumpToText(self, fileobj, name):
+        """Write the 2d dataset to the file given."""
+
+        fileobj.write("ImportString2D(%s, '''\n" % crepr(name))
+        if self.xcent is not None:
+            fileobj.write("xcent %s\n" %
+                          " ".join(("%e" % v for v in self.xcent)) )
+        elif self.xedge is not None:
+            fileobj.write("xedge %s\n" %
+                          " ".join(("%e" % v for v in self.xedge)) )
+        else:
+            fileobj.write("xrange %e %e\n" % tuple(self.xrange))
+
+        if self.ycent is not None:
+            fileobj.write("ycent %s\n" %
+                          " ".join(("%e" % v for v in self.ycent)) )
+        elif self.yedge is not None:
+            fileobj.write("yedge %s\n" %
+                          " ".join(("%e" % v for v in self.yedge)) )
+        else:
+            fileobj.write("yrange %e %e\n" % tuple(self.yrange))
+
+        fileobj.write(self.datasetAsText(fmt='%e', join=' '))
+        fileobj.write("''')\n")
+
+    def saveDataDumpToHDF5(self, group, name):
+        """Save 2D data in hdf5 file."""
+
+        tdgrp = group.create_group(name)
+        tdgrp.attrs['vsz_datatype'] = '2d'
+
+        for v in ('data', 'xcent', 'xedge', 'ycent',
+                  'yedge', 'xrange', 'yrange'):
+            if getattr(self, v) is not None:
+                tdgrp[v] = getattr(self, v)
+
+                # map attributes for importing
+                if v != 'data':
+                    tdgrp['data'].attrs['vsz_' + v] = tdgrp[v].ref
+
+        # unicode text not stored properly unless encoded
+        tdgrp['data'].attrs['vsz_name'] = name.encode('utf-8')
+
 def dsPreviewHelper(d):
     """Get preview of numpy data d."""
     if d.shape[0] <= 6:
@@ -543,8 +564,8 @@ def dsPreviewHelper(d):
         return line1
     return line1 + '\n' + line2
 
-class Dataset(DatasetBase):
-    '''Represents a dataset.'''
+class Dataset1DBase(DatasetBase):
+    """Base for 1D datasets."""
 
     # number of dimensions the dataset holds
     dimensions = 1
@@ -553,43 +574,7 @@ class Dataset(DatasetBase):
                            _('Pos. errors') )
     dstype = _('1D')
 
-    # the dataset is recreated if its data changes
-    isstable = True
-
-    def __init__(self, data = None, serr = None, nerr = None, perr = None,
-                 linked = None):
-        '''Initialise dataset with the sets of values given.
-
-        The values can be given as numpy 1d arrays or lists of numbers
-        linked optionally specifies a LinkedFile to link the dataset to
-        '''
-        
-        DatasetBase.__init__(self, linked=linked)
-
-        # convert data to numpy arrays
-        data = convertNumpy(data)
-        serr = convertNumpyAbs(serr)
-        perr = convertNumpyAbs(perr)
-        nerr = convertNumpyNegAbs(nerr)
-
-        # check the sizes of things match up
-        s = data.shape
-        for x in (serr, nerr, perr):
-            if x is not None and x.shape != s:
-                raise DatasetException('Lengths of error data do not match data')
-
-        # finally assign data
-        self._invalidpoints = None
-
-        try:
-            if not hasattr(self, 'data'):
-                self.data = data
-                self.serr = serr
-                self.perr = perr
-                self.nerr = nerr
-        except AttributeError:
-            # we don't want these set if a inheriting class uses properties instead
-            pass
+    # subclasses must define .data, .serr, .perr, .nerr
 
     def userSize(self):
         """Size of dataset."""
@@ -617,16 +602,13 @@ class Dataset(DatasetBase):
 
     def invalidDataPoints(self):
         """Return a numpy bool detailing which datapoints are invalid."""
-        if self._invalidpoints is None:
-            # recalculate valid points
-            self._invalidpoints = N.logical_not(N.isfinite(self.data))
-            for error in self.serr, self.perr, self.nerr:
-                if error is not None:
-                    self._invalidpoints = N.logical_or(self._invalidpoints,
-                                                       N.logical_not(N.isfinite(error)))
 
-        return self._invalidpoints
-    
+        valid = N.isfinite(self.data)
+        for error in self.serr, self.perr, self.nerr:
+            if error is not None:
+                valid = N.logical_and(valid, N.isfinite(error))
+        return N.logical_not(valid)
+
     def hasErrors(self):
         '''Whether errors on dataset'''
         return (self.serr is not None or self.nerr is not None or
@@ -664,46 +646,6 @@ class Dataset(DatasetBase):
         '''Is the data defined?'''
         return self.data is None or len(self.data) == 0
 
-    def changeValues(self, thetype, vals):
-        """Change the requested part of the dataset to vals.
-
-        thetype == data | serr | perr | nerr
-        """
-        self._invalidpoints = None
-        if thetype in self.columns:
-            setattr(self, thetype, vals)
-        else:
-            raise ValueError('thetype does not contain an allowed value')
-
-        # just a check...
-        s = self.data.shape
-        for x in (self.serr, self.nerr, self.perr):
-            assert x is None or x.shape == s
-
-        # tell the document that we've changed
-        self.document.modifiedData(self)
-
-    def saveToFile(self, fileobj, name):
-        '''Save data to file.
-        '''
-
-        # return if there is a link
-        if self.linked is not None:
-            return
-
-        # build up descriptor
-        descriptor = datasetNameToDescriptorName(name) + '(numeric)'
-        if self.serr is not None:
-            descriptor += ',+-'
-        if self.perr is not None:
-            descriptor += ',+'
-        if self.nerr is not None:
-            descriptor += ',-'
-
-        fileobj.write( "ImportString(%s,'''\n" % crepr(descriptor) )
-        fileobj.write( self.datasetAsText(fmt='%e', join=' ') )
-        fileobj.write( "''')\n" )
-
     def datasetAsText(self, fmt='%g', join='\t'):
         """Return data as text."""
 
@@ -722,6 +664,89 @@ class Dataset(DatasetBase):
             lines.append( format % line )
         return ''.join(lines)
 
+    def returnCopy(self):
+        """Return version of dataset with no linking."""
+        return Dataset(data = _copyOrNone(self.data),
+                       serr = _copyOrNone(self.serr),
+                       perr = _copyOrNone(self.perr),
+                       nerr = _copyOrNone(self.nerr))
+
+class Dataset(Dataset1DBase):
+    '''Represents a dataset.'''
+
+    editable = True
+
+    def __init__(self, data = None, serr = None, nerr = None, perr = None,
+                 linked = None):
+        '''Initialise dataset with the sets of values given.
+
+        The values can be given as numpy 1d arrays or lists of numbers
+        linked optionally specifies a LinkedFile to link the dataset to
+        '''
+
+        Dataset1DBase.__init__(self, linked=linked)
+
+        # convert data to numpy arrays
+        self.data = convertNumpy(data)
+        self.serr = convertNumpyAbs(serr)
+        self.perr = convertNumpyAbs(perr)
+        self.nerr = convertNumpyNegAbs(nerr)
+
+        # check the sizes of things match up
+        s = self.data.shape
+        for x in self.serr, self.nerr, self.perr:
+            if x is not None and x.shape != s:
+                raise DatasetException('Lengths of error data do not match data')
+
+    def changeValues(self, thetype, vals):
+        """Change the requested part of the dataset to vals.
+
+        thetype == data | serr | perr | nerr
+        """
+        if thetype in self.columns:
+            setattr(self, thetype, vals)
+        else:
+            raise ValueError('thetype does not contain an allowed value')
+
+        # just a check...
+        s = self.data.shape
+        for x in (self.serr, self.nerr, self.perr):
+            assert x is None or x.shape == s
+
+        # tell the document that we've changed
+        self.document.modifiedData(self)
+
+    def saveDataDumpToText(self, fileobj, name):
+        '''Save data to file.
+        '''
+
+        # build up descriptor
+        descriptor = datasetNameToDescriptorName(name) + '(numeric)'
+        if self.serr is not None:
+            descriptor += ',+-'
+        if self.perr is not None:
+            descriptor += ',+'
+        if self.nerr is not None:
+            descriptor += ',-'
+
+        fileobj.write( "ImportString(%s,'''\n" % crepr(descriptor) )
+        fileobj.write( self.datasetAsText(fmt='%e', join=' ') )
+        fileobj.write( "''')\n" )
+
+    def saveDataDumpToHDF5(self, group, name):
+        """Save dataset to HDF5."""
+
+        # store as a group to simplify things
+        odgrp = group.create_group(name)
+        odgrp.attrs['vsz_datatype'] = '1d'
+
+        for key, suffix in (
+                ('data', ''), ('serr', ' (+-)'),
+                ('perr', ' (+)'), ('nerr', ' (-)')):
+            if getattr(self, key) is not None:
+                odgrp[key] = getattr(self, key)
+                odgrp[key].attrs['vsz_name'] = (name + suffix).encode('utf-8')
+
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.
         Returns deleted rows as a dict of {column:data, ...}
@@ -732,7 +757,7 @@ class Dataset(DatasetBase):
             if coldata is not None:
                 retn[col] = coldata[row:row+numrows]
                 setattr(self, col, N.delete( coldata, N.s_[row:row+numrows] ))
-        
+
         self.document.modifiedData(self)
         return retn
 
@@ -751,22 +776,16 @@ class Dataset(DatasetBase):
 
         self.document.modifiedData(self)
 
-    def returnCopy(self):
-        """Return version of dataset with no linking."""
-        return Dataset(data = _copyOrNone(self.data),
-                       serr = _copyOrNone(self.serr),
-                       perr = _copyOrNone(self.perr),
-                       nerr = _copyOrNone(self.nerr))
-
 class DatasetDateTime(Dataset):
     """Dataset holding dates and times."""
 
     columns = ('data',)
     column_descriptions = (_('Data'),)
-    isstable = True
 
     dstype = _('Date')
     displaytype = 'date'
+
+    editable = True
 
     def __init__(self, data=None, linked=None):
         Dataset.__init__(self, data=data, linked=linked)
@@ -794,18 +813,22 @@ class DatasetDateTime(Dataset):
         """Return val converted to data."""
         return utils.dateFloatToString(val)
 
-    def saveToFile(self, fileobj, name):
+    def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
-
-        if self.linked is not None:
-            # do not save if linked to a file
-            return
-
         descriptor = datasetNameToDescriptorName(name) + '(date)'
         fileobj.write( "ImportString(%s,'''\n" % crepr(descriptor) )
         fileobj.write( self.datasetAsText() )
         fileobj.write( "''')\n" )
+
+    def saveDataDumpToHDF5(self, group, name):
+        """Save date data to hdf5 file."""
+        dgrp = group.create_group(name)
+        dgrp.attrs['vsz_datatype'] = 'date'
+        dgrp['data'] = self.data
+        data = dgrp['data']
+        data.attrs['vsz_convert_datetime'] = 1
+        data.attrs['vsz_name'] = name.encode('utf-8')
 
     def datasetAsText(self, fmt=None, join=None):
         """Return data as text."""
@@ -825,7 +848,7 @@ class DatasetText(DatasetBase):
     columns = ('data',)
     column_descriptions = (_('Data'),)
     dstype = _('Text')
-    isstable = True
+    editable = True
 
     def __init__(self, data=None, linked=None):
         """Initialise dataset with data given. Data are a list of strings."""
@@ -850,7 +873,7 @@ class DatasetText(DatasetBase):
             raise ValueError('type does not contain an allowed value')
 
         self.document.modifiedData(self)
-    
+
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
         return cstr(val)
@@ -859,21 +882,22 @@ class DatasetText(DatasetBase):
         """Return val converted to data."""
         return val
 
-    def saveToFile(self, fileobj, name):
+    def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
-
-        # don't save if a link
-        if self.linked is not None:
-            return
-
-        descriptor = datasetNameToDescriptorName(name) + '(text)'
-        fileobj.write( "ImportString(%s, ur'''\n" % crepr(descriptor) )
+        fileobj.write("SetDataText(%s, [\n" % repr(name))
         for line in self.data:
-            # need to "escape" ''' marks in text
-            r = repr(line).replace("'''", "''' \"'''\" r'''") + '\n'
-            fileobj.write(r)
-        fileobj.write( "''')\n" )
+            fileobj.write("    %s,\n" % crepr(line))
+        fileobj.write("])\n")
+
+    def saveDataDumpToHDF5(self, group, name):
+        """Save text data to hdf5 file."""
+        tgrp = group.create_group(name)
+        tgrp.attrs['vsz_datatype'] = 'text'
+        # make sure data are encoded
+        encdata = [x.encode('utf-8') for x in self.data]
+        tgrp['data'] = encdata
+        tgrp['data'].attrs['vsz_name'] = name.encode('utf-8')
 
     def datasetAsText(self, fmt=None, join=None):
         """Return data as text."""
@@ -887,7 +911,7 @@ class DatasetText(DatasetBase):
         """
         retn = {'data': self.data[row:row+numrows]}
         del self.data[row:row+numrows]
-        
+
         self.document.modifiedData(self)
         return retn
 
@@ -1100,7 +1124,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
 
     return None
 
-class DatasetExpression(Dataset):
+class DatasetExpression(Dataset1DBase):
     """A dataset which is linked to another dataset by an expression."""
 
     dstype = _('Expression')
@@ -1112,7 +1136,7 @@ class DatasetExpression(Dataset):
         parametric is option and can be (minval, maxval, steps) or None
         """
 
-        Dataset.__init__(self, data=[])
+        Dataset1DBase.__init__(self)
 
         # store the expressions to use to generate the dataset
         self.expr = {}
@@ -1125,13 +1149,9 @@ class DatasetExpression(Dataset):
         self.docchangeset = -1
         self.evaluated = {}
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
-        
+
         dsname is the name of the dataset
         dspart is the part to get (e.g. data, serr)
         """
@@ -1237,7 +1257,7 @@ class DatasetExpression(Dataset):
     perr = property(lambda self: self._propValues('perr'))
     nerr = property(lambda self: self._propValues('nerr'))
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         '''Save data to file.
         '''
 
@@ -1264,12 +1284,6 @@ class DatasetExpression(Dataset):
         """
         return Dataset(**self._getItemHelper(key))
 
-    def deleteRows(self, row, numrows):
-        pass
-
-    def insertRows(self, row, numrows, rowdata):
-        pass
-
     def canUnlink(self):
         """Whether dataset can be unlinked."""
         return True
@@ -1291,11 +1305,10 @@ class DatasetExpression(Dataset):
 
         return '\n'.join(text)
 
-class DatasetRange(Dataset):
+class DatasetRange(Dataset1DBase):
     """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
 
     dstype = _('Range')
-    isstable = True
 
     def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
         """Construct dataset.
@@ -1303,7 +1316,7 @@ class DatasetRange(Dataset):
         numsteps: number of steps in range
         data, serr, perr and nerr are tuples containing (start, stop) values."""
 
-        Dataset.__init__(self, data=[])
+        Dataset1DBase.__init__(self)
 
         self.range_data = data
         self.range_serr = serr
@@ -1324,10 +1337,6 @@ class DatasetRange(Dataset):
                 vals = None
             setattr(self, name, vals)
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
@@ -1340,7 +1349,7 @@ class DatasetRange(Dataset):
         """Size of dataset."""
         return str( self.numsteps )
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         """Save dataset to file."""
 
         parts = [crepr(name), crepr(self.numsteps), crepr(self.range_data)]
@@ -1371,7 +1380,7 @@ class DatasetRange(Dataset):
 def getSpacing(data):
     """Given a set of values, get minimum, maximum, step size
     and number of steps.
-    
+
     Function allows that values may be missing
 
     Function assumes that at least one of the steps is the minimum step size
@@ -1401,7 +1410,7 @@ def getSpacing(data):
     return (uniquesorted[0], uniquesorted[-1], mindelta,
             int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
 
-class Dataset2DXYZExpression(Dataset2D):
+class Dataset2DXYZExpression(Dataset2DBase):
     '''A 2d dataset with expressions for x, y and z.'''
 
     dstype = _('2D XYZ')
@@ -1410,30 +1419,29 @@ class Dataset2DXYZExpression(Dataset2D):
         """Initialise dataset.
 
         Parameters are mathematical expressions based on datasets."""
-        Dataset2D.__init__(self, None)
+        Dataset2DBase.__init__(self)
 
         self.lastchangeset = -1
         self.cacheddata = None
+        self.xedge = self.yedge = self.xcent = self.ycent = None
 
         # copy parameters
         self.exprx = exprx
         self.expry = expry
         self.exprz = exprz
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
-        
+
         dsname is the name of the dataset
         dspart is the part to get (e.g. data, serr)
         """
         return _evaluateDataset(self.document.data, dsname, dspart)
-                    
+
     def evalDataset(self):
         """Return the evaluated dataset."""
+
+        # FIXME: handle irregular grids
         # return cached data if document unchanged
         if self.document.changeset == self.lastchangeset:
             return self.cacheddata
@@ -1469,7 +1477,7 @@ class Dataset2DXYZExpression(Dataset2D):
         # update cached x and y ranges
         self._xrange = (minx-stepx*0.5, maxx+stepx*0.5)
         self._yrange = (miny-stepy*0.5, maxy+stepy*0.5)
-        
+
         self.cacheddata = N.empty( (stepsy, stepsx) )
         self.cacheddata[:,:] = N.nan
         xpts = ((1./stepx)*(evaluated['exprx']-minx)).astype('int32')
@@ -1517,7 +1525,7 @@ class Dataset2DXYZExpression(Dataset2D):
         text += ', x=%g->%g' % tuple(self.xrange)
         text += ', y=%g->%g' % tuple(self.yrange)
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         '''Save expressions to file.
         '''
 
@@ -1534,7 +1542,7 @@ class Dataset2DXYZExpression(Dataset2D):
         return _('Linked 2D function: x=%s, y=%s, z=%s') % (
             self.exprx, self.expry, self.exprz)
 
-class Dataset2DExpression(Dataset2D):
+class Dataset2DExpression(Dataset2DBase):
     """Evaluate an expression of 2d datasets."""
 
     dstype = _('2D Expr')
@@ -1542,15 +1550,11 @@ class Dataset2DExpression(Dataset2D):
     def __init__(self, expr):
         """Create 2d expression dataset."""
 
-        Dataset2D.__init__(self, None)
+        Dataset2DBase.__init__(self)
 
         self.expr = expr
         self.lastchangeset = -1
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-        
     @property
     def data(self):
         """Return data, or empty array if error."""
@@ -1597,7 +1601,7 @@ class Dataset2DExpression(Dataset2D):
         """Do actual evaluation."""
         return self.document.evalDatasetExpression(self.expr, dimensions=2)
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         '''Save expression to file.'''
         s = 'SetData2DExpression(%s, %s, linked=True)\n' % (
             crepr(name), crepr(self.expr) )
@@ -1611,7 +1615,7 @@ class Dataset2DExpression(Dataset2D):
         """Return linking information."""
         return _('Linked 2D expression: %s') % self.expr
 
-class Dataset2DXYFunc(Dataset2D):
+class Dataset2DXYFunc(Dataset2DBase):
     """Given a range of x and y, this is a dataset which is a function of
     this.
     """
@@ -1626,23 +1630,20 @@ class Dataset2DXYFunc(Dataset2D):
         expr: expression of x and y
         """
 
-        Dataset2D.__init__(self, None)
+        Dataset2DBase.__init__(self)
 
         self.xstep = xstep
         self.ystep = ystep
         self.expr = expr
 
-        self._xrange = (self.xstep[0] - self.xstep[2]*0.5,
-                        self.xstep[1] + self.xstep[2]*0.5)
-        self._yrange = (self.ystep[0] - self.ystep[2]*0.5,
-                        self.ystep[1] + self.ystep[2]*0.5)
+        self.xrange = (self.xstep[0] - self.xstep[2]*0.5,
+                       self.xstep[1] + self.xstep[2]*0.5)
+        self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
+                       self.ystep[1] + self.ystep[2]*0.5)
+        self.xedge = self.yedge = self.xcent = self.ycent = None
 
         self.cacheddata = None
         self.lastchangeset = -1
-
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
 
     @property
     def data(self):
@@ -1685,7 +1686,7 @@ class Dataset2DXYFunc(Dataset2D):
         self.lastchangeset = self.document.changeset
         return data
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         '''Save expressions to file.
         '''
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
@@ -1740,7 +1741,7 @@ class _DatasetPlugin(object):
     def insertRows(self, row, numrows, rowdata):
         pass
 
-    def saveToFile(self, fileobj, name):
+    def saveDataRelationToText(self, fileobj, name):
         """Save plugin to file, if this is the first one."""
 
         # only try to save if this is the 1st dataset of this plugin
@@ -1754,21 +1755,23 @@ class _DatasetPlugin(object):
                     self.pluginmanager.saveToFile(fileobj)
                 return
 
+    def saveDataDumpToText(self, fileobj, name):
+        """Save data to text: not used."""
+
+    def saveDataDumpToHDF5(self, group, name):
+        """Save data to HDF5: not used."""
+
     @property
     def dstype(self):
         """Return type of plugin."""
         return self.pluginmanager.plugin.name
 
-class Dataset1DPlugin(_DatasetPlugin, Dataset):
+class Dataset1DPlugin(_DatasetPlugin, Dataset1DBase):
     """Return 1D dataset from a plugin."""
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
-        Dataset.__init__(self, data=[])
-
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
+        Dataset1DBase.__init__(self)
 
     def userSize(self):
         """Size of dataset."""
@@ -1792,16 +1795,12 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset):
     perr = property( lambda self: self.getPluginData('perr'),
                      lambda self, val: None )
 
-class Dataset2DPlugin(_DatasetPlugin, Dataset2D):
+class Dataset2DPlugin(_DatasetPlugin, Dataset2DBase):
     """Return 2D dataset from a plugin."""
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
-        Dataset2D.__init__(self, None)
-
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
+        Dataset2DBase.__init__(self)
 
     def __getitem__(self, key):
         return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange,
@@ -1830,10 +1829,6 @@ class DatasetTextPlugin(_DatasetPlugin, DatasetText):
         _DatasetPlugin.__init__(self, manager, ds)
         DatasetText.__init__(self, [])
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-
     def __getitem__(self, key):
         return DatasetText(self.data[key])
 
@@ -1846,10 +1841,6 @@ class DatasetDateTimePlugin(_DatasetPlugin, DatasetDateTime):
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         DatasetDateTime.__init__(self, [])
-
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
 
     def __getitem__(self, key):
         return DatasetDateTime(self.data[key])

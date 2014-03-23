@@ -19,14 +19,19 @@
 
 """Implements the main window of the application."""
 
-from __future__ import division
+from __future__ import division, print_function
 import os.path
 import sys
 import traceback
 import glob
-import io
+import re
 
-from ..compat import citems, ckeys, cstr, cexec, cstrerror
+try:
+    import h5py
+except ImportError:
+    h5py = None
+
+from ..compat import citems, ckeys, cstr, cstrerror
 from .. import qtall as qt4
 
 from .. import document
@@ -84,6 +89,11 @@ class DBusWinInterface(vzdbus.Object):
 
 class MainWindow(qt4.QMainWindow):
     """ The main window class for the application."""
+
+    # this is emitted when a dialog is opened by the main window
+    dialogShown = qt4.pyqtSignal(qt4.QWidget)
+    # emitted when a document is opened
+    documentOpened = qt4.pyqtSignal()
 
     windows = []
     @classmethod
@@ -238,6 +248,9 @@ class MainWindow(qt4.QMainWindow):
         self.dbuswininterface = DBusWinInterface(
             self.vzactions, self.dbusdocinterface.index)
 
+        # has the document already been setup
+        self.documentsetup = False
+
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
         self.statusBar().showMessage(text, 2000)
@@ -276,12 +289,16 @@ class MainWindow(qt4.QMainWindow):
     def setupDefaultDoc(self):
         """Setup default document."""
 
-        # add page and default graph
-        self.document.makeDefaultDoc()
+        if not self.documentsetup:
+            # add page and default graph
+            self.document.makeDefaultDoc()
 
-        # load defaults if set
-        self.loadDefaultStylesheet()
-        self.loadDefaultCustomDefinitions()
+            # load defaults if set
+            self.loadDefaultStylesheet()
+            self.loadDefaultCustomDefinitions()
+
+            # done setup
+            self.documentsetup = True
 
     def loadDefaultStylesheet(self):
         """Loads the default stylesheet for the new document."""
@@ -694,7 +711,7 @@ class MainWindow(qt4.QMainWindow):
         self.connect(dialog, qt4.SIGNAL('dialogFinished'), self.deleteDialog)
         self.dialogs.append(dialog)
         dialog.show()
-        self.emit( qt4.SIGNAL('dialogShown'), dialog )
+        self.dialogShown.emit(dialog)
 
     def deleteDialog(self, dialog):
         """Remove dialog from list of dialogs."""
@@ -883,8 +900,9 @@ class MainWindow(qt4.QMainWindow):
             # show busy cursor
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
             try:
-                ofile = open(self.filename, 'w')
-                self.document.saveToFile(ofile)
+                ext = os.path.splitext(self.filename)[1]
+                mode = 'hdf5' if ext == '.vszh5' else 'vsz'
+                self.document.save(self.filename, mode)
                 self.updateStatusbar(_("Saved to %s") % self.filename)
             except EnvironmentError as e:
                 qt4.QApplication.restoreOverrideCursor()
@@ -909,14 +927,26 @@ class MainWindow(qt4.QMainWindow):
         text = u'•' * self.plotqueuecount
         self.plotqueuelabel.setText(text)
 
-    def _fileSaveDialog(self, filetype, filedescr, dialogtitle):
-        """A generic file save dialog for exporting / saving."""
+    def fileSaveDialog(self, filters, dialogtitle):
+        """A generic file save dialog for exporting / saving.
+
+        filters: list of filters
+        """
 
         fd = qt4.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
-        fd.setFileMode( qt4.QFileDialog.AnyFile )
-        fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
-        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
+        fd.setFileMode(qt4.QFileDialog.AnyFile)
+        fd.setAcceptMode(qt4.QFileDialog.AcceptSave)
+        fd.setNameFilters(filters)
+
+        # selected filetype is saved under a key constructed here
+        filetype_re = re.compile(r'.*\(\*\.([a-z0-9]+)\)')
+        filtertypes = [filetype_re.match(f).group(1) for f in filters]
+        filterkey = '_'.join(['filterdefault'] + filtertypes)
+        if filterkey in setting.settingdb:
+            filter = setting.settingdb[filterkey]
+            if filter in filters:
+                fd.selectNameFilter(filter)
 
         # okay was selected (and is okay to overwrite if it exists)
         if fd.exec_() == qt4.QDialog.Accepted:
@@ -924,20 +954,25 @@ class MainWindow(qt4.QMainWindow):
             self.dirname = fd.directory().absolutePath()
             # update the edit box
             filename = fd.selectedFiles()[0]
-            if os.path.splitext(filename)[1] == '':
+            filetype = filetype_re.match(fd.selectedNameFilter()).group(1)
+            if os.path.splitext(filename)[1][1:] != filetype:
                 filename += '.' + filetype
-
+            setting.settingdb[filterkey] = fd.selectedNameFilter()
             return filename
+
         return None
 
-    def _fileOpenDialog(self, filetype, filedescr, dialogtitle):
-        """Display an open dialog and return a filename."""
+    def fileOpenDialog(self, filters, dialogtitle):
+        """Display an open dialog and return a filename.
+
+        filters: list of filters in format "Filetype (*.vsz)"
+        """
 
         fd = qt4.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
         fd.setFileMode( qt4.QFileDialog.ExistingFile )
         fd.setAcceptMode( qt4.QFileDialog.AcceptOpen )
-        fd.setFilter( "%s (*.%s)" % (filedescr, filetype) )
+        fd.setNameFilters(filters)
 
         # if the user chooses a file
         if fd.exec_() == qt4.QDialog.Accepted:
@@ -946,7 +981,8 @@ class MainWindow(qt4.QMainWindow):
 
             filename = fd.selectedFiles()[0]
             try:
-                open(filename)
+                with open(filename) as f:
+                    pass
             except EnvironmentError as e:
                 qt4.QMessageBox.critical(
                     self, _("Error - Veusz"),
@@ -959,7 +995,10 @@ class MainWindow(qt4.QMainWindow):
     def slotFileSaveAs(self):
         """Save As file."""
 
-        filename = self._fileSaveDialog('vsz', _('Veusz script files'), _('Save as'))
+        filters = [_('Veusz document files (*.vsz)')]
+        if h5py is not None:
+            filters += [_('Veusz HDF5 document files (*.vszh5)')]
+        filename = self.fileSaveDialog(filters, _('Save as'))
         if filename:
             self.filename = filename
             self.updateTitlebar()
@@ -978,144 +1017,83 @@ class MainWindow(qt4.QMainWindow):
             # create a new window
             self.CreateWindow(filename)
 
-    class _unsafeCmdMsgBox(qt4.QMessageBox):
-        """Show document is unsafe."""
-        def __init__(self, window, filename):
-            qt4.QMessageBox.__init__(self, _("Unsafe code in document"),
-                                     _("The document '%s' contains potentially "
-                                       "unsafe code which may damage your "
-                                       "computer or data. Please check that the "
-                                       "file comes from a "
-                                       "trusted source.") % filename,
-                                     qt4.QMessageBox.Warning,
-                                     qt4.QMessageBox.Yes,
-                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
-                                     qt4.QMessageBox.NoButton,
-                                     window)
-            self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
-            self.setButtonText(qt4.QMessageBox.No, _("&Stop loading"))
-
-    class _unsafeVeuszCmdMsgBox(qt4.QMessageBox):
-        """Show document has unsafe Veusz commands."""
-        def __init__(self, window):
-            qt4.QMessageBox.__init__(self, _('Unsafe Veusz commands'),
-                                     _('This Veusz document contains potentially'
-                                       ' unsafe Veusz commands for Saving, '
-                                       'Exporting or Printing. Please check that the'
-                                       ' file comes from a trusted source.'),
-                                     qt4.QMessageBox.Warning,
-                                     qt4.QMessageBox.Yes,
-                                     qt4.QMessageBox.No | qt4.QMessageBox.Default,
-                                     qt4.QMessageBox.NoButton,
-                                     window)
-            self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
-            self.setButtonText(qt4.QMessageBox.No, _("&Ignore command"))
-
-    def openFileInWindow(self, filename):
-        """Actually do the work of loading a new document.
+    def loadDocument(self, filename):
+        """Load a Veusz document.
+        Return True if loaded ok
         """
 
-        # FIXME: This function suffers from spaghetti code
-        # it needs splitting up into bits to make it clearer
-        # the steps are fairly well documented below, however
-        #####################################################
+        class _unsafeCmdMsgBox(qt4.QMessageBox):
+            """Show document is unsafe."""
+            def __init__(self, window):
+                qt4.QMessageBox.__init__(
+                    self, _("Unsafe code in document"),
+                    _("The document '%s' contains potentially unsafe code "
+                      "which may damage your computer or data. Please check "
+                      "that the file comes from a trusted source.") % filename,
+                    qt4.QMessageBox.Warning,
+                    qt4.QMessageBox.Yes,
+                    qt4.QMessageBox.No | qt4.QMessageBox.Default,
+                    qt4.QMessageBox.NoButton,
+                    window)
+                self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
+                self.setButtonText(qt4.QMessageBox.No, _("&Stop loading"))
 
-        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
-        # read script
-        try:
-            script = io.open(filename, 'rU', encoding='utf8').read()
-        except EnvironmentError as e:
+        def _callbackunsafe():
             qt4.QApplication.restoreOverrideCursor()
-            qt4.QMessageBox.critical(
-                self, _("Error - Veusz"),
-                _("Cannot open document '%s'\n\n%s") %
-                (filename, cstrerror(e)))
-            self.setupDefaultDoc()
-            return
-
-        def errordialog(e):
-            # display error dialog if there is an error loading
-            qt4.QApplication.restoreOverrideCursor()
-            i = sys.exc_info()
-            backtrace = traceback.format_exception( *i )
-            d = ErrorLoadingDialog(self, filename, str(e), ''.join(backtrace))
-            d.exec_()
-
-        # compile script and check for security (if reqd)
-        unsafe = setting.transient_settings['unsafe_mode']
-        while True:
-            try:
-                compiled = utils.compileChecked(script, mode='exec', filename=filename,
-                                                ignoresecurity=unsafe)
-                break
-            except utils.SafeEvalException:
-                # ask the user whether to execute in unsafe mode
-                qt4.QApplication.restoreOverrideCursor()
-                if ( self._unsafeCmdMsgBox(self, filename).exec_() ==
-                     qt4.QMessageBox.No ):
-                    return
-                unsafe = True
-            except Exception as e:
-                errordialog(e)
-                return
-
-        # set up environment to run script
-        env = self.document.eval_context.copy()
-        interface = document.CommandInterface(self.document)
-
-        # allow safe commands as-is
-        for cmd in interface.safe_commands:
-            env[cmd] = getattr(interface, cmd)
-
-        # define root node
-        env['Root'] = interface.Root
-
-        # wrap "unsafe" commands with a message box to check the user
-        safenow = [unsafe]
-        def _unsafeCaller(func):
-            def wrapped(*args, **argsk):
-                if not safenow[0]:
-                    qt4.QApplication.restoreOverrideCursor()
-                    if ( self._unsafeVeuszCmdMsgBox(self).exec_() ==
-                         qt4.QMessageBox.No ):
-                        return
-                safenow[0] = True
-                func(*args, **argsk)
-            return wrapped
-        for name in interface.unsafe_commands:
-            env[name] = _unsafeCaller(getattr(interface, name))
+            v = _unsafeCmdMsgBox(self).exec_()
+            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+            return v == qt4.QMessageBox.Yes
 
         # save stdout and stderr, then redirect to console
         stdout, stderr = sys.stdout, sys.stderr
         sys.stdout = self.console.con_stdout
         sys.stderr = self.console.con_stderr
 
-        # get ready to load document
-        env['__file__'] = os.path.abspath(filename)
-        self.document.wipe()
-        self.document.suspendUpdates()
-
-        # allow import to happen relative to loaded file
-        interface.AddImportPath( os.path.dirname(os.path.abspath(filename)) )
+        qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
 
         try:
-            # actually run script text
-            cexec(compiled, env)
-        except Exception as e:
-            # need to remember to restore stdout, stderr
-            sys.stdout, sys.stderr = stdout, stderr
-            self.document.enableUpdates()
-            errordialog(e)
-            return
+            # get loading mode
+            ext = os.path.splitext(filename)[1].lower()
+            if ext in ('.vsz', '.py'):
+                mode = 'vsz'
+            elif ext in ('.h5', '.hdf5', '.he5', '.vszh5'):
+                mode = 'hdf5'
+            else:
+                raise document.LoadError(
+                    _("Did not recognise file type '%s'") % ext)
+
+            # do the actual loading
+            self.document.load(
+                filename,
+                mode=mode,
+                callbackunsafe=_callbackunsafe)
+
+        except document.LoadError as e:
+            qt4.QApplication.restoreOverrideCursor()
+            if e.backtrace:
+                d = ErrorLoadingDialog(self, filename, cstr(e), e.backtrace)
+                d.exec_()
+            else:
+                qt4.QMessageBox.critical(
+                    self, _("Error opening %s - Veusz") % filename,
+                    cstr(e))
+            return False
+
+        qt4.QApplication.restoreOverrideCursor()
 
         # need to remember to restore stdout, stderr
         sys.stdout, sys.stderr = stdout, stderr
 
-        # document is loaded
-        self.document.enableUpdates()
-        self.document.setModified(False)
-        self.document.clearHistory()
+        self.documentsetup = True
+        return True
+
+    def openFileInWindow(self, filename):
+        """Actually do the work of loading a new document.
+        """
+
+        ok = self.loadDocument(filename)
+        if not ok:
+            return
 
         # remember file for recent list
         self.addRecentFile(filename)
@@ -1131,8 +1109,7 @@ class MainWindow(qt4.QMainWindow):
             self.dirname_export = self.dirname
 
         # notify cmpts which need notification that doc has finished opening
-        self.emit(qt4.SIGNAL("documentopened"))
-        qt4.QApplication.restoreOverrideCursor()
+        self.documentOpened.emit()
 
     def addRecentFile(self, filename):
         """Add a file to the recent files list."""
@@ -1149,7 +1126,13 @@ class MainWindow(qt4.QMainWindow):
     def slotFileOpen(self):
         """Open an existing file in a new window."""
 
-        filename = self._fileOpenDialog('vsz', _('Veusz script files'), _('Open'))
+        filters = ['*.vsz']
+        if h5py is not None:
+            filters.append('*.vszh5')
+
+        filename = self.fileOpenDialog(
+            [_('Veusz document files (%s)') % ' '.join(filters)],
+            _('Open'))
         if filename:
             self.openFile(filename)
 

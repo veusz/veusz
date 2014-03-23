@@ -154,7 +154,10 @@ else:
     # convert strerror exception to string
     def cstrerror(ex):
         if isinstance(ex.strerror, str):
-            return ex.strerror.decode(locale.getdefaultlocale()[1])
+            deflocale = locale.getdefaultlocale()[1]
+            if deflocale is None:
+                deflocale = 'ascii'
+            return ex.strerror.decode(deflocale)
         else:
             return ex.strerror
 

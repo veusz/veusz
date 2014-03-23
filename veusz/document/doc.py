@@ -22,6 +22,7 @@
 """A class to represent Veusz documents, with dataset classes."""
 
 from __future__ import division
+import codecs
 import os.path
 import re
 import traceback
@@ -30,7 +31,12 @@ from collections import defaultdict
 
 import numpy as N
 
-from ..compat import crange, citems, cvalues, cstr, cexec
+try:
+    import h5py
+except ImportError:
+    h5py = None
+
+from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO
 from .. import qtall as qt4
 
 from . import widgetfactory
@@ -473,7 +479,16 @@ class Document( qt4.QObject ):
         self.saveCustomDefinitions(fileobj)
 
     def saveToFile(self, fileobj):
-        """Save the text representing a document to a file."""
+        """Save the text representing a document to a file.
+
+        The ordering can be important, as some things override
+        previous steps:
+
+         - Tagging doesn't work if the dataset isn't
+           already defined.
+         - Loading from files may bring in new datasets which
+           override defined datasets, so save links first
+        """
 
         self._writeFileHeader(fileobj, 'saved document')
         
@@ -504,6 +519,86 @@ class Document( qt4.QObject ):
         fileobj.write(self.basewidget.getSaveText())
         
         self.setModified(False)
+
+    def saveToHDF5File(self, fileobj):
+        """Save to HDF5 (h5py) output file given."""
+
+        # groups in output hdf5
+        vszgrp = fileobj.create_group('Veusz')
+        vszgrp.attrs['vsz_version'] = utils.version()
+        vszgrp.attrs['vsz_saved_at'] = datetime.datetime.utcnow().isoformat()
+        vszgrp.attrs['vsz_format'] = 1  # version number (currently unused)
+        datagrp = vszgrp.create_group('Data')
+        docgrp = vszgrp.create_group('Document')
+
+        textstream = CStringIO()
+
+        self._writeFileHeader(textstream, 'saved document')
+
+        # add file directory to import path if we know it
+        reldirname = None
+        if getattr(fileobj, 'filename', False):
+            reldirname = os.path.dirname( os.path.abspath(fileobj.filename) )
+            textstream.write('AddImportPath(%s)\n' % repr(reldirname))
+
+        # add custom definitions
+        self.saveCustomDefinitions(textstream)
+
+        # save those datasets which are linked
+        # we do this first in case the datasets are overridden below
+        savedlinks = {}
+        for name, dataset in sorted(citems(self.data)):
+            dataset.saveLinksToSavedDoc(textstream, savedlinks,
+                                        relpath=reldirname)
+
+        # save the remaining datasets
+        for name, dataset in sorted(citems(self.data)):
+            dataset.saveToFile(textstream, name, mode='hdf5', hdfgroup=datagrp)
+
+        # handle tagging
+        # get a list of all tags and which datasets have them
+        bytag = defaultdict(list)
+        for name, dataset in sorted(citems(self.data)):
+            for t in dataset.tags:
+                bytag[t].append(name)
+
+        # write out tags as datasets
+        tagsgrp = docgrp.create_group('Tags')
+        for tag, datasets in sorted(citems(bytag)):
+            tagsgrp[tag] = [v.encode('utf-8') for v in sorted(datasets)]
+
+        # save the actual tree structure
+        textstream.write(self.basewidget.getSaveText())
+
+        # create single dataset contains document
+        docgrp['document'] = [ textstream.getvalue().encode('utf-8') ]
+
+        self.setModified(False)
+
+    def save(self, filename, mode='vsz'):
+        """Save to output file.
+
+        mode is 'vsz' or 'hdf5'
+        """
+        if mode == 'vsz':
+            with codecs.open(filename, 'w', 'utf-8') as f:
+                self.saveToFile(f)
+        elif mode == 'hdf5':
+            if h5py is None:
+                raise RuntimeError('Missing h5py module')
+            with h5py.File(filename, 'w') as f:
+                self.saveToHDF5File(f)
+        else:
+            raise RuntimeError('Invalid save mode')
+
+    def load(self, filename, mode='vsz', callbackunsafe=None):
+        """Load document from file.
+
+        mode is 'vsz' or 'hdf5'
+        """
+        from . import loader
+        loader.loadDocument(self, filename, mode=mode,
+                            callbackunsafe=callbackunsafe)
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""

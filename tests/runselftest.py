@@ -45,6 +45,12 @@ import os
 import os.path
 import sys
 import subprocess
+import optparse
+
+try:
+    import h5py
+except ImportError:
+    h5py = None
 
 from veusz.compat import cexec, cstr
 import veusz.qtall as qt4
@@ -56,11 +62,6 @@ import veusz.document.svg_export as svg_export
 
 # required to get structures initialised
 import veusz.windows.mainwindow
-
-try:
-    import h5py
-except ImportError:
-    h5py = None
 
 try:
     from astropy.io import fits as pyfits
@@ -119,22 +120,28 @@ class PartTextAscii(_pt):
     def addText(self, text):
         self.text += text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
 
-def renderVszTest(invsz, outfile):
+def renderVszTest(invsz, outfile, test_saves=False):
     """Render vsz document to create outfile."""
 
-    d = document.Document()
-    ifc = document.CommandInterface(d)
+    doc = document.Document()
+    mode = 'hdf5' if os.path.splitext(invsz)[1] == '.vszh5' else 'vsz'
+    doc.load(invsz, mode=mode)
 
-    # this lot looks a bit of a mess
-    cmds = d.eval_context
-    for cmd in document.CommandInterface.safe_commands:
-        cmds[cmd] = getattr(ifc, cmd)
-    for cmd in document.CommandInterface.unsafe_commands:
-        cmds[cmd] = getattr(ifc, cmd)
+    if test_saves and h5py is not None:
+        tempfilename = 'self-test-temporary.vszh5'
+        doc.save(tempfilename, mode='hdf5')
+        doc = document.Document()
+        doc.load(tempfilename, mode='hdf5')
+        os.unlink(tempfilename)
 
-    cexec("from numpy import *", cmds)
-    ifc.AddImportPath( os.path.dirname(invsz) )
-    cexec(compile(open(invsz).read(), invsz, 'exec'), cmds)
+    if test_saves:
+        tempfilename = 'self-test-temporary.vsz'
+        doc.save(tempfilename, mode='vsz')
+        doc = document.Document()
+        doc.load(tempfilename, mode='vsz')
+        os.unlink(tempfilename)
+
+    ifc = document.CommandInterface(doc)
     ifc.Export(outfile)
 
 def renderPyTest(inpy, outfile):
@@ -152,7 +159,8 @@ class Dirs(object):
         self.comparisondir = os.path.join(self.thisdir, 'comparison')
 
         files = ( glob.glob( os.path.join(self.exampledir, '*.vsz') ) +
-                  glob.glob( os.path.join(self.testdir, '*.vsz') ) )
+                  glob.glob( os.path.join(self.testdir, '*.vsz') ) +
+                  glob.glob( os.path.join(self.testdir, '*.vszh5') ) )
 
         self.infiles = [ f for f in files if
                          os.path.basename(f) not in excluded_tests ]
@@ -169,12 +177,12 @@ def renderAllTests():
         print(base)
         outfile = os.path.join(d.comparisondir, base + '.selftest')
         ext = os.path.splitext(base)[1]
-        if ext == '.vsz':
+        if ext == '.vsz' or ext == '.vszh5':
             renderVszTest(infile, outfile)
         elif ext == '.py':
             renderPyTest(infile, outfile)
 
-def runTests():
+def runTests(test_saves=False):
     print("Testing output")
 
     fails = 0
@@ -186,17 +194,19 @@ def runTests():
         base = os.path.basename(infile)
         print(base)
 
+        ext = os.path.splitext(infile)[1]
+
         if ( (base[:5] == 'hdf5_' and h5py is None) or
-             (base[:5] == 'fits_' and pyfits is None) ):
+             (base[:5] == 'fits_' and pyfits is None) or
+             (ext == '.vszh5' and h5py is None) ):
             print(" SKIPPED")
             skipped += 1
             continue
 
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
 
-        ext = os.path.splitext(infile)[1]
-        if ext == '.vsz':
-            renderVszTest(infile, outfile)
+        if ext == '.vsz' or ext == '.vszh5':
+            renderVszTest(infile, outfile, test_saves=test_saves)
         elif ext == '.py':
             if not renderPyTest(infile, outfile):
                 print(" FAIL: did not execute cleanly")
@@ -257,10 +267,14 @@ if __name__ == '__main__':
     svg_export.scale = 1.
     svg_export.fltStr = fltStr
 
-    if len(sys.argv) == 1:
-        runTests()
-    else:
-        if len(sys.argv) != 2 or sys.argv[1] != 'regenerate':
-            print >>sys.stderr, "Usage: %s [regenerate]" % sys.argv[0]
-            sys.exit(1)
+    parser = optparse.OptionParser()
+    parser.add_option("", "--test-saves", action="store_true",
+                      help="tests saving documents and reloading them")
+
+    options, args = parser.parse_args()
+    if len(args) == 0:
+        runTests(test_saves=options.test_saves)
+    elif args == ['regenerate']:
         renderAllTests()
+    else:
+        parser.error("argument must be empty or 'regenerate'")

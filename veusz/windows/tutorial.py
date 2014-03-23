@@ -342,7 +342,7 @@ class DataImport(TutorialStep):
             if k in setting.settingdb:
                 del setting.settingdb[k]
 
-        self.connect(mainwin, qt4.SIGNAL('dialogShown'), self.slotDialogShown )
+        mainwin.dialogShown.connect(self.slotDialogShown)
 
     def slotDialogShown(self, dialog):
         """Called when a dialog is opened in the main window."""

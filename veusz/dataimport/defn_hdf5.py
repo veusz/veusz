@@ -48,9 +48,24 @@ def bconv(s):
 
     Byte string attributes are not converted to normal strings."""
 
-    if cpy3 and isinstance(s, cbytes):
+    if isinstance(s, cbytes):
         return s.decode('utf-8', 'replace')
     return s
+
+def auto_deref_attr(attr, attrs, grp):
+    """Automatic dereference any attributes which are references."""
+    val = attrs[attr]
+    # convert reference to a dataset
+    if isinstance(val, h5py.Reference):
+        # have to find root to dereference reference
+        root = grp
+        while root.name != '/':
+            root = root.parent
+        val = root[val]
+    # convert dataset to an array
+    if isinstance(val, h5py.Dataset):
+        val = N.array(val)
+    return bconv(val)
 
 def filterAttrsByName(attrs, name):
     """For compound datasets, attributes can be given on a per-column basis.
@@ -250,7 +265,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         options = {}
         for a in ckeys(dsattrs):
             if a[:4] == "vsz_":
-                options[a] = bconv(dsattrs[a])
+                options[a] = auto_deref_attr(a, dsattrs, dataset)
 
         # find name for dataset
         if (self.params.namemap is not None and
@@ -416,21 +431,26 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                         data=data[:,0], perr=data[:,1], nerr=data[:,2])
             else:
                 # this really is a 2D dataset
-                # find any ranges
-                rangex = rangey = None
 
+                attrs = {}
+                # find any ranges
                 if "vsz_range" in dread.options:
                     r = dread.options["vsz_range"]
-                    rangex = (r[0], r[2])
-                    rangey = (r[1], r[3])
+                    attrs["xrange"] = (r[0], r[2])
+                    attrs["yrange"] = (r[1], r[3])
+                for attr in ("xrange", "yrange", "xcent", "ycent",
+                             "xedge", "yedge"):
+                    if "vsz_"+attr in dread.options:
+                        attrs[attr] = dread.options.get("vsz_"+attr)
+
                 if ( self.params.twodranges and
                      dread.origname in self.params.twodranges ):
                     r = self.params.twodranges[dread.origname]
-                    rangex = (r[0], r[2])
-                    rangey = (r[1], r[3])
+                    attrs["xrange"] = (r[0], r[2])
+                    attrs["yrange"] = (r[1], r[3])
 
                 # create the object
-                ds = document.Dataset2D(data, xrange=rangex, yrange=rangey)
+                ds = document.Dataset2D(data, **attrs)
 
         return ds
 
@@ -568,9 +588,13 @@ def ImportFileHDF5(comm, filename,
      'vsz_slice': slice on importing (use format "start:stop:step,...")
      'vsz_range': should be 4 item array to specify x and y ranges:
                   [minx, miny, maxx, maxy]
+     'vsz_xrange' / 'vsz_yrange': individual ranges for x and y
+     'vsz_xcent' / 'vsz_ycent': arrays giving the centres of pixels
+     'vsz_xedge' / 'vsz_yedge': arrays giving the edges of pixels
      'vsz_twod_as_oned': treat 2d dataset as 1d dataset with errors
      'vsz_convert_datetime': treat as date/time, set to one of the values
                              above.
+    References to other datasets can be provided in thes attributes.
  
     For compound datasets these attributes can be given on a
     per-column basis using attribute names
