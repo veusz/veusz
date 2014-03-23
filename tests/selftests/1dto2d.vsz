@@ -1,8 +1,6 @@
 # Veusz saved document (version 1.12.99)
 # Saved at 2011-08-16T14:20:29.340311
 
-AddImportPath(u'/data/jss/veusz/code/veusz/tests/selftests')
-
 xv = []
 yv = []
 zv = []
@@ -11,7 +9,7 @@ for x in range(10):
         z = sqrt((x-5.)**2 + (y-5.)**2)
         xv.append(x)
         yv.append(y)
-        zv.append(z)
+        zv.append( round(z, 3) )
 SetData("x", xv)
 SetData("y", yv)
 SetData("z", zv)
