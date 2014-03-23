@@ -886,7 +886,7 @@ class DatasetText(DatasetBase):
         '''
         fileobj.write("SetDataText(%s, [\n" % repr(name))
         for line in self.data:
-            fileobj.write("    %s,\n" % repr(line))
+            fileobj.write("    %s,\n" % crepr(line))
         fileobj.write("])\n")
 
     def saveDataDumpToHDF5(self, group, name):
