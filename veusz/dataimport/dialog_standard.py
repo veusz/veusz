@@ -32,6 +32,8 @@ class ImportTabStandard(importdialog.ImportTab):
     """Standard import format tab."""
 
     resource = 'import_standard.ui'
+    filetypes = ('.dat', '.txt')
+    filefilter = _('Text data')
 
     def loadUi(self):
         """Load widget and setup controls."""
@@ -111,9 +113,5 @@ class ImportTabStandard(importdialog.ImportTab):
         lines += self.dialog.retnDatasetInfo(op.outnames, linked, filename)
 
         self.previewedit.setPlainText( '\n'.join(lines) )
-
-    def isFiletypeSupported(self, ftype):
-        """Is the filetype supported by this tab?"""
-        return ftype in ('.dat', '.txt')
 
 importdialog.registerImportTab(_('&Standard'), ImportTabStandard)

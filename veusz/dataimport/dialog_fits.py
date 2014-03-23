@@ -31,6 +31,8 @@ class ImportTabFITS(importdialog.ImportTab):
     """Tab for importing from a FITS file."""
 
     resource = 'import_fits.ui'
+    filetypes = ('.fits', '.fit')
+    filefilter = _('FITS files')
 
     def loadUi(self):
         importdialog.ImportTab.loadUi(self)
@@ -251,9 +253,5 @@ class ImportTabFITS(importdialog.ImportTab):
         # inform user
         self.fitsimportstatus.setText(_("Imported dataset '%s'") % name)
         qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
-
-    def isFiletypeSupported(self, ftype):
-        """Is the filetype supported by this tab?"""
-        return ftype in ('.fit', '.fits')
 
 importdialog.registerImportTab(_('FI&TS'), ImportTabFITS)

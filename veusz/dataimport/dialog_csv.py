@@ -45,6 +45,8 @@ class ImportTabCSV(importdialog.ImportTab):
     """For importing data from CSV files."""
 
     resource = 'import_csv.ui'
+    filetypes = ('.csv', '.tsv')
+    filefilter = _('CSV files')
 
     def loadUi(self):
         """Load user interface and setup panel."""
@@ -203,9 +205,5 @@ class ImportTabCSV(importdialog.ImportTab):
         for i, l in enumerate(lines):
             item = qt4.QTableWidgetItem(l)
             t.setItem(i, 0, item)
-
-    def isFiletypeSupported(self, ftype):
-        """Is the filetype supported by this tab?"""
-        return ftype in ('.tsv', '.csv')
 
 importdialog.registerImportTab(_('CS&V'), ImportTabCSV)

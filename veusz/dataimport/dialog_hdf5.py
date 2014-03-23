@@ -502,9 +502,8 @@ class ImportTabHDF5(importdialog.ImportTab):
     """Tab for importing HDF5 file."""
 
     resource = "import_hdf5.ui"
-
-    def isFiletypeSupported(self, filetype):
-        return filetype in ('.hdf', '.hdf5', '.h5', '.he5')
+    filetypes = ('.hdf', '.hdf5', '.h5', '.he5')
+    filefilter = _('HDF5 files')
 
     def showError(self, err):
         node = ErrorNode(None, err)
@@ -546,6 +545,9 @@ class ImportTabHDF5(importdialog.ImportTab):
             return False
 
         try:
+            # check can be opened first
+            with open(filename, "r") as f:
+                pass
             with h5py.File(filename, "r") as f:
                 self.rootnode, self.datanodes = constructTree(f)
         except IOError as e:

@@ -15,6 +15,7 @@ external sources such as Internet sockets or other programs.
 Changes in 1.21:
  * Add HDF5 saved document format
  * Add filled curve error bar style
+ * Add filetype filters to import dialog file browser dialog
 
 Bug fixes:
  * Fix saved text datasets in Python3

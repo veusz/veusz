@@ -41,6 +41,8 @@ class ImportTab(qt4.QWidget):
     """Tab for a particular import type."""
 
     resource = ''
+    filetypes = ()       # list of file types handled
+    filefilter = None    # name of filter for types for open dialog
 
     def __init__(self, importdialog, *args):
         """Initialise dialog. importdialog is the import dialog itself."""
@@ -73,7 +75,7 @@ class ImportTab(qt4.QWidget):
 
     def isFiletypeSupported(self, ftype):
         """Is the filetype supported by this tab?"""
-        return False
+        return ftype in self.filetypes
 
     def useFiletype(self, ftype):
         """If the tab can do something with the selected filetype,
@@ -129,12 +131,10 @@ class ImportDialog(VeuszDialog):
             setting.settingdb.get('import_lasttab', 0))
 
         # add completion for filename if there is support in version of qt
-        # (requires qt >= 4.3)
-        if hasattr(qt4, 'QDirModel'):
-            c = self.filenamecompleter = qt4.QCompleter(self)
-            model = qt4.QDirModel(c)
-            c.setModel(model)
-            self.filenameedit.setCompleter(c)
+        c = self.filenamecompleter = qt4.QCompleter(self)
+        model = qt4.QDirModel(c)
+        c.setModel(model)
+        self.filenameedit.setCompleter(c)
 
         # defaults for prefix and suffix
         self.prefixcombo.default = self.suffixcombo.default = ['', '$FILENAME']
@@ -159,6 +159,20 @@ class ImportDialog(VeuszDialog):
         fd = qt4.QFileDialog(self, _('Browse data file'))
         fd.setFileMode( qt4.QFileDialog.ExistingFile )
 
+        # collect filters from tabs
+        filters = [_('All files (*.*)')]
+        for i in crange(self.methodtab.count()):
+            w = self.methodtab.widget(i)
+            if w.filefilter:
+                ftypes = ' '.join(['*'+t for t in w.filetypes])
+                f = '%s (%s)' % (w.filefilter, ftypes)
+                filters.append(f)
+        fd.setNameFilters(filters)
+
+        lastfilt = setting.settingdb.get('import_filterbrowse')
+        if lastfilt in filters:
+            fd.selectNameFilter(lastfilt)
+
         # use filename to guess a path if possible
         filename = self.filenameedit.text()
         if os.path.isdir(filename):
@@ -172,6 +186,7 @@ class ImportDialog(VeuszDialog):
         if fd.exec_() == qt4.QDialog.Accepted:
             ImportDialog.dirname = fd.directory().absolutePath()
             self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
+            setting.settingdb['import_filterbrowse'] = fd.selectedNameFilter()
             self.guessImportTab()
 
     def guessImportTab(self):
