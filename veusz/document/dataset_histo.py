@@ -18,7 +18,7 @@
 
 from __future__ import division
 import numpy as N
-from .datasets import Dataset, evalDatasetExpression
+from .datasets import Dataset1DBase, evalDatasetExpression
 from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Datasets"):
@@ -201,13 +201,13 @@ class DatasetHistoGenerator(object):
 
         return _("Histogram of '%s' with %s") % (self.inexpr, bins)
 
-class DatasetHistoBins(Dataset):
+class DatasetHistoBins(Dataset1DBase):
     """A dataset for getting the bin positions for the histogram."""
 
     dstype = _('Histogram')
 
     def __init__(self, generator, document):
-        Dataset.__init__(self, data=[])
+        Dataset1DBase.__init__(self)
         self.generator = generator
         self.document = document
         self.linked = None
@@ -236,13 +236,13 @@ class DatasetHistoBins(Dataset):
     perr = property(lambda self: self.getData()[2])
     serr = None
 
-class DatasetHistoValues(Dataset):
+class DatasetHistoValues(Dataset1DBase):
     """A dataset for getting the height of the bins in a histogram."""
 
     dstype = _('Histogram')
 
     def __init__(self, generator, document):
-        Dataset.__init__(self, data=[])
+        Dataset1DBase.__init__(self)
         self.generator = generator
         self.document = document
         self.linked = None

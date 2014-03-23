@@ -144,12 +144,11 @@ class DatasetBase(object):
     # use descriptions for columns
     column_descriptions = ()
 
+    # can values be edited
+    editable = False
+
     # class for representing part of this dataset
     subsetclass = None
-
-    # whether this dataset's columns will change without updating the document's
-    # changeset
-    isstable = False
 
     def __init__(self, linked=None):
         """Initialise common members."""
@@ -232,7 +231,7 @@ class DatasetBase(object):
     def uiDataItemToData(self, val):
         """Return val converted to data."""
         return float(val)
-    
+
     def _getItemHelper(self, key):
         """Help get arguments to constructor."""
         args = {}
@@ -252,7 +251,7 @@ class DatasetBase(object):
     def __len__(self):
         """Return length of dataset."""
         return len(self.data)
-    
+
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.
         Returns deleted rows as a dict of {column:data, ...}
@@ -288,10 +287,6 @@ class DatasetBase(object):
         """Return dataset as text (for use by user)."""
         return ''
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return True
-
 def regularGrid(vals):
     '''Are the values equally spaced?'''
     if len(vals) < 2:
@@ -308,16 +303,9 @@ class Dataset2DBase(DatasetBase):
 
     # dataset type
     dstype = _('2D')
-    
-    # the dataset is recreated if its data changes
-    isstable = True
 
-    # sublcasses must define data, x/yrange, x/yedge, x/ycent as
+    # subclasses must define data, x/yrange, x/yedge, x/ycent as
     # attributes or properties
-
-    def __init__(self, linked=None):
-        """Initialise common members."""
-        DatasetBase.__init__(self, linked=linked)
 
     def isLinearImage(self):
         """Are these simple linear pixels?"""
@@ -448,6 +436,8 @@ class Dataset2DBase(DatasetBase):
 class Dataset2D(Dataset2DBase):
     '''Represents a two-dimensional dataset.'''
 
+    editable = True
+
     def __init__(self, data, xrange=None, yrange=None,
                  xedge=None, yedge=None,
                  xcent=None, ycent=None):
@@ -574,8 +564,8 @@ def dsPreviewHelper(d):
         return line1
     return line1 + '\n' + line2
 
-class Dataset(DatasetBase):
-    '''Represents a dataset.'''
+class Dataset1DBase(DatasetBase):
+    """Base for 1D datasets."""
 
     # number of dimensions the dataset holds
     dimensions = 1
@@ -584,43 +574,7 @@ class Dataset(DatasetBase):
                            _('Pos. errors') )
     dstype = _('1D')
 
-    # the dataset is recreated if its data changes
-    isstable = True
-
-    def __init__(self, data = None, serr = None, nerr = None, perr = None,
-                 linked = None):
-        '''Initialise dataset with the sets of values given.
-
-        The values can be given as numpy 1d arrays or lists of numbers
-        linked optionally specifies a LinkedFile to link the dataset to
-        '''
-        
-        DatasetBase.__init__(self, linked=linked)
-
-        # convert data to numpy arrays
-        data = convertNumpy(data)
-        serr = convertNumpyAbs(serr)
-        perr = convertNumpyAbs(perr)
-        nerr = convertNumpyNegAbs(nerr)
-
-        # check the sizes of things match up
-        s = data.shape
-        for x in (serr, nerr, perr):
-            if x is not None and x.shape != s:
-                raise DatasetException('Lengths of error data do not match data')
-
-        # finally assign data
-        self._invalidpoints = None
-
-        try:
-            if not hasattr(self, 'data'):
-                self.data = data
-                self.serr = serr
-                self.perr = perr
-                self.nerr = nerr
-        except AttributeError:
-            # we don't want these set if a inheriting class uses properties instead
-            pass
+    # subclasses must define .data, .serr, .perr, .nerr
 
     def userSize(self):
         """Size of dataset."""
@@ -648,16 +602,13 @@ class Dataset(DatasetBase):
 
     def invalidDataPoints(self):
         """Return a numpy bool detailing which datapoints are invalid."""
-        if self._invalidpoints is None:
-            # recalculate valid points
-            self._invalidpoints = N.logical_not(N.isfinite(self.data))
-            for error in self.serr, self.perr, self.nerr:
-                if error is not None:
-                    self._invalidpoints = N.logical_or(self._invalidpoints,
-                                                       N.logical_not(N.isfinite(error)))
 
-        return self._invalidpoints
-    
+        valid = N.isfinite(self.data)
+        for error in self.serr, self.perr, self.nerr:
+            if error is not None:
+                valid = N.logical_and(valid, N.isfinite(error))
+        return N.logical_not(valid)
+
     def hasErrors(self):
         '''Whether errors on dataset'''
         return (self.serr is not None or self.nerr is not None or
@@ -695,12 +646,63 @@ class Dataset(DatasetBase):
         '''Is the data defined?'''
         return self.data is None or len(self.data) == 0
 
+    def datasetAsText(self, fmt='%g', join='\t'):
+        """Return data as text."""
+
+        # work out which columns to write
+        cols = []
+        for c in (self.data, self.serr, self.perr, self.nerr):
+            if c is not None:
+                cols.append(c)
+
+        # format statement
+        format = (fmt + join) * (len(cols)-1) + fmt + '\n'
+
+        # do the conversion
+        lines = []
+        for line in czip(*cols):
+            lines.append( format % line )
+        return ''.join(lines)
+
+    def returnCopy(self):
+        """Return version of dataset with no linking."""
+        return Dataset(data = _copyOrNone(self.data),
+                       serr = _copyOrNone(self.serr),
+                       perr = _copyOrNone(self.perr),
+                       nerr = _copyOrNone(self.nerr))
+
+class Dataset(Dataset1DBase):
+    '''Represents a dataset.'''
+
+    editable = True
+
+    def __init__(self, data = None, serr = None, nerr = None, perr = None,
+                 linked = None):
+        '''Initialise dataset with the sets of values given.
+
+        The values can be given as numpy 1d arrays or lists of numbers
+        linked optionally specifies a LinkedFile to link the dataset to
+        '''
+
+        Dataset1DBase.__init__(self, linked=linked)
+
+        # convert data to numpy arrays
+        self.data = convertNumpy(data)
+        self.serr = convertNumpyAbs(serr)
+        self.perr = convertNumpyAbs(perr)
+        self.nerr = convertNumpyNegAbs(nerr)
+
+        # check the sizes of things match up
+        s = self.data.shape
+        for x in self.serr, self.nerr, self.perr:
+            if x is not None and x.shape != s:
+                raise DatasetException('Lengths of error data do not match data')
+
     def changeValues(self, thetype, vals):
         """Change the requested part of the dataset to vals.
 
         thetype == data | serr | perr | nerr
         """
-        self._invalidpoints = None
         if thetype in self.columns:
             setattr(self, thetype, vals)
         else:
@@ -745,24 +747,6 @@ class Dataset(DatasetBase):
                 odgrp[key] = getattr(self, key)
                 odgrp[key].attrs['vsz_name'] = (name + suffix).encode('utf-8')
 
-    def datasetAsText(self, fmt='%g', join='\t'):
-        """Return data as text."""
-
-        # work out which columns to write
-        cols = []
-        for c in (self.data, self.serr, self.perr, self.nerr):
-            if c is not None:
-                cols.append(c)
-
-        # format statement
-        format = (fmt + join) * (len(cols)-1) + fmt + '\n'
-
-        # do the conversion
-        lines = []
-        for line in czip(*cols):
-            lines.append( format % line )
-        return ''.join(lines)
-
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.
         Returns deleted rows as a dict of {column:data, ...}
@@ -773,7 +757,7 @@ class Dataset(DatasetBase):
             if coldata is not None:
                 retn[col] = coldata[row:row+numrows]
                 setattr(self, col, N.delete( coldata, N.s_[row:row+numrows] ))
-        
+
         self.document.modifiedData(self)
         return retn
 
@@ -792,22 +776,16 @@ class Dataset(DatasetBase):
 
         self.document.modifiedData(self)
 
-    def returnCopy(self):
-        """Return version of dataset with no linking."""
-        return Dataset(data = _copyOrNone(self.data),
-                       serr = _copyOrNone(self.serr),
-                       perr = _copyOrNone(self.perr),
-                       nerr = _copyOrNone(self.nerr))
-
 class DatasetDateTime(Dataset):
     """Dataset holding dates and times."""
 
     columns = ('data',)
     column_descriptions = (_('Data'),)
-    isstable = True
 
     dstype = _('Date')
     displaytype = 'date'
+
+    editable = True
 
     def __init__(self, data=None, linked=None):
         Dataset.__init__(self, data=data, linked=linked)
@@ -869,7 +847,7 @@ class DatasetText(DatasetBase):
     columns = ('data',)
     column_descriptions = (_('Data'),)
     dstype = _('Text')
-    isstable = True
+    editable = True
 
     def __init__(self, data=None, linked=None):
         """Initialise dataset with data given. Data are a list of strings."""
@@ -894,7 +872,7 @@ class DatasetText(DatasetBase):
             raise ValueError('type does not contain an allowed value')
 
         self.document.modifiedData(self)
-    
+
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
         return cstr(val)
@@ -935,7 +913,7 @@ class DatasetText(DatasetBase):
         """
         retn = {'data': self.data[row:row+numrows]}
         del self.data[row:row+numrows]
-        
+
         self.document.modifiedData(self)
         return retn
 
@@ -1148,7 +1126,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
 
     return None
 
-class DatasetExpression(Dataset):
+class DatasetExpression(Dataset1DBase):
     """A dataset which is linked to another dataset by an expression."""
 
     dstype = _('Expression')
@@ -1160,7 +1138,7 @@ class DatasetExpression(Dataset):
         parametric is option and can be (minval, maxval, steps) or None
         """
 
-        Dataset.__init__(self, data=[])
+        Dataset1DBase.__init__(self)
 
         # store the expressions to use to generate the dataset
         self.expr = {}
@@ -1173,13 +1151,9 @@ class DatasetExpression(Dataset):
         self.docchangeset = -1
         self.evaluated = {}
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
-        
+
         dsname is the name of the dataset
         dspart is the part to get (e.g. data, serr)
         """
@@ -1304,12 +1278,6 @@ class DatasetExpression(Dataset):
         s = 'SetDataExpression(%s)\n' % ', '.join(parts)
         fileobj.write(s)
 
-    def saveDataDumpToText(self, fileobj, name):
-        """Save data to text: not used."""
-
-    def saveDataDumpToHDF5(self, group, name):
-        """Save data to HDF5: not used."""
-
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
@@ -1317,12 +1285,6 @@ class DatasetExpression(Dataset):
         DatsetExpression otherwise, not chopped sets of data.
         """
         return Dataset(**self._getItemHelper(key))
-
-    def deleteRows(self, row, numrows):
-        pass
-
-    def insertRows(self, row, numrows, rowdata):
-        pass
 
     def canUnlink(self):
         """Whether dataset can be unlinked."""
@@ -1345,11 +1307,10 @@ class DatasetExpression(Dataset):
 
         return '\n'.join(text)
 
-class DatasetRange(Dataset):
+class DatasetRange(Dataset1DBase):
     """Dataset consisting of a range of values e.g. 1 to 10 in 10 steps."""
 
     dstype = _('Range')
-    isstable = True
 
     def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
         """Construct dataset.
@@ -1357,7 +1318,7 @@ class DatasetRange(Dataset):
         numsteps: number of steps in range
         data, serr, perr and nerr are tuples containing (start, stop) values."""
 
-        Dataset.__init__(self, data=[])
+        Dataset1DBase.__init__(self)
 
         self.range_data = data
         self.range_serr = serr
@@ -1377,10 +1338,6 @@ class DatasetRange(Dataset):
             else:
                 vals = None
             setattr(self, name, vals)
-
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
 
     def __getitem__(self, key):
         """Return a dataset based on this dataset
@@ -1409,12 +1366,6 @@ class DatasetRange(Dataset):
         s = 'SetDataRange(%s)\n' % ', '.join(parts)
         fileobj.write(s)
 
-    def saveDataDumpToText(self, fileobj, name):
-        """Save data to text: not used."""
-
-    def saveDataDumpToHDF5(self, group, name):
-        """Save data to HDF5: not used."""
-
     def canUnlink(self):
         return True
 
@@ -1431,7 +1382,7 @@ class DatasetRange(Dataset):
 def getSpacing(data):
     """Given a set of values, get minimum, maximum, step size
     and number of steps.
-    
+
     Function allows that values may be missing
 
     Function assumes that at least one of the steps is the minimum step size
@@ -1481,18 +1432,14 @@ class Dataset2DXYZExpression(Dataset2DBase):
         self.expry = expry
         self.exprz = exprz
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-
     def evaluateDataset(self, dsname, dspart):
         """Return the dataset given.
-        
+
         dsname is the name of the dataset
         dspart is the part to get (e.g. data, serr)
         """
         return _evaluateDataset(self.document.data, dsname, dspart)
-                    
+
     def evalDataset(self):
         """Return the evaluated dataset."""
 
@@ -1532,7 +1479,7 @@ class Dataset2DXYZExpression(Dataset2DBase):
         # update cached x and y ranges
         self._xrange = (minx-stepx*0.5, maxx+stepx*0.5)
         self._yrange = (miny-stepy*0.5, maxy+stepy*0.5)
-        
+
         self.cacheddata = N.empty( (stepsy, stepsx) )
         self.cacheddata[:,:] = N.nan
         xpts = ((1./stepx)*(evaluated['exprx']-minx)).astype('int32')
@@ -1610,10 +1557,6 @@ class Dataset2DExpression(Dataset2DBase):
         self.expr = expr
         self.lastchangeset = -1
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-        
     @property
     def data(self):
         """Return data, or empty array if error."""
@@ -1703,10 +1646,6 @@ class Dataset2DXYFunc(Dataset2DBase):
 
         self.cacheddata = None
         self.lastchangeset = -1
-
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
 
     @property
     def data(self):
@@ -1829,16 +1768,12 @@ class _DatasetPlugin(object):
         """Return type of plugin."""
         return self.pluginmanager.plugin.name
 
-class Dataset1DPlugin(_DatasetPlugin, Dataset):
+class Dataset1DPlugin(_DatasetPlugin, Dataset1DBase):
     """Return 1D dataset from a plugin."""
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
-        Dataset.__init__(self, data=[])
-
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
+        Dataset1DBase.__init__(self)
 
     def userSize(self):
         """Size of dataset."""
@@ -1869,10 +1804,6 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2DBase):
         _DatasetPlugin.__init__(self, manager, ds)
         Dataset2DBase.__init__(self)
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-
     def __getitem__(self, key):
         return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange,
                          xedge=self.xedge, yedge=self.yedge,
@@ -1900,10 +1831,6 @@ class DatasetTextPlugin(_DatasetPlugin, DatasetText):
         _DatasetPlugin.__init__(self, manager, ds)
         DatasetText.__init__(self, [])
 
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
-
     def __getitem__(self, key):
         return DatasetText(self.data[key])
 
@@ -1916,10 +1843,6 @@ class DatasetDateTimePlugin(_DatasetPlugin, DatasetDateTime):
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
         DatasetDateTime.__init__(self, [])
-
-    def editable(self):
-        """Is the dataset editable?"""
-        return False
 
     def __getitem__(self, key):
         return DatasetDateTime(self.data[key])
