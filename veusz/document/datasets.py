@@ -825,7 +825,8 @@ class DatasetDateTime(Dataset):
         """Save date data to hdf5 file."""
         dgrp = group.create_group(name)
         dgrp.attrs['vsz_datatype'] = 'date'
-        data = dgrp['data'] = self.data
+        dgrp['data'] = self.data
+        data = dgrp['data']
         data.attrs['vsz_convert_datetime'] = 1
         data.attrs['vsz_name'] = name.encode('utf-8')
 
