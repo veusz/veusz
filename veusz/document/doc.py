@@ -22,6 +22,7 @@
 """A class to represent Veusz documents, with dataset classes."""
 
 from __future__ import division
+import codecs
 import os.path
 import re
 import traceback
@@ -580,7 +581,7 @@ class Document( qt4.QObject ):
         mode is 'vsz' or 'hdf5'
         """
         if mode == 'vsz':
-            with open(filename, 'w') as f:
+            with codecs.open(filename, 'w', 'utf-8') as f:
                 self.saveToFile(f)
         elif mode == 'hdf5':
             if h5py is None:

@@ -884,13 +884,10 @@ class DatasetText(DatasetBase):
     def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
-        descriptor = datasetNameToDescriptorName(name) + '(text)'
-        fileobj.write( "ImportString(%s, ur'''\n" % crepr(descriptor) )
+        fileobj.write("SetDataText(%s, [\n" % repr(name))
         for line in self.data:
-            # need to "escape" ''' marks in text
-            r = repr(line).replace("'''", "''' \"'''\" r'''") + '\n'
-            fileobj.write(r)
-        fileobj.write( "''')\n" )
+            fileobj.write("    %s,\n" % repr(line))
+        fileobj.write("])\n")
 
     def saveDataDumpToHDF5(self, group, name):
         """Save text data to hdf5 file."""
