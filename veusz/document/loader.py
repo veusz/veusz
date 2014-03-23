@@ -158,7 +158,8 @@ def loadHDF5DatasetDate(datagrp):
     return datasets.DatasetDateTime(data=datagrp['data'])
 
 def loadHDF5DatasetText(datagrp):
-    return datasets.DatasetText(data=datagrp['data'])
+    data = [d.decode('utf-8') for d in datagrp['data']]
+    return datasets.DatasetText(data=data)
 
 def loadHDF5Datasets(thedoc, hdffile):
     """Load all the Veusz datasets in the HDF5 file."""
