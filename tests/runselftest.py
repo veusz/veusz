@@ -45,6 +45,12 @@ import os
 import os.path
 import sys
 import subprocess
+import optparse
+
+try:
+    import h5py
+except ImportError:
+    h5py = None
 
 from veusz.compat import cexec, cstr
 import veusz.qtall as qt4
@@ -119,7 +125,7 @@ class PartTextAscii(_pt):
     def addText(self, text):
         self.text += text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
 
-def renderVszTest(invsz, outfile):
+def renderVszTest(invsz, outfile, test_saves=False):
     """Render vsz document to create outfile."""
 
     d = document.Document()
@@ -136,15 +142,21 @@ def renderVszTest(invsz, outfile):
     ifc.AddImportPath( os.path.dirname(invsz) )
     cexec(compile(open(invsz).read(), invsz, 'exec'), cmds)
 
-    #ifc.Save('temp.vszh5', mode='hdf5')
-    #d = document.Document()
-    #document.loadDocument(d, 'temp.vszh5', mode='hdf5')
-    #ifc = document.CommandInterface(d)
+    if test_saves and h5py is not None:
+        tempfilename = 'self-test-temporary.vszh5'
+        ifc.Save(tempfilename, mode='hdf5')
+        d = document.Document()
+        document.loadDocument(d, tempfilename, mode='hdf5')
+        os.unlink(tempfilename)
+        ifc = document.CommandInterface(d)
 
-    #ifc.Save('temp.vsz', mode='vsz')
-    #d = document.Document()
-    #document.loadDocument(d, 'temp.vsz', mode='vsz')
-    #ifc = document.CommandInterface(d)
+    if test_saves:
+        tempfilename = 'self-test-temporary.vsz'
+        ifc.Save(tempfilename, mode='vsz')
+        d = document.Document()
+        document.loadDocument(d, tempfilename, mode='vsz')
+        os.unlink(tempfilename)
+        ifc = document.CommandInterface(d)
 
     ifc.Export(outfile)
 
@@ -185,7 +197,7 @@ def renderAllTests():
         elif ext == '.py':
             renderPyTest(infile, outfile)
 
-def runTests():
+def runTests(test_saves=False):
     print("Testing output")
 
     fails = 0
@@ -207,7 +219,7 @@ def runTests():
 
         ext = os.path.splitext(infile)[1]
         if ext == '.vsz':
-            renderVszTest(infile, outfile)
+            renderVszTest(infile, outfile, test_saves=test_saves)
         elif ext == '.py':
             if not renderPyTest(infile, outfile):
                 print(" FAIL: did not execute cleanly")
@@ -268,10 +280,14 @@ if __name__ == '__main__':
     svg_export.scale = 1.
     svg_export.fltStr = fltStr
 
-    if len(sys.argv) == 1:
-        runTests()
-    else:
-        if len(sys.argv) != 2 or sys.argv[1] != 'regenerate':
-            print >>sys.stderr, "Usage: %s [regenerate]" % sys.argv[0]
-            sys.exit(1)
+    parser = optparse.OptionParser()
+    parser.add_option("", "--test-saves", action="store_true",
+                      help="tests saving documents and reloading them")
+
+    options, args = parser.parse_args()
+    if len(args) == 0:
+        runTests(test_saves=options.test_saves)
+    elif args == ['regenerate']:
         renderAllTests()
+    else:
+        parser.error("argument must be empty or 'regenerate'")
