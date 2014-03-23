@@ -575,7 +575,7 @@ class Document( qt4.QObject ):
 
         self.setModified(False)
 
-    def saveDocument(self, filename, mode='vsz'):
+    def save(self, filename, mode='vsz'):
         """Save to output file.
 
         mode is 'vsz' or 'hdf5'
@@ -590,6 +590,15 @@ class Document( qt4.QObject ):
                 self.saveToHDF5File(f)
         else:
             raise RuntimeError('Invalid save mode')
+
+    def load(self, filename, mode='vsz', callbackunsafe=None):
+        """Load document from file.
+
+        mode is 'vsz' or 'hdf5'
+        """
+        from . import loader
+        loader.loadDocument(self, filename, mode=mode,
+                            callbackunsafe=callbackunsafe)
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""

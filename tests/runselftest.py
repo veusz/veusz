@@ -64,11 +64,6 @@ import veusz.document.svg_export as svg_export
 import veusz.windows.mainwindow
 
 try:
-    import h5py
-except ImportError:
-    h5py = None
-
-try:
     from astropy.io import fits as pyfits
 except ImportError:
     try:
@@ -128,36 +123,25 @@ class PartTextAscii(_pt):
 def renderVszTest(invsz, outfile, test_saves=False):
     """Render vsz document to create outfile."""
 
-    d = document.Document()
-    ifc = document.CommandInterface(d)
-
-    # this lot looks a bit of a mess
-    cmds = d.eval_context
-    for cmd in document.CommandInterface.safe_commands:
-        cmds[cmd] = getattr(ifc, cmd)
-    for cmd in document.CommandInterface.unsafe_commands:
-        cmds[cmd] = getattr(ifc, cmd)
-
-    cexec("from numpy import *", cmds)
-    ifc.AddImportPath( os.path.dirname(invsz) )
-    cexec(compile(open(invsz).read(), invsz, 'exec'), cmds)
+    doc = document.Document()
+    mode = 'hdf5' if os.path.splitext(invsz)[1] == '.vszh5' else 'vsz'
+    doc.load(invsz, mode=mode)
 
     if test_saves and h5py is not None:
         tempfilename = 'self-test-temporary.vszh5'
-        ifc.Save(tempfilename, mode='hdf5')
-        d = document.Document()
-        document.loadDocument(d, tempfilename, mode='hdf5')
+        doc.save(tempfilename, mode='hdf5')
+        doc = document.Document()
+        doc.load(tempfilename, mode='hdf5')
         os.unlink(tempfilename)
-        ifc = document.CommandInterface(d)
 
     if test_saves:
         tempfilename = 'self-test-temporary.vsz'
-        ifc.Save(tempfilename, mode='vsz')
-        d = document.Document()
-        document.loadDocument(d, tempfilename, mode='vsz')
+        doc.save(tempfilename, mode='vsz')
+        doc = document.Document()
+        doc.load(tempfilename, mode='vsz')
         os.unlink(tempfilename)
-        ifc = document.CommandInterface(d)
 
+    ifc = document.CommandInterface(doc)
     ifc.Export(outfile)
 
 def renderPyTest(inpy, outfile):
@@ -175,7 +159,8 @@ class Dirs(object):
         self.comparisondir = os.path.join(self.thisdir, 'comparison')
 
         files = ( glob.glob( os.path.join(self.exampledir, '*.vsz') ) +
-                  glob.glob( os.path.join(self.testdir, '*.vsz') ) )
+                  glob.glob( os.path.join(self.testdir, '*.vsz') ) +
+                  glob.glob( os.path.join(self.testdir, '*.vszh5') ) )
 
         self.infiles = [ f for f in files if
                          os.path.basename(f) not in excluded_tests ]
@@ -192,7 +177,7 @@ def renderAllTests():
         print(base)
         outfile = os.path.join(d.comparisondir, base + '.selftest')
         ext = os.path.splitext(base)[1]
-        if ext == '.vsz':
+        if ext == '.vsz' or ext == '.vszh5':
             renderVszTest(infile, outfile)
         elif ext == '.py':
             renderPyTest(infile, outfile)
@@ -209,16 +194,18 @@ def runTests(test_saves=False):
         base = os.path.basename(infile)
         print(base)
 
+        ext = os.path.splitext(infile)[1]
+
         if ( (base[:5] == 'hdf5_' and h5py is None) or
-             (base[:5] == 'fits_' and pyfits is None) ):
+             (base[:5] == 'fits_' and pyfits is None) or
+             (ext == '.vszh5' and h5py is None) ):
             print(" SKIPPED")
             skipped += 1
             continue
 
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
 
-        ext = os.path.splitext(infile)[1]
-        if ext == '.vsz':
+        if ext == '.vsz' or ext == '.vszh5':
             renderVszTest(infile, outfile, test_saves=test_saves)
         elif ext == '.py':
             if not renderPyTest(infile, outfile):

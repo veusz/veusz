@@ -902,7 +902,7 @@ class MainWindow(qt4.QMainWindow):
             try:
                 ext = os.path.splitext(self.filename)[1]
                 mode = 'hdf5' if ext == '.vszh5' else 'vsz'
-                self.document.saveDocument(self.filename, mode)
+                self.document.save(self.filename, mode)
                 self.updateStatusbar(_("Saved to %s") % self.filename)
             except EnvironmentError as e:
                 qt4.QApplication.restoreOverrideCursor()
@@ -1063,8 +1063,7 @@ class MainWindow(qt4.QMainWindow):
                     _("Did not recognise file type '%s'") % ext)
 
             # do the actual loading
-            document.loadDocument(
-                self.document,
+            self.document.load(
                 filename,
                 mode=mode,
                 callbackunsafe=_callbackunsafe)

@@ -368,7 +368,7 @@ class CommandInterface(qt4.QObject):
          'vsz': standard veusz text format
          'hdf5': HDF5 format
         """
-        self.document.saveDocument(filename, mode)
+        self.document.save(filename, mode)
 
     def Set(self, var, val):
         """Set the value of a setting."""

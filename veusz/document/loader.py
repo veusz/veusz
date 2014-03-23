@@ -35,7 +35,7 @@ from . import datasets
 # loaded lazily
 h5py = None
 
-def _(text, disambiguation=None, context='ExecuteScript'):
+def _(text, disambiguation=None, context='DocumentLoader'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
