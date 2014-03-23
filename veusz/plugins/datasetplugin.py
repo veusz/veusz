@@ -274,14 +274,15 @@ class DatasetPluginHelper(object):
         try:
             ds = self._doc.data[name]
         except KeyError:
-            raise DatasetPluginException("Unknown dataset '%s'" % name)
+            raise DatasetPluginException(_("Unknown dataset '%s'") % name)
 
         if ds.dimensions != dimensions:
             raise DatasetPluginException(
-                "Dataset '%s' does not have %i dimensions" % (name, dimensions))
+                _("Dataset '%s' does not have %i dimensions") % (
+                    name, dimensions))
         if ds.datatype != 'numeric':
             raise DatasetPluginException(
-                "Dataset '%s' is not a numerical dataset" % name)
+                _("Dataset '%s' is not a numerical dataset") % name)
 
         if isinstance(ds, document.DatasetDateTime):
             return DatasetDateTime(name, data=ds.data)
@@ -308,10 +309,10 @@ class DatasetPluginHelper(object):
         try:
             ds = self._doc.data[name]
         except KeyError:
-            raise DatasetPluginException("Unknown dataset '%s'" % name)
+            raise DatasetPluginException(_("Unknown dataset '%s'") % name)
         if ds.datatype == 'text':
             return DatasetText(name, ds.data)
-        raise DatasetPluginException("Dataset '%s' is not a text datset" % name)
+        raise DatasetPluginException(_("Dataset '%s' is not a text datset") % name)
 
 # internal object to synchronise datasets created by a plugin
 class DatasetPluginManager(object):
@@ -449,7 +450,7 @@ class _OneOutputDatasetPlugin(DatasetPlugin):
     def getDatasets(self, fields):
         """Returns single output dataset (self.dsout)."""
         if fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
+            raise DatasetPluginException(_('Invalid output dataset name'))
         self.dsout = Dataset1D(fields['ds_out'])
         return [self.dsout]
 
@@ -1553,9 +1554,9 @@ class ReBinXYPlugin(DatasetPlugin):
     def getDatasets(self, fields):
         """Return output datasets"""
         if fields['ds_yout'] == '':
-            raise DatasetPluginException('Invalid output Y dataset name')
+            raise DatasetPluginException(_('Invalid output Y dataset name'))
         if fields['ds_x'] != '' and fields['ds_xout'] == '':
-            raise DatasetPluginException('Invalid output X dataset name')
+            raise DatasetPluginException(_('Invalid output X dataset name'))
 
         self.dssout = out = [ Dataset1D(fields['ds_yout']) ]
         if fields['ds_xout'] != '':
@@ -1683,7 +1684,7 @@ class SortTextPlugin(_OneOutputDatasetPlugin):
     def getDatasets(self, fields):
         """Returns single output dataset (self.dsout)."""
         if fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
+            raise DatasetPluginException(_('Invalid output dataset name'))
         self.dsout = DatasetText(fields['ds_out'])
         return [self.dsout]
 
@@ -1805,7 +1806,7 @@ class Histogram2D(DatasetPlugin):
     def getDatasets(self, fields):
         """Returns single output dataset (self.dsout)."""
         if fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
+            raise DatasetPluginException(_('Invalid output dataset name'))
         self.dsout = Dataset2D(fields['ds_out'])
         return [self.dsout]
 
@@ -1834,7 +1835,7 @@ class ConvertNumbersToText(DatasetPlugin):
 
     def getDatasets(self, fields):
         if fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
+            raise DatasetPluginException(_('Invalid output dataset name'))
         self.dsout = DatasetText(fields['ds_out'])
         return [self.dsout]
 

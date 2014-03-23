@@ -45,6 +45,19 @@ class LoadError(RuntimeError):
         RuntimeError.__init__(self, text)
         self.backtrace = backtrace
 
+class _UpdateSuspender(object):
+    """Handle document updates/suspensions."""
+
+    def __init__(self, doc):
+        self.doc = doc
+
+    def __enter__(self):
+        self.doc.suspendUpdates()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.doc.enableUpdates()
+
 def bconv(s):
     """Sometimes h5py returns non-unicode strings,
     so hack to decode strings if in wrong format."""
@@ -114,20 +127,14 @@ def executeScript(thedoc, filename, script, callbackunsafe=None):
     # allow import to happen relative to loaded file
     interface.AddImportPath( os.path.dirname(os.path.abspath(filename)) )
 
-    thedoc.suspendUpdates()
-
-    try:
-        # actually run script text
-        cexec(compiled, env)
-    except LoadError:
-        thedoc.enableUpdates()
-        raise
-    except Exception as e:
-        thedoc.enableUpdates()
-        raise genexception(e)
-
-    # success!!
-    thedoc.enableUpdates()
+    with _UpdateSuspender(thedoc):
+        try:
+            # actually run script text
+            cexec(compiled, env)
+        except LoadError:
+            raise
+        except Exception as e:
+            raise genexception(e)
 
 def loadHDF5Dataset1D(datagrp):
     args = {}
@@ -191,33 +198,34 @@ def loadHDF5Doc(thedoc, filename, callbackunsafe=None):
     except ImportError:
         raise LoadError(_("No HDF5 support as h5py module is missing"))
 
-    thedoc.wipe()
-    hdffile = h5py.File(filename, 'r')
+    with _UpdateSuspender(thedoc):
+        thedoc.wipe()
+        hdffile = h5py.File(filename, 'r')
 
-    try:
-        vszformat = hdffile['Veusz'].attrs['vsz_format']
-        vszversion = hdffile['Veusz'].attrs['vsz_version']
-    except KeyError:
-        raise LoadError(_("HDF5 file '%s' is not a Veusz saved document") %
-                        os.path.basename(filename))
+        try:
+            vszformat = hdffile['Veusz'].attrs['vsz_format']
+            vszversion = hdffile['Veusz'].attrs['vsz_version']
+        except KeyError:
+            raise LoadError(_("HDF5 file '%s' is not a Veusz saved document") %
+                            os.path.basename(filename))
 
-    maxformat = 1
-    if vszformat > maxformat:
-        raise LoadError(_("This document version (%i) is not supported. "
-                          "It was written by Veusz %s.\n"
-                          "This Veusz only supports document version %i." %
-                          (vszformat, vszversion, maxformat)))
+        maxformat = 1
+        if vszformat > maxformat:
+            raise LoadError(_("This document version (%i) is not supported. "
+                              "It was written by Veusz %s.\n"
+                              "This Veusz only supports document version %i." %
+                              (vszformat, vszversion, maxformat)))
 
-    # load document
-    script = hdffile['Veusz']['Document']['document'][0].decode('utf-8')
-    executeScript(thedoc, filename, script, callbackunsafe=callbackunsafe)
+        # load document
+        script = hdffile['Veusz']['Document']['document'][0].decode('utf-8')
+        executeScript(thedoc, filename, script, callbackunsafe=callbackunsafe)
 
-    # then load datasets
-    loadHDF5Datasets(thedoc, hdffile)
-    # and then tag
-    tagHDF5Datasets(thedoc, hdffile)
+        # then load datasets
+        loadHDF5Datasets(thedoc, hdffile)
+        # and then tag
+        tagHDF5Datasets(thedoc, hdffile)
 
-    hdffile.close()
+        hdffile.close()
 
 def loadDocument(thedoc, filename, mode='vsz', callbackunsafe=None):
     """Load document from file.
