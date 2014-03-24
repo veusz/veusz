@@ -16,6 +16,7 @@ Changes in 1.21:
  * Add HDF5 saved document format
  * Add filled curve error bar style
  * Add filetype filters to import dialog file browser dialog
+ * In file completer in import dialog, use selected tab as filter
 
 Bug fixes:
  * Direction combo did not work in import dialog

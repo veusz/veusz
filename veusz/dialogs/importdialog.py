@@ -114,7 +114,7 @@ class ImportDialog(VeuszDialog):
                 w = ImportTabPlugins(self, promote=p.name)
                 self.methodtab.addTab(w, p.promote_tab)
 
-        self.methodtab.currentChanged.connect(self.slotUpdatePreview)
+        self.methodtab.currentChanged.connect(self.slotTabChanged)
         self.browsebutton.clicked.connect(self.slotBrowseClicked)
         self.filenameedit.editTextChanged.connect(self.slotUpdatePreview)
 
@@ -126,15 +126,13 @@ class ImportDialog(VeuszDialog):
             self.slotReset)
         self.encodingcombo.currentIndexChanged.connect(self.slotUpdatePreview)
 
+        # add completion for filename
+        c = self.filenamecompleter = qt4.QCompleter(self)
+        self.filenameedit.setCompleter(c)
+
         # change to tab last used
         self.methodtab.setCurrentIndex(
             setting.settingdb.get('import_lasttab', 0))
-
-        # add completion for filename if there is support in version of qt
-        c = self.filenamecompleter = qt4.QCompleter(self)
-        model = qt4.QDirModel(c)
-        c.setModel(model)
-        self.filenameedit.setCompleter(c)
 
         # defaults for prefix and suffix
         self.prefixcombo.default = self.suffixcombo.default = ['', '$FILENAME']
@@ -232,6 +230,19 @@ class ImportDialog(VeuszDialog):
 
         # enable or disable import button
         self.enableDisableImport()
+
+    def slotTabChanged(self, tabindex):
+        """Change completer depending on tab."""
+        self.slotUpdatePreview()
+        w = self.methodtab.widget(tabindex)
+
+        if w.filetypes is None:
+            filters = ['*.*']
+        else:
+            filters = ['*'+t for t in w.filetypes]
+        model = qt4.QDirModel(filters, qt4.QDir.AllDirs | qt4.QDir.Files,
+                              qt4.QDir.Name)
+        self.filenamecompleter.setModel(model)
 
     def enableDisableImport(self, *args):
         """Disable or enable import button if allowed."""
