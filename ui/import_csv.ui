@@ -67,16 +67,6 @@
           <property name="toolTip">
            <string>Are the data arranged in columns or rows?</string>
           </property>
-          <item>
-           <property name="text">
-            <string>Columns</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Rows</string>
-           </property>
-          </item>
          </widget>
         </item>
         <item row="2" column="0">

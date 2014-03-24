@@ -18,7 +18,8 @@ Changes in 1.21:
  * Add filetype filters to import dialog file browser dialog
 
 Bug fixes:
- * Fix saved text datasets in Python3
+ * Direction combo did not work in import dialog
+ * Saving text datasets did not work in Python3
  * Fix partial dataset evaluation issue when loading documents
 
 Features of package:

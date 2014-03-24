@@ -65,6 +65,7 @@ class ImportTabCSV(importdialog.ImportTab):
             ]
         self.csvnumfmtcombo.defaultlist = csv_locales
         self.csvheadermodecombo.defaultlist = [_('Multiple'), _('1st row'), _('None')]
+        self.csvdirectioncombo.defaultlist = [_('Columns'), _('Rows')]
 
     def reset(self):
         """Reset controls."""
