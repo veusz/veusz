@@ -105,11 +105,10 @@ def cropGridImageToBox(image, gridx, gridy, posn):
             # reverse order of grid
             gridr = grid[::-1]
 
-            t1 = max(N.searchsorted(gridr, p1, side='right')-1, 0)
-            t2 = min(N.searchsorted(gridr, p2, side='left'), len(gridr)) + 1
-
-            i1 = len(grid) - t2
-            i2 = len(grid)+1 - t1
+            i1 = max( len(grid) - N.searchsorted(gridr, p2, side='left')-1,
+                      0)
+            i2 = min( len(grid) - N.searchsorted(gridr, p1, side='right'),
+                      len(grid) ) + 1
 
         return i1, i2
 
@@ -128,7 +127,7 @@ def cropGridImageToBox(image, gridx, gridy, posn):
 
     if x1 > 0 or y1 > 0 or x2 < len(gridx)-1 or y2 < len(gridy)-1:
         # do cropping
-        image = image.copy(x1, y1, x2-x1-1, y2-y1-1)
+        image = image.copy(x1, len(gridy)-y2, x2-x1-1, y2-y1-1)
         gridx = N.array(gridx[x1:x2])
         gridy = N.array(gridy[y1:y2])
 
