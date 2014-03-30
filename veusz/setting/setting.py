@@ -105,7 +105,7 @@ class Setting(object):
         obj = self.__class__(*args, **opt)
         obj.readonly = self.readonly
         obj.default = self.default
-        return obj        
+        return obj
 
     def copy(self):
         """Make a setting which has its values copied from this one.
@@ -113,10 +113,10 @@ class Setting(object):
         This needs to be overridden if the constructor changes
         """
         return self._copyHelper((), (), {})
-        
+
     def get(self):
         """Get the value."""
-        
+
         if isinstance(self._val, Reference):
             return self._val.resolve(self).get()
         else:
@@ -161,7 +161,7 @@ class Setting(object):
     def linkToStylesheet(self):
         """Make this setting link to stylesheet setting, if possible."""
         self.set( Reference(self.getStylesheetLink()) )
-               
+
     def _path(self):
         """Return full path of setting."""
         path = []
@@ -178,10 +178,10 @@ class Setting(object):
                     path.insert(0, obj.name)
             obj = obj.parent
         return '/'.join(path)
-        
+
     path = property(_path, None, None,
                     'Return the full path of the setting')
-    
+
     def toText(self):
         """Convert the type to text for saving."""
         return ""
@@ -208,7 +208,7 @@ class Setting(object):
             deftext = settingdb[namedpath]
         except KeyError:
             pass
-    
+
         if deftext is not None:
             self.val = self.fromText(deftext)
             self.default = self.val
@@ -495,7 +495,7 @@ class Int(Setting):
         """
         return self._copyHelper((), (), {'minval': self.minval,
                                          'maxval': self.maxval})
-        
+
     def convertTo(self, val):
         if isinstance(val, int):
             if val >= self.minval and val <= self.maxval:
@@ -555,7 +555,7 @@ class Float(Setting):
         return self._copyHelper((), (), {'minval': self.minval,
                                          'maxval': self.maxval})
 
-    def convertTo(self, val):       
+    def convertTo(self, val):
         if isinstance(val, int) or isinstance(val, float):
             return _finiteRangeFloat(val,
                                      minval=self.minval, maxval=self.maxval)
@@ -608,7 +608,7 @@ class FloatOrAuto(Float):
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
-            
+
 class IntOrAuto(Setting):
     """Save an int or text auto."""
 
@@ -643,7 +643,7 @@ class IntOrAuto(Setting):
             if not ok:
                 raise utils.InvalidType
             return i
-            
+
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
 
@@ -754,7 +754,7 @@ class Distance(Setting):
     @classmethod
     def isDist(kls, dist):
         """Is the text a valid distance measure?"""
-        
+
         return kls.distre.match(dist) is not None
 
     def convertTo(self, val):
@@ -807,7 +807,7 @@ class Distance(Setting):
     def convertPts(self, painter):
         """Get the distance in points."""
         return self.convert(painter) / painter.pixperpt
-        
+
     def convertInverse(self, distpix, painter):
         """Convert distance in pixels into units of this distance.
         """
@@ -849,7 +849,7 @@ class DistanceOrAuto(Distance):
     typename = 'distance-or-auto'
 
     distre = re.compile( distre_expr + r'|^Auto$', re.VERBOSE )
-    
+
     def isAuto(self):
         return self.val == 'Auto'
 
@@ -881,7 +881,7 @@ class Choice(Setting):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((self.vallist,), (), {})
-        
+
     def convertTo(self, val):
         if val in self.vallist:
             return val
@@ -913,7 +913,7 @@ class ChoiceOrMore(Setting):
         descriptions is an optional addon to put a tooltip on each item
         in the control
         """
-        
+
         self.vallist = vallist
         self.descriptions = args.get('descriptions', None)
         if self.descriptions:
@@ -937,7 +937,7 @@ class ChoiceOrMore(Setting):
     def makeControl(self, *args):
         argsv = {'descriptions': self.descriptions}
         return controls.Choice(self, True, self.vallist, *args, **argsv)
-    
+
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
 
@@ -1101,7 +1101,7 @@ class WidgetPath(Str):
                     allowed = True
             if not allowed:
                 raise utils.InvalidType
-        
+
         return widget
 
 class Dataset(Str):
@@ -1124,7 +1124,7 @@ class Dataset(Str):
         return self._copyHelper((), (),
                                 {'dimensions': self.dimensions,
                                  'datatype': self.datatype})
-        
+
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
         return controls.Dataset(self, self.getDocument(), self.dimensions,
@@ -1160,7 +1160,7 @@ class Strings(Setting):
                 raise utils.InvalidType
 
         return tuple(val)
-        
+
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
         return controls.Strings(self, self.getDocument(), *args)
@@ -1203,7 +1203,7 @@ class Datasets(Setting):
         return self._copyHelper((), (),
                                 {'dimensions': self.dimensions,
                                  'datatype': self.datatype})
-        
+
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
         return controls.Datasets(self, self.getDocument(), self.dimensions,
@@ -1351,30 +1351,30 @@ class Color(ChoiceOrMore):
                 'cyan', 'magenta', 'yellow',
                 'grey', 'darkred', 'darkgreen', 'darkblue',
                 'darkcyan', 'darkmagenta' ]
-    
+
     controls.Color._colors = _colors
 
     def __init__(self, name, value, **args):
         """Initialise the color setting with the given name, default
         and description."""
-        
+
         ChoiceOrMore.__init__(self, name, self._colors, value,
                               **args)
 
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def color(self):
         """Return QColor for color."""
         return qt4.QColor(self.val)
-    
+
     def makeControl(self, *args):
         return controls.Color(self, *args)
 
 class FillStyle(Choice):
     """A setting for the different fill styles provided by Qt."""
-    
+
     typename = 'fill-style'
 
     _fillstyles = [ 'solid', 'horizontal', 'vertical', 'cross',
@@ -1407,7 +1407,7 @@ class FillStyle(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def qtStyle(self):
         """Return Qt ID of fill."""
         return self._fillcnvt[self.val]
@@ -1443,27 +1443,27 @@ class LineStyle(Choice):
                   'dot4': (qt4.Qt.CustomDashLine, [0.1, 8]),
                   'dash1': (qt4.Qt.CustomDashLine, [4, 4]),
                   'dash2': (qt4.Qt.CustomDashLine, [4, 8]),
-                  'dash3': (qt4.Qt.CustomDashLine, [8, 8]), 
+                  'dash3': (qt4.Qt.CustomDashLine, [8, 8]),
                   'dash4': (qt4.Qt.CustomDashLine, [16, 8]),
                   'dash5': (qt4.Qt.CustomDashLine, [16, 16]),
                   'dashdot1': (qt4.Qt.CustomDashLine, [0.1, 4, 4, 4]),
                   'dashdot2': (qt4.Qt.CustomDashLine, [0.1, 4, 8, 4]),
                   'dashdot3': (qt4.Qt.CustomDashLine, [0.1, 2, 4, 2]),
                  }
-    
+
     controls.LineStyle._lines = _linestyles
-    
+
     def __init__(self, name, default, **args):
         Choice.__init__(self, name, self._linestyles, default, **args)
 
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def qtStyle(self):
         """Get Qt ID of chosen line style."""
         return self._linecnvt[self.val]
-    
+
     def makeControl(self, *args):
         return controls.LineStyle(self, *args)
 
@@ -1477,14 +1477,14 @@ class Axis(Str):
 
     def __init__(self, name, val, direction, **args):
         """Initialise using the document, so we can get the axes later.
-        
+
         direction is horizontal or vertical to specify the type of axis to
         show
         """
 
         Setting.__init__(self, name, val, **args)
         self.direction = direction
-        
+
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (self.direction,), {})
@@ -1564,7 +1564,7 @@ class WidgetChoice(Str):
     def makeControl(self, *args):
         """Allows user to choose an image widget or enter a name."""
         return controls.WidgetChoice(self, self.getDocument(), *args)
-    
+
 class Marker(Choice):
     """Choose a marker type from one allowable."""
 
@@ -1576,10 +1576,10 @@ class Marker(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def makeControl(self, *args):
         return controls.Marker(self, *args)
-    
+
 class Arrow(Choice):
     """Choose an arrow type from one allowable."""
 
@@ -1591,7 +1591,7 @@ class Arrow(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def makeControl(self, *args):
         return controls.Arrow(self, *args)
 
@@ -1626,7 +1626,7 @@ class LineSet(Setting):
                 raise utils.InvalidType
 
         return val
-    
+
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.LineSet(self, *args)
@@ -1654,7 +1654,7 @@ class LineSet(Setting):
             if hide:
                 pen.setStyle(qt4.Qt.NoPen)
             return pen
-    
+
 class FillSet(Setting):
     """A setting which corresponds to a set of fills.
 
@@ -1693,7 +1693,7 @@ class FillSet(Setting):
                 raise utils.InvalidType
 
         return val
-    
+
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.FillSet(self, *args)
@@ -1777,7 +1777,7 @@ class ErrorStyle(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def makeControl(self, *args):
         return controls.ErrorStyle(self, *args)
 
