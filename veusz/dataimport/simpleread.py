@@ -43,6 +43,7 @@ x +- y + -
 from __future__ import division
 import re
 import csv
+import ast
 
 import numpy as N
 
@@ -264,18 +265,20 @@ class DescriptorPart(object):
                     except ValueError:
                         dat = N.nan
                         self.errorcount += 1
-                        
+
                 elif self.datatype == 'string':
                     if string_re.match(val):
-                        # possible security issue:
-                        # regular expression checks this is safe
+                        conv = val
+                        if conv[0:1] != 'u':
+                            # a hack for python2
+                            conv = 'u' + val
                         try:
-                            dat = eval(val)
+                            dat = ast.literal_eval(conv)
                         except:
                             dat = val
                     else:
                         dat = val
-                        
+
                 elif self.datatype == 'date':
                     dat = utils.dateStringToDate(val)
 

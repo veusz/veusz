@@ -23,6 +23,7 @@ Bug fixes:
  * Saving text datasets did not work in Python3
  * Fix partial dataset evaluation issue when loading documents
  * 2D non-regular pixel spaced images give error if clipped in y
+ * Handle Unicode quoted characters in simple text data files
 
 Features of package:
  Plotting features:
