@@ -111,7 +111,8 @@ class OperationDataImportPlugin(base.OperationDataImportBase):
             elif isinstance(d, plugins.Dataset2D):
                 ds = document.Dataset2D(data=d.data,
                                         xrange=d.rangex, yrange=d.rangey,
-                                        xedge=d.xedge, yedge=d.yedge)
+                                        xedge=d.xedge, yedge=d.yedge,
+                                        xcent=d.xcent, ycent=d.ycent)
             elif isinstance(d, plugins.DatasetText):
                 ds = document.DatasetText(data=d.data)
             elif isinstance(d, plugins.DatasetDateTime):
