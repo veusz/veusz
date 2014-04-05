@@ -26,6 +26,7 @@ Bug fixes:
  * Handle Unicode quoted characters in simple text data files
  * xcent/ycent in Dataset2D import plugins were ignored
  * promote_tab broken for import plugins
+ * Full screen view when all pages are deleted
 
 Features of package:
  Plotting features:

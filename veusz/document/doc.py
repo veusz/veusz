@@ -626,13 +626,18 @@ class Document( qt4.QObject ):
 
         If dpi is None, use the default Qt screen dpi
         Use dpi if given."""
-        return self._pagedocsize(self.basewidget.getPage(pagenum),
-                                 dpi=dpi, scaling=scaling, integer=integer)
+
+        page = self.basewidget.getPage(pagenum)
+        if page is None:
+            return self.docSize(dpi=dpi, scaling=scaling, integer=integer)
+        return self._pagedocsize(
+            page, dpi=dpi, scaling=scaling, integer=integer)
 
     def docSize(self, dpi=None, scaling=1., integer=True):
         """Get size for document."""
-        return self._pagedocsize(self.basewidget,
-                                 dpi=dpi, scaling=scaling, integer=integer)
+        return self._pagedocsize(
+            self.basewidget,
+            dpi=dpi, scaling=scaling, integer=integer)
 
     def resolveItem(self, fromwidget, where):
         """Resolve item relative to fromwidget.
