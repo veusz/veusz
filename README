@@ -25,6 +25,7 @@ Bug fixes:
  * 2D non-regular pixel spaced images give error if clipped in y
  * Handle Unicode quoted characters in simple text data files
  * xcent/ycent in Dataset2D import plugins were ignored
+ * promote_tab broken for import plugins
 
 Features of package:
  Plotting features:

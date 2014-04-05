@@ -111,8 +111,9 @@ class ImportDialog(VeuszDialog):
         # add promoted plugins
         for p in plugins.importpluginregistry:
             if p.promote_tab is not None:
+                from ..dataimport.dialog_plugin import ImportTabPlugins
                 w = ImportTabPlugins(self, promote=p.name)
-                self.methodtab.addTab(w, p.promote_tab)
+                self.methodtab.addTab(w, p.name)
 
         self.methodtab.currentChanged.connect(self.slotTabChanged)
         self.browsebutton.clicked.connect(self.slotBrowseClicked)
