@@ -27,6 +27,7 @@ Bug fixes:
  * xcent/ycent in Dataset2D import plugins were ignored
  * promote_tab broken for import plugins
  * Full screen view when all pages are deleted
+ * Crash with empty dataset and boxplot widget
 
 Features of package:
  Plotting features:
