@@ -44,6 +44,10 @@ def floattostring(f):
     """Convert float to string with more precision."""
     return uilocale.toString(f, 'g', 15)
 
+class OnModified(qt4.QObject):
+    """onmodified is emitted from an object contained in each setting."""
+    onModified = qt4.pyqtSignal()
+
 class Setting(object):
     """A class to store a value with a particular type."""
 
@@ -71,7 +75,7 @@ class Setting(object):
         self.formatting = formatting
         self.hidden = hidden
         self.default = value
-        self.onmodified = qt4.QObject()
+        self.onmodified = OnModified()
         self._val = None
 
         # calls the set function for the val property
@@ -131,7 +135,7 @@ class Setting(object):
             # this also removes the linked value if there is one set
             self._val = self.convertTo(v)
 
-        self.onmodified.emit(qt4.SIGNAL("onModified"), True)
+        self.onmodified.onModified.emit()
 
     val = property(get, set, None,
                    'Get or modify the value of the setting')
@@ -268,8 +272,7 @@ class Setting(object):
 
     def setOnModified(self, fn):
         """Set the function to be called on modification (passing True)."""
-        self.onmodified.connect(self.onmodified,
-                                qt4.SIGNAL("onModified"), fn)
+        self.onmodified.onModified.connect(fn)
 
         if isinstance(self._val, Reference):
             # make reference pointed to also call this onModified
@@ -278,7 +281,7 @@ class Setting(object):
 
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""
-        self.onmodified.disconnect(self.onmodified, 0, fn, 0)
+        self.onmodified.onModified.disconnect(fn)
 
     def newDefault(self, value):
         """Update the default and the value."""

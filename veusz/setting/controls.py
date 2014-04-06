@@ -88,7 +88,8 @@ class Edit(qt4.QLineEdit):
         except utils.InvalidType:
             styleError(self)
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
         self.setText( self.setting.toText() )
 
@@ -224,7 +225,8 @@ class String(qt4.QWidget):
         except utils.InvalidType:
             styleError(self.edit)
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toText() )
 
@@ -252,7 +254,8 @@ class Int(qt4.QSpinBox):
         if not self.ignorechange:
             self.emit(qt4.SIGNAL('settingChanged'), self, self.setting, value)
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
         self.ignorechange = True
         self.setValue( self.setting.val )
@@ -286,7 +289,8 @@ class Bool(qt4.QCheckBox):
         if not self.ignorechange:
             self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, state )
         
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
         self.ignorechange = True
         self.setChecked( self.setting.val )
@@ -382,7 +386,8 @@ class Choice(qt4.QComboBox):
         except utils.InvalidType:
             styleError(self)
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
         text = self.setting.toText()
         index = self.findText(text)
@@ -398,9 +403,10 @@ class ChoiceSwitch(Choice):
         Choice.showEvent(self, event)
         self.updateState()
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
-        Choice.onModified(self, mod)
+        Choice.onModified(self)
         self.updateState()
 
     def updateState(self):
@@ -506,7 +512,8 @@ class MultiLine(qt4.QTextEdit):
         except utils.InvalidType:
             styleError(self)
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
         self.setPlainText( self.setting.toText() )
 
@@ -973,7 +980,8 @@ class Color(qt4.QWidget):
         self.combo.setCurrentIndex(index)
         self.button.setIcon( self.combo.itemIcon(index) )
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
         self.setColor( self.setting.toText() )
 
@@ -1146,7 +1154,8 @@ class ListSet(qt4.QFrame):
         rows = list(self.setting.val)[:-1]
         self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, rows )
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
 
         if not self.ignorechange:
@@ -1533,7 +1542,8 @@ class MultiSettingWidget(qt4.QWidget):
         self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
                    tuple(val) )
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """Called when the setting is changed remotely,
         or when control is opened"""
 
@@ -1583,7 +1593,7 @@ class Datasets(MultiSettingWidget):
 
         self.lastdatasets = []
         # force updating to initialise
-        self.onModified(True)
+        self.onModified()
 
     def makeControl(self, row):
         """Make QComboBox edit widget."""
@@ -1616,11 +1626,12 @@ class Datasets(MultiSettingWidget):
         for cntrls, val in czip(self.controls, self.setting.val):
             cntrls[0].lineEdit().setText(val)
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """Called when the setting is changed remotely,
         or when control is opened"""
 
-        MultiSettingWidget.onModified(self, mod)
+        MultiSettingWidget.onModified(self)
 
         datasets = self.getDatasets()
 
@@ -1640,7 +1651,7 @@ class Strings(MultiSettingWidget):
         for browsing."""
 
         MultiSettingWidget.__init__(self, setting, doc, *args)
-        self.onModified(True)
+        self.onModified()
 
     def makeControl(self, row):
         """Make edit widget."""
@@ -1734,7 +1745,8 @@ class Filename(qt4.QWidget):
         except utils.InvalidType:
             styleError(self.edit)
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toText() )
 
@@ -1749,7 +1761,7 @@ class FontFamily(qt4.QFontComboBox):
         self.setFontFilters( qt4.QFontComboBox.ScalableFonts )
         
         # set initial value
-        self.onModified(True)
+        self.onModified()
 
         # stops combobox readjusting in size to fit contents
         self.setSizeAdjustPolicy(
@@ -1771,7 +1783,8 @@ class FontFamily(qt4.QFontComboBox):
         newval = self.currentText()
         self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, newval )
 
-    def onModified(self, mod):
+    @qt4.pyqtSlot()
+    def onModified(self):
         """Make control reflect chosen setting."""
         self.setCurrentFont( qt4.QFont(self.setting.toText()) )
 
@@ -1859,7 +1872,8 @@ class AxisBound(Choice):
         modesetn = setting.parent.get('mode')
         modesetn.setOnModified(self.modeChange)
 
-    def modeChange(self, changed):
+    @qt4.pyqtSlot()
+    def modeChange(self):
         """Called if the mode of the axis changes.
         Re-set text as float or date."""
 
