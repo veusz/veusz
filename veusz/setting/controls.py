@@ -65,12 +65,8 @@ class Edit(qt4.QLineEdit):
         qt4.QLineEdit.__init__(self, parent)
         self.setting = setting
 
-        # set the text of the widget to the 
         self.setText( setting.toText() )
-
-        self.connect(self, qt4.SIGNAL('editingFinished()'),
-                     self.validateAndSet)
-
+        self.editingFinished.connect(self.validateAndSet)
         self.setting.setOnModified(self.onModified)
 
         if setting.readonly:
@@ -179,10 +175,8 @@ class String(qt4.QWidget):
         # set the text of the widget to the 
         self.edit.setText( setting.toText() )
 
-        self.connect(self.edit, qt4.SIGNAL('editingFinished()'),
-                     self.validateAndSet)
-        self.connect(b, qt4.SIGNAL('toggled(bool)'),
-                     self.buttonToggled)
+        self.edit.editingFinished.connect(self.validateAndSet)
+        b.toggled.connect(self.buttonToggled)
 
         self.setting.setOnModified(self.onModified)
 
@@ -242,7 +236,7 @@ class Int(qt4.QSpinBox):
         self.setMaximum(setting.maxval)
         self.setValue(setting.val)
 
-        self.connect(self, qt4.SIGNAL('valueChanged(int)'), self.slotChanged)
+        self.valueChanged[int].connect(self.slotChanged)
         self.setting.setOnModified(self.onModified)
 
         if setting.readonly:
@@ -275,8 +269,7 @@ class Bool(qt4.QCheckBox):
         self.setChecked(setting.val)
 
         # we get a signal when the button is toggled
-        self.connect( self, qt4.SIGNAL('toggled(bool)'),
-                      self.slotToggled )
+        self.toggled.connect(self.slotToggled)
 
         self.setting.setOnModified(self.onModified)
 
@@ -357,8 +350,7 @@ class Choice(qt4.QComboBox):
             self.setEditText( setting.toText() )
 
         # if a different item is selected
-        self.connect( self, qt4.SIGNAL('activated(const QString&)'),
-                      self.slotActivated )
+        self.activated[str].connect(self.slotActivated)
 
         self.setting.setOnModified(self.onModified)
 
@@ -620,8 +612,7 @@ class Dataset(qt4.QWidget):
                       self.slotSettingChanged )
 
         b = self.button = DotDotButton(tooltip=_("Select using dataset browser"))
-        self.connect(b, qt4.SIGNAL("toggled(bool)"),
-                     self.slotButtonToggled)
+        b.toggled.connect(self.slotButtonToggled)
 
         self.document = document
         self.dimensions = dimensions
@@ -693,7 +684,7 @@ class DatasetOrString(Dataset):
 
         b = self.textbutton = DotDotButton()
         self.layout().addWidget(b)
-        self.connect(b, qt4.SIGNAL('toggled(bool)'), self.textButtonToggled)
+        b.toggled.connect(self.textButtonToggled)
 
     def textButtonToggled(self, on):
         """Button is pressed to bring popup up / down."""
@@ -894,8 +885,7 @@ class Color(qt4.QWidget):
         c.setEditable(True)
         for color in self._colors:
             c.addItem(self._icons[color], color)
-        self.connect(c, qt4.SIGNAL('activated(const QString&)'),
-                     self.slotActivated )
+        c.activated[str].connect(self.slotActivated)
 
         # add color if a color is added by a different combo box
         self.connect(Color._qobj, qt4.SIGNAL('addcolor'), self.addcolorSlot)
@@ -906,7 +896,7 @@ class Color(qt4.QWidget):
         b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         b.setMaximumHeight(24)
         b.setMaximumWidth(24)
-        self.connect(b, qt4.SIGNAL('clicked()'), self.slotButtonClicked)
+        b.clicked.connect(self.slotButtonClicked)
 
         if setting.readonly:
             c.setEnabled(False)
@@ -1128,13 +1118,13 @@ class ListSet(qt4.QFrame):
         # a button to add a new entry
         b = qt4.QPushButton('Add')
         h.addWidget(b)
-        self.connect(b, qt4.SIGNAL('clicked()'), self.onAddClicked)
+        b.clicked.connect(self.onAddClicked)
         b.show()
 
         # a button to delete the last entry
         b = qt4.QPushButton('Delete')
         h.addWidget(b)
-        self.connect(b, qt4.SIGNAL('clicked()'), self.onDeleteClicked)
+        b.clicked.connect(self.onDeleteClicked)
         b.setEnabled( len(self.setting.val) > 0 )
         b.show()
 
@@ -1190,7 +1180,7 @@ class ListSet(qt4.QFrame):
         wcolor.setIcon( qt4.QIcon(pix) )
         wcolor.setToolTip(tooltip)
 
-        self.connect(wcolor, qt4.SIGNAL('clicked()'), self.onColorClicked)
+        wcolor.clicked.connect(self.onColorClicked)
         return wcolor
 
     def addToggleButton(self, row, col, tooltip):
@@ -1200,7 +1190,7 @@ class ListSet(qt4.QFrame):
         wtoggle = qt4.QCheckBox()
         wtoggle.setChecked(toggle)
         wtoggle.setToolTip(tooltip)
-        self.connect(wtoggle, qt4.SIGNAL('toggled(bool)'), self.onToggled)
+        wtoggle.toggled.connect(self.onToggled)
         return wtoggle
 
     def addCombo(self, row, col, tooltip, values, icons, texts):
@@ -1219,8 +1209,7 @@ class ListSet(qt4.QFrame):
 
         wcombo.setCurrentIndex(values.index(val))
         wcombo.setToolTip(tooltip)
-        self.connect(wcombo, qt4.SIGNAL('activated(int)'),
-                     self.onComboChanged)
+        wcombo.activated[int].connect(self.onComboChanged)
         wcombo._vz_values = values
         return wcombo
 
@@ -1291,8 +1280,7 @@ class LineSet(ListSet):
         wwidth = qt4.QLineEdit()
         wwidth.setText(self.setting.val[row][1])
         wwidth.setToolTip('Line width')
-        self.connect(wwidth, qt4.SIGNAL('editingFinished()'),
-                     self.onWidthChanged)
+        wwidth.editingFinished.connect(self.onWidthChanged)
 
         # make color selector button
         wcolor = self.addColorButton(row, 2, _('Line color'))
@@ -1431,8 +1419,7 @@ class FillSet(ListSet):
 
         # extended options
         wmore = DotDotButton(tooltip=_("More options"))
-        self.connect(wmore, qt4.SIGNAL("toggled(bool)"),
-                     lambda on, row=row: self.editMore(on, row))
+        wmore.toggled.connect(lambda on, row=row: self.editMore(on, row))
 
         # return widgets
         return [wfillstyle, wcolor, whide, wmore]
@@ -1496,10 +1483,8 @@ class MultiSettingWidget(qt4.QWidget):
         self.grid.addWidget(addbutton, row, 1)
         self.grid.addWidget(subbutton, row, 2)
 
-        self.connect(addbutton, qt4.SIGNAL('clicked()'),
-                     lambda: self.addPressed(row))
-        self.connect(subbutton, qt4.SIGNAL('clicked()'),
-                     lambda: self.subPressed(row))
+        addbutton.clicked.connect(lambda: self.addPressed(row))
+        subbutton.clicked.connect(lambda: self.subPressed(row))
 
         if len(self.controls) == 2:
             # enable first subtraction button
@@ -1599,11 +1584,9 @@ class Datasets(MultiSettingWidget):
         """Make QComboBox edit widget."""
         combo = qt4.QComboBox()
         combo.setEditable(True)
-        self.connect(combo.lineEdit(), qt4.SIGNAL('editingFinished()'), 
-                     lambda: self.dataChanged(row))
+        combo.lineEdit().editingFinished.connect(lambda: self.dataChanged(row))
         # if a different item is selected
-        self.connect(combo, qt4.SIGNAL('activated(const QString&)'),
-                     lambda x: self.dataChanged(row))
+        combo.activated[str].connect(lambda x: self.dataChanged(row))
         utils.populateCombo(combo, self.getDatasets())
         return combo
 
@@ -1656,8 +1639,7 @@ class Strings(MultiSettingWidget):
     def makeControl(self, row):
         """Make edit widget."""
         lineedit = qt4.QLineEdit()
-        self.connect(lineedit, qt4.SIGNAL('editingFinished()'), 
-                     lambda: self.dataChanged(row))
+        lineedit.editingFinished.connect(lambda: self.dataChanged(row))
         return lineedit
 
     def readControl(self, control):
@@ -1667,7 +1649,7 @@ class Strings(MultiSettingWidget):
     def updateControls(self):
         """Set values of controls."""
         for cntrls, val in czip(self.controls, self.setting.val):
-            cntrls[0].setText(val)        
+            cntrls[0].setText(val)
 
 class Filename(qt4.QWidget):
     """A widget for selecting a filename with a browse button."""
@@ -1698,17 +1680,14 @@ class Filename(qt4.QWidget):
         layout.addWidget(b)
 
         # connect up signals
-        self.connect(self.edit, qt4.SIGNAL('editingFinished()'),
-                     self.validateAndSet)
-        self.connect(b, qt4.SIGNAL('clicked()'),
-                     self.buttonClicked)
+        self.edit.editingFinished.connect(self.validateAndSet)
+        b.clicked.connect(self.buttonClicked)
 
-        # add completion if we have support (qt >= 4.3)
-        if hasattr(qt4, 'QDirModel'):
-            c = self.filenamecompleter = qt4.QCompleter(self)
-            model = qt4.QDirModel(c)
-            c.setModel(model)
-            self.edit.setCompleter(c)
+        # completion support
+        c = self.filenamecompleter = qt4.QCompleter(self)
+        model = qt4.QDirModel(c)
+        c.setModel(model)
+        self.edit.setCompleter(c)
 
         # for read only filenames
         if setting.readonly:
@@ -1770,8 +1749,7 @@ class FontFamily(qt4.QFontComboBox):
         self.setting.setOnModified(self.onModified)
 
         # if a different item is selected
-        self.connect( self, qt4.SIGNAL('activated(const QString&)'),
-                      self.slotActivated )
+        self.activated[str].connect(self.slotActivated)
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
