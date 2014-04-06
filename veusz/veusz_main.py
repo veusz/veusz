@@ -133,8 +133,7 @@ class VeuszApp(qt4.QApplication):
     def __init__(self, args):
         qt4.QApplication.__init__(self, args)
 
-        self.connect(self, qt4.SIGNAL('lastWindowClosed()'),
-                     self, qt4.SLOT('quit()'))
+        self.lastWindowClosed.connect(self.quit)
 
         # register a signal handler to catch ctrl+C
         signal.signal(signal.SIGINT, handleIntSignal)
@@ -230,8 +229,7 @@ class VeuszApp(qt4.QApplication):
             self.installTranslator(trans)
 
         self.thread = ImportThread()
-        self.connect( self.thread, qt4.SIGNAL('finished()'),
-                      self.slotStartApplication )
+        self.thread.finished.connect(self.slotStartApplication)
         self.thread.start()
 
     def slotStartApplication(self):

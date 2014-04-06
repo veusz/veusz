@@ -47,8 +47,7 @@ class DataCreateDialog(VeuszDialog):
         self.document = document
 
         # create button group to get notification of changes
-        self.connect( self.methodGroup, qt4.SIGNAL('radioClicked'),
-                      self.slotMethodChanged )
+        self.methodGroup.radioClicked.connect(self.slotMethodChanged)
 
         # connect create button
         self.createbutton = self.buttonBox.addButton(

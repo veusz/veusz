@@ -54,23 +54,17 @@ class DataCreate2DDialog(VeuszDialog):
 
         self.createbutton = self.buttonBox.addButton(
             _("C&reate"), qt4.QDialogButtonBox.ApplyRole )
-        self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
-                      self.createButtonClickedSlot )
+        self.createbutton.clicked.connect(self.createButtonClickedSlot)
 
-        self.connect( self.fromxyfunc, qt4.SIGNAL('toggled(bool)'),
-                      self.fromxyfuncSlot )
-        self.connect( self.fromxyzexpr, qt4.SIGNAL('toggled(bool)'),
-                      self.fromxyzexprSlot )
-        self.connect( self.from2dexpr, qt4.SIGNAL('toggled(bool)'),
-                      self.from2dexprSlot )
+        self.fromxyfunc.toggled.connect(self.fromxyfuncSlot)
+        self.fromxyzexpr.toggled.connect(self.fromxyzexprSlot)
+        self.from2dexpr.toggled.connect(self.from2dexprSlot)
 
         document.signalModified.connect(self.updateDatasetLists)
 
         for combo in (self.namecombo, self.xexprcombo, self.yexprcombo,
                       self.zexprcombo):
-            self.connect(combo,
-                         qt4.SIGNAL('editTextChanged(const QString&)'),
-                         self.enableDisableCreate)
+            combo.editTextChanged.connect(self.enableDisableCreate)
 
         self.fromxyzexpr.toggle()
         self.enableDisableCreate()

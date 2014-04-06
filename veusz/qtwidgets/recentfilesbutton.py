@@ -69,8 +69,7 @@ class RecentFilesButton(qt4.QPushButton):
                 act = self.menu.addAction( os.path.basename(filename) )
                 def loadRecentFile(filename=filename):
                     self.emit(qt4.SIGNAL('filechosen'), filename)
-                self.connect( act, qt4.SIGNAL('triggered()'),
-                              loadRecentFile )
+                act.triggered.connect(loadRecentFile)
 
     def addFile(self, filename):
         """Add filename to list of recent files."""

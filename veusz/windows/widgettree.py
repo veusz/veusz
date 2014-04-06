@@ -50,7 +50,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """The document has been changed."""
         if not self.suspendmodified:
             # needs to be suspended within insert/delete row operations
-            self.emit( qt4.SIGNAL('layoutChanged()') )
+            self.layoutChanged.emit()
 
     def columnCount(self, parent):
         """Return number of columns of data."""

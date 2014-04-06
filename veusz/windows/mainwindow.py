@@ -231,8 +231,7 @@ class MainWindow(qt4.QMainWindow):
                       self.plot.selectedWidgets )
 
         # enable/disable undo/redo
-        self.connect(self.menus['edit'], qt4.SIGNAL('aboutToShow()'),
-                     self.slotAboutToShowEdit)
+        self.menus['edit'].aboutToShow.connect(self.slotAboutToShowEdit)
 
         #Get the list of recently opened files
         self.populateRecentFiles()
@@ -693,12 +692,11 @@ class MainWindow(qt4.QMainWindow):
             a = self.vzactions[act]
             fn = viewHideWindow(win)
             self.viewwinfns.append( (win, a, fn) )
-            self.connect(a, qt4.SIGNAL('triggered()'), fn)
+            a.triggered.connect(fn)
 
         # needs to update state every time menu is shown
-        self.connect(self.menus['view.viewwindows'],
-                     qt4.SIGNAL('aboutToShow()'),
-                     self.slotAboutToShowViewWindow)
+        self.menus['view.viewwindows'].aboutToShow.connect(
+            self.slotAboutToShowViewWindow)
 
     def slotAboutToShowViewWindow(self):
         """Enable/disable View->Window item check boxes."""

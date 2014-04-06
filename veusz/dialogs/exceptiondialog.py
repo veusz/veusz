@@ -188,8 +188,7 @@ class ExceptionDialog(VeuszDialog):
                                              None, self)
         self.erroriconlabel.setPixmap(icon.pixmap(32))
 
-        self.connect(self.ignoreSessionButton, qt4.SIGNAL('clicked()'),
-                     self.ignoreSessionSlot)
+        self.ignoreSessionButton.clicked.connect(self.ignoreSessionSlot)
        
         self.checkVeuszVersion()
 

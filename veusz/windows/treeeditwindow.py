@@ -334,7 +334,7 @@ class PropertyList(qt4.QWidget):
             # need to save reference to caller object
             button.caller = utils.BoundCaller(setnsproxy.onAction, action,
                                               self.getConsole())
-            self.connect(button, qt4.SIGNAL('clicked()'), button.caller)
+            button.clicked.connect(button.caller)
 
             self.layout.addWidget(button, row, 1)
             self.childlist.append(button)
@@ -412,7 +412,7 @@ class PropertyList(qt4.QWidget):
             expandbutton.setText( ("+","-")[checked] )
             grpwidget.setVisible( checked )
 
-        self.connect(expandbutton, qt4.SIGNAL("toggled(bool)"), ontoggle)
+        expandbutton.toggled.connect(ontoggle)
 
         # add group to standard layout
         self.layout.addWidget(grpwidget, row, 0, 1, -1)
@@ -516,8 +516,7 @@ class TabbedFormatting(qt4.QTabWidget):
             # add on a formatting tab
             setnslist.insert(0, setnsproxy)
 
-        self.connect( self, qt4.SIGNAL('currentChanged(int)'),
-                      self.slotCurrentChanged )
+        self.currentChanged.connect(self.slotCurrentChanged)
 
         # subsettings for tabs
         self.tabsubsetns = []
@@ -677,10 +676,8 @@ class TreeEditDock(qt4.QDockWidget):
         self.treeview = WidgetTreeView(self.treemodel)
 
         # receive change in selection
-        self.connect(self.treeview.selectionModel(),
-                     qt4.SIGNAL('selectionChanged(const QItemSelection &,'
-                                ' const QItemSelection &)'),
-                     self.slotTreeItemsSelected)
+        self.treeview.selectionModel().selectionChanged.connect(
+            self.slotTreeItemsSelected)
 
         # set tree as main widget
         self.setWidget(self.treeview)
@@ -705,9 +702,8 @@ class TreeEditDock(qt4.QDockWidget):
         self.selectWidget(document.basewidget)
 
         # update paste button when clipboard changes
-        self.connect(qt4.QApplication.clipboard(),
-                     qt4.SIGNAL('dataChanged()'),
-                     self.updatePasteButton)
+        qt4.QApplication.clipboard().dataChanged.connect(
+            self.updatePasteButton)
         self.updatePasteButton()
 
     def slotDocumentWiped(self):
@@ -772,9 +768,9 @@ class TreeEditDock(qt4.QDockWidget):
             if enabled:
                 m.addSeparator()
                 act = qt4.QAction(menutext, self)
-                self.connect(act, qt4.SIGNAL('triggered()'),
-                             utils.BoundCaller(self.slotWidgetHideShow,
-                                               self.selwidgets, showhide))
+                act.triggered.connect(
+                    utils.BoundCaller(self.slotWidgetHideShow,
+                                      self.selwidgets, showhide))
                 m.addAction(act)
 
         m.exec_(self.mapToGlobal(event.pos()))
@@ -978,8 +974,8 @@ class TreeEditDock(qt4.QDockWidget):
                                  'edit.moveup', 'edit.movedown',
                                  'edit.delete', 'edit.rename'))
 
-        self.connect( self.parentwin.menus['edit.select'],
-                      qt4.SIGNAL('aboutToShow()'), self.updateSelectMenu )
+        self.parentwin.menus['edit.select'].aboutToShow.connect(
+            self.updateSelectMenu)
 
     def slotMakeWidgetButton(self, wc):
         """User clicks button to make widget."""
@@ -1351,7 +1347,7 @@ class SettingLabel(qt4.QWidget):
                 self.document.applyOperation(
                     document.OperationSettingSet(wpath, self.setting.get()))
 
-            menu.connect(action, qt4.SIGNAL('triggered()'), modify)
+            action.triggered.connect(modify)
 
     @qt4.pyqtSlot(qt4.QPoint)
     def settingMenu(self, pos):
