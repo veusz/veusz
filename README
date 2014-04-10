@@ -28,6 +28,7 @@ Bug fixes:
  * promote_tab broken for import plugins
  * Full screen view when all pages are deleted
  * Crash with empty dataset and boxplot widget
+ * Fix copy and paste of datasets
 
 Features of package:
  Plotting features:

@@ -272,7 +272,7 @@ class OperationDataPaste(object):
         tempdoc = doc.Document()
         # interpreter to create datasets
         interpreter = commandinterpreter.CommandInterpreter(tempdoc)
-        interpreter.runFile(self.data)
+        interpreter.runFile(CStringIO(self.data))
 
         # list of pasted datasets
         self.newds = []
