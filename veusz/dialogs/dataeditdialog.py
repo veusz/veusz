@@ -500,8 +500,8 @@ class DataEditDialog(VeuszDialog):
         else:
             self.slotDatasetsSelected([])
 
-        self.connect(self.dsbrowser.navtree, qt4.SIGNAL("selecteddatasets"),
-                     self.slotDatasetsSelected)
+        self.dsbrowser.navtree.selecteddatasets.connect(
+            self.slotDatasetsSelected)
 
         # connect buttons
         for btn, slot in ( (self.deletebutton, self.slotDatasetDelete),

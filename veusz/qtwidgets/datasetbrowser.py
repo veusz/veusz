@@ -351,6 +351,9 @@ class DatasetRelationModel(TreeModel):
 class DatasetsNavigatorTree(qt4.QTreeView):
     """Tree view for dataset names."""
 
+    updateitem = qt4.pyqtSignal()
+    selecteddatasets = qt4.pyqtSignal(list)
+
     def __init__(self, doc, mainwin, grouping, parent,
                  readonly=False, filterdims=None, filterdtype=None):
         """Initialise the dataset tree view.
@@ -611,19 +614,19 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     def keyPressEvent(self, event):
         """Enter key selects widget."""
         if event.key() in (qt4.Qt.Key_Return, qt4.Qt.Key_Enter):
-            self.emit(qt4.SIGNAL("updateitem"))
+            self.updateitem.emit()
             return
         qt4.QTreeView.keyPressEvent(self, event)
 
     def mouseDoubleClickEvent(self, event):
         """Emit updateitem signal if double clicked."""
         retn = qt4.QTreeView.mouseDoubleClickEvent(self, event)
-        self.emit(qt4.SIGNAL("updateitem"))
+        self.updateitem.emit()
         return retn
 
     def slotNewSelection(self, selected, deselected):
         """Emit selecteditem signal on new selection."""
-        self.emit(qt4.SIGNAL("selecteddatasets"), self.getSelectedDatasets())
+        self.selecteddatasets.emit(self.getSelectedDatasets())
 
     def slotNewRow(self, parent, start, end):
         """Expand parent if added."""
@@ -726,6 +729,9 @@ class DatasetBrowserPopup(DatasetBrowser):
     This is used by setting.controls.Dataset
     """
 
+    closing = qt4.pyqtSignal()
+    newdataset = qt4.pyqtSignal(str)
+
     def __init__(self, document, dsname, parent,
                  filterdims=None, filterdtype=None):
         """Open popup window for document
@@ -747,8 +753,7 @@ class DatasetBrowserPopup(DatasetBrowser):
 
         self.navtree.setFocus()
 
-        self.connect(self.navtree, qt4.SIGNAL("updateitem"),
-                     self.slotUpdateItem)
+        self.navtree.updateitem.connect(self.slotUpdateItem)
 
     def eventFilter(self, node, event):
         """Grab clicks outside this window to close it."""
@@ -766,7 +771,7 @@ class DatasetBrowserPopup(DatasetBrowser):
 
     def closeEvent(self, event):
         """Tell the calling widget that we are closing."""
-        self.emit(qt4.SIGNAL("closing"))
+        self.closing.emit()
         event.accept()
 
     def slotUpdateItem(self):
@@ -775,5 +780,5 @@ class DatasetBrowserPopup(DatasetBrowser):
         if selected.isValid():
             n = self.navtree.model.objFromIndex(selected)
             if isinstance(n, DatasetNode):
-                self.emit(qt4.SIGNAL("newdataset"), n.data[0])
+                self.newdataset.emit(n.data[0])
                 self.close()

@@ -42,13 +42,15 @@ class ReadingThread(qt4.QThread):
     Windows as its stdin is a weird object
     """
 
+    newline = qt4.pyqtSignal(str)
+
     def run(self):
         """Emit lines read from stdin."""
         while True:
             line = sys.stdin.readline()
             if line == '':
                 break
-            self.emit(qt4.SIGNAL("newline"), line)
+            self.newline.emit(line)
 
 class InputListener(qt4.QObject):
     """Class reads text from stdin, in order to send commands to a document."""
@@ -76,9 +78,9 @@ class InputListener(qt4.QObject):
 
         # reading is done in a separate thread so as not to block
         self.readthread = ReadingThread(self)
-        self.connect(self.readthread, qt4.SIGNAL("newline"), self.processLine)
+        self.readthread.newline.connect(self.processLine)
         self.readthread.start()
-        
+
     def resizeWindow(self, width, height):
         """ResizeWindow(width, height)
 

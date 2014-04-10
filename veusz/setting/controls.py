@@ -95,6 +95,8 @@ class _EditBox(qt4.QTextEdit):
     Emits closing(text) when the box closes
     """
 
+    closing = qt4.pyqtSignal(str)
+
     def __init__(self, origtext, readonly, parent):
         """Make a popup, framed widget containing a text editor."""
 
@@ -151,7 +153,7 @@ class _EditBox(qt4.QTextEdit):
 
         text = self.toPlainText()
         text = text.replace('\n', '')
-        self.emit(qt4.SIGNAL('closing'), text)
+        self.closing.emit(text)
         event.accept()
 
 class String(qt4.QWidget):
@@ -192,7 +194,7 @@ class String(qt4.QWidget):
                           self.setting.readonly, self.button)
 
             # we get notified with text when the popup closes
-            self.connect(e, qt4.SIGNAL('closing'), self.boxClosing)
+            e.closing.connect(self.boxClosing)
             e.show()
 
     def boxClosing(self, text):
@@ -663,8 +665,8 @@ class Dataset(qt4.QWidget):
                                     self.button,
                                     filterdims=set((self.dimensions,)),
                                     filterdtype=set((self.datatype,)) )
-            self.connect(d, qt4.SIGNAL("closing"), self.boxClosing)
-            self.connect(d, qt4.SIGNAL("newdataset"), self.newDataset)
+            d.closing.connect(self.boxClosing)
+            d.newdataset.connect(self.newDataset)
             d.show()
 
     def boxClosing(self):
@@ -695,7 +697,7 @@ class DatasetOrString(Dataset):
                           self.choice.setting.readonly, self.textbutton)
 
             # we get notified with text when the popup closes
-            self.connect(e, qt4.SIGNAL("closing"), self.textBoxClosing)
+            e.closing.connect(self.textBoxClosing)
             e.show()
 
     def textBoxClosing(self, text):
@@ -1310,6 +1312,8 @@ class LineSet(ListSet):
 class _FillBox(qt4.QScrollArea):
     """Pop up box for extended fill settings."""
 
+    closing = qt4.pyqtSignal(int)
+
     def __init__(self, doc, thesetting, row, button, parent):
         """Initialse widget. This is based on a PropertyList widget.
 
@@ -1387,7 +1391,7 @@ class _FillBox(qt4.QScrollArea):
         """Tell the calling widget that we are closing, and provide
         the new text."""
 
-        self.emit(qt4.SIGNAL("closing"), self.row)
+        self.closing.emit(self.row)
         qt4.QScrollArea.closeEvent(self, event)
 
 class FillSet(ListSet):
@@ -1432,7 +1436,7 @@ class FillSet(ListSet):
         if on:
             fb = _FillBox(self.setting.getDocument(), self.setting,
                           row, self.buttonAtRow(row), self.parent())
-            self.connect(fb, qt4.SIGNAL("closing"), self.boxClosing)
+            fb.closing.connect(self.boxClosing)
             self.connect(fb, qt4.SIGNAL("settingChanged"), self,
                          qt4.SIGNAL("settingChanged"))
             fb.show()
