@@ -44,6 +44,8 @@ class RecentFilesButton(qt4.QPushButton):
     emits filechosen(filename) if a file is chosen
     """
 
+    filechosen = qt4.pyqtSignal(str)
+
     def __init__(self, *args):
         qt4.QPushButton.__init__(self, *args)
 
@@ -67,9 +69,9 @@ class RecentFilesButton(qt4.QPushButton):
         for filename in recent:
             if os.path.exists(filename):
                 act = self.menu.addAction( os.path.basename(filename) )
-                def loadRecentFile(filename=filename):
-                    self.emit(qt4.SIGNAL('filechosen'), filename)
-                act.triggered.connect(loadRecentFile)
+                def loadrecentfile(f):
+                    return lambda: self.filechosen.emit(f)
+                act.triggered.connect(loadrecentfile(filename))
 
     def addFile(self, filename):
         """Add filename to list of recent files."""
@@ -77,5 +79,3 @@ class RecentFilesButton(qt4.QPushButton):
         recent.insert(0, os.path.abspath(filename))
         setting.settingdb[self.settingname] = recent
         self.fillMenu()
-
-                      

@@ -58,8 +58,7 @@ class ManualBinModel(qt4.QAbstractListModel):
                 return False
 
             self.thedata[ index.row() ] = val
-            self.emit( qt4.SIGNAL("dataChanged(const QModelIndex &,"
-                                  " const QModelIndex &)"), index, index)
+            self.dataChanged.emit(index, index)
             return True
         return False
 

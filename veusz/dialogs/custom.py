@@ -88,7 +88,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
 
     def doUpdate(self):
         """Document changed."""
-        self.emit( qt4.SIGNAL('layoutChanged()') )
+        self.layoutChanged.emit()
 
     def addNewEntry(self):
         """Add a new row to the list of custom items."""
@@ -159,8 +159,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
             self.document.applyOperation(
                 document.OperationSetCustom(newcustom) )
 
-            self.emit(qt4.SIGNAL('dataChanged(const QModelIndex &, const QModelIndex &'),
-                      index, index)
+            self.dataChanged.emit(index, index)
             return True
         return False
 
@@ -204,18 +203,16 @@ class CustomDialog(VeuszDialog):
         self.definitionView.setItemDelegateForColumn(0, self.combodeligate)
 
         # connect buttons to slots
-        self.connect(self.addButton, qt4.SIGNAL('clicked()'), self.slotAdd)
-        self.connect(self.removeButton, qt4.SIGNAL('clicked()'),
-                     self.slotRemove)
-        self.connect(self.upButton, qt4.SIGNAL('clicked()'), self.slotUp)
-        self.connect(self.downButton, qt4.SIGNAL('clicked()'), self.slotDown)
+        self.addButton.clicked.connect(self.slotAdd)
+        self.removeButton.clicked.connect(self.slotRemove)
+        self.upButton.clicked.connect(self.slotUp)
+        self.downButton.clicked.connect(self.slotDown)
 
-        self.connect(self.saveButton, qt4.SIGNAL('clicked()'), self.slotSave)
-        self.connect(self.loadButton, qt4.SIGNAL('clicked()'), self.slotLoad)
+        self.saveButton.clicked.connect(self.slotSave)
+        self.loadButton.clicked.connect(self.slotLoad)
 
         # recent button shows list of recently used files for loading
-        self.connect(self.recentButton, qt4.SIGNAL('filechosen'),
-                     self.loadFile)
+        self.recentButton.filechosen.connect(self.loadFile)
         self.recentButton.setSetting('customdialog_recent')
 
     def loadFile(self, filename):

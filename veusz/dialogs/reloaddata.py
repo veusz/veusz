@@ -57,21 +57,17 @@ class ReloadData(VeuszDialog):
         self.reloadData()
 
         # if interval changed or enabled update timer
-        self.connect(self.intervalCheck, qt4.SIGNAL('clicked()'),
-                     self.intervalUpdate)
-        self.connect(self.intervalTime, qt4.SIGNAL('valueChanged(int)'),
-                     self.intervalUpdate)
+        self.intervalCheck.clicked.connect(self.intervalUpdate)
+        self.intervalTime.valueChanged[int].connect(self.intervalUpdate)
 
         # timer to reload data
         self.intervalTimer = qt4.QTimer()
-        self.connect(self.intervalTimer, qt4.SIGNAL('timeout()'),
-                     self.reloadIfChanged)
+        self.intervalTimer.timeout.connect(self.reloadIfChanged)
 
         # manual reload
         self.reloadbutton = self.buttonBox.addButton(
             "&Reload again", qt4.QDialogButtonBox.ApplyRole)
-        self.connect(self.reloadbutton, qt4.SIGNAL('clicked()'),
-                     self.reloadData)
+        self.reloadbutton.clicke.connect(self.reloadData)
 
         # close by default, not reload
         self.buttonBox.button(qt4.QDialogButtonBox.Close).setDefault(True)

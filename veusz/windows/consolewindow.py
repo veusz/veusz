@@ -65,8 +65,7 @@ class _CommandEdit(qt4.QLineEdit):
         self.history_posn = 0
         self.entered_text = ''
 
-        qt4.QObject.connect( self, qt4.SIGNAL("returnPressed()"),
-                             self.slotReturnPressed )
+        self.returnPressed.connect(self.slotReturnPressed)
 
         self.setToolTip(_("Input a python expression here and press enter"))
 

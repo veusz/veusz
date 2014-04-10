@@ -55,13 +55,11 @@ class DataCreateDialog(VeuszDialog):
         self.replacebutton = self.buttonBox.addButton(
             _("&Replace"), qt4.QDialogButtonBox.ApplyRole )
 
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
-                      qt4.SIGNAL('clicked()'), self.resetButtonClicked )
+        self.buttonBox.button(
+            qt4.QDialogButtonBox.Reset).clicked.connect(self.resetButtonClicked)
 
-        self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
-                      self.createButtonClicked )
-        self.connect( self.replacebutton, qt4.SIGNAL('clicked()'),
-                      self.createButtonClicked )
+        self.createbutton.clicked.connect(self.createButtonClicked)
+        self.replacebutton.clicked.connect(self.createButtonClicked)
 
         # connect notification of document change
         self.document.signalModified.connect(self.modifiedDocSlot)
@@ -76,11 +74,9 @@ class DataCreateDialog(VeuszDialog):
         for edit in (self.numstepsedit, self.tstartedit, self.tendedit,
                      self.tstepsedit, self.nameedit,
                      self.valueedit):
-            self.connect( edit, qt4.SIGNAL('editTextChanged(const QString &)'),
-                          self.editsEditSlot )
+            edit.editTextChanged.connect(self.editsEditSlot)
 
-        self.connect( self.nameedit, qt4.SIGNAL('currentIndexChanged(int)'),
-                      self.datasetSelected )
+        self.nameedit.currentIndexChanged[int].connect(self.datasetSelected)
 
         # edit controls for dataset
         self.dsedits = { 'data': self.valueedit, 'serr': self.symerroredit,

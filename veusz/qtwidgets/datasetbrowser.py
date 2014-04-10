@@ -331,9 +331,7 @@ class DatasetRelationModel(TreeModel):
 
         self.doc.applyOperation(
             document.OperationDatasetRename(dsnode.data[0], newname))
-        self.emit(
-            qt4.SIGNAL("dataChanged(const QModelIndex &, const QModelIndex &)"),
-            idx, idx)
+        self.dataChanged.emit(idx, idx)
         return True
 
     @qt4.pyqtSlot()
@@ -377,8 +375,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         self.setUniformRowHeights(True)
         self.setContextMenuPolicy(qt4.Qt.CustomContextMenu)
         if not readonly:
-            self.connect(self, qt4.SIGNAL("customContextMenuRequested(QPoint)"),
-                         self.showContextMenu)
+            self.customContextMenuRequested.connect(self.showContextMenu)
         self.model.refresh()
         self.expandAll()
 
@@ -394,15 +391,10 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             mainwin.documentOpened.connect(self.expandAll)
 
         # keep track of selection
-        self.connect( self.selectionModel(),
-                      qt4.SIGNAL("selectionChanged(const QItemSelection&, "
-                                 "const QItemSelection&)"),
-                      self.slotNewSelection )
+        self.selectionModel().selectionChanged.connect(self.slotNewSelection)
 
         # expand nodes by default
-        self.connect( self.model,
-                      qt4.SIGNAL("rowsInserted(const QModelIndex&, int, int)"),
-                      self.slotNewRow )
+        self.model.rowsInserted.connect(self.slotNewRow)
 
     def changeGrouping(self, grouping):
         """Change the tree grouping behaviour."""
@@ -695,8 +687,7 @@ class DatasetBrowser(qt4.QWidget):
             if name == self.grouping:
                 a.setChecked(True)
             self.grpact.addAction(a)
-        self.connect(self.grpact, qt4.SIGNAL("triggered(QAction*)"),
-                     self.slotGrpChanged)
+        self.grpact.triggered.connect(self.slotGrpChanged)
         self.grpbutton.setMenu(self.grpmenu)
         self.grpbutton.setToolTip(_("Group datasets with property given"))
         self.optslayout.addWidget(self.grpbutton)
@@ -705,8 +696,8 @@ class DatasetBrowser(qt4.QWidget):
         self.optslayout.addWidget(qt4.QLabel(_("Filter")))
         self.filteredit = LineEditWithClear()
         self.filteredit.setToolTip(_("Enter text here to filter datasets"))
-        self.connect(self.filteredit, qt4.SIGNAL("textChanged(const QString&)"),
-                     self.slotFilterChanged)
+
+        self.filteredit.textChanged.connect(self.slotFilterChanged)
         self.optslayout.addWidget(self.filteredit)
 
         self.layout.addLayout(self.optslayout)

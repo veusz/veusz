@@ -42,8 +42,7 @@ class AboutDialog(VeuszDialog):
         copyrighttext = copyrighttext % {'version': utils.version()}
         self.copyrightlabel.setText(copyrighttext)
 
-        self.connect(self.licenseButton, qt4.SIGNAL('clicked()'),
-                     self.licenseClicked)
+        self.licenseButton.clicked.connect(self.licenseClicked)
 
     def licenseClicked(self):
         """Show the license."""

@@ -479,7 +479,7 @@ class DataEditDialog(VeuszDialog):
             (_('Insert row'), self.slotInsertRow),
             ):
             act = qt4.QAction(text, self)
-            self.connect(act, qt4.SIGNAL('triggered()'), slot)
+            act.triggered.connect(slot)
             self.datatableview.addAction(act)
         self.datatableview.setContextMenuPolicy( qt4.Qt.ActionsContextMenu )
 
@@ -511,7 +511,7 @@ class DataEditDialog(VeuszDialog):
                            (self.createbutton, self.slotDatasetCreate),
                            (self.editbutton, self.slotDatasetEdit),
                            ):
-            self.connect(btn, qt4.SIGNAL('clicked()'), slot)
+            btn.clicked.connect(slot)
 
         # menu for new button
         self.newmenu = qt4.QMenu()
@@ -519,7 +519,7 @@ class DataEditDialog(VeuszDialog):
                             (_('Text dataset'), self.slotNewTextDataset),
                             (_('Date/time dataset'), self.slotNewDateDataset) ):
             a = self.newmenu.addAction(text)
-            self.connect(a, qt4.SIGNAL('triggered()'), slot)
+            a.triggered.connect(slot)
         self.newbutton.setMenu(self.newmenu)
 
     def slotDatasetsSelected(self, names):

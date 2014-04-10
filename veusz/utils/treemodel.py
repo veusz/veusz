@@ -243,11 +243,9 @@ class TreeModel(qt4.QAbstractItemModel):
                     clone._idx = idx
                     self.nodes[idx] = clone
 
-                    self.emit(qt4.SIGNAL('dataChanged(const QModelIndex &, '
-                                         'const QModelIndex &)'),
-                              self.index(i, 0, parentidx),
-                              self.index(i, len(c[i].data)-1,
-                                         parentidx))
+                    self.dataChanged.emit(
+                        self.index(i, 0, parentidx),
+                        self.index(i, len(c[i].data)-1, parentidx))
 
             # now recurse to update any subnodes
             newindex = self.index(i, 0, parentidx)

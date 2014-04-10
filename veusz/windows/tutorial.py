@@ -29,6 +29,9 @@ def _(text, disambiguation=None, context="Tutorial"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class TutorialStep(qt4.QObject):
+
+    nextStep = qt4.pyqtSignal()
+
     def __init__(self, text, mainwin,
                  nextstep=None, flash=None,
                  disablenext=False,
@@ -69,14 +72,14 @@ class TutorialStep(qt4.QObject):
             setn = self.mainwin.document.basewidget.prefLookup(
                 self.nextonsetting[0]).get()
             if self.nextonsetting[1](setn):
-                self.emit( qt4.SIGNAL('nextStep') )
+                self.nextStep.emit()
         except ValueError:
             pass
 
     def slotWidgetsSelected(self, widgets, *args):
         """Go to next page if widget selected."""
         if len(widgets) == 1 and widgets[0].name == self.nextonselected:
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 ##########################
 ## Introduction to widgets
@@ -278,12 +281,11 @@ the flashing Line tab (%s).</p>
             disablenext=True,
             nextstep=FunctionLineFormatting)
 
-        self.connect(tb, qt4.SIGNAL('currentChanged(int)'),
-                     self.slotCurrentChanged)
+        tb.currentChanged[int].connect(self.slotCurrentChanged)
 
     def slotCurrentChanged(self, idx):
         if idx == 1:
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class FunctionLineFormatting(TutorialStep):
     def __init__(self, mainwin):
@@ -354,7 +356,7 @@ class DataImport(TutorialStep):
             # and choosing tab
             dialog.guessImportTab()
             # get rid of existing values
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class DataImportDialog(TutorialStep):
     def __init__(self, mainwin):
@@ -389,7 +391,7 @@ to the original file.</p>
 
     def slotDocModified(self):
         if 'alpha' in self.mainwin.document.data:
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class DataImportDialog3(TutorialStep):
     def __init__(self, mainwin):
@@ -405,8 +407,7 @@ box or reopen it later.</p>
             nextstep=DataImportDialog4)
 
         self.timer = qt4.QTimer()
-        self.connect( self.timer, qt4.SIGNAL('timeout()'),
-                      self.slotTimeout )
+        self.timer.timeout.connect(self.slotTimeout)
         self.timer.start(200)
 
     def slotTimeout(self):
@@ -417,7 +418,7 @@ box or reopen it later.</p>
                 closed = False
         if closed:
             # move forward if no import dialog open
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class DataImportDialog4(TutorialStep):
     def __init__(self, mainwin):
@@ -648,7 +649,7 @@ deletes it from the document.</p>
             d.resolve(d.basewidget, '/page1/graph1')
         except ValueError:
             # success!
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class AddGrid(TutorialStep):
     def __init__(self, mainwin):
@@ -773,7 +774,7 @@ class TutorialDock(qt4.QDockWidget):
         self.buttonbox = qt4.QDialogButtonBox()
         self.nextb = self.buttonbox.addButton(
             'Next', qt4.QDialogButtonBox.ActionRole)
-        self.connect(self.nextb, qt4.SIGNAL('clicked()'), self.slotNext)
+        self.nextb.clicked.connect(self.slotNext)
 
         l.addWidget(self.buttonbox)
 
@@ -806,7 +807,7 @@ class TutorialDock(qt4.QDockWidget):
         self.step = stepklass(self.mainwin)
 
         # listen to step for next step
-        self.connect(self.step, qt4.SIGNAL('nextStep'), self.slotNext)
+        self.step.nextStep.connect(self.slotNext)
 
         # update text
         self.textedit.setHtml(self.step.text)
@@ -825,7 +826,7 @@ class TutorialDock(qt4.QDockWidget):
         if self.step.closestep:
             closeb = self.buttonbox.addButton(
                 'Close', qt4.QDialogButtonBox.ActionRole)
-            self.connect(closeb, qt4.SIGNAL('clicked()'), self.close)
+            closeb.clicked.connect(self.close)
 
     # work around C/C++ object deleted
     @qt4.pyqtSlot()
