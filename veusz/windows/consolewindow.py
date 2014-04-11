@@ -24,6 +24,7 @@ import codeop
 import traceback
 import sys
 
+from ..compat import cstr
 from .. import qtall as qt4
 
 from .. import document
@@ -59,6 +60,8 @@ class _CommandEdit(qt4.QLineEdit):
     The edit control has a history (press up and down keys to access)
     """
 
+    sigEnter = qt4.pyqtSignal(cstr)
+
     def __init__(self, *args):
         qt4.QLineEdit.__init__(self, *args)
         self.history = []
@@ -82,7 +85,7 @@ class _CommandEdit(qt4.QLineEdit):
         self.entered_text = ''
 
         # tell the console we have a command
-        self.emit( qt4.SIGNAL("sigEnter"), command)
+        self.sigEnter.emit(command)
 
     historykeys = (qt4.Qt.Key_Up, qt4.Qt.Key_Down)
 
@@ -199,11 +202,9 @@ class ConsoleWindow(qt4.QDockWidget):
         self.command_build = ''
 
         # get called if enter is pressed in the input control
-        self.connect( self._inputedit, qt4.SIGNAL("sigEnter"),
-                      self.slotEnter )
+        self._inputedit.sigEnter.connect(self.slotEnter)
         # called if document logs something
-        self.connect( thedocument, qt4.SIGNAL("sigLog"),
-                      self.slotDocumentLog )
+        thedocument.sigLog.connect(self.slotDocumentLog)
 
     def _makeTextFormat(self, cursor, color):
         fmt = cursor.charFormat()

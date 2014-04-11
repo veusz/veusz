@@ -31,6 +31,8 @@ class VeuszDialog(qt4.QDialog):
     - Emits dialogFinished when dialog is done
     """
 
+    dialogFinished = qt4.pyqtSignal(qt4.QDialog)
+
     def __init__(self, mainwindow, uifile, modal=False):
         """Initialise dialog given Veusz mainwindow and uifile for dialog.
         If modal is False, base on a top level window instead
@@ -53,5 +55,5 @@ class VeuszDialog(qt4.QDialog):
     def hideEvent(self, event):
         """Emits dialogFinished if hidden."""
         if not event.spontaneous():
-            self.emit( qt4.SIGNAL('dialogFinished'), self )
+            self.dialogFinished.emit(self)
         return qt4.QDialog.hideEvent(self, event)

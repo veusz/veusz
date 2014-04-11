@@ -40,8 +40,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         self.document = document
 
         document.signalModified.connect(self.slotDocumentModified)
-        self.connect( self.document, qt4.SIGNAL("sigWiped"),
-                      self.slotDocumentModified )
+        self.document.sigWiped.connect(self.slotDocumentModified)
 
         # suspend signals to the view that the model has changed
         self.suspendmodified = False

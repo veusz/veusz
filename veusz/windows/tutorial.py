@@ -63,8 +63,7 @@ class TutorialStep(qt4.QObject):
 
         self.nextonselected = nextonselected
         if nextonselected is not None:
-            self.connect(mainwin.treeedit, qt4.SIGNAL('widgetsSelected'),
-                         self.slotWidgetsSelected)
+            mainwin.treeedit.widgetsSelected.connect(self.slotWidgetsSelected)
 
     def slotNextSetting(self, *args):
         """Check setting to emit next."""

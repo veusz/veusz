@@ -148,13 +148,13 @@ class RenderControl(qt4.QObject):
             self.mutex.unlock()
 
         # tell any listeners that a job has been processed
-        self.plotwindow.emit( qt4.SIGNAL("queuechange"), -1 )
+        self.plotwindow.sigQueueChange.emit(-1)
 
     def addJob(self, helper):
         """Process drawing job in PaintHelper given."""
 
         # indicate that there is a new item to be processed to listeners
-        self.plotwindow.emit( qt4.SIGNAL("queuechange"), 1 )
+        self.plotwindow.sigQueueChange.emit(1)
 
         # add the job to the queue
         self.mutex.lock()
@@ -196,6 +196,19 @@ class RenderThread( qt4.QThread ):
 
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
+
+    # emitted when new item on plot queue
+    sigQueueChange = qt4.pyqtSignal(int)
+    # on drawing a page
+    sigUpdatePage = qt4.pyqtSignal(int)
+    # point picked on plot
+    sigPointPicked = qt4.pyqtSignal(object)
+    # picker enabled
+    sigPickerEnabled = qt4.pyqtSignal(bool)
+    # axis values update from moving mouse
+    sigAxisValuesFromMouse = qt4.pyqtSignal(dict)
+    # gives widget clicked
+    sigWidgetClicked = qt4.pyqtSignal(object)
 
     # how often the document can update
     updateintervals = (
@@ -594,7 +607,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         self.pickerinfo = pickinfo
         self.pickeritem.setPos(pickinfo.screenpos[0], pickinfo.screenpos[1])
-        self.emit(qt4.SIGNAL("sigPointPicked"), pickinfo)
+        self.sigPointPicked.emit(pickinfo)
 
     def doPick(self, mousepos):
         """Find the point on any plot-like widget closest to the cursor"""
@@ -710,7 +723,7 @@ class PlotWindow( qt4.QGraphicsView ):
             axes = self.axesForPoint(event.pos())
             vals = dict([ (a[0].name, a[1]) for a in axes ])
 
-            self.emit( qt4.SIGNAL('sigAxisValuesFromMouse'), vals )
+            self.sigAxisValuesFromMouse.emit(vals)
 
             if self.currentclickmode == 'pick':
                 # drag the picker around
@@ -845,7 +858,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # tell connected objects that widget was clicked
         if widget is not None:
-            self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
+            self.sigWidgetClicked.emit(widget)
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -921,7 +934,7 @@ class PlotWindow( qt4.QGraphicsView ):
                 self.setSceneRect(0, 0, *size)
                 self.pixmapitem.setPixmap(pixmap)
 
-            self.emit( qt4.SIGNAL("sigUpdatePage"), self.pagenumber )
+            self.sigUpdatePage.emit(self.pagenumber)
             self.updatePageToolbar()
 
             self.updateControlGraphs(self.lastwidgetsselected)
@@ -1116,7 +1129,7 @@ class PlotWindow( qt4.QGraphicsView ):
         
         # close the current picker
         self.pickeritem.hide()
-        self.emit(qt4.SIGNAL('sigPickerEnabled'), False)
+        self.sigPickerEnabled.emit(False)
 
         # convert action into clicking mode
         self.clickmode = modecnvt[action]
@@ -1129,7 +1142,7 @@ class PlotWindow( qt4.QGraphicsView ):
             #self.label.setCursor(qt4.Qt.CrossCursor)
         elif self.clickmode == 'pick':
             self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
-            self.emit(qt4.SIGNAL('sigPickerEnabled'), True)
+            self.sigPickerEnabled.emit(True)
         
     def getClick(self):
         """Return a click point from the graph."""

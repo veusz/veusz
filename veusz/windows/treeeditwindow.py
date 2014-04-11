@@ -605,8 +605,7 @@ class FormatDock(qt4.QDockWidget):
         self.tabwidget = None
 
         # update our view when the tree edit window selection changes
-        self.connect(treeedit, qt4.SIGNAL('widgetsSelected'),
-                     self.selectedWidgets)
+        treeedit.widgetsSelected.connect(self.selectedWidgets)
 
     def selectedWidgets(self, widgets, setnsproxy):
         """Created tabbed widgets for formatting for each subsettings."""
@@ -640,8 +639,7 @@ class PropertiesDock(qt4.QDockWidget):
         self.document = document
 
         # update our view when the tree edit window selection changes
-        self.connect(treeedit, qt4.SIGNAL('widgetsSelected'),
-                     self.slotWidgetsSelected)
+        treeedit.widgetsSelected.connect(self.slotWidgetsSelected)
 
         # construct scrollable area
         self.scroll = qt4.QScrollArea()
@@ -659,6 +657,9 @@ class PropertiesDock(qt4.QDockWidget):
 class TreeEditDock(qt4.QDockWidget):
     """A dock window presenting widgets as a tree."""
 
+    widgetsSelected = qt4.pyqtSignal(list, object)
+    sigPageChanged = qt4.pyqtSignal(int)
+
     def __init__(self, document, parentwin):
         """Initialise dock given document and parent widget."""
         qt4.QDockWidget.__init__(self, parentwin)
@@ -668,8 +669,7 @@ class TreeEditDock(qt4.QDockWidget):
         self.selwidgets = []
 
         self.document = document
-        self.connect( self.document, qt4.SIGNAL("sigWiped"),
-                      self.slotDocumentWiped )
+        self.document.sigWiped.connect(self.slotDocumentWiped)
 
         # construct tree
         self.treemodel = WidgetTreeModel(document)
@@ -732,7 +732,7 @@ class TreeEditDock(qt4.QDockWidget):
         self._enableCorrectButtons()
         self._checkPageChange()
 
-        self.emit( qt4.SIGNAL('widgetsSelected'), swidget, setnsproxy )
+        self.widgetsSelected.emit(swidget, setnsproxy)
 
     def contextMenuEvent(self, event):
         """Bring up context menu."""
@@ -789,7 +789,7 @@ class TreeEditDock(qt4.QDockWidget):
             # have page, so check what number we are in basewidget children
             try:
                 i = self.document.basewidget.children.index(w)
-                self.emit(qt4.SIGNAL("sigPageChanged"), i)
+                self.sigPageChanged.emit(i)
             except ValueError:
                 pass
 

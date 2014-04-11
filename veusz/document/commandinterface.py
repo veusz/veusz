@@ -110,8 +110,7 @@ class CommandInterface(qt4.QObject):
         self.verbose = False
         self.importpath = []
 
-        self.connect( self.document, qt4.SIGNAL("sigWiped"),
-                      self.slotWipedDoc )
+        self.document.sigWiped.connect(self.slotWipedDoc)
 
         self.Root = embed.WidgetNode(self, 'widget', '/')
 

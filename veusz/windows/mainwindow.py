@@ -184,8 +184,7 @@ class MainWindow(qt4.QMainWindow):
 
         # plot queue - how many plots are currently being drawn
         self.plotqueuecount = 0
-        self.connect( self.plot, qt4.SIGNAL("queuechange"),
-                      self.plotQueueChanged )
+        self.plot.sigQueueChange.connect(self.plotQueueChanged)
         self.plotqueuelabel = qt4.QLabel()
         self.plotqueuelabel.setToolTip(_("Number of rendering jobs remaining"))
         statusbar.addWidget(self.plotqueuelabel)
@@ -209,26 +208,19 @@ class MainWindow(qt4.QMainWindow):
             self.dirname = self.dirname_export = os.getcwd()
 
         # connect plot signals to main window
-        self.connect( self.plot, qt4.SIGNAL("sigUpdatePage"),
-                      self.slotUpdatePage )
-        self.connect( self.plot, qt4.SIGNAL("sigAxisValuesFromMouse"),
-                      self.slotUpdateAxisValues )
-        self.connect( self.plot, qt4.SIGNAL("sigPickerEnabled"),
-                      self.slotPickerEnabled )
-        self.connect( self.plot, qt4.SIGNAL("sigPointPicked"),
-                      self.slotUpdatePickerLabel )
+        self.plot.sigUpdatePage.connect(self.slotUpdatePage)
+        self.plot.sigAxisValuesFromMouse.connect(self.slotUpdateAxisValues)
+        self.plot.sigPickerEnabled.connect(self.slotPickerEnabled)
+        self.plot.sigPointPicked.connect(self.slotUpdatePickerLabel)
 
         # disable save if already saved
         self.document.signalModified.connect(self.slotModifiedDoc)
         # if the treeeditwindow changes the page, change the plot window
-        self.connect( self.treeedit, qt4.SIGNAL("sigPageChanged"),
-                      self.plot.setPageNumber )
+        self.treeedit.sigPageChanged.connect(self.plot.setPageNumber)
 
         # if a widget in the plot window is clicked by the user
-        self.connect( self.plot, qt4.SIGNAL("sigWidgetClicked"),
-                      self.treeedit.selectWidget )
-        self.connect( self.treeedit, qt4.SIGNAL("widgetsSelected"),
-                      self.plot.selectedWidgets )
+        self.plot.sigWidgetClicked.connect(self.treeedit.selectWidget)
+        self.treeedit.widgetsSelected.connect(self.plot.selectedWidgets)
 
         # enable/disable undo/redo
         self.menus['edit'].aboutToShow.connect(self.slotAboutToShowEdit)
@@ -706,7 +698,7 @@ class MainWindow(qt4.QMainWindow):
 
     def showDialog(self, dialog):
         """Show dialog given."""
-        self.connect(dialog, qt4.SIGNAL('dialogFinished'), self.deleteDialog)
+        dialog.dialogFinished.connect(self.deleteDialog)
         self.dialogs.append(dialog)
         dialog.show()
         self.dialogShown.emit(dialog)

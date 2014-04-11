@@ -81,15 +81,16 @@ def getSuitableParent(widgettype, initialwidget):
 
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
-
-    Emits: sigModified when the document has been modified
-           sigWiped when document is wiped
     """
 
     pluginsloaded = False
 
     # this is emitted when the document is modified
     signalModified = qt4.pyqtSignal(int)
+    # emited to log a message
+    sigLog = qt4.pyqtSignal(cstr)
+    # emitted when document wiped
+    sigWiped = qt4.pyqtSignal()
 
     def __init__(self):
         """Initialise the document."""
@@ -140,7 +141,7 @@ class Document( qt4.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
-        self.emit( qt4.SIGNAL("sigWiped") )
+        self.sigWiped.emit()
 
     def clearHistory(self):
         """Clear any history."""
@@ -172,7 +173,7 @@ class Document( qt4.QObject ):
 
     def log(self, message):
         """Log a message - this is emitted as a signal."""
-        self.emit( qt4.SIGNAL("sigLog"), message )
+        self.sigLog.emit(message)
 
     def applyOperation(self, operation):
         """Apply operation to the document.
