@@ -331,10 +331,8 @@ class PropertyList(qt4.QWidget):
 
             button = qt4.QPushButton(text)
             button.setToolTip(action.descr)
-            def fn():
-                # use double function as action changes in loop
-                return lambda: setnsproxy.onAction(action, self.getConsole())
-            button.clicked.connect(fn())
+            button.clicked[()].connect(
+                lambda a=action: setnsproxy.onAction(a, self.getConsole()))
 
             self.layout.addWidget(button, row, 1)
             self.childlist.append(button)

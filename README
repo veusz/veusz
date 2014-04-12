@@ -17,6 +17,7 @@ Changes in 1.21:
  * Add filled curve error bar style
  * Add filetype filters to import dialog file browser dialog
  * In file completer in import dialog, use selected tab as filter
+ * Move completely to PyQt new style signals
 
 Bug fixes:
  * Direction combo did not work in import dialog
