@@ -118,9 +118,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         self.document.applyOperation(
             document.OperationWidgetRename(widget, name))
 
-        self.emit( qt4.SIGNAL(
-                'dataChanged(const QModelIndex &, const QModelIndex &)'),
-                   index, index )
+        self.dataChanged.emit(index, index)
         return True
             
     def flags(self, index):

@@ -231,8 +231,7 @@ class MainWindow(qt4.QMainWindow):
         self.defineViewWindowMenu()
 
         # if document requests it, ask whether an allowed import
-        self.connect(self.document, qt4.SIGNAL('check_allowed_imports'),
-                     self.slotAllowedImportsDoc)
+        self.document.sigAllowedImports.connect(self.slotAllowedImportsDoc)
 
         # add on dbus interface
         self.dbusdocinterface = document.DBusInterface(self.document)

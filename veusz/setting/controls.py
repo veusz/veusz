@@ -28,7 +28,7 @@ from __future__ import division
 import re
 import numpy as N
 
-from ..compat import crange, czip, citems, ckeys
+from ..compat import crange, czip, citems, ckeys, cstr
 from .. import qtall as qt4
 
 from .settingdb import settingdb
@@ -59,6 +59,8 @@ class DotDotButton(qt4.QPushButton):
 class Edit(qt4.QLineEdit):
     """Main control for editing settings which are text."""
 
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
     def __init__(self, setting, parent):
         """Initialise the setting widget."""
 
@@ -79,7 +81,7 @@ class Edit(qt4.QLineEdit):
         try:
             val = self.setting.fromText(text)
             styleClear(self)
-            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.sigSettingChanged.emit(self, self.setting, val)
 
         except utils.InvalidType:
             styleError(self)
@@ -95,7 +97,7 @@ class _EditBox(qt4.QTextEdit):
     Emits closing(text) when the box closes
     """
 
-    closing = qt4.pyqtSignal(str)
+    closing = qt4.pyqtSignal(cstr)
 
     def __init__(self, origtext, readonly, parent):
         """Make a popup, framed widget containing a text editor."""
@@ -159,6 +161,8 @@ class _EditBox(qt4.QTextEdit):
 class String(qt4.QWidget):
     """A line editor which allows editting in a larger popup window."""
 
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
     def __init__(self, setting, parent):
         qt4.QWidget.__init__(self, parent)
         self.setting = setting
@@ -216,7 +220,7 @@ class String(qt4.QWidget):
         try:
             val = self.setting.fromText(text)
             styleClear(self.edit)
-            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.sigSettingChanged.emit(self, self.setting, val)
 
         except utils.InvalidType:
             styleError(self.edit)
@@ -228,6 +232,8 @@ class String(qt4.QWidget):
 
 class Int(qt4.QSpinBox):
     """A control for changing an integer."""
+
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
 
     def __init__(self, setting, parent):
         qt4.QSpinBox.__init__(self, parent)
@@ -248,7 +254,7 @@ class Int(qt4.QSpinBox):
         """If check box changes."""
         # this is emitted by setValue, so ignore onModified doing this
         if not self.ignorechange:
-            self.emit(qt4.SIGNAL('settingChanged'), self, self.setting, value)
+            self.sigSettingChanged.emit(self, self.setting, value)
 
     @qt4.pyqtSlot()
     def onModified(self):
@@ -259,7 +265,9 @@ class Int(qt4.QSpinBox):
 
 class Bool(qt4.QCheckBox):
     """A check box for changing a bool setting."""
-    
+
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
     def __init__(self, setting, parent):
         qt4.QCheckBox.__init__(self, parent)
 
@@ -282,7 +290,7 @@ class Bool(qt4.QCheckBox):
         """Emitted when checkbox toggled."""
         # this is emitted by setChecked, so ignore onModified doing this
         if not self.ignorechange:
-            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, state )
+            self.sigSettingChanged.emit(self, self.setting, state)
         
     @qt4.pyqtSlot()
     def onModified(self):
@@ -315,6 +323,8 @@ class BoolSwitch(Bool):
 
 class Choice(qt4.QComboBox):
     """For choosing between a set of values."""
+
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
 
     def __init__(self, setting, iseditable, vallist, parent, icons=None,
                  descriptions=None):
@@ -375,7 +385,7 @@ class Choice(qt4.QComboBox):
         try:
             val = self.setting.fromText(text)
             styleClear(self)
-            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.sigSettingChanged.emit(self, self.setting, val)
 
         except utils.InvalidType:
             styleError(self)
@@ -458,6 +468,8 @@ class FillStyleExtended(ChoiceSwitch):
 class MultiLine(qt4.QTextEdit):
     """For editting multi-line settings."""
 
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
     def __init__(self, setting, parent):
         """Initialise the widget."""
 
@@ -501,7 +513,7 @@ class MultiLine(qt4.QTextEdit):
         try:
             val = self.setting.fromText(text)
             styleClear(self)
-            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.sigSettingChanged.emit(self, self.setting, val)
 
         except utils.InvalidType:
             styleError(self)
@@ -600,6 +612,8 @@ class DistancePt(Choice):
 class Dataset(qt4.QWidget):
     """Allow the user to choose between the possible datasets."""
 
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
     def __init__(self, setting, document, dimensions, datatype, parent):
         """Initialise the combobox. The list is populated with datasets.
 
@@ -610,8 +624,7 @@ class Dataset(qt4.QWidget):
         qt4.QWidget.__init__(self, parent)
 
         self.choice = Choice(setting, True, [], None)
-        self.connect( self.choice, qt4.SIGNAL("settingChanged"),
-                      self.slotSettingChanged )
+        self.choice.sigSettingChanged.connect(self.sigSettingChanged)
 
         b = self.button = DotDotButton(tooltip=_("Select using dataset browser"))
         b.toggled.connect(self.slotButtonToggled)
@@ -629,10 +642,6 @@ class Dataset(qt4.QWidget):
         layout.addWidget(self.choice)
         layout.addWidget(b)
         self.setLayout(layout)
-
-    def slotSettingChanged(self, *args):
-        """Reemit setting changed signal if combo box changes."""
-        self.emit( qt4.SIGNAL("settingChanged"), *args )
 
     def _populateEntries(self):
         """Put the list of datasets into the combobox."""
@@ -675,8 +684,7 @@ class Dataset(qt4.QWidget):
 
     def newDataset(self, dsname):
         """New dataset selected."""
-        self.emit( qt4.SIGNAL("settingChanged"), self,
-                   self.choice.setting, dsname )
+        self.sigSettingChanged.emit(self, self.choice.setting, dsname)
 
 class DatasetOrString(Dataset):
     """Allow use to choose a dataset or enter some text."""
@@ -864,15 +872,20 @@ class LineStyle(Choice):
 
         cls._icons = icons
 
+class _ColNotifier(qt4.QObject):
+    sigNewColor = qt4.pyqtSignal(cstr)
+
 class Color(qt4.QWidget):
     """A control which lets the user choose a color.
 
     A drop down list and a button to bring up a dialog are used
     """
 
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
     _icons = None
     _colors = None
-    _qobj = None
+    _colnotifier = None
 
     def __init__(self, setting,  parent):
         qt4.QWidget.__init__(self, parent)
@@ -890,7 +903,7 @@ class Color(qt4.QWidget):
         c.activated[str].connect(self.slotActivated)
 
         # add color if a color is added by a different combo box
-        self.connect(Color._qobj, qt4.SIGNAL('addcolor'), self.addcolorSlot)
+        Color._colnotifier.sigNewColor.connect(self.addcolorSlot)
 
         # button for selecting colors
         b = self.button = qt4.QPushButton()
@@ -934,12 +947,12 @@ class Color(qt4.QWidget):
                 pix = qt4.QPixmap(size, size)
                 pix.fill( qt4.QColor(c) )
                 icons[c] = qt4.QIcon(pix)
-                if cls._qobj is not None:
+                if cls._colnotifier is not None:
                     # tell other combo boxes a color has been added
-                    cls._qobj.emit(qt4.SIGNAL('addcolor'), c)
+                    cls._colnotifier.sigNewColor.emit(c)
 
-        if cls._qobj is None:
-            cls._qobj = qt4.QObject()
+        if cls._colnotifier is None:
+            cls._colnotifier = _ColNotifier()
     
     def slotButtonClicked(self):
         """Open dialog to edit color."""
@@ -948,14 +961,14 @@ class Color(qt4.QWidget):
         if col.isValid():
             # change setting
             val = col.name()
-            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.sigSettingChanged.emit(self, self.setting, val)
 
     def slotActivated(self, val):
         """A different value is selected."""
         
         text = self.combo.currentText()
         val = self.setting.fromText(text)
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+        self.sigSettingChanged.emit(self, self.setting, val)
 
     def setColor(self, color):
         """Update control with color given."""
@@ -1054,6 +1067,8 @@ class ListSet(qt4.QFrame):
     base widget
     """
 
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
     pixsize = 12
 
     def __init__(self, defaultval, setting, parent):
@@ -1138,13 +1153,13 @@ class ListSet(qt4.QFrame):
             rows.append(rows[-1])
         else:
             rows.append(self.defaultval)
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, rows )
+        self.sigSettingChanged.emit(self, self.setting, rows)
 
     def onDeleteClicked(self):
         """Remove final entry in settings list."""
 
         rows = list(self.setting.val)[:-1]
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, rows )
+        self.sigSettingChanged.emit(self, self.setting, rows)
 
     @qt4.pyqtSlot()
     def onModified(self):
@@ -1222,8 +1237,8 @@ class ListSet(qt4.QFrame):
         items[col] = val
         rows[row] = tuple(items)
         self.ignorechange = True
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, rows )
-        
+        self.sigSettingChanged.emit(self, self.setting, rows)
+
     def onToggled(self, on):
         """Checkbox toggled."""
         row, col = self.identifyPosn(self.sender())
@@ -1312,6 +1327,7 @@ class LineSet(ListSet):
 class _FillBox(qt4.QScrollArea):
     """Pop up box for extended fill settings."""
 
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
     closing = qt4.pyqtSignal(int)
 
     def __init__(self, doc, thesetting, row, button, parent):
@@ -1367,7 +1383,7 @@ class _FillBox(qt4.QScrollArea):
             # if row different, send update signal
             val = list(self.setting.val)
             val[self.row] = rowdata
-            self.emit( qt4.SIGNAL("settingChanged"), self, self.setting, val )
+            self.sigSettingChanged.emit(self, self.setting, val)
 
     def eventFilter(self, obj, event):
         """Grab clicks outside this window to close it."""
@@ -1437,8 +1453,7 @@ class FillSet(ListSet):
             fb = _FillBox(self.setting.getDocument(), self.setting,
                           row, self.buttonAtRow(row), self.parent())
             fb.closing.connect(self.boxClosing)
-            self.connect(fb, qt4.SIGNAL("settingChanged"), self,
-                         qt4.SIGNAL("settingChanged"))
+            fb.sigSettingChanged.connect(self.sigSettingChanged)
             fb.show()
 
     def boxClosing(self, row):
@@ -1449,6 +1464,8 @@ class FillSet(ListSet):
 class MultiSettingWidget(qt4.QWidget):
     """A widget for storing multiple values in a tuple,
     with + and - signs by each entry."""
+
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
 
     def __init__(self, setting, doc, *args):
         """Construct widget as combination of LineEdit and PushButton
@@ -1521,15 +1538,13 @@ class MultiSettingWidget(qt4.QWidget):
         """User adds a new row."""
         val = list(self.setting.val)
         val.insert(row+1, '')
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
-                   tuple(val) )
+        self.sigSettingChanged.emit(self, self.setting, tuple(val))
 
     def subPressed(self, row):
         """User deletes a row."""
         val = list(self.setting.val)
         val.pop(row)
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
-                   tuple(val) )
+        self.sigSettingChanged.emit(self, self.setting, tuple(val))
 
     @qt4.pyqtSlot()
     def onModified(self):
@@ -1567,8 +1582,7 @@ class MultiSettingWidget(qt4.QWidget):
         """Update row of setitng with new data"""
         val = list(self.setting.val)
         val[row] = self.readControl( self.controls[row][0] )
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting,
-                   tuple(val) )
+        self.sigSettingChanged.emit(self, self.setting, tuple(val))
 
 class Datasets(MultiSettingWidget):
     """A control for editing a list of datasets."""
@@ -1658,6 +1672,8 @@ class Strings(MultiSettingWidget):
 class Filename(qt4.QWidget):
     """A widget for selecting a filename with a browse button."""
 
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
     def __init__(self, setting, mode, parent):
         """Construct widget as combination of LineEdit and PushButton
         for browsing.
@@ -1713,8 +1729,7 @@ class Filename(qt4.QWidget):
             self, title, self.edit.text(), filefilter)
 
         if filename:
-            val = filename
-            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.sigSettingChanged.emit(self, self.setting, filename)
 
     def validateAndSet(self):
         """Check the text is a valid setting and update it."""
@@ -1723,7 +1738,7 @@ class Filename(qt4.QWidget):
         try:
             val = self.setting.fromText(text)
             styleClear(self.edit)
-            self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, val )
+            self.sigSettingChanged.emit(self, self.setting, val)
 
         except utils.InvalidType:
             styleError(self.edit)
@@ -1735,6 +1750,8 @@ class Filename(qt4.QWidget):
 
 class FontFamily(qt4.QFontComboBox):
     """List the font families, showing each font."""
+
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
 
     def __init__(self, setting, parent):
         """Create the combobox."""
@@ -1763,7 +1780,7 @@ class FontFamily(qt4.QFontComboBox):
     def slotActivated(self, val):
         """Update setting if a different item is chosen."""
         newval = self.currentText()
-        self.emit( qt4.SIGNAL('settingChanged'), self, self.setting, newval )
+        self.sigSettingChanged.emit(self, self.setting, newval)
 
     @qt4.pyqtSlot()
     def onModified(self):

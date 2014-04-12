@@ -91,6 +91,8 @@ class Document( qt4.QObject ):
     sigLog = qt4.pyqtSignal(cstr)
     # emitted when document wiped
     sigWiped = qt4.pyqtSignal()
+    # to ask whether the import is allowed (module name and symbol list)
+    sigAllowedImports = qt4.pyqtSignal(cstr, list)
 
     def __init__(self):
         """Initialise the document."""
@@ -768,8 +770,7 @@ class Document( qt4.QObject ):
 
             # only ask the user the first time
             if thepass == 0:
-                self.emit(qt4.SIGNAL('check_allowed_imports'), module,
-                          possibleimport)
+                self.sigAllowedImports.emit(module, possibleimport)
 
         return toimport
 

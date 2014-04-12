@@ -31,6 +31,7 @@ from __future__ import division
 import sys
 
 from . import qtall as qt4
+from .compat import cstr
 
 from .windows.simplewindow import SimpleWindow
 from . import document
@@ -42,7 +43,7 @@ class ReadingThread(qt4.QThread):
     Windows as its stdin is a weird object
     """
 
-    newline = qt4.pyqtSignal(str)
+    newline = qt4.pyqtSignal(cstr)
 
     def run(self):
         """Emit lines read from stdin."""

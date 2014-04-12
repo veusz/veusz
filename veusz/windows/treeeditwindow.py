@@ -350,8 +350,7 @@ class PropertyList(qt4.QWidget):
             self.layout.addWidget(lab, row, 0)
             self.childlist.append(lab)
 
-            self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                         setnsproxy.onSettingChanged)
+            cntrl.sigSettingChanged.connect(setnsproxy.onSettingChanged)
             self.layout.addWidget(cntrl, row, 1)
             self.childlist.append(cntrl)
             self.setncntrls[setn.name] = (lab, cntrl)
@@ -382,8 +381,7 @@ class PropertyList(qt4.QWidget):
 
         # make main control
         cntrl = slist[0].makeControl(None)
-        self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                     grpdsetting.onSettingChanged)
+        cntrl.sigSettingChanged.connect(grpdsetting.onSettingChanged)
         self.layout.addWidget(cntrl, row, 1)
         self.childlist.append(cntrl)
 
@@ -397,8 +395,7 @@ class PropertyList(qt4.QWidget):
             if cntrl:
                 lab = SettingLabel(self.document, setn, grpdsetting)
                 l.addWidget(lab, grp_row, 0)
-                self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                             grpdsetting.onSettingChanged)
+                cntrl.sigSettingChanged.connect(grpdsetting.onSettingChanged)
                 l.addWidget(cntrl, grp_row, 1)
                 grp_row += 1
 

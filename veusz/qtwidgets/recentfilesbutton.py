@@ -20,6 +20,7 @@ from __future__ import division
 import os.path
 
 from .. import qtall as qt4
+from ..compat import cstr
 from .. import setting
 
 def removeBadRecents(itemlist):
@@ -44,7 +45,7 @@ class RecentFilesButton(qt4.QPushButton):
     emits filechosen(filename) if a file is chosen
     """
 
-    filechosen = qt4.pyqtSignal(str)
+    filechosen = qt4.pyqtSignal(cstr)
 
     def __init__(self, *args):
         qt4.QPushButton.__init__(self, *args)

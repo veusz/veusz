@@ -24,7 +24,7 @@ import os.path
 import numpy as N
 import textwrap
 
-from ..compat import crange, citems, czip
+from ..compat import crange, citems, czip, cstr
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -730,7 +730,7 @@ class DatasetBrowserPopup(DatasetBrowser):
     """
 
     closing = qt4.pyqtSignal()
-    newdataset = qt4.pyqtSignal(str)
+    newdataset = qt4.pyqtSignal(cstr)
 
     def __init__(self, document, dsname, parent,
                  filterdims=None, filterdtype=None):

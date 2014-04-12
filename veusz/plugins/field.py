@@ -197,7 +197,7 @@ class _FieldSetting(Field):
             setn.set(val)
 
         # if control changes setting, update setting
-        c.connect(c, qt4.SIGNAL('settingChanged'), updateval)
+        c.sigSettingChanged.connect(updateval)
 
         return (l, c)
 
