@@ -23,6 +23,7 @@ from .. import qtall as qt4
 
 from . import setting
 from .settings import Settings
+from .reference import Reference
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
@@ -95,6 +96,7 @@ class XYPlotLine(Line):
         self.add( setting.Bool('bezierJoin', False,
                                descr=_('Connect points with a cubic Bezier curve'),
                                usertext=_('Bezier join')), 1 )
+        self.get('color').newDefault( Reference('../color') )
 
 class MarkerLine(Line):
     '''A line for marker border.'''

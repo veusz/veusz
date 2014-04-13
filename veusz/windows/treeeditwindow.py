@@ -1260,8 +1260,8 @@ class SettingLabel(qt4.QWidget):
         # update tooltip
         tooltip = self.setting.descr
         if self.setting.isReference():
-            tooltip += (_('\nLinked to %s') %
-                        self.setting.getReference().resolve(self.setting).path)
+            paths = self.setting.getReference().getPaths()
+            tooltip += _('\nLinked to: %s') % ', '.join(paths)
         self.setToolTip(tooltip)
 
         # if not default, make label bold

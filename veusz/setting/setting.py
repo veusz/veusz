@@ -36,7 +36,7 @@ from ..compat import citems, ckeys, cbasestr, cstr, crepr
 from .. import qtall as qt4
 from . import controls
 from .settingdb import settingdb, uilocale
-from .reference import Reference
+from .reference import ReferenceBase, Reference
 
 from .. import utils
 
@@ -93,7 +93,7 @@ class Setting(object):
         optinal as optional arguments
         """
 
-        if isinstance(self._val, Reference):
+        if isinstance(self._val, ReferenceBase):
             val = self._val
         else:
             val = self.val
@@ -121,7 +121,7 @@ class Setting(object):
     def get(self):
         """Get the value."""
 
-        if isinstance(self._val, Reference):
+        if isinstance(self._val, ReferenceBase):
             return self._val.resolve(self).get()
         else:
             return self.convertFrom(self._val)
@@ -129,7 +129,7 @@ class Setting(object):
     def set(self, v):
         """Set the value."""
 
-        if isinstance(v, Reference):
+        if isinstance(v, ReferenceBase):
             self._val = v
         else:
             # this also removes the linked value if there is one set
@@ -142,11 +142,11 @@ class Setting(object):
 
     def isReference(self):
         """Is this a setting a reference to another object."""
-        return isinstance(self._val, Reference)
+        return isinstance(self._val, ReferenceBase)
 
     def getReference(self):
         """Return the reference object. Raise ValueError if not a reference"""
-        if isinstance(self._val, Reference):
+        if isinstance(self._val, ReferenceBase):
             return self._val
         else:
             raise ValueError("Setting is not a reference")
@@ -261,7 +261,7 @@ class Setting(object):
         """Return text to restore the value of this setting."""
 
         if (saveall or not self.isDefault()) and not self.readonly:
-            if isinstance(self._val, Reference):
+            if isinstance(self._val, ReferenceBase):
                 return "SetToReference('%s%s', %s)\n" % (rootname, self.name,
                                                          crepr(self._val.value))
             else:
@@ -274,10 +274,9 @@ class Setting(object):
         """Set the function to be called on modification (passing True)."""
         self.onmodified.onModified.connect(fn)
 
-        if isinstance(self._val, Reference):
-            # make reference pointed to also call this onModified
-            r = self._val.resolve(self)
-            r.setOnModified(fn)
+        if isinstance(self._val, ReferenceBase):
+            # tell references to notify us if they are modified
+            self._val.setOnModified(self, fn)
 
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""
@@ -292,8 +291,8 @@ class Setting(object):
         """Is the current value a default?
         This also returns true if it is linked to the appropriate stylesheet
         """
-        if ( isinstance(self._val, Reference) and
-             isinstance(self.default, Reference) ):
+        if ( isinstance(self._val, ReferenceBase) and
+             isinstance(self.default, ReferenceBase) ):
             return self._val.value == self.default.value
         else:
             return self.val == self.default
@@ -301,7 +300,7 @@ class Setting(object):
     def isDefaultLink(self):
         """Is this a link to the default stylesheet value."""
 
-        return ( isinstance(self._val, Reference) and
+        return ( isinstance(self._val, ReferenceBase) and
                  self._val.value == self.getStylesheetLink() )
 
     def setSilent(self, val):
@@ -391,7 +390,7 @@ class SettingBackwardCompat(Setting):
         return self.getForward().fromText(val)
 
     def set(self, val):
-        if self.parent is not None and not isinstance(val, Reference):
+        if self.parent is not None and not isinstance(val, ReferenceBase):
             if self.translatefn:
                 val = self.translatefn(val)
             self.getForward().set(val)

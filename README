@@ -17,7 +17,8 @@ Changes in 1.21:
  * Add filled curve error bar style
  * Add filetype filters to import dialog file browser dialog
  * In file completer in import dialog, use selected tab as filter
- * Move completely to PyQt new style signals
+ * Move code to use PyQt new style signals
+ * Add a master color setting for xy point and nonorthpoint plot
 
 Bug fixes:
  * Direction combo did not work in import dialog

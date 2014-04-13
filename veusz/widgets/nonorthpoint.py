@@ -76,6 +76,11 @@ class NonOrthPoint(Widget):
                 usertext=_('Scale markers')) )
         s.add( setting.MarkerColor('Color') )
 
+        s.add( setting.Color('color',
+                             'black',
+                             descr = _('Master color'),
+                             usertext = _('Color'),
+                             formatting=True), 0 )
         s.add( setting.DistancePt('markerSize',
                                   '3pt',
                                   descr = _('Size of marker to plot'),
@@ -88,6 +93,8 @@ class NonOrthPoint(Widget):
                             descr = _('Plot line settings'),
                             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
+        s.PlotLine.get('color').newDefault( setting.Reference('../color') )
+
         s.add( setting.MarkerLine('MarkerLine',
                                   descr = _('Line around the marker settings'),
                                   usertext = _('Marker border')),

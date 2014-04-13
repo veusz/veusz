@@ -53,7 +53,7 @@ def processSetting(parent, setn):
         for choice in setn.vallist:
             ET.SubElement(setnxml, "choice").text = choice
 
-    if not isinstance(setn.default, setting.Reference):
+    if not isinstance(setn.default, setting.ReferenceBase):
         ET.SubElement(setnxml, "default").text = setn.toText()
     else:
         ET.SubElement(setnxml, "default").text = "to reference"

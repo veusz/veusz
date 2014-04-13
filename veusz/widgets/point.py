@@ -252,8 +252,7 @@ class MarkerFillBrush(setting.Brush):
     def __init__(self, name, **args):
         setting.Brush.__init__(self, name, **args)
 
-        self.get('color').newDefault( setting.Reference(
-            '../PlotLine/color') )
+        self.get('color').newDefault( setting.Reference('../color') )
 
         self.add( setting.Colormap(
                 'colorMap', 'grey',
@@ -288,31 +287,7 @@ class PointPlotter(GenericPlotter):
         """Construct list of settings."""
         GenericPlotter.addSettings(s)
 
-        s.add( setting.Int('thinfactor', 1,
-                           minval=1,
-                           descr=_('Thin number of markers plotted'
-                                   ' for each datapoint by this factor'),
-                           usertext=_('Thin markers'),
-                           formatting=True), 0 )
-        s.add( setting.DistancePt('markerSize',
-                                  '3pt',
-                                  descr = _('Size of marker to plot'),
-                                  usertext=_('Marker size'), formatting=True), 0 )
-        s.add( setting.Marker('marker',
-                              'circle',
-                              descr = _('Type of marker to plot'),
-                              usertext=_('Marker'), formatting=True), 0 )
-        s.add( setting.DatasetOrStr('labels', '',
-                                    descr=_('Dataset or string to label points'),
-                                    usertext=_('Labels')), 5 )
-        s.add( setting.DatasetExtended(
-                'scalePoints', '',
-                descr = _('Scale size of markers given by dataset, expression'
-                          ' or list of values'),
-                usertext=_('Scale markers')), 6 )
-
-        s.add( setting.MarkerColor('Color') )
-
+        # non-formatting
         s.add( setting.DatasetExtended(
                 'yData', 'y',
                 descr=_('Y values, given by dataset, expression or list of values'),
@@ -321,6 +296,38 @@ class PointPlotter(GenericPlotter):
                 'xData', 'x',
                 descr=_('X values, given by dataset, expression or list of values'),
                 usertext=_('X data')), 0 )
+        s.add( setting.DatasetOrStr(
+            'labels', '',
+            descr=_('Dataset or string to label points'),
+            usertext=_('Labels')), 5 )
+        s.add( setting.DatasetExtended(
+            'scalePoints', '',
+            descr = _('Scale size of markers given by dataset, expression'
+                      ' or list of values'),
+            usertext=_('Scale markers')), 6 )
+
+        # formatting
+        s.add( setting.Int('thinfactor', 1,
+                           minval=1,
+                           descr=_('Thin number of markers plotted'
+                                   ' for each datapoint by this factor'),
+                           usertext=_('Thin markers'),
+                           formatting=True), 0 )
+        s.add( setting.Color('color',
+                             'black',
+                             descr = _('Master color'),
+                             usertext = _('Color'),
+                             formatting=True), 0 )
+        s.add( setting.DistancePt('markerSize',
+                                  '3pt',
+                                  descr = _('Size of marker to plot'),
+                                  usertext=_('Marker size'), formatting=True), 0 )
+        s.add( setting.Marker('marker',
+                              'circle',
+                              descr = _('Type of marker to plot'),
+                              usertext=_('Marker'), formatting=True), 0 )
+        s.add( setting.MarkerColor('Color') )
+
         s.add( setting.ErrorStyle('errorStyle',
                                   'bar',
                                   descr=_('Style of error bars to plot'),
@@ -330,6 +337,7 @@ class PointPlotter(GenericPlotter):
                                   descr = _('Plot line settings'),
                                   usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
+
         s.add( setting.MarkerLine('MarkerLine',
                                   descr = _('Line around the marker settings'),
                                   usertext = _('Marker border')),
@@ -338,10 +346,13 @@ class PointPlotter(GenericPlotter):
                                descr = _('Marker fill settings'),
                                usertext = _('Marker fill')),
                pixmap = 'settings_plotmarkerfill' )
+
         s.add( setting.ErrorBarLine('ErrorBarLine',
                                     descr = _('Error bar line settings'),
                                     usertext = _('Error bar line')),
                pixmap = 'settings_ploterrorline' )
+        s.ErrorBarLine.get('color').newDefault( setting.Reference('../color') )
+
         s.add( setting.PointFill('FillBelow',
                                  descr = _('Fill below plot line'),
                                  usertext = _('Fill below')),
