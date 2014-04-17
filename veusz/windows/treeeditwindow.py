@@ -763,9 +763,10 @@ class TreeEditDock(qt4.QDockWidget):
             if enabled:
                 m.addSeparator()
                 act = qt4.QAction(menutext, self)
-                act.triggered.connect(
-                    utils.BoundCaller(self.slotWidgetHideShow,
-                                      self.selwidgets, showhide))
+                def trigfn(showorhide):
+                    return lambda: self.slotWidgetHideShow(
+                        self.selwidgets, showorhide)
+                act.triggered.connect(trigfn(showhide))
                 m.addAction(act)
 
         m.exec_(self.mapToGlobal(event.pos()))
