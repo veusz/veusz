@@ -225,7 +225,7 @@ class VeuszApp(qt4.QApplication):
         # optionally load a translation
         if self.options.translation:
             trans = qt4.QTranslator()
-            trans.load(options.translation)
+            trans.load(self.options.translation)
             self.installTranslator(trans)
 
         self.thread = ImportThread()

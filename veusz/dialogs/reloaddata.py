@@ -131,8 +131,6 @@ class ReloadData(VeuszDialog):
 
         except EnvironmentError as e:
             text = _('Error reading file:\n') + cstr(e)
-        except document.DescriptorError:
-            text = _('Could not interpret descriptor. Reload failed.')
         except:
             self.document.enableUpdates()
             raise
