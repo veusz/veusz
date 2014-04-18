@@ -20,7 +20,6 @@ from __future__ import division, print_function
 
 from .. import qtall as qt4
 from .. import document
-from .. import utils
 from . import readcsv
 from . import base
 

@@ -36,7 +36,6 @@ from ..compat import czip, crange, citems, cbasestr
 from . import datasets
 from . import widgetfactory
 
-from .. import utils
 from .. import plugins
 from .. import qtall as qt4
 

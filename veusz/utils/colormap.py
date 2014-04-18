@@ -280,7 +280,6 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
         # do a linear color scaling
         vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
         colorscaling = scaling
-        coloraxisscale = 'linear'
     else:
         assert scaling == 'log'
 
@@ -292,7 +291,6 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
 
         vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
         colorscaling = 'linear'
-        coloraxisscale = 'log'
 
     # convert 1d array to 2d image
     if direction == 'horizontal':

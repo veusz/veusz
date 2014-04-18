@@ -17,7 +17,6 @@
 ###############################################################################
 
 from __future__ import division
-from ..compat import cbasestr
 
 class ReferenceBase(object):
     """Reference objects are inherited from this base class.

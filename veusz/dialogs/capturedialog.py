@@ -21,7 +21,6 @@
 from __future__ import division
 from ..compat import citems, cstr, cstrerror
 from .. import qtall as qt4
-from .. import document
 from .. import setting
 from ..dataimport import capture, simpleread
 from .veuszdialog import VeuszDialog

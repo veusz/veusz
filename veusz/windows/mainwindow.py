@@ -22,7 +22,6 @@
 from __future__ import division, print_function
 import os.path
 import sys
-import traceback
 import glob
 import re
 
@@ -970,7 +969,7 @@ class MainWindow(qt4.QMainWindow):
 
             filename = fd.selectedFiles()[0]
             try:
-                with open(filename) as f:
+                with open(filename):
                     pass
             except EnvironmentError as e:
                 qt4.QMessageBox.critical(

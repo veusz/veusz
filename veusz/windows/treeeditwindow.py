@@ -928,7 +928,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         # separate menus for adding shapes and axis types
         shapemenu = qt4.QMenu()
-        shapemenu.addActions( [actions[a] for a in (
+        shapemenu.addActions( [actions[act] for act in (
                     'add.rect',
                     'add.ellipse',
                     'add.line',
@@ -938,7 +938,7 @@ class TreeEditDock(qt4.QDockWidget):
         actions['add.shapemenu'].setMenu(shapemenu)
 
         axismenu = qt4.QMenu()
-        axismenu.addActions( [actions[a] for a in (
+        axismenu.addActions( [actions[act] for act in (
                     'add.axis',
                     'add.axis-broken',
                     'add.axis-function',

@@ -23,8 +23,6 @@ from ..compat import cbasestr, cbytes
 from .. import document
 from . import base
 
-import numpy as N
-
 def _(text, disambiguation=None, context="Import_FITS"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 

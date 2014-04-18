@@ -26,7 +26,6 @@ import sys
 
 from ..compat import crange
 from .. import qtall as qt4
-from .. import document
 from .. import setting
 from .. import utils
 from .. import plugins
@@ -195,7 +194,7 @@ class ImportDialog(VeuszDialog):
         ftype = os.path.splitext(filename)[1]
         # strip off any gz, bz2 extensions to get real extension
         while ftype.lower() in ('.gz', '.bz2'):
-            ftype = os.path.splitext(fname)[1]
+            ftype = os.path.splitext(filename)[1]
         ftype = ftype.lower()
 
         # examine from left to right

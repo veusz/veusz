@@ -350,11 +350,9 @@ class Contour(plotters.GenericPlotter):
 
         xr, yr = data.getDataRanges()
         if depname == 'sx':
-            dxrange = xr
             axrange[0] = min( axrange[0], xr[0] )
             axrange[1] = max( axrange[1], xr[1] )
         elif depname == 'sy':
-            dyrange = yr
             axrange[0] = min( axrange[0], yr[0] )
             axrange[1] = max( axrange[1], yr[1] )
 

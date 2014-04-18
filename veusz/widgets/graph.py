@@ -19,7 +19,6 @@
 ##############################################################################
 
 from __future__ import division
-from collections import defaultdict
 import textwrap
 
 from ..compat import crange, citems

@@ -42,7 +42,6 @@ x +- y + -
 
 from __future__ import division
 import re
-import csv
 import ast
 
 import numpy as N

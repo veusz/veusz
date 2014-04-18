@@ -28,7 +28,7 @@ from __future__ import division, print_function
 import os.path
 import numpy as N
 
-from ..compat import citems, ckeys, cbasestr
+from ..compat import ckeys, cbasestr
 from .. import qtall as qt4
 from .. import setting
 from .. import embed
@@ -420,7 +420,7 @@ class CommandInterface(qt4.QObject):
             print(
                 _("Set dataset '%s':\n"
                   " Values = %s") % (
-                      name, str(data.data))
+                      name, str(ds.data))
             )
 
     def SetDataExpression(self, name, val, symerr=None, negerr=None, poserr=None,

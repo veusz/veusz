@@ -20,7 +20,6 @@ from __future__ import division, print_function
 
 import collections
 import re
-import sys
 
 import numpy as N
 from .. import qtall as qt4

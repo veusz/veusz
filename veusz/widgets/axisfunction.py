@@ -455,7 +455,7 @@ class AxisFunction(axis.Axis):
 
         try:
             ourgraphcoords = self.getFunction()(tvals)
-        except Exception as e:
+        except Exception:
             return
 
         deltas = ourgraphcoords[1:] - ourgraphcoords[:-1]

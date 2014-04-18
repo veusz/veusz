@@ -21,7 +21,7 @@ from __future__ import division, print_function
 from .. import qtall as qt4
 from .. import setting
 from ..dialogs import importdialog
-from ..compat import crange, cstr, ckeys
+from ..compat import cstr, ckeys
 
 from . import base
 from . import defn_hdf5
@@ -404,7 +404,6 @@ class ImportNameDeligate(qt4.QItemDelegate):
 
         node = index.internalPointer()
         out = []
-        tooltips = []
         for dn in (n for n in self.datanodes if n.toimport):
             name = dn.name
             out.append( (name, '') )
@@ -435,9 +434,9 @@ class ImportNameDeligate(qt4.QItemDelegate):
                 last = out[i]
                 i += 1
 
-        w.addItems([i[0] for i in out])
-        for i, item in enumerate(out):
-            w.setItemData(i, item[1], qt4.Qt.ToolTipRole)
+        w.addItems([x[0] for x in out])
+        for v, item in enumerate(out):
+            w.setItemData(v, item[1], qt4.Qt.ToolTipRole)
         return w
 
     def setEditorData(self, editor, index):
@@ -550,7 +549,7 @@ class ImportTabHDF5(importdialog.ImportTab):
                 pass
             with h5py.File(filename, "r") as f:
                 self.rootnode, self.datanodes = constructTree(f)
-        except IOError as e:
+        except IOError:
             self.showError(_("Cannot open file"))
             return False
 

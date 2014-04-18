@@ -567,8 +567,8 @@ class Document( qt4.QObject ):
 
         # write out tags as datasets
         tagsgrp = docgrp.create_group('Tags')
-        for tag, datasets in sorted(citems(bytag)):
-            tagsgrp[tag] = [v.encode('utf-8') for v in sorted(datasets)]
+        for tag, dsnames in sorted(citems(bytag)):
+            tagsgrp[tag] = [v.encode('utf-8') for v in sorted(dsnames)]
 
         # save the actual tree structure
         textstream.write(self.basewidget.getSaveText())
