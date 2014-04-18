@@ -94,7 +94,7 @@ class EMFPaintEngine(qt4.QPaintEngine):
         self.dpi = dpi
 
     def begin(self, paintdevice):
-        self.emf = pyemf.EMF(self.width, self.height, self.dpi*scale)
+        self.emf = pyemf.EMF(self.width, self.height, int(self.dpi*scale))
         self.pen = self.emf.GetStockObject(pyemf.BLACK_PEN)
         self.pencolor = (0, 0, 0)
         self.brush = self.emf.GetStockObject(pyemf.NULL_BRUSH)
@@ -107,13 +107,13 @@ class EMFPaintEngine(qt4.QPaintEngine):
 
         for line in lines:
             self.emf.Polyline(
-                 [(line.x1()*scale, line.y1()*scale),
-                  (line.x2()*scale, line.y2()*scale)] )
+                 [ (int(line.x1()*scale), int(line.y1()*scale)),
+                   (int(line.x2()*scale), int(line.y2()*scale)) ] )
 
     def drawPolygon(self, points, mode):
         """Draw polygon on output."""
         # print "Polygon"
-        pts = [(p.x()*scale, p.y()*scale) for p in points]
+        pts = [(int(p.x()*scale), int(p.y()*scale)) for p in points]
 
         if mode == qt4.QPaintEngine.PolylineMode:
             self.emf.Polyline(pts)
@@ -129,10 +129,10 @@ class EMFPaintEngine(qt4.QPaintEngine):
     def drawEllipse(self, rect):
         """Draw an ellipse."""
         # print "ellipse"
-        args = (rect.left()*scale, rect.top()*scale,
-                rect.right()*scale, rect.bottom()*scale,
-                rect.left()*scale, rect.top()*scale,
-                rect.left()*scale, rect.top()*scale)
+        args = ( int(rect.left()*scale),  int(rect.top()*scale),
+                 int(rect.right()*scale), int(rect.bottom()*scale),
+                 int(rect.left()*scale),  int(rect.top()*scale),
+                 int(rect.left()*scale),  int(rect.top()*scale) )
         self.emf.Pie(*args)
         self.emf.Arc(*args)
 
@@ -142,9 +142,9 @@ class EMFPaintEngine(qt4.QPaintEngine):
 
         for pt in points:
             x, y = (pt.x()-0.5)*scale, (pt.y()-0.5)*scale
-            self.emf.Pie( x, y,
-                          (pt.x()+0.5)*scale, (pt.y()+0.5)*scale,
-                          x, y, x, y )
+            self.emf.Pie( int(x), int(y),
+                          int((pt.x()+0.5)*scale), int((pt.y()+0.5)*scale),
+                          int(x), int(y), int(x), int(y) )
 
     def drawPixmap(self, r, pixmap, sr):
         """Draw pixmap to display."""
@@ -163,14 +163,14 @@ class EMFPaintEngine(qt4.QPaintEngine):
         datasize, = struct.unpack('<i', bmp[0x22:0x26])
 
         epix = pyemf._EMR._STRETCHDIBITS()
-        epix.rclBounds_left = r.left()*scale
-        epix.rclBounds_top = r.top()*scale
-        epix.rclBounds_right = r.right()*scale
-        epix.rclBounds_bottom = r.bottom()*scale
-        epix.xDest = r.left()*scale
-        epix.yDest = r.top()*scale
-        epix.cxDest = r.width()*scale
-        epix.cyDest = r.height()*scale
+        epix.rclBounds_left = int(r.left()*scale)
+        epix.rclBounds_top = int(r.top()*scale)
+        epix.rclBounds_right = int(r.right()*scale)
+        epix.rclBounds_bottom = int(r.bottom()*scale)
+        epix.xDest = int(r.left()*scale)
+        epix.yDest = int(r.top()*scale)
+        epix.cxDest = int(r.width()*scale)
+        epix.cyDest = int(r.height()*scale)
         epix.xSrc = sr.left()
         epix.ySrc = sr.top()
         epix.cxSrc = sr.width()
@@ -196,17 +196,17 @@ class EMFPaintEngine(qt4.QPaintEngine):
         while i < count:
             e = path.elementAt(i)
             if e.type == qt4.QPainterPath.MoveToElement:
-                self.emf.MoveTo(e.x*scale, e.y*scale)
+                self.emf.MoveTo( int(e.x*scale), int(e.y*scale) )
                 #print "M", e.x*scale, e.y*scale
             elif e.type == qt4.QPainterPath.LineToElement:
-                self.emf.LineTo(e.x*scale, e.y*scale)
+                self.emf.LineTo( int(e.x*scale), int(e.y*scale) )
                 #print "L", e.x*scale, e.y*scale
             elif e.type == qt4.QPainterPath.CurveToElement:
                 e1 = path.elementAt(i+1)
                 e2 = path.elementAt(i+2)
-                params = ((e.x*scale, e.y*scale),
-                          (e1.x*scale, e1.y*scale),
-                          (e2.x*scale, e2.y*scale))
+                params = ( ( int(e.x*scale), int(e.y*scale) ),
+                           ( int(e1.x*scale), int(e1.y*scale) ),
+                           ( int(e2.x*scale), int(e2.y*scale) ) )
                 self.emf.PolyBezierTo(params)
                 #print "C", params
 
@@ -277,14 +277,14 @@ class EMFPaintEngine(qt4.QPaintEngine):
             # use proper widths of lines
             style |= pyemf.PS_GEOMETRIC
 
-        width = pen.widthF()*scale
+        width = int(pen.widthF()*scale)
         qc = pen.color()
         color = (qc.red(), qc.green(), qc.blue())
         self.pencolor = color
 
         if pen.style() & qt4.Qt.CustomDashLine:
             # make an extended pen if we need a custom dash pattern
-            dash = [width*f for f in pen.dashPattern()]
+            dash = [int(pen.widthF()*scale*f) for f in pen.dashPattern()]
             newpen = self.emf._appendHandle(
                  _EXTCREATEPEN(style,
                                width=width, color=color,
@@ -342,8 +342,8 @@ class EMFPaintEngine(qt4.QPaintEngine):
             # is this the only wave to get rid of clipping?
             self.emf.BeginPath()
             self.emf.MoveTo(0,0)
-            w = self.width*self.dpi*scale
-            h = self.height*self.dpi*scale
+            w = int(self.width*self.dpi*scale)
+            h = int(self.height*self.dpi*scale)
             self.emf.LineTo(w, 0)
             self.emf.LineTo(w, h)
             self.emf.LineTo(0, h)
