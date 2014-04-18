@@ -260,9 +260,17 @@ class PointFill(BrushExtended):
         hide.descr = _('Hide the filled region to the edge of the plot')
         self.get('color').newDefault('grey')
 
-        self.add( setting.Bool( 'hideerror', False,
-                                descr = _('Hide the filled region inside the error bars'),
-                                usertext=_('Hide error fill')) )
+        self.add( setting.Choice(
+            'fillto', 
+            ['top', 'bottom', 'left', 'right'],
+            'top',
+            descr=_('Edge to fill towards'),
+            usertext=_('Fill to')), 0)
+
+        self.add( setting.Bool(
+            'hideerror', False,
+            descr = _('Hide the filled region inside the error bars'),
+            usertext=_('Hide error fill')) )
 
 class ShapeFill(BrushExtended):
     '''Filling used for filling shapes.'''

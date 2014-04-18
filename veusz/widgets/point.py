@@ -248,6 +248,30 @@ _errorBarFunctionMap = {
     'linevertbar': (_errorBarsBar, _errorBarsFilled),
     }
 
+def fillPtsToEdge(painter, pts, posn, cliprect, fillstyle):
+    """Fill points depending on fill mode."""
+    ft = fillstyle.fillto
+    if ft == 'top':
+        x1, x2 = pts[0].x(), pts[-1].x()
+        y1 = y2 = posn[1]
+    elif ft == 'bottom':
+        x1, x2 = pts[0].x(), pts[-1].x()
+        y1 = y2 = posn[3]
+    elif ft == 'left':
+        y1, y2 = pts[0].y(), pts[-1].y()
+        x1 = x2 = posn[0]
+    elif ft == 'right':
+        y1, y2 = pts[0].y(), pts[-1].y()
+        x1 = x2 = posn[2]
+    else:
+        raise RuntimeError('Invalid fillto mode')
+
+    polypts = qt4.QPolygonF([qt4.QPointF(x1, y1)])
+    polypts += pts
+    polypts.append(qt4.QPointF(x2, y2))
+
+    utils.brushExtFillPolygon(painter, fillstyle, cliprect, polypts)
+
 class MarkerFillBrush(setting.Brush):
     def __init__(self, name, **args):
         setting.Brush.__init__(self, name, **args)
@@ -354,12 +378,13 @@ class PointPlotter(GenericPlotter):
         s.ErrorBarLine.get('color').newDefault( setting.Reference('../color') )
 
         s.add( setting.PointFill('FillBelow',
-                                 descr = _('Fill below plot line'),
-                                 usertext = _('Fill below')),
+                                 descr = _('Fill mode 1'),
+                                 usertext = _('Fill 1')),
                pixmap = 'settings_plotfillbelow' )
+        s.FillBelow.get('fillto').newDefault('bottom')
         s.add( setting.PointFill('FillAbove',
-                                 descr = _('Fill above plot line'),
-                                 usertext = _('Fill above')),
+                                 descr = _('Fill mode 2'),
+                                 usertext = _('Fill 2')),
                pixmap = 'settings_plotfillabove' )
         s.add( setting.PointLabel('Label',
                                   descr = _('Label settings'),
@@ -558,17 +583,20 @@ class PointPlotter(GenericPlotter):
         path = self._getBezierLine(pts)
         s = self.settings
 
-        if not s.FillBelow.hide:
-            temppath = qt4.QPainterPath(path)
-            temppath.lineTo(pts[-1].x(), posn[3])
-            temppath.lineTo(pts[0].x(), posn[3])
-            utils.brushExtFillPath(painter, s.FillBelow, temppath)
+        # do filling
+        for fillstyle in s.FillBelow, s.FillAbove:
+            if not fillstyle.hide:
+                x1, y1, x2, y2 = {
+                    'top': (pts[0].x(), posn[1], pts[-1].x(), posn[1]),
+                    'bottom': (pts[0].x(), posn[3], pts[-1].x(), posn[3]),
+                    'left': (posn[0], pts[0].y(), posn[0], pts[-1].y()),
+                    'right': (posn[2], pts[0].y(), posn[2], pts[-1].y())
+                }[fillstyle.fillto]
 
-        if not s.FillAbove.hide:
-            temppath = qt4.QPainterPath(path)
-            temppath.lineTo(pts[-1].x(), posn[1])
-            temppath.lineTo(pts[0].x(), posn[1])
-            utils.brushExtFillPath(painter, s.FillAbove, temppath)
+                temppath = qt4.QPainterPath(path)
+                temppath.lineTo(x2, y2)
+                temppath.lineTo(x1, y1)
+                utils.brushExtFillPath(painter, fillstyle, temppath)
 
         if not s.PlotLine.hide:
             painter.strokePath(path, s.PlotLine.makeQPen(painter))
@@ -582,20 +610,10 @@ class PointPlotter(GenericPlotter):
             return
         s = self.settings
 
-        if not s.FillBelow.hide:
-            # construct polygon to draw filled region
-            polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[3])])
-            polypts += pts
-            polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[3]))
-
-            utils.brushExtFillPolygon(painter, s.FillBelow, cliprect, polypts)
-
-        if not s.FillAbove.hide:
-            polypts = qt4.QPolygonF([qt4.QPointF(pts[0].x(), posn[1])])
-            polypts += pts
-            polypts.append(qt4.QPointF(pts[len(pts)-1].x(), posn[1]))
-
-            utils.brushExtFillPolygon(painter, s.FillAbove, cliprect, polypts)
+        # do filling
+        for fillstyle in s.FillBelow, s.FillAbove:
+            if not fillstyle.hide:
+                fillPtsToEdge(painter, pts, posn, cliprect, fillstyle)
 
         # draw line between points
         if not s.PlotLine.hide:

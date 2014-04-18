@@ -15,6 +15,7 @@ external sources such as Internet sockets or other programs.
 Changes in 1.21:
  * Add HDF5 saved document format
  * Add filled curve error bar style
+ * Add fill left/right options for point plotter
  * Add filetype filters to import dialog file browser dialog
  * In file completer in import dialog, use selected tab as filter
  * Move code to use PyQt new style signals

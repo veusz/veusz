@@ -82,13 +82,13 @@ class FunctionPlotter(GenericPlotter):
                pixmap = 'settings_plotline' )
 
         s.add( setting.PlotterFill('FillBelow',
-                                   descr = _('Fill below function'),
-                                   usertext = _('Fill below')),
+                                   descr = _('Fill mode 1'),
+                                   usertext = _('Fill 1')),
                pixmap = 'settings_plotfillbelow' )
-        
+        s.FillBelow.get('fillto').newDefault('bottom')
         s.add( setting.PlotterFill('FillAbove',
-                                   descr = _('Fill above function'),
-                                   usertext = _('Fill above')),
+                                   descr = _('Fill mode 2'),
+                                   usertext = _('Fill 2')),
                pixmap = 'settings_plotfillabove' )
 
     @property
