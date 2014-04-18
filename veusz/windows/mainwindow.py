@@ -1326,7 +1326,7 @@ class MainWindow(qt4.QMainWindow):
         ytext = fmt(yv, yt)
 
         t = '%s: %s%s = %s, %s%s = %s' % (
-                info.widget.name, xn, ix, xtext, yn, ix, ytext)
+            info.widget.name, xn, ix, xtext, yn, ix, ytext)
         self.pickerlabel.setText(t)
         if setdb['picker_to_console']:
             self.console.appendOutput(t + "\n", 'error')

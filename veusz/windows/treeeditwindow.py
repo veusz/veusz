@@ -847,7 +847,9 @@ class TreeEditDock(qt4.QDockWidget):
                            'nonorthpoint', 'nonorthfunc'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
-            slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
+            def slotfn(klass=wc):
+                return lambda: self.slotMakeWidgetButton(klass)
+            slot = slotfn(wc)
             self.addslots[wc] = slot
 
             actionname = 'add.' + widgettype
@@ -873,11 +875,11 @@ class TreeEditDock(qt4.QDockWidget):
                       icon='kde-edit-paste', key='Ctrl+V'),
                 'edit.moveup':
                     a(self, _('Move the selected widget up'), _('Move &up'),
-                      utils.BoundCaller(self.slotWidgetMove, -1),
+                      lambda: self.slotWidgetMove(-1),
                       icon='kde-go-up'),
                 'edit.movedown':
                     a(self, _('Move the selected widget down'), _('Move d&own'),
-                      utils.BoundCaller(self.slotWidgetMove, 1),
+                      lambda: self.slotWidgetMove(1),
                       icon='kde-go-down'),
                 'edit.delete':
                     a(self, _('Remove the selected widget'), _('&Delete'),
@@ -1335,15 +1337,17 @@ class SettingLabel(qt4.QWidget):
         wpath = self.setting.getWidget().path
         setpath = setpath[len(wpath):]  # includes /
 
-        for widget in widgets:
-            action = menu.addAction(widget)
-            def modify(widget=widget):
+        def modifyfn(widget):
+            def modify():
                 """Modify the setting for the widget given."""
                 wpath = widget + setpath
                 self.document.applyOperation(
                     document.OperationSettingSet(wpath, self.setting.get()))
+            return modify
 
-            action.triggered.connect(modify)
+        for widget in widgets:
+            action = menu.addAction(widget)
+            action.triggered.connect(modifyfn(widget))
 
     @qt4.pyqtSlot(qt4.QPoint)
     def settingMenu(self, pos):

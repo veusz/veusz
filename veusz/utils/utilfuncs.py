@@ -156,12 +156,6 @@ def pixmapAsHtml(pix):
     b64 = cbytes(buf.data().toBase64()).decode('ascii')
     return '<img src="data:image/png;base64,%s">' % b64
 
-def BoundCaller(function, *params):
-    """Wrap a function with its initial arguments."""
-    def wrapped(*args):
-        function( *(params+args) )
-    return wrapped
-
 def pythonise(text):
     """Turn an expression of the form 'A b c d' into 'A(b,c,d)'.
 

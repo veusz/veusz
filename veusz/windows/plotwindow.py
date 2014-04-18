@@ -983,8 +983,9 @@ class PlotWindow( qt4.QGraphicsView ):
         for intv, text in self.updateintervals:
             act = intgrp.addAction(text)
             act.setCheckable(True)
-            fn = utils.BoundCaller(self.actionSetTimeout, intv)
-            act.triggered.connect(fn)
+            def setfn(interval):
+                return lambda checked: self.actionSetTimeout(interval, checked)
+            act.triggered.connect(setfn(intv))
             if intv == self.interval:
                 act.setChecked(True)
             submenu.addAction(act)
