@@ -522,6 +522,7 @@ class Contour(plotters.GenericPlotter):
 
         cl = s.get('ContourLabels')
         font = cl.makeQFont(painter)
+        descent = qt4.QFontMetricsF(font).descent()
 
         # linelabeller does clipping and labelling of contours
         linelabeller = ContourLineLabeller(clip, cl.rotate, painter, font)
@@ -537,6 +538,7 @@ class Contour(plotters.GenericPlotter):
                 rend = utils.Renderer(painter, font, 0, 0, text, alignhorz=0,
                                       alignvert=0, angle=0)
                 textdims = qt4.QSizeF(*rend.getDimensions())
+                textdims += qt4.QSizeF(descent*2, descent*2)
             else:
                 textdims = qt4.QSizeF(0, 0)
 
