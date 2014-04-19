@@ -209,10 +209,55 @@ void plotClippedPolygon(QPainter& painter,
 			const QPolygonF& inpoly,
 			bool autoexpand = true);
 
+// polyline clipping code
+
 void plotClippedPolyline(QPainter& painter,
 			 QRectF clip,
 			 const QPolygonF& poly,
 			 bool autoexpand = true);
+
+struct RotatedRectangle
+{
+  %TypeHeaderCode
+#include <polylineclip.h>
+  %End
+
+  RotatedRectangle(double _cx, double _cy,
+		   double _xw, double _yw, double _angle);
+
+  QPolygonF makePolygon() const;
+
+  double cx;
+  double cy;
+  double xw;
+  double yw;
+  double angle;
+};
+
+// for labelling of sets of contour lines
+class LineLabeller
+{
+  %TypeHeaderCode
+#include <polylineclip.h>
+  %End
+
+public:
+  LineLabeller(QRectF cliprect, bool rotatelabels);
+  virtual ~LineLabeller();
+
+  // override this to receive the label to draw
+  virtual void drawAt(int idx, RotatedRectangle r);
+
+  void addLine(const QPolygonF& poly, QSizeF textsize);
+
+  void process();
+
+  int getNumPolySets() const;
+  QVector<QPolygonF> getPolySet(int i) const;
+};
+
+
+// bezier functions
 
 QPolygonF bezier_fit_cubic_single(const QPolygonF& data, double error);
 

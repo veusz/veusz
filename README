@@ -20,6 +20,8 @@ Changes in 1.21:
  * In file completer in import dialog, use selected tab as filter
  * Move code to use PyQt new style signals
  * Add a master color setting for xy point and nonorthpoint plot
+ * Line labelling algorithm much improved in contour plots, which
+   rotates text to match line angle and avoids label overlaps
 
 Bug fixes:
  * Direction combo did not work in import dialog
