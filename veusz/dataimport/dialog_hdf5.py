@@ -21,7 +21,7 @@ from __future__ import division, print_function
 from .. import qtall as qt4
 from .. import setting
 from ..dialogs import importdialog
-from ..compat import cstr, ckeys
+from ..compat import cstr
 
 from . import base
 from . import defn_hdf5
@@ -221,7 +221,7 @@ class HDFDataNode(HDFNode):
 
         # keep track of vsz attributes for data item
         self.attrs = {}
-        for attr in ckeys(dsattrs):
+        for attr in dsattrs:
             if attr[:4] == "vsz_":
                 self.attrs[attr] = defn_hdf5.bconv(dsattrs[attr])
 

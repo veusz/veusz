@@ -23,7 +23,7 @@ from __future__ import division
 import re
 import numpy as N
 
-from ..compat import crange, ckeys, cnext, CIterator
+from ..compat import crange, cnext, CIterator
 from .. import document
 from .. import utils
 from .. import qtall as qt4
@@ -352,7 +352,7 @@ class ReadCSV(object):
     def setData(self, outmap, linkedfile=None):
         """Set the read-in datasets in the dict outmap."""
 
-        for name in ckeys(self.data):
+        for name in self.data:
             # skip error data here, they are used below
             # error data name contains \0
             if name.find('\0') >= 0:
@@ -383,4 +383,4 @@ class ReadCSV(object):
 
             outmap[name] = ds
 
-        return sorted(ckeys(outmap))
+        return sorted(outmap)

@@ -23,7 +23,7 @@ import re
 
 import numpy as N
 from .. import qtall as qt4
-from ..compat import citems, ckeys, cvalues, cbytes, cunicode, cpy3
+from ..compat import citems, cvalues, cbytes, cunicode, cpy3
 from .. import document
 from .. import utils
 from . import base
@@ -262,7 +262,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
         # store options associated with dataset
         options = {}
-        for a in ckeys(dsattrs):
+        for a in dsattrs:
             if a[:4] == "vsz_":
                 options[a] = auto_deref_attr(a, dsattrs, dataset)
 
@@ -361,7 +361,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         # this a defaultdict of defaultdict with None as default
         errordatasets = collections.defaultdict(
             lambda: collections.defaultdict(lambda: None))
-        for name in list(ckeys(dsread)):
+        for name in list(dsread):
             dr = dsread[name]
             ds = dr.data
             if not isinstance(ds, N.ndarray) or len(ds.shape) != 1:
@@ -410,7 +410,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 # find minimum length and cut down if necessary
                 minlen = min([len(d) for d in cvalues(args)
                               if d is not None])
-                for a in list(ckeys(args)):
+                for a in list(args):
                     if args[a] is not None and len(args[a]) > minlen:
                         args[a] = args[a][:minlen]
 

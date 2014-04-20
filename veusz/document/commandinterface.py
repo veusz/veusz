@@ -28,7 +28,7 @@ from __future__ import division, print_function
 import os.path
 import numpy as N
 
-from ..compat import ckeys, cbasestr
+from ..compat import cbasestr
 from .. import qtall as qt4
 from .. import setting
 from .. import embed
@@ -344,7 +344,7 @@ class CommandInterface(qt4.QObject):
 
     def GetDatasets(self):
         """Return a list of names of datasets."""
-        return sorted(ckeys(self.document.data))
+        return sorted(self.document.data)
 
     def ResolveReference(self, setn):
         """If the setting is set to a reference, follow the chain of

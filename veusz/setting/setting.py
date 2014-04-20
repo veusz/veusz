@@ -32,7 +32,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, ckeys, cbasestr, cstr, crepr
+from ..compat import citems, cbasestr, cstr, crepr
 from .. import qtall as qt4
 from . import controls
 from .settingdb import settingdb, uilocale
@@ -960,7 +960,7 @@ class FloatDict(Setting):
 
     def toText(self):
         text = ['%s = %s' % (k, floattostring(self.val[k]))
-                for k in sorted(ckeys(self.val))]
+                for k in sorted(self.val)]
         return '\n'.join(text)
 
     def fromText(self, text):

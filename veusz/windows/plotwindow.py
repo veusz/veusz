@@ -23,7 +23,7 @@ from __future__ import division
 import sys
 import traceback
 
-from ..compat import crange, ckeys
+from ..compat import crange
 from .. import qtall as qt4
 import numpy as N
 
@@ -541,7 +541,7 @@ class PlotWindow( qt4.QGraphicsView ):
                     axes[a] = True
 
         # iterate over each axis, and update the ranges
-        for axis in ckeys(axes):
+        for axis in axes:
             s = axis.settings
             if s.direction == 'horizontal':
                 p = xpts

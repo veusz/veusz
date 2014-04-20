@@ -24,7 +24,7 @@ import socket
 import platform
 import signal
 
-from ..compat import cstr, ckeys
+from ..compat import cstr
 from .. import qtall as qt4
 from .. import utils
 from . import simpleread
@@ -252,7 +252,7 @@ class OperationDataCaptureSet(object):
         self.simplereadobject.setOutput(readdata)
 
         # keep a copy of datasets which have changed from backup
-        self.nameschanged = list(ckeys(readdata))
+        self.nameschanged = list(readdata)
         self.olddata = {}
         for name in self.nameschanged:
             if name in doc.data:

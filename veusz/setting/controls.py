@@ -28,7 +28,7 @@ from __future__ import division
 import re
 import numpy as N
 
-from ..compat import crange, czip, citems, ckeys, cstr
+from ..compat import crange, czip, citems, cstr
 from .. import qtall as qt4
 
 from .settingdb import settingdb
@@ -1819,7 +1819,7 @@ class Colormap(Choice):
     size = (32, 12)
 
     def __init__(self, setn, document, parent):
-        names = sorted(ckeys(document.colormaps))
+        names = sorted(document.colormaps)
 
         icons = Colormap._generateIcons(document, names)
         Choice.__init__(self, setn, True,

@@ -30,7 +30,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import citems, ckeys, cstr, cstrerror
+from ..compat import citems, cstr, cstrerror
 from .. import qtall as qt4
 
 from .. import document
@@ -79,7 +79,7 @@ class DBusWinInterface(vzdbus.Object):
     @vzdbus.method(dbus_interface=interface, out_signature='as')
     def GetActions(self):
         """Get list of actions which can be activated."""
-        return sorted(ckeys(self.actions))
+        return sorted(self.actions)
 
     @vzdbus.method(dbus_interface=interface, in_signature='s')
     def TriggerAction(self, action):

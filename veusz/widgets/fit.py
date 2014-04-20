@@ -25,7 +25,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, czip, ckeys, cstr
+from ..compat import citems, czip, cstr
 from .. import document
 from .. import setting
 from .. import utils
@@ -242,7 +242,7 @@ class Fit(FunctionPlotter):
             return
 
         # populate the input parameters
-        paramnames = sorted(ckeys(s.values))
+        paramnames = sorted(s.values)
         params = N.array( [s.values[p] for p in paramnames] )
 
         # FIXME: loads of error handling!!

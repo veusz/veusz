@@ -20,7 +20,7 @@
 ##############################################################################
 
 from __future__ import division
-from ..compat import citems, ckeys
+from ..compat import citems
 
 class WidgetFactory(object):
     """Class to help produce any type of widget you want by name."""
@@ -66,7 +66,7 @@ class WidgetFactory(object):
 
     def listWidgets(self):
         """Return an array of the widgets the factory can make."""
-        return sorted(ckeys(self.regwidgets))
+        return sorted(self.regwidgets)
 
     def listWidgetClasses(self):
         """Return list of allowed classes."""
