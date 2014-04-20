@@ -322,9 +322,7 @@ void plotClippedPolyline(QPainter& painter,
   pcb.clipPolyline(poly);
 }
 
-////////////
-// algorithm:
-// 
+//////////////////////////////////////////////////////
 
 typedef QVector<QPolygonF> PolyVector;
 
@@ -346,6 +344,53 @@ public:
 private:
   PolyVector& _polyvec;
 };
+
+///////////////////////////////////////////////////////
+
+// Check whether polygons intersect
+// http://stackoverflow.com/questions/10962379/how-to-check-intersection-between-2-rotated-rectangles
+
+bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b)
+{
+  for(int polyi = 0; polyi < 2; ++polyi)
+    {
+      const QPolygonF& polygon = polyi == 0 ? a : b;
+
+      for(int i1 = 0; i1 < polygon.size(); ++i1)
+        {
+          const int i2 = (i1 + 1) % polygon.size();
+
+          const double normalx = polygon[i2].y() - polygon[i1].y();
+          const double normaly = polygon[i2].x() - polygon[i1].x();
+
+          double minA = std::numeric_limits<double>::max();
+          double maxA = std::numeric_limits<double>::min();
+          for(int ai = 0; ai < a.size(); ++ai)
+            {
+              const double projected = normalx * a[ai].x() +
+                normaly * a[ai].y();
+              if( projected < minA ) minA = projected;
+              if( projected > maxA ) maxA = projected;
+            }
+
+          double minB = std::numeric_limits<double>::max();
+          double maxB = std::numeric_limits<double>::min();
+          for(int bi = 0; bi < b.size(); ++bi)
+            {
+              const double projected = normalx * b[bi].x() +
+                normaly * b[bi].y();
+              if( projected < minB ) minB = projected;
+              if( projected > maxB ) maxB = projected;
+            }
+
+          if( maxA < minB || maxB < minA )
+            return false;
+        }
+    }
+
+  return true;
+}
+
 
 ///////////////////////////////////////////////////////
 
@@ -376,7 +421,7 @@ bool RectangleOverlapTester::willOverlap(const RotatedRectangle& rect)
 
   for(int i = 0; i < _rects.size(); ++i)
     {
-      if( ! thispoly.intersected(_rects.at(i).makePolygon()).empty() )
+      if( doPolygonsIntersect(thispoly, _rects.at(i).makePolygon()) )
         return true;
     }
 

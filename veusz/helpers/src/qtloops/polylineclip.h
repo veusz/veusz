@@ -38,6 +38,10 @@ void plotClippedPolyline(QPainter& painter,
                          bool autoexpand = true);
 
 
+// Do the polygons intersect?
+bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b);
+
+// class for describing a rectangle with a rotation angle
 struct RotatedRectangle
 {
   // a lot of boilerplate so it can go in QVector

@@ -216,6 +216,12 @@ void plotClippedPolyline(QPainter& painter,
 			 const QPolygonF& poly,
 			 bool autoexpand = true);
 
+// Do the polygons intersect?
+bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b);
+
+
+// storing rotated rectangles
+
 struct RotatedRectangle
 {
   %TypeHeaderCode
