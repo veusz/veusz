@@ -26,7 +26,7 @@ from __future__ import division, print_function
 import sys
 import math
 
-from ..compat import czip
+from ..compat import czip, crange
 from .. import qtall as qt4
 import numpy as N
 
@@ -562,7 +562,7 @@ class Contour(plotters.GenericPlotter):
         linelabeller.process()
         painter.setClipPath(linelabeller.clippath)
 
-        for i in xrange(linelabeller.getNumPolySets()):
+        for i in crange(linelabeller.getNumPolySets()):
             polyset = linelabeller.getPolySet(i)
             painter.setPen(linestyles.makePen(painter, levels[i]))
             for poly in polyset:
