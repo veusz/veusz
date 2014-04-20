@@ -24,6 +24,7 @@ from __future__ import division
 from itertools import count
 import sys
 import struct
+import math
 
 from ..compat import crange, czip
 from .. import qtall as qt4
@@ -302,3 +303,44 @@ def resampleLinearImage(img, xpts, ypts):
             outimg.setPixel(ox, oy, col)
 
     return outimg
+
+class RotatedRectangle:
+    """A rectangle with a rotation angle."""
+    def __init__(self, cx, cy, xw, yw, angle):
+        self.cx = cx
+        self.cy = cy
+        self.xw = xw
+        self.yw = yw
+        self.angle = angle
+
+    def makePolygon(self):
+        """Return QPolygonF for rectangle."""
+        c, s = math.cos(self.angle), math.sin(self.angle)
+        cx, cy, xw, yw = self.cx, self.cy, self.xw, self.yw
+        poly = qt4.QPolygonF()
+        poly.append(qt4.QPointF((-xw/2.)*c - (-yw/2.)*s + cx,
+                                (-xw/2.)*s + (-yw/2.)*c + cy))
+        poly.append(qt4.QPointF((-xw/2.)*c - ( yw/2.)*s + cx,
+                                (-xw/2.)*s + ( yw/2.)*c + cy))
+        poly.append(qt4.QPointF(( xw/2.)*c - ( yw/2.)*s + cx,
+                                ( xw/2.)*s + ( yw/2.)*c + cy))
+        poly.append(qt4.QPointF(( xw/2.)*c - (-yw/2.)*s + cx,
+                                ( xw/2.)*s + (-yw/2.)*c + cy))
+        return poly
+
+class RectangleOverlapTester:
+    """Keep track of whether RotatedRectangles overlap."""
+    def __init__(self):
+        self._rects = []
+
+    def willOverlap(self, rect):
+        """Will this rectangle overlap with the others?"""
+        poly = rect.makePolygon()
+        for r in self._rects:
+            if len( poly.intersected(r.makePolygon()) ) > 0:
+                return True
+        return False
+
+    def addRect(self, rect):
+        """Add rectangle to list."""
+        self._rects.append(rect)

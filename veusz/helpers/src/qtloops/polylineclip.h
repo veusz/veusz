@@ -92,11 +92,15 @@ private:
   QVector<QSizeF> _textsizes;
 };
 
-struct RectangleOverlapTester
+class RectangleOverlapTester
 {
+public:
   RectangleOverlapTester();
   bool willOverlap(const RotatedRectangle& rect);
-  QVector<RotatedRectangle> rects;
+  void addRect(const RotatedRectangle& rect) { _rects.append(rect); };
+
+private:
+  QVector<RotatedRectangle> _rects;
 };
 
 #endif

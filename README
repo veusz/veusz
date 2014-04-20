@@ -22,6 +22,8 @@ Changes in 1.21:
  * Add a master color setting for xy point and nonorthpoint plot
  * Line labelling algorithm much improved in contour plots, which
    rotates text to match line angle and avoids label overlaps
+ * More accurate tick label bounding boxes, allowing rotated labels
+   to be placed close together
 
 Bug fixes:
  * Direction combo did not work in import dialog
@@ -34,6 +36,7 @@ Bug fixes:
  * Full screen view when all pages are deleted
  * Crash with empty dataset and boxplot widget
  * Fix copy and paste of datasets
+ * Python 3 resizing axis bug
 
 Features of package:
  Plotting features:

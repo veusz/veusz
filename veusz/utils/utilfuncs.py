@@ -31,7 +31,8 @@ import csv
 import time
 from collections import defaultdict
 
-from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes, crepr
+from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes, crepr, \
+    crange
 from .. import qtall as qt4
 import numpy as N
 
@@ -525,7 +526,7 @@ def round2delt(fin1, fin2):
     else:
         out1 = out2 = ''
 
-    for i in xrange(maxlog,-200,-1):
+    for i in crange(maxlog,-200,-1):
         p = 10**i
         d1, d2 = int(f1/p), int(f2/p)
         f1 -= int(d1)*p

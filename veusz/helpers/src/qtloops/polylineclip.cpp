@@ -374,9 +374,9 @@ bool RectangleOverlapTester::willOverlap(const RotatedRectangle& rect)
 {
   const QPolygonF thispoly(rect.makePolygon());
 
-  for(int i = 0; i < rects.size(); ++i)
+  for(int i = 0; i < _rects.size(); ++i)
     {
-      if( ! thispoly.intersected(rects.at(i).makePolygon()).empty() )
+      if( ! thispoly.intersected(_rects.at(i).makePolygon()).empty() )
         return true;
     }
 
@@ -480,7 +480,7 @@ void LineLabeller::process()
               if( ! rtest.willOverlap(r) )
                 {
                   drawAt(polyseti, r);
-                  rtest.rects.append(r);
+                  rtest.addRect(r);
                   break; // only add label once
                 }
             } // positions

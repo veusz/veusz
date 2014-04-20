@@ -1077,16 +1077,19 @@ class Axis(widget.Widget):
 
         texttorender is a list of (Renderer, QPen) tuples.
         """
-        drawntext = qt4.QPainterPath()
-        for r, pen in texttorender:
-            bounds = r.getBounds()
-            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
-                              bounds[3]-bounds[1])
+        overlaps = utils.RectangleOverlapTester()
 
-            if not drawntext.intersects(rect):
+        for r, pen in texttorender:
+            rect = r.getTightBounds()
+
+            if not overlaps.willOverlap(rect):
                 painter.setPen(pen)
                 r.render()
-                drawntext.addRect(rect)
+                overlaps.addRect(rect)
+
+            # debug
+            # poly = rect.makePolygon()
+            # painter.drawPolygon(poly)
 
     def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
         """Internal drawing routine."""

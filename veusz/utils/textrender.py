@@ -36,6 +36,11 @@ try:
 except ImportError:
     mmlsupport = False
 
+try:
+    from ..helpers.qtloops import RotatedRectangle
+except ImportError:
+    from .slowfuncs import RotatedRectangle
+
 # this definition is monkey-patched when veusz is running in self-test
 # mode as we need to hack the metrics - urgh
 FontMetrics = qt4.QFontMetricsF
@@ -1233,6 +1238,20 @@ class _Renderer:
         Return totalwidth, totalheight, dy
         dy is a descent to add, to include in the alignment, if wanted
         """
+
+    def getTightBounds(self):
+        """Get bounds in form of rotated rectangle."""
+
+        largebounds = self.getBounds()
+
+        totalwidth, totalheight, dy = self._getWidthHeight()
+
+        return RotatedRectangle(
+            0.5*(largebounds[0]+largebounds[2]),
+            0.5*(largebounds[1]+largebounds[3]),
+            totalwidth,
+            totalheight+dy,
+            self.angle * math.pi / 180.)
 
     def getBounds(self):
         """Get bounds in standard version."""

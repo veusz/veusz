@@ -256,6 +256,18 @@ public:
   QVector<QPolygonF> getPolySet(int i) const;
 };
 
+class RectangleOverlapTester
+{
+  %TypeHeaderCode
+#include <polylineclip.h>
+  %End
+
+public:
+  RectangleOverlapTester();
+  bool willOverlap(const RotatedRectangle& rect);
+  void addRect(const RotatedRectangle& rect);
+};
+
 
 // bezier functions
 
