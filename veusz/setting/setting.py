@@ -32,7 +32,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, cbasestr, cstr, crepr
+from ..compat import cbasestr, cstr, crepr
 from .. import qtall as qt4
 from . import controls
 from .settingdb import settingdb, uilocale
@@ -949,14 +949,12 @@ class FloatDict(Setting):
         if type(val) != dict:
             raise utils.InvalidType
 
-        out = {}
-        for key, val in citems(val):
-            if type(val) not in (float, int):
+        for v in val.values():
+            if type(v) not in (float, int):
                 raise utils.InvalidType
-            else:
-                out[key] = val
 
-        return out
+        # return copy
+        return dict(val)
 
     def toText(self):
         text = ['%s = %s' % (k, floattostring(self.val[k]))
@@ -1540,13 +1538,13 @@ class WidgetChoice(Str):
             widget = widget.parent
 
         # get list of widgets from recursive find
-        images = {}
+        widgets = {}
         if widget is not None:
-            self.buildWidgetList(0, widget, images)
+            self.buildWidgetList(0, widget, widgets)
 
         # turn (object, level) pairs into object
         outdict = {}
-        for name, val in citems(images):
+        for name, val in widgets.items():
             outdict[name] = val[0]
 
         return outdict

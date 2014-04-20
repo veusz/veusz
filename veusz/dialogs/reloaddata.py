@@ -23,7 +23,7 @@
 from __future__ import division
 import os
 
-from ..compat import citems, cstr
+from ..compat import cstr
 from .. import qtall as qt4
 from .. import document
 from .veuszdialog import VeuszDialog
@@ -113,7 +113,7 @@ class ReloadData(VeuszDialog):
                 self.filenames)
 
             # show errors in read data
-            for var, count in citems(errors):
+            for var, count in errors.items():
                 if count != 0:
                     text += ( _('%i conversions failed for dataset "%s"\n') %
                               (count, var) )

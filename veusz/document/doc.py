@@ -306,9 +306,8 @@ class Document( qt4.QObject ):
 
     def modifiedData(self, dataset):
         """The named dataset was modified"""
-        for name, ds in citems(self.data):
-            if ds is dataset:
-                self.setModified()
+        if dataset in self.data.values():
+            self.setModified()
 
     def getLinkedFiles(self, filenames=None):
         """Get a list of LinkedFile objects used by the document.
@@ -466,12 +465,12 @@ class Document( qt4.QObject ):
 
         # get a list of all tags and which datasets have them
         bytag = defaultdict(list)
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             for t in dataset.tags:
                 bytag[t].append(name)
 
         # write out tags
-        for tag, val in sorted(citems(bytag)):
+        for tag, val in sorted(bytag.items()):
             fileobj.write('TagDatasets(%s, %s)\n' %
                           (repr(tag), repr(val)))
 
@@ -507,12 +506,12 @@ class Document( qt4.QObject ):
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             dataset.saveLinksToSavedDoc(fileobj, savedlinks,
                                         relpath=reldirname)
 
         # save the remaining datasets
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             dataset.saveToFile(fileobj, name)
 
         # save tags of datasets
@@ -550,24 +549,24 @@ class Document( qt4.QObject ):
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             dataset.saveLinksToSavedDoc(textstream, savedlinks,
                                         relpath=reldirname)
 
         # save the remaining datasets
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             dataset.saveToFile(textstream, name, mode='hdf5', hdfgroup=datagrp)
 
         # handle tagging
         # get a list of all tags and which datasets have them
         bytag = defaultdict(list)
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             for t in dataset.tags:
                 bytag[t].append(name)
 
         # write out tags as datasets
         tagsgrp = docgrp.create_group('Tags')
-        for tag, dsnames in sorted(citems(bytag)):
+        for tag, dsnames in sorted(bytag.items()):
             tagsgrp[tag] = [v.encode('utf-8') for v in sorted(dsnames)]
 
         # save the actual tree structure
@@ -1023,7 +1022,7 @@ class Document( qt4.QObject ):
                            nodetypes=nodetypes, _path=_path)
         elif root.nodetype == 'settings':
             # do the settings of the settings
-            for name, s in sorted(citems(root.setdict)):
+            for name, s in sorted(root.setdict.items()):
                 self.walkNodes(tocall, root=s, nodetypes=nodetypes,
                                _path = _path + '/' + s.name)
         # elif root.nodetype == 'setting': pass

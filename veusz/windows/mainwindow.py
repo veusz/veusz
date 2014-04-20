@@ -30,7 +30,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import citems, cstr, cstrerror
+from ..compat import cstr, cstrerror
 from .. import qtall as qt4
 
 from .. import document
@@ -1286,10 +1286,9 @@ class MainWindow(qt4.QMainWindow):
 
         if values:
             # construct comma separated text representing axis values
-            valitems = []
-            for name, val in citems(values):
-                valitems.append('%s=%#.4g' % (name, val))
-            valitems.sort()
+            valitems = [
+                '%s=%#.4g' % (name, values[name])
+                for name in sorted(values) ]
             self.axisvalueslabel.setText(', '.join(valitems))
         else:
             self.axisvalueslabel.setText(_('No position'))

@@ -25,7 +25,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, czip, cstr
+from ..compat import czip, cstr
 from .. import document
 from .. import setting
 from .. import utils
@@ -217,7 +217,7 @@ class Fit(FunctionPlotter):
             # build up a set of X=Y values
             loc = self.document.locale
             txt = []
-            for l, v in sorted(citems(vals)):
+            for l, v in sorted(vals.items()):
                 val = utils.formatNumber(v, '%.4Vg', locale=loc)
                 txt.append( '%s = %s' % (l, val) )
             # add chi2 output

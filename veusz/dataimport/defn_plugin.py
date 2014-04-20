@@ -19,7 +19,6 @@
 from __future__ import division, print_function
 import traceback
 
-from ..compat import citems
 from .. import document
 from .. import plugins
 from .. import qtall as qt4
@@ -47,7 +46,7 @@ class ImportParamsPlugin(base.ImportParamsBase):
 
         pluginpars = {}
         upvars = {}
-        for n, v in citems(argsv):
+        for n, v in argsv.items():
             if n in self.defaults:
                 upvars[n] = v
             else:

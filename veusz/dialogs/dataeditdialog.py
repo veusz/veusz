@@ -496,7 +496,7 @@ class DataEditDialog(VeuszDialog):
 
         # select first item, if any or initialise if none
         if len(self.document.data) > 0:
-            self.selectDataset( sorted(self.document.data.keys())[0] )
+            self.selectDataset( sorted(self.document.data)[0] )
         else:
             self.slotDatasetsSelected([])
 

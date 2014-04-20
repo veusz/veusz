@@ -46,7 +46,7 @@ import ast
 
 import numpy as N
 
-from ..compat import crange, cnext, CStringIO, citems
+from ..compat import crange, cnext, CStringIO
 from .. import utils
 from .. import document
 from .. import qtall as qt4
@@ -609,9 +609,9 @@ class SimpleRead(object):
         """Get a dict of the datasets read (main data part) and number
         of entries read."""
         out = {}
-        for name, data in citems(self.datasets):
+        for name in self.datasets:
             if name[-2:] == '\0D':
-                out[name[:-2]] = len(data)
+                out[name[:-2]] = len(self.datasets[name])
         return out
 
     def setOutput(self, out, linkedfile=None,

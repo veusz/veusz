@@ -21,7 +21,6 @@
 from __future__ import division
 import textwrap
 
-from ..compat import crange, citems
 from .. import qtall as qt4
 from .. import setting
 from .. import utils
@@ -235,7 +234,7 @@ class Graph(widget.Widget):
                     axestodraw[c.name] = c
 
         # grid lines are normally plotted before other child widgets
-        axisdrawlist = sorted(citems(axestodraw), reverse=True)
+        axisdrawlist = sorted(axestodraw.items(), reverse=True)
         for aname, awidget in axisdrawlist:
             awidget.updateAxisLocation(bounds)
             awidget.computePlottedRange()
@@ -244,7 +243,7 @@ class Graph(widget.Widget):
 
         # broken axis handling
         brokenaxes = set()
-        for name, axis in citems(axestodraw):
+        for axis in axestodraw.values():
             if isinstance(axis, axisbroken.AxisBroken):
                 brokenaxes.add(axis)
 
@@ -271,7 +270,7 @@ class Graph(widget.Widget):
                     hence this rather strange iteration.
                     """
                     ax = b[0][1]
-                    for i in crange(ax.breakvnum):
+                    for i in range(ax.breakvnum):
                         ax.switchBreak(i, bounds)
                         if len(b) == 1:
                             c.draw(bounds, painthelper, outerbounds=outerbounds)
