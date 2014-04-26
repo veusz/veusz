@@ -537,7 +537,7 @@ void LineLabeller::process()
 
 QVector<QPolygonF> LineLabeller::getPolySet(int i) const
 {
-  if( i >= 0 and i < _polys.size() )
+  if( i >= 0 && i < _polys.size() )
     return _polys[i];
   return QVector<QPolygonF>();
 }
