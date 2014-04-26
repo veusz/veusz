@@ -22,8 +22,9 @@ Changes in 1.21:
  * Add a master color setting for xy point and nonorthpoint plot
  * Line labelling algorithm much improved in contour plots, which
    rotates text to match line angle and avoids label overlaps
- * More accurate tick label bounding boxes, allowing rotated labels
-   to be placed close together
+ * More accurate axis tick label bounding boxes, allowing rotated
+   labels to be placed close together
+ * Add reflection and rotation options to vector field widget
 
 Bug fixes:
  * Direction combo did not work in import dialog

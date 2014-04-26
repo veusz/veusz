@@ -940,6 +940,31 @@ class ChoiceOrMore(Setting):
         argsv = {'descriptions': self.descriptions}
         return controls.Choice(self, True, self.vallist, *args, **argsv)
 
+class FloatChoice(ChoiceOrMore):
+    """A numeric value, which can also be chosen from the list of values."""
+
+    typename = 'float-choice'
+
+    def convertTo(self, val):
+        if isinstance(val, int) or isinstance(val, float):
+            return _finiteRangeFloat(val)
+        raise utils.InvalidType
+
+    def toText(self):
+        return floattostring(self.val)
+
+    def fromText(self, text):
+        f, ok = uilocale.toDouble(text)
+        if not ok:
+            # try to evaluate
+            f = self.safeEvalHelper(text)
+        return self.convertTo(f)
+
+    def makeControl(self, *args):
+        argsv = {'descriptions': self.descriptions}
+        strings = [floattostring(x) for x in self.vallist]
+        return controls.Choice(self, True, strings, *args, **argsv)
+
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
 

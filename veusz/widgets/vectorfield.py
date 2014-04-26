@@ -72,6 +72,23 @@ class VectorField(plotters.GenericPlotter):
                               descr = _('Cartesian (dx,dy) or polar (r,theta)'),
                               usertext = _('Mode')),
                2 )
+        s.add( setting.FloatChoice(
+            'rotate',
+            [0., 45., 90., 135., 180., -135., -90., -45.],
+            0.,
+            descr = _('Rotate vector clockwise by this angle in degrees'),
+            usertext = _('Rotate')),
+               3 )
+        s.add( setting.Bool(
+            'reflectx', False,
+            descr = _('Reflect vector in X direction'),
+            usertext = _('Reflect X')),
+               4 )
+        s.add( setting.Bool(
+            'reflecty', False,
+            descr = _('Reflect vector in Y direction'),
+            usertext = _('Reflect Y')),
+               5 )
 
         # formatting
         s.add( setting.DistancePt('baselength', '10pt',
@@ -111,7 +128,7 @@ class VectorField(plotters.GenericPlotter):
         """Range information provided by widget."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
-        
+
     def getRange(self, axis, depname, axrange):
         """Automatically determine the ranges of variable on the axes."""
 
@@ -191,6 +208,17 @@ class VectorField(plotters.GenericPlotter):
             theta = data2nd[:yw, :xw].ravel()
             dx = r * N.cos(theta)
             dy = r * N.sin(theta)
+
+        if s.rotate != 0.:
+            angle = -s.rotate / 180 * N.pi
+            rotx = dx*N.cos(angle) - dy*N.sin(angle)
+            roty = dx*N.sin(angle) + dy*N.cos(angle)
+            dx, dy = rotx, roty
+
+        if s.reflectx:
+            dx = -dx
+        if s.reflecty:
+            dy = -dy
 
         x1, x2 = xplotter-dx, xplotter+dx
         y1, y2 = yplotter+dy, yplotter-dy
