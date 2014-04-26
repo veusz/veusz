@@ -389,13 +389,13 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         if ds is not None and role == qt4.Qt.DisplayRole:
             v = self.xcent[section] if xaxis else self.ycent[section]
-            return '%i (%s)' % (section+1, setting.uilocale.toString(v))
+            return '%i (%s)' % (section+1, setting.ui_floattostring(v))
 
         elif ds is not None and role == qt4.Qt.ToolTipRole:
             v1 = self.xedge[section] if xaxis else self.yedge[section]
             v2 = self.xedge[section+1] if xaxis else self.yedge[section+1]
-            return u'%s\u2013%s' % (setting.uilocale.toString(v1),
-                                    setting.uilocale.toString(v2))
+            return u'%s\u2013%s' % (setting.ui_floattostring(v1),
+                                    setting.ui_floattostring(v2))
 
         return None
 
@@ -451,7 +451,7 @@ class ViewDelegate(qt4.QStyledItemDelegate):
     def setEditorData(self, editor, index):
         """Override setData to use correct formatting."""
         if type(index.data()) is float:
-            txt = setting.uilocale.toString(index.data(), 'g', 8)
+            txt = setting.ui_floattostring(index.data())
             editor.setText(txt)
         else:
             qt4.QStyledItemDelegate.setEditorData(self, editor, index)

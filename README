@@ -25,6 +25,7 @@ Changes in 1.21:
  * More accurate axis tick label bounding boxes, allowing rotated
    labels to be placed close together
  * Add reflection and rotation options to vector field widget
+ * Switch to scientific notation earlier when showing float settings
 
 Bug fixes:
  * Direction combo did not work in import dialog

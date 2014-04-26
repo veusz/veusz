@@ -208,4 +208,28 @@ def updateUILocale():
 
     qt4.QLocale.setDefault(uilocale)
 
+def ui_floattostring(f):
+    """Convert float to string with more precision."""
+    if 1e-4 <= abs(f) <= 1e5 or f == 0:
+        s = '%.14g' % f
+        # strip excess zeros to right
+        if s.find('.') >= 0:
+            s = s.rstrip('0').rstrip('.')
+    else:
+        s = '%.14e' % f
+        # split into mantissa/exponent and strip extra zeros, etc
+        mant, expon = s.split('e')
+        mant = mant.rstrip('0').rstrip('.')
+        expon = int(expon)
+        s = '%se%i' % (mant, expon)
+    # make decimal point correct for local
+    s = s.replace('.', uilocale.decimalPoint())
+    return s
+
+def ui_stringtofloat(s):
+    """Convert string to float, allowing for decimal point in different
+    locale."""
+    s = s.replace(uilocale.decimalPoint(), '.')
+    return float(s)
+
 updateUILocale()

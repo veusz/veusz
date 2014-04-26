@@ -35,14 +35,10 @@ import numpy as N
 from ..compat import cbasestr, cstr, crepr
 from .. import qtall as qt4
 from . import controls
-from .settingdb import settingdb, uilocale
+from .settingdb import settingdb, uilocale, ui_floattostring, ui_stringtofloat
 from .reference import ReferenceBase, Reference
 
 from .. import utils
-
-def floattostring(f):
-    """Convert float to string with more precision."""
-    return uilocale.toString(f, 'g', 15)
 
 class OnModified(qt4.QObject):
     """onmodified is emitted from an object contained in each setting."""
@@ -564,11 +560,12 @@ class Float(Setting):
         raise utils.InvalidType
 
     def toText(self):
-        return floattostring(self.val)
+        return ui_floattostring(self.val)
 
     def fromText(self, text):
-        f, ok = uilocale.toDouble(text)
-        if not ok:
+        try:
+            f = ui_stringtofloat(text)
+        except ValueError:
             # try to evaluate
             f = self.safeEvalHelper(text)
         return self.convertTo(f)
@@ -600,7 +597,7 @@ class FloatOrAuto(Float):
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
-            return floattostring(self.val)
+            return ui_floattostring(self.val)
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
@@ -951,18 +948,19 @@ class FloatChoice(ChoiceOrMore):
         raise utils.InvalidType
 
     def toText(self):
-        return floattostring(self.val)
+        return ui_floattostring(self.val)
 
     def fromText(self, text):
-        f, ok = uilocale.toDouble(text)
-        if not ok:
+        try:
+            f = ui_stringtofloat(text)
+        except ValueError:
             # try to evaluate
             f = self.safeEvalHelper(text)
         return self.convertTo(f)
 
     def makeControl(self, *args):
         argsv = {'descriptions': self.descriptions}
-        strings = [floattostring(x) for x in self.vallist]
+        strings = [ui_floattostring(x) for x in self.vallist]
         return controls.Choice(self, True, strings, *args, **argsv)
 
 class FloatDict(Setting):
@@ -982,7 +980,7 @@ class FloatDict(Setting):
         return dict(val)
 
     def toText(self):
-        text = ['%s = %s' % (k, floattostring(self.val[k]))
+        text = ['%s = %s' % (k, ui_floattostring(self.val[k]))
                 for k in sorted(self.val)]
         return '\n'.join(text)
 
@@ -1002,8 +1000,9 @@ class FloatDict(Setting):
             if len(p) != 2:
                 raise utils.InvalidType
 
-            v, ok = uilocale.toDouble(p[1])
-            if not ok:
+            try:
+                v = ui_stringtofloat(p[1])
+            except ValueError:
                 raise utils.InvalidType
 
             out[ p[0].strip() ] = v
@@ -1037,7 +1036,7 @@ class FloatList(Setting):
         join = ', '
         if uilocale.decimalPoint() == ',':
             join = '; '
-        return join.join( [floattostring(x) for x in self.val] )
+        return join.join( [ui_floattostring(x) for x in self.val] )
 
     def fromText(self, text):
         """Convert from a, b, c or a b c."""
@@ -1050,10 +1049,9 @@ class FloatList(Setting):
         out = []
         for x in re.split(splitre, text.strip()):
             if x:
-                f, ok = uilocale.toDouble(x)
-                if ok:
-                    out.append(f)
-                else:
+                try:
+                    out.append( ui_stringtofloat(x) )
+                except ValueError:
                     out.append( self.safeEvalHelper(x) )
         return out
 
@@ -1277,7 +1275,7 @@ class DatasetExtended(Dataset):
             join = ', '
             if uilocale.decimalPoint() == ',':
                 join = '; '
-            return join.join( [ floattostring(x)
+            return join.join( [ ui_floattostring(x)
                                 for x in self.val ] )
 
     def fromText(self, text):
@@ -1296,10 +1294,9 @@ class DatasetExtended(Dataset):
         out = []
         for x in re.split(splitre, text):
             if x:
-                f, ok = uilocale.toDouble(x)
-                if ok:
-                    out.append(f)
-                else:
+                try:
+                    out.append( ui_stringtofloat(x) )
+                except ValueError:
                     # fail conversion, so exit with text
                     return text
         return out
