@@ -4,6 +4,7 @@
   <mime-type type="application/x-veusz">
     <comment>Veusz saved document</comment>
     <glob pattern="*.vsz"/>
+    <glob pattern="*.vszh5"/>
     <magic priority="50">
         <match type="string" value="# Veusz saved document" offset="0"/>
     </magic>
