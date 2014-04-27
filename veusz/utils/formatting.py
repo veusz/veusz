@@ -191,6 +191,7 @@ def formatNumber(num, formatstr, locale=None):
         # repeatedly try to do string format
         match = _formatRE.search(formatstr)
         if not match:
+            outitems.append(formatstr)
             break
 
         # argument and type of formatting

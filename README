@@ -41,6 +41,7 @@ Bug fixes:
  * Python 3 resizing axis bug
  * Crash if picking/zooming on document with no pages
  * Crash if reediting histogram dataset with blank output entry
+ * Use end of text formatting string beyond format specifier
 
 Features of package:
  Plotting features:
