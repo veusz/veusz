@@ -49,6 +49,7 @@ class DatasetHistoGenerator(object):
         self.method = method
         self.cumulative = cumulative
         self.errors = errors
+        self.bindataset = self.valuedataset = None
 
     def getData(self):
         """Get data from input expression, caching result."""
@@ -163,10 +164,10 @@ class DatasetHistoGenerator(object):
 
         return hist, nerr, perr
 
-    def getBinDataset(self):
+    def generateBinDataset(self):
         self.bindataset = DatasetHistoBins(self, self.document)
         return self.bindataset
-    def getValueDataset(self):
+    def generateValueDataset(self):
         self.valuedataset = DatasetHistoValues(self, self.document)
         return self.valuedataset
 
@@ -316,11 +317,11 @@ class OperationDatasetHistogram(object):
 
         if self.outvalues != '':
             self.oldvaluesds = document.data.get(self.outvalues, None)
-            document.setData(self.outvalues, gen.getValueDataset())
+            document.setData(self.outvalues, gen.generateValueDataset())
 
         if self.outposns != '':
             self.oldposnsds = document.data.get(self.outposns, None)
-            document.setData(self.outposns, gen.getBinDataset())
+            document.setData(self.outposns, gen.generateBinDataset())
 
     def undo(self, document):
         """Undo creation of datasets."""

@@ -40,6 +40,7 @@ Bug fixes:
  * Fix copy and paste of datasets
  * Python 3 resizing axis bug
  * Crash if picking/zooming on document with no pages
+ * Crash if reediting histogram dataset with blank output entry
 
 Features of package:
  Plotting features:

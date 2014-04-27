@@ -233,8 +233,8 @@ class HistoDataDialog(VeuszDialog):
 
         # need to map backwards to get dataset names
         revds = dict( (a,b) for b,a in citems(self.document.data) )
-        self.outdataset.setEditText( revds[gen.valuedataset] )
-        self.outbins.setEditText( revds[gen.bindataset] )
+        self.outdataset.setEditText(revds.get(gen.valuedataset, ''))
+        self.outbins.setEditText(revds.get(gen.bindataset, ''))
 
         # if there are parameters
         if gen.binparams:
