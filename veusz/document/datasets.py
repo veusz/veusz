@@ -776,7 +776,7 @@ class Dataset(Dataset1DBase):
 
         self.document.modifiedData(self)
 
-class DatasetDateTime(Dataset):
+class DatasetDateTimeBase(Dataset1DBase):
     """Dataset holding dates and times."""
 
     columns = ('data',)
@@ -784,11 +784,6 @@ class DatasetDateTime(Dataset):
 
     dstype = _('Date')
     displaytype = 'date'
-
-    editable = True
-
-    def __init__(self, data=None, linked=None):
-        Dataset.__init__(self, data=data, linked=linked)
 
     def description(self, showlinked=True):
         text = _('%s (%i date/times)') % (self.name(), len(self.data))
@@ -813,6 +808,23 @@ class DatasetDateTime(Dataset):
         """Return val converted to data."""
         return utils.dateFloatToString(val)
 
+    def datasetAsText(self, fmt=None, join=None):
+        """Return data as text."""
+        lines = [ utils.dateFloatToString(val) for val in self.data ]
+        lines.append('')
+        return '\n'.join(lines)
+
+class DatasetDateTime(DatasetDateTimeBase):
+    """Standard date/time class for use by humans."""
+
+    editable = True
+
+    def __init__(self, data=None, linked=None):
+        DatasetDateTimeBase.__init__(self, linked=linked)
+
+        self.data = convertNumpy(data)
+        self.perr = self.nerr = self.serr = None
+
     def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
@@ -830,15 +842,30 @@ class DatasetDateTime(Dataset):
         data.attrs['vsz_convert_datetime'] = 1
         data.attrs['vsz_name'] = name.encode('utf-8')
 
-    def datasetAsText(self, fmt=None, join=None):
-        """Return data as text."""
-        lines = [ utils.dateFloatToString(val) for val in self.data ]
-        lines.append('')
-        return '\n'.join(lines)
-
     def returnCopy(self):
         """Returns version of dataset with no linking."""
         return DatasetDateTime(data=N.array(self.data))
+
+    def deleteRows(self, row, numrows):
+        """Delete numrows rows starting from row.
+        Returns deleted rows as a dict of {column:data, ...}
+        """
+        retn = {
+            'data': self.data[row:row+numrows],
+        }
+        self.data = N.delete(self.data, N.s_[row:row+numrows])
+        self.document.modifiedData(self)
+        return retn
+
+    def insertRows(self, row, numrows, rowdata):
+        """Insert numrows rows starting from row.
+        rowdata is a dict of {column: data}.
+        """
+        data = N.zeros(numrows)
+        if 'data' in rowdata:
+            data[:len(rowdata['data'])] = N.array(rowdata['data'])
+        self.data =  N.insert(self.data, [row]*numrows, data)
+        self.document.modifiedData(self)
 
 class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""
@@ -1835,12 +1862,13 @@ class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     data = property( lambda self: self.getPluginData('data'),
                      lambda self, val: None )
 
-class DatasetDateTimePlugin(_DatasetPlugin, DatasetDateTime):
+class DatasetDateTimePlugin(_DatasetPlugin, DatasetDateTimeBase):
     """Return date dataset from plugin."""
 
     def __init__(self, manager, ds):
         _DatasetPlugin.__init__(self, manager, ds)
-        DatasetDateTime.__init__(self, [])
+        DatasetDateTimeBase.__init__(self)
+        self.serr = self.perr = self.nerr = None
 
     def __getitem__(self, key):
         return DatasetDateTime(self.data[key])
