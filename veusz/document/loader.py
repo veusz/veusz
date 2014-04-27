@@ -175,7 +175,7 @@ def loadHDF5Datasets(thedoc, hdffile):
     for name in alldatagrp:
         datagrp = alldatagrp[name]
         datatype = bconv(datagrp.attrs['vsz_datatype'])
-        veuszname = bconv(name)
+        veuszname = utils.unescapeHDFDataName(bconv(name))
 
         dataset = datafuncs[datatype](datagrp)
         thedoc.setData(veuszname, dataset)

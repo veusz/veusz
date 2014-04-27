@@ -120,12 +120,16 @@ class PartTextAscii(_pt):
     def addText(self, text):
         self.text += text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
 
-def renderVszTest(invsz, outfile, test_saves=False):
+def renderVszTest(invsz, outfile, test_saves=False, test_unlink=False):
     """Render vsz document to create outfile."""
 
     doc = document.Document()
     mode = 'hdf5' if os.path.splitext(invsz)[1] == '.vszh5' else 'vsz'
     doc.load(invsz, mode=mode)
+
+    if test_unlink:
+        for d in doc.data:
+            doc.data[d].linked = None
 
     if test_saves and h5py is not None:
         tempfilename = 'self-test-temporary.vszh5'
@@ -182,7 +186,7 @@ def renderAllTests():
         elif ext == '.py':
             renderPyTest(infile, outfile)
 
-def runTests(test_saves=False):
+def runTests(test_saves=False, test_unlink=False):
     print("Testing output")
 
     fails = 0
@@ -206,7 +210,8 @@ def runTests(test_saves=False):
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
 
         if ext == '.vsz' or ext == '.vszh5':
-            renderVszTest(infile, outfile, test_saves=test_saves)
+            renderVszTest(infile, outfile, test_saves=test_saves,
+                          test_unlink=test_unlink)
         elif ext == '.py':
             if not renderPyTest(infile, outfile):
                 print(" FAIL: did not execute cleanly")
@@ -270,10 +275,13 @@ if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option("", "--test-saves", action="store_true",
                       help="tests saving documents and reloading them")
+    parser.add_option("", "--test-unlink", action="store_true",
+                      help="unlinks data from files before --test-saves")
 
     options, args = parser.parse_args()
     if len(args) == 0:
-        runTests(test_saves=options.test_saves)
+        runTests(test_saves=options.test_saves,
+                 test_unlink=options.test_unlink)
     elif args == ['regenerate']:
         renderAllTests()
     else:

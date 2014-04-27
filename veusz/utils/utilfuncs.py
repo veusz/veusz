@@ -577,3 +577,17 @@ def rrepr(val):
         return "[%s]" % ", ".join(l)
     else:
         return crepr(val)
+
+def escapeHDFDataName(name):
+    """Return escaped dataset name for saving in HDF5 files.
+    This is because names cannot include / characters in HDF5
+    """
+    name = name.replace('`', '`BT')
+    name = name.replace('/', '`SL')
+    return name.encode('utf-8')
+
+def unescapeHDFDataName(name):
+    """Return original name after being escaped."""
+    name = name.replace('`SL', '/')
+    name = name.replace('`BT', '`')
+    return name

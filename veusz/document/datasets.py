@@ -530,7 +530,7 @@ class Dataset2D(Dataset2DBase):
     def saveDataDumpToHDF5(self, group, name):
         """Save 2D data in hdf5 file."""
 
-        tdgrp = group.create_group(name)
+        tdgrp = group.create_group(utils.escapeHDFDataName(name))
         tdgrp.attrs['vsz_datatype'] = '2d'
 
         for v in ('data', 'xcent', 'xedge', 'ycent',
@@ -737,7 +737,7 @@ class Dataset(Dataset1DBase):
         """Save dataset to HDF5."""
 
         # store as a group to simplify things
-        odgrp = group.create_group(name)
+        odgrp = group.create_group(utils.escapeHDFDataName(name))
         odgrp.attrs['vsz_datatype'] = '1d'
 
         for key, suffix in (
@@ -835,7 +835,7 @@ class DatasetDateTime(DatasetDateTimeBase):
 
     def saveDataDumpToHDF5(self, group, name):
         """Save date data to hdf5 file."""
-        dgrp = group.create_group(name)
+        dgrp = group.create_group(utils.escapeHDFDataName(name))
         dgrp.attrs['vsz_datatype'] = 'date'
         dgrp['data'] = self.data
         data = dgrp['data']
@@ -919,7 +919,7 @@ class DatasetText(DatasetBase):
 
     def saveDataDumpToHDF5(self, group, name):
         """Save text data to hdf5 file."""
-        tgrp = group.create_group(name)
+        tgrp = group.create_group(utils.escapeHDFDataName(name))
         tgrp.attrs['vsz_datatype'] = 'text'
         # make sure data are encoded
         encdata = [x.encode('utf-8') for x in self.data]
