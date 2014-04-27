@@ -39,6 +39,7 @@ Bug fixes:
  * Crash with empty dataset and boxplot widget
  * Fix copy and paste of datasets
  * Python 3 resizing axis bug
+ * Crash if picking/zooming on document with no pages
 
 Features of package:
  Plotting features:

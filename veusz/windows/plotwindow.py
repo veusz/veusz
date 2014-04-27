@@ -657,7 +657,10 @@ class PlotWindow( qt4.QGraphicsView ):
         items = self.items(event.pos())
         if len(items) > 0 and isinstance(items[0], qt4.QGraphicsItemGroup):
             del items[0]
-        self.ignoreclick = len(items)==0 or items[0] is not self.pixmapitem
+
+        self.ignoreclick = ( len(items)==0 or
+                             items[0] is not self.pixmapitem or
+                             self.painthelper is None )
 
         if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
 
