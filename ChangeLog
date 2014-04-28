@@ -28,6 +28,8 @@ Bug fixes:
  * Crash if picking/zooming on document with no pages
  * Crash if reediting histogram dataset with blank output entry
  * Use end of text formatting string beyond format specifier
+ * When writing SVG text as text, use xml:space="preserve" to
+   avoid missing whitespace
 
 Changes in 1.20.1:
  * Include free-desktop appdata, MIME and desktop files

@@ -460,6 +460,10 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 'textLength="%s"' % fltStr(textitem.width()*scale),
                 ]
 
+            # spaces get lost without this
+            if text.find('  ') >= 0 or text[:1] == ' ' or text[-1:] == ' ':
+                textattrb.append('xml:space="preserve"')
+
             # write as an SVG text element
             SVGElement(
                 grp, 'text',
