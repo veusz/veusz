@@ -147,8 +147,15 @@ class Embedded(object):
             cls.sockfamily = socket.AF_UNIX
             sock, socket2 = socket.socketpair(cls.sockfamily,
                                               socket.SOCK_STREAM)
+
+            # socket is closed on popen in Python 3.4+ without this (PEP 446)
+            try:
+                os.set_inheritable(socket2.fileno(), True)
+            except AttributeError:
+                pass
+
             sendtext = 'unix %i\n' % socket2.fileno()
-            cls.socket2 = socket2
+            cls.socket2 = socket2    # prevent socket being destroyed
             waitaccept = False
 
         else:

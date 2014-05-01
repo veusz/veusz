@@ -30,6 +30,7 @@ Bug fixes:
  * Use end of text formatting string beyond format specifier
  * When writing SVG text as text, use xml:space="preserve" to
    avoid missing whitespace
+ * Embedding socket issue on Python 3.4+
 
 Changes in 1.20.1:
  * Include free-desktop appdata, MIME and desktop files
