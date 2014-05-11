@@ -224,6 +224,9 @@ class Embedded(object):
             else:
                 possiblecommands += [[
                     '/Applications/Veusz.app/Contents/MacOS/Veusz' ]]
+                possiblecommands += [[
+                    os.path.expanduser('~/Applications/Veusz.app/Contents/MacOS/Veusz')]]
+
 
         for cmd in possiblecommands:
             # only try to run commands that exist as error handling
