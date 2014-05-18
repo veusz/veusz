@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>264</width>
+    <width>265</width>
     <height>277</height>
    </rect>
   </property>
@@ -73,7 +73,7 @@
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Ignores lines consisting of text when importing the data</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ignores lines consisting of text when importing the data. This option only works if a list of datasets is given.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>I&amp;gnore text lines</string>

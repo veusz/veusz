@@ -19,9 +19,7 @@
 """For plotting one or more text labels on a graph."""
 
 from __future__ import division
-import math
 import itertools
-import numpy as N
 
 from ..compat import czip
 from .. import document
@@ -35,6 +33,13 @@ from . import controlgraph
 def _(text, disambiguation=None, context='TextLabel'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+class BorderLine(setting.Line):
+    '''Plot line around text.'''
+
+    def __init__(self, name, **args):
+        setting.Line.__init__(self, name, **args)
+        self.get('hide').newDefault(True)
 
 class TextLabel(plotters.FreePlotter):
 
@@ -57,7 +62,7 @@ class TextLabel(plotters.FreePlotter):
 
         s.add( setting.DatasetOrStr('label', '',
                                     descr=_('Text to show or text dataset'),
-                                    usertext=_('Label'), datatype='text'), 0 )
+                                    usertext=_('Label')), 0 )
 
         s.add( setting.AlignHorz('alignHorz',
                                  'left',
@@ -75,15 +80,32 @@ class TextLabel(plotters.FreePlotter):
                              usertext=_('Angle'),
                              formatting=True), 9 )
 
+        s.add( setting.DistancePt(
+                'margin',
+                '4pt',
+                descr = _('Margin of fill/border'),
+                usertext=_('Margin'),
+                formatting=True), 10 )
+
         s.add( setting.Bool('clip', False,
                             descr=_('Clip text to its container'),
                             usertext=_('Clip'),
-                            formatting=True), 10 )
+                            formatting=True), 11 )
 
         s.add( setting.Text('Text',
                             descr = _('Text settings'),
                             usertext=_('Text')),
                pixmap = 'settings_axislabel' )
+        s.add( setting.ShapeFill(
+                'Background',
+                descr=_('Fill behind text'),
+                usertext=_('Background')),
+               pixmap = 'settings_bgfill' )
+        s.add( BorderLine(
+                'Border',
+                descr=_('Border around text'),
+                usertext=_('Border')),
+               pixmap = 'settings_border' )
 
     # convert text to alignments used by Renderer
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }
@@ -117,11 +139,14 @@ class TextLabel(plotters.FreePlotter):
             clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
                                qt4.QPointF(posn[2], posn[3]) )
 
+        borderorfill = not s.Border.hide or not s.Background.hide
+
         painter = phelper.painter(self, posn, clip=clip)
         with painter:
             textpen = s.get('Text').makeQPen()
             painter.setPen(textpen)
             font = s.get('Text').makeQFont(painter)
+            margin = s.get('margin').convert(painter)
 
             # we should only be able to move non-dataset labels
             isnotdataset = ( not s.get('xPos').isDataset(d) and
@@ -131,10 +156,32 @@ class TextLabel(plotters.FreePlotter):
             for index, (x, y, t) in enumerate(czip(
                     xp, yp, itertools.cycle(text))):
                 # render the text
-                tbounds = utils.Renderer( painter, font, x, y, t,
-                                          TextLabel.cnvtalignhorz[s.alignHorz],
-                                          TextLabel.cnvtalignvert[s.alignVert],
-                                          s.angle ).render()
+
+                dx = dy = 0
+                if borderorfill:
+                    dx = -TextLabel.cnvtalignhorz[s.alignHorz]*margin
+                    dy =  TextLabel.cnvtalignvert[s.alignVert]*margin
+
+                r = utils.Renderer( painter, font, x+dx, y+dy, t,
+                                    TextLabel.cnvtalignhorz[s.alignHorz],
+                                    TextLabel.cnvtalignvert[s.alignVert],
+                                    s.angle )
+
+                tbounds = r.getBounds()
+                if borderorfill:
+                    tbounds = [
+                        tbounds[0]-margin, tbounds[1]-margin,
+                        tbounds[2]+margin, tbounds[3]+margin ]
+                    rect = qt4.QRectF(
+                        qt4.QPointF(tbounds[0], tbounds[1]),
+                        qt4.QPointF(tbounds[2], tbounds[3]))
+                    path = qt4.QPainterPath()
+                    path.addRect(rect)
+                    pen = s.get('Border').makeQPenWHide(painter)
+                    utils.brushExtFillPath(painter, s.Background, path,
+                                           stroke=pen)
+
+                r.render()
 
                 # add cgi for adjustable positions
                 if isnotdataset:
@@ -159,10 +206,17 @@ class TextLabel(plotters.FreePlotter):
         xpos, ypos = self._getGraphCoords(cgi.widgetposn,
                                           cgi.deltacrosspos[0]+cgi.posn[0],
                                           cgi.deltacrosspos[1]+cgi.posn[1])
+        # this is a small distance away to get delta
+        xposd, yposd = self._getGraphCoords(cgi.widgetposn,
+                                            cgi.deltacrosspos[0]+cgi.posn[0]+1,
+                                            cgi.deltacrosspos[1]+cgi.posn[1]+1)
         if xpos is None or ypos is None:
             return
 
-        pointsX[ind], pointsY[ind] = xpos, ypos
+        roundx = utils.round2delt(xpos, xposd)
+        roundy = utils.round2delt(ypos, yposd)
+
+        pointsX[ind], pointsY[ind] = roundx, roundy
         operations = (
             document.OperationSettingSet(s.get('xPos'), pointsX),
             document.OperationSettingSet(s.get('yPos'), pointsY)

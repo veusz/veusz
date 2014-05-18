@@ -17,7 +17,7 @@
 ###############################################################################
 
 from .settingdb import *
-from .reference import Reference
+from .reference import Reference, ReferenceMultiple
 from .setting import *
 from .settings import *
 from .collections import *

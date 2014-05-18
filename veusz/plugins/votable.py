@@ -22,7 +22,11 @@ from .importplugin import ImportPlugin, importpluginregistry
 from .datasetplugin import Dataset1D, DatasetText
 
 try:
-    from astropy.io.vo.table import parse
+    import astropy.version
+    if astropy.version.version >= 0.2:
+        from astropy.io.votable.table import parse
+    else:
+        from astropy.io.vo.table import parse
 
 except ImportError:
     print('VO table import: astropy module not available')

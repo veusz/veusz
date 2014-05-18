@@ -89,25 +89,40 @@ class Dataset1D(object):
 
 class Dataset2D(object):
     """2D dataset for ImportPlugin or DatasetPlugin."""
-    def __init__(self, name, data=[[]], rangex=None, rangey=None):
+    def __init__(self, name, data=[[]], rangex=None, rangey=None,
+                 xedge=None, yedge=None,
+                 xcent=None, ycent=None):
         """2D dataset.
         name: name of dataset
         data: 2D numpy array of values or list of lists of floats
         rangex: optional tuple with X range of data (min, max)
         rangey: optional tuple with Y range of data (min, max)
+        xedge: x values for grid (instead of rangex)
+        yedge: y values for grid (instead of rangey)
+        xcent: x values for pixel centres (instead of rangex)
+        ycent: y values for pixel centres (instead of rangey)
         """
         self.name = name
-        self.update(data=data, rangex=rangex, rangey=rangey)
+        self.update(data=data, rangex=rangex, rangey=rangey,
+                    xedge=xedge, yedge=yedge,
+                    xcent=xcent, ycent=ycent)
 
-    def update(self, data=[[]], rangex=None, rangey=None):
+    def update(self, data=[[]], rangex=None, rangey=None,
+               xedge=None, yedge=None,
+               xcent=None, ycent=None):
         self.data = N.array(data, dtype=N.float64)
         self.rangex = rangex
         self.rangey = rangey
+        self.xedge = xedge
+        self.yedge = yedge
+        self.xcent = xcent
+        self.ycent = ycent
 
     def _null(self):
         """Empty data contents."""
         self.data = N.array([[]])
         self.rangex = self.rangey = (0, 1)
+        self.xedge = self.yedge = self.xcent = self.ycent = None
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
@@ -150,7 +165,7 @@ class DatasetDateTime(object):
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
         from .. import document
-        return document.DatasetDatePlugin(manager, self)
+        return document.DatasetDateTimePlugin(manager, self)
 
 class DatasetText(object):
     """Text dataset for ImportPlugin or DatasetPlugin."""
@@ -227,6 +242,11 @@ class DatasetPluginHelper(object):
         return [name for name, ds in citems(self._doc.data) if
                 isinstance(ds, document.DatasetDateTime)]
 
+    @property
+    def locale(self):
+        """Return Qt locale."""
+        return self._doc.locale
+
     def evaluateExpression(self, expr, part='data'):
         """Return results of evaluating a 1D dataset expression.
         part is 'data', 'serr', 'perr' or 'nerr' - these are the
@@ -254,14 +274,15 @@ class DatasetPluginHelper(object):
         try:
             ds = self._doc.data[name]
         except KeyError:
-            raise DatasetPluginException("Unknown dataset '%s'" % name)
+            raise DatasetPluginException(_("Unknown dataset '%s'") % name)
 
         if ds.dimensions != dimensions:
             raise DatasetPluginException(
-                "Dataset '%s' does not have %i dimensions" % (name, dimensions))
+                _("Dataset '%s' does not have %i dimensions") % (
+                    name, dimensions))
         if ds.datatype != 'numeric':
             raise DatasetPluginException(
-                "Dataset '%s' is not a numerical dataset" % name)
+                _("Dataset '%s' is not a numerical dataset") % name)
 
         if isinstance(ds, document.DatasetDateTime):
             return DatasetDateTime(name, data=ds.data)
@@ -288,10 +309,10 @@ class DatasetPluginHelper(object):
         try:
             ds = self._doc.data[name]
         except KeyError:
-            raise DatasetPluginException("Unknown dataset '%s'" % name)
+            raise DatasetPluginException(_("Unknown dataset '%s'") % name)
         if ds.datatype == 'text':
             return DatasetText(name, ds.data)
-        raise DatasetPluginException("Dataset '%s' is not a text datset" % name)
+        raise DatasetPluginException(_("Dataset '%s' is not a text datset") % name)
 
 # internal object to synchronise datasets created by a plugin
 class DatasetPluginManager(object):
@@ -429,7 +450,7 @@ class _OneOutputDatasetPlugin(DatasetPlugin):
     def getDatasets(self, fields):
         """Returns single output dataset (self.dsout)."""
         if fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
+            raise DatasetPluginException(_('Invalid output dataset name'))
         self.dsout = Dataset1D(fields['ds_out'])
         return [self.dsout]
 
@@ -1504,6 +1525,112 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=interpol)
 
+class ReBinXYPlugin(DatasetPlugin):
+    """Bin-up data by factor given."""
+
+    menu = (_('Filtering'), _('Bin X,Y'))
+    name = 'RebinXY'
+    description_short = 'Bin every N datapoints'
+    description_full = ('Given dataset Y (and optionally X), for every N '
+                        'datapoints calculate the binned value. For '
+                        'dataset Y this is the sum or mean of every N '
+                        'datapoints. For X this is the midpoint of the '
+                        'datapoints (using error bars to give the range.')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_y', _('Input dataset Y')),
+            field.FieldDataset('ds_x', _('Input dataset X (optional)')),
+            field.FieldInt('binsize', _('Bin size (N)'),
+                           minval=1, default=2),
+            field.FieldCombo('mode', _('Mode of binning'),
+                             items=('sum', 'average'),
+                             editable=False),
+            field.FieldDataset('ds_yout', _("Output Y'")),
+            field.FieldDataset('ds_xout', _("Output X' (optional)")),
+            ]
+
+    def getDatasets(self, fields):
+        """Return output datasets"""
+        if fields['ds_yout'] == '':
+            raise DatasetPluginException(_('Invalid output Y dataset name'))
+        if fields['ds_x'] != '' and fields['ds_xout'] == '':
+            raise DatasetPluginException(_('Invalid output X dataset name'))
+
+        self.dssout = out = [ Dataset1D(fields['ds_yout']) ]
+        if fields['ds_xout'] != '':
+            out.append(Dataset1D(fields['ds_xout']))
+        return out
+
+    def updateDatasets(self, fields, helper):
+        """Do binning."""
+
+        binsize = fields['binsize']
+        average = fields['mode'] == 'average'
+
+        def binerr(err):
+            """Compute binned error."""
+            if err is None:
+                return None
+            err2 = qtloops.binData(err**2, binsize, False)
+            cts = qtloops.binData(N.ones(err.shape), binsize, False)
+            return N.sqrt(err2) / cts
+
+        # bin up data and calculate errors (if any)
+        dsy = helper.getDataset(fields['ds_y'])
+        binydata = qtloops.binData(dsy.data, binsize, average)
+        binyserr = binerr(dsy.serr)
+        binyperr = binerr(dsy.perr)
+        binynerr = binerr(dsy.nerr)
+
+        self.dssout[0].update(data=binydata, serr=binyserr, perr=binyperr, nerr=binynerr)
+
+        if len(self.dssout) == 2:
+            # x datasets
+            dsx = helper.getDataset(fields['ds_x'])
+
+            # Calculate ranges between adjacent binned points.  This
+            # is horribly messy - we have to account for the fact
+            # there might not be error bars and calculate the midpoint
+            # to the previous/next point.
+            minvals = N.array(dsx.data)
+            if dsx.serr is not None:
+                minvals -= dsx.serr
+            elif dsx.nerr is not None:
+                minvals += dsx.nerr
+            else:
+                minvals = 0.5*(dsx.data[1:] + dsx.data[:-1])
+                if len(dsx.data) > 2:
+                    # assume +ve error bar on last point is as big as its -ve error
+                    minvals = N.insert(minvals, 0, dsx.data[0] - 0.5*(
+                            dsx.data[1] - dsx.data[0]))
+                elif len(dsx.data) != 0:
+                    # no previous point so we assume 0 error
+                    minvals = N.insert(minvals, 0, dsx.data[0])
+
+            maxvals = N.array(dsx.data)
+            if dsx.serr is not None:
+                maxvals += dsx.serr
+            elif dsx.perr is not None:
+                maxvals += dsx.perr
+            else:
+                maxvals = 0.5*(dsx.data[1:] + dsx.data[:-1])
+                if len(dsx.data) > 2:
+                    maxvals = N.append(maxvals, dsx.data[-1] + 0.5*(
+                            dsx.data[-1] - dsx.data[-2]))
+                elif len(dsx.data) != 0:
+                    maxvals = N.append(maxvals, dsx.data[-1])
+
+            minbin = minvals[::binsize]
+            maxbin = maxvals[binsize-1::binsize]
+            if len(minbin) > len(maxbin):
+                # not an even number of bin size
+                maxbin = N.append(maxbin, maxvals[-1])
+
+            self.dssout[1].update(data=0.5*(minbin+maxbin),
+                                  serr=0.5*(maxbin-minbin))
+
 class SortPlugin(_OneOutputDatasetPlugin):
     """Sort a dataset."""
 
@@ -1557,7 +1684,7 @@ class SortTextPlugin(_OneOutputDatasetPlugin):
     def getDatasets(self, fields):
         """Returns single output dataset (self.dsout)."""
         if fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
+            raise DatasetPluginException(_('Invalid output dataset name'))
         self.dsout = DatasetText(fields['ds_out'])
         return [self.dsout]
 
@@ -1589,7 +1716,7 @@ class Histogram2D(DatasetPlugin):
     menu = (_('Compute'), _('2D histogram'),)
     name = 'Histogram 2D'
     description_short = _('Compute 2D histogram.')
-    description_long = _('Given two 1D datasets, compute a 2D histogram. '
+    description_full = _('Given two 1D datasets, compute a 2D histogram. '
                          'Can optionally compute a probability distribution.')
 
     def __init__(self):
@@ -1679,9 +1806,48 @@ class Histogram2D(DatasetPlugin):
     def getDatasets(self, fields):
         """Returns single output dataset (self.dsout)."""
         if fields['ds_out'] == '':
-            raise DatasetPluginException('Invalid output dataset name')
+            raise DatasetPluginException(_('Invalid output dataset name'))
         self.dsout = Dataset2D(fields['ds_out'])
         return [self.dsout]
+
+class ConvertNumbersToText(DatasetPlugin):
+    """Convert a set of numbers to text."""
+
+    menu = (_('Convert'), _('Numbers to Text'),)
+    name = 'NumbersToText'
+    description_short = _('Convert numeric dataset to text')
+    description_full = _('Given a 1D numeric dataset, create a text dataset '
+                         'by applying formatting. Format string is in standard '
+                         'Veusz-extended C formatting, e.g.\n'
+                         ' "%Vg" - general,'
+                         ' "%Ve" - scientific,'
+                         ' "%VE" - engineering suffix,'
+                         ' "%.2f" - two decimal places and'
+                         ' "%e" - C-style scientific')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldText('format', _('Format'), default='%Vg'),
+            field.FieldDataset('ds_out', _('Output dataset name')),
+            ]
+
+    def getDatasets(self, fields):
+        if fields['ds_out'] == '':
+            raise DatasetPluginException(_('Invalid output dataset name'))
+        self.dsout = DatasetText(fields['ds_out'])
+        return [self.dsout]
+
+    def updateDatasets(self, fields, helper):
+        """Convert dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        f = fields['format']
+
+        data = [ utils.formatNumber(n, f, locale=helper.locale)
+                 for n in ds_in.data ]
+
+        self.dsout.update(data=data)
 
 datasetpluginregistry += [
     AddDatasetPlugin,
@@ -1707,11 +1873,14 @@ datasetpluginregistry += [
     ThinDatasetPlugin,
 
     PolarToCartesianPlugin,
+    ConvertNumbersToText,
 
     FilterDatasetPlugin,
 
     MovingAveragePlugin,
     LinearInterpolatePlugin,
+    ReBinXYPlugin,
+
     SortPlugin,
     SortTextPlugin,
 

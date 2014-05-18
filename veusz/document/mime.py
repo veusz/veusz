@@ -19,7 +19,7 @@
 from __future__ import division
 from itertools import count
 
-from ..compat import czip, citems, CStringIO
+from ..compat import czip, CStringIO
 from .. import qtall as qt4
 
 from . import doc
@@ -272,13 +272,13 @@ class OperationDataPaste(object):
         tempdoc = doc.Document()
         # interpreter to create datasets
         interpreter = commandinterpreter.CommandInterpreter(tempdoc)
-        interpreter.runFile(self.data)
+        interpreter.runFile(CStringIO(self.data))
 
         # list of pasted datasets
         self.newds = []
 
         # now transfer datasets to existing document
-        for name, ds in sorted(citems(tempdoc.data)):
+        for name, ds in sorted(tempdoc.data.items()):
 
             # get new name
             if name not in thisdoc.data:

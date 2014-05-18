@@ -58,7 +58,7 @@ def makeAction(parent, descr, menutext, slot, icon=None, key=None,
     a.setStatusTip(descr)
     a.setToolTip(textwrap.fill(descr, 25))
     if slot:
-        parent.connect(a, qt4.SIGNAL('triggered()'), slot)
+        a.triggered[()].connect(slot)
     if icon:
         a.setIcon(getIcon(icon))
     if key:
@@ -142,7 +142,7 @@ def populateMenuToolbars(items, toolbar, menus):
         if callable(slot):
             # connect the action to the slot
             if slot is not None:
-                qt4.QObject.connect( action, qt4.SIGNAL('triggered()'), slot )
+                action.triggered[()].connect(slot)
                 # add to menu
             if menus is not None:
                 menus[menu].addAction(action)

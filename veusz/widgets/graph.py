@@ -19,9 +19,8 @@
 ##############################################################################
 
 from __future__ import division
-from collections import defaultdict
+import textwrap
 
-from ..compat import crange, citems
 from .. import qtall as qt4
 from .. import setting
 from .. import utils
@@ -80,6 +79,12 @@ class Graph(widget.Widget):
                                    maxval = 100.,
                                    formatting=True) )
 
+        s.add( setting.Notes(
+                'notes', '',
+                descr=_('User-defined notes'),
+                usertext=_('Notes')
+                ) )
+
         s.add( setting.GraphBrush( 'Background',
                                    descr = _('Background plot fill'),
                                    usertext=_('Background')),
@@ -89,9 +94,14 @@ class Graph(widget.Widget):
                pixmap='settings_border')
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import page, grid
         return (page.Page, grid.Grid)
+
+    @property
+    def userdescription(self):
+        """Return user-friendly description."""
+        return textwrap.fill(self.settings.notes, 60)
 
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
@@ -224,7 +234,7 @@ class Graph(widget.Widget):
                     axestodraw[c.name] = c
 
         # grid lines are normally plotted before other child widgets
-        axisdrawlist = sorted(citems(axestodraw), reverse=True)
+        axisdrawlist = sorted(axestodraw.items(), reverse=True)
         for aname, awidget in axisdrawlist:
             awidget.updateAxisLocation(bounds)
             awidget.computePlottedRange()
@@ -233,7 +243,7 @@ class Graph(widget.Widget):
 
         # broken axis handling
         brokenaxes = set()
-        for name, axis in citems(axestodraw):
+        for axis in axestodraw.values():
             if isinstance(axis, axisbroken.AxisBroken):
                 brokenaxes.add(axis)
 
@@ -260,7 +270,7 @@ class Graph(widget.Widget):
                     hence this rather strange iteration.
                     """
                     ax = b[0][1]
-                    for i in crange(ax.breakvnum):
+                    for i in range(ax.breakvnum):
                         ax.switchBreak(i, bounds)
                         if len(b) == 1:
                             c.draw(bounds, painthelper, outerbounds=outerbounds)

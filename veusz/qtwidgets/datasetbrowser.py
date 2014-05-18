@@ -24,7 +24,7 @@ import os.path
 import numpy as N
 import textwrap
 
-from ..compat import crange, citems, czip
+from ..compat import crange, citems, czip, cstr
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -208,7 +208,7 @@ class DatasetRelationModel(TreeModel):
         self.filterdtype = filterdtype
         self.refresh()
 
-        self.connect(doc, qt4.SIGNAL("sigModified"), self.refresh)
+        doc.signalModified.connect(self.refresh)
 
     def datasetFilterOut(self, ds, node):
         """Should dataset be filtered out by filter options."""
@@ -331,11 +331,10 @@ class DatasetRelationModel(TreeModel):
 
         self.doc.applyOperation(
             document.OperationDatasetRename(dsnode.data[0], newname))
-        self.emit(
-            qt4.SIGNAL("dataChanged(const QModelIndex &, const QModelIndex &)"),
-            idx, idx)
+        self.dataChanged.emit(idx, idx)
         return True
 
+    @qt4.pyqtSlot()
     def refresh(self):
         """Update tree of datasets when document changes."""
 
@@ -351,6 +350,9 @@ class DatasetRelationModel(TreeModel):
 
 class DatasetsNavigatorTree(qt4.QTreeView):
     """Tree view for dataset names."""
+
+    updateitem = qt4.pyqtSignal()
+    selecteddatasets = qt4.pyqtSignal(list)
 
     def __init__(self, doc, mainwin, grouping, parent,
                  readonly=False, filterdims=None, filterdtype=None):
@@ -376,8 +378,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         self.setUniformRowHeights(True)
         self.setContextMenuPolicy(qt4.Qt.CustomContextMenu)
         if not readonly:
-            self.connect(self, qt4.SIGNAL("customContextMenuRequested(QPoint)"),
-                         self.showContextMenu)
+            self.customContextMenuRequested.connect(self.showContextMenu)
         self.model.refresh()
         self.expandAll()
 
@@ -390,18 +391,13 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
         # when documents have finished opening, expand all nodes
         if mainwin is not None:
-            self.connect(mainwin, qt4.SIGNAL("documentopened"), self.expandAll)
+            mainwin.documentOpened.connect(self.expandAll)
 
         # keep track of selection
-        self.connect( self.selectionModel(),
-                      qt4.SIGNAL("selectionChanged(const QItemSelection&, "
-                                 "const QItemSelection&)"),
-                      self.slotNewSelection )
+        self.selectionModel().selectionChanged.connect(self.slotNewSelection)
 
         # expand nodes by default
-        self.connect( self.model,
-                      qt4.SIGNAL("rowsInserted(const QModelIndex&, int, int)"),
-                      self.slotNewRow )
+        self.model.rowsInserted.connect(self.slotNewRow)
 
     def changeGrouping(self, grouping):
         """Change the tree grouping behaviour."""
@@ -618,19 +614,19 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     def keyPressEvent(self, event):
         """Enter key selects widget."""
         if event.key() in (qt4.Qt.Key_Return, qt4.Qt.Key_Enter):
-            self.emit(qt4.SIGNAL("updateitem"))
+            self.updateitem.emit()
             return
         qt4.QTreeView.keyPressEvent(self, event)
 
     def mouseDoubleClickEvent(self, event):
         """Emit updateitem signal if double clicked."""
         retn = qt4.QTreeView.mouseDoubleClickEvent(self, event)
-        self.emit(qt4.SIGNAL("updateitem"))
+        self.updateitem.emit()
         return retn
 
     def slotNewSelection(self, selected, deselected):
         """Emit selecteditem signal on new selection."""
-        self.emit(qt4.SIGNAL("selecteddatasets"), self.getSelectedDatasets())
+        self.selecteddatasets.emit(self.getSelectedDatasets())
 
     def slotNewRow(self, parent, start, end):
         """Expand parent if added."""
@@ -694,8 +690,7 @@ class DatasetBrowser(qt4.QWidget):
             if name == self.grouping:
                 a.setChecked(True)
             self.grpact.addAction(a)
-        self.connect(self.grpact, qt4.SIGNAL("triggered(QAction*)"),
-                     self.slotGrpChanged)
+        self.grpact.triggered.connect(self.slotGrpChanged)
         self.grpbutton.setMenu(self.grpmenu)
         self.grpbutton.setToolTip(_("Group datasets with property given"))
         self.optslayout.addWidget(self.grpbutton)
@@ -704,8 +699,8 @@ class DatasetBrowser(qt4.QWidget):
         self.optslayout.addWidget(qt4.QLabel(_("Filter")))
         self.filteredit = LineEditWithClear()
         self.filteredit.setToolTip(_("Enter text here to filter datasets"))
-        self.connect(self.filteredit, qt4.SIGNAL("textChanged(const QString&)"),
-                     self.slotFilterChanged)
+
+        self.filteredit.textChanged.connect(self.slotFilterChanged)
         self.optslayout.addWidget(self.filteredit)
 
         self.layout.addLayout(self.optslayout)
@@ -734,6 +729,9 @@ class DatasetBrowserPopup(DatasetBrowser):
     This is used by setting.controls.Dataset
     """
 
+    closing = qt4.pyqtSignal()
+    newdataset = qt4.pyqtSignal(cstr)
+
     def __init__(self, document, dsname, parent,
                  filterdims=None, filterdtype=None):
         """Open popup window for document
@@ -755,8 +753,7 @@ class DatasetBrowserPopup(DatasetBrowser):
 
         self.navtree.setFocus()
 
-        self.connect(self.navtree, qt4.SIGNAL("updateitem"),
-                     self.slotUpdateItem)
+        self.navtree.updateitem.connect(self.slotUpdateItem)
 
     def eventFilter(self, node, event):
         """Grab clicks outside this window to close it."""
@@ -774,7 +771,7 @@ class DatasetBrowserPopup(DatasetBrowser):
 
     def closeEvent(self, event):
         """Tell the calling widget that we are closing."""
-        self.emit(qt4.SIGNAL("closing"))
+        self.closing.emit()
         event.accept()
 
     def slotUpdateItem(self):
@@ -783,5 +780,5 @@ class DatasetBrowserPopup(DatasetBrowser):
         if selected.isValid():
             n = self.navtree.model.objFromIndex(selected)
             if isinstance(n, DatasetNode):
-                self.emit(qt4.SIGNAL("newdataset"), n.data[0])
+                self.newdataset.emit(n.data[0])
                 self.close()

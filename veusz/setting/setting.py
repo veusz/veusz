@@ -32,15 +32,17 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, ckeys, cbasestr, cstr
+from ..compat import cbasestr, cstr, crepr
 from .. import qtall as qt4
 from . import controls
-from .settingdb import settingdb, uilocale
-from .reference import Reference
+from .settingdb import settingdb, uilocale, ui_floattostring, ui_stringtofloat
+from .reference import ReferenceBase, Reference
 
 from .. import utils
 
-# if invalid type passed to set
+class OnModified(qt4.QObject):
+    """onmodified is emitted from an object contained in each setting."""
+    onModified = qt4.pyqtSignal()
 
 class Setting(object):
     """A class to store a value with a particular type."""
@@ -69,7 +71,7 @@ class Setting(object):
         self.formatting = formatting
         self.hidden = hidden
         self.default = value
-        self.onmodified = qt4.QObject()
+        self.onmodified = OnModified()
         self._val = None
 
         # calls the set function for the val property
@@ -87,7 +89,7 @@ class Setting(object):
         optinal as optional arguments
         """
 
-        if isinstance(self._val, Reference):
+        if isinstance(self._val, ReferenceBase):
             val = self._val
         else:
             val = self.val
@@ -103,7 +105,7 @@ class Setting(object):
         obj = self.__class__(*args, **opt)
         obj.readonly = self.readonly
         obj.default = self.default
-        return obj        
+        return obj
 
     def copy(self):
         """Make a setting which has its values copied from this one.
@@ -111,11 +113,11 @@ class Setting(object):
         This needs to be overridden if the constructor changes
         """
         return self._copyHelper((), (), {})
-        
+
     def get(self):
         """Get the value."""
-        
-        if isinstance(self._val, Reference):
+
+        if isinstance(self._val, ReferenceBase):
             return self._val.resolve(self).get()
         else:
             return self.convertFrom(self._val)
@@ -123,24 +125,24 @@ class Setting(object):
     def set(self, v):
         """Set the value."""
 
-        if isinstance(v, Reference):
+        if isinstance(v, ReferenceBase):
             self._val = v
         else:
             # this also removes the linked value if there is one set
             self._val = self.convertTo(v)
 
-        self.onmodified.emit(qt4.SIGNAL("onModified"), True)
+        self.onmodified.onModified.emit()
 
     val = property(get, set, None,
                    'Get or modify the value of the setting')
 
     def isReference(self):
         """Is this a setting a reference to another object."""
-        return isinstance(self._val, Reference)
+        return isinstance(self._val, ReferenceBase)
 
     def getReference(self):
         """Return the reference object. Raise ValueError if not a reference"""
-        if isinstance(self._val, Reference):
+        if isinstance(self._val, ReferenceBase):
             return self._val
         else:
             raise ValueError("Setting is not a reference")
@@ -159,7 +161,7 @@ class Setting(object):
     def linkToStylesheet(self):
         """Make this setting link to stylesheet setting, if possible."""
         self.set( Reference(self.getStylesheetLink()) )
-               
+
     def _path(self):
         """Return full path of setting."""
         path = []
@@ -176,10 +178,10 @@ class Setting(object):
                     path.insert(0, obj.name)
             obj = obj.parent
         return '/'.join(path)
-        
+
     path = property(_path, None, None,
                     'Return the full path of the setting')
-    
+
     def toText(self):
         """Convert the type to text for saving."""
         return ""
@@ -206,7 +208,7 @@ class Setting(object):
             deftext = settingdb[namedpath]
         except KeyError:
             pass
-    
+
         if deftext is not None:
             self.val = self.fromText(deftext)
             self.default = self.val
@@ -255,28 +257,26 @@ class Setting(object):
         """Return text to restore the value of this setting."""
 
         if (saveall or not self.isDefault()) and not self.readonly:
-            if isinstance(self._val, Reference):
+            if isinstance(self._val, ReferenceBase):
                 return "SetToReference('%s%s', %s)\n" % (rootname, self.name,
-                                                         repr(self._val.value))
+                                                         crepr(self._val.value))
             else:
                 return "Set('%s%s', %s)\n" % ( rootname, self.name,
-                                               repr(self.val) )
+                                               crepr(self.val) )
         else:
             return ''
 
     def setOnModified(self, fn):
         """Set the function to be called on modification (passing True)."""
-        self.onmodified.connect(self.onmodified,
-                                qt4.SIGNAL("onModified"), fn)
+        self.onmodified.onModified.connect(fn)
 
-        if isinstance(self._val, Reference):
-            # make reference pointed to also call this onModified
-            r = self._val.resolve(self)
-            r.setOnModified(fn)
+        if isinstance(self._val, ReferenceBase):
+            # tell references to notify us if they are modified
+            self._val.setOnModified(self, fn)
 
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""
-        self.onmodified.disconnect(self.onmodified, 0, fn, 0)
+        self.onmodified.onModified.disconnect(fn)
 
     def newDefault(self, value):
         """Update the default and the value."""
@@ -287,8 +287,8 @@ class Setting(object):
         """Is the current value a default?
         This also returns true if it is linked to the appropriate stylesheet
         """
-        if ( isinstance(self._val, Reference) and
-             isinstance(self.default, Reference) ):
+        if ( isinstance(self._val, ReferenceBase) and
+             isinstance(self.default, ReferenceBase) ):
             return self._val.value == self.default.value
         else:
             return self.val == self.default
@@ -296,7 +296,7 @@ class Setting(object):
     def isDefaultLink(self):
         """Is this a link to the default stylesheet value."""
 
-        return ( isinstance(self._val, Reference) and
+        return ( isinstance(self._val, ReferenceBase) and
                  self._val.value == self.getStylesheetLink() )
 
     def setSilent(self, val):
@@ -386,7 +386,7 @@ class SettingBackwardCompat(Setting):
         return self.getForward().fromText(val)
 
     def set(self, val):
-        if self.parent is not None and not isinstance(val, Reference):
+        if self.parent is not None and not isinstance(val, ReferenceBase):
             if self.translatefn:
                 val = self.translatefn(val)
             self.getForward().set(val)
@@ -430,6 +430,14 @@ class Str(Setting):
 
     def makeControl(self, *args):
         return controls.String(self, *args)
+
+class Notes(Str):
+    """String for making notes."""
+
+    typename = 'str-notes'
+
+    def makeControl(self, *args):
+        return controls.Notes(self, *args)
 
 # Store bools
 class Bool(Setting):
@@ -485,7 +493,7 @@ class Int(Setting):
         """
         return self._copyHelper((), (), {'minval': self.minval,
                                          'maxval': self.maxval})
-        
+
     def convertTo(self, val):
         if isinstance(val, int):
             if val >= self.minval and val <= self.maxval:
@@ -545,18 +553,19 @@ class Float(Setting):
         return self._copyHelper((), (), {'minval': self.minval,
                                          'maxval': self.maxval})
 
-    def convertTo(self, val):       
+    def convertTo(self, val):
         if isinstance(val, int) or isinstance(val, float):
             return _finiteRangeFloat(val,
                                      minval=self.minval, maxval=self.maxval)
         raise utils.InvalidType
 
     def toText(self):
-        return uilocale.toString(self.val)
+        return ui_floattostring(self.val)
 
     def fromText(self, text):
-        f, ok = uilocale.toDouble(text)
-        if not ok:
+        try:
+            f = ui_stringtofloat(text)
+        except ValueError:
             # try to evaluate
             f = self.safeEvalHelper(text)
         return self.convertTo(f)
@@ -588,7 +597,7 @@ class FloatOrAuto(Float):
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
-            return uilocale.toString(self.val)
+            return ui_floattostring(self.val)
 
     def fromText(self, text):
         if text.strip().lower() == 'auto':
@@ -598,7 +607,7 @@ class FloatOrAuto(Float):
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
-            
+
 class IntOrAuto(Setting):
     """Save an int or text auto."""
 
@@ -633,7 +642,7 @@ class IntOrAuto(Setting):
             if not ok:
                 raise utils.InvalidType
             return i
-            
+
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
 
@@ -744,7 +753,7 @@ class Distance(Setting):
     @classmethod
     def isDist(kls, dist):
         """Is the text a valid distance measure?"""
-        
+
         return kls.distre.match(dist) is not None
 
     def convertTo(self, val):
@@ -797,7 +806,7 @@ class Distance(Setting):
     def convertPts(self, painter):
         """Get the distance in points."""
         return self.convert(painter) / painter.pixperpt
-        
+
     def convertInverse(self, distpix, painter):
         """Convert distance in pixels into units of this distance.
         """
@@ -839,7 +848,7 @@ class DistanceOrAuto(Distance):
     typename = 'distance-or-auto'
 
     distre = re.compile( distre_expr + r'|^Auto$', re.VERBOSE )
-    
+
     def isAuto(self):
         return self.val == 'Auto'
 
@@ -871,7 +880,7 @@ class Choice(Setting):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((self.vallist,), (), {})
-        
+
     def convertTo(self, val):
         if val in self.vallist:
             return val
@@ -903,7 +912,7 @@ class ChoiceOrMore(Setting):
         descriptions is an optional addon to put a tooltip on each item
         in the control
         """
-        
+
         self.vallist = vallist
         self.descriptions = args.get('descriptions', None)
         if self.descriptions:
@@ -927,7 +936,33 @@ class ChoiceOrMore(Setting):
     def makeControl(self, *args):
         argsv = {'descriptions': self.descriptions}
         return controls.Choice(self, True, self.vallist, *args, **argsv)
-    
+
+class FloatChoice(ChoiceOrMore):
+    """A numeric value, which can also be chosen from the list of values."""
+
+    typename = 'float-choice'
+
+    def convertTo(self, val):
+        if isinstance(val, int) or isinstance(val, float):
+            return _finiteRangeFloat(val)
+        raise utils.InvalidType
+
+    def toText(self):
+        return ui_floattostring(self.val)
+
+    def fromText(self, text):
+        try:
+            f = ui_stringtofloat(text)
+        except ValueError:
+            # try to evaluate
+            f = self.safeEvalHelper(text)
+        return self.convertTo(f)
+
+    def makeControl(self, *args):
+        argsv = {'descriptions': self.descriptions}
+        strings = [ui_floattostring(x) for x in self.vallist]
+        return controls.Choice(self, True, strings, *args, **argsv)
+
 class FloatDict(Setting):
     """A dictionary, taking floats as values."""
 
@@ -937,18 +972,16 @@ class FloatDict(Setting):
         if type(val) != dict:
             raise utils.InvalidType
 
-        out = {}
-        for key, val in citems(val):
-            if type(val) not in (float, int):
+        for v in val.values():
+            if type(v) not in (float, int):
                 raise utils.InvalidType
-            else:
-                out[key] = val
 
-        return out
+        # return copy
+        return dict(val)
 
     def toText(self):
-        text = ['%s = %s' % (k, uilocale.toString(self.val[k]))
-                for k in sorted(ckeys(self.val))]
+        text = ['%s = %s' % (k, ui_floattostring(self.val[k]))
+                for k in sorted(self.val)]
         return '\n'.join(text)
 
     def fromText(self, text):
@@ -967,8 +1000,9 @@ class FloatDict(Setting):
             if len(p) != 2:
                 raise utils.InvalidType
 
-            v, ok = uilocale.toDouble(p[1])
-            if not ok:
+            try:
+                v = ui_stringtofloat(p[1])
+            except ValueError:
                 raise utils.InvalidType
 
             out[ p[0].strip() ] = v
@@ -1002,7 +1036,7 @@ class FloatList(Setting):
         join = ', '
         if uilocale.decimalPoint() == ',':
             join = '; '
-        return join.join( [uilocale.toString(x) for x in self.val] )
+        return join.join( [ui_floattostring(x) for x in self.val] )
 
     def fromText(self, text):
         """Convert from a, b, c or a b c."""
@@ -1015,10 +1049,9 @@ class FloatList(Setting):
         out = []
         for x in re.split(splitre, text.strip()):
             if x:
-                f, ok = uilocale.toDouble(x)
-                if ok:
-                    out.append(f)
-                else:
+                try:
+                    out.append( ui_stringtofloat(x) )
+                except ValueError:
                     out.append( self.safeEvalHelper(x) )
         return out
 
@@ -1091,7 +1124,7 @@ class WidgetPath(Str):
                     allowed = True
             if not allowed:
                 raise utils.InvalidType
-        
+
         return widget
 
 class Dataset(Str):
@@ -1114,7 +1147,7 @@ class Dataset(Str):
         return self._copyHelper((), (),
                                 {'dimensions': self.dimensions,
                                  'datatype': self.datatype})
-        
+
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
         return controls.Dataset(self, self.getDocument(), self.dimensions,
@@ -1150,7 +1183,7 @@ class Strings(Setting):
                 raise utils.InvalidType
 
         return tuple(val)
-        
+
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
         return controls.Strings(self, self.getDocument(), *args)
@@ -1193,7 +1226,7 @@ class Datasets(Setting):
         return self._copyHelper((), (),
                                 {'dimensions': self.dimensions,
                                  'datatype': self.datatype})
-        
+
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
         return controls.Datasets(self, self.getDocument(), self.dimensions,
@@ -1242,7 +1275,7 @@ class DatasetExtended(Dataset):
             join = ', '
             if uilocale.decimalPoint() == ',':
                 join = '; '
-            return join.join( [ uilocale.toString(x)
+            return join.join( [ ui_floattostring(x)
                                 for x in self.val ] )
 
     def fromText(self, text):
@@ -1261,10 +1294,9 @@ class DatasetExtended(Dataset):
         out = []
         for x in re.split(splitre, text):
             if x:
-                f, ok = uilocale.toDouble(x)
-                if ok:
-                    out.append(f)
-                else:
+                try:
+                    out.append( ui_stringtofloat(x) )
+                except ValueError:
                     # fail conversion, so exit with text
                     return text
         return out
@@ -1301,9 +1333,15 @@ class DatasetExtended(Dataset):
                 self.val, self.datatype, self.dimensions)
 
 class DatasetOrStr(Dataset):
-    """Choose a dataset or enter a string."""
+    """Choose a dataset or enter a string.
+
+    Non string datasets are converted to string arrays using this.
+    """
 
     typename = 'dataset-or-str'
+
+    def __init__(self, name, val, **args):
+        Dataset.__init__(self, name, val, datatype='text', **args)
 
     def getData(self, doc, checknull=False):
         """Return either a list of strings, a single item list.
@@ -1311,19 +1349,20 @@ class DatasetOrStr(Dataset):
         """
         if doc:
             ds = doc.data.get(self.val)
-            if ds and ds.datatype == self.datatype:
-                return ds.data
+            if ds:
+                return doc.formatValsWithDatatypeToText(
+                    ds.data, ds.displaytype)
         if checknull and not self.val:
             return None
         else:
             return [cstr(self.val)]
 
     def makeControl(self, *args):
-        # use string editor rather than drop down list
-        # need to write a custom control
-        return controls.DatasetOrString(self, self.getDocument(), self.dimensions,
-                                        self.datatype, *args)
-        #return controls.String(self, *args)
+        return controls.DatasetOrString(self, self.getDocument(), *args)
+
+    def copy(self):
+        """Make a setting which has its values copied from this one."""
+        return self._copyHelper((), (), {})
 
 class Color(ChoiceOrMore):
     """A color setting."""
@@ -1334,30 +1373,30 @@ class Color(ChoiceOrMore):
                 'cyan', 'magenta', 'yellow',
                 'grey', 'darkred', 'darkgreen', 'darkblue',
                 'darkcyan', 'darkmagenta' ]
-    
+
     controls.Color._colors = _colors
 
     def __init__(self, name, value, **args):
         """Initialise the color setting with the given name, default
         and description."""
-        
+
         ChoiceOrMore.__init__(self, name, self._colors, value,
                               **args)
 
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def color(self):
         """Return QColor for color."""
         return qt4.QColor(self.val)
-    
+
     def makeControl(self, *args):
         return controls.Color(self, *args)
 
 class FillStyle(Choice):
     """A setting for the different fill styles provided by Qt."""
-    
+
     typename = 'fill-style'
 
     _fillstyles = [ 'solid', 'horizontal', 'vertical', 'cross',
@@ -1390,7 +1429,7 @@ class FillStyle(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def qtStyle(self):
         """Return Qt ID of fill."""
         return self._fillcnvt[self.val]
@@ -1426,27 +1465,27 @@ class LineStyle(Choice):
                   'dot4': (qt4.Qt.CustomDashLine, [0.1, 8]),
                   'dash1': (qt4.Qt.CustomDashLine, [4, 4]),
                   'dash2': (qt4.Qt.CustomDashLine, [4, 8]),
-                  'dash3': (qt4.Qt.CustomDashLine, [8, 8]), 
+                  'dash3': (qt4.Qt.CustomDashLine, [8, 8]),
                   'dash4': (qt4.Qt.CustomDashLine, [16, 8]),
                   'dash5': (qt4.Qt.CustomDashLine, [16, 16]),
                   'dashdot1': (qt4.Qt.CustomDashLine, [0.1, 4, 4, 4]),
                   'dashdot2': (qt4.Qt.CustomDashLine, [0.1, 4, 8, 4]),
                   'dashdot3': (qt4.Qt.CustomDashLine, [0.1, 2, 4, 2]),
                  }
-    
+
     controls.LineStyle._lines = _linestyles
-    
+
     def __init__(self, name, default, **args):
         Choice.__init__(self, name, self._linestyles, default, **args)
 
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def qtStyle(self):
         """Get Qt ID of chosen line style."""
         return self._linecnvt[self.val]
-    
+
     def makeControl(self, *args):
         return controls.LineStyle(self, *args)
 
@@ -1460,14 +1499,14 @@ class Axis(Str):
 
     def __init__(self, name, val, direction, **args):
         """Initialise using the document, so we can get the axes later.
-        
+
         direction is horizontal or vertical to specify the type of axis to
         show
         """
 
         Setting.__init__(self, name, val, **args)
         self.direction = direction
-        
+
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (self.direction,), {})
@@ -1521,13 +1560,13 @@ class WidgetChoice(Str):
             widget = widget.parent
 
         # get list of widgets from recursive find
-        images = {}
+        widgets = {}
         if widget is not None:
-            self.buildWidgetList(0, widget, images)
+            self.buildWidgetList(0, widget, widgets)
 
         # turn (object, level) pairs into object
         outdict = {}
-        for name, val in citems(images):
+        for name, val in widgets.items():
             outdict[name] = val[0]
 
         return outdict
@@ -1547,7 +1586,7 @@ class WidgetChoice(Str):
     def makeControl(self, *args):
         """Allows user to choose an image widget or enter a name."""
         return controls.WidgetChoice(self, self.getDocument(), *args)
-    
+
 class Marker(Choice):
     """Choose a marker type from one allowable."""
 
@@ -1559,10 +1598,10 @@ class Marker(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def makeControl(self, *args):
         return controls.Marker(self, *args)
-    
+
 class Arrow(Choice):
     """Choose an arrow type from one allowable."""
 
@@ -1574,7 +1613,7 @@ class Arrow(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def makeControl(self, *args):
         return controls.Arrow(self, *args)
 
@@ -1609,7 +1648,7 @@ class LineSet(Setting):
                 raise utils.InvalidType
 
         return val
-    
+
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.LineSet(self, *args)
@@ -1637,7 +1676,7 @@ class LineSet(Setting):
             if hide:
                 pen.setStyle(qt4.Qt.NoPen)
             return pen
-    
+
 class FillSet(Setting):
     """A setting which corresponds to a set of fills.
 
@@ -1676,7 +1715,7 @@ class FillSet(Setting):
                 raise utils.InvalidType
 
         return val
-    
+
     def makeControl(self, *args):
         """Make specialised lineset control."""
         return controls.FillSet(self, *args)
@@ -1746,7 +1785,7 @@ class ErrorStyle(Choice):
         'none',
         'bar', 'barends', 'box', 'diamond', 'curve',
         'barbox', 'bardiamond', 'barcurve',
-        'boxfill', 'diamondfill',
+        'boxfill', 'diamondfill', 'curvefill',
         'fillvert', 'fillhorz',
         'linevert', 'linehorz',
         'linevertbar', 'linehorzbar'
@@ -1760,7 +1799,7 @@ class ErrorStyle(Choice):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
-                              
+
     def makeControl(self, *args):
         return controls.ErrorStyle(self, *args)
 

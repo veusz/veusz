@@ -87,7 +87,7 @@ class NonOrthFunction(Widget):
                            usertext=_('Steps'), formatting=True), 0 )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         return (NonOrthGraph,)
 
     @property

@@ -252,7 +252,7 @@ class Export(object):
         dpi = svg_export.dpi * 1.
         size = self.doc.pageSize(
             self.pagenumber, dpi=(dpi,dpi), integer=False)
-        with codecs.open(self.filename, 'w', encoding='utf-8') as f:
+        with codecs.open(self.filename, 'w', 'utf-8') as f:
             paintdev = svg_export.SVGPaintDevice(
                 f, size[0]/dpi, size[1]/dpi, writetextastext=self.svgtextastext)
             painter = painthelper.DirectPainter(paintdev)

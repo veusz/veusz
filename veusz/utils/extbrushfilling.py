@@ -42,7 +42,7 @@ def dumppath(p):
             print(" m(%i,%i)" %(e.x, e.y), end=' ')
             i += 1
         else:
-            print(" c(%i,%i,%i,%i)" %(e.x, e.y, p.elementAt(i+1).x, p.elementAt(i+1).y, p.elementAt(i+2).x, p.elementAt(i+2).y), end=' ')
+            print(" c(%i,%i,%i,%i,%i,%i)" %(e.x, e.y, p.elementAt(i+1).x, p.elementAt(i+1).y, p.elementAt(i+2).x, p.elementAt(i+2).y), end=' ')
             i += 3
     print()
 

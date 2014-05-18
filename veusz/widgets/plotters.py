@@ -44,7 +44,7 @@ class GenericPlotter(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import graph
         return (graph.Graph,)
 
@@ -184,7 +184,7 @@ class FreePlotter(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import page, graph
         return (graph.Graph, page.Page)
 
@@ -248,6 +248,8 @@ class FreePlotter(widget.Widget):
         """Calculate graph coodinates given plot coordinates xplt, yplt."""
 
         s = self.settings
+        xplt = N.array(xplt)
+        yplt = N.array(yplt)
         if s.positioning == 'axes':
             if hasattr(self.parent, 'getAxes'):
                 axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
@@ -256,8 +258,8 @@ class FreePlotter(widget.Widget):
             if None in axes:
                 return None, None
             
-            xpos = axes[0].plotterToDataCoords(posn, N.array(xplt))
-            ypos = axes[1].plotterToDataCoords(posn, N.array(yplt))
+            xpos = axes[0].plotterToDataCoords(posn, xplt)
+            ypos = axes[1].plotterToDataCoords(posn, yplt)
         else:
             xpos = (xplt - posn[0]) / (posn[2]-posn[0])
             ypos = (yplt - posn[3]) / (posn[1]-posn[3])

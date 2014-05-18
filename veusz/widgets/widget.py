@@ -22,7 +22,7 @@
 from __future__ import division
 import itertools
 
-from ..compat import czip
+from ..compat import czip, crepr
 from .. import document
 from .. import setting
 from .. import qtall as qt4
@@ -99,7 +99,7 @@ class Widget(object):
         self.actions = []
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         """Get types of widgets this can be a child of."""
         return ()
 
@@ -198,11 +198,11 @@ class Widget(object):
         else:
             return self.parent.createUniqueName(self.typename)
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """Return a user-friendly description of what
         this is (e.g. function)."""
         return ''
-    userdescription = property(_getUserDescription)
 
     def prefLookup(self, name):
         """Get the value of a preference in the form foo/bar/baz"""
@@ -239,10 +239,10 @@ class Widget(object):
         """Return whether there is a child with a name."""
         return self.getChild(name) is not None
 
-    def _getChildNames(self):
+    @property
+    def childnames(self):
         """Return the child names."""
         return [i.name for i in self.children]
-    childnames = property(_getChildNames)
 
     def removeChild(self, name):
         """Remove a child."""
@@ -264,7 +264,8 @@ class Widget(object):
         else:
             return self.parent.children.index(self)
 
-    def _getPath(self):
+    @property
+    def path(self):
         """Returns a path for the object, e.g. /plot1/x."""
 
         obj = self
@@ -277,7 +278,6 @@ class Widget(object):
             build = '/'
 
         return build
-    path = property(_getPath)
 
     def getMargins(self, painthelper):
         """Return margins of widget."""
@@ -322,14 +322,14 @@ class Widget(object):
         # now go throught the subwidgets
         for c in self.children:
             text += ( "Add('%s', name=%s, autoadd=False)\n" %
-                      (c.typename, repr(c.name)) )
+                      (c.typename, crepr(c.name)) )
 
             # if we need to go to the child, go there
             ctext = c.getSaveText(saveall)
             if ctext != '':
                 text += ("To(%s)\n"
                          "%s"
-                         "To('..')\n") % (repr(c.name), ctext)
+                         "To('..')\n") % (crepr(c.name), ctext)
 
         return text
 

@@ -42,12 +42,15 @@ x +- y + -
 
 from __future__ import division
 import re
+import ast
 
 import numpy as N
 
-from ..compat import crange, cnext, CStringIO, citems
+from ..compat import crange, cnext, CStringIO
 from .. import utils
-from . import datasets
+from .. import document
+from .. import qtall as qt4
+from .import base
 
 # a regular expression for splitting descriptor into tokens
 descrtokens_split_re = re.compile(r'''
@@ -261,34 +264,35 @@ class DescriptorPart(object):
                     except ValueError:
                         dat = N.nan
                         self.errorcount += 1
-                        
+
                 elif self.datatype == 'string':
                     if string_re.match(val):
-                        # possible security issue:
-                        # regular expression checks this is safe
+                        conv = val
+                        if conv[0:1] != 'u':
+                            # a hack for python2
+                            conv = 'u' + val
                         try:
-                            dat = eval(val)
+                            dat = ast.literal_eval(conv)
                         except:
                             dat = val
                     else:
                         dat = val
-                        
+
                 elif self.datatype == 'date':
                     dat = utils.dateStringToDate(val)
 
                 # add data into dataset
                 dataset.append(dat)
 
-    def setInDocument(self, thedatasets, document, block=None,
-                      linkedfile=None,
-                      prefix="", suffix="", tail=None):
+    def setOutput(self, thedatasets, outmap, block=None,
+                  linkedfile=None,
+                  prefix="", suffix="", tail=None):
         """Set the read-in data in the document."""
 
         # we didn't read any data
         if self.datatype is None:
-            return []
+            return
 
-        names = []
         for index in crange(self.startindex, self.stopindex+1):
             # name for variable
             if self.single:
@@ -326,25 +330,22 @@ class DescriptorPart(object):
 
                 # create the dataset
                 if self.datatype == 'float':
-                    ds = datasets.Dataset( data = vals, serr = sym,
+                    ds = document.Dataset( data = vals, serr = sym,
                                            nerr = neg, perr = pos,
                                            linked = linkedfile )
                 elif self.datatype == 'date':
-                    ds = datasets.DatasetDateTime( data=vals,
+                    ds = document.DatasetDateTime( data=vals,
                                                    linked=linkedfile )
                 elif self.datatype == 'string':
-                    ds = datasets.DatasetText( data=vals,
+                    ds = document.DatasetText( data=vals,
                                                linked = linkedfile )
                 else:
                     raise RuntimeError("Invalid data type")
 
                 finalname = prefix + name + suffix
-                document.setData( finalname, ds )
-                names.append(finalname)
+                outmap[finalname] = ds
             else:
                 break
-
-        return names
 
 class Stream(object):
     """This object reads through an input data source (override
@@ -430,6 +431,47 @@ class StringStream(FileStream):
         """A stream which reads in from a text string."""
         
         FileStream.__init__( self, CStringIO(text) )
+
+class CSVStream(Stream):
+    """Read text from csv file."""
+
+    def __init__(self, filename, delim, textdelim, locale, encoding):
+        Stream.__init__(self)
+
+        self.csvfile = utils.get_unicode_csv_reader(
+            filename,
+            delimiter=delim,
+            quotechar=textdelim,
+            encoding=encoding )
+        self.localename = locale
+        self.locale = qt4.QLocale(locale)
+
+    def newLine(self):
+        """Get next line from CSV file."""
+        try:
+            line = cnext(self.csvfile)
+        except StopIteration:
+            return False
+
+        # delete empty cells on left, to make compatible with normal
+        # text stream
+        i = 0
+        while i < len(line) and not line[i]:
+            i += 1
+        line = line[i:]
+
+        if self.localename == 'en_US':
+            # no conversion
+            self.remainingline += line
+        else:
+            for t in line:
+                v, ok = self.locale.toDouble(t)
+                if ok:
+                    # add on converted text - yuck - double conversion
+                    self.remainingline.append('%e' % v)
+                else:
+                    self.remainingline.append(v)
+        return True
 
 class SimpleRead(object):
     '''Class to read in datasets from a stream.
@@ -567,16 +609,14 @@ class SimpleRead(object):
         """Get a dict of the datasets read (main data part) and number
         of entries read."""
         out = {}
-        for name, data in citems(self.datasets):
+        for name in self.datasets:
             if name[-2:] == '\0D':
-                out[name[:-2]] = len(data)
+                out[name[:-2]] = len(self.datasets[name])
         return out
 
-    def setInDocument(self, document, linkedfile=None,
-                      prefix='', suffix=''):
-        """Set the data in the document.
-
-        Returns list of variable names read.
+    def setOutput(self, out, linkedfile=None,
+                  prefix='', suffix=''):
+        """Set the data in the out dict.
         """
 
         # iterate over blocks used
@@ -589,22 +629,19 @@ class SimpleRead(object):
         if self.autodescr and prefix == '' and suffix == '':
             prefix = 'col'
 
-        names = []
         for block in blocks:
             for part in self.parts:
-                names += part.setInDocument(
-                    self.datasets, document,
+                part.setOutput(
+                    self.datasets, out,
                     block=block,
                     linkedfile=linkedfile,
                     prefix=prefix, suffix=suffix,
                     tail=self.tail)
 
-        return names
-
 #####################################################################
 # 2D data reading
 
-class Read2DError(ValueError):
+class Read2DError(base.ImportingError):
     pass
 
 class SimpleRead2D(object):
@@ -615,6 +652,9 @@ class SimpleRead2D(object):
         self.name = name
         self.params = params.copy()
 
+        # not present in ImportParams2D
+        self.xedge = self.yedge = self.xcent = self.ycent = None
+
     ####################################################################
     # Follow functions are for setting parameters during reading of data
 
@@ -622,22 +662,35 @@ class SimpleRead2D(object):
         try:
             self.params.xrange = ( float(cols[1]), float(cols[2]) )
         except ValueError:
-            raise Read2DError("Could not interpret xrange")
-        
+            raise Read2DError("xrange is not two numerical values")
+
     def _paramYRange(self, cols):
         try:
             self.params.yrange = ( float(cols[1]), float(cols[2]) )
         except ValueError:
-            raise Read2DError("Could not interpret yrange")
+            raise Read2DError("yrange is not two numerical values")
+
+    def _getNumList(self, attr, cols):
+        """Generic conversion of a list of numbers."""
+        try:
+            g = [float(v) for v in cols[1:]]
+        except ValueError:
+            raise Read2DError("%s is not a list of numerical values" % attr)
+        if not utils.checkAscending(g):
+            raise Read2DError("%s values are not ascending" % attr)
+        setattr(self, attr, g)
 
     def _paramInvertRows(self, cols):
         self.params.invertrows = True
-        
+
     def _paramInvertCols(self, cols):
         self.params.invertcols = True
 
     def _paramTranspose(self, cols):
         self.params.transpose = True
+
+    def _paramGridAtEdge(self, cols):
+        self.params.gridatedge = True
 
     ####################################################################
 
@@ -648,9 +701,14 @@ class SimpleRead2D(object):
         optional:
          xrange A B   - set the range of x from A to B
          yrange A B   - set the range of y from A to B
+         xedge A B... - list of x values (instead of xrange)
+         yedge A B... - list of y values (instead of yrange)
+         xcent A B... - list of x centres (instead of xrange)
+         ycent A B... - list of y centres (instead of yrange)
          invertrows   - invert order of the rows
          invertcols   - invert order of the columns
          transpose    - swap rows and columns
+         gridatedge   - positions of pixels are given at top and left
         then:
          matrix of columns and rows, separated by line endings
          the rows are in reverse-y order (highest y first)
@@ -660,9 +718,14 @@ class SimpleRead2D(object):
         settings = {
             'xrange': self._paramXRange,
             'yrange': self._paramYRange,
+            'xedge': lambda cols: self._getNumList('xedge', cols),
+            'yedge': lambda cols: self._getNumList('yedge', cols),
+            'xcent': lambda cols: self._getNumList('xcent', cols),
+            'ycent': lambda cols: self._getNumList('ycent', cols),
             'invertrows': self._paramInvertRows,
             'invertcols': self._paramInvertCols,
-            'transpose': self._paramTranspose
+            'transpose': self._paramTranspose,
+            'gridatedge': self._paramGridAtEdge,
             }
 
         rows = []
@@ -670,17 +733,18 @@ class SimpleRead2D(object):
         while stream.newLine():
             cols = stream.allColumns()
 
-            if len(cols) > 0:
-                # check to see whether parameter is set
-                c = cols[0].lower()
-                if c in settings:
-                    settings[c](cols)
-                    stream.flushLine()
-                    continue
-            else:
-                # if there's data and we get to a blank line, finish
+            if len(cols) == 0:
                 if len(rows) != 0:
+                    # end of data
                     break
+                continue
+
+            # check to see whether parameter is set
+            c = cols[0].lower()
+            if c in settings:
+                settings[c](cols)
+                stream.flushLine()
+                continue
 
             # read columns
             line = []
@@ -693,23 +757,27 @@ class SimpleRead2D(object):
                 except ValueError:
                     raise Read2DError("Could not interpret number '%s'" % v)
 
-            # add row to dataset
-            if len(line) != 0:
-                if self.params.invertcols:
-                    line.reverse()
-                rows.insert(0, line)
+            rows.insert(0, line)
 
-        # swap rows if requested
-        if self.params.invertrows:
-            rows.reverse()
+        if self.params.gridatedge:
+
+            if any( [getattr(self, x) is not None
+                     for x in ("xedge", "yedge", "xcent", "ycent")] ):
+                raise Read2DError(
+                    "x|y grid|cent are incompatible with gridatedge")
+
+            self.xcent = N.array(rows[-1])
+            self.ycent = N.array([r[0] for r in rows[-2::-1]])
+
+            # chop out grid
+            rows = [ r[1:] for r in rows[:-1] ]
 
         # dodgy formatting probably...
         if len(rows) == 0:
             raise Read2DError("No data could be imported for dataset")
 
-        # convert the data to a numpy
         try:
-            self.data = N.array(rows)
+            self.data = N.array(rows, dtype=N.float64)
         except ValueError:
             raise Read2DError("Could not convert data to 2D matrix")
 
@@ -717,21 +785,53 @@ class SimpleRead2D(object):
         if len(self.data.shape) != 2:
             raise Read2DError("Dataset was not 2D")
 
+        if self.params.invertcols:
+            self.data = self.data[:,::-1]
+            if self.xedge is not None:
+                self.xedge = self.xedge[::-1]
+            if self.xcent is not None:
+                self.xcent = self.xcent[::-1]
+        if self.params.invertrows:
+            self.data = self.data[::-1,:]
+            if self.yedge is not None:
+                self.yedge = self.yedge[::-1]
+            if self.ycent is not None:
+                self.ycent = self.ycent[::-1]
+
         # transpose matrix if requested
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
+            self.xedge, self.yedge = self.xedge, self.yedge
 
-    def setInDocument(self, document, linkedfile=None):
-        """Set the data in the document.
+        # sanity checks
+        for a in 'xedge', 'yedge', 'xcent', 'ycent':
+            v = getattr(self, a)
+            if v is not None and not utils.checkAscending(v):
+                raise Read2DError("%s must be ascending" % a)
 
-        Returns list containing name of dataset read
+        if ( (self.xedge is not None and
+              len(self.xedge) != self.data.shape[1]+1) or
+             (self.yedge is not None and
+              len(self.yedge) != self.data.shape[0]+1) ):
+            raise Read2DError("xedge and yedge lengths must be data shape+1")
+
+        if ( (self.xcent is not None and
+              len(self.xcent) != self.data.shape[1]) or
+             (self.ycent is not None and
+              len(self.ycent) != self.data.shape[0]) ):
+            raise Read2DError("xcent and ycent lengths must be data shape")
+
+    def setOutput(self, out, linkedfile=None):
+        """Set the data in the output dict out
         """
 
-        ds = datasets.Dataset2D(self.data, xrange=self.params.xrange,
-                                yrange=self.params.yrange)
+        ds = document.Dataset2D(self.data,
+                                xrange=self.params.xrange,
+                                yrange=self.params.yrange,
+                                xedge=self.xedge, yedge=self.yedge,
+                                xcent=self.xcent, ycent=self.ycent)
+
         ds.linked = linkedfile
 
         fullname = self.params.prefix + self.name + self.params.suffix
-        document.setData(fullname, ds)
-
-        return [fullname]
+        out[fullname] = ds

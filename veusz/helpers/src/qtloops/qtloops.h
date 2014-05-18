@@ -51,7 +51,8 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 			const Numpy1DObj& x, const Numpy1DObj& y,
 			const Numpy1DObj* scaling = 0,
 			const QRectF* clip = 0,
-			const QImage* colorimg = 0);
+			const QImage* colorimg = 0,
+			bool scaleline = false);
 
 void plotLinesToPainter(QPainter& painter,
 			const Numpy1DObj& x1, const Numpy1DObj& y1,
@@ -67,5 +68,8 @@ QImage numpyToQImage(const Numpy2DObj& data, const Numpy2DIntObj &colors,
 		     bool forcetrans = false);
 
 void applyImageTransparancy(QImage& img, const Numpy2DObj& data);
+
+QImage resampleLinearImage(QImage& img,
+			   const Numpy1DObj& xpts, const Numpy1DObj& ypts);
 
 #endif

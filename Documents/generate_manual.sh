@@ -18,13 +18,16 @@
 ##############################################################################
 
 # generate the output manual files from the input docbook file
+# uses xmlto and fop
+
 # DO NOT EDIT THE OUTPUT FILES!
 
-infile=manual.xml
+# this is pretty ugly
+xmlto html-nochunks -m config.xsl manual.xml
+xmlto text manual.xml
 
-docbook2pdf $infile
-docbook2html -u $infile
-docbook2txt $infile
+xmlto fo manual.xml
+fop manual.fo -pdf manual.pdf
 
 release=$(cat ../VERSION)
 pod2man --release=${release} --center="Veusz"  veusz.pod > veusz.1

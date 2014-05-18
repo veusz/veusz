@@ -25,7 +25,6 @@ from ..compat import crange, cstr
 from .. import qtall as qt4
 from .. import setting
 from .. import document
-from .. import utils
 
 from . import axis
 
@@ -265,7 +264,7 @@ class AxisFunction(axis.Axis):
             except FunctionError as e:
                 self.logError(e)
                 self.cachedfuncobj = None
-            except AxisError as e:
+            except AxisError:
                 pass
 
         return self.cachedfuncobj
@@ -397,7 +396,7 @@ class AxisFunction(axis.Axis):
 
         try:
             ourgraphcoords = self.getFunction()(linkgraphcoords)
-        except Exception as e:
+        except:
             return
 
         deltas = ourgraphcoords[1:] - ourgraphcoords[:-1]
@@ -456,7 +455,7 @@ class AxisFunction(axis.Axis):
 
         try:
             ourgraphcoords = self.getFunction()(tvals)
-        except Exception as e:
+        except Exception:
             return
 
         deltas = ourgraphcoords[1:] - ourgraphcoords[:-1]

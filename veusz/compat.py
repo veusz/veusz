@@ -25,6 +25,7 @@ with a 'c')
 
 import sys
 import itertools
+import locale
 
 cpy3 = sys.version_info[0] == 3
 
@@ -54,6 +55,9 @@ if cpy3:
     # bytes-like object
     cbytes = bytes
 
+    # unicode-like object
+    cunicode = str
+
     # iterate over dict
     def citems(d):
         return d.items()
@@ -80,6 +84,12 @@ if cpy3:
     def cstrerror(ex):
         return ex.strerror
 
+    # text repr (compatible with python2)
+    def crepr(v):
+        if isinstance(v, str):
+            return 'u' + repr(v)
+        return repr(v)
+
 else:
     # py2
 
@@ -105,6 +115,9 @@ else:
 
     # bytes-like object
     cbytes = str
+
+    # unicode-like string
+    cunicode = unicode
 
     # iterate over dict
     def citems(d):
@@ -140,8 +153,13 @@ else:
 
     # convert strerror exception to string
     def cstrerror(ex):
-        if isinstance(ex, str):
-            return ex.strerror.decode(locale.getdefaultlocale()[1])
+        if isinstance(ex.strerror, str):
+            deflocale = locale.getdefaultlocale()[1]
+            if deflocale is None:
+                deflocale = 'ascii'
+            return ex.strerror.decode(deflocale)
         else:
             return ex.strerror
 
+    # py2/3 repr
+    crepr = repr

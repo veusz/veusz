@@ -24,6 +24,7 @@ from .. import qtall as qt4
 from .. import utils
 from .. import document
 from .veuszdialog import VeuszDialog
+from . import dataeditdialog
 
 def _(text, disambiguation=None, context="DataCreate2D"):
     """Translate text."""
@@ -53,24 +54,17 @@ class DataCreate2DDialog(VeuszDialog):
 
         self.createbutton = self.buttonBox.addButton(
             _("C&reate"), qt4.QDialogButtonBox.ApplyRole )
-        self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
-                      self.createButtonClickedSlot )
+        self.createbutton.clicked.connect(self.createButtonClickedSlot)
 
-        self.connect( self.fromxyfunc, qt4.SIGNAL('toggled(bool)'),
-                      self.fromxyfuncSlot )
-        self.connect( self.fromxyzexpr, qt4.SIGNAL('toggled(bool)'),
-                      self.fromxyzexprSlot )
-        self.connect( self.from2dexpr, qt4.SIGNAL('toggled(bool)'),
-                      self.from2dexprSlot )
+        self.fromxyfunc.toggled.connect(self.fromxyfuncSlot)
+        self.fromxyzexpr.toggled.connect(self.fromxyzexprSlot)
+        self.from2dexpr.toggled.connect(self.from2dexprSlot)
 
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.updateDatasetLists)
+        document.signalModified.connect(self.updateDatasetLists)
 
         for combo in (self.namecombo, self.xexprcombo, self.yexprcombo,
                       self.zexprcombo):
-            self.connect(combo,
-                         qt4.SIGNAL('editTextChanged(const QString&)'),
-                         self.enableDisableCreate)
+            combo.editTextChanged.connect(self.enableDisableCreate)
 
         self.fromxyzexpr.toggle()
         self.enableDisableCreate()
@@ -131,6 +125,33 @@ class DataCreate2DDialog(VeuszDialog):
             utils.populateCombo(self.xexprcombo, ['0:10:0.1'])
             utils.populateCombo(self.yexprcombo, ['0:10:0.1'])
             utils.populateCombo(self.zexprcombo, ['x+y'])
+
+    def reEditDataset(self, ds, dsname):
+        """Allow dataset to be edited again."""
+
+        self.namecombo.setEditText(dsname)
+        self.linkcheckbox.setChecked(True)
+
+        if isinstance(ds, document.Dataset2DXYZExpression):
+            self.fromxyzexpr.click()
+            self.xexprcombo.setEditText(ds.exprx)
+            self.yexprcombo.setEditText(ds.expry)
+            self.zexprcombo.setEditText(ds.exprz)
+
+        elif isinstance(ds, document.Dataset2DExpression):
+            self.from2dexpr.click()
+            self.xexprcombo.clearEditText()
+            self.yexprcombo.clearEditText()
+            self.zexprcombo.setEditText(ds.expr)
+
+        elif isinstance(ds, document.Dataset2DXYFunc):
+            self.fromxyfunc.click()
+            self.xexprcombo.setEditText('%g:%g:%g' % tuple(ds.xstep))
+            self.yexprcombo.setEditText('%g:%g:%g' % tuple(ds.ystep))
+            self.zexprcombo.setEditText(ds.expr)
+
+        else:
+            raise RuntimeError('Invalid dataset type')
 
     def enableDisableCreate(self):
         """Enable or disable create button."""
@@ -199,7 +220,7 @@ class DataCreate2DDialog(VeuszDialog):
             # forces an evaluation
             self.document.data[text['name']].data
         except (document.CreateDatasetException,
-                document.DatasetException) as e:
+                document.DatasetException):
             msg = _("Failed to create dataset '%s'") % text['name']
         else:
             msg = _("Created dataset '%s'") % text['name']
@@ -207,3 +228,12 @@ class DataCreate2DDialog(VeuszDialog):
         self.notifylabel.setText(msg)
         qt4.QTimer.singleShot(4000, self.notifylabel.clear)
         
+def recreateDataset(mainwindow, document, dataset, datasetname):
+    """Open dialog to recreate a DatasetExpression / DatasetRange."""
+    dialog = DataCreate2DDialog(mainwindow, document)
+    mainwindow.showDialog(dialog)
+    dialog.reEditDataset(dataset, datasetname)
+
+for c in (document.Dataset2DXYZExpression, document.Dataset2DExpression,
+          document.Dataset2DXYFunc):
+    dataeditdialog.recreate_register[c] = recreateDataset

@@ -23,7 +23,7 @@ from __future__ import division
 import sys
 import traceback
 
-from ..compat import crange, ckeys
+from ..compat import crange
 from .. import qtall as qt4
 import numpy as N
 
@@ -67,6 +67,9 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
 
 class RenderControl(qt4.QObject):
     """Object for rendering plots in a separate thread."""
+
+    signalRenderFinished = qt4.pyqtSignal(
+        int, qt4.QImage, document.PaintHelper)
 
     def __init__(self, plotwindow):
         """Start up numthreads rendering threads."""
@@ -140,19 +143,18 @@ class RenderControl(qt4.QObject):
             self.mutex.lock()
             # just throw away result if it older than the latest one
             if jobid > self.latestdrawnjob:
-                self.emit( qt4.SIGNAL("renderfinished"),
-                              jobid, img, helper )
+                self.signalRenderFinished.emit(jobid, img, helper)
                 self.latestdrawnjob = jobid
             self.mutex.unlock()
 
         # tell any listeners that a job has been processed
-        self.plotwindow.emit( qt4.SIGNAL("queuechange"), -1 )
+        self.plotwindow.sigQueueChange.emit(-1)
 
     def addJob(self, helper):
         """Process drawing job in PaintHelper given."""
 
         # indicate that there is a new item to be processed to listeners
-        self.plotwindow.emit( qt4.SIGNAL("queuechange"), 1 )
+        self.plotwindow.sigQueueChange.emit(1)
 
         # add the job to the queue
         self.mutex.lock()
@@ -194,6 +196,19 @@ class RenderThread( qt4.QThread ):
 
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
+
+    # emitted when new item on plot queue
+    sigQueueChange = qt4.pyqtSignal(int)
+    # on drawing a page
+    sigUpdatePage = qt4.pyqtSignal(int)
+    # point picked on plot
+    sigPointPicked = qt4.pyqtSignal(object)
+    # picker enabled
+    sigPickerEnabled = qt4.pyqtSignal(bool)
+    # axis values update from moving mouse
+    sigAxisValuesFromMouse = qt4.pyqtSignal(dict)
+    # gives widget clicked
+    sigWidgetClicked = qt4.pyqtSignal(object)
 
     # how often the document can update
     updateintervals = (
@@ -257,8 +272,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.document = document
         self.docchangeset = -100
         self.oldpagenumber = -1
-        self.connect(self.document, qt4.SIGNAL("sigModified"),
-                     self.slotDocModified)
+        self.document.signalModified.connect(self.slotDocModified)
 
         # state of last plot from painthelper
         self.painthelper = None
@@ -271,8 +285,8 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # for rendering plots in separate threads
         self.rendercontrol = RenderControl(self)
-        self.connect(self.rendercontrol, qt4.SIGNAL("renderfinished"),
-        self.slotRenderFinished)
+        self.rendercontrol.signalRenderFinished.connect(
+            self.slotRenderFinished)
 
         # mode for clicking
         self.clickmode = 'select'
@@ -283,8 +297,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # set up redrawing timer
         self.timer = qt4.QTimer(self)
-        self.connect( self.timer, qt4.SIGNAL('timeout()'),
-                      self.checkPlotUpdate )
+        self.timer.timeout.connect(self.checkPlotUpdate)
 
         # for drag scrolling
         self.grabpos = None
@@ -292,8 +305,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.scrolltimer.setSingleShot(True)
 
         # for turning clicking into scrolling after a period
-        self.connect( self.scrolltimer, qt4.SIGNAL('timeout()'),
-                      self.slotBecomeScrollClick )
+        self.scrolltimer.timeout.connect(self.slotBecomeScrollClick)
 
         # get plot view updating policy
         #  -1: update on document changes
@@ -437,8 +449,7 @@ class PlotWindow( qt4.QGraphicsView ):
             zoomag.addAction(a)
             a.vzname = act
         actions['view.zoommenu'].setMenu(zoommenu)
-        self.connect(zoomag, qt4.SIGNAL('triggered(QAction*)'),
-                     self.zoomActionTriggered)
+        zoomag.triggered.connect(self.zoomActionTriggered)
 
         lastzoom = setting.settingdb.get('view_defaultzoom', 'view.zoompage')
         self.updateZoomMenuButton(actions[lastzoom])
@@ -457,8 +468,7 @@ class PlotWindow( qt4.QGraphicsView ):
             actions[a].setActionGroup(grp)
             actions[a].setCheckable(True)
         actions['view.select'].setChecked(True)
-        self.connect( grp, qt4.SIGNAL('triggered(QAction*)'),
-                      self.slotSelectMode )
+        grp.triggered.connect(self.slotSelectMode)
 
         return self.viewtoolbar
 
@@ -510,8 +520,9 @@ class PlotWindow( qt4.QGraphicsView ):
             return
         
         # convert points on plotter to points on axis for each axis
-        xpts = N.array( [pt1.x(), pt2.x()] )
-        ypts = N.array( [pt1.y(), pt2.y()] )
+        # we also add a neighbouring pixel for the rounding calculation
+        xpts = N.array( [pt1.x(), pt2.x(), pt1.x()+1, pt2.x()-1] )
+        ypts = N.array( [pt1.y(), pt2.y(), pt2.y()+1, pt2.y()-1] )
 
         # build up operation list to do zoom
         operations = []
@@ -530,7 +541,7 @@ class PlotWindow( qt4.QGraphicsView ):
                     axes[a] = True
 
         # iterate over each axis, and update the ranges
-        for axis in ckeys(axes):
+        for axis in axes:
             s = axis.settings
             if s.direction == 'horizontal':
                 p = xpts
@@ -548,14 +559,18 @@ class PlotWindow( qt4.QGraphicsView ):
             # invert if min and max are inverted
             if r[1] < r[0]:
                 r[1], r[0] = r[0], r[1]
+                r[3], r[2] = r[2], r[3]
 
             # build up operations to change axis
             if s.min != r[0]:
-                operations.append( document.OperationSettingSet(s.get('min'),
-                                                                float(r[0])) )
+                operations.append( document.OperationSettingSet(
+                        s.get('min'),
+                        utils.round2delt(r[0], r[2])) )
+
             if s.max != r[1]:
-                operations.append( document.OperationSettingSet(s.get('max'),
-                                                                float(r[1])) )
+                operations.append( document.OperationSettingSet(
+                        s.get('max'),
+                        utils.round2delt(r[1], r[3])) )
 
         # finally change the axes
         self.document.applyOperation(
@@ -592,7 +607,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         self.pickerinfo = pickinfo
         self.pickeritem.setPos(pickinfo.screenpos[0], pickinfo.screenpos[1])
-        self.emit(qt4.SIGNAL("sigPointPicked"), pickinfo)
+        self.sigPointPicked.emit(pickinfo)
 
     def doPick(self, mousepos):
         """Find the point on any plot-like widget closest to the cursor"""
@@ -642,7 +657,10 @@ class PlotWindow( qt4.QGraphicsView ):
         items = self.items(event.pos())
         if len(items) > 0 and isinstance(items[0], qt4.QGraphicsItemGroup):
             del items[0]
-        self.ignoreclick = len(items)==0 or items[0] is not self.pixmapitem
+
+        self.ignoreclick = ( len(items)==0 or
+                             items[0] is not self.pixmapitem or
+                             self.painthelper is None )
 
         if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
 
@@ -708,7 +726,7 @@ class PlotWindow( qt4.QGraphicsView ):
             axes = self.axesForPoint(event.pos())
             vals = dict([ (a[0].name, a[1]) for a in axes ])
 
-            self.emit( qt4.SIGNAL('sigAxisValuesFromMouse'), vals )
+            self.sigAxisValuesFromMouse.emit(vals)
 
             if self.currentclickmode == 'pick':
                 # drag the picker around
@@ -843,7 +861,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # tell connected objects that widget was clicked
         if widget is not None:
-            self.emit( qt4.SIGNAL('sigWidgetClicked'), widget )
+            self.sigWidgetClicked.emit(widget)
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -865,6 +883,7 @@ class PlotWindow( qt4.QGraphicsView ):
         """Get the the selected page."""
         return self.pagenumber
 
+    @qt4.pyqtSlot(int)
     def slotDocModified(self, ismodified):
         """Update plot on document being modified."""
         # only update if doc is modified and the update policy is set
@@ -918,7 +937,7 @@ class PlotWindow( qt4.QGraphicsView ):
                 self.setSceneRect(0, 0, *size)
                 self.pixmapitem.setPixmap(pixmap)
 
-            self.emit( qt4.SIGNAL("sigUpdatePage"), self.pagenumber )
+            self.sigUpdatePage.emit(self.pagenumber)
             self.updatePageToolbar()
 
             self.updateControlGraphs(self.lastwidgetsselected)
@@ -967,8 +986,9 @@ class PlotWindow( qt4.QGraphicsView ):
         for intv, text in self.updateintervals:
             act = intgrp.addAction(text)
             act.setCheckable(True)
-            fn = utils.BoundCaller(self.actionSetTimeout, intv)
-            self.connect(act, qt4.SIGNAL('triggered(bool)'), fn)
+            def setfn(interval):
+                return lambda checked: self.actionSetTimeout(interval, checked)
+            act.triggered.connect(setfn(intv))
             if intv == self.interval:
                 act.setChecked(True)
             submenu.addAction(act)
@@ -1113,7 +1133,7 @@ class PlotWindow( qt4.QGraphicsView ):
         
         # close the current picker
         self.pickeritem.hide()
-        self.emit(qt4.SIGNAL('sigPickerEnabled'), False)
+        self.sigPickerEnabled.emit(False)
 
         # convert action into clicking mode
         self.clickmode = modecnvt[action]
@@ -1126,7 +1146,7 @@ class PlotWindow( qt4.QGraphicsView ):
             #self.label.setCursor(qt4.Qt.CrossCursor)
         elif self.clickmode == 'pick':
             self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
-            self.emit(qt4.SIGNAL('sigPickerEnabled'), True)
+            self.sigPickerEnabled.emit(True)
         
     def getClick(self):
         """Return a click point from the graph."""

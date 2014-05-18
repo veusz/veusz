@@ -111,7 +111,7 @@ class _WidgetCombo(qt4.QComboBox):
         self.widgettypes = widgettypes
         self.default = default
         self.updateWidgets()
-        self.connect(doc, qt4.SIGNAL("sigModified"), self.updateWidgets)
+        doc.signalModified.connect(self.updateWidgets)
 
     def _iterateWidgets(self, comboitems, paths, widget, level):
         """Walk widget tree recursively.
@@ -126,6 +126,7 @@ class _WidgetCombo(qt4.QComboBox):
         for w in widget.children:
             self._iterateWidgets(comboitems, paths, w, level+1)
 
+    @qt4.pyqtSlot()
     def updateWidgets(self):
         """Update combo with new widgets."""
 
@@ -196,7 +197,7 @@ class _FieldSetting(Field):
             setn.set(val)
 
         # if control changes setting, update setting
-        c.connect(c, qt4.SIGNAL('settingChanged'), updateval)
+        c.sigSettingChanged.connect(updateval)
 
         return (l, c)
 

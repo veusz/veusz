@@ -1,0 +1,99 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="531.4px" height="531.4px" version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+<desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
+</clipPath>
+<clipPath id="c1">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</clipPath>
+</defs>
+<g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</g>
+</g>
+<g clip-path="url(#c1)">
+<g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(292.3,239.1)">
+<path d="m3.7,0c0,2,-1.6,3.7,-3.7,3.7c-2,0,-3.7,-1.6,-3.7,-3.7c0,-2,1.6,-3.7,3.7,-3.7c2,0,3.7,1.6,3.7,3.7" id="p0"/>
+</g>
+<use xlink:href="#p0" x="303.9" y="34.1"/>
+<use xlink:href="#p0" x="310.7" y="420.9"/>
+</g>
+<g fill="#000000" stroke-width="1">
+<g transform="matrix(0 1 -1 0 297.9 234.7)">
+<text x="0" y="0" font-size="14pt" fill="#000000">1</text>
+</g>
+<g transform="matrix(0 1 -1 0 309.5 29.7)">
+<text x="0" y="0" font-size="14pt" fill="#000000">2</text>
+</g>
+<g transform="matrix(0 1 -1 0 316.4 416.5)">
+<text x="0" y="0" font-size="14pt" fill="#000000">3</text>
+</g>
+</g>
+<g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
+<use xlink:href="#p0" x="292.3" y="239.1"/>
+<use xlink:href="#p0" x="497.3" y="227.5"/>
+<use xlink:href="#p0" x="110.5" y="220.7"/>
+</g>
+<g fill="#000000" stroke-width="1">
+<g transform="matrix(0 1 -1 0 297.9 234.7)">
+<text x="0" y="0" font-size="14pt" fill="#000000">1</text>
+</g>
+<g transform="matrix(0 1 -1 0 502.9 185.5)">
+<text x="0" y="0" font-size="14pt" fill="#000000">2&#215;10</text>
+<text x="78.7" y="-7" font-size="8pt" fill="#000000">5</text>
+</g>
+<g transform="matrix(0 1 -1 0 116.1 160.3)">
+<text x="0" y="0" font-size="14pt" fill="#000000">2&#215;10</text>
+<text x="78.7" y="-7" font-size="8pt" fill="#000000">&#8722;5</text>
+</g>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l0,-464.1"/>
+<path d="M60.2,471.2l3.7,0M60.2,432.5l3.7,0M60.2,393.8l3.7,0M60.2,355.2l3.7,0M60.2,316.5l3.7,0M60.2,277.8l3.7,0M60.2,239.1l3.7,0M60.2,200.4l3.7,0M60.2,161.8l3.7,0M60.2,123.1l3.7,0M60.2,84.4l3.7,0M60.2,45.7l3.7,0M60.2,7l3.7,0"/>
+<path d="M60.2,471.2l7.5,0M60.2,355.2l7.5,0M60.2,239.1l7.5,0M60.2,123.1l7.5,0M60.2,7l7.5,0"/>
+<path d="M524.4,471.2l0,-464.1"/>
+<path d="M524.4,471.2l-3.7,0M524.4,432.5l-3.7,0M524.4,393.8l-3.7,0M524.4,355.2l-3.7,0M524.4,316.5l-3.7,0M524.4,277.8l-3.7,0M524.4,239.1l-3.7,0M524.4,200.4l-3.7,0M524.4,161.8l-3.7,0M524.4,123.1l-3.7,0M524.4,84.4l-3.7,0M524.4,45.7l-3.7,0M524.4,7l-3.7,0"/>
+<path d="M524.4,471.2l-7.5,0M524.4,355.2l-7.5,0M524.4,239.1l-7.5,0M524.4,123.1l-7.5,0M524.4,7l-7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="-2.7" y="480" font-size="14pt" fill="#000000">10</text>
+<text x="14.7" y="473" font-size="8pt" fill="#000000">&#8722;6</text>
+<text x="-2.7" y="363.9" font-size="14pt" fill="#000000">10</text>
+<text x="14.7" y="356.9" font-size="8pt" fill="#000000">&#8722;3</text>
+<text x="47.9" y="247.9" font-size="14pt" fill="#000000">1</text>
+<text x="21.7" y="131.8" font-size="14pt" fill="#000000">1000</text>
+<text x="33.9" y="21" font-size="14pt" fill="#000000">10</text>
+<text x="51.4" y="14" font-size="8pt" fill="#000000">6</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l464.1,0"/>
+<path d="M60.2,471.2l0,-3.7M98.9,471.2l0,-3.7M137.5,471.2l0,-3.7M176.2,471.2l0,-3.7M214.9,471.2l0,-3.7M253.6,471.2l0,-3.7M292.3,471.2l0,-3.7M331,471.2l0,-3.7M369.6,471.2l0,-3.7M408.3,471.2l0,-3.7M447,471.2l0,-3.7M485.7,471.2l0,-3.7M524.4,471.2l0,-3.7"/>
+<path d="M60.2,471.2l0,-7.5M176.2,471.2l0,-7.5M292.3,471.2l0,-7.5M408.3,471.2l0,-7.5M524.4,471.2l0,-7.5"/>
+<path d="M60.2,7l464.1,0"/>
+<path d="M60.2,7l0,3.7M98.9,7l0,3.7M137.5,7l0,3.7M176.2,7l0,3.7M214.9,7l0,3.7M253.6,7l0,3.7M292.3,7l0,3.7M331,7l0,3.7M369.6,7l0,3.7M408.3,7l0,3.7M447,7l0,3.7M485.7,7l0,3.7M524.4,7l0,3.7"/>
+<path d="M60.2,7l0,7.5M176.2,7l0,7.5M292.3,7l0,7.5M408.3,7l0,7.5M524.4,7l0,7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="30.4" y="476.5" font-size="14pt" fill="#000000">10</text>
+<text x="47.9" y="469.5" font-size="8pt" fill="#000000">&#8722;6</text>
+<text x="146.5" y="476.5" font-size="14pt" fill="#000000">10</text>
+<text x="164" y="469.5" font-size="8pt" fill="#000000">&#8722;3</text>
+<text x="287.9" y="476.5" font-size="14pt" fill="#000000">1</text>
+<text x="390.8" y="476.5" font-size="14pt" fill="#000000">1000</text>
+<text x="508.7" y="476.5" font-size="14pt" fill="#000000">10</text>
+<text x="526.2" y="469.5" font-size="8pt" fill="#000000">6</text>
+</g>
+</g>
+</g>
+</svg>

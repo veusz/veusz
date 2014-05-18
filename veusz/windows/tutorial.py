@@ -29,6 +29,9 @@ def _(text, disambiguation=None, context="Tutorial"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class TutorialStep(qt4.QObject):
+
+    nextStep = qt4.pyqtSignal()
+
     def __init__(self, text, mainwin,
                  nextstep=None, flash=None,
                  disablenext=False,
@@ -56,13 +59,11 @@ class TutorialStep(qt4.QObject):
 
         self.nextonsetting = nextonsetting
         if nextonsetting is not None:
-            self.connect( mainwin.document,
-                          qt4.SIGNAL('sigModified'), self.slotNextSetting )
+            mainwin.document.signalModified.connect(self.slotNextSetting)
 
         self.nextonselected = nextonselected
         if nextonselected is not None:
-            self.connect(mainwin.treeedit, qt4.SIGNAL('widgetsSelected'),
-                         self.slotWidgetsSelected)
+            mainwin.treeedit.widgetsSelected.connect(self.slotWidgetsSelected)
 
     def slotNextSetting(self, *args):
         """Check setting to emit next."""
@@ -70,14 +71,14 @@ class TutorialStep(qt4.QObject):
             setn = self.mainwin.document.basewidget.prefLookup(
                 self.nextonsetting[0]).get()
             if self.nextonsetting[1](setn):
-                self.emit( qt4.SIGNAL('nextStep') )
+                self.nextStep.emit()
         except ValueError:
             pass
 
     def slotWidgetsSelected(self, widgets, *args):
         """Go to next page if widget selected."""
         if len(widgets) == 1 and widgets[0].name == self.nextonselected:
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 ##########################
 ## Introduction to widgets
@@ -263,7 +264,7 @@ class FunctionFormatLine(TutorialStep):
     def __init__(self, mainwin):
 
         tb = mainwin.formatdock.tabwidget.tabBar()
-        label = qt4.QLabel("  ")
+        label = qt4.QLabel("  ", tb)
         tb.setTabButton(1, qt4.QTabBar.LeftSide, label)
 
         TutorialStep.__init__(
@@ -279,12 +280,11 @@ the flashing Line tab (%s).</p>
             disablenext=True,
             nextstep=FunctionLineFormatting)
 
-        self.connect(tb, qt4.SIGNAL('currentChanged(int)'),
-                     self.slotCurrentChanged)
+        tb.currentChanged[int].connect(self.slotCurrentChanged)
 
     def slotCurrentChanged(self, idx):
         if idx == 1:
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class FunctionLineFormatting(TutorialStep):
     def __init__(self, mainwin):
@@ -343,7 +343,7 @@ class DataImport(TutorialStep):
             if k in setting.settingdb:
                 del setting.settingdb[k]
 
-        self.connect(mainwin, qt4.SIGNAL('dialogShown'), self.slotDialogShown )
+        mainwin.dialogShown.connect(self.slotDialogShown)
 
     def slotDialogShown(self, dialog):
         """Called when a dialog is opened in the main window."""
@@ -355,7 +355,7 @@ class DataImport(TutorialStep):
             # and choosing tab
             dialog.guessImportTab()
             # get rid of existing values
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class DataImportDialog(TutorialStep):
     def __init__(self, mainwin):
@@ -386,12 +386,11 @@ to the original file.</p>
 '''), mainwin,
             nextstep=DataImportDialog3,
             disablenext=True)
-        self.connect( mainwin.document,
-                      qt4.SIGNAL('sigModified'), self.slotDocModified )
+        mainwin.document.signalModified.connect(self.slotDocModified)
 
     def slotDocModified(self):
         if 'alpha' in self.mainwin.document.data:
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class DataImportDialog3(TutorialStep):
     def __init__(self, mainwin):
@@ -407,8 +406,7 @@ box or reopen it later.</p>
             nextstep=DataImportDialog4)
 
         self.timer = qt4.QTimer()
-        self.connect( self.timer, qt4.SIGNAL('timeout()'),
-                      self.slotTimeout )
+        self.timer.timeout.connect(self.slotTimeout)
         self.timer.start(200)
 
     def slotTimeout(self):
@@ -419,7 +417,7 @@ box or reopen it later.</p>
                 closed = False
         if closed:
             # move forward if no import dialog open
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class DataImportDialog4(TutorialStep):
     def __init__(self, mainwin):
@@ -642,8 +640,7 @@ deletes it from the document.</p>
             flash=mainwin.treeedit.edittoolbar.widgetForAction(
                 mainwin.vzactions['edit.cut']),
             nextstep=AddGrid)
-        self.connect( mainwin.document,
-                      qt4.SIGNAL('sigModified'), self.slotCheckDelete )
+        mainwin.document.signalModified.connect(self.slotCheckDelete)
 
     def slotCheckDelete(self, *args):
         d = self.mainwin.document
@@ -651,7 +648,7 @@ deletes it from the document.</p>
             d.resolve(d.basewidget, '/page1/graph1')
         except ValueError:
             # success!
-            self.emit( qt4.SIGNAL('nextStep') )
+            self.nextStep.emit()
 
 class AddGrid(TutorialStep):
     def __init__(self, mainwin):
@@ -776,7 +773,7 @@ class TutorialDock(qt4.QDockWidget):
         self.buttonbox = qt4.QDialogButtonBox()
         self.nextb = self.buttonbox.addButton(
             'Next', qt4.QDialogButtonBox.ActionRole)
-        self.connect(self.nextb, qt4.SIGNAL('clicked()'), self.slotNext)
+        self.nextb.clicked.connect(self.slotNext)
 
         l.addWidget(self.buttonbox)
 
@@ -787,8 +784,7 @@ class TutorialDock(qt4.QDockWidget):
 
         # timer for controlling flashing
         self.flashtimer = qt4.QTimer(self)
-        self.connect(self.flashtimer, qt4.SIGNAL('timeout()'),
-                     self.slotFlashTimeout)
+        self.flashtimer.timeout.connect(self.slotFlashTimeout)
         self.flash = self.oldflash = None
         self.flashon = False
         self.flashct = 0
@@ -810,7 +806,7 @@ class TutorialDock(qt4.QDockWidget):
         self.step = stepklass(self.mainwin)
 
         # listen to step for next step
-        self.connect(self.step, qt4.SIGNAL('nextStep'), self.slotNext)
+        self.step.nextStep.connect(self.slotNext)
 
         # update text
         self.textedit.setHtml(self.step.text)
@@ -829,17 +825,24 @@ class TutorialDock(qt4.QDockWidget):
         if self.step.closestep:
             closeb = self.buttonbox.addButton(
                 'Close', qt4.QDialogButtonBox.ActionRole)
-            self.connect(closeb, qt4.SIGNAL('clicked()'), self.close)
+            closeb.clicked.connect(self.close)
 
+    # work around C/C++ object deleted
+    @qt4.pyqtSlot()
     def slotFlashTimeout(self):
         '''Handle flashing of UI components.'''
 
-        if self.flash is not self.oldflash and self.oldflash is not None:
+        # because we're flashing random UI components, the C++ object
+        # might be deleted, so we have to check before doing things to
+        # it: hence the qt4.isdeleted
+
+        if ( self.flash is not self.oldflash and self.oldflash is not None
+             and not qt4.isdeleted(self.oldflash) ):
             # clear any flashing on previous widget
             self.oldflash.setStyleSheet('')
             self.oldflash = None
 
-        if self.flash:
+        if self.flash is not None and not qt4.isdeleted(self.flash):
             # set flash state and toggle variable
             if self.flashon:
                 self.flash.setStyleSheet('background: yellow;')

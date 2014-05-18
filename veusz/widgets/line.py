@@ -20,6 +20,7 @@
 
 from __future__ import division
 import math
+import itertools
 import numpy as N
 
 from ..compat import czip
@@ -145,8 +146,6 @@ class Line(plotters.FreePlotter):
     def _computeLinesPointToPoint(self, posn):
         """Return set of lines for point to point."""
 
-        s = self.settings
-
         # translate coordinates from axes or relative values
         xpos, ypos = self._getPlotterCoords(posn)
         xpos2, ypos2 = self._getPlotterCoords(posn, xsetting='xPos2', ysetting='yPos2')
@@ -246,39 +245,61 @@ class Line(plotters.FreePlotter):
         s = self.settings
 
         # calculate new position coordinate for item
-        xpos, ypos = self._getGraphCoords(cgi.widgetposn,
-                                          pt1[0], pt1[1])
+        xpos, ypos = self._getGraphCoords(
+            cgi.widgetposn, [pt1[0], pt1[0]+1], [pt1[1], pt1[1]+1])
         if xpos is None or ypos is None:
             return
 
         x, y = list(s.xPos), list(s.yPos)
-        x[min(cgi.index, len(x)-1)] = xpos
-        y[min(cgi.index, len(y)-1)] = ypos
+        idx = min(cgi.index, len(x)-1)
+        if not N.allclose(x[idx], xpos[0]):
+            x[idx] = utils.round2delt(xpos[0], xpos[1])
+        idx = min(cgi.index, len(y)-1)
+        if not N.allclose(y[idx], ypos[0]):
+            y[idx] = utils.round2delt(ypos[0], ypos[1])
         operations = [
             document.OperationSettingSet(s.get('xPos'), x),
             document.OperationSettingSet(s.get('yPos'), y),
             ]
+
         if s.mode == 'length-angle':
             # convert 2nd point to length, angle
-            length = ( math.sqrt( (pt2[0]-pt1[0])**2 + (pt2[1]-pt1[1])**2 ) /
-                       (cgi.widgetposn[2]-cgi.widgetposn[0]) )
-            angle = ( (math.atan2( pt2[1]-pt1[1], pt2[0]-pt1[0] )
-                       * 180. / math.pi) % 360. )
+            def la(ptx, pty):
+                length = ( math.sqrt( (ptx-pt1[0])**2 + (pty-pt1[1])**2 ) /
+                           (cgi.widgetposn[2]-cgi.widgetposn[0]) )
+                angle = ( (math.atan2( pty-pt1[1], ptx-pt1[0] )
+                           * 180. / math.pi) % 360. )
+                return length, angle
+            length, angle = la(pt2[0], pt2[1])
+            # calculate length angle for neighbouring point, to get delta
+            ldelt, adelt = la(pt2[0]+1, pt2[1]+1)
+
             # update values
             l, a = list(s.length), list(s.angle)
-            l[min(cgi.index, len(l)-1)] = length
-            a[min(cgi.index, len(a)-1)] = angle
+            idx = min(cgi.index, len(l)-1)
+            if abs(l[idx]-length) > 1e-8:
+                l[idx] = utils.round2delt(length, ldelt)
+            idx = min(cgi.index, len(a)-1)
+            if abs(a[idx]-angle) > 1e-8:
+                a[idx] = utils.round2delt(angle, adelt)
+
             operations += [
                 document.OperationSettingSet(s.get('length'), l),
                 document.OperationSettingSet(s.get('angle'), a),
                 ]
         else:
-            xpos2, ypos2 = self._getGraphCoords(cgi.widgetposn,
-                                                pt2[0], pt2[1])
-            if xpos is not None and ypos is not None:
+            xpos2, ypos2 = self._getGraphCoords(
+                cgi.widgetposn, [pt2[0], pt2[0]+1], [pt2[1], pt2[1]+1])
+            if xpos2 is not None and ypos2 is not None:
                 x2, y2 = list(s.xPos2), list(s.yPos2)
-                x2[min(cgi.index, len(x2)-1)] = xpos2
-                y2[min(cgi.index, len(y2)-1)] = ypos2
+
+                idx = min(cgi.index, len(x2)-1)
+                if not N.allclose(x2[idx], xpos2[0]):
+                    x2[idx] = utils.round2delt(xpos2[0], xpos2[1])
+                idx = min(cgi.index, len(y2)-1)
+                if not N.allclose(y2[idx], ypos2[0]):
+                    y2[idx] = utils.round2delt(ypos2[0], ypos2[1])
+
                 operations += [
                     document.OperationSettingSet(s.get('xPos2'), x2),
                     document.OperationSettingSet(s.get('yPos2'), y2)

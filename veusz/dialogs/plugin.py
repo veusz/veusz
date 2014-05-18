@@ -69,9 +69,9 @@ class PluginDialog(VeuszDialog):
         reset = self.buttonBox.button(qt4.QDialogButtonBox.Reset)
         reset.setAutoDefault(False)
         reset.setDefault(False)
-        self.connect(reset, qt4.SIGNAL('clicked()'), self.slotReset)
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Apply),
-                      qt4.SIGNAL('clicked()'), self.slotApply )
+        reset.clicked.connect( self.slotReset)
+        self.buttonBox.button(
+            qt4.QDialogButtonBox.Apply).clicked.connect(self.slotApply)
 
         self.pluginkls = pluginkls
         self.plugininst = plugininst

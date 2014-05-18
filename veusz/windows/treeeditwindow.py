@@ -331,10 +331,8 @@ class PropertyList(qt4.QWidget):
 
             button = qt4.QPushButton(text)
             button.setToolTip(action.descr)
-            # need to save reference to caller object
-            button.caller = utils.BoundCaller(setnsproxy.onAction, action,
-                                              self.getConsole())
-            self.connect(button, qt4.SIGNAL('clicked()'), button.caller)
+            button.clicked[()].connect(
+                lambda a=action: setnsproxy.onAction(a, self.getConsole()))
 
             self.layout.addWidget(button, row, 1)
             self.childlist.append(button)
@@ -350,8 +348,7 @@ class PropertyList(qt4.QWidget):
             self.layout.addWidget(lab, row, 0)
             self.childlist.append(lab)
 
-            self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                         setnsproxy.onSettingChanged)
+            cntrl.sigSettingChanged.connect(setnsproxy.onSettingChanged)
             self.layout.addWidget(cntrl, row, 1)
             self.childlist.append(cntrl)
             self.setncntrls[setn.name] = (lab, cntrl)
@@ -382,8 +379,7 @@ class PropertyList(qt4.QWidget):
 
         # make main control
         cntrl = slist[0].makeControl(None)
-        self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                     grpdsetting.onSettingChanged)
+        cntrl.sigSettingChanged.connect(grpdsetting.onSettingChanged)
         self.layout.addWidget(cntrl, row, 1)
         self.childlist.append(cntrl)
 
@@ -397,8 +393,7 @@ class PropertyList(qt4.QWidget):
             if cntrl:
                 lab = SettingLabel(self.document, setn, grpdsetting)
                 l.addWidget(lab, grp_row, 0)
-                self.connect(cntrl, qt4.SIGNAL('settingChanged'),
-                             grpdsetting.onSettingChanged)
+                cntrl.sigSettingChanged.connect(grpdsetting.onSettingChanged)
                 l.addWidget(cntrl, grp_row, 1)
                 grp_row += 1
 
@@ -412,7 +407,7 @@ class PropertyList(qt4.QWidget):
             expandbutton.setText( ("+","-")[checked] )
             grpwidget.setVisible( checked )
 
-        self.connect(expandbutton, qt4.SIGNAL("toggled(bool)"), ontoggle)
+        expandbutton.toggled.connect(ontoggle)
 
         # add group to standard layout
         self.layout.addWidget(grpwidget, row, 0, 1, -1)
@@ -516,8 +511,7 @@ class TabbedFormatting(qt4.QTabWidget):
             # add on a formatting tab
             setnslist.insert(0, setnsproxy)
 
-        self.connect( self, qt4.SIGNAL('currentChanged(int)'),
-                      self.slotCurrentChanged )
+        self.currentChanged.connect(self.slotCurrentChanged)
 
         # subsettings for tabs
         self.tabsubsetns = []
@@ -606,8 +600,7 @@ class FormatDock(qt4.QDockWidget):
         self.tabwidget = None
 
         # update our view when the tree edit window selection changes
-        self.connect(treeedit, qt4.SIGNAL('widgetsSelected'),
-                     self.selectedWidgets)
+        treeedit.widgetsSelected.connect(self.selectedWidgets)
 
     def selectedWidgets(self, widgets, setnsproxy):
         """Created tabbed widgets for formatting for each subsettings."""
@@ -641,8 +634,7 @@ class PropertiesDock(qt4.QDockWidget):
         self.document = document
 
         # update our view when the tree edit window selection changes
-        self.connect(treeedit, qt4.SIGNAL('widgetsSelected'),
-                     self.slotWidgetsSelected)
+        treeedit.widgetsSelected.connect(self.slotWidgetsSelected)
 
         # construct scrollable area
         self.scroll = qt4.QScrollArea()
@@ -660,6 +652,9 @@ class PropertiesDock(qt4.QDockWidget):
 class TreeEditDock(qt4.QDockWidget):
     """A dock window presenting widgets as a tree."""
 
+    widgetsSelected = qt4.pyqtSignal(list, object)
+    sigPageChanged = qt4.pyqtSignal(int)
+
     def __init__(self, document, parentwin):
         """Initialise dock given document and parent widget."""
         qt4.QDockWidget.__init__(self, parentwin)
@@ -669,18 +664,15 @@ class TreeEditDock(qt4.QDockWidget):
         self.selwidgets = []
 
         self.document = document
-        self.connect( self.document, qt4.SIGNAL("sigWiped"),
-                      self.slotDocumentWiped )
+        self.document.sigWiped.connect(self.slotDocumentWiped)
 
         # construct tree
         self.treemodel = WidgetTreeModel(document)
         self.treeview = WidgetTreeView(self.treemodel)
 
         # receive change in selection
-        self.connect(self.treeview.selectionModel(),
-                     qt4.SIGNAL('selectionChanged(const QItemSelection &,'
-                                ' const QItemSelection &)'),
-                     self.slotTreeItemsSelected)
+        self.treeview.selectionModel().selectionChanged.connect(
+            self.slotTreeItemsSelected)
 
         # set tree as main widget
         self.setWidget(self.treeview)
@@ -705,9 +697,8 @@ class TreeEditDock(qt4.QDockWidget):
         self.selectWidget(document.basewidget)
 
         # update paste button when clipboard changes
-        self.connect(qt4.QApplication.clipboard(),
-                     qt4.SIGNAL('dataChanged()'),
-                     self.updatePasteButton)
+        qt4.QApplication.clipboard().dataChanged.connect(
+            self.updatePasteButton)
         self.updatePasteButton()
 
     def slotDocumentWiped(self):
@@ -736,7 +727,7 @@ class TreeEditDock(qt4.QDockWidget):
         self._enableCorrectButtons()
         self._checkPageChange()
 
-        self.emit( qt4.SIGNAL('widgetsSelected'), swidget, setnsproxy )
+        self.widgetsSelected.emit(swidget, setnsproxy)
 
     def contextMenuEvent(self, event):
         """Bring up context menu."""
@@ -772,9 +763,10 @@ class TreeEditDock(qt4.QDockWidget):
             if enabled:
                 m.addSeparator()
                 act = qt4.QAction(menutext, self)
-                self.connect(act, qt4.SIGNAL('triggered()'),
-                             utils.BoundCaller(self.slotWidgetHideShow,
-                                               self.selwidgets, showhide))
+                def trigfn(showorhide):
+                    return lambda: self.slotWidgetHideShow(
+                        self.selwidgets, showorhide)
+                act.triggered.connect(trigfn(showhide))
                 m.addAction(act)
 
         m.exec_(self.mapToGlobal(event.pos()))
@@ -793,7 +785,7 @@ class TreeEditDock(qt4.QDockWidget):
             # have page, so check what number we are in basewidget children
             try:
                 i = self.document.basewidget.children.index(w)
-                self.emit(qt4.SIGNAL("sigPageChanged"), i)
+                self.sigPageChanged.emit(i)
             except ValueError:
                 pass
 
@@ -815,6 +807,9 @@ class TreeEditDock(qt4.QDockWidget):
                 w = w.parent
 
             self.vzactions['add.%s' % wc.typename].setEnabled(w is not None)
+
+        self.vzactions['add.axismenu'].setEnabled(
+            self.vzactions['add.axis'].isEnabled())
 
         # exclusive widgets
         nonorth = self.vzactions['add.nonorthpoint'].isEnabled()
@@ -852,7 +847,9 @@ class TreeEditDock(qt4.QDockWidget):
                            'nonorthpoint', 'nonorthfunc'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
-            slot = utils.BoundCaller(self.slotMakeWidgetButton, wc)
+            def slotfn(klass=wc):
+                return lambda: self.slotMakeWidgetButton(klass)
+            slot = slotfn(wc)
             self.addslots[wc] = slot
 
             actionname = 'add.' + widgettype
@@ -878,11 +875,11 @@ class TreeEditDock(qt4.QDockWidget):
                       icon='kde-edit-paste', key='Ctrl+V'),
                 'edit.moveup':
                     a(self, _('Move the selected widget up'), _('Move &up'),
-                      utils.BoundCaller(self.slotWidgetMove, -1),
+                      lambda: self.slotWidgetMove(-1),
                       icon='kde-go-up'),
                 'edit.movedown':
                     a(self, _('Move the selected widget down'), _('Move d&own'),
-                      utils.BoundCaller(self.slotWidgetMove, 1),
+                      lambda: self.slotWidgetMove(1),
                       icon='kde-go-down'),
                 'edit.delete':
                     a(self, _('Remove the selected widget'), _('&Delete'),
@@ -931,7 +928,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         # separate menus for adding shapes and axis types
         shapemenu = qt4.QMenu()
-        shapemenu.addActions( [actions[a] for a in (
+        shapemenu.addActions( [actions[act] for act in (
                     'add.rect',
                     'add.ellipse',
                     'add.line',
@@ -941,7 +938,7 @@ class TreeEditDock(qt4.QDockWidget):
         actions['add.shapemenu'].setMenu(shapemenu)
 
         axismenu = qt4.QMenu()
-        axismenu.addActions( [actions[a] for a in (
+        axismenu.addActions( [actions[act] for act in (
                     'add.axis',
                     'add.axis-broken',
                     'add.axis-function',
@@ -975,8 +972,8 @@ class TreeEditDock(qt4.QDockWidget):
                                  'edit.moveup', 'edit.movedown',
                                  'edit.delete', 'edit.rename'))
 
-        self.connect( self.parentwin.menus['edit.select'],
-                      qt4.SIGNAL('aboutToShow()'), self.updateSelectMenu )
+        self.parentwin.menus['edit.select'].aboutToShow.connect(
+            self.updateSelectMenu)
 
     def slotMakeWidgetButton(self, wc):
         """User clicks button to make widget."""
@@ -1201,6 +1198,9 @@ class SettingLabel(qt4.QWidget):
     access to the context menu
     """
     
+    # this is emitted when widget is clicked
+    signalClicked = qt4.pyqtSignal(qt4.QPoint)
+
     def __init__(self, document, setting, setnsproxy):
         """Initialise button, passing document, setting, and parent widget."""
         
@@ -1208,7 +1208,7 @@ class SettingLabel(qt4.QWidget):
         self.setFocusPolicy(qt4.Qt.StrongFocus)
 
         self.document = document
-        self.connect(document, qt4.SIGNAL('sigModified'), self.slotDocModified)
+        document.signalModified.connect(self.slotDocModified)
 
         self.setting = setting
         self.setnsproxy = setnsproxy
@@ -1226,31 +1226,35 @@ class SettingLabel(qt4.QWidget):
         self.iconlabel = qt4.QLabel()
         self.layout.addWidget(self.iconlabel)
 
-        self.connect(self, qt4.SIGNAL('clicked'), self.settingMenu)
+        self.signalClicked.connect(self.settingMenu)
 
         self.infocus = False
         self.inmouse = False
         self.inmenu = False
 
         # initialise settings
-        self.slotDocModified()
+        self.slotDocModified(True)
 
     def mouseReleaseEvent(self, event):
-        """Emit clicked(pos) on mouse release."""
-        self.emit( qt4.SIGNAL('clicked'),
-                   self.mapToGlobal(event.pos()) )
+        """Emit signalClicked(pos) on mouse release."""
+        self.signalClicked.emit( self.mapToGlobal(event.pos()) )
         return qt4.QWidget.mouseReleaseEvent(self, event)
 
     def keyReleaseEvent(self, event):
-        """Emit clicked(pos) on key release."""
+        """Emit signalClicked(pos) on key release."""
         if event.key() == qt4.Qt.Key_Space:
-            self.emit( qt4.SIGNAL('clicked'),
-                       self.mapToGlobal(self.iconlabel.pos()) )
+            self.signalClicked.emit(
+                self.mapToGlobal(self.iconlabel.pos()) )
             event.accept()
         else:
             return qt4.QWidget.keyReleaseEvent(self, event)
 
-    def slotDocModified(self):
+    # Mark as a qt slot. This fixes a bug where you get C/C++ object
+    # deleted messages when the document emits signalModified but this
+    # widget has been deleted. This can be reproduced by dragging a
+    # widget between two windows, then undoing.
+    @qt4.pyqtSlot(int)
+    def slotDocModified(self, ismodified):
         """If the document has been modified."""
 
         # update pixmap (e.g. link added/removed)
@@ -1259,8 +1263,8 @@ class SettingLabel(qt4.QWidget):
         # update tooltip
         tooltip = self.setting.descr
         if self.setting.isReference():
-            tooltip += (_('\nLinked to %s') %
-                        self.setting.getReference().resolve(self.setting).path)
+            paths = self.setting.getReference().getPaths()
+            tooltip += _('\nLinked to: %s') % ', '.join(paths)
         self.setToolTip(tooltip)
 
         # if not default, make label bold
@@ -1333,16 +1337,19 @@ class SettingLabel(qt4.QWidget):
         wpath = self.setting.getWidget().path
         setpath = setpath[len(wpath):]  # includes /
 
-        for widget in widgets:
-            action = menu.addAction(widget)
-            def modify(widget=widget):
+        def modifyfn(widget):
+            def modify():
                 """Modify the setting for the widget given."""
                 wpath = widget + setpath
                 self.document.applyOperation(
                     document.OperationSettingSet(wpath, self.setting.get()))
+            return modify
 
-            menu.connect(action, qt4.SIGNAL('triggered()'), modify)
+        for widget in widgets:
+            action = menu.addAction(widget)
+            action.triggered.connect(modifyfn(widget))
 
+    @qt4.pyqtSlot(qt4.QPoint)
     def settingMenu(self, pos):
         """Pop up menu for each setting."""
 

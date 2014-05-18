@@ -20,7 +20,7 @@
 
 from __future__ import division
 from ..compat import citems
-from .reference import Reference
+from .reference import Reference, ReferenceMultiple
 
 class Settings(object):
     """A class for holding collections of settings."""
@@ -252,11 +252,18 @@ class Settings(object):
                 # call recursively if this is a Settings
                 setn.linkToStylesheet(_root=thispath+'/')
             else:
+                # check that reference resolves
                 ref = Reference(thispath)
                 try:
-                    # if the reference resolves, then set it
                     ref.resolve(setn)
+                except Reference.ResolveException:
+                    # leave it as it was
+                    pass
+                else:
+                    if setn.isReference() and setn.getReference().split[0] == '..':
+                        # convert a relative path to multiple references
+                        paths = [thispath, setn.getReference().value]
+                        ref = ReferenceMultiple(paths)
+
                     setn.set(ref)
                     setn.default = ref
-                except Reference.ResolveException:
-                    pass

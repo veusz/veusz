@@ -23,12 +23,10 @@ from .doc import *
 from .datasets import *
 from .commandinterface import *
 from .commandinterpreter import *
-from .simpleread import *
 from .operations import *
-from .capture import *
 from .mime import *
 from .dataset_histo import *
 from .painthelper import *
 from .export import Export, printDialog
 from .dbusinterface import *
-from .importparams import *
+from .loader import loadDocument, executeScript, LoadError

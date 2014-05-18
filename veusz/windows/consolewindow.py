@@ -24,6 +24,7 @@ import codeop
 import traceback
 import sys
 
+from ..compat import cstr
 from .. import qtall as qt4
 
 from .. import document
@@ -59,14 +60,15 @@ class _CommandEdit(qt4.QLineEdit):
     The edit control has a history (press up and down keys to access)
     """
 
+    sigEnter = qt4.pyqtSignal(cstr)
+
     def __init__(self, *args):
         qt4.QLineEdit.__init__(self, *args)
         self.history = []
         self.history_posn = 0
         self.entered_text = ''
 
-        qt4.QObject.connect( self, qt4.SIGNAL("returnPressed()"),
-                             self.slotReturnPressed )
+        self.returnPressed.connect(self.slotReturnPressed)
 
         self.setToolTip(_("Input a python expression here and press enter"))
 
@@ -83,7 +85,7 @@ class _CommandEdit(qt4.QLineEdit):
         self.entered_text = ''
 
         # tell the console we have a command
-        self.emit( qt4.SIGNAL("sigEnter"), command)
+        self.sigEnter.emit(command)
 
     historykeys = (qt4.Qt.Key_Up, qt4.Qt.Key_Down)
 
@@ -139,7 +141,7 @@ class _CommandEdit(qt4.QLineEdit):
             self.setText(text)
 
 introtext=_(u'''Welcome to <b><font color="purple">Veusz %s</font></b> --- a scientific plotting application.<br>
-Copyright \u00a9 2003-2013 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt; and contributors.<br>
+Copyright \u00a9 2003-2014 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt; and contributors.<br>
 Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are<br>
 welcome to redistribute it under certain conditions. Enter "GPL()" for details.<br>
 This window is a Python command line console and acts as a calculator.<br>
@@ -200,11 +202,9 @@ class ConsoleWindow(qt4.QDockWidget):
         self.command_build = ''
 
         # get called if enter is pressed in the input control
-        self.connect( self._inputedit, qt4.SIGNAL("sigEnter"),
-                      self.slotEnter )
+        self._inputedit.sigEnter.connect(self.slotEnter)
         # called if document logs something
-        self.connect( thedocument, qt4.SIGNAL("sigLog"),
-                      self.slotDocumentLog )
+        thedocument.sigLog.connect(self.slotDocumentLog)
 
     def _makeTextFormat(self, cursor, color):
         fmt = cursor.charFormat()

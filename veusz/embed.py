@@ -147,8 +147,15 @@ class Embedded(object):
             cls.sockfamily = socket.AF_UNIX
             sock, socket2 = socket.socketpair(cls.sockfamily,
                                               socket.SOCK_STREAM)
+
+            # socket is closed on popen in Python 3.4+ without this (PEP 446)
+            try:
+                os.set_inheritable(socket2.fileno(), True)
+            except AttributeError:
+                pass
+
             sendtext = 'unix %i\n' % socket2.fileno()
-            cls.socket2 = socket2
+            cls.socket2 = socket2    # prevent socket being destroyed
             waitaccept = False
 
         else:
@@ -199,13 +206,7 @@ class Embedded(object):
                 [findexe] ]
 
         else:
-            if sys.version_info[0] != 2:
-                # remote needs to run on python 2
-                executable = findOnPath('python2')
-                if not executable:
-                    executable = findOnPath('python')
-            else:
-                executable = sys.executable
+            executable = sys.executable
 
             # try embed_remote.py in this directory, veusz in this directory
             # or veusz on the path in order
@@ -223,6 +224,9 @@ class Embedded(object):
             else:
                 possiblecommands += [[
                     '/Applications/Veusz.app/Contents/MacOS/Veusz' ]]
+                possiblecommands += [[
+                    os.path.expanduser('~/Applications/Veusz.app/Contents/MacOS/Veusz')]]
+
 
         for cmd in possiblecommands:
             # only try to run commands that exist as error handling
@@ -314,9 +318,12 @@ class Embedded(object):
     @classmethod
     def exitQt(cls):
         """Exit the Qt thread."""
-        cls.sendCommand( (-1, '_Quit', (), {}) )
-        cls.serv_socket.shutdown(socket.SHUT_RDWR)
-        cls.serv_socket.close()
+        try:
+            cls.sendCommand( (-1, '_Quit', (), {}) )
+            cls.serv_socket.shutdown(socket.SHUT_RDWR)
+            cls.serv_socket.close()
+        except socket.error:
+            pass
         cls.serv_socket, cls.from_pipe = -1, -1
 
 ############################################################################

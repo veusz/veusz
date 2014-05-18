@@ -26,11 +26,13 @@ import re
 import os.path
 import threading
 import codecs
+import io
 import csv
-import locale
+import time
 from collections import defaultdict
 
-from ..compat import citems, CIterator, cnext, cstr, CStringIO, cbasestr, cpy3, cbytes
+from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes, crepr, \
+    crange
 from .. import qtall as qt4
 import numpy as N
 
@@ -155,12 +157,6 @@ def pixmapAsHtml(pix):
     b64 = cbytes(buf.data().toBase64()).decode('ascii')
     return '<img src="data:image/png;base64,%s">' % b64
 
-def BoundCaller(function, *params):
-    """Wrap a function with its initial arguments."""
-    def wrapped(*args):
-        function( *(params+args) )
-    return wrapped
-
 def pythonise(text):
     """Turn an expression of the form 'A b c d' into 'A(b,c,d)'.
 
@@ -251,15 +247,19 @@ class NonBlockingReaderThread(threading.Thread):
 
     This is used mainly because windows doesn't properly support
     non-blocking pipes as files.
+
+    If exiteof is True, then exit capturing when we can capture no
+    more data.
     """
 
-    def __init__(self, fileobject):
+    def __init__(self, fileobject, exiteof=True):
         """Create the thread object."""
         threading.Thread.__init__(self)
         self.fileobject = fileobject
         self.lock = threading.Lock()
         self.data = ''
         self.done = False
+        self.exiteof = exiteof
 
     def getNewData(self):
         """Get any data waiting to be read, and whether
@@ -293,14 +293,17 @@ class NonBlockingReaderThread(threading.Thread):
 
             # no more data: end of file
             if len(data) == 0:
+                if self.exiteof:
+                    self.lock.acquire()
+                    self.done = True
+                    self.lock.release()
+                    break
+                else:
+                    time.sleep(0.1)
+            else:
                 self.lock.acquire()
-                self.done = True
+                self.data += data
                 self.lock.release()
-                break
-
-            self.lock.acquire()
-            self.data += data
-            self.lock.release()
 
 # standard python encodings
 encodings = [
@@ -334,7 +337,7 @@ def openEncoding(filename, encoding, mode='r'):
         text = qt4.QApplication.clipboard().text()
         return CStringIO(text)
     else:
-        return codecs.open(filename, mode, encoding, 'ignore')
+        return io.open(filename, mode, encoding=encoding, errors='ignore')
 
 # The following two classes are adapted from the Python documentation
 # they are modified to turn off encoding errors
@@ -494,3 +497,97 @@ def topological_sort(dependency_pairs):
 def isiternostr(i):
     """Is this iterator, but not a string?"""
     return hasattr(i, '__iter__') and not isinstance(i, cbasestr)
+
+def nextfloat(fin):
+    """Return (approximately) next float value (for f>0)."""
+    d = 2**-52
+    split = N.frexp(fin)
+    while True:
+        fout = N.ldexp(split[0] + d, split[1])
+        if fin != fout:
+            return fout
+        d *= 2
+
+def round2delt(fin1, fin2):
+    """Take two float values. Return value rounded to number
+    of decimal places where they differ."""
+
+    if not N.isfinite(fin1) or not N.isfinite(fin2):
+        return fin1
+
+    # round up to next value to avoid 0.999999...
+    f1 = nextfloat(abs(fin1))
+    f2 = nextfloat(abs(fin2))
+
+    maxlog = int( max(N.log10(f1), N.log10(f2)) + 1 )
+    # note: out2 unused, but useful for debugging
+    if maxlog < 0:
+        out1 = out2 = '0.' + '0'*(-1-maxlog)
+    else:
+        out1 = out2 = ''
+
+    for i in crange(maxlog,-200,-1):
+        p = 10**i
+        d1, d2 = int(f1/p), int(f2/p)
+        f1 -= int(d1)*p
+        f2 -= int(d2)*p
+
+        c1 = chr(d1 + 48) # 48 == '0'
+        c2 = chr(d2 + 48)
+        out1 += c1
+        out2 += c2
+
+        if c1 != c2 and p < abs(fin1): # at least 1 sig fig
+            if i > 0:
+                # add missing zeros
+                out1 += '0'*i
+                out2 += '0'*i
+            break
+
+        if i == 0:
+            out1 += '.'
+            out2 += '.'
+
+    # convert back to float for output
+    fout = float(out1)
+    return fout if fin1 > 0 else -fout
+
+def checkAscending(v):
+    """Check list of values is finite and ascending."""
+    v = N.array(v)
+    if not N.all( N.isfinite(v) ):
+        return False
+    return N.all( (v[1:] - v[:-1]) > 0 )
+
+def rrepr(val):
+    """Reproducible repr.
+
+    The idea is to make a repr which won't change. We sort dict and
+    set entries."""
+
+    if isinstance(val, dict):
+        l = [ "%s: %s" % (rrepr(k), rrepr(val[k]))
+              for k in sorted(val) ]
+        return "{%s}" % ", ".join(l)
+    elif isinstance(val, set):
+        l = [rrepr(v) for v in sorted(val)]
+        return "set([%s])" % ", ".join(l)
+    elif isinstance(val, list):
+        l = [rrepr(v) for v in val]
+        return "[%s]" % ", ".join(l)
+    else:
+        return crepr(val)
+
+def escapeHDFDataName(name):
+    """Return escaped dataset name for saving in HDF5 files.
+    This is because names cannot include / characters in HDF5
+    """
+    name = name.replace('`', '`BT')
+    name = name.replace('/', '`SL')
+    return name.encode('utf-8')
+
+def unescapeHDFDataName(name):
+    """Return original name after being escaped."""
+    name = name.replace('`SL', '/')
+    name = name.replace('`BT', '`')
+    return name

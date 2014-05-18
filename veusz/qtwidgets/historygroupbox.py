@@ -28,6 +28,8 @@ class HistoryGroupBox(qt4.QGroupBox):
     emits radioClicked(radiowidget) when clicked
     """
 
+    radioClicked = qt4.pyqtSignal(qt4.QObject)
+
     def getSettingName(self):
         """Get name for saving in settings."""
         # get dialog for widget
@@ -44,9 +46,9 @@ class HistoryGroupBox(qt4.QGroupBox):
         # connect up radio buttons to emit clicked signal
         for w in self.children():
             if isinstance(w, qt4.QRadioButton):
-                def doemit(w=w):
-                    self.emit(qt4.SIGNAL("radioClicked"), w)
-                self.connect( w, qt4.SIGNAL('clicked()'), doemit)
+                def doemit(widget):
+                    return lambda: self.radioClicked.emit(widget)
+                w.clicked.connect(doemit(w))
 
         # set item to be checked
         checked = setting.settingdb.get(self.getSettingName(), "")

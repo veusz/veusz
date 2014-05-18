@@ -41,12 +41,10 @@ class LineEditWithClear(qt4.QLineEdit):
         cb.setToolTip("Clear text")
         cb.hide()
 
-        # make clicking on the button clear the text
-        self.connect(cb, qt4.SIGNAL('clicked()'), self, qt4.SLOT("clear()"))
+        cb.clicked.connect(self.clear)
 
         # button should appear if there is text
-        self.connect(self, qt4.SIGNAL('textChanged(const QString&)'),
-                     self.updateCloseButton)
+        self.textChanged.connect(self.updateCloseButton)
 
         # positioning of the button
         fw = self.style().pixelMetric(qt4.QStyle.PM_DefaultFrameWidth)

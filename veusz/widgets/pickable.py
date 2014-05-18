@@ -59,7 +59,8 @@ class Index:
         if not self.useindex:
             return ''
         else:
-            return str(self.index)
+            # 1-based index
+            return str(self.index+1)
 
 def _chooseOrderingSign(m, c, p):
     """Figures out whether p or m is visually right of c"""

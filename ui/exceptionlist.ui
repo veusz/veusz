@@ -91,7 +91,7 @@
        <item>
         <widget class="QPushButton" name="ignoreSessionButton">
          <property name="text">
-          <string>Ignore in &amp;session</string>
+          <string>Ignore in sessio&amp;n</string>
          </property>
         </widget>
        </item>

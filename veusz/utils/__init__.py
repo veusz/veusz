@@ -35,8 +35,10 @@ from .extbrushfilling import *
 try:
     from ..helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
-        plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath
+        plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath, \
+        resampleLinearImage, RotatedRectangle, RectangleOverlapTester
 except ImportError:
     from .slowfuncs import addNumpyToPolygonF, plotPathsToPainter, \
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
-        plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath
+        plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath, \
+        resampleLinearImage, RotatedRectangle, RectangleOverlapTester

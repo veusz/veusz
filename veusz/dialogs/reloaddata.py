@@ -23,7 +23,7 @@
 from __future__ import division
 import os
 
-from ..compat import citems, cstr
+from ..compat import cstr
 from .. import qtall as qt4
 from .. import document
 from .veuszdialog import VeuszDialog
@@ -57,21 +57,17 @@ class ReloadData(VeuszDialog):
         self.reloadData()
 
         # if interval changed or enabled update timer
-        self.connect(self.intervalCheck, qt4.SIGNAL('clicked()'),
-                     self.intervalUpdate)
-        self.connect(self.intervalTime, qt4.SIGNAL('valueChanged(int)'),
-                     self.intervalUpdate)
+        self.intervalCheck.clicked.connect(self.intervalUpdate)
+        self.intervalTime.valueChanged[int].connect(self.intervalUpdate)
 
         # timer to reload data
         self.intervalTimer = qt4.QTimer()
-        self.connect(self.intervalTimer, qt4.SIGNAL('timeout()'),
-                     self.reloadIfChanged)
+        self.intervalTimer.timeout.connect(self.reloadIfChanged)
 
         # manual reload
         self.reloadbutton = self.buttonBox.addButton(
             "&Reload again", qt4.QDialogButtonBox.ApplyRole)
-        self.connect(self.reloadbutton, qt4.SIGNAL('clicked()'),
-                     self.reloadData)
+        self.reloadbutton.clicked.connect(self.reloadData)
 
         # close by default, not reload
         self.buttonBox.button(qt4.QDialogButtonBox.Close).setDefault(True)
@@ -117,7 +113,7 @@ class ReloadData(VeuszDialog):
                 self.filenames)
 
             # show errors in read data
-            for var, count in citems(errors):
+            for var, count in errors.items():
                 if count != 0:
                     text += ( _('%i conversions failed for dataset "%s"\n') %
                               (count, var) )
@@ -135,8 +131,6 @@ class ReloadData(VeuszDialog):
 
         except EnvironmentError as e:
             text = _('Error reading file:\n') + cstr(e)
-        except document.DescriptorError:
-            text = _('Could not interpret descriptor. Reload failed.')
         except:
             self.document.enableUpdates()
             raise

@@ -22,6 +22,7 @@
 """A class to represent Veusz documents, with dataset classes."""
 
 from __future__ import division
+import codecs
 import os.path
 import re
 import traceback
@@ -30,7 +31,12 @@ from collections import defaultdict
 
 import numpy as N
 
-from ..compat import crange, citems, cvalues, cstr, cexec
+try:
+    import h5py
+except ImportError:
+    h5py = None
+
+from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO
 from .. import qtall as qt4
 
 from . import widgetfactory
@@ -75,12 +81,18 @@ def getSuitableParent(widgettype, initialwidget):
 
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
-
-    Emits: sigModified when the document has been modified
-           sigWiped when document is wiped
     """
 
     pluginsloaded = False
+
+    # this is emitted when the document is modified
+    signalModified = qt4.pyqtSignal(int)
+    # emited to log a message
+    sigLog = qt4.pyqtSignal(cstr)
+    # emitted when document wiped
+    sigWiped = qt4.pyqtSignal()
+    # to ask whether the import is allowed (module name and symbol list)
+    sigAllowedImports = qt4.pyqtSignal(cstr, list)
 
     def __init__(self):
         """Initialise the document."""
@@ -92,10 +104,6 @@ class Document( qt4.QObject ):
 
         # change tracking of document as a whole
         self.changeset = 0            # increased when the document changes
-
-        # change tracking of datasets
-        self.datachangeset = 0        # increased whan any dataset changes
-        self.datachangesets = dict()  # each ds has an associated change set
 
         # map tags to dataset names
         self.datasettags = defaultdict(list)
@@ -135,7 +143,7 @@ class Document( qt4.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
-        self.emit( qt4.SIGNAL("sigWiped") )
+        self.sigWiped.emit()
 
     def clearHistory(self):
         """Clear any history."""
@@ -167,7 +175,7 @@ class Document( qt4.QObject ):
 
     def log(self, message):
         """Log a message - this is emitted as a signal."""
-        self.emit( qt4.SIGNAL("sigLog"), message )
+        self.sigLog.emit(message)
 
     def applyOperation(self, operation):
         """Apply operation to the document.
@@ -288,28 +296,18 @@ class Document( qt4.QObject ):
         dataset.document = self
         
         # update the change tracking
-        cs = self.datachangesets.get(name, 0)
-        self.datachangesets[name] = cs + 1
-        self.datachangeset += 1
         self.setModified()
     
     def deleteData(self, name):
         """Remove a dataset"""
         if name in self.data:
             del self.data[name]
-            
-            # don't remove the changeset tracker, in case this action is later undone
-            self.datachangesets[name] += 1
-            self.datachangeset += 1
             self.setModified()
 
     def modifiedData(self, dataset):
         """The named dataset was modified"""
-        for name, ds in citems(self.data):
-            if ds is dataset:
-                self.datachangesets[name] += 1
-                self.datachangeset += 1
-                self.setModified()
+        if dataset in self.data.values():
+            self.setModified()
 
     def getLinkedFiles(self, filenames=None):
         """Get a list of LinkedFile objects used by the document.
@@ -364,8 +362,6 @@ class Document( qt4.QObject ):
         d = self.data[oldname]
         del self.data[oldname]
         self.data[newname] = d
-        # transfer change set to new name
-        self.datachangesets[newname] = self.datachangesets[oldname]
 
         self.setModified()
 
@@ -388,7 +384,7 @@ class Document( qt4.QObject ):
         self.changeset += 1
 
         if len(self.suspendupdates) == 0:
-            self.emit( qt4.SIGNAL("sigModified"), ismodified )
+            self.signalModified.emit(ismodified)
 
     def isModified(self):
         """Return whether modified flag set."""
@@ -469,12 +465,12 @@ class Document( qt4.QObject ):
 
         # get a list of all tags and which datasets have them
         bytag = defaultdict(list)
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             for t in dataset.tags:
                 bytag[t].append(name)
 
         # write out tags
-        for tag, val in sorted(citems(bytag)):
+        for tag, val in sorted(bytag.items()):
             fileobj.write('TagDatasets(%s, %s)\n' %
                           (repr(tag), repr(val)))
 
@@ -485,7 +481,16 @@ class Document( qt4.QObject ):
         self.saveCustomDefinitions(fileobj)
 
     def saveToFile(self, fileobj):
-        """Save the text representing a document to a file."""
+        """Save the text representing a document to a file.
+
+        The ordering can be important, as some things override
+        previous steps:
+
+         - Tagging doesn't work if the dataset isn't
+           already defined.
+         - Loading from files may bring in new datasets which
+           override defined datasets, so save links first
+        """
 
         self._writeFileHeader(fileobj, 'saved document')
         
@@ -501,12 +506,12 @@ class Document( qt4.QObject ):
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             dataset.saveLinksToSavedDoc(fileobj, savedlinks,
                                         relpath=reldirname)
 
         # save the remaining datasets
-        for name, dataset in sorted(citems(self.data)):
+        for name, dataset in sorted(self.data.items()):
             dataset.saveToFile(fileobj, name)
 
         # save tags of datasets
@@ -516,6 +521,86 @@ class Document( qt4.QObject ):
         fileobj.write(self.basewidget.getSaveText())
         
         self.setModified(False)
+
+    def saveToHDF5File(self, fileobj):
+        """Save to HDF5 (h5py) output file given."""
+
+        # groups in output hdf5
+        vszgrp = fileobj.create_group('Veusz')
+        vszgrp.attrs['vsz_version'] = utils.version()
+        vszgrp.attrs['vsz_saved_at'] = datetime.datetime.utcnow().isoformat()
+        vszgrp.attrs['vsz_format'] = 1  # version number (currently unused)
+        datagrp = vszgrp.create_group('Data')
+        docgrp = vszgrp.create_group('Document')
+
+        textstream = CStringIO()
+
+        self._writeFileHeader(textstream, 'saved document')
+
+        # add file directory to import path if we know it
+        reldirname = None
+        if getattr(fileobj, 'filename', False):
+            reldirname = os.path.dirname( os.path.abspath(fileobj.filename) )
+            textstream.write('AddImportPath(%s)\n' % repr(reldirname))
+
+        # add custom definitions
+        self.saveCustomDefinitions(textstream)
+
+        # save those datasets which are linked
+        # we do this first in case the datasets are overridden below
+        savedlinks = {}
+        for name, dataset in sorted(self.data.items()):
+            dataset.saveLinksToSavedDoc(textstream, savedlinks,
+                                        relpath=reldirname)
+
+        # save the remaining datasets
+        for name, dataset in sorted(self.data.items()):
+            dataset.saveToFile(textstream, name, mode='hdf5', hdfgroup=datagrp)
+
+        # handle tagging
+        # get a list of all tags and which datasets have them
+        bytag = defaultdict(list)
+        for name, dataset in sorted(self.data.items()):
+            for t in dataset.tags:
+                bytag[t].append(name)
+
+        # write out tags as datasets
+        tagsgrp = docgrp.create_group('Tags')
+        for tag, dsnames in sorted(bytag.items()):
+            tagsgrp[tag] = [v.encode('utf-8') for v in sorted(dsnames)]
+
+        # save the actual tree structure
+        textstream.write(self.basewidget.getSaveText())
+
+        # create single dataset contains document
+        docgrp['document'] = [ textstream.getvalue().encode('utf-8') ]
+
+        self.setModified(False)
+
+    def save(self, filename, mode='vsz'):
+        """Save to output file.
+
+        mode is 'vsz' or 'hdf5'
+        """
+        if mode == 'vsz':
+            with codecs.open(filename, 'w', 'utf-8') as f:
+                self.saveToFile(f)
+        elif mode == 'hdf5':
+            if h5py is None:
+                raise RuntimeError('Missing h5py module')
+            with h5py.File(filename, 'w') as f:
+                self.saveToHDF5File(f)
+        else:
+            raise RuntimeError('Invalid save mode')
+
+    def load(self, filename, mode='vsz', callbackunsafe=None):
+        """Load document from file.
+
+        mode is 'vsz' or 'hdf5'
+        """
+        from . import loader
+        loader.loadDocument(self, filename, mode=mode,
+                            callbackunsafe=callbackunsafe)
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""
@@ -543,13 +628,18 @@ class Document( qt4.QObject ):
 
         If dpi is None, use the default Qt screen dpi
         Use dpi if given."""
-        return self._pagedocsize(self.basewidget.getPage(pagenum),
-                                 dpi=dpi, scaling=scaling, integer=integer)
+
+        page = self.basewidget.getPage(pagenum)
+        if page is None:
+            return self.docSize(dpi=dpi, scaling=scaling, integer=integer)
+        return self._pagedocsize(
+            page, dpi=dpi, scaling=scaling, integer=integer)
 
     def docSize(self, dpi=None, scaling=1., integer=True):
         """Get size for document."""
-        return self._pagedocsize(self.basewidget,
-                                 dpi=dpi, scaling=scaling, integer=integer)
+        return self._pagedocsize(
+            self.basewidget,
+            dpi=dpi, scaling=scaling, integer=integer)
 
     def resolveItem(self, fromwidget, where):
         """Resolve item relative to fromwidget.
@@ -679,8 +769,7 @@ class Document( qt4.QObject ):
 
             # only ask the user the first time
             if thepass == 0:
-                self.emit(qt4.SIGNAL('check_allowed_imports'), module,
-                          possibleimport)
+                self.sigAllowedImports.emit(module, possibleimport)
 
         return toimport
 
@@ -901,7 +990,7 @@ class Document( qt4.QObject ):
             except ValueError:
                 pass
 
-        raise RuntimError('Invalid array')
+        raise RuntimeError('Invalid array')
 
     def walkNodes(self, tocall, root=None,
                   nodetypes=('widget', 'setting', 'settings'),
@@ -933,7 +1022,7 @@ class Document( qt4.QObject ):
                            nodetypes=nodetypes, _path=_path)
         elif root.nodetype == 'settings':
             # do the settings of the settings
-            for name, s in sorted(citems(root.setdict)):
+            for name, s in sorted(root.setdict.items()):
                 self.walkNodes(tocall, root=s, nodetypes=nodetypes,
                                _path = _path + '/' + s.name)
         # elif root.nodetype == 'setting': pass
@@ -948,3 +1037,17 @@ class Document( qt4.QObject ):
                 # ignore marker at beginning for stepped maps
                 return tuple([cmap[0]] + list(cmap[-1:0:-1]))
         return cmap
+
+    def formatValsWithDatatypeToText(self, vals, displaydatatype):
+        """Given a set of values, datatype, return a list of strings
+        corresponding to these data."""
+
+        if displaydatatype == 'text':
+            return vals
+        elif displaydatatype == 'numeric':
+            return [ utils.formatNumber(val, '%Vg', locale=self.locale)
+                     for val in vals ]
+        elif displaydatatype == 'date':
+            return [ utils.dateFloatToString(val) for val in vals ]
+        else:
+            raise RuntimeError('Invalid data type')

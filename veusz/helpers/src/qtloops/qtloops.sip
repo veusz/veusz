@@ -16,10 +16,10 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-%Module qtloops 0
+%Module(name=qtloops, version=0)
 
-%Import QtCore/QtCoremod.sip
-%Import QtGui/QtGuimod.sip
+%Import(name=QtCore/QtCoremod.sip)
+%Import(name=QtGui/QtGuimod.sip)
 
 %ModuleHeaderCode
 #include <qtloops_helpers.h>
@@ -78,7 +78,8 @@ void addNumpyPolygonToPath(QPainterPath&, const QRectF*, ...);
 void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
 			SIP_PYOBJECT,
 			const QRectF* clip=0,
-			const QImage* colorimg=0);
+			const QImage* colorimg=0,
+			bool scaleline=false);
 %MethodCode
 {
   Numpy1DObj* scaling = 0;
@@ -94,7 +95,7 @@ void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
 	scaling = new Numpy1DObj(a4);
       }
       
-      plotPathsToPainter(*a0, *a1, x, y, scaling, a5, a6);
+      plotPathsToPainter(*a0, *a1, x, y, scaling, a5, a6, a7);
     }
   catch( const char *msg )
     {
@@ -181,6 +182,24 @@ void applyImageTransparancy(QImage& img, SIP_PYOBJECT);
   }
 %End
 
+QImage resampleLinearImage(QImage& img, SIP_PYOBJECT, SIP_PYOBJECT);
+%MethodCode
+   {
+   try
+     {
+       Numpy1DObj xpts(a1);
+       Numpy1DObj ypts(a2);
+
+       QImage *oimg = new QImage( resampleLinearImage(*a0, xpts, ypts) );
+       sipRes = oimg;
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
+   }
+%End
+
 void polygonClip(const QPolygonF& inpoly,
 		 const QRectF& cliprect,
 		 QPolygonF& outpoly);
@@ -190,10 +209,73 @@ void plotClippedPolygon(QPainter& painter,
 			const QPolygonF& inpoly,
 			bool autoexpand = true);
 
+// polyline clipping code
+
 void plotClippedPolyline(QPainter& painter,
 			 QRectF clip,
 			 const QPolygonF& poly,
 			 bool autoexpand = true);
+
+// Do the polygons intersect?
+bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b);
+
+
+// storing rotated rectangles
+
+struct RotatedRectangle
+{
+  %TypeHeaderCode
+#include <polylineclip.h>
+  %End
+
+  RotatedRectangle(double _cx, double _cy,
+		   double _xw, double _yw, double _angle);
+
+  QPolygonF makePolygon() const;
+
+  double cx;
+  double cy;
+  double xw;
+  double yw;
+  double angle;
+};
+
+// for labelling of sets of contour lines
+class LineLabeller
+{
+  %TypeHeaderCode
+#include <polylineclip.h>
+  %End
+
+public:
+  LineLabeller(QRectF cliprect, bool rotatelabels);
+  virtual ~LineLabeller();
+
+  // override this to receive the label to draw
+  virtual void drawAt(int idx, RotatedRectangle r);
+
+  void addLine(const QPolygonF& poly, QSizeF textsize);
+
+  void process();
+
+  int getNumPolySets() const;
+  QVector<QPolygonF> getPolySet(int i) const;
+};
+
+class RectangleOverlapTester
+{
+  %TypeHeaderCode
+#include <polylineclip.h>
+  %End
+
+public:
+  RectangleOverlapTester();
+  bool willOverlap(const RotatedRectangle& rect);
+  void addRect(const RotatedRectangle& rect);
+};
+
+
+// bezier functions
 
 QPolygonF bezier_fit_cubic_single(const QPolygonF& data, double error);
 

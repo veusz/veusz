@@ -18,7 +18,7 @@
 
 """Dataset creation dialog."""
 
-from ..compat import citems, ckeys, cstr
+from ..compat import cstr
 from .. import qtall as qt4
 from .. import utils
 from .. import document
@@ -47,8 +47,7 @@ class DataCreateDialog(VeuszDialog):
         self.document = document
 
         # create button group to get notification of changes
-        self.connect( self.methodGroup, qt4.SIGNAL('radioClicked'),
-                      self.slotMethodChanged )
+        self.methodGroup.radioClicked.connect(self.slotMethodChanged)
 
         # connect create button
         self.createbutton = self.buttonBox.addButton(
@@ -56,17 +55,14 @@ class DataCreateDialog(VeuszDialog):
         self.replacebutton = self.buttonBox.addButton(
             _("&Replace"), qt4.QDialogButtonBox.ApplyRole )
 
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
-                      qt4.SIGNAL('clicked()'), self.resetButtonClicked )
+        self.buttonBox.button(
+            qt4.QDialogButtonBox.Reset).clicked.connect(self.resetButtonClicked)
 
-        self.connect( self.createbutton, qt4.SIGNAL('clicked()'),
-                      self.createButtonClicked )
-        self.connect( self.replacebutton, qt4.SIGNAL('clicked()'),
-                      self.createButtonClicked )
+        self.createbutton.clicked.connect(self.createButtonClicked)
+        self.replacebutton.clicked.connect(self.createButtonClicked)
 
         # connect notification of document change
-        self.connect( self.document, qt4.SIGNAL("sigModified"),
-                      self.modifiedDocSlot )
+        self.document.signalModified.connect(self.modifiedDocSlot)
 
         # set validators for edit controls
         self.numstepsedit.setValidator( qt4.QIntValidator(1, 99999999, self) )
@@ -78,11 +74,9 @@ class DataCreateDialog(VeuszDialog):
         for edit in (self.numstepsedit, self.tstartedit, self.tendedit,
                      self.tstepsedit, self.nameedit,
                      self.valueedit):
-            self.connect( edit, qt4.SIGNAL('editTextChanged(const QString &)'),
-                          self.editsEditSlot )
+            edit.editTextChanged.connect(self.editsEditSlot)
 
-        self.connect( self.nameedit, qt4.SIGNAL('currentIndexChanged(int)'),
-                      self.datasetSelected )
+        self.nameedit.currentIndexChanged[int].connect(self.datasetSelected)
 
         # edit controls for dataset
         self.dsedits = { 'data': self.valueedit, 'serr': self.symerroredit,
@@ -144,7 +138,7 @@ class DataCreateDialog(VeuszDialog):
             # make sure name is set
             self.nameedit.setText(dsname)
             # set expressions
-            for part in ckeys(self.dsedits):
+            for part in self.dsedits:
                 text = ds.expr[part]
                 if text is None:
                     text = ''
@@ -156,7 +150,7 @@ class DataCreateDialog(VeuszDialog):
             # make sure name is set
             self.nameedit.setText(dsname)
             # set expressions
-            for part in ckeys(self.dsedits):
+            for part in self.dsedits:
                 data = getattr(ds, 'range_%s' % part)
                 if data is None:
                     text = ''
@@ -260,7 +254,7 @@ class DataCreateDialog(VeuszDialog):
 
         # go over each of the ranges / values
         vals = {}
-        for key, cntrl in citems(self.dsedits):
+        for key, cntrl in self.dsedits.items():
             text = cntrl.text().strip()
 
             if not text:
@@ -301,7 +295,7 @@ class DataCreateDialog(VeuszDialog):
 
         # get expressions
         vals = {}
-        for key, cntrl in citems(self.dsedits):
+        for key, cntrl in self.dsedits.items():
             text = cntrl.text().strip()
             if text:
                 vals[key] = text
@@ -316,7 +310,7 @@ class DataCreateDialog(VeuszDialog):
 
         # get expression for each part of the dataset
         vals = {}
-        for key, cntrl in citems(self.dsedits):
+        for key, cntrl in self.dsedits.items():
             text = cntrl.text().strip()
             if text:
                 vals[key] = text

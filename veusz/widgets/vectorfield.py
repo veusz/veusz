@@ -72,6 +72,23 @@ class VectorField(plotters.GenericPlotter):
                               descr = _('Cartesian (dx,dy) or polar (r,theta)'),
                               usertext = _('Mode')),
                2 )
+        s.add( setting.FloatChoice(
+            'rotate',
+            [0., 45., 90., 135., 180., -135., -90., -45.],
+            0.,
+            descr = _('Rotate vector clockwise by this angle in degrees'),
+            usertext = _('Rotate')),
+               3 )
+        s.add( setting.Bool(
+            'reflectx', False,
+            descr = _('Reflect vector in X direction'),
+            usertext = _('Reflect X')),
+               4 )
+        s.add( setting.Bool(
+            'reflecty', False,
+            descr = _('Reflect vector in Y direction'),
+            usertext = _('Reflect Y')),
+               5 )
 
         # formatting
         s.add( setting.DistancePt('baselength', '10pt',
@@ -111,7 +128,7 @@ class VectorField(plotters.GenericPlotter):
         """Range information provided by widget."""
         s = self.settings
         return ( (s.xAxis, 'sx'), (s.yAxis, 'sy') )
-        
+
     def getRange(self, axis, depname, axrange):
         """Automatically determine the ranges of variable on the axes."""
 
@@ -121,12 +138,13 @@ class VectorField(plotters.GenericPlotter):
                 continue
 
             if data.dimensions == 2:
+                xr, yr = data.getDataRanges()
                 if depname == 'sx':
-                    dxrange = data.xrange
+                    dxrange = xr
                     axrange[0] = min( axrange[0], dxrange[0] )
                     axrange[1] = max( axrange[1], dxrange[1] )
                 elif depname == 'sy':
-                    dyrange = data.yrange
+                    dyrange = yr
                     axrange[0] = min( axrange[0], dyrange[0] )
                     axrange[1] = max( axrange[1], dyrange[1] )
 
@@ -168,10 +186,11 @@ class VectorField(plotters.GenericPlotter):
         xw = min(data1st.shape[1], data2nd.shape[1])
         yw = min(data1st.shape[0], data2nd.shape[0])
 
-        # construct indices into datasets
-        yvals, xvals = N.mgrid[0:yw, 0:xw]
-        # convert using 1st dataset to axes values
-        xdsvals, ydsvals = data1.indexToPoint(xvals.ravel(), yvals.ravel())
+        # get pixel coordinates
+        xc, yc = data1.getPixelCentres()
+        xc, yc = xc[:xw], yc[:yw]
+        xdsvals = N.reshape(N.tile(xc, yw), xw*yw)
+        ydsvals = N.reshape(N.tile(yc[:, N.newaxis], xw), xw*yw)
 
         # convert using axes to plotter values
         xplotter = axes[0].dataToPlotterCoords(posn, xdsvals)
@@ -189,6 +208,17 @@ class VectorField(plotters.GenericPlotter):
             theta = data2nd[:yw, :xw].ravel()
             dx = r * N.cos(theta)
             dy = r * N.sin(theta)
+
+        if s.rotate != 0.:
+            angle = -s.rotate / 180 * N.pi
+            rotx = dx*N.cos(angle) - dy*N.sin(angle)
+            roty = dx*N.sin(angle) + dy*N.cos(angle)
+            dx, dy = rotx, roty
+
+        if s.reflectx:
+            dx = -dx
+        if s.reflecty:
+            dy = -dy
 
         x1, x2 = xplotter-dx, xplotter+dx
         y1, y2 = yplotter+dy, yplotter-dy

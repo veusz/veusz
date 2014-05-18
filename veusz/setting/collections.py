@@ -23,6 +23,7 @@ from .. import qtall as qt4
 
 from . import setting
 from .settings import Settings
+from .reference import Reference
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
@@ -95,6 +96,18 @@ class XYPlotLine(Line):
         self.add( setting.Bool('bezierJoin', False,
                                descr=_('Connect points with a cubic Bezier curve'),
                                usertext=_('Bezier join')), 1 )
+        self.get('color').newDefault( Reference('../color') )
+
+class MarkerLine(Line):
+    '''A line for marker border.'''
+
+    def __init__(self, name, **args):
+        Line.__init__(self, name, **args)
+
+        self.add( setting.Bool('scaleLine', True,
+                               descr=_('Scale line width with marker if scaling'
+                                       ' enabled'),
+                               usertext=_('Scale')), 4 )
 
 class ErrorBarLine(Line):
     '''A line style for error bar plotting.'''
@@ -247,9 +260,17 @@ class PointFill(BrushExtended):
         hide.descr = _('Hide the filled region to the edge of the plot')
         self.get('color').newDefault('grey')
 
-        self.add( setting.Bool( 'hideerror', False,
-                                descr = _('Hide the filled region inside the error bars'),
-                                usertext=_('Hide error fill')) )
+        self.add( setting.Choice(
+            'fillto', 
+            ['top', 'bottom', 'left', 'right'],
+            'top',
+            descr=_('Edge to fill towards'),
+            usertext=_('Fill to')), 0)
+
+        self.add( setting.Bool(
+            'hideerror', False,
+            descr = _('Hide the filled region inside the error bars'),
+            usertext=_('Hide error fill')) )
 
 class ShapeFill(BrushExtended):
     '''Filling used for filling shapes.'''

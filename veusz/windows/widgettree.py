@@ -39,10 +39,8 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         self.document = document
 
-        self.connect( self.document, qt4.SIGNAL("sigModified"),
-                      self.slotDocumentModified )
-        self.connect( self.document, qt4.SIGNAL("sigWiped"),
-                      self.slotDocumentModified )
+        document.signalModified.connect(self.slotDocumentModified)
+        self.document.sigWiped.connect(self.slotDocumentModified)
 
         # suspend signals to the view that the model has changed
         self.suspendmodified = False
@@ -51,7 +49,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """The document has been changed."""
         if not self.suspendmodified:
             # needs to be suspended within insert/delete row operations
-            self.emit( qt4.SIGNAL('layoutChanged()') )
+            self.layoutChanged.emit()
 
     def columnCount(self, parent):
         """Return number of columns of data."""
@@ -67,7 +65,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         column = index.column()
         obj = index.internalPointer()
 
-        if role == qt4.Qt.DisplayRole:
+        if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
             # return text for columns
             if column == 0:
                 return obj.name
@@ -120,9 +118,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         self.document.applyOperation(
             document.OperationWidgetRename(widget, name))
 
-        self.emit( qt4.SIGNAL(
-                'dataChanged(const QModelIndex &, const QModelIndex &)'),
-                   index, index )
+        self.dataChanged.emit(index, index)
         return True
             
     def flags(self, index):
@@ -324,7 +320,7 @@ class WidgetTreeView(qt4.QTreeView):
 
         if index.isValid():
             parent = self.model().getWidget(index)
-            data = document.getWidgetMime(event.mimeData)
+            data = document.getWidgetMime(event.mimeData())
             if document.isMimeDropable(parent, data):
                 # move the widget!
                 parentpath = parent.path

@@ -1,3 +1,112 @@
+Changes in 1.21:
+ * Add HDF5 saved document format
+ * Add filled curve error bar style
+ * Add fill left/right options for point plotter
+ * Add filetype filters to import dialog file browser dialog
+ * In file completer in import dialog, use selected tab as filter
+ * Move code to use PyQt new style signals
+ * Add a master color setting for xy point and nonorthpoint plot
+ * Line labelling algorithm much improved in contour plots, which
+   rotates text to match line angle and avoids label overlaps
+ * More accurate axis tick label bounding boxes, allowing rotated
+   labels to be placed close together
+ * Add reflection and rotation options to vector field widget
+ * Switch to scientific notation earlier when showing float settings
+
+Bug fixes:
+ * Direction combo did not work in import dialog
+ * Saving text datasets did not work in Python3
+ * Fix partial dataset evaluation issue when loading documents
+ * 2D non-regular pixel spaced images give error if clipped in y
+ * Handle Unicode quoted characters in simple text data files
+ * xcent/ycent in Dataset2D import plugins were ignored
+ * promote_tab broken for import plugins
+ * Full screen view when all pages are deleted
+ * Crash with empty dataset and boxplot widget
+ * Fix copy and paste of datasets
+ * Python 3 resizing axis bug
+ * Crash if picking/zooming on document with no pages
+ * Crash if reediting histogram dataset with blank output entry
+ * Use end of text formatting string beyond format specifier
+ * When writing SVG text as text, use xml:space="preserve" to
+   avoid missing whitespace
+ * Embedding socket issue on Python 3.4+
+
+Changes in 1.20.1:
+ * Include free-desktop appdata, MIME and desktop files
+ * When plotting xy widget filled error regions, plot line on top
+
+Bug fixes:
+ * Fix embedding interface startup problem in 1.20
+ * Additional embedding interface fixes for Python 3
+ * Fix crash in tutorial if flashing widget deleted
+ * Fix polar plot crash with reverse minumum and maximum radii
+ * Fix crash when changing range of broken axes interactively
+ * Fix object deletion crash in setting menu
+ * Check output dataset is not same as an input for histograms
+ * Fix for compilation on Qt 4.6
+ * Catch socket errors on embed client
+ * Fixes for formatting strings, including fixes for arguments of
+   the extended %Vg format and properly supporting %%
+ * When restoring window position, do not restore offscreen
+
+Changes in 1.20:
+ * Add HDF5 file data import
+ * Allow expressions to be edited for linked 2D datasets
+ * Add support for 2D datasets with irregular gridpoints
+ * Add 2D data CSV import
+ * Allow safe renaming of linked datasets
+ * Support importing text from FITS files
+
+Bug fixes:
+ * When capturing data from a file/named pipe, do not stop when no
+   more data are available
+ * Fixes mangling of text in saved files using Windows binary
+ * Fix encoding for standard file import
+ * Fix FITS import for python3
+
+Changes in 1.19.1:
+ * Add option to disable scaling of marker border with point scaling
+ * Implement label at-minimum/at-maximum for ternary plot
+ * Add border and background fill settings for text label widget
+ * Enable FITS support with astropy
+
+Bug fixes:
+ * Fix broken drag and drop in documents
+ * Fix deleted C/C++ object crash when using undo and in tutorial
+ * Fix compilation in MSVC for Python 3
+ * Remove warning/error in compilation in gcc in SUSE
+ * Add Python version classifiers
+ * Fix document icons in Windows binary
+ * Error bars can be plotted incorrectly for histogrammed data
+
+Changes in 1.19:
+ * Make code compatible with python3
+ * Separation of python module and resources in source package
+   (packagers may need to consult INSTALL)
+ * Move to v2 of PyQt API
+ * Remove deprecated numpy API from helpers module
+ * Allow FITS dataset names to be blank if prefix/suffix are not
+ * New ast-based code security checker
+ * Picker uses 1-based index for consistency
+ * Allow non-text datasets to be used for labels
+ * Add number->text conversion dataset plugin
+ * Add binning dataset plugin
+ * Allow more significant figures in float values
+ * Intelligent choice of significant figures when interactively
+   changing axis range
+ * Decrease minimum range of axis
+ * Add notes setting to document, pages and graphs
+
+Bug fixes:
+ * Fix crash if other linked axis not initialized
+ * Fix crash if trying to edit non-editable datasets
+ * Make ignore exception work in error reporting dialog
+ * Renaming datasets, widgets and editing data now allow original
+   text to be edited, rather than being cleared
+ * Fix line positions on broken axes
+ * OS X Mavericks - fixes for opening files from finder and fonts
+
 Changes in 1.18:
  * Add support for dataset expressions when plotting
  * Add axis-function widget for plotting axes which have a scale given

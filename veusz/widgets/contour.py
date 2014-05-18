@@ -24,8 +24,9 @@ as a C routine (taken from matplotlib) is used to trace the contours.
 
 from __future__ import division, print_function
 import sys
+import math
 
-from ..compat import czip
+from ..compat import czip, crange
 from .. import qtall as qt4
 import numpy as N
 
@@ -34,6 +35,13 @@ from .. import document
 from .. import utils
 
 from . import plotters
+
+try:
+    from ..helpers._nc_cntr import Cntr
+    from ..helpers.qtloops import LineLabeller
+except ImportError:
+    Cntr = None
+    LineLabeller = object   # allow class definition below
 
 def _(text, disambiguation=None, context='Contour'):
     """Translate text."""
@@ -47,6 +55,36 @@ def finitePoly(poly):
         validrows = N.logical_and(finite[:,0], finite[:,1])
         out.append( line[validrows] )
     return out
+
+class ContourLineLabeller(LineLabeller):
+    def __init__(self, clip, rot, painter, font):
+        LineLabeller.__init__(self, clip, rot)
+        self.clippath = qt4.QPainterPath()
+        self.clippath.addRect(clip)
+        self.labels = []
+        self.painter = painter
+        self.font = font
+
+    def drawAt(self, idx, rect):
+        """Called to draw the label with the index given."""
+        text = self.labels[idx]
+        if not text:
+            return
+
+        angle = rect.angle*180/math.pi
+        if angle < -90 or angle > 90:
+            angle += 180
+
+        rend = utils.Renderer(
+            self.painter, self.font,
+            rect.cx, rect.cy, text,
+            alignhorz=0, alignvert=0,
+            angle=angle)
+        rend.render()
+        if rect.xw > 0:
+            p = qt4.QPainterPath()
+            p.addPolygon(rect.makePolygon())
+            self.clippath -= p
 
 class ContourFills(setting.Settings):
     """Settings for contour fills."""
@@ -109,6 +147,9 @@ class ContourLabel(setting.Text):
                                 descr=_('A scale factor to apply to the values '
                                         'of the tick labels'),
                                 usertext=_('Scale')) )
+        self.add( setting.Bool('rotate', True,
+                               descr=_('Rotate labels to follow lines'),
+                               usertext=_('Rotate')) )
 
         self.get('hide').newDefault(True)
 
@@ -125,16 +166,11 @@ class Contour(plotters.GenericPlotter):
 
         plotters.GenericPlotter.__init__(self, parent, name=name)
 
-        # try to import contour helpers here
-        Cntr = None
-        try:
-            from ..helpers._nc_cntr import Cntr
-        except ImportError:
+        if Cntr is None:
             print(('WARNING: Veusz cannot import contour module\n'
                                 'Please run python setup.py build\n'
                                 'Contour support is disabled'), file=sys.stderr)
             
-        self.Cntr = Cntr
         # keep track of settings so we recalculate when necessary
         self.lastdataset = None
         self.contsettings = None
@@ -217,7 +253,8 @@ class Contour(plotters.GenericPlotter):
 
         s.remove('key')
 
-    def _getUserDescription(self):
+    @property
+    def userdescription(self):
         """User friendly description."""
         s = self.settings
         out = []
@@ -229,7 +266,6 @@ class Contour(plotters.GenericPlotter):
         else:
             out.append('%(numLevels)i %(scaling)s levels (%(min)s to %(max)s)' % s)
         return ', '.join(out)
-    userdescription = property(_getUserDescription)
 
     def calculateLevels(self):
         """Calculate contour levels from data and settings.
@@ -348,14 +384,13 @@ class Contour(plotters.GenericPlotter):
         if data is None or data.dimensions != 2:
             return
 
+        xr, yr = data.getDataRanges()
         if depname == 'sx':
-            dxrange = data.xrange
-            axrange[0] = min( axrange[0], dxrange[0] )
-            axrange[1] = max( axrange[1], dxrange[1] )
+            axrange[0] = min( axrange[0], xr[0] )
+            axrange[1] = max( axrange[1], xr[1] )
         elif depname == 'sy':
-            dyrange = data.yrange
-            axrange[0] = min( axrange[0], dyrange[0] )
-            axrange[1] = max( axrange[1], dyrange[1] )
+            axrange[0] = min( axrange[0], yr[0] )
+            axrange[1] = max( axrange[1], yr[1] )
 
     def getNumberKeys(self):
         """How many keys to show."""
@@ -413,8 +448,6 @@ class Contour(plotters.GenericPlotter):
     def dataDraw(self, painter, axes, posn, cliprect):
         """Draw the contours."""
 
-        s = self.settings
-
         # update contours if necessary
         if not self.checkContoursUpToDate():
             return
@@ -440,13 +473,9 @@ class Contour(plotters.GenericPlotter):
         if xw == 0 or yw == 0:
             return
 
-        # arrays containing coordinates of pixels in x and y
-        xpts = N.fromfunction(lambda y,x:
-                              (x+0.5)*((rangex[1]-rangex[0])/xw) + rangex[0],
-                              (yw, xw))
-        ypts = N.fromfunction(lambda y,x:
-                              (y+0.5)*((rangey[1]-rangey[0])/yw) + rangey[0],
-                              (yw, xw))
+        xc, yc = data.getPixelCentres()
+        xpts = N.reshape( N.tile(xc, yw), (yw, xw) )
+        ypts = N.tile(yc[:, N.newaxis], xw)
 
         # only keep finite data points
         mask = N.logical_not(N.isfinite(data.data))
@@ -456,8 +485,8 @@ class Contour(plotters.GenericPlotter):
         self._cachedpolygons = None
         self._cachedsubcontours = None
 
-        if self.Cntr is not None:
-            c = self.Cntr(xpts, ypts, data.data, mask)
+        if Cntr is not None:
+            c = Cntr(xpts, ypts, data.data, mask)
 
             # trace the contour levels
             if len(s.Lines.lines) != 0:
@@ -480,56 +509,6 @@ class Contour(plotters.GenericPlotter):
                     linelist = c.trace(level)
                     self._cachedsubcontours.append( finitePoly(linelist) )
 
-    def plotContourLabel(self, painter, number, xplt, yplt, showline):
-        """Draw a label on a contour.
-        This clips when drawing the line, plotting the label on top.
-        """
-        s = self.settings
-        cl = s.get('ContourLabels')
-
-        painter.save()
-
-        # get text and font
-        text = utils.formatNumber(number * cl.scale, cl.format,
-                                  locale=self.document.locale)
-        font = cl.makeQFont(painter)
-        descent = utils.FontMetrics(font, painter.device()).descent()
-
-        # work out where text lies
-        half = len(xplt) // 2
-        hx, hy = xplt[half], yplt[half]
-        r = utils.Renderer(painter, font, hx, hy, text, alignhorz=0,
-                           alignvert=0, angle=0)
-        bounds = r.getBounds()
-
-        # heuristics of when to plot label
-        # we try to only plot label if underlying line is long enough
-        height = bounds[3]-bounds[1]
-        showtext = ( height*1.5 < (yplt.max() - yplt.min()) or
-                     (height*4 < (xplt.max() - xplt.min())) )
-
-        if showtext:
-            # clip region containing text
-            oldclip = painter.clipRegion()
-            cr = oldclip - qt4.QRegion( bounds[0]-descent, bounds[1]-descent,
-                                        bounds[2]-bounds[0]+descent*2,
-                                        bounds[3]-bounds[1]+descent*2 )
-            painter.setClipRegion(cr)
-
-        # draw lines
-        if showline:
-            pts = qt4.QPolygonF()
-            utils.addNumpyToPolygonF(pts, xplt, yplt)
-            painter.drawPolyline(pts)
-
-        # actually plot the label
-        if showtext:
-            painter.setClipRegion(oldclip)
-            painter.setPen( cl.makeQPen() )
-            r.render()
-
-        painter.restore()
-
     def _plotContours(self, painter, posn, axes, linestyles,
                       contours, showlabels, hidelines, clip):
         """Plot a set of contours.
@@ -541,12 +520,28 @@ class Contour(plotters.GenericPlotter):
         if contours is None:
             return
 
+        cl = s.get('ContourLabels')
+        font = cl.makeQFont(painter)
+        descent = qt4.QFontMetricsF(font).descent()
+
+        # linelabeller does clipping and labelling of contours
+        linelabeller = ContourLineLabeller(clip, cl.rotate, painter, font)
+        levels = []
+
         # iterate over each level, and list of lines
         for num, linelist in enumerate(contours):
 
-            # move to the next line style
-            painter.setPen(linestyles.makePen(painter, num))
-                
+            if showlabels:
+                number = s.levelsOut[num]
+                text = utils.formatNumber(number * cl.scale, cl.format,
+                                          locale=self.document.locale)
+                rend = utils.Renderer(painter, font, 0, 0, text, alignhorz=0,
+                                      alignvert=0, angle=0)
+                textdims = qt4.QSizeF(*rend.getDimensions())
+                textdims += qt4.QSizeF(descent*2, descent*2)
+            else:
+                textdims = qt4.QSizeF(0, 0)
+
             # iterate over each complete line of the contour
             for curve in linelist:
                 # convert coordinates from graph to plotter
@@ -555,14 +550,25 @@ class Contour(plotters.GenericPlotter):
                     
                 pts = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(pts, xplt, yplt)
+                linelabeller.addLine(pts, textdims)
 
                 if showlabels:
-                    self.plotContourLabel(painter, s.levelsOut[num],
-                                          xplt, yplt, not hidelines)
+                    linelabeller.labels.append(text)
                 else:
-                    # actually draw the curve to the plotter
-                    if not hidelines:
-                        utils.plotClippedPolyline(painter, clip, pts)
+                    linelabeller.labels.append(None)
+                levels.append(num)
+
+        painter.save()
+        linelabeller.process()
+        painter.setClipPath(linelabeller.clippath)
+
+        for i in crange(linelabeller.getNumPolySets()):
+            polyset = linelabeller.getPolySet(i)
+            painter.setPen(linestyles.makePen(painter, levels[i]))
+            for poly in polyset:
+                painter.drawPolyline(poly)
+
+        painter.restore()
 
     def plotContours(self, painter, posn, axes, clip):
         """Plot the traced contours on the painter."""

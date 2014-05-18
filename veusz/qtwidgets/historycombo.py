@@ -128,7 +128,8 @@ class HistoryCombo(qt4.QComboBox):
         qt4.QComboBox.showEvent(self, event)
         # we do this now rather than in __init__ because the widget
         # has no name set at __init__
-        self.loadHistory()
+        if not self.hasshown:
+            self.loadHistory()
 
     def hideEvent(self, event):
         """Save history as widget is hidden."""

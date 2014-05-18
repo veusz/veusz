@@ -140,7 +140,7 @@ class BoxPlot(GenericPlotter):
                               usertext=_('Direction')), 0 )
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label bars'),
-                                    usertext=_('Labels'), datatype='text'), 0 )
+                                    usertext=_('Labels')), 0 )
         s.add( setting.DatasetExtended(
                 'posn', '',
                 descr = _('Dataset or list of values giving '
@@ -290,8 +290,9 @@ class BoxPlot(GenericPlotter):
                 values = s.get('values').getData(doc)
                 if values:
                     for v in values:
-                        axrange[0] = min(axrange[0], N.nanmin(v.data))
-                        axrange[1] = max(axrange[1], N.nanmax(v.data))
+                        if len(v.data) > 0:
+                            axrange[0] = min(axrange[0], N.nanmin(v.data))
+                            axrange[1] = max(axrange[1], N.nanmax(v.data))
             else:
                 # update from manual entries
                 drange = self.rangeManual()

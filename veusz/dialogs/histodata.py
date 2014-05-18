@@ -26,8 +26,6 @@ from .. import document
 from .veuszdialog import VeuszDialog
 from . import dataeditdialog
 
-import numpy as N
-
 def _(text, disambiguation=None, context="HistogramDialog"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -40,15 +38,15 @@ def checkValidator(combo):
 
 class ManualBinModel(qt4.QAbstractListModel):
     """Model to store a list of floating point values in a list."""
-    def __init__(self, data):
+    def __init__(self, thedata):
         qt4.QAbstractListModel.__init__(self)
-        self.data = data
+        self.thedata = thedata
     def data(self, index, role):
         if role == qt4.Qt.DisplayRole and index.isValid():
-            return float(self.data[index.row()])
+            return float(self.thedata[index.row()])
         return None
     def rowCount(self, parent):
-        return len(self.data)
+        return len(self.thedata)
     def flags(self, index):
         return ( qt4.Qt.ItemIsSelectable | qt4.Qt.ItemIsEnabled |
                  qt4.Qt.ItemIsEditable )
@@ -59,9 +57,8 @@ class ManualBinModel(qt4.QAbstractListModel):
             except ValueError:
                 return False
 
-            self.data[ index.row() ] = val
-            self.emit( qt4.SIGNAL("dataChanged(const QModelIndex &,"
-                                  " const QModelIndex &)"), index, index)
+            self.thedata[ index.row() ] = val
+            self.dataChanged.emit(index, index)
             return True
         return False
 
@@ -78,22 +75,19 @@ class HistoDataDialog(VeuszDialog):
         validator = qt4.QRegExpValidator(regexp, self)
         self.minval.setValidator(validator)
         self.maxval.setValidator(validator)
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Apply),
-                      qt4.SIGNAL("clicked()"), self.applyClicked )
-        self.connect( self.buttonBox.button(qt4.QDialogButtonBox.Reset),
-                      qt4.SIGNAL('clicked()'), self.resetClicked )
-        self.connect( self.bingenerate, qt4.SIGNAL('clicked()'),
-                      self.generateManualBins )
-        self.connect( self.binadd, qt4.SIGNAL('clicked()'), self.addManualBins )
-        self.connect( self.binremove, qt4.SIGNAL('clicked()'),
-                      self.removeManualBins )
+        self.buttonBox.button(qt4.QDialogButtonBox.Apply).clicked.connect(
+            self.applyClicked )
+        self.buttonBox.button(qt4.QDialogButtonBox.Reset).clicked.connect(
+            self.resetClicked )
+        self.bingenerate.clicked.connect(self.generateManualBins)
+        self.binadd.clicked.connect(self.addManualBins)
+        self.binremove.clicked.connect(self.removeManualBins)
 
         self.bindata = []
         self.binmodel = ManualBinModel(self.bindata)
         self.binmanuals.setModel(self.binmodel)
 
-        self.connect(document, qt4.SIGNAL("sigModified"),
-                     self.updateDatasetLists)
+        document.signalModified.connect(self.updateDatasetLists)
         self.updateDatasetLists()
 
     def escapeDatasets(self, dsnames):
@@ -145,9 +139,13 @@ class HistoDataDialog(VeuszDialog):
             islog = dialog.logarithmic.isChecked()
             self.binparams = (numbins, minval, maxval, islog)
 
-            self.expr = dialog.indataset.currentText()
-            self.outdataset = dialog.outdataset.currentText()
-            self.outbins = dialog.outbins.currentText()
+            self.expr = dialog.indataset.currentText().strip()
+            self.outdataset = dialog.outdataset.currentText().strip()
+            self.outbins = dialog.outbins.currentText().strip()
+
+            if self.expr == self.outdataset or self.expr == self.outbins:
+                raise RuntimeError(_("Output datasets cannot be the same as input datasets"))
+
             self.method = dialog.methodGroup.getRadioChecked().objectName()
             self.manualbins = list( dialog.bindata )
             self.manualbins.sort()
@@ -235,8 +233,8 @@ class HistoDataDialog(VeuszDialog):
 
         # need to map backwards to get dataset names
         revds = dict( (a,b) for b,a in citems(self.document.data) )
-        self.outdataset.setEditText( revds[gen.valuedataset] )
-        self.outbins.setEditText( revds[gen.bindataset] )
+        self.outdataset.setEditText(revds.get(gen.valuedataset, ''))
+        self.outbins.setEditText(revds.get(gen.bindataset, ''))
 
         # if there are parameters
         if gen.binparams:

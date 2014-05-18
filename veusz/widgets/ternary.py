@@ -475,34 +475,46 @@ class Ternary(NonOrthGraph):
             sp = fm.leading() + fm.descent()
             off = labelSetn.get('offset').convert(painter)
 
+            # alignment
+            align = {'at-minimum': -1, 'centre': 0, 'at-maximum': 1}[
+                labelSetn.position]
+            aoffset = {'at-minimum': -self._width/2,
+                       'centre': 0,
+                       'at-maximum': self._width/2}[labelSetn.position]
+
             # bottom label
-            r = utils.Renderer(painter, font,
-                               self._box[0]+self._width/2,
-                               self._box[3] + bdelta + off,
+            r = utils.Renderer(painter, font, 0, 0,
                                self.settings.labelbottom,
-                               0, 1)
+                               align, 1)
+            painter.save()
+            painter.translate(self._box[0]+self._width/2,
+                              self._box[3] + bdelta + off)
+            painter.translate(aoffset, 0)
             r.render()
+            painter.restore()
 
             # left label - rotate frame before drawing so we can get
             # the bounds correct
             r = utils.Renderer(painter, font, 0, -sp,
                                self.settings.labelleft,
-                               0, -1)
+                               -align, -1)
             painter.save()
-            painter.translate(self._box[0]+self._width*0.25 - ldelta - off,
+            painter.translate(self._box[0]+self._width*0.25,
                               0.5*(self._box[1]+self._box[3]))
             painter.rotate(-60)
+            painter.translate(-aoffset, -ldelta - off)
             r.render()
             painter.restore()
 
             # right label
             r = utils.Renderer(painter, font, 0, -sp,
                                self.settings.labelright,
-                               0, -1)
+                               -align, -1)
             painter.save()
-            painter.translate(self._box[0]+self._width*0.75 + ldelta + off,
-                              0.5*(self._box[1]+self._box[3]))
+            painter.translate(self._box[0]+self._width*0.75 ,
+                              0.5*(self._box[1]+self._box[3]) )
             painter.rotate(60)
+            painter.translate(-aoffset, -ldelta - off)
             r.render()
             painter.restore()
 

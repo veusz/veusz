@@ -1,10 +1,10 @@
-Veusz 1.19
+Veusz 1.21
 ----------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
-publication-ready Postscript/PDF/SVG output. Graphs are built-up by
-combining plotting widgets. The user interface aims to be simple,
+publication-ready Postscript, PDF or SVG output. Graphs are built-up
+by combining plotting widgets. The user interface aims to be simple,
 consistent and powerful.
 
 Veusz provides GUI, Python module, command line, scripting, DBUS and
@@ -12,18 +12,39 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.19:
- * Make code compatible with python3
- * Separation of python module and resources in source package
-   (packagers may need to consult INSTALL)
- * Move to v2 of PyQt API
- * Remove deprecated numpy API from helpers module
- * Allow fits dataset names to be blank if prefix/suffix are not
- * New ast-based code checker
+Changes in 1.21:
+ * Add HDF5 saved document format
+ * Add filled curve error bar style
+ * Add fill left/right options for point plotter
+ * Add filetype filters to import dialog file browser dialog
+ * In file completer in import dialog, use selected tab as filter
+ * Move code to use PyQt new style signals
+ * Add a master color setting for xy point and nonorthpoint plot
+ * Line labelling algorithm much improved in contour plots, which
+   rotates text to match line angle and avoids label overlaps
+ * More accurate axis tick label bounding boxes, allowing rotated
+   labels to be placed close together
+ * Add reflection and rotation options to vector field widget
+ * Switch to scientific notation earlier when showing float settings
 
 Bug fixes:
- * Fix crash if other linked axis not initialized
- 
+ * Direction combo did not work in import dialog
+ * Saving text datasets did not work in Python3
+ * Fix partial dataset evaluation issue when loading documents
+ * 2D non-regular pixel spaced images give error if clipped in y
+ * Handle Unicode quoted characters in simple text data files
+ * xcent/ycent in Dataset2D import plugins were ignored
+ * promote_tab broken for import plugins
+ * Full screen view when all pages are deleted
+ * Crash with empty dataset and boxplot widget
+ * Fix copy and paste of datasets
+ * Python 3 resizing axis bug
+ * Crash if picking/zooming on document with no pages
+ * Crash if reediting histogram dataset with blank output entry
+ * Use end of text formatting string beyond format specifier
+ * When writing SVG text as text, use xml:space="preserve" to
+   avoid missing whitespace
+ * Embedding socket issue on Python 3.4+
 
 Features of package:
  Plotting features:
@@ -53,7 +74,7 @@ Features of package:
   * EPS/PDF/PNG/SVG/EMF export
   * Dataset creation/manipulation
   * Embed Veusz within other programs
-  * Text, CSV, FITS, NPY/NPZ, QDP, binary and user-plugin importing
+  * Text, HDF5, CSV, FITS, NPY/NPZ, QDP, binary and user-plugin importing
   * Data can be captured from external sources
  Extending:
   * Use as a Python module
@@ -70,9 +91,9 @@ Features of package:
   * Multithreaded rendering
 
 Requirements for source install:
- Python 2.x (2.6 or greater required)
+ Python 2.x (2.6 or greater required) or 3.x (3.3 or greater required)
    http://www.python.org/
- Qt >= 4.4 (free edition)
+ Qt >= 4.6 (free edition)
    http://www.trolltech.com/products/qt/
  PyQt >= 4.5 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/software/pyqt/
@@ -80,15 +101,16 @@ Requirements for source install:
  numpy >= 1.0
    http://numpy.scipy.org/
 
-Optional:
- PyFITS >= 1.1 (optional for FITS import)
+Optional requirements:
+ h5py (optional for HDF5 support)
+   http://www.h5py.org/
+ astropy >= 0.2 or PyFITS >= 1.1 (optional for FITS import)
    http://www.stsci.edu/resources/software_hardware/pyfits
+   http://www.astropy.org/
  pyemf >= 2.0.0 (optional for EMF export)
    http://pyemf.sourceforge.net/
  PyMinuit >= 1.1.2 (optional improved fitting)
    http://code.google.com/p/pyminuit/
- For EMF and better SVG export, PyQt >= 4.6 or better is
-   required, to fix a bug in the C++ wrapping
  dbus-python, for dbus interface
    http://dbus.freedesktop.org/doc/dbus-python/
  astropy (optional for VO table import)
@@ -96,14 +118,14 @@ Optional:
  SAMPy (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
 
-Veusz is Copyright (C) 2003-2013 Jeremy Sanders
-<jeremy@jeremysanders.net> and contributors. It is licenced under the
-GPL (version 2 or greater).
+Veusz is Copyright (C) 2003-2014 Jeremy Sanders <jeremy@jeremysanders.net>
+ and contributors.
+It is licenced under the GPL (version 2 or greater).
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
 examples are also useful documentation. Please also see and contribute
-to the Veusz wiki: http://barmag.net/veusz-wiki/
+to the Veusz wiki: https://github.com/jeremysanders/veusz/wiki
 
 Issues with the current version:
 

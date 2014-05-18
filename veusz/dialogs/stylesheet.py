@@ -48,10 +48,8 @@ class StylesheetDialog(VeuszDialog):
 
         self.fillStyleList()
 
-        self.connect(self.stylesListWidget,
-                     qt4.SIGNAL(
-                'currentItemChanged(QListWidgetItem *,QListWidgetItem *)'),
-                     self.slotStyleItemChanged)
+        self.stylesListWidget.currentItemChanged.connect(
+            self.slotStyleItemChanged)
 
         self.stylesListWidget.setCurrentRow(0)
 
@@ -60,14 +58,11 @@ class StylesheetDialog(VeuszDialog):
         close.setDefault(False)
         close.setAutoDefault(False)
 
-        self.connect(self.saveButton, qt4.SIGNAL('clicked()'),
-                     self.slotSaveStyleSheet)
-        self.connect(self.loadButton, qt4.SIGNAL('clicked()'),
-                     self.slotLoadStyleSheet)
+        self.saveButton.clicked.connect(self.slotSaveStyleSheet)
+        self.loadButton.clicked.connect(self.slotLoadStyleSheet)
 
         # recent button shows list of recently used files for loading
-        self.connect(self.recentButton, qt4.SIGNAL('filechosen'),
-                     self.loadStyleSheet)
+        self.recentButton.filechosen.connect(self.loadStyleSheet)
         self.recentButton.setSetting('stylesheetdialog_recent')
 
     def loadStyleSheet(self, filename):
@@ -108,8 +103,8 @@ class StylesheetDialog(VeuszDialog):
     def slotSaveStyleSheet(self):
         """Save stylesheet as a file."""
     
-        filename = self.parent()._fileSaveDialog(
-            'vst', _('Veusz stylesheet'), _('Save stylesheet'))
+        filename = self.parent().fileSaveDialog(
+            [_('Veusz stylesheet (*.vst)')], _('Save stylesheet'))
         if filename:
             try:
                 f = open(filename, 'w')
@@ -125,8 +120,8 @@ class StylesheetDialog(VeuszDialog):
 
     def slotLoadStyleSheet(self):
         """Load a style sheet."""
-        filename = self.parent()._fileOpenDialog(
-            'vst', _('Veusz stylesheet'), _('Load stylesheet'))
+        filename = self.parent().fileOpenDialog(
+            [_('Veusz stylesheet (*.vst)')], _('Load stylesheet'))
         if filename:
             try:
                 self.loadStyleSheet(filename)

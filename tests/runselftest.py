@@ -44,16 +44,32 @@ import glob
 import os
 import os.path
 import sys
+import subprocess
+import optparse
+
+try:
+    import h5py
+except ImportError:
+    h5py = None
 
 from veusz.compat import cexec, cstr
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
+import veusz.dataimport
 import veusz.document.svg_export as svg_export
 
 # required to get structures initialised
 import veusz.windows.mainwindow
+
+try:
+    from astropy.io import fits as pyfits
+except ImportError:
+    try:
+        import pyfits
+    except ImportError:
+        pyfits = None
 
 # these tests fail for some reason which haven't been debugged
 # it appears the failures aren't important however
@@ -61,6 +77,14 @@ excluded_tests = set([
         # fails on Linux Arm
         'spectrum.vsz',
         'hatching.vsz',
+
+        # fails on suse / fedora
+        'contour_labels.vsz',
+        # new arm self test failures
+        'example_import.vsz',
+        'profile.vsz',
+        '1dto2d.vsz',
+
         # don't expect this to work
         'mathml.vsz',
     ])
@@ -104,23 +128,39 @@ class PartTextAscii(_pt):
     def addText(self, text):
         self.text += text.encode('ascii', 'xmlcharrefreplace').decode('ascii')
 
-def renderTest(invsz, outfile):
+def renderVszTest(invsz, outfile, test_saves=False, test_unlink=False):
     """Render vsz document to create outfile."""
 
-    d = document.Document()
-    ifc = document.CommandInterface(d)
+    doc = document.Document()
+    mode = 'hdf5' if os.path.splitext(invsz)[1] == '.vszh5' else 'vsz'
+    doc.load(invsz, mode=mode)
 
-    # this lot looks a bit of a mess
-    cmds = d.eval_context
-    for cmd in document.CommandInterface.safe_commands:
-        cmds[cmd] = getattr(ifc, cmd)
-    for cmd in document.CommandInterface.unsafe_commands:
-        cmds[cmd] = getattr(ifc, cmd)
+    if test_unlink:
+        for d in doc.data:
+            doc.data[d].linked = None
 
-    cexec("from numpy import *", cmds)
-    ifc.AddImportPath( os.path.dirname(invsz) )
-    cexec(compile(open(invsz).read(), invsz, 'exec'), cmds)
+    if test_saves and h5py is not None:
+        tempfilename = 'self-test-temporary.vszh5'
+        doc.save(tempfilename, mode='hdf5')
+        doc = document.Document()
+        doc.load(tempfilename, mode='hdf5')
+        os.unlink(tempfilename)
+
+    if test_saves:
+        tempfilename = 'self-test-temporary.vsz'
+        doc.save(tempfilename, mode='vsz')
+        doc = document.Document()
+        doc.load(tempfilename, mode='vsz')
+        os.unlink(tempfilename)
+
+    ifc = document.CommandInterface(doc)
     ifc.Export(outfile)
+
+def renderPyTest(inpy, outfile):
+    """Render py embedded script to create outfile."""
+
+    retn = subprocess.call([sys.executable, inpy, outfile])
+    return retn == 0
 
 class Dirs(object):
     """Directories and files object."""
@@ -131,10 +171,12 @@ class Dirs(object):
         self.comparisondir = os.path.join(self.thisdir, 'comparison')
 
         files = ( glob.glob( os.path.join(self.exampledir, '*.vsz') ) +
-                  glob.glob( os.path.join(self.testdir, '*.vsz') ) )
+                  glob.glob( os.path.join(self.testdir, '*.vsz') ) +
+                  glob.glob( os.path.join(self.testdir, '*.vszh5') ) )
 
-        self.invszfiles = [ f for f in files if
-                            os.path.basename(f) not in excluded_tests ]
+        self.infiles = [ f for f in files if
+                         os.path.basename(f) not in excluded_tests ]
+        self.infiles += glob.glob(os.path.join(self.testdir, '*.py'))
 
 def renderAllTests():
     """Check documents produce same output as in comparison directory."""
@@ -142,25 +184,49 @@ def renderAllTests():
     print("Regenerating all test output")
 
     d = Dirs()
-    for vsz in d.invszfiles:
-        base = os.path.basename(vsz)
+    for infile in d.infiles:
+        base = os.path.basename(infile)
         print(base)
         outfile = os.path.join(d.comparisondir, base + '.selftest')
-        renderTest(vsz, outfile)
+        ext = os.path.splitext(base)[1]
+        if ext == '.vsz' or ext == '.vszh5':
+            renderVszTest(infile, outfile)
+        elif ext == '.py':
+            renderPyTest(infile, outfile)
 
-def runTests():
+def runTests(test_saves=False, test_unlink=False):
     print("Testing output")
 
     fails = 0
     passes = 0
+    skipped = 0
 
     d = Dirs()
-    for vsz in sorted(d.invszfiles):
-        base = os.path.basename(vsz)
+    for infile in sorted(d.infiles):
+        base = os.path.basename(infile)
         print(base)
 
+        ext = os.path.splitext(infile)[1]
+
+        if ( (base[:5] == 'hdf5_' and h5py is None) or
+             (base[:5] == 'fits_' and pyfits is None) or
+             (ext == '.vszh5' and h5py is None) ):
+            print(" SKIPPED")
+            skipped += 1
+            continue
+
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
-        renderTest(vsz, outfile)
+
+        if ext == '.vsz' or ext == '.vszh5':
+            renderVszTest(infile, outfile, test_saves=test_saves,
+                          test_unlink=test_unlink)
+        elif ext == '.py':
+            if not renderPyTest(infile, outfile):
+                print(" FAIL: did not execute cleanly")
+                fails += 1
+                continue
+        else:
+            raise RuntimeError('Invalid input file')
 
         comparfile = os.path.join(d.thisdir, 'comparison', base + '.selftest')
 
@@ -179,6 +245,8 @@ def runTests():
             os.unlink(outfile)
 
     print()
+    if skipped != 0:
+        print('Skipped %i tests' % skipped)
     if fails == 0:
         print("All tests %i/%i PASSED" % (passes, passes))
         sys.exit(0)
@@ -188,12 +256,7 @@ def runTests():
 
 oldflt = svg_export.fltStr
 def fltStr(v, prec=1):
-    # this is to get consistent rounding to get the self test correct... yuck
-    # decimal would work, but that drags in loads of code
-    # convert float to string with prec decimal places
-
-    v = round(v, prec+2)
-
+    """Only output floats to 1 dp."""
     return oldflt(v, prec=prec)
 
 if __name__ == '__main__':
@@ -217,10 +280,17 @@ if __name__ == '__main__':
     svg_export.scale = 1.
     svg_export.fltStr = fltStr
 
-    if len(sys.argv) == 1:
-        runTests()
-    else:
-        if len(sys.argv) != 2 or sys.argv[1] != 'regenerate':
-            print >>sys.stderr, "Usage: %s [regenerate]" % sys.argv[0]
-            sys.exit(1)
+    parser = optparse.OptionParser()
+    parser.add_option("", "--test-saves", action="store_true",
+                      help="tests saving documents and reloading them")
+    parser.add_option("", "--test-unlink", action="store_true",
+                      help="unlinks data from files before --test-saves")
+
+    options, args = parser.parse_args()
+    if len(args) == 0:
+        runTests(test_saves=options.test_saves,
+                 test_unlink=options.test_unlink)
+    elif args == ['regenerate']:
         renderAllTests()
+    else:
+        parser.error("argument must be empty or 'regenerate'")

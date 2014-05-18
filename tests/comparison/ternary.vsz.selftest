@@ -62,11 +62,13 @@
 <text x="322.7" y="125.4" font-size="14pt" fill="#000000">80</text>
 <text x="299.7" y="85.5" font-size="14pt" fill="#000000">90</text>
 <text x="276.7" y="45.6" font-size="14pt" fill="#000000">100</text>
-<text x="234.4" y="450" font-size="20pt" fill="#000000">Earth</text>
-<g transform="matrix(0.5 -0.866 0.866 0.5 117 236.3)">
+<g transform="translate(265.7,447.5)">
+<text x="-31.2" y="2.5" font-size="20pt" fill="#000000">Earth</text>
+</g>
+<g transform="matrix(0.5 -0.866 0.866 0.5 121.5 219.5)">
 <text x="-18.7" y="-5" font-size="20pt" fill="#000000">Air</text>
 </g>
-<g transform="matrix(0.5 0.866 -0.866 0.5 414.4 236.3)">
+<g transform="matrix(0.5 0.866 -0.866 0.5 409.9 219.5)">
 <text x="-25" y="-5" font-size="20pt" fill="#000000">Fire</text>
 </g>
 </g>

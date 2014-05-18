@@ -87,7 +87,7 @@ class BarPlotter(GenericPlotter):
 
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label bars'),
-                                    usertext=_('Labels'), datatype='text'), 5 )
+                                    usertext=_('Labels')), 5 )
 
         s.add( setting.Choice('mode', ('grouped', 'stacked', 'stacked-area'),
                               'grouped',
@@ -187,20 +187,20 @@ class BarPlotter(GenericPlotter):
         s = self.settings
         if ((s.direction == 'horizontal' and depname == 'sx') or
             (s.direction == 'vertical' and depname == 'sy')):
-                # update from lengths
-                data = s.get('lengths').getData(self.document)
-                if s.mode == 'grouped':
-                    # update range from individual datasets
-                    for d in data:
-                        drange = d.getRange()
-                        if drange is not None:
-                            axrange[0] = min(axrange[0], drange[0])
-                            axrange[1] = max(axrange[1], drange[1])
-                else:
-                    # update range from sum of datasets
-                    minv, maxv = self.singleBarDataRange(data)
-                    axrange[0] = min(axrange[0], minv)
-                    axrange[1] = max(axrange[1], maxv)
+            # update from lengths
+            data = s.get('lengths').getData(self.document)
+            if s.mode == 'grouped':
+                # update range from individual datasets
+                for d in data:
+                    drange = d.getRange()
+                    if drange is not None:
+                        axrange[0] = min(axrange[0], drange[0])
+                        axrange[1] = max(axrange[1], drange[1])
+            else:
+                # update range from sum of datasets
+                minv, maxv = self.singleBarDataRange(data)
+                axrange[0] = min(axrange[0], minv)
+                axrange[1] = max(axrange[1], maxv)
         else:
             if s.posn:
                 # use given positions
@@ -446,6 +446,10 @@ class BarPlotter(GenericPlotter):
             dsvals, vaxis, widgetposn)
         # coordinates of origin
         zerocoords = vaxis.dataToPlotterCoords(widgetposn, N.zeros(posns.shape))
+
+        # bail out if problem
+        if len(zerocoords) == 0 or len(posns) == 0:
+            return
 
         # draw areas (reverse order, so edges are plotted correctly)
         for dsnum, coords in czip( crange(len(stackedcoords)-1, -1, -1),

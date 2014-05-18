@@ -25,7 +25,7 @@ import sys
 
 import numpy as N
 
-from ..compat import citems, czip, ckeys, cstr
+from ..compat import czip, cstr
 from .. import document
 from .. import setting
 from .. import utils
@@ -92,17 +92,17 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     redchi2 = retchi2 / dof
 
     if have_err:
-        print(_('Fit results:\n'), "\n".join([
+        print(_('Fit results:\n') + "\n".join([
                     u"    %s = %g \u00b1 %g (+%g / %g)"
                     % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)],
                        m.merrors[(n, -1.0)]) for n in names]))
     elif have_symerr:
-        print(_('Fit results:\n'), "\n".join([
+        print(_('Fit results:\n') + "\n".join([
                     u"    %s = %g \u00b1 %g" % (n, m.values[n], m.errors[n])
                     for n in names]))
         print(_('MINOS error estimate not available.'))
     else:
-        print(_('Fit results:\n'), "\n".join([
+        print(_('Fit results:\n') + "\n".join([
                     '    %s = %g' % (n, m.values[n]) for n in names]))
         print(_('No error analysis available: fit quality uncertain'))
 
@@ -217,7 +217,7 @@ class Fit(FunctionPlotter):
             # build up a set of X=Y values
             loc = self.document.locale
             txt = []
-            for l, v in sorted(citems(vals)):
+            for l, v in sorted(vals.items()):
                 val = utils.formatNumber(v, '%.4Vg', locale=loc)
                 txt.append( '%s = %s' % (l, val) )
             # add chi2 output
@@ -242,7 +242,7 @@ class Fit(FunctionPlotter):
             return
 
         # populate the input parameters
-        paramnames = sorted(ckeys(s.values))
+        paramnames = sorted(s.values)
         params = N.array( [s.values[p] for p in paramnames] )
 
         # FIXME: loads of error handling!!

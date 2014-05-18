@@ -103,7 +103,7 @@ class TreeModel(qt4.QAbstractItemModel):
         """Get text or tooltip."""
         if index.isValid():
             item = self.objFromIndex(index)
-            if role == qt4.Qt.DisplayRole:
+            if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
                 return item.nodeData(index.column())
             elif role == qt4.Qt.ToolTipRole:
                 return item.toolTip(index.column())
@@ -243,11 +243,9 @@ class TreeModel(qt4.QAbstractItemModel):
                     clone._idx = idx
                     self.nodes[idx] = clone
 
-                    self.emit(qt4.SIGNAL('dataChanged(const QModelIndex &, '
-                                         'const QModelIndex &)'),
-                              self.index(i, 0, parentidx),
-                              self.index(i, len(c[i].data)-1,
-                                         parentidx))
+                    self.dataChanged.emit(
+                        self.index(i, 0, parentidx),
+                        self.index(i, len(c[i].data)-1, parentidx))
 
             # now recurse to update any subnodes
             newindex = self.index(i, 0, parentidx)

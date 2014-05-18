@@ -130,11 +130,42 @@ void addNumpyPolygonToPath(QPainterPath &path, const Tuple2Ptrs& d,
     }
 }
 
+namespace
+{
+
+  // Scale path by scale given. Puts output in out.
+  void scalePath(const QPainterPath& path, qreal scale, QPainterPath& out)
+  {
+    const int count = path.elementCount();
+    for(int i=0; i<count; ++i)
+      {
+	const QPainterPath::Element& el = path.elementAt(i);
+	if(el.isMoveTo())
+	  {
+	    out.moveTo(el*scale);
+	  }
+	else if(el.isLineTo())
+	  {
+	    out.lineTo(el*scale);
+	  }
+	else if(el.isCurveTo())
+	  {
+	    out.cubicTo(el*scale,
+			path.elementAt(i+1)*scale,
+			path.elementAt(i+2)*scale);
+	    i += 2;
+	  }
+      }
+  }
+
+} // namespace
+
 void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 			const Numpy1DObj& x, const Numpy1DObj& y,
 			const Numpy1DObj* scaling,
 			const QRectF* clip,
-			const QImage* colorimg)
+			const QImage* colorimg,
+			bool scaleline)
 {
   QRectF cliprect( QPointF(-32767,-32767), QPointF(32767,32767) );
   if( clip != 0 )
@@ -169,12 +200,7 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
       if( cliprect.contains(pt) && ! smallDelta(lastpt, pt) )
 	{
 	  painter.translate(pt);
-	  if( scaling != 0 )
-	    {
-	      // scale point if requested
-	      const qreal s = (*scaling)(i);
-	      painter.scale(s, s);
-	    }
+
 	  if( colorimg != 0 )
 	    {
 	      // get color from pixel and create a new brush
@@ -182,7 +208,27 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 	      painter.setBrush(b);
 	    }
 
-	  painter.drawPath(path);
+	  if( scaling == 0 )
+	    {
+	      painter.drawPath(path);
+	    }
+	  else
+	    {
+	      // scale point if requested
+	      const qreal s = (*scaling)(i);
+	      if( scaleline )
+		{
+		  painter.scale(s, s);
+		  painter.drawPath(path);
+		}
+	      else
+		{
+		  QPainterPath scaled;
+		  scalePath(path, s, scaled);
+		  painter.drawPath(scaled);
+		}
+	    }
+
 	  painter.setWorldTransform(origtrans);
 	  lastpt = pt;
 	}
@@ -376,4 +422,70 @@ void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
 	  *(scanline+x) = newcol;
 	}
     }
+}
+
+QImage resampleLinearImage(QImage& img,
+			   const Numpy1DObj& xpts, const Numpy1DObj& ypts)
+{
+  // reversed mode
+  const int revx = xpts(0) > xpts(xpts.dim-1);
+  const int revy = ypts(0) > ypts(ypts.dim-1);
+
+  // get smallest spacing
+  double mindeltax = 1e99;
+  for(int i=0; i<(xpts.dim-1); ++i)
+    {
+      mindeltax = std::min(mindeltax, fabs(xpts(i+1)-xpts(i)));
+    }
+  double mindeltay = 1e99;
+  for(int i=0; i<(ypts.dim-1); ++i)
+    {
+      mindeltay = std::min(mindeltay, fabs(ypts(i+1)-ypts(i)));
+    }
+
+  // get bounds
+  const double minx = revx ? xpts(xpts.dim-1) : xpts(0);
+  const double maxx = revx ? xpts(0) : xpts(xpts.dim-1);
+  const double miny = revy ? ypts(ypts.dim-1) : ypts(0);
+  const double maxy = revy ? ypts(0) : ypts(ypts.dim-1);
+
+  // output size (trimmed to 1024)
+  const int sizex = std::min(1024, int((maxx-minx) / (mindeltax*0.25) + 0.01) );
+  const int sizey = std::min(1024, int((maxy-miny) / (mindeltay*0.25) + 0.01) );
+  const double deltax = (maxx-minx) / sizex;
+  const double deltay = (maxy-miny) / sizey;
+
+  QImage outimg(sizex, sizey, img.format());
+
+  // need to account for reverse direction, so count backwards
+  const int xptsbase = revx ? xpts.dim-1 : 0;
+  const int xptsdir = revx ? -1 : 1;
+  const int yptsbase = revy ? ypts.dim-1 : 0;
+  const int yptsdir = revy ? -1 : 1;
+
+  int iy = 0;
+  for(int oy = 0; oy < sizey; ++oy)
+    {
+      // do we move to the next pixel in y?
+      while( miny+(oy+0.5)*deltay > ypts(yptsbase+yptsdir*(iy+1)) &&
+	     iy < ypts.dim-2 )
+	++iy;
+
+      QRgb* iscanline = reinterpret_cast<QRgb*>(img.scanLine(iy));
+      QRgb* oscanline = reinterpret_cast<QRgb*>(outimg.scanLine(oy));
+
+      int ix = 0;
+      for(int ox = 0; ox < sizex; ++ox)
+	{
+	  // do we move to the next pixel in x?
+	  while( minx+(ox+0.5)*deltax > xpts(xptsbase+xptsdir*(ix+1)) &&
+		 ix < xpts.dim-2 )
+	    ++ix;
+
+	  // copy pixel
+	  *(oscanline+ox) = *(iscanline+ix);
+	}
+    }
+
+  return outimg;
 }

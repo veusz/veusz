@@ -102,7 +102,7 @@ class ColorBar(axis.Axis):
         s.add( setting.SettingBackwardCompat('image', 'widgetName', None) )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import graph, grid, nonorthgraph
         return (graph.Graph, grid.Grid, nonorthgraph.NonOrthGraph)
 

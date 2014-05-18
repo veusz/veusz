@@ -17,7 +17,6 @@
 ##############################################################################
 
 from __future__ import division
-from ..compat import citems
 from .. import qtall as qt4
 from .. import setting
 from .. import utils
@@ -95,8 +94,8 @@ class PreferencesDialog(VeuszDialog):
         self.exportQuality.setValue( setdb['export_quality'] )
 
         # changing background color of bitmaps
-        self.connect( self.exportBackgroundButton, qt4.SIGNAL('clicked()'),
-                      self.slotExportBackgroundChanged )
+        self.exportBackgroundButton.clicked.connect(
+            self.slotExportBackgroundChanged )
         self.updateExportBackground(setdb['export_background'])
 
         # set color setting
@@ -105,22 +104,18 @@ class PreferencesDialog(VeuszDialog):
 
         # default stylesheet
         self.styleLineEdit.setText(setdb['stylesheet_default'])
-        self.connect( self.styleBrowseButton, qt4.SIGNAL('clicked()'),
-                      self.styleBrowseClicked )
+        self.styleBrowseButton.clicked.connect(self.styleBrowseClicked)
 
         # default custom settings
         self.customLineEdit.setText(setdb['custom_default'])
-        self.connect( self.customBrowseButton, qt4.SIGNAL('clicked()'),
-                      self.customBrowseClicked )
+        self.customBrowseButton.clicked.connect(self.customBrowseClicked)
 
         # for plugins
         plugins = list( setdb.get('plugins', []) )
         self.pluginmodel = qt4.QStringListModel(plugins)
         self.pluginList.setModel(self.pluginmodel)
-        self.connect( self.pluginAddButton, qt4.SIGNAL('clicked()'),
-                      self.pluginAddClicked )
-        self.connect( self.pluginRemoveButton, qt4.SIGNAL('clicked()'),
-                      self.pluginRemoveClicked )
+        self.pluginAddButton.clicked.connect(self.pluginAddClicked)
+        self.pluginRemoveButton.clicked.connect(self.pluginRemoveClicked)
 
         # specifics for color tab
         self.setupColorTab()
@@ -140,8 +135,7 @@ class PreferencesDialog(VeuszDialog):
         layout = qt4.QGridLayout()
         setdb = setting.settingdb
         for row, colname in enumerate(setdb.colors):
-            isdefault, colval = setting.settingdb['color_%s' %
-                                                  colname]
+            isdefault, colval = setting.settingdb['color_%s' % colname]
             self.chosencolors[colname] = qt4.QColor(colval)
 
             # label
@@ -158,31 +152,28 @@ class PreferencesDialog(VeuszDialog):
             self.colordefaultcheck[colname] = defcheck
             defcheck.setChecked(isdefault)
 
-            # button
-            button = qt4.QPushButton()
-
             # connect button to method to change color
-            def clicked(color=colname):
-                self.colorButtonClickedSlot(color)
-            self.connect(button, qt4.SIGNAL('clicked()'),
-                         clicked)
+            button = self.colorbutton[colname] = qt4.QPushButton()
+            def getcolclick(cname):
+                # double function to get around colname changing
+                return lambda: self.colorButtonClicked(cname)
+            button.clicked.connect(getcolclick(colname))
             layout.addWidget(button, row, 2)
-            self.colorbutton[colname] = button
 
         self.colorGroup.setLayout(layout)
 
         self.updateButtonColors()
 
-    def colorButtonClickedSlot(self, color):
+    def colorButtonClicked(self, cname):
         """Open color dialog if color button clicked."""
-        retcolor = qt4.QColorDialog.getColor( self.chosencolors[color], self )
+        retcolor = qt4.QColorDialog.getColor( self.chosencolors[cname], self )
         if retcolor.isValid():
-            self.chosencolors[color] = retcolor
+            self.chosencolors[cname] = retcolor
             self.updateButtonColors()
 
     def updateButtonColors(self):
         """Update color icons on color buttons."""
-        for name, val in citems(self.chosencolors):
+        for name, val in self.chosencolors.items():
             pixmap = qt4.QPixmap(16, 16)
             pixmap.fill(val)
             self.colorbutton[name].setIcon( qt4.QIcon(pixmap) )
@@ -258,7 +249,7 @@ class PreferencesDialog(VeuszDialog):
         setdb['custom_default'] = self.customLineEdit.text()
 
         # colors
-        for name, color in citems(self.chosencolors):
+        for name, color in self.chosencolors.items():
             isdefault = self.colordefaultcheck[name].isChecked()
             colorname = color.name()
             setdb['color_' + name] = (isdefault, colorname)
@@ -278,22 +269,22 @@ class PreferencesDialog(VeuszDialog):
 
     def styleBrowseClicked(self):
         """Browse for a stylesheet."""
-        filename = self.parent()._fileOpenDialog(
-            'vst', _('Veusz stylesheet'), _('Choose stylesheet'))
+        filename = self.parent().fileOpenDialog(
+            [_('Veusz stylesheet (*.vst)')], _('Choose stylesheet'))
         if filename:
             self.styleLineEdit.setText(filename)
 
     def customBrowseClicked(self):
         """Browse for a custom definitons."""
-        filename = self.parent()._fileOpenDialog(
-            'vsz', _('Veusz documents'), _('Choose custom definitons'))
+        filename = self.parent().fileOpenDialog(
+            [_('Veusz document (*.vsz)')], _('Choose custom definitons'))
         if filename:
             self.customLineEdit.setText(filename)
 
     def pluginAddClicked(self):
         """Add a new plugin."""
-        filename = self.parent()._fileOpenDialog(
-            'py', _('Python scripts'), _('Choose plugin'))
+        filename = self.parent().fileOpenDialog(
+            [_('Python scripts (*.py)')], _('Choose plugin'))
         if filename:
             self.pluginmodel.insertRows(0, 1)
             self.pluginmodel.setData( self.pluginmodel.index(0),

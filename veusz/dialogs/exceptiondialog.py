@@ -146,8 +146,8 @@ def formatLocals(exception):
             outlines.append(' %s = %s' % (key, v))
 
             # print out attributes if item is self
-            if key == 'self' and value not in alreadyself:
-                alreadyself.add(value)
+            if key == 'self' and id(value) not in alreadyself:
+                alreadyself.add(id(value))
                 for attr in sorted( dir(value) ):
                     try:
                         v = getattr(value, attr)
@@ -178,8 +178,8 @@ class ExceptionDialog(VeuszDialog):
         VeuszDialog.__init__(self, parent, 'exceptionlist.ui')
 
         # get text for traceback and locals
-        self.backtrace = ( ''.join(traceback.format_exception(*exception)) +
-                           formatLocals(exception) )
+        self.fmtexcept = ''.join(traceback.format_exception(*exception))
+        self.backtrace = self.fmtexcept + formatLocals(exception)
 
         self.errortextedit.setPlainText(self.backtrace)
 
@@ -188,8 +188,7 @@ class ExceptionDialog(VeuszDialog):
                                              None, self)
         self.erroriconlabel.setPixmap(icon.pixmap(32))
 
-        self.connect(self.ignoreSessionButton, qt4.SIGNAL('clicked()'),
-                     self.ignoreSessionSlot)
+        self.ignoreSessionButton.clicked.connect(self.ignoreSessionSlot)
        
         self.checkVeuszVersion()
 
@@ -229,12 +228,12 @@ class ExceptionDialog(VeuszDialog):
         
     def ignoreSessionSlot(self):
         """Ignore exception for session."""
-        ExceptionDialog.ignore_exceptions.add(self.backtrace)
+        ExceptionDialog.ignore_exceptions.add(self.fmtexcept)
         self.reject()
 
     def exec_(self):
         """Exec dialog if exception is not ignored."""
-        if self.backtrace not in ExceptionDialog.ignore_exceptions:
+        if self.fmtexcept not in ExceptionDialog.ignore_exceptions:
             VeuszDialog.exec_(self)
 
         # send another exception shortly - this clears out the current one

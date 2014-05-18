@@ -22,7 +22,7 @@ and exporting text as paths for WYSIWYG."""
 from __future__ import division, print_function
 import re
 
-from ..compat import crange, citems, cbytes
+from ..compat import crange, cbytes
 from .. import qtall as qt4
 
 # dpi runs at many times usual, and results are scaled down
@@ -43,6 +43,9 @@ def printpath(path):
 def fltStr(v, prec=2):
     """Change a float to a string, using a maximum number of decimal places
     but removing trailing zeros."""
+
+    # ensures consistent rounding behaviour on different platforms
+    v = round(v, prec+2)
 
     val = ('% 20.10f' % v)[:10+prec]
 
@@ -369,7 +372,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         if b.color().alphaF() != 1.0:
             vals['fill-opacity'] = '%.3g' % b.color().alphaF()
 
-        items = ['%s="%s"' % x for x in sorted(citems(vals))]
+        items = ['%s="%s"' % x for x in sorted(vals.items())]
         return tuple(items)
 
     def transformState(self):
@@ -456,6 +459,10 @@ class SVGPaintEngine(qt4.QPaintEngine):
                 'y="%s"' % fltStr(pt.y()*scale),
                 'textLength="%s"' % fltStr(textitem.width()*scale),
                 ]
+
+            # spaces get lost without this
+            if text.find('  ') >= 0 or text[:1] == ' ' or text[-1:] == ' ':
+                textattrb.append('xml:space="preserve"')
 
             # write as an SVG text element
             SVGElement(

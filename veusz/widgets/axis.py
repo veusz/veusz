@@ -331,7 +331,7 @@ class Axis(widget.Widget):
                pixmap='settings_axisminorgridlines' )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         from . import graph, grid
         return (graph.Graph, grid.Grid)
 
@@ -387,7 +387,7 @@ class Axis(widget.Widget):
             # this is ensured to be an Axis
             try:
                 widget = s.get('match').getReferredWidget()
-            except setting.InvalidType:
+            except utils.InvalidType:
                 widget = None
 
             # this looks valid + sanity checks
@@ -411,7 +411,7 @@ class Axis(widget.Widget):
         # tweak range to make sure things don't blow up further down the
         # line
         if ( abs(self.plottedrange[0] - self.plottedrange[1]) <
-             ( abs(self.plottedrange[0]) + abs(self.plottedrange[1]) )*1e-8 ):
+             ( abs(self.plottedrange[0]) + abs(self.plottedrange[1]) )*1e-12 ):
                self.plottedrange[1] = ( self.plottedrange[0] +
                                         max(1., self.plottedrange[0]*0.1) )
 
@@ -1088,16 +1088,19 @@ class Axis(widget.Widget):
 
         texttorender is a list of (Renderer, QPen) tuples.
         """
-        drawntext = qt4.QPainterPath()
-        for r, pen in texttorender:
-            bounds = r.getBounds()
-            rect = qt4.QRectF(bounds[0], bounds[1], bounds[2]-bounds[0],
-                              bounds[3]-bounds[1])
+        overlaps = utils.RectangleOverlapTester()
 
-            if not drawntext.intersects(rect):
+        for r, pen in texttorender:
+            rect = r.getTightBounds()
+
+            if not overlaps.willOverlap(rect):
                 painter.setPen(pen)
                 r.render()
-                drawntext.addRect(rect)
+                overlaps.addRect(rect)
+
+            # debug
+            # poly = rect.makePolygon()
+            # painter.drawPolygon(poly)
 
     def _axisDraw(self, posn, parentposn, outerbounds, painter, phelper):
         """Internal drawing routine."""
@@ -1161,16 +1164,31 @@ class Axis(widget.Widget):
 
         if cgi.zoomed():
             # zoom axis scale
-            c1, c2 = self.plotterToGraphCoords(
-                cgi.maxposn, N.array([cgi.minzoom, cgi.maxzoom]))
+            # we convert a neighbouring pixel to see how we should
+            # round the text
+            c1, c2, c1delt, c2delt = self.plotterToGraphCoords(
+                cgi.maxposn, N.array([cgi.minzoom, cgi.maxzoom,
+                                      cgi.minzoom+1, cgi.maxzoom-1]))
             if c1 > c2:
                 c1, c2 = c2, c1
-            operations = (
-                document.OperationSettingSet(s.get('min'), float(c1)),
-                document.OperationSettingSet(s.get('max'), float(c2)),
-                )
+                c1delt, c2delt = c2delt, c1delt
+
+            round1 = utils.round2delt(c1, c1delt)
+            round2 = utils.round2delt(c2, c2delt)
+
+            ops = []
+            if ( (s.min == 'Auto' or not N.allclose(c1, s.min, rtol=1e-8))
+                 and N.isfinite(round1) ):
+                ops.append( document.OperationSettingSet(
+                        s.get('min'), round1) )
+            if ( (s.max == 'Auto' or not N.allclose(c2, s.max, rtol=1e-8))
+                 and N.isfinite(round2) ):
+                ops.append( document.OperationSettingSet(
+                        s.get('max'), round2) )
+
             self.document.applyOperation(
-                document.OperationMultiple(operations, descr=_('zoom axis')))
+                document.OperationMultiple(ops, descr=_('zoom axis')))
+
         elif cgi.moved():
             # move axis
             # convert positions to fractions
@@ -1185,13 +1203,18 @@ class Axis(widget.Widget):
                 minfrac, maxfrac = maxfrac, minfrac
 
             # update doc
-            operations = (
-                document.OperationSettingSet(s.get('lowerPosition'), minfrac),
-                document.OperationSettingSet(s.get('upperPosition'), maxfrac),
-                document.OperationSettingSet(s.get('otherPosition'), axisfrac),
-                )
+            ops = []
+            if s.lowerPosition != minfrac:
+                ops.append( document.OperationSettingSet(
+                        s.get('lowerPosition'), round(minfrac, 3)) )
+            if s.upperPosition != maxfrac:
+                ops.append( document.OperationSettingSet(
+                        s.get('upperPosition'), round(maxfrac, 3)) )
+            if s.otherPosition != axisfrac:
+                ops.append( document.OperationSettingSet(
+                        s.get('otherPosition'), round(axisfrac, 3)) )
             self.document.applyOperation(
-                document.OperationMultiple(operations, descr=_('adjust axis')))
+                document.OperationMultiple(ops, descr=_('adjust axis')))
 
 # allow the factory to instantiate an axis
 document.thefactory.register( Axis )

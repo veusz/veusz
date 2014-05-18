@@ -68,7 +68,7 @@ class NonOrthPoint(Widget):
         s.add( setting.DatasetOrStr(
                 'labels', '',
                 descr=_('Dataset or string to label points'),
-                usertext=_('Labels'), datatype='text') )
+                usertext=_('Labels')) )
         s.add( setting.DatasetExtended(
                 'scalePoints', '',
                 descr = _('Scale size of plotted markers by this dataset, '
@@ -76,6 +76,11 @@ class NonOrthPoint(Widget):
                 usertext=_('Scale markers')) )
         s.add( setting.MarkerColor('Color') )
 
+        s.add( setting.Color('color',
+                             'black',
+                             descr = _('Master color'),
+                             usertext = _('Color'),
+                             formatting=True), 0 )
         s.add( setting.DistancePt('markerSize',
                                   '3pt',
                                   descr = _('Size of marker to plot'),
@@ -88,9 +93,11 @@ class NonOrthPoint(Widget):
                             descr = _('Plot line settings'),
                             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
-        s.add( setting.Line('MarkerLine',
-                            descr = _('Line around the marker settings'),
-                            usertext = _('Marker border')),
+        s.PlotLine.get('color').newDefault( setting.Reference('../color') )
+
+        s.add( setting.MarkerLine('MarkerLine',
+                                  descr = _('Line around the marker settings'),
+                                  usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
         s.add( MarkerFillBrush('MarkerFill',
                                descr = _('Marker fill settings'),
@@ -110,7 +117,7 @@ class NonOrthPoint(Widget):
                pixmap = 'settings_axislabel' )
 
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         return (NonOrthGraph,)
 
     @property
@@ -248,7 +255,8 @@ class NonOrthPoint(Widget):
 
                     utils.plotMarkers(painter, px, py, s.marker, markersize,
                                       scaling=pscale, clip=cliprect,
-                                      cmap=cmap, colorvals=colorvals)
+                                      cmap=cmap, colorvals=colorvals,
+                                      scaleline=s.MarkerLine.scaleLine)
 
                 # finally plot any labels
                 if textitems and not s.Label.hide:

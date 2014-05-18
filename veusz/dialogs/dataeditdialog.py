@@ -25,6 +25,7 @@ from __future__ import division
 from ..compat import cstr
 from .. import qtall as qt4
 from .. import document
+from .. import setting
 from ..qtwidgets.datasetbrowser import DatasetBrowser
 from .veuszdialog import VeuszDialog
 
@@ -43,8 +44,8 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
+
+        document.signalModified.connect(self.slotDocumentModified)
 
     def rowCount(self, parent):
         """Return number of rows."""
@@ -56,10 +57,10 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             return len(self.document.data[self.dsname].data)+1
         except (KeyError, AttributeError):
             return 0
-        
+
     def slotDocumentModified(self):
         """Called when document modified."""
-        self.emit( qt4.SIGNAL('layoutChanged()') )
+        self.layoutChanged.emit()
 
     def columnCount(self, parent):
         """Return number of columns."""
@@ -79,7 +80,8 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         if ds is not None:
             # select correct part of dataset
             data = getattr(ds, ds.columns[index.column()])
-        if ds is not None and data is not None and role == qt4.Qt.DisplayRole:
+        if ds is not None and data is not None and role in (
+            qt4.Qt.DisplayRole, qt4.Qt.EditRole):
             # blank row at end of data
             if index.row() == len(data):
                 return None
@@ -110,12 +112,15 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
                 return section+1
 
         return None
-        
+
     def flags(self, index):
         """Update flags to say that items are editable."""
         if index.isValid():
-            return ( qt4.QAbstractTableModel.flags(self, index) |
-                     qt4.Qt.ItemIsEditable )
+            f = qt4.QAbstractTableModel.flags(self, index)
+            ds = self.document.data.get(self.dsname)
+            if ds is not None and ds.editable:
+                f |= qt4.Qt.ItemIsEditable
+            return f
         return qt4.Qt.ItemIsEnabled
 
     def removeRows(self, row, count):
@@ -175,8 +180,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsnames = datasetnames
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
+        document.signalModified.connect(self.slotDocumentModified)
 
         self.changeset = -1
         self.rows = 0
@@ -230,7 +234,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
 
     def slotDocumentModified(self):
         self.updateCounts()
-        self.emit( qt4.SIGNAL('layoutChanged()') )
+        self.layoutChanged.emit()
 
     def data(self, index, role):
         """Return data for index."""
@@ -270,8 +274,12 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
     def flags(self, index):
         """Update flags to say that items are editable."""
         if index.isValid():
-            return ( qt4.QAbstractTableModel.flags(self, index) |
-                     qt4.Qt.ItemIsEditable )
+            f = qt4.QAbstractTableModel.flags(self, index)
+            dsname, colname, dsidx, colidx = self.colattrs[index.column()]
+            ds = self.document.data.get(dsname)
+            if ds is not None and ds.editable:
+                f |= qt4.Qt.ItemIsEditable
+            return f
         return qt4.Qt.ItemIsEnabled
 
     def setData(self, index, value, role):
@@ -334,8 +342,16 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
 
         self.document = document
         self.dsname = datasetname
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
+        self.updatePixelCoords()
+        document.signalModified.connect(self.slotDocumentModified)
+
+    def updatePixelCoords(self):
+        """Get coordinates at edge of grid."""
+        self.xedge = self.yedge = self.xcent = self.ycent = []
+        ds = self.document.data.get(self.dsname)
+        if ds:
+            self.xcent, self.ycent = ds.getPixelCentres()
+            self.xedge, self.yedge = ds.getPixelEdges()
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -368,33 +384,36 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         """Return headers at top."""
 
-        if role == qt4.Qt.DisplayRole:
-            ds = self.document.data[self.dsname]
+        ds = self.document.data[self.dsname]
+        xaxis = orientation == qt4.Qt.Horizontal
 
-            if ds is not None:
-                # return a number for the top left of the cell
-                if orientation == qt4.Qt.Horizontal:
-                    r = ds.xrange
-                    num = ds.data.shape[1]
-                else:
-                    r = ds.yrange
-                    r = (r[1], r[0]) # swap (as y reversed)
-                    num = ds.data.shape[0]
-                val = (r[1]-r[0])/num*(section+0.5)+r[0]
-                return '%g' % val
+        if ds is not None and role == qt4.Qt.DisplayRole:
+            v = self.xcent[section] if xaxis else self.ycent[section]
+            return '%i (%s)' % (section+1, setting.ui_floattostring(v))
+
+        elif ds is not None and role == qt4.Qt.ToolTipRole:
+            v1 = self.xedge[section] if xaxis else self.yedge[section]
+            v2 = self.xedge[section+1] if xaxis else self.yedge[section+1]
+            return u'%s\u2013%s' % (setting.ui_floattostring(v1),
+                                    setting.ui_floattostring(v2))
 
         return None
-    
+
     def flags(self, index):
         """Update flags to say that items are editable."""
         if not index.isValid():
             return qt4.Qt.ItemIsEnabled
         else:
-            return qt4.QAbstractTableModel.flags(self, index) | qt4.Qt.ItemIsEditable
+            f = qt4.QAbstractTableModel.flags(self, index)
+            ds = self.document.data.get(self.dsname)
+            if ds is not None and ds.editable:
+                f |= qt4.Qt.ItemIsEditable
+            return f
 
     def slotDocumentModified(self):
         """Called when document modified."""
-        self.emit( qt4.SIGNAL('layoutChanged()') )
+        self.updatePixelCoords()
+        self.layoutChanged.emit()
 
     def setData(self, index, value, role):
         """Called to set the data."""
@@ -417,6 +436,26 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         self.document.applyOperation(op)
         return True
 
+class ViewDelegate(qt4.QStyledItemDelegate):
+    """Delegate for fixing double editing.
+    Normal editing uses double spin box, which is inappropriate
+    """
+
+    def createEditor(self, parent, option, index):
+        if type(index.data()) is float:
+            return qt4.QLineEdit(parent)
+        else:
+            return qt4.QStyledItemDelegate.createEditor(
+                self, parent, option, index)
+
+    def setEditorData(self, editor, index):
+        """Override setData to use correct formatting."""
+        if type(index.data()) is float:
+            txt = setting.ui_floattostring(index.data())
+            editor.setText(txt)
+        else:
+            qt4.QStyledItemDelegate.setEditorData(self, editor, index)
+
 class DataEditDialog(VeuszDialog):
     """Dialog for editing and rearranging data sets."""
     
@@ -430,6 +469,9 @@ class DataEditDialog(VeuszDialog):
             _('Select multiple datasets to edit simultaneously'))
         self.splitter.insertWidget(0, self.dsbrowser)
 
+        self.deligate = ViewDelegate()
+        self.datatableview.setItemDelegate(self.deligate)
+
         # actions for data table
         for text, slot in (
             (_('Copy'), self.slotCopy),
@@ -437,7 +479,7 @@ class DataEditDialog(VeuszDialog):
             (_('Insert row'), self.slotInsertRow),
             ):
             act = qt4.QAction(text, self)
-            self.connect(act, qt4.SIGNAL('triggered()'), slot)
+            act.triggered.connect(slot)
             self.datatableview.addAction(act)
         self.datatableview.setContextMenuPolicy( qt4.Qt.ActionsContextMenu )
 
@@ -450,17 +492,16 @@ class DataEditDialog(VeuszDialog):
         self.linkedlabel.viewport().setBackgroundRole(qt4.QPalette.Window)
 
         # document changes
-        self.connect(document, qt4.SIGNAL('sigModified'),
-                     self.slotDocumentModified)
+        document.signalModified.connect(self.slotDocumentModified)
 
         # select first item, if any or initialise if none
         if len(self.document.data) > 0:
-            self.selectDataset( sorted(self.document.data.keys())[0] )
+            self.selectDataset( sorted(self.document.data)[0] )
         else:
             self.slotDatasetsSelected([])
 
-        self.connect(self.dsbrowser.navtree, qt4.SIGNAL("selecteddatasets"),
-                     self.slotDatasetsSelected)
+        self.dsbrowser.navtree.selecteddatasets.connect(
+            self.slotDatasetsSelected)
 
         # connect buttons
         for btn, slot in ( (self.deletebutton, self.slotDatasetDelete),
@@ -470,7 +511,7 @@ class DataEditDialog(VeuszDialog):
                            (self.createbutton, self.slotDatasetCreate),
                            (self.editbutton, self.slotDatasetEdit),
                            ):
-            self.connect(btn, qt4.SIGNAL('clicked()'), slot)
+            btn.clicked.connect(slot)
 
         # menu for new button
         self.newmenu = qt4.QMenu()
@@ -478,7 +519,7 @@ class DataEditDialog(VeuszDialog):
                             (_('Text dataset'), self.slotNewTextDataset),
                             (_('Date/time dataset'), self.slotNewDateDataset) ):
             a = self.newmenu.addAction(text)
-            self.connect(a, qt4.SIGNAL('triggered()'), slot)
+            a.triggered.connect(slot)
         self.newbutton.setMenu(self.newmenu)
 
     def slotDatasetsSelected(self, names):

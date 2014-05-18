@@ -20,6 +20,7 @@
 ##############################################################################
 
 from __future__ import division
+import textwrap
 from .. import qtall as qt4
 
 from .. import document
@@ -80,9 +81,20 @@ class Root(widget.Widget):
                 usertext=_('English locale'),
                 formatting=True) )
 
+        s.add( setting.Notes(
+                'notes', '',
+                descr=_('User-defined notes'),
+                usertext=_('Notes')
+                ) )
+
     @classmethod
-    def allowedParentTypes(self):
+    def allowedParentTypes(klass):
         return (None,)
+
+    @property
+    def userdescription(self):
+        """Return user-friendly description."""
+        return textwrap.fill(self.settings.notes, 60)
 
     def changeLocale(self):
         """Update locale of document if changed by user."""

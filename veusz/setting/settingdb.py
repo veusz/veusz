@@ -21,7 +21,6 @@
 from __future__ import division, print_function
 import sys
 
-from ..compat import citems
 from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Preferences"):
@@ -141,13 +140,13 @@ class _SettingDB(object):
             try:
                 self.database[realkey] = eval(val)
             except:
-                print(('Error interpreting item "%s" in '
-                                     'settings file' % realkey), file=sys.stderr)
+                print('Error interpreting item "%s" in '
+                      'settings file' % realkey, file=sys.stderr)
 
         # set any defaults which haven't been set
-        for key, value in citems(defaultValues):
+        for key in defaultValues:
             if key not in self.database:
-                self.database[key] = value
+                self.database[key] = defaultValues[key]
 
     def writeSettings(self):
         """Write the settings using QSettings.
@@ -159,11 +158,11 @@ class _SettingDB(object):
 
         # write each entry, keeping track of which ones haven't been written
         cleankeys = []
-        for key, value in citems(self.database):
+        for key in self.database:
             cleankey = key.replace('/', self.sepchars)
             cleankeys.append(cleankey)
 
-            s.setValue(cleankey, repr(value))
+            s.setValue(cleankey, repr(self.database[key]))
 
         # now remove all the values which have been removed
         for key in list(s.childKeys()):
@@ -208,5 +207,29 @@ def updateUILocale():
     uilocale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
 
     qt4.QLocale.setDefault(uilocale)
+
+def ui_floattostring(f):
+    """Convert float to string with more precision."""
+    if 1e-4 <= abs(f) <= 1e5 or f == 0:
+        s = '%.14g' % f
+        # strip excess zeros to right
+        if s.find('.') >= 0:
+            s = s.rstrip('0').rstrip('.')
+    else:
+        s = '%.14e' % f
+        # split into mantissa/exponent and strip extra zeros, etc
+        mant, expon = s.split('e')
+        mant = mant.rstrip('0').rstrip('.')
+        expon = int(expon)
+        s = '%se%i' % (mant, expon)
+    # make decimal point correct for local
+    s = s.replace('.', uilocale.decimalPoint())
+    return s
+
+def ui_stringtofloat(s):
+    """Convert string to float, allowing for decimal point in different
+    locale."""
+    s = s.replace(uilocale.decimalPoint(), '.')
+    return float(s)
 
 updateUILocale()

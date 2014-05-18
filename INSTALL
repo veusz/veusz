@@ -13,19 +13,21 @@ Requirements:
  numpy >= 1.0    http://numpy.scipy.org/
 
 PyQt requires
- Qt4             http://www.trolltech.com/products/qt/ (free version)
-                 version >= 4.4 recommended
- SIP             http://www.riverbankcomputing.co.uk/software/sip/
+ Qt4 >= 4.7      http://www.trolltech.com/products/qt/ (free version)
+                 latest version recommended
+ SIP >= 4.12     http://www.riverbankcomputing.co.uk/software/sip/
 
 Optional requirements:
- PyFITS >=1.1    http://www.stsci.edu/resources/software_hardware/pyfits
+ h5py            http://www.h5py.org/
+ Astropy >= 0.2  http://www.astropy.org
  pyemf >= 2.0.0  http://pyemf.sourceforge.net/
  PyMinuit        http://code.google.com/p/pyminuit/
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
 
-Python3 support is included in veusz-1.19+, although it has less
-testing than python2 support. Note that the source code is compatible
-with both python versions and does not need translations with 2to3.
+Python 3 support is included in veusz-1.19+, although it has less
+testing than Python 2 support. Note that the source code is compatible
+with both python versions and does not need translation with 2to3. The
+optional dependency pyemf does not have Python 3 support.
 
 1.1 Full installation with distutils
 ====================================
@@ -34,7 +36,7 @@ list a few of the possible method here:
 
 To install on linux to the standard location on the hard disk
 
-# cd veusz-1.19
+# cd veusz-1.20.1
 # python setup.py build
 # su
 [enter root password]
@@ -92,8 +94,8 @@ resources directory to point to the location of the example files.
 If you don't want to install veusz fully or are doing development, it
 can currently be run from its own directory. Do
 
-# tar xzf veusz-1.19.tar.gz                [change version here]
-# cd veusz-1.19
+# tar xzf veusz-1.20.1.tar.gz                [change version here]
+# cd veusz-1.20.1
 # ./run_veusz_inplace
 
 Certain features will be disabled if you do this. You will not be able
@@ -115,8 +117,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xzf veusz-linux-i386-1.19.tar.gz     [change version here]
-# cd veusz-linux-i386-1.19
+# tar xzf veusz-linux-i386-1.20.1.tar.gz     [change version here]
+# cd veusz-linux-i386-1.20.1
 # ./veusz
 
 2.2 Installing in Windows
@@ -142,3 +144,14 @@ into your Applications directory.
   a separate "helpers" module containing platform-dependent code. It
   may save space in repositories to separate out the helpers
   sub-module.
+
+- Veusz includes man pages in Documents/veusz.1 Documents/veusz_listen.1
+  These are not automatically installed by distutils.
+
+- Veusz also includes freedesktop mime, desktop and appdata files in
+  the support subdirectory which can be installed to better integrate
+  with desktop environments.
+
+- Icons are also included in the icons directory with the names
+  veusz_16.png, _32, _48, _64 and _128. A scalable icon can be found
+  in veusz.svg.

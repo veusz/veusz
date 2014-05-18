@@ -28,17 +28,14 @@ because some operations cannot restore references (e.g. add object)
 
 from __future__ import division, print_function
 import os.path
+import io
 
 import numpy as N
 
 from ..compat import czip, crange, citems, cbasestr
 from . import datasets
 from . import widgetfactory
-from . import simpleread
-from . import readcsv
-from . import linked
 
-from .. import utils
 from .. import plugins
 from .. import qtall as qt4
 
@@ -458,29 +455,55 @@ class OperationDatasetDelete(object):
     def undo(self, document):
         """Put dataset back"""
         document.setData(self.datasetname, self.olddata)
-    
+
 class OperationDatasetRename(object):
     """Rename the dataset.
-    
+
     Assumes newname doesn't already exist
     """
-    
+
     descr = _('rename dataset')
-    
+
     def __init__(self, oldname, newname):
         self.oldname = oldname
         self.newname = newname
-    
+
     def do(self, document):
         """Rename dataset from oldname to newname."""
-        
+        ds = document.data[self.oldname]
+        self.origname = self.origrename = None
+
+        if ds.linked:
+            p = ds.linked.params
+            if p.renames is None:
+                p.renames = {}
+
+            # dataset might have been renamed before, so we have to
+            # remove that entry and remember how to put it back
+            origname = self.oldname
+            for o, n in list(citems(p.renames)):
+                if n == self.oldname:
+                    origname = o
+                    # store in case of undo
+                    self.origrename = (o, n)
+                    break
+            p.renames[origname] = self.newname
+            self.origname = origname
+
         document.renameDataset(self.oldname, self.newname)
-        
+
     def undo(self, document):
         """Change name back."""
-        
+
+        ds = document.data[self.newname]
+        if ds.linked:
+            p = ds.linked.params
+            del p.renames[self.origname]
+            if self.origrename:
+                p.renames[self.origrename[0]] = self.origrename[1]
+
         document.renameDataset(self.newname, self.oldname)
-        
+
 class OperationDatasetDuplicate(object):
     """Duplicate a dataset.
     
@@ -713,8 +736,10 @@ class OperationDataset2DBase(object):
         ds.document = document
         if not self.link:
             # unlink if necessary
-            ds = datasets.Dataset2D(ds.data, xrange=ds.xrange,
-                                    yrange=ds.yrange)
+            ds = datasets.Dataset2D(ds.data,
+                                    xrange=ds.xrange, yrange=ds.yrange,
+                                    xedge=ds.xedge, yedge=ds.yedge,
+                                    xcent=ds.xcent, ycent=ds.ycent)
         document.setData(self.datasetname, ds)
         return ds
 
@@ -726,7 +751,7 @@ class OperationDataset2DBase(object):
 
 class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
     descr = _('create 2D dataset from x, y and z expressions')
-    
+
     def __init__(self, datasetname, xexpr, yexpr, zexpr, link):
         OperationDataset2DBase.__init__(self, datasetname, link)
         self.xexpr = xexpr
@@ -739,7 +764,7 @@ class OperationDataset2DCreateExpressionXYZ(OperationDataset2DBase):
 
 class OperationDataset2DCreateExpression(OperationDataset2DBase):
     descr = _('create 2D dataset from expression')
-    
+
     def __init__(self, datasetname, expr, link):
         OperationDataset2DBase.__init__(self, datasetname, link)
         self.expr = expr
@@ -815,382 +840,6 @@ class OperationDatasetDeleteByFile(object):
 
 ###############################################################################
 # Import datasets
-
-class OperationDataImportBase(object):
-    """Default useful import class."""
-
-    def __init__(self, params):
-        self.params = params
-
-        # list of returned datasets
-        self.outdatasets = []
-        # list of returned custom variables
-        self.outcustoms = []
-        # invalid conversions
-        self.outinvalids = {}
-
-    def doImport(self, document):
-        """Do import, override this.
-        Return list of names of datasets read
-        """
-
-    def addCustoms(self, document, consts):
-        """Optionally, add the customs return by plugins to document."""
-
-        if len(consts) > 0:
-            self.oldconst = list(document.customs)
-            cd = document.customDict()
-            for item in consts:
-                if item[1] in cd:
-                    idx, ctype, val = cd[item[1]]
-                    document.customs[idx] = item
-                else:
-                    document.customs.append(item)
-            document.updateEvalContext()
-
-    def do(self, document):
-        """Do import."""
-
-        # remember datasets in document for undo
-        olddatasets = dict(document.data)
-        self.oldconst = None
-
-        # do actual import
-        self.doImport(document)
-
-        # only remember the parts we need
-        self.olddatasets = [ (n, olddatasets.get(n)) for n in self.outdatasets ]
-
-        # apply tags
-        if self.params.tags:
-            for n in self.outdatasets:
-                document.data[n].tags.update(self.params.tags)
-
-    def undo(self, document):
-        """Undo import."""
-
-        # put back old datasets
-        for name, ds in self.olddatasets:
-            if ds is None:
-                document.deleteData(name)
-            else:
-                document.setData(name, ds)
-
-        # for custom definitions
-        if self.oldconst is not None:
-            document.customs = self.oldconst
-            document.updateEvalContext()
-
-class OperationDataImport(OperationDataImportBase):
-    """Import 1D data from text files."""
-
-    descr = _('import data')
-
-    def __init__(self, params):
-        """Setup operation.
-        """
-
-        OperationDataImportBase.__init__(self, params)
-        self.simpleread = simpleread.SimpleRead(params.descriptor)
-
-    def doImport(self, document):
-        """Import data.
-        
-        Returns a list of datasets which were imported.
-        """
-
-        p = self.params
-        # open stream to import data from
-        if p.filename is not None:
-            stream = simpleread.FileStream(
-                utils.openEncoding(p.filename, p.encoding))
-        elif p.datastr is not None:
-            stream = simpleread.StringStream(p.datastr)
-        else:
-            raise RuntimeError("No filename or string")
-
-        # do the import
-        self.simpleread.clearState()
-        self.simpleread.readData(stream, useblocks=p.useblocks,
-                                 ignoretext=p.ignoretext)
-
-        # associate linked file
-        LF = None
-        if p.linked:
-            assert p.filename
-            LF = linked.LinkedFile(p)
-
-        # actually set the data in the document
-        self.outdatasets = self.simpleread.setInDocument(
-            document, linkedfile=LF, prefix=p.prefix, suffix=p.suffix)
-        self.outinvalids = self.simpleread.getInvalidConversions()
-
-class OperationDataImportCSV(OperationDataImportBase):
-    """Import data from a CSV file."""
-
-    descr = _('import CSV data')
-
-    def doImport(self, document):
-        """Do the data import."""
-        
-        csvr = readcsv.ReadCSV(self.params)
-        csvr.readData()
-
-        LF = None
-        if self.params.linked:
-            LF = linked.LinkedFileCSV(self.params)
-        
-        # set the data
-        self.outdatasets = csvr.setData(document, linkedfile=LF)
-
-class OperationDataImport2D(OperationDataImportBase):
-    """Import a 2D matrix from a file."""
-    
-    descr = _('import 2d data')
-
-    def doImport(self, document):
-        """Import data."""
-
-        p = self.params
-
-        # get stream
-        if p.filename is not None:
-            stream = simpleread.FileStream(
-                utils.openEncoding(p.filename, p.encoding) )
-        elif p.datastr is not None:
-            stream = simpleread.StringStream(p.datastr)
-        else:
-            assert False
-
-        # linked file
-        LF = None
-        if p.linked:
-            assert p.filename
-            LF = linked.LinkedFile2D(p)
-
-        for name in p.datasetnames:
-            sr = simpleread.SimpleRead2D(name, p)
-            sr.readData(stream)
-            self.outdatasets += sr.setInDocument(document, linkedfile=LF)
-
-class OperationDataImportFITS(OperationDataImportBase):
-    """Import 1d or 2d data from a fits file."""
-
-    descr = _('import FITS file')
-    
-    def _import1d(self, hdu):
-        """Import 1d data from hdu."""
-
-        data = hdu.data
-        datav = None
-        symv = None
-        posv = None
-        negv = None
-
-        # read the columns required
-        p = self.params
-        if p.datacol is not None:
-            datav = data.field(p.datacol)
-        if p.symerrcol is not None:
-            symv = data.field(p.symerrcol)
-        if p.poserrcol is not None:
-            posv = data.field(p.poserrcol)
-        if p.negerrcol is not None:
-            negv = data.field(p.negerrcol)
-
-        # actually create the dataset
-        return datasets.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
-
-    def _import1dimage(self, hdu):
-        """Import 1d image data form hdu."""
-        return datasets.Dataset(data=hdu.data)
-
-    def _import2dimage(self, hdu):
-        """Import 2d image data from hdu."""
-
-        p = self.params
-        if ( p.datacol is not None or p.symerrcol is not None
-             or p.poserrcol is not None
-             or p.negerrcol is not None ):
-            print("Warning: ignoring columns as import 2D dataset")
-
-        header = hdu.header
-        data = hdu.data
-
-        try:
-            # try to read WCS for image, and work out x/yrange
-            wcs = [header[i] for i in ('CRVAL1', 'CRPIX1', 'CDELT1',
-                                       'CRVAL2', 'CRPIX2', 'CDELT2')]
-
-            if p.wcsmode == 'pixel':
-                # no coordinate system - just pixel values
-                rangex = rangey = None
-            elif p.wcsmode == 'pixel_wcs':
-                rangex = (data.shape[1]-wcs[1], 0-wcs[1])
-                rangey = (0-wcs[4], data.shape[0]-wcs[4])
-            elif p.wcsmode == 'fraction':
-                rangex = rangey = (0., 1.)
-            else:
-                # linear wcs mode (linear_wcs)
-                rangex = ( (data.shape[1]-wcs[1])*wcs[2] + wcs[0],
-                           (0-wcs[1])*wcs[2] + wcs[0])
-                rangey = ( (0-wcs[4])*wcs[5] + wcs[3],
-                           (data.shape[0]-wcs[4])*wcs[5] + wcs[3] )
-
-                rangex = (rangex[1], rangex[0])
-
-        except KeyError:
-            # no / broken wcs
-            rangex = rangey = None
-
-        return datasets.Dataset2D(data, xrange=rangex, yrange=rangey)
-
-    def doImport(self, document):
-        """Do the import."""
-
-        try:
-            import pyfits
-        except ImportError:
-            raise RuntimeError( 'PyFITS is required to import '
-                                  'data from FITS files')
-
-        p = self.params
-        f = pyfits.open( str(p.filename), 'readonly')
-        hdu = f[p.hdu]
-
-        try:
-            # raise an exception if this isn't a table therefore is an image
-            hdu.get_coldefs()
-            ds = self._import1d(hdu)
-
-        except AttributeError:
-            naxis = hdu.header.get('NAXIS')
-            if naxis == 1:
-                ds = self._import1dimage(hdu)
-            elif naxis == 2:
-                ds = self._import2dimage(hdu)
-            else:
-                raise RuntimeError("Cannot import images with %i dimensions" % naxis)
-        f.close()
-
-        if p.linked:
-            ds.linked = linked.LinkedFileFITS(self.params)
-        if p.dsname in document.data:
-            self.olddataset = document.data[p.dsname]
-        else:
-            self.olddataset = None
-        document.setData(p.dsname.strip(), ds)
-        self.outdatasets.append(p.dsname)
-
-class OperationDataImportPlugin(OperationDataImportBase):
-    """Import data using a plugin."""
-
-    descr = _('import using plugin')
-
-    def doImport(self, document):
-        """Do import."""
-
-        pluginnames = [p.name for p in plugins.importpluginregistry]
-        plugin = plugins.importpluginregistry[
-            pluginnames.index(self.params.plugin)]
-
-        # if the plugin is a class, make an instance
-        # the old API is for the plugin to be instances
-        if isinstance(plugin, type):
-            plugin = plugin()
-
-        # strip out parameters for plugin itself
-        p = self.params
-
-        # stick back together the plugin parameter object
-        plugparams = plugins.ImportPluginParams(
-            p.filename, p.encoding,  p.pluginpars)
-        results = plugin.doImport(plugparams)
-
-        # make link for file
-        LF = None
-        if p.linked:
-            LF = linked.LinkedFilePlugin(p)
-
-        customs = []
-
-        # convert results to real datasets
-        names = []
-        for d in results:
-            if isinstance(d, plugins.Dataset1D):
-                ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
-                                      nerr=d.nerr)
-            elif isinstance(d, plugins.Dataset2D):
-                ds = datasets.Dataset2D(data=d.data, xrange=d.rangex,
-                                        yrange=d.rangey)
-            elif isinstance(d, plugins.DatasetText):
-                ds = datasets.DatasetText(data=d.data)
-            elif isinstance(d, plugins.DatasetDateTime):
-                ds = datasets.DatasetDateTime(data=d.data)
-            elif isinstance(d, plugins.Constant):
-                customs.append( ['constant', d.name, d.val] )
-                continue
-            elif isinstance(d, plugins.Function):
-                customs.append( ['function', d.name, d.val] )
-                continue
-            else:
-                raise RuntimeError("Invalid data set in plugin results")
-
-            # set any linking
-            if linked:
-                ds.linked = LF
-
-            # construct name
-            name = p.prefix + d.name + p.suffix
-
-            # actually make dataset
-            document.setData(name, ds)
-
-            names.append(name)
-
-        # add constants, functions to doc, if any
-        self.addCustoms(document, customs)
-
-        self.outdatasets = names
-        self.outcustoms = list(customs)
-
-class OperationDataCaptureSet(object):
-    """An operation for setting the results from a SimpleRead into the
-    docunment's data from a data capture.
-
-    This is a bit primative, but it is not obvious how to isolate the capturing
-    functionality elsewhere."""
-
-    descr = _('data capture')
-
-    def __init__(self, simplereadobject):
-        """Takes a simpleread object containing the data to be set."""
-        self.simplereadobject = simplereadobject
-
-    def do(self, document):
-        """Set the data in the document."""
-        # before replacing data, get a backup of document's data
-        databackup = dict(document.data)
-        
-        # set the data to the document and keep a list of what's changed
-        self.nameschanged = self.simplereadobject.setInDocument(document)
-
-        # keep a copy of datasets which have changed from backup
-        self.olddata = {}
-        for name in self.nameschanged:
-            if name in databackup:
-                self.olddata[name] = databackup[name]
-
-    def undo(self, document):
-        """Undo the results of the capture."""
-
-        for name in self.nameschanged:
-            if name in self.olddata:
-                # replace datasets with what was there previously
-                document.setData(name, self.olddata[name])
-            else:
-                # or delete datasets that weren't there before
-                document.deleteData(name)
 
 class OperationDataTag(object):
     """Add a tag to a list of datasets."""
@@ -1441,7 +1090,8 @@ class OperationLoadStyleSheet(OperationMultiple):
         # fire up interpreter to read file
         interpreter = commandinterpreter.CommandInterpreter(document)
         try:
-            interpreter.runFile( open(self.filename) )
+            interpreter.runFile( io.open(self.filename, 'rU',
+                                         encoding='utf8') )
         except:
             document.batchHistory(None)
             raise

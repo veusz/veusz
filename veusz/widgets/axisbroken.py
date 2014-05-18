@@ -115,6 +115,38 @@ class AxisBroken(axis.Axis):
 
         return N.array(out)
 
+    def _graphToPlotter(self, vals):
+        """Convert graph values to plotter coords.
+        This could be slow if no range selected
+        """
+
+        if self.rangeswitch is not None:
+            return axis.Axis._graphToPlotter(self, vals)
+
+        out = []
+        for val in vals:
+            breaki = bisect.bisect_left(self.breakvstarts, val) - 1
+            if breaki >= 0 and breaki < self.breakvnum:
+                if val > self.breakvstops[breaki] and breaki < self.breakvnum-1:
+                    # in gap, so use half-value
+                    coord = 0.5*(self.posstops[breaki]+self.posstarts[breaki+1])
+
+                    b = self.currentbounds
+                    if self.settings.direction == 'horizontal':
+                        coord = coord*(b[2] - b[0]) + b[0]
+                    else:
+                        coord = coord*(b[3] - b[1]) + b[1]
+
+                else:
+                    # lookup value
+                    self.switchBreak(breaki, self.currentbounds)
+                    coord = axis.Axis._graphToPlotter(self, N.array([val]))
+            else:
+                coord = N.nan
+            out.append(coord)
+        self.switchBreak(None, self.currentbounds)
+        return N.array(out)
+
     def updateAxisLocation(self, bounds, otherposition=None):
         """Recalculate broken axis positions."""
 

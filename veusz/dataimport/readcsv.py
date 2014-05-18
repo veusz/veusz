@@ -23,8 +23,8 @@ from __future__ import division
 import re
 import numpy as N
 
-from ..compat import crange, ckeys, cnext, CIterator
-from . import datasets
+from ..compat import crange, cnext, CIterator
+from .. import document
 from .. import utils
 from .. import qtall as qt4
 
@@ -349,19 +349,14 @@ class ReadCSV(object):
                 except _NextValue:
                     pass
 
-    def setData(self, document, linkedfile=None):
-        """Set the read-in datasets in the document."""
+    def setData(self, outmap, linkedfile=None):
+        """Set the read-in datasets in the dict outmap."""
 
-        # iterate over each read-in dataset
-        dsnames = []
-
-        for name in ckeys(self.data):
+        for name in self.data:
             # skip error data here, they are used below
             # error data name contains \0
             if name.find('\0') >= 0:
                 continue
-
-            dsnames.append(name)
 
             # get data and errors (if any)
             data = []
@@ -378,15 +373,14 @@ class ReadCSV(object):
             # create dataset
             dstype = self.nametypes[name]
             if dstype == 'string':
-                ds = datasets.DatasetText(data=data[0], linked=linkedfile)
+                ds = document.DatasetText(data=data[0], linked=linkedfile)
             elif dstype == 'date':
-                ds = datasets.DatasetDateTime(data=data[0], linked=linkedfile)
+                ds = document.DatasetDateTime(data=data[0], linked=linkedfile)
             else:
-                ds = datasets.Dataset(data=data[0], serr=data[1],
+                ds = document.Dataset(data=data[0], serr=data[1],
                                       perr=data[2], nerr=data[3],
                                       linked=linkedfile)
 
-            document.setData(name, ds)
+            outmap[name] = ds
 
-        dsnames.sort()
-        return dsnames
+        return sorted(outmap)

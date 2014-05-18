@@ -21,8 +21,8 @@
 from __future__ import division
 from ..compat import citems, cstr, cstrerror
 from .. import qtall as qt4
-from .. import document
 from .. import setting
+from ..dataimport import capture, simpleread
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="CaptureDialog"):
@@ -53,21 +53,18 @@ class CaptureDialog(VeuszDialog):
         self.updateIntervalsEdit.setValidator(
             qt4.QDoubleValidator(1e-2, 10000000, 2, self))
 
-        # add completion for filename if there is support in version of qt
-        # (requires qt >= 4.3)
-        if hasattr(qt4, 'QDirModel'):
-            c = self.filenamecompleter = qt4.QCompleter(self)
-            model = qt4.QDirModel(c)
-            c.setModel(model)
-            self.filenameEdit.setCompleter(c)
+        # add completion for filenames
+        c = self.filenamecompleter = qt4.QCompleter(self)
+        model = qt4.QDirModel(c)
+        c.setModel(model)
+        self.filenameEdit.setCompleter(c)
 
         # get notification of change of capture method
         self.methodBG = qt4.QButtonGroup(self)
         self.methodBG.addButton( self.captureFileButton, 0 )
         self.methodBG.addButton( self.captureInternetButton, 1 )
         self.methodBG.addButton( self.captureProgramButton, 2 )
-        self.connect(self.methodBG, qt4.SIGNAL('buttonClicked(int)'),
-                     self.slotMethodChanged)
+        self.methodBG.buttonClicked[int].connect(self.slotMethodChanged)
         # restore previously clicked button
         self.methodBG.button( d.get('CaptureDialog_method', 0) ).click()
 
@@ -76,28 +73,24 @@ class CaptureDialog(VeuszDialog):
         self.stopBG.addButton( self.clickingStopButton, 0 )
         self.stopBG.addButton( self.numLinesStopButton, 1 )
         self.stopBG.addButton( self.timeStopButton, 2 )
-        self.connect(self.stopBG, qt4.SIGNAL('buttonClicked(int)'),
-                     self.slotStopChanged)
+        self.stopBG.buttonClicked[int].connect(self.slotStopChanged)
         self.stopBG.button( d.get('CaptureDialog_stop', 0) ).click()
 
         # update interval
-        self.connect(self.updateIntervalsCheck,
-                     qt4.SIGNAL('toggled(bool)'),
-                     self.updateIntervalsEdit.setEnabled)
+        self.updateIntervalsCheck.toggled.connect(
+            self.updateIntervalsEdit.setEnabled)
 
         # tail data
-        self.connect(self.tailCheck, qt4.SIGNAL('toggled(bool)'),
-                     self.tailEdit.setEnabled)
+        self.tailCheck.toggled.connect(self.tailEdit.setEnabled)
 
         # user starts capture
         self.captureButton = self.buttonBox.addButton(
             _("Ca&pture"), qt4.QDialogButtonBox.ApplyRole )
-        self.connect(self.captureButton, qt4.SIGNAL('clicked()'),
-                     self.slotCaptureClicked)
+
+        self.captureButton.clicked.connect(self.slotCaptureClicked)
 
         # filename browse button clicked
-        self.connect(self.browseButton, qt4.SIGNAL('clicked()'),
-                     self.slotBrowseClicked)
+        self.browseButton.clicked.connect(self.slotBrowseClicked)
 
     def done(self, r):
         """Dialog is closed."""
@@ -146,7 +139,7 @@ class CaptureDialog(VeuszDialog):
 
         # object to interpret data from stream
         descriptor = self.descriptorEdit.text()
-        simpleread = document.SimpleRead(descriptor)
+        simprd = simpleread.SimpleRead(descriptor)
 
         maxlines = None
         timeout = None
@@ -179,15 +172,15 @@ class CaptureDialog(VeuszDialog):
             # create stream
             if method == 0:
                 # file/socket
-                stream = document.FileCaptureStream(self.filenameEdit.text())
+                stream = capture.FileCaptureStream(self.filenameEdit.text())
             elif method == 1:
                 # internet socket
-                stream = document.SocketCaptureStream(
+                stream = capture.SocketCaptureStream(
                     self.hostEdit.text(),
                     int(self.portEdit.text()) )
             elif method == 2:
                 # external program
-                stream = document.CommandCaptureStream(
+                stream = capture.CommandCaptureStream(
                     self.commandLineEdit.text())
         except EnvironmentError as e:
             # problem opening stream
@@ -199,8 +192,8 @@ class CaptureDialog(VeuszDialog):
 
         stream.maxlines = maxlines
         stream.timeout = timeout
-        simpleread.tail = tail
-        cd = CapturingDialog(self.document, simpleread, stream, self,
+        simprd.tail = tail
+        cd = CapturingDialog(self.document, simprd, stream, self,
                              updateinterval=updateinterval)
         self.mainwindow.showDialog(cd)
 
@@ -210,11 +203,11 @@ class CapturingDialog(VeuszDialog):
     """Capturing data dialog.
     Shows progress to user."""
 
-    def __init__(self, document, simpleread, stream, parent,
+    def __init__(self, document, simprd, stream, parent,
                  updateinterval = None):
         """Initialse capture dialog:
         document: document to send data to
-        simpleread: object to interpret data
+        simprd: object to interpret data
         stream: capturestream to read data from
         parent: parent widget
         updateinterval: if set, interval of seconds to update data in doc
@@ -223,19 +216,16 @@ class CapturingDialog(VeuszDialog):
         VeuszDialog.__init__(self, parent, 'capturing.ui')
 
         self.document = document
-        self.simpleread = simpleread
+        self.simpleread = simprd
         self.stream = stream
 
         # connect buttons
-        self.connect( self.finishButton, qt4.SIGNAL('clicked()'),
-                      self.slotFinish )
-        self.connect( self.cancelButton, qt4.SIGNAL('clicked()'),
-                      self.slotCancel )
+        self.finishButton.clicked.connect(self.slotFinish)
+        self.cancelButton.clicked.connect(self.slotCancel)
 
         # timer which governs reading from source
         self.readtimer = qt4.QTimer(self)
-        self.connect( self.readtimer, qt4.SIGNAL('timeout()'),
-                      self.slotReadTimer )
+        self.readtimer.timeout.connect(self.slotReadTimer)
 
         # record time capture started
         self.starttime = qt4.QTime()
@@ -246,8 +236,7 @@ class CapturingDialog(VeuszDialog):
 
         # timer for updating display
         self.displaytimer = qt4.QTimer(self)
-        self.connect( self.displaytimer, qt4.SIGNAL('timeout()'),
-                      self.slotDisplayTimer )
+        self.displaytimer.timeout.connect(self.slotDisplayTimer)
         self.sourceLabel.setText( self.sourceLabel.text() %
                                   stream.name )
         self.txt_statusLabel = self.statusLabel.text()
@@ -257,8 +246,7 @@ class CapturingDialog(VeuszDialog):
         self.updatetimer = qt4.QTimer(self)
         self.updateoperation = None
         if updateinterval:
-            self.connect( self.updatetimer, qt4.SIGNAL('timeout()'),
-                          self.slotUpdateTimer )
+            self.updatetimer.timeout.connect(self.slotUpdateTimer)
             self.updatetimer.start( int(updateinterval*1000) )
 
         # start display and read timers
@@ -269,7 +257,7 @@ class CapturingDialog(VeuszDialog):
         """Time to read more data."""
         try:
             self.simpleread.readData(self.stream)
-        except document.CaptureFinishException as e:
+        except capture.CaptureFinishException as e:
             # stream tells us it's time to finish
             self.streamCaptureFinished( cstr(e) )
 
@@ -300,7 +288,7 @@ class CapturingDialog(VeuszDialog):
             self.updateoperation.undo(self.document)
 
         # create new one
-        self.updateoperation = document.OperationDataCaptureSet(
+        self.updateoperation = capture.OperationDataCaptureSet(
             self.simpleread)
 
         # apply it (bypass history here - urgh)
@@ -335,7 +323,7 @@ class CapturingDialog(VeuszDialog):
             self.updateoperation.undo(self.document)
 
         # apply real document operation update
-        op = document.OperationDataCaptureSet(self.simpleread)
+        op = capture.OperationDataCaptureSet(self.simpleread)
         self.document.applyOperation(op)
 
         # close dialog

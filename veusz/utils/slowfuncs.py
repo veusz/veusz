@@ -24,6 +24,7 @@ from __future__ import division
 from itertools import count
 import sys
 import struct
+import math
 
 from ..compat import crange, czip
 from .. import qtall as qt4
@@ -78,8 +79,25 @@ def addNumpyPolygonToPath(path, clip, *args):
                 path.addPolygon(cp)
             path.closeSubpath()
 
+def scalePath(path, scale, out):
+    """Put scaled path in out."""
+
+    i = 0
+    while i < path.elementCount():
+        el = path.elementAt(i)
+        if el.isMoveTo():
+            out.moveTo(qt4.QPointF(el)*scale)
+        elif el.isLineTo():
+            out.lineTo(qt4.QPointF(el)*scale)
+        elif el.isCurveTo():
+            out.cubicTo(qt4.QPointF(el)*scale,
+                        qt4.QPointF(path.elementAt(i+1))*scale,
+                        qt4.QPointF(path.elementAt(i+2))*scale);
+            i += 2
+        i += 1
+
 def plotPathsToPainter(painter, path, x, y, scaling=None,
-                       clip=None, colorimg=None):
+                       clip=None, colorimg=None, scaleline=False):
     """Plot array of x, y points."""
 
     if clip is None:
@@ -104,15 +122,23 @@ def plotPathsToPainter(painter, path, x, y, scaling=None,
         pt = qt4.QPointF(x[i], y[i])
         if clip.contains(pt):
             painter.translate(pt)
-            # scale if wanted
-            if scaling is not None:
-                painter.scale(scaling[i], scaling[i])
             # set color if given
             if colorimg is not None:
                 b = qt4.QBrush( qt4.QColor.fromRgba(colorimg.pixel(i, 0)) )
                 painter.setBrush(b)
 
-            painter.drawPath(path)
+            # scale if wanted
+            if scaling is None:
+                painter.drawPath(path)
+            else:
+                if scaleline:
+                    painter.scale(scaling[i], scaling[i])
+                    painter.drawPath(path)
+                else:
+                    spath = qt4.QPainterPath()
+                    scalePath(path, scaling[i], spath)
+                    painter.drawPath(spath)
+
             painter.setWorldTransform(origtrans)
 
 def plotLinesToPainter(painter, x1, y1, x2, y2, clip=None, autoexpand=True):
@@ -233,3 +259,88 @@ def slowNumpyToQImage(img, cmap, transparencyimg):
     img.veusz_string = s
     return img
 
+def resampleLinearImage(img, xpts, ypts):
+    """Resample image to linear image.
+
+    img: QImage
+    xpts: edge grid points for image
+    ypts: edge grid points for image.
+    """
+
+    if xpts[0] > xpts[-1]:
+        xpts = xpts[::-1]
+    if ypts[0] > ypts[-1]:
+        ypts = ypts[::-1]
+
+    # find minimum pixel delta
+    mindeltax = (xpts[1:]-xpts[:-1]).min()
+    mindeltay = (ypts[1:]-ypts[:-1]).min()
+
+    minx, maxx = xpts[0], xpts[-1]
+    miny, maxy = ypts[0], ypts[-1]
+
+    sizex = int((maxx - minx) / (mindeltax*0.5) + 0.01)
+    sizey = int((maxy - miny) / (mindeltay*0.5) + 0.01)
+    sizex = min(sizex, 1024)
+    sizey = min(sizey, 1024)
+
+    deltax = (maxx - minx) / sizex
+    deltay = (maxy - miny) / sizey
+
+    outimg = qt4.QImage(sizex, sizey, img.format())
+
+    iy = 0
+    for oy in crange(sizey):
+        while miny+(oy+0.5)*deltay > ypts[iy+1] and iy < len(ypts)-2:
+            iy += 1
+
+        ix = 0
+        for ox in crange(sizex):
+            while minx+(ox+0.5)*deltax > xpts[ix+1] and ix < len(xpts)-2:
+                ix += 1
+
+            col = img.pixel(qt4.QPoint(ix, iy))
+            outimg.setPixel(ox, oy, col)
+
+    return outimg
+
+class RotatedRectangle:
+    """A rectangle with a rotation angle."""
+    def __init__(self, cx, cy, xw, yw, angle):
+        self.cx = cx
+        self.cy = cy
+        self.xw = xw
+        self.yw = yw
+        self.angle = angle
+
+    def makePolygon(self):
+        """Return QPolygonF for rectangle."""
+        c, s = math.cos(self.angle), math.sin(self.angle)
+        cx, cy, xw, yw = self.cx, self.cy, self.xw, self.yw
+        poly = qt4.QPolygonF()
+        poly.append(qt4.QPointF((-xw/2.)*c - (-yw/2.)*s + cx,
+                                (-xw/2.)*s + (-yw/2.)*c + cy))
+        poly.append(qt4.QPointF((-xw/2.)*c - ( yw/2.)*s + cx,
+                                (-xw/2.)*s + ( yw/2.)*c + cy))
+        poly.append(qt4.QPointF(( xw/2.)*c - ( yw/2.)*s + cx,
+                                ( xw/2.)*s + ( yw/2.)*c + cy))
+        poly.append(qt4.QPointF(( xw/2.)*c - (-yw/2.)*s + cx,
+                                ( xw/2.)*s + (-yw/2.)*c + cy))
+        return poly
+
+class RectangleOverlapTester:
+    """Keep track of whether RotatedRectangles overlap."""
+    def __init__(self):
+        self._rects = []
+
+    def willOverlap(self, rect):
+        """Will this rectangle overlap with the others?"""
+        poly = rect.makePolygon()
+        for r in self._rects:
+            if len( poly.intersected(r.makePolygon()) ) > 0:
+                return True
+        return False
+
+    def addRect(self, rect):
+        """Add rectangle to list."""
+        self._rects.append(rect)
