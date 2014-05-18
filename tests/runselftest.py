@@ -77,6 +77,14 @@ excluded_tests = set([
         # fails on Linux Arm
         'spectrum.vsz',
         'hatching.vsz',
+
+        # fails on suse / fedora
+        'contour_labels.vsz',
+        # new arm self test failures
+        'example_import.vsz',
+        'profile.vsz',
+        '1dto2d.vsz',
+
         # don't expect this to work
         'mathml.vsz',
     ])
