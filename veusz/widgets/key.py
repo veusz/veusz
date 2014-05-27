@@ -238,6 +238,13 @@ class Key(widget.Widget):
                             maxval = 100,
                             formatting = True) )
 
+        s.add( setting.Bool(
+            'symbolswap',
+            False,
+            descr=_('Put key symbol on right and text on left'),
+            usertext=_('Swap symbol'),
+            formatting=True) )
+
     @classmethod
     def allowedParentTypes(klass):
         from . import graph
@@ -383,7 +390,7 @@ class Key(widget.Widget):
                                               c.getKeyText(i)).getDimensions()
                         maxwidth = max(maxwidth, w)
                         lines = max(1, math.ceil(h/height))
-                    
+
                     totallines += lines
                     entries.append( (c, i, lines) )
 
@@ -451,6 +458,8 @@ class Key(widget.Widget):
 
         textpen = s.get('Text').makeQPen()
 
+        swap = s.symbolswap
+
         # plot dataset entries
         for (plotter, num, xp, yp, lines) in layout:
             xpos = x + xp*(maxwidth+2*height+symbolwidth)
@@ -463,18 +472,28 @@ class Key(widget.Widget):
                 keyoffset = (lines-1)*height/2.0
             elif s.keyAlign == 'bottom':
                 keyoffset = (lines-1)*height
-            
-            plotter.drawKeySymbol(num, painter, xpos, ypos+keyoffset,
+
+            sx = xpos
+            if swap:
+                sx += maxwidth + height
+            plotter.drawKeySymbol(num, painter, sx, ypos+keyoffset,
                                   symbolwidth, height)
             painter.restore()
 
             # write key text
             if showtext:
                 painter.setPen(textpen)
+                if swap:
+                    lx = xpos + maxwidth
+                    alignx = 1
+                else:
+                    lx = xpos + height + symbolwidth
+                    alignx = -1
+
                 utils.Renderer(painter, font,
-                               xpos + height + symbolwidth, ypos,
+                               lx, ypos,
                                plotter.getKeyText(num),
-                               -1, 1).render()
+                               alignx, 1).render()
 
         phelper.setControlGraph(
             self, [ControlKey(self, parentposn, boxposn, boxdims, height)] )
