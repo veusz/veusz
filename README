@@ -1,5 +1,5 @@
-Veusz 1.21
-----------
+Veusz 1.21+
+-----------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -12,39 +12,8 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.21:
- * Add HDF5 saved document format
- * Add filled curve error bar style
- * Add fill left/right options for point plotter
- * Add filetype filters to import dialog file browser dialog
- * In file completer in import dialog, use selected tab as filter
- * Move code to use PyQt new style signals
- * Add a master color setting for xy point and nonorthpoint plot
- * Line labelling algorithm much improved in contour plots, which
-   rotates text to match line angle and avoids label overlaps
- * More accurate axis tick label bounding boxes, allowing rotated
-   labels to be placed close together
- * Add reflection and rotation options to vector field widget
- * Switch to scientific notation earlier when showing float settings
-
-Bug fixes:
- * Direction combo did not work in import dialog
- * Saving text datasets did not work in Python3
- * Fix partial dataset evaluation issue when loading documents
- * 2D non-regular pixel spaced images give error if clipped in y
- * Handle Unicode quoted characters in simple text data files
- * xcent/ycent in Dataset2D import plugins were ignored
- * promote_tab broken for import plugins
- * Full screen view when all pages are deleted
- * Crash with empty dataset and boxplot widget
- * Fix copy and paste of datasets
- * Python 3 resizing axis bug
- * Crash if picking/zooming on document with no pages
- * Crash if reediting histogram dataset with blank output entry
- * Use end of text formatting string beyond format specifier
- * When writing SVG text as text, use xml:space="preserve" to
-   avoid missing whitespace
- * Embedding socket issue on Python 3.4+
+Changes in 1.21+
+ * Add swap option on keys, swapping symbol and text
 
 Features of package:
  Plotting features:
