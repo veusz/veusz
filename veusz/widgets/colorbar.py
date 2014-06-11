@@ -243,7 +243,7 @@ class ColorBar(axis.Axis):
             painter.drawRect( routside )
 
         # actually draw axis
-        axis.Axis._axisDraw(self, bounds, parentposn, outerbounds, painter,
+        axis.Axis._axisDraw(self, bounds, parentposn, None, painter,
                             phelper)
 
 # allow the factory to instantiate a colorbar

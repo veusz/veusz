@@ -15,6 +15,9 @@ external sources such as Internet sockets or other programs.
 Changes in 1.21+
  * Add swap option on keys, swapping symbol and text
 
+Bug fixes
+ * Fix missing labels if colorbar out of plot
+
 Features of package:
  Plotting features:
   * X-Y plots (with errorbars)

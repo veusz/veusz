@@ -1000,6 +1000,10 @@ class Axis(widget.Widget):
 
         If the edge of the plot is within textheight then suppress text
         """
+
+        if outerbounds is None:
+            return False
+
         s = self.settings
         height = utils.FontMetrics( s.get('Label').makeQFont(painter),
                                     painter.device()).height()
