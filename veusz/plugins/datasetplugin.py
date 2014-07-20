@@ -291,7 +291,9 @@ class DatasetPluginHelper(object):
                              perr=ds.perr, nerr=ds.nerr)
         elif ds.dimensions == 2:
             return Dataset2D(name, ds.data,
-                             rangex=ds.xrange, rangey=ds.yrange)
+                             xrange=ds.xrange, yrange=ds.yrange,
+                             xedge=ds.xedge, yedge=ds.yedge,
+                             xcent=ds.xcent, ycent=ds.ycent)
         else:
             raise RuntimeError("Invalid number of dimensions in dataset")
 
