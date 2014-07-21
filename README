@@ -20,6 +20,7 @@ Bug fixes
  * Preserve tags when reloading datasets
  * Handle nan/inf/-inf when as value in UI
  * Remove dependence on pyqtconfig in build system
+ * Handle errors properly in 2D CSV read
 
 Features of package:
  Plotting features:

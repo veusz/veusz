@@ -470,7 +470,7 @@ class CSVStream(Stream):
                     # add on converted text - yuck - double conversion
                     self.remainingline.append('%e' % v)
                 else:
-                    self.remainingline.append(v)
+                    self.remainingline.append(t)
         return True
 
 class SimpleRead(object):
