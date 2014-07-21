@@ -18,6 +18,8 @@ Changes in 1.21+
 Bug fixes
  * Fix missing labels if colorbar out of plot
  * Preserve tags when reloading datasets
+ * Handle nan/inf/-inf when as value in UI
+ * Remove dependence on pyqtconfig in build system
 
 Features of package:
  Plotting features:
