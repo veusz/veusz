@@ -21,6 +21,7 @@ Bug fixes
  * Handle nan/inf/-inf when as value in UI
  * Remove dependence on pyqtconfig in build system
  * Handle errors properly in 2D CSV read
+ * Do not crash if selecting siblings of document widget
 
 Features of package:
  Plotting features:

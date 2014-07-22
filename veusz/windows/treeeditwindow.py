@@ -1160,6 +1160,10 @@ class TreeEditDock(qt4.QDockWidget):
 
     def _selectWidgetSiblings(self, w, wtype):
         """Select siblings of widget given with type."""
+
+        if w.parent is None:
+            return
+
         for c in w.parent.children:
             if c is not w and c.typename == wtype:
                 idx = self.treemodel.getWidgetIndex(c)
