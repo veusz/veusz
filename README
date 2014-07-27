@@ -22,6 +22,7 @@ Bug fixes
  * Remove dependence on pyqtconfig in build system
  * Handle errors properly in 2D CSV read
  * Do not crash if selecting siblings of document widget
+ * Fix accidental modification of data by line widget
 
 Features of package:
  Plotting features:
