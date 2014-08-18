@@ -24,6 +24,7 @@ Bug fixes
  * Do not crash if selecting siblings of document widget
  * Fix accidental modification of data by line widget
  * Improve PDF bounding box rounding to prevent chopping near edge
+ * Fix function plotter in embedding
 
 Features of package:
  Plotting features:
