@@ -23,7 +23,7 @@ from .datasetplugin import Dataset1D, DatasetText
 
 try:
     import astropy.version
-    if astropy.version.version >= 0.2:
+    if [int(x) for x in astropy.version.version.split('.')] >= [0, 2]:
         from astropy.io.votable.table import parse
     else:
         from astropy.io.vo.table import parse
