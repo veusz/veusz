@@ -136,6 +136,8 @@ class ReadCSV(object):
             # loop to find previous valid column
             prevcol = colnum - 1
             while prevcol >= 0:
+                if prevcol not in self.colnames:
+                    break
                 n = self.colnames[prevcol]
                 if len(n) > 0 and n[-1] not in "+-":
                     # we add a \0 here so that there's no chance of the user
@@ -143,9 +145,9 @@ class ReadCSV(object):
                     name = n + '\0' + name
                     return self.coltypes[prevcol], name
                 prevcol -= 1
-            else:
-                # did not find anything
-                name = self._generateName(colnum)
+
+            # did not find anything
+            name = self._generateName(colnum)
 
         # examine whether object type is at end of name
         # convert, and remove, if is

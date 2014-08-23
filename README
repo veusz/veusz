@@ -26,6 +26,7 @@ Bug fixes
  * Improve PDF bounding box rounding to prevent chopping near edge
  * Fix function plotter in embedding
  * Fix astropy version checking
+ * Fix crash for error bar in CSV with blank previous column
 
 Features of package:
  Plotting features:
