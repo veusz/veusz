@@ -1,3 +1,6 @@
+Changes in <next version>:
+ * Add option to ignore white space following delimiters when importing CSVs
+
 Changes in 1.21:
  * Add HDF5 saved document format
  * Add filled curve error bar style
