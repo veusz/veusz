@@ -30,11 +30,11 @@ class ImportParamsCSV(base.ImportParamsBase):
     """CSV import parameters.
 
     additional parameters:
-     readrows: readdata in rows
+     readrows: read data in rows
      delimiter: CSV delimiter
      textdelimiter: delimiter for text
      headerignore: number of lines to ignore after headers
-     rowsignore: number of lines to ignore at top fo file
+     rowsignore: number of lines to ignore at top of file
      blanksaredata: treat blank entries as nans
      numericlocale: name of local for numbers
      dateformat: date format string
