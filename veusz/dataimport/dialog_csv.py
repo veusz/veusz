@@ -54,6 +54,8 @@ class ImportTabCSV(importdialog.ImportTab):
         self.csvhelpbutton.clicked.connect(self.slotHelp)
         self.csvdelimitercombo.editTextChanged.connect(
             self.dialog.slotUpdatePreview)
+        self.csvskipwhitespacecheck.stateChanged.connect(
+            self.dialog.slotUpdatePreview)
         self.csvtextdelimitercombo.editTextChanged.connect(
             self.dialog.slotUpdatePreview)
         self.csvdelimitercombo.default = csv_delimiters
@@ -70,6 +72,7 @@ class ImportTabCSV(importdialog.ImportTab):
     def reset(self):
         """Reset controls."""
         self.csvdelimitercombo.setEditText(",")
+        self.csvskipwhitespacecheck.setChecked(False)
         self.csvtextdelimitercombo.setEditText('"')
         self.csvdirectioncombo.setCurrentIndex(0)
         self.csvignorehdrspin.setValue(0)
@@ -114,11 +117,14 @@ class ImportTabCSV(importdialog.ImportTab):
         if len(delimiter) != 1 or len(textdelimiter) != 1:
             return False
 
+        skipwhitespace = self.csvskipwhitespacecheck.isChecked()
+
         try:
             reader = utils.get_unicode_csv_reader(
                 filename,
                 delimiter=delimiter,
                 quotechar=textdelimiter,
+                skipinitialspace=skipwhitespace,
                 encoding=encoding )
 
             # construct list of rows
@@ -161,6 +167,7 @@ class ImportTabCSV(importdialog.ImportTab):
         except UnicodeEncodeError:
             return
 
+        skipwhitespace = self.csvskipwhitespacecheck.isChecked()
         numericlocale = csvLocaleIndexToLocale(
             self.csvnumfmtcombo.currentIndex() )
         headerignore = self.csvignorehdrspin.value()
@@ -176,6 +183,7 @@ class ImportTabCSV(importdialog.ImportTab):
             readrows=inrows,
             encoding=encoding,
             delimiter=delimiter,
+            skipwhitespace=skipwhitespace,
             textdelimiter=textdelimiter,
             headerignore=headerignore,
             rowsignore=rowsignore,

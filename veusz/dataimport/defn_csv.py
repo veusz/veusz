@@ -30,11 +30,12 @@ class ImportParamsCSV(base.ImportParamsBase):
     """CSV import parameters.
 
     additional parameters:
-     readrows: readdata in rows
+     readrows: read data in rows
      delimiter: CSV delimiter
+     skipwhitespace: whether to ignore white space following CSV delimiter
      textdelimiter: delimiter for text
      headerignore: number of lines to ignore after headers
-     rowsignore: number of lines to ignore at top fo file
+     rowsignore: number of lines to ignore at top of file
      blanksaredata: treat blank entries as nans
      numericlocale: name of local for numbers
      dateformat: date format string
@@ -44,6 +45,7 @@ class ImportParamsCSV(base.ImportParamsBase):
     defaults = {
         'readrows': False,
         'delimiter': ',',
+        'skipwhitespace' : False,
         'textdelimiter': '"',
         'headerignore': 0,
         'rowsignore': 0,
@@ -95,7 +97,7 @@ class LinkedFileCSV(base.LinkedFileBase):
 
 def ImportFileCSV(comm, filename,
                   readrows=False,
-                  delimiter=',', textdelimiter='"',
+                  delimiter=',', skipwhitespace=False, textdelimiter='"',
                   encoding='utf_8',
                   headerignore=0, rowsignore=0,
                   blanksaredata=False,
@@ -111,6 +113,7 @@ def ImportFileCSV(comm, filename,
 
     readrows: if true, data are read across rather than down
     delimiter: character for delimiting data (usually ',')
+    skipwhitespace: if true, white space following delimiter is ignored
     textdelimiter: character surrounding text (usually '"')
     encoding: encoding used in file
     headerignore: number of lines to ignore after header text
@@ -143,7 +146,8 @@ def ImportFileCSV(comm, filename,
 
     params = ImportParamsCSV(
         filename=realfilename, readrows=readrows,
-        delimiter=delimiter, textdelimiter=textdelimiter,
+        delimiter=delimiter, skipwhitespace=skipwhitespace, 
+        textdelimiter=textdelimiter,
         encoding=encoding,
         headerignore=headerignore, rowsignore=rowsignore,
         blanksaredata=blanksaredata,
