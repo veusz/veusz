@@ -1,3 +1,19 @@
+Changes in 1.21.1
+ * Add swap option on keys, swapping symbol and text
+
+Bug fixes
+ * Fix missing labels if colorbar out of plot
+ * Preserve tags when reloading datasets
+ * Handle nan/inf/-inf when as value in UI
+ * Remove dependence on pyqtconfig in build system
+ * Handle errors properly in 2D CSV read
+ * Do not crash if selecting siblings of document widget
+ * Fix accidental modification of data by line widget
+ * Improve PDF bounding box rounding to prevent chopping near edge
+ * Fix function plotter in embedding
+ * Fix astropy version checking
+ * Fix crash for error bar in CSV with blank previous column
+
 Changes in 1.21:
  * Add HDF5 saved document format
  * Add filled curve error bar style
