@@ -310,7 +310,6 @@ class ReadCSV(object):
             par.filename,
             delimiter=par.delimiter,
             quotechar=par.textdelimiter,
-            skipinitialspace=par.skipwhitespace,
             encoding=par.encoding )
 
         # make in iterator for the file
