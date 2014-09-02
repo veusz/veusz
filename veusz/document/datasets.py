@@ -642,6 +642,17 @@ class Dataset1DBase(DatasetBase):
         else:
             return None
 
+    def rangeVisit(self, fn):
+        '''Call fn on data points and error values, in order to get range.'''
+        fn(self.data)
+        if self.serr is not None:
+            fn(self.data - self.serr)
+            fn(self.data + self.serr)
+        if self.nerr is not None:
+            fn(self.data + self.nerr)
+        if self.perr is not None:
+            fn(self.data + self.perr)
+
     def empty(self):
         '''Is the data defined?'''
         return self.data is None or len(self.data) == 0
