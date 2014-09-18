@@ -135,6 +135,8 @@ class Document( qt4.QObject ):
         self.exprcompiled = {}
         self.exprfailed = set()
         self.exprfailedchangeset = -1
+        self.evalexprcache = {}
+        self.evalexprcachechangeset = None
 
     def wipe(self):
         """Wipe out any stored data."""
@@ -949,8 +951,7 @@ class Document( qt4.QObject ):
         return retn
 
     def evalDatasetExpression(self, expr, part='data', datatype='numeric',
-                              dimensions=1,
-                              _cache={}, _cache_changeset=[None]):
+                              dimensions=1):
         """Return dataset after evaluating a dataset expression.
         part is 'data', 'serr', 'perr' or 'nerr' - these are the
         dataset parts which are evaluated by the expression
@@ -959,13 +960,13 @@ class Document( qt4.QObject ):
         """
 
         key = (expr, part, datatype, dimensions)
-        if _cache_changeset[0] != self.changeset:
-            _cache_changeset[0] = self.changeset
-            _cache.clear()
-        elif key in _cache:
-            return _cache[key]
+        if self.evalexprcachechangeset != self.changeset:
+            self.evalexprcachechangeset = self.changeset
+            self.evalexprcache.clear()
+        elif key in self.evalexprcache:
+            return self.evalexprcache[key]
 
-        _cache[key] = ds = datasets.evalDatasetExpression(
+        self.evalexprcache[key] = ds = datasets.evalDatasetExpression(
             self, expr, part=part, datatype=datatype, dimensions=dimensions)
         return ds
 
