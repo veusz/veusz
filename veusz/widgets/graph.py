@@ -284,12 +284,14 @@ class Graph(widget.Widget):
                 c.draw(bounds, painthelper, outerbounds=outerbounds)
 
         # then for grid lines on top
-        for aname, awidget in axisdrawlist:
+        axiswidgets = [axis for name, axis in axisdrawlist]
+        for awidget in axiswidgets:
             awidget.drawGrid(bounds, painthelper, outerbounds=outerbounds,
                              ontop=True)
+            awidget.drawAutoMirror(bounds, painthelper, axiswidgets)
 
         # draw remaining axes
-        for aname, awidget in axisdrawlist:
+        for awidget in axiswidgets:
             if awidget not in axesdrawn:
                 awidget.draw(bounds, painthelper, outerbounds=outerbounds)
 

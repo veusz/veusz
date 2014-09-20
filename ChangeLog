@@ -3,6 +3,8 @@ Changes in <next version>:
 
 Bug fixes
  * Fix faulty caching of datasets expressions
+ * Do not auto mirror axes if shared axis placed in grid and ignore
+   other hidden axes for mirroring purposes
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text

@@ -944,44 +944,6 @@ class Axis(widget.Widget):
 
         texttorender.insert(0, (r, s.get('Label').makeQPen()) )
 
-    def _shouldAutoMirror(self):
-        """Work out whether to do mirroring."""
-
-        # FIXME: This is a nasty hack: must think of a better way to do this
-
-        s = self.settings
-        countaxis = 0
-        for c in self.parent.children:
-            try:
-                # don't allow descendents of axis to look like an axis
-                # to this function (e.g. colorbar)
-                if c.isaxis and s.direction == c.settings.direction:
-                    countaxis += 1
-            except AttributeError:
-                # if it's not an axis we get here
-                pass
-        return countaxis <= 1
-
-    def _autoMirrorDraw(self, posn, painter, coordticks, coordminorticks):
-        """Mirror axis to opposite side of graph if there isn't
-        an axis there already."""
-
-        # swap axis to other side
-        s = self.settings
-        if s.otherPosition < 0.5:
-            otheredge = 1.
-        else:
-            otheredge = 0.
-
-        # temporarily change position of axis to other side for drawing
-        self.updateAxisLocation(posn, otherposition=otheredge)
-        if not s.Line.hide:
-            self._drawAxisLine(painter)
-        if not s.MinorTicks.hide:
-            self._drawMinorTicks(painter, coordminorticks)
-        if not s.MajorTicks.hide:
-            self._drawMajorTicks(painter, coordticks)
-
     def chooseName(self):
         """Get default name for axis. Make x and y axes, then axisN."""
 
@@ -1058,22 +1020,61 @@ class Axis(widget.Widget):
 
             painter.restore()
 
+    def _drawAutoMirrorTicks(self, posn, painter):
+        s = self.settings
+        coordticks = self._graphToPlotter(self.majortickscalc)
+        coordminorticks = self._graphToPlotter(self.minortickscalc)
+
+        if s.otherPosition < 0.5:
+            otheredge = 1.
+        else:
+            otheredge = 0.
+
+        # temporarily change position of axis to other side for drawing
+        self.updateAxisLocation(posn, otherposition=otheredge)
+        if not s.Line.hide:
+            self._drawAxisLine(painter)
+        if not s.MinorTicks.hide:
+            self._drawMinorTicks(painter, coordminorticks)
+        if not s.MajorTicks.hide:
+            self._drawMajorTicks(painter, coordticks)
+
+    def drawAutoMirror(self, parentposn, phelper, allaxes):
+        """Draw mirrored ticks."""
+
+        s = self.settings
+
+        # if there's another axis in this direction, we don't mirror
+        count = 0
+        thisdir = s.direction
+        for a in allaxes:
+            if a.settings.direction == thisdir and not a.settings.hide:
+                count += 1
+        if count > 1 or not s.autoMirror or s.hide:
+            return
+
+        painter = phelper.painter(self, parentposn, layer=-1)
+        self.updateAxisLocation(parentposn)
+        with painter:
+            painter.save()
+            self._drawAutoMirrorTicks(parentposn, painter)
+            painter.restore()
+
     def draw(self, parentposn, phelper, outerbounds=None):
         """Plot the axis on the painter.
         """
 
-        posn = self.computeBounds(parentposn, phelper)
-        self.updateAxisLocation(posn)
+        self.updateAxisLocation(parentposn)
 
         # exit if axis is hidden
         if self.settings.hide:
             return
 
         self.computePlottedRange()
-        painter = phelper.painter(self, posn)
+        painter = phelper.painter(self, parentposn)
         with painter:
-            self._axisDraw(posn, parentposn, outerbounds, painter, phelper)
-
+            self._axisDraw(
+                parentposn, parentposn, outerbounds, painter, phelper)
 
     def _drawTextWithoutOverlap(self, painter, texttorender):
         """Aall the text is drawn at the end so that we can check it
@@ -1142,10 +1143,6 @@ class Axis(widget.Widget):
         # draw an axis label
         if not s.Label.hide and not suppresstext:
             self._drawAxisLabel(painter, sign, outerbounds, texttorender)
-
-        # mirror axis at other side of plot
-        if s.autoMirror and self._shouldAutoMirror():
-            self._autoMirrorDraw(posn, painter, coordticks, coordminorticks)
 
         self._drawTextWithoutOverlap(painter, texttorender)
 

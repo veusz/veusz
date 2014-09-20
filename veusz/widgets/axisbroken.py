@@ -238,7 +238,7 @@ class AxisBroken(axis.Axis):
 
         self.plottedrange = self.orig_plottedrange
 
-    def _autoMirrorDraw(self, posn, painter):
+    def _drawAutoMirrorTicks(self, posn, painter):
         """Mirror axis to opposite side of graph if there isn't an
         axis there already."""
 
@@ -400,10 +400,6 @@ class AxisBroken(axis.Axis):
         # draw an axis label
         if not s.Label.hide and not suppresstext:
             self._drawAxisLabel(painter, sign, outerbounds, texttorender)
-
-        # mirror axis at other side of plot
-        if s.autoMirror and self._shouldAutoMirror():
-            self._autoMirrorDraw(posn, painter)
 
         self._drawTextWithoutOverlap(painter, texttorender)
 
