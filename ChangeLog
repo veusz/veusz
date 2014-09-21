@@ -1,10 +1,14 @@
 Changes in <next version>:
  * Add option to ignore white space following delimiters when importing CSVs
+ * Allow x/yedge and x/ycent to be inverted to change data order
+   when import 2D data
 
 Bug fixes
  * Fix faulty caching of datasets expressions
  * Do not auto mirror axes if shared axis placed in grid and ignore
    other hidden axes for mirroring purposes
+ * gridatedge 2D import option inverts values in rows
+ * y values for 2D datasets in data edit dialog are inverted
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text

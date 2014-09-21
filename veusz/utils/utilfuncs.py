@@ -552,6 +552,21 @@ def round2delt(fin1, fin2):
     fout = float(out1)
     return fout if fin1 > 0 else -fout
 
+def checkOrder(inv):
+    """Check order of inv
+    Returns: +1: ascending order
+             -1: descending order
+              0: other, or non finite."""
+    v = N.array(inv)
+    if not N.all(N.isfinite(v)):
+        return 0
+    delta = v[1:] - v[:-1]
+    if N.all(delta > 0):
+        return 1
+    if N.all(delta < 0):
+        return -1
+    return 0
+
 def checkAscending(v):
     """Check list of values is finite and ascending."""
     v = N.array(v)

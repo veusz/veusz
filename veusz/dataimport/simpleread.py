@@ -676,8 +676,8 @@ class SimpleRead2D(object):
             g = [float(v) for v in cols[1:]]
         except ValueError:
             raise Read2DError("%s is not a list of numerical values" % attr)
-        if not utils.checkAscending(g):
-            raise Read2DError("%s values are not ascending" % attr)
+        if utils.checkOrder(g) == 0:
+            raise Read2DError("%s are not ascending or descending" % attr)
         setattr(self, attr, g)
 
     def _paramInvertRows(self, cols):
@@ -767,7 +767,7 @@ class SimpleRead2D(object):
                     "x|y grid|cent are incompatible with gridatedge")
 
             self.xcent = N.array(rows[-1])
-            self.ycent = N.array([r[0] for r in rows[-2::-1]])
+            self.ycent = N.array([r[0] for r in rows[:-1]])
 
             # chop out grid
             rows = [ r[1:] for r in rows[:-1] ]
@@ -787,28 +787,30 @@ class SimpleRead2D(object):
 
         if self.params.invertcols:
             self.data = self.data[:,::-1]
-            if self.xedge is not None:
-                self.xedge = self.xedge[::-1]
-            if self.xcent is not None:
-                self.xcent = self.xcent[::-1]
         if self.params.invertrows:
             self.data = self.data[::-1,:]
-            if self.yedge is not None:
-                self.yedge = self.yedge[::-1]
-            if self.ycent is not None:
-                self.ycent = self.ycent[::-1]
 
         # transpose matrix if requested
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
             self.xedge, self.yedge = self.xedge, self.yedge
 
-        # sanity checks
-        for a in 'xedge', 'yedge', 'xcent', 'ycent':
-            v = getattr(self, a)
-            if v is not None and not utils.checkAscending(v):
-                raise Read2DError("%s must be ascending" % a)
+        # check orders of coords - flip if wrong
+        for attr in 'xedge', 'xcent', 'yedge', 'ycent':
+            v = getattr(self, attr)
+            if v is not None:
+                order = utils.checkOrder(v)
+                if order == 0:
+                    raise Read2DError('%s must be ascending or descending' % a)
+                elif order == -1:
+                    # flip direction of coord and data
+                    setattr(self, attr, v[::-1])
+                    if attr[0] == 'x':
+                        self.data = self.data[:,::-1]
+                    else:
+                        self.data = self.data[::-1,:]
 
+        # more sanity checks
         if ( (self.xedge is not None and
               len(self.xedge) != self.data.shape[1]+1) or
              (self.yedge is not None and

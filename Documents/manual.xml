@@ -1096,9 +1096,11 @@ descriptor alpha beta gamma
       which affect the import. Such specifiers are used, for example,
       to change the coordinates of the pixels in the file. By default
       the first pixels coordinates is between 0 and 1, with the centre
-      at 0.5. Subsequent pixels are 1 greater. When using specifiers
-      in CSV files, put the different parts (separated by spaces) in
-      separate columns. Below are listed the specifiers:
+      at 0.5. Subsequent pixels are 1 greater. Note that the lowest
+      coordinate pixel is the bottom-left value in the table of
+      imported values. When using specifiers in CSV files, put the
+      different parts (separated by spaces) in separate columns. Below
+      are listed the specifiers:
     </para>
 
     <orderedlist>
@@ -1124,13 +1126,18 @@ descriptor alpha beta gamma
 	edges of the pixels in the x-axis. The numbers should be
 	space-separated and there should be one more number than
 	pixels. Do not give <command>xrange</command> or
-	<command>xcent</command> if this is given.</para>
+	<command>xcent</command> if this is given. If the values are
+	increasing, the lowest coordinate value is at the left of the
+	dataset, otherwise if they are decreasing, it is on the right
+	(unless the rows/columns are inverted or transposed).</para>
       </listitem>
 
       <listitem>
 	<para><command>yedge A B C...</command> - rather than assume
 	the pixels have the same spacing, give the coordinates of the
-	edges of the pixels in the y-axis.</para>
+	edges of the pixels in the y-axis. If the values are
+	increasing, the lowest coordinate value is at the bottom
+	row. If they instead decrease, it is at the top.</para>
       </listitem>
 
       <listitem>
@@ -1138,13 +1145,16 @@ descriptor alpha beta gamma
 	total range or pixel edges, give the centres of the
 	pixels. There should be the same number of values as pixels in
 	the image. Do not give <command>xrange</command> or
-	<command>xedge</command> if this is given.</para>
+	<command>xedge</command> if this is given. The order of the
+	values specify whether the pixels are left to right or right
+	to left.</para>
       </listitem>
 
       <listitem>
 	<para><command>ycent A B C...</command> - rather than give a
 	total range or pixel edges, give the centres of the
-	pixels.</para>
+	pixels. The value order specifies whether the pixels are
+	bottom to top, or top to bottom.</para>
       </listitem>
 
       <listitem>
@@ -1166,7 +1176,7 @@ descriptor alpha beta gamma
 	<para><command>gridatedge</command> - the first row and
 	leftmost column give the positions of the centres of the
 	pixels. This is also an option in the import dialog. The
-	values should be increasing.</para>
+	values should be increasing or decreasing.</para>
       </listitem>
     </orderedlist>
 

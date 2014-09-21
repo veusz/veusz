@@ -387,13 +387,18 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         ds = self.document.data[self.dsname]
         xaxis = orientation == qt4.Qt.Horizontal
 
+        # note: y coordinates are upside down (high y is at top)
         if ds is not None and role == qt4.Qt.DisplayRole:
-            v = self.xcent[section] if xaxis else self.ycent[section]
-            return '%i (%s)' % (section+1, setting.ui_floattostring(v))
+            v = self.xcent[section] if xaxis else self.ycent[
+                len(self.ycent)-section-1]
+            return '%i (%s)' % (
+                len(self.ycent)-section, setting.ui_floattostring(v))
 
         elif ds is not None and role == qt4.Qt.ToolTipRole:
-            v1 = self.xedge[section] if xaxis else self.yedge[section]
-            v2 = self.xedge[section+1] if xaxis else self.yedge[section+1]
+            v1 = self.xedge[section] if xaxis else self.yedge[
+                len(self.yedge)-section-2]
+            v2 = self.xedge[section+1] if xaxis else self.yedge[
+                len(self.yedge)-section-1]
             return u'%s\u2013%s' % (setting.ui_floattostring(v1),
                                     setting.ui_floattostring(v2))
 
