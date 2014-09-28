@@ -14,6 +14,7 @@ Bug fixes
  * Fix for crash when moving ellipses on broken axes
  * Fix crash when editing datetime data
  * Fix crash when renaming 2D datasets in dataset editor
+ * If 2d dataset does not exist, don't crash when using colorbar
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text
