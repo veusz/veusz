@@ -13,6 +13,7 @@ Bug fixes
  * Fix crash when interpreting date values with unicode
  * Fix for crash when moving ellipses on broken axes
  * Fix crash when editing datetime data
+ * Fix crash when renaming 2D datasets in dataset editor
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text
