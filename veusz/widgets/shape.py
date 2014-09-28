@@ -133,6 +133,7 @@ class BoxShape(Shape):
             # iterate over positions
             index = 0
             dx, dy = posn[2]-posn[0], posn[3]-posn[1]
+            x = y = w = h = r = None
             for x, y, w, h, r in czip(xpos, ypos,
                                       itertools.cycle(width),
                                       itertools.cycle(height),
@@ -145,7 +146,7 @@ class BoxShape(Shape):
                 self.drawShape(painter, qt4.QRectF(-wp*0.5, -hp*0.5, wp, hp))
                 painter.restore()
 
-        if isnotdataset:
+        if x is not None and isnotdataset:
             cgi = controlgraph.ControlResizableBox(
                 self, [x, y], [wp, hp], r, allowrotate=True)
             cgi.index = index
