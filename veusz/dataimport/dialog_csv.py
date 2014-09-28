@@ -21,9 +21,10 @@ import csv
 
 from .. import qtall as qt4
 from ..dialogs import importdialog, veuszdialog
-from ..compat import crange, cnext
+from ..compat import crange, cnext, cstr
 from .. import utils
 from . import defn_csv
+from . import base
 
 def _(text, disambiguation=None, context="Import_CSV"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -195,10 +196,16 @@ class ImportTabCSV(importdialog.ImportTab):
             tags=tags,
             linked=linked,
             )
-        op = defn_csv.OperationDataImportCSV(params)
 
-        # actually import the data
-        doc.applyOperation(op)
+        try:
+            op = defn_csv.OperationDataImportCSV(params)
+
+            # actually import the data
+            doc.applyOperation(op)
+
+        except base.ImportingError as e:
+            qt4.QMessageBox.warning(self, _("Veusz"), cstr(e))
+            return
 
         # update output, showing what datasets were imported
         lines = self.dialog.retnDatasetInfo(op.outnames, linked, filename)

@@ -17,6 +17,7 @@
 ##############################################################################
 
 from __future__ import division, print_function
+import re
 
 from .. import qtall as qt4
 from .. import document
@@ -69,7 +70,12 @@ class OperationDataImportCSV(base.OperationDataImportBase):
     def doImport(self):
         """Do the data import."""
 
-        csvr = readcsv.ReadCSV(self.params)
+        try:
+            csvr = readcsv.ReadCSV(self.params)
+        except re.error:
+            # invalid date RE
+            raise base.ImportingError(_('Invalid date regular expression'))
+
         csvr.readData()
 
         LF = None
