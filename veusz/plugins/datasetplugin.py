@@ -1696,7 +1696,10 @@ class SortTextPlugin(_OneOutputDatasetPlugin):
         ds = helper.getTextDataset(fields['ds_in']).data
         if fields['ds_sort'].strip():
             ds_sort = helper.getDataset(fields['ds_sort'])
-            idxs = N.argsort(ds_sort.data)
+            length = min(len(ds), len(ds_sort.data))
+            ds = ds[:length]
+
+            idxs = N.argsort(ds_sort.data[:length])
             dout = []
             for i in idxs:
                 dout.append(ds[i])
