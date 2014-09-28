@@ -801,7 +801,8 @@ class SimpleRead2D(object):
             if v is not None:
                 order = utils.checkOrder(v)
                 if order == 0:
-                    raise Read2DError('%s must be ascending or descending' % a)
+                    raise Read2DError(
+                        '%s must be ascending or descending' % attr)
                 elif order == -1:
                     # flip direction of coord and data
                     setattr(self, attr, v[::-1])
