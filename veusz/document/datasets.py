@@ -1425,6 +1425,16 @@ def getSpacing(data):
     (i.e. steps are not all multiples of some mininimum)
     """
 
+    try:
+        data = N.array(data) + 0
+    except ValueError:
+        raise DatasetExpressionException('Expression is not an array')
+
+    if len(data.shape) != 1:
+        raise DatasetExpressionException('Array is not 1D')
+    if len(data) < 2:
+        raise DatasetExpressionException('Two values required to convert to 2D')
+
     uniquesorted = N.unique(data)
 
     sigfactor = (uniquesorted[-1]-uniquesorted[0])*1e-13

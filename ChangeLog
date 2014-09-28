@@ -9,6 +9,7 @@ Bug fixes
    other hidden axes for mirroring purposes
  * gridatedge 2D import option inverts values in rows
  * y values for 2D datasets in data edit dialog are inverted
+ * Fix crash when constructing 2D dataset with constants
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text
