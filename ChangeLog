@@ -20,6 +20,7 @@ Bug fixes
  * In text sort plugin, clip length to minimum
  * Do not plot functions with more than 1D in function plotter
  * Catch error for shapes widgets with no coordinates
+ * Handle zero length datasets in subtract minimum or mean
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text

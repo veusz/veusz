@@ -1016,11 +1016,13 @@ class SubtractMeanDatasetPlugin(_OneOutputDatasetPlugin):
         dsin = helper.getDataset(fields['ds_in'])
 
         vals = dsin.data
-        mean = vals[N.isfinite(vals)].mean()
-        vals = vals - mean
+        if len(vals) > 0:
+            mean = vals[N.isfinite(vals)].mean()
+            vals = vals - mean
 
         if fields['divstddev']:
-            vals /= vals[N.isfinite(vals)].std()
+            if len(vals) > 0:
+                vals /= vals[N.isfinite(vals)].std()
 
         self.dsout.update(
             data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
@@ -1046,8 +1048,9 @@ class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
         dsin = helper.getDataset(fields['ds_in'])
 
         vals = dsin.data
-        minval = vals[N.isfinite(vals)].min()
-        vals = vals - minval
+        if len(vals) > 0:
+            minval = vals[N.isfinite(vals)].min()
+            vals = vals - minval
 
         self.dsout.update(
             data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
