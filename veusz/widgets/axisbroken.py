@@ -91,6 +91,14 @@ class AxisBroken(axis.Axis):
         if self.rangeswitch is not None:
             return axis.Axis.plotterToGraphCoords(self, bounds, vals)
 
+        # support single int/float values
+        try:
+            iter(vals)
+            issingle = False
+        except TypeError:
+            vals = N.array([vals])
+            issingle = True
+
         # scaled to be fractional coordinates in bounds
         if self.settings.direction == 'horizontal':
             svals = (vals - bounds[0]) / (bounds[2] - bounds[0])
@@ -113,7 +121,10 @@ class AxisBroken(axis.Axis):
             out.append(coord)
         self.switchBreak(None, bounds)
 
-        return N.array(out)
+        if issingle:
+            return out[0]
+        else:
+            return N.array(out)
 
     def _graphToPlotter(self, vals):
         """Convert graph values to plotter coords.

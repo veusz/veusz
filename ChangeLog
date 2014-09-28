@@ -11,6 +11,7 @@ Bug fixes
  * y values for 2D datasets in data edit dialog are inverted
  * Fix crash when constructing 2D dataset with constants
  * Fix crash when interpreting date values with unicode
+ * Fix for crash when moving ellipses on broken axes
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text
