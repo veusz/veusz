@@ -91,7 +91,7 @@ def dateStringToDate(datestr):
             try:
                 dt = datetime.datetime.strptime(datestr, fmt)
                 break
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
 
     if dt is not None:

@@ -10,6 +10,7 @@ Bug fixes
  * gridatedge 2D import option inverts values in rows
  * y values for 2D datasets in data edit dialog are inverted
  * Fix crash when constructing 2D dataset with constants
+ * Fix crash when interpreting date values with unicode
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text
