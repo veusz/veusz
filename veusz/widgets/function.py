@@ -382,7 +382,8 @@ class FunctionPlotter(GenericPlotter):
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
 
         # draw the function line
-        if pxpts is None or pypts is None:
+        if ( pxpts is None or pypts is None or
+             pxpts.ndim != 1 or pypts.ndim != 1 ):
             # not sure how to deal with errors here
             painter.setPen( setting.settingdb.color('error') )
             f = qt4.QFont()

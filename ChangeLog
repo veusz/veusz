@@ -18,6 +18,7 @@ Bug fixes
  * Ignore HDF5 data types which are not supported by h5py
  * Catch recursion limit errors properly
  * In text sort plugin, clip length to minimum
+ * Do not plot functions with more than 1D in function plotter
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text
