@@ -878,6 +878,19 @@ class DatasetDateTime(DatasetDateTimeBase):
         self.data =  N.insert(self.data, [row]*numrows, data)
         self.document.modifiedData(self)
 
+    def changeValues(self, thetype, vals):
+        """Change the requested part of the dataset to vals.
+
+        thetype == data
+        """
+        if thetype != 'data':
+            raise ValueError('invalid column %s' % thetype)
+
+        self.data = N.array(vals)
+
+        # tell the document that we've changed
+        self.document.modifiedData(self)
+
 class DatasetText(DatasetBase):
     """Represents a text dataset: holding an array of strings."""
 
