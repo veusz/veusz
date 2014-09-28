@@ -80,6 +80,8 @@ def makeSplashLogo():
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
     '''Show exception dialog if an exception occurs.'''
+    sys.setrecursionlimit(sys.getrecursionlimit()+1000)
+
     from veusz.dialogs.exceptiondialog import ExceptionDialog
     if not isinstance(exceptvalue, utils.IgnoreException):
         # next exception is ignored to clear out the stack frame of the
