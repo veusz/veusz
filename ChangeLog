@@ -15,6 +15,7 @@ Bug fixes
  * Fix crash when editing datetime data
  * Fix crash when renaming 2D datasets in dataset editor
  * If 2d dataset does not exist, don't crash when using colorbar
+ * Ignore HDF5 data types which are not supported by h5py
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text
