@@ -1349,7 +1349,7 @@ class DatasetOrStr(Dataset):
         """
         if doc:
             ds = doc.data.get(self.val)
-            if ds:
+            if ds and ds.dimensions == 1:
                 return doc.formatValsWithDatatypeToText(
                     ds.data, ds.displaytype)
         if checknull and not self.val:
