@@ -17,7 +17,7 @@ Bug fixes
  * If 2d dataset does not exist, don't crash when using colorbar
  * Ignore HDF5 data types which are not supported by h5py
  * Catch recursion limit errors properly
- * In text sort plugin, clip length to minimum
+ * In sort and text sort plugins, clip length to minimum
  * Do not plot functions with more than 1D in function plotter
  * Catch error for shapes widgets with no coordinates
  * Handle zero length datasets in subtract minimum or mean

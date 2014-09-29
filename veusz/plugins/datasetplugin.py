@@ -1659,14 +1659,15 @@ class SortPlugin(_OneOutputDatasetPlugin):
         if fields['ds_sort'].strip():
             ds_sort = helper.getDataset(fields['ds_sort'])
 
-        idxs = N.argsort(ds_sort.data)
+        minlen = min(len(ds_sort.data), len(ds.data))
+        idxs = N.argsort(ds_sort.data[:minlen])
         if fields['reverse']:
             idxs = idxs[::-1]
 
-        out = { 'data': ds.data[idxs] }
-        if ds.serr is not None: out['serr'] = ds.serr[idxs]
-        if ds.perr is not None: out['perr'] = ds.perr[idxs]
-        if ds.nerr is not None: out['nerr'] = ds.nerr[idxs]
+        out = { 'data': ds.data[:minlen][idxs] }
+        if ds.serr is not None: out['serr'] = ds.serr[:minlen][idxs]
+        if ds.perr is not None: out['perr'] = ds.perr[:minlen][idxs]
+        if ds.nerr is not None: out['nerr'] = ds.nerr[:minlen][idxs]
 
         self.dsout.update(**out)
 
