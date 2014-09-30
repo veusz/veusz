@@ -103,6 +103,9 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def setData(self, index, name, role):
         """User renames object. This renames the widget."""
+
+        if not index.isValid():
+            return False
         
         widget = index.internalPointer()
 
@@ -165,6 +168,9 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
     
     def parent(self, index):
         """Find the parent of the index given."""
+
+        if not index.isValid():
+            return qt4.QModelIndex()
 
         parentobj = index.internalPointer().parent
         if parentobj is None:
