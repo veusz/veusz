@@ -24,6 +24,7 @@ Bug fixes
  * Clip range of zoom between 0.05 and 20x
  * Catch errors in CSV date format
  * Do not allow 2D datasets to be used for labels in label widget
+ * Handle unicode data correctly in clipboard data
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text

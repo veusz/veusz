@@ -98,7 +98,7 @@ else:
 
     # imports
     import cPickle as pickle
-    from cStringIO import StringIO as CStringIO
+    from StringIO import StringIO as CStringIO
     import urllib2 as curlrequest
 
     # range function
