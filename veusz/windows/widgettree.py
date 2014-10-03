@@ -34,7 +34,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def __init__(self, document, parent=None):
         """Initialise using document."""
-        
+
         qt4.QAbstractItemModel.__init__(self, parent)
 
         self.document = document
@@ -106,13 +106,13 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         if not index.isValid():
             return False
-        
+
         widget = index.internalPointer()
 
         # check symbols in name
         if not utils.validateWidgetName(name):
             return False
-        
+
         # check name not already used
         if widget.parent.hasChild(name):
             return False
@@ -123,10 +123,10 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         self.dataChanged.emit(index, index)
         return True
-            
+
     def flags(self, index):
         """What we can do with the item."""
-        
+
         if not index.isValid():
             return qt4.Qt.ItemIsEnabled
 
@@ -141,7 +141,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def headerData(self, section, orientation, role):
         """Return the header of the tree."""
-        
+
         if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
             val = ('Name', 'Type')[section]
             return val
@@ -165,7 +165,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
     def getWidgetIndex(self, widget):
         """Returns index for widget specified."""
         return self.createIndex(widget.widgetSiblingIndex(), 0, widget)
-    
+
     def parent(self, index):
         """Find the parent of the index given."""
 
@@ -291,7 +291,7 @@ class WidgetTreeView(qt4.QTreeView):
         self.setDragEnabled(True)
         self.viewport().setAcceptDrops(True)
         self.setDropIndicatorShown(True)
-        
+
     def testModifier(self, e):
         """Look for keyboard modifier for copy or move."""
         if e.keyboardModifiers() & qt4.Qt.ControlModifier:
@@ -357,4 +357,3 @@ class WidgetTreeView(qt4.QTreeView):
         self.testModifier(e)
 
         qt4.QTreeView.dragMoveEvent(self, e)
-
