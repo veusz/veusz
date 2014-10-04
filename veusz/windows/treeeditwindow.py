@@ -664,11 +664,11 @@ class TreeEditDock(qt4.QDockWidget):
         self.selwidgets = []
 
         self.document = document
-        self.document.sigWiped.connect(self.slotDocumentWiped)
 
         # construct tree
         self.treemodel = WidgetTreeModel(document)
         self.treeview = WidgetTreeView(self.treemodel)
+        self.document.sigWiped.connect(self.slotDocumentWiped)
 
         # receive change in selection
         self.treeview.selectionModel().selectionChanged.connect(

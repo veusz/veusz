@@ -2,6 +2,7 @@ Changes in <next version>:
  * Add option to ignore white space following delimiters when importing CSVs
  * Allow x/yedge and x/ycent to be inverted to change data order
    when import 2D data
+ * Rewrite of widget tree internals to fix miscellaneous bugs
 
 Bug fixes
  * Fix faulty caching of datasets expressions
