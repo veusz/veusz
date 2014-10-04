@@ -3,6 +3,7 @@ Changes in <next version>:
  * Allow x/yedge and x/ycent to be inverted to change data order
    when import 2D data
  * Rewrite of widget tree internals to fix miscellaneous bugs
+ * Optionally use astropy for SAMP
 
 Bug fixes
  * Fix faulty caching of datasets expressions

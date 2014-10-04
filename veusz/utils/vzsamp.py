@@ -15,7 +15,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
+from __future__ import division, print_function
 import atexit
 
 from ..windows.mainwindow import MainWindow
@@ -45,7 +45,6 @@ else:
 
 if SM:
     def load_votable(private_key, sender_id, msg_id, mtype, params, extra):
-        print(params)
         try:
             url = params['url']
             name = params['name']
