@@ -97,7 +97,7 @@ Optional requirements:
    http://dbus.freedesktop.org/doc/dbus-python/
  astropy (optional for VO table import)
    http://www.astropy.org/
- SAMPy (optional for SAMP support)
+ SAMPy or astropy >= 0.4 (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
 
 Veusz is Copyright (C) 2003-2014 Jeremy Sanders <jeremy@jeremysanders.net>

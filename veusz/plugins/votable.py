@@ -17,7 +17,7 @@
 
 from __future__ import division, print_function
 
-from ..compat import CStringIO, curlrequest
+from ..compat import CStringIO, CBytesIO, curlrequest
 from .importplugin import ImportPlugin, importpluginregistry
 from .datasetplugin import Dataset1D, DatasetText
 
@@ -39,8 +39,12 @@ else:
 
         def _load_votable(self, params):
             if 'url' in params.field_results:
-                buff = CStringIO(curlrequest.urlopen(
-                        params.field_results['url']).read())
+                try:
+                    buff = CStringIO(curlrequest.urlopen(
+                            params.field_results['url']).read())
+                except TypeError:
+                    buff = CBytesIO(curlrequest.urlopen(
+                            params.field_results['url']).read())
                 return parse(buff, filename=params.filename)
             else:
                 return parse(params.filename)

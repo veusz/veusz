@@ -34,7 +34,7 @@ if cpy3:
 
     # builtins
     import builtins as cbuiltins
-    from io import StringIO as CStringIO
+    from io import StringIO as CStringIO, BytesIO as CBytesIO
     import urllib.request as curlrequest
 
     # imports
@@ -99,6 +99,7 @@ else:
     # imports
     import cPickle as pickle
     from StringIO import StringIO as CStringIO
+    from io import BytesIO as CBytesIO
     import urllib2 as curlrequest
 
     # range function
