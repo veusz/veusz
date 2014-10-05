@@ -1,4 +1,4 @@
-Veusz 1.21.1
+Veusz 1.21.xxx
 ------------
 http://home.gna.org/veusz/
 
@@ -12,21 +12,35 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.21.1
- * Add swap option on keys, swapping symbol and text
+Changes in <next version>:
+ * Add option to ignore white space following delimiters when importing CSVs
+ * Allow x/yedge and x/ycent to be inverted to change data order
+   when import 2D data
+ * Rewrite of widget tree internals to fix miscellaneous bugs
+ * Optionally use astropy for SAMP
 
 Bug fixes
- * Fix missing labels if colorbar out of plot
- * Preserve tags when reloading datasets
- * Handle nan/inf/-inf when as value in UI
- * Remove dependence on pyqtconfig in build system
- * Handle errors properly in 2D CSV read
- * Do not crash if selecting siblings of document widget
- * Fix accidental modification of data by line widget
- * Improve PDF bounding box rounding to prevent chopping near edge
- * Fix function plotter in embedding
- * Fix astropy version checking
- * Fix crash for error bar in CSV with blank previous column
+ * Fix faulty caching of datasets expressions
+ * Do not auto mirror axes if shared axis placed in grid and ignore
+   other hidden axes for mirroring purposes
+ * gridatedge 2D import option inverts values in rows
+ * y values for 2D datasets in data edit dialog are inverted
+ * Fix crash when constructing 2D dataset with constants
+ * Fix crash when interpreting date values with unicode
+ * Fix for crash when moving ellipses on broken axes
+ * Fix crash when editing datetime data
+ * Fix crash when renaming 2D datasets in dataset editor
+ * If 2d dataset does not exist, don't crash when using colorbar
+ * Ignore HDF5 data types which are not supported by h5py
+ * Catch recursion limit errors properly
+ * In sort and text sort plugins, clip length to minimum
+ * Do not plot functions with more than 1D in function plotter
+ * Catch error for shapes widgets with no coordinates
+ * Handle zero length datasets in subtract minimum or mean
+ * Clip range of zoom between 0.05 and 20x
+ * Catch errors in CSV date format
+ * Do not allow 2D datasets to be used for labels in label widget
+ * Handle unicode data correctly in clipboard data
 
 Features of package:
  Plotting features:
