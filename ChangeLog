@@ -5,6 +5,7 @@ Changes in <next version>:
  * Rewrite of widget tree internals to fix miscellaneous bugs
  * Optionally use astropy for SAMP
  * Add setting to extend the python import path
+ * Add option to select widgets with same name on page
 
 Bug fixes
  * Fix faulty caching of datasets expressions

@@ -1144,7 +1144,7 @@ class TreeEditDock(qt4.QDockWidget):
         if len(self.treeview.selectionModel().selectedRows()) == 0:
             self.selectWidget(self.document.basewidget)
 
-    def _selectWidgetsTypeAndOrName(self, wtype, wname):
+    def _selectWidgetsTypeAndOrName(self, wtype, wname, root=None):
         """Select widgets with type or name given.
         Give None if you don't care for either."""
         def selectwidget(path, w):
@@ -1156,7 +1156,7 @@ class TreeEditDock(qt4.QDockWidget):
                     idx, qt4.QItemSelectionModel.Select |
                     qt4.QItemSelectionModel.Rows)
 
-        self.document.walkNodes(selectwidget, nodetypes=('widget',))
+        self.document.walkNodes(selectwidget, nodetypes=('widget',), root=root)
 
     def _selectWidgetSiblings(self, w, wtype):
         """Select siblings of widget given with type."""
@@ -1179,21 +1179,32 @@ class TreeEditDock(qt4.QDockWidget):
         if len(self.selwidgets) == 0:
             return
 
-        wtype = self.selwidgets[0].typename
-        name = self.selwidgets[0].name
+        widget = self.selwidgets[0]
+        wtype = widget.typename
+        name = widget.name
+
+        # get page widget for selecting on page
+        page = widget
+        while page is not None and page.typename != 'page':
+            page = page.parent
 
         menu.addAction(
             _("All '%s' widgets") % wtype,
             lambda: self._selectWidgetsTypeAndOrName(wtype, None))
         menu.addAction(
             _("Siblings of '%s' with type '%s'") % (name, wtype),
-            lambda: self._selectWidgetSiblings(self.selwidgets[0], wtype))
+            lambda: self._selectWidgetSiblings(widget, wtype))
         menu.addAction(
             _("All '%s' widgets called '%s'") % (wtype, name),
             lambda: self._selectWidgetsTypeAndOrName(wtype, name))
         menu.addAction(
             _("All widgets called '%s'") % name,
             lambda: self._selectWidgetsTypeAndOrName(None, name))
+        if page and page is not widget:
+            menu.addAction(
+                _("All widgets called '%s' on page '%s'") % (name, page.name),
+                lambda: self._selectWidgetsTypeAndOrName(
+                    None, name, root=page))
 
 class SettingLabel(qt4.QWidget):
     """A label to describe a setting.
