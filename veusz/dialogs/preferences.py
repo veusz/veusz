@@ -124,6 +124,9 @@ class PreferencesDialog(VeuszDialog):
         self.pickerToConsoleCheck.setChecked( setdb['picker_to_console'] )
         self.pickerToClipboardCheck.setChecked( setdb['picker_to_clipboard'] )
 
+        # python path
+        self.externalPythonPath.setText(setdb['external_pythonpath'])
+
     def setupColorTab(self):
         """Initialise color tab
         this makes a grid of controls for each color
@@ -254,13 +257,16 @@ class PreferencesDialog(VeuszDialog):
             colorname = color.name()
             setdb['color_' + name] = (isdefault, colorname)
 
+        # plugins
+        plugins = self.pluginmodel.stringList()
+        setdb['plugins'] = plugins
+
         # picker
         setdb['picker_to_clipboard'] = self.pickerToClipboardCheck.isChecked()
         setdb['picker_to_console'] = self.pickerToConsoleCheck.isChecked()
 
-        # plugins
-        plugins = self.pluginmodel.stringList()
-        setdb['plugins'] = plugins
+        # python path
+        setdb['external_pythonpath'] = self.externalPythonPath.text()
 
         self.plotwindow.updatePlotSettings()
 

@@ -254,6 +254,10 @@ class VeuszApp(qt4.QApplication):
         setting.transient_settings['unsafe_mode'] = bool(
             options.unsafe_mode)
 
+        # add directories to path
+        if setting.settingdb['external_pythonpath']:
+            sys.path += setting.settingdb['external_pythonpath'].split(':')
+
         # load any requested plugins
         if options.plugin:
             document.Document.loadPlugins(pluginlist=options.plugin)

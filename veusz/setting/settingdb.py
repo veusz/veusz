@@ -73,7 +73,10 @@ defaultValues = {
 
     # log picked points to clipboard or to console
     'picker_to_clipboard': False,
-    'picker_to_console': True
+    'picker_to_console': True,
+
+    # add these directories to the python path (colon-separated)
+    'external_pythonpath': '',
     }
 
 class _SettingDB(object):
