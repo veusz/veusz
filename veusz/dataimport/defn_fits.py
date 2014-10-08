@@ -158,7 +158,7 @@ class OperationDataImportFITS(base.OperationDataImportBase):
 
         p = self.params
 
-        with pyfits.open(str(p.filename), 'readonly') as f:
+        with pyfits.open(p.filename, 'readonly') as f:
             hdu = f[p.hdu]
 
             if ( isinstance(hdu, pyfits.TableHDU) or

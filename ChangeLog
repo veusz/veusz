@@ -29,6 +29,7 @@ Bug fixes
  * Catch errors in CSV date format
  * Do not allow 2D datasets to be used for labels in label widget
  * Handle unicode data correctly in clipboard data
+ * Fix data import dialog for fits files in unicode paths
 
 Changes in 1.21.1
  * Add swap option on keys, swapping symbol and text

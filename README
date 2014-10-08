@@ -43,6 +43,7 @@ Bug fixes
  * Catch errors in CSV date format
  * Do not allow 2D datasets to be used for labels in label widget
  * Handle unicode data correctly in clipboard data
+ * Fix data import dialog for fits files in unicode paths
 
 Features of package:
  Plotting features:
