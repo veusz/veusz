@@ -352,6 +352,8 @@ class _GraphResizableBox(qt4.QGraphicsItem):
         self.corners[1].setCursor(qt4.Qt.SizeBDiagCursor)
         self.corners[2].setCursor(qt4.Qt.SizeBDiagCursor)
         self.corners[3].setCursor(qt4.Qt.SizeFDiagCursor)
+        for c in self.corners:
+            c.setToolTip(_('Hold Ctrl to resize symmetrically'))
 
         # lines connecting corners
         self.lines = [
@@ -377,12 +379,34 @@ class _GraphResizableBox(qt4.QGraphicsItem):
             # rotate position back
             angle = -par.angle/180.*math.pi
             s, c = math.sin(angle), math.cos(angle)
-            dx = x*c-y*s
-            dy = x*s+y*c
+            tx = x*c-y*s
+            ty = x*s+y*c
 
-            # compute size from corner position
-            par.dims[0] = abs(dx*2)
-            par.dims[1] = abs(dy*2)
+            if event.modifiers() & qt4.Qt.ControlModifier:
+                # expand around centre
+                par.dims[0] = abs(tx*2)
+                par.dims[1] = abs(ty*2)
+            else:
+                # moved distances of corner point
+                mdx = par.dims[0]*0.5 - abs(tx)
+                mdy = par.dims[1]*0.5 - abs(ty)
+
+                # The direction to move the centre depends on which corner
+                # it is. This makes the other side of the box stay in the
+                # same place.
+                signx = 1 if tx<0 else -1
+                signy = 1 if ty<0 else -1
+
+                # compute how much to move box centre by
+                dx = 0.5*signx*mdx
+                dy = 0.5*signy*mdy
+                rdx =  dx*c+dy*s  # rotate forwards again
+                rdy = -dx*s+dy*c
+
+                par.posn[0] += rdx
+                par.posn[1] += rdy
+                par.dims[0] -= mdx
+                par.dims[1] -= mdy
 
         elif corner is self.rotator:
             # work out angle relative to centre of widget
@@ -403,9 +427,8 @@ class _GraphResizableBox(qt4.QGraphicsItem):
         for corn, (xd, yd) in czip(
                 self.corners, ((-1, -1), (1, -1), (-1, 1), (1, 1))):
             dx, dy = xd*par.dims[0]*0.5, yd*par.dims[1]*0.5
-            nx = dx*c-dy*s + par.posn[0]
-            ny = dx*s+dy*c + par.posn[1]
-            corn.setPos(nx, ny)
+            corn.setPos(dx*c-dy*s + par.posn[0],
+                        dx*s+dy*c + par.posn[1])
 
         if self.rotator:
             # set rotator position (constant distance)

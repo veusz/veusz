@@ -1,5 +1,5 @@
-Veusz 1.21.xxx
-------------
+Veusz 1.22
+----------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -12,7 +12,7 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in <next version>:
+Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs
  * Allow x/yedge and x/ycent to be inverted to change data order
    when import 2D data
@@ -20,6 +20,8 @@ Changes in <next version>:
  * Optionally use astropy for SAMP
  * Add setting to extend the python import path
  * Add option to select widgets with same name on page
+ * Resize rectangular shapes keeping other corners fixed. Old symmetric
+   resize behaviour is retained if Ctrl is pressed.
 
 Bug fixes
  * Fix faulty caching of datasets expressions
