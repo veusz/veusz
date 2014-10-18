@@ -21,7 +21,7 @@ Changes in 1.22:
  * Add setting to extend the python import path
  * Add option to select widgets with same name on page
  * Resize rectangular shapes keeping other corners fixed. Old symmetric
-   resize behaviour is retained if Ctrl is pressed.
+   resize behaviour is retained if shift is pressed.
 
 Bug fixes
  * Fix faulty caching of datasets expressions

@@ -353,7 +353,7 @@ class _GraphResizableBox(qt4.QGraphicsItem):
         self.corners[2].setCursor(qt4.Qt.SizeBDiagCursor)
         self.corners[3].setCursor(qt4.Qt.SizeFDiagCursor)
         for c in self.corners:
-            c.setToolTip(_('Hold Ctrl to resize symmetrically'))
+            c.setToolTip(_('Hold shift to resize symmetrically'))
 
         # lines connecting corners
         self.lines = [
@@ -382,7 +382,7 @@ class _GraphResizableBox(qt4.QGraphicsItem):
             tx = x*c-y*s
             ty = x*s+y*c
 
-            if event.modifiers() & qt4.Qt.ControlModifier:
+            if event.modifiers() & qt4.Qt.ShiftModifier:
                 # expand around centre
                 par.dims[0] = abs(tx*2)
                 par.dims[1] = abs(ty*2)
