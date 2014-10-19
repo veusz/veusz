@@ -80,6 +80,8 @@ def makeSplashLogo():
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
     '''Show exception dialog if an exception occurs.'''
+    sys.setrecursionlimit(sys.getrecursionlimit()+1000)
+
     from veusz.dialogs.exceptiondialog import ExceptionDialog
     if not isinstance(exceptvalue, utils.IgnoreException):
         # next exception is ignored to clear out the stack frame of the
@@ -251,6 +253,10 @@ class VeuszApp(qt4.QApplication):
         # for people who want to run any old script
         setting.transient_settings['unsafe_mode'] = bool(
             options.unsafe_mode)
+
+        # add directories to path
+        if setting.settingdb['external_pythonpath']:
+            sys.path += setting.settingdb['external_pythonpath'].split(':')
 
         # load any requested plugins
         if options.plugin:

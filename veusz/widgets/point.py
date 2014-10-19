@@ -452,11 +452,21 @@ class PointPlotter(GenericPlotter):
         dsetn = self.settings.get(dataname)
         data = dsetn.getData(self.document)
 
+        if axis.settings.log:
+            def updateRange(v):
+                chopzero = v[v>0 & N.isfinite(v)]
+                if len(chopzero) > 0:
+                    axrange[0] = min(axrange[0], chopzero.min())
+                    axrange[1] = max(axrange[1], chopzero.max())
+        else:
+            def updateRange(v):
+                fvals = v[N.isfinite(v)]
+                if len(fvals) > 0:
+                    axrange[0] = min(axrange[0], fvals.min())
+                    axrange[1] = max(axrange[1], fvals.max())
+
         if data:
-            drange = data.getRange()
-            if drange:
-                axrange[0] = min(axrange[0], drange[0])
-                axrange[1] = max(axrange[1], drange[1])
+            data.rangeVisit(updateRange)
         elif dsetn.isEmpty():
             # no valid dataset.
             # check if there a valid dataset for the other axis.

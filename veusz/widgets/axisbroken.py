@@ -91,6 +91,14 @@ class AxisBroken(axis.Axis):
         if self.rangeswitch is not None:
             return axis.Axis.plotterToGraphCoords(self, bounds, vals)
 
+        # support single int/float values
+        try:
+            iter(vals)
+            issingle = False
+        except TypeError:
+            vals = N.array([vals])
+            issingle = True
+
         # scaled to be fractional coordinates in bounds
         if self.settings.direction == 'horizontal':
             svals = (vals - bounds[0]) / (bounds[2] - bounds[0])
@@ -113,7 +121,10 @@ class AxisBroken(axis.Axis):
             out.append(coord)
         self.switchBreak(None, bounds)
 
-        return N.array(out)
+        if issingle:
+            return out[0]
+        else:
+            return N.array(out)
 
     def _graphToPlotter(self, vals):
         """Convert graph values to plotter coords.
@@ -238,7 +249,7 @@ class AxisBroken(axis.Axis):
 
         self.plottedrange = self.orig_plottedrange
 
-    def _autoMirrorDraw(self, posn, painter):
+    def _drawAutoMirrorTicks(self, posn, painter):
         """Mirror axis to opposite side of graph if there isn't an
         axis there already."""
 
@@ -400,10 +411,6 @@ class AxisBroken(axis.Axis):
         # draw an axis label
         if not s.Label.hide and not suppresstext:
             self._drawAxisLabel(painter, sign, outerbounds, texttorender)
-
-        # mirror axis at other side of plot
-        if s.autoMirror and self._shouldAutoMirror():
-            self._autoMirrorDraw(posn, painter)
 
         self._drawTextWithoutOverlap(painter, texttorender)
 

@@ -1308,7 +1308,7 @@ class DatasetExtended(Dataset):
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
             if ds:
                 # get numpy array of values
-                return ds.data
+                return N.array(ds.data)
         else:
             # list of values
             return N.array(self.val)
@@ -1349,7 +1349,7 @@ class DatasetOrStr(Dataset):
         """
         if doc:
             ds = doc.data.get(self.val)
-            if ds:
+            if ds and ds.dimensions == 1:
                 return doc.formatValsWithDatatypeToText(
                     ds.data, ds.displaytype)
         if checknull and not self.val:

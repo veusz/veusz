@@ -24,6 +24,7 @@ import socket
 from .compat import citems, pickle
 from .windows.simplewindow import SimpleWindow
 from . import document
+from . import setting
 from . import qtall as qt4
 
 """Program to be run by embedding interface to run Veusz commands."""
@@ -56,6 +57,14 @@ class EmbeddedClient(object):
         self.ci.addCommand('IsClosed', self.cmdIsClosed)
         self.ci.addCommand('SetAntiAliasing', self.cmdSetAntiAliasing)
         self.ci.addCommand('_apiVersion', self.cmd_apiVersion)
+
+        setting.transient_settings['unsafe_mode'] = True
+
+        self.document.sigLog.connect(self.logEmitted)
+
+    def logEmitted(self, msg):
+        """Write anything logged to stderr."""
+        sys.stderr.write(msg + '\n')
 
     def cmdClose(self):
         """Close()

@@ -18,7 +18,8 @@
 
 """Contains a model and view for handling a tree of widgets."""
 
-from __future__ import division
+from __future__ import division, print_function
+from ..compat import crange
 from .. import qtall as qt4
 
 from .. import utils
@@ -28,88 +29,243 @@ def _(text, disambiguation=None, context="WidgetTree"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+class _WidgetNode:
+    """Class to represent widgets in WidgetTreeModel.
+
+     parent: parent _WidgetNode
+     widget: document widget node is representing
+     children: child nodes
+     data: tuple of data items, so we can see whether the node should
+           be refreshed
+    """
+
+    def __init__(self, parent, widget):
+        self.parent = parent
+        self.widget = widget
+        self.children = []
+        self.data = self.getData()
+
+    def getData(self):
+        """Get the latest version of the data."""
+        w = self.widget
+        parenthidden = False if self.parent is None else self.parent.data[3]
+        hidden = parenthidden or ("hide" in w.settings and w.settings.hide)
+        return (
+            w.name,
+            w.typename,
+            w.userdescription,
+            hidden,
+        )
+
+    def __repr__(self):
+        return "<_WidgetNode widget:%s>" % repr(self.widget)
+
 class WidgetTreeModel(qt4.QAbstractItemModel):
     """A model representing the widget tree structure.
+
+    We hide the actual widgets behind a tree of _WidgetNode
+    objects. The syncTree method synchronises the tree in the model to
+    the tree in the document. It works out which nodes to be deleted,
+    which to be added and which to be moved around. It informs the
+    view that the data are being changed using the standard
+    begin... and end... functions. The synchronisation code is a bit
+    hairy and is hopefully correct.
+
+    This extra layer is necessary as the model requires that the
+    document underneath it can't be changed until the view knows its
+    about to be changed.
+
     """
 
     def __init__(self, document, parent=None):
         """Initialise using document."""
-        
+
         qt4.QAbstractItemModel.__init__(self, parent)
 
         self.document = document
 
         document.signalModified.connect(self.slotDocumentModified)
-        self.document.sigWiped.connect(self.slotDocumentModified)
+        document.sigWiped.connect(self.deleteTree)
 
         # suspend signals to the view that the model has changed
         self.suspendmodified = False
+        # root node of document
+        self.rootnode = _WidgetNode(None, document.basewidget)
+        # map of widgets to nodes
+        self.widgetnodemap = {self.rootnode.widget: self.rootnode}
+        self.syncTree()
+
+    def deleteTree(self):
+        """Reset tree contents (for loading docs, etc)."""
+        self.beginRemoveRows(
+            self.nodeIndex(self.rootnode),
+            0, len(self.rootnode.children))
+        self.rootnode.widget = self.document.basewidget
+        del self.rootnode.children[:]
+        self.widgetnodemap = {self.rootnode.widget: self.rootnode}
+        self.endRemoveRows()
 
     def slotDocumentModified(self):
         """The document has been changed."""
-        if not self.suspendmodified:
-            # needs to be suspended within insert/delete row operations
-            self.layoutChanged.emit()
+        if self.suspendmodified:
+            return
+        self.syncTree()
+
+    def syncTree(self):
+        """Synchronise tree to document."""
+
+        docwidgets = set()
+        def recursecollect(widget):
+            """Recursively collect widgets in document."""
+            docwidgets.add(widget)
+            for child in widget.children:
+                recursecollect(child)
+
+        recursecollect(self.rootnode.widget)
+        self._recursiveupdate(self.rootnode.widget, docwidgets)
+
+    def _recursiveupdate(self, widget, docwidgets):
+        """Recursively remove, add and move nodes to correct place.
+
+        widget: widget to operate below
+        docwidgets: all widgets used in the document
+        """
+
+        #print('recurse', widget)
+        node = self.widgetnodemap[widget]
+
+        # delete non existent child nodes recursively
+        for nch in node.children[::-1]:
+            if nch.widget not in docwidgets:
+                self._recursivedelete(nch)
+
+        # now iterate over children to see whether anything has
+        # changed
+        for i in crange(len(widget.children)):
+            c = widget.children[i]
+            add = False
+            if c not in self.widgetnodemap:
+                # need to add widget as not in doc
+                #print('add', c, i, node)
+                self.beginInsertRows(self.nodeIndex(node), i, i)
+                self.widgetnodemap[c] = cnode = _WidgetNode(node, c)
+                node.children.insert(i, cnode)
+                self.endInsertRows()
+                add = True
+
+            elif (i >= len(node.children) or
+                  c is not node.children[i].widget or
+                  c.parent is not node.children[i].parent.widget):
+                # need to move widget
+                cnode = self.widgetnodemap[c]
+                oldparent = cnode.parent
+                oldrow = oldparent.children.index(cnode)
+
+                # this code works because when moving, we're always
+                # moving a widget to this position in the list (and
+                # never backwards within this list)
+                oldidx = self.nodeIndex(oldparent)
+                newidx = oldidx if oldparent is node else self.nodeIndex(node)
+
+                #print('move', oldparent, oldrow, node, i)
+                self.beginMoveRows(oldidx, oldrow, oldrow, newidx, i)
+                del oldparent.children[oldrow]
+                node.children.insert(i, cnode)
+                cnode.parent = node
+                self.endMoveRows()
+
+            if not add:
+                # update data if changed
+                cnode = self.widgetnodemap[c]
+                data = cnode.getData()
+                if cnode.data != data:
+                    index = self.nodeIndex(cnode)
+                    cnode.data = data
+                    #print('changed', c, data)
+                    self.dataChanged.emit(index, index)
+
+            self._recursiveupdate(c, docwidgets)
+
+        #print('rec retn')
+
+    def _recursivedelete(self, node):
+        """Recursively delete node and its children."""
+        for cnode in node.children[::-1]:
+            self._recursivedelete(cnode)
+        parentnode = node.parent
+        if parentnode is not None:
+            #print('delete', node.widget)
+            row = parentnode.children.index(node)
+            self.beginRemoveRows(self.nodeIndex(parentnode), row, row)
+            del parentnode.children[row]
+            del self.widgetnodemap[node.widget]
+            self.endRemoveRows()
 
     def columnCount(self, parent):
         """Return number of columns of data."""
         return 2
 
-    def data(self, index, role):
-        """Return data for the index given."""
+    def rowCount(self, index):
+        """Return number of rows of children of index."""
 
-        # why do we get passed invalid indicies? :-)
+        if index.isValid():
+            return len(index.internalPointer().children)
+        else:
+            # always 1 root node
+            return 1
+
+    def data(self, index, role):
+        """Return data for the index given.
+
+        Uses the data from the _WidgetNode class.
+
+        """
+
         if not index.isValid():
             return None
 
         column = index.column()
-        obj = index.internalPointer()
+        data = index.internalPointer().data
 
         if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
             # return text for columns
             if column == 0:
-                return obj.name
+                return data[0]
             elif column == 1:
-                return obj.typename
+                return data[1]
 
         elif role == qt4.Qt.DecorationRole:
             # return icon for first column
             if column == 0:
-                filename = 'button_%s' % obj.typename
+                filename = 'button_%s' % data[1]
                 return utils.getIcon(filename)
 
         elif role == qt4.Qt.ToolTipRole:
             # provide tool tip showing description
-            if obj.userdescription:
-                return obj.userdescription
+            return data[2]
 
         elif role == qt4.Qt.TextColorRole:
             # show disabled looking text if object or any parent is hidden
-            hidden = False
-            p = obj
-            while p is not None:
-                if 'hide' in p.settings and p.settings.hide:
-                    hidden = True
-                    break
-                p = p.parent
-
             # return brush for hidden widget text, based on disabled text
-            if hidden:
-                return qt4.QPalette().brush(qt4.QPalette.Disabled,
-                                            qt4.QPalette.Text)
+            if data[3]:
+                return qt4.QPalette().brush(
+                    qt4.QPalette.Disabled, qt4.QPalette.Text)
 
         # return nothing
         return None
 
     def setData(self, index, name, role):
         """User renames object. This renames the widget."""
-        
-        widget = index.internalPointer()
+
+        if not index.isValid():
+            return False
+
+        widget = index.internalPointer().widget
 
         # check symbols in name
         if not utils.validateWidgetName(name):
             return False
-        
+
         # check name not already used
         if widget.parent.hasChild(name):
             return False
@@ -120,16 +276,16 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
         self.dataChanged.emit(index, index)
         return True
-            
+
     def flags(self, index):
         """What we can do with the item."""
-        
+
         if not index.isValid():
             return qt4.Qt.ItemIsEnabled
 
         flags = ( qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable |
                   qt4.Qt.ItemIsDropEnabled )
-        if ( index.internalPointer() is not self.document.basewidget and
+        if ( index.internalPointer().parent is not None and
              index.column() == 0 ):
             # allow items other than root to be edited and dragged
             flags |= qt4.Qt.ItemIsEditable | qt4.Qt.ItemIsDragEnabled
@@ -138,12 +294,15 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def headerData(self, section, orientation, role):
         """Return the header of the tree."""
-        
+
         if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
             val = ('Name', 'Type')[section]
             return val
-
         return None
+
+    def nodeIndex(self, node):
+        row = 0 if node.parent is None else node.parent.children.index(node)
+        return self.createIndex(row, 0, node)
 
     def index(self, row, column, parent):
         """Construct an index for a child of parent."""
@@ -156,63 +315,58 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
                 return qt4.QModelIndex()
         else:
             # root widget
-            child = self.document.basewidget
+            child = self.rootnode
         return self.createIndex(row, column, child)
 
     def getWidgetIndex(self, widget):
         """Returns index for widget specified."""
-        return self.createIndex(widget.widgetSiblingIndex(), 0, widget)
-    
+
+        if widget not in self.widgetnodemap:
+            return None
+        node = self.widgetnodemap[widget]
+        parent = node.parent
+        row = 0 if parent is None else parent.children.index(node)
+        return self.createIndex(row, 0, node)
+
     def parent(self, index):
         """Find the parent of the index given."""
 
-        parentobj = index.internalPointer().parent
-        if parentobj is None:
+        if not index.isValid():
+            return qt4.QModelIndex()
+
+        parent = index.internalPointer().parent
+        if parent is None:
             return qt4.QModelIndex()
         else:
-            try:
-                return self.createIndex(parentobj.widgetSiblingIndex(), 0,
-                                        parentobj)
-            except ValueError:
-                return qt4.QModelIndex()
-
-    def rowCount(self, index):
-        """Return number of rows of children of index."""
-
-        if index.isValid():
-            return len(index.internalPointer().children)
-        else:
-            # always 1 root node
-            return 1
+            gparent = parent.parent
+            row = 0 if gparent is None else gparent.children.index(parent)
+            return self.createIndex(row, 0, parent)
 
     def getSettings(self, index):
         """Return the settings for the index selected."""
-        obj = index.internalPointer()
-        return obj.settings
+        return index.internalPointer().widget.settings
 
     def getWidget(self, index):
         """Get associated widget for index selected."""
-        return index.internalPointer()
+        return index.internalPointer().widget
 
     def removeRows(self, row, count, parentindex):
-        """Remove widgets from parent."""
+        """Remove widgets from parent.
+
+        This is used by the mime dragging and dropping
+        """
 
         if not parentindex.isValid():
             return
 
         parent = self.getWidget(parentindex)
-        self.suspendmodified = True
-        self.beginRemoveRows(parentindex, row, row+count-1)
 
-        # construct an operation for deleting the rows
+        # make an operation to delete the rows
         deleteops = []
         for w in parent.children[row:row+count]:
             deleteops.append( document.OperationWidgetDelete(w) )
         op = document.OperationMultiple(deleteops, descr=_("remove widget(s)"))
         self.document.applyOperation(op)
-
-        self.endRemoveRows()
-        self.suspendmodified = False
         return True
 
     def supportedDropActions(self):
@@ -221,7 +375,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def mimeData(self, indexes):
         """Get mime data for indexes."""
-        widgets = [idx.internalPointer() for idx in indexes]
+        widgets = [idx.internalPointer().widget for idx in indexes]
         return document.generateWidgetsMime(widgets)
 
     def mimeTypes(self):
@@ -252,18 +406,8 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         if row == -1:
             startrow = len(parent.children)
 
-        # need to tell qt that these rows are being inserted, so that the
-        # right number of rows are removed afterwards
-        self.suspendmodified = True
-        self.beginInsertRows(parentindex, startrow,
-                             startrow+document.getMimeWidgetCount(data)-1)
-
         op = document.OperationWidgetPaste(parent, data, index=startrow)
         self.document.applyOperation(op)
-
-        self.endInsertRows()
-        self.suspendmodified = False
-
         return True
 
 class WidgetTreeView(qt4.QTreeView):
@@ -285,7 +429,7 @@ class WidgetTreeView(qt4.QTreeView):
         self.setDragEnabled(True)
         self.viewport().setAcceptDrops(True)
         self.setDropIndicatorShown(True)
-        
+
     def testModifier(self, e):
         """Look for keyboard modifier for copy or move."""
         if e.keyboardModifiers() & qt4.Qt.ControlModifier:
@@ -351,4 +495,3 @@ class WidgetTreeView(qt4.QTreeView):
         self.testModifier(e)
 
         qt4.QTreeView.dragMoveEvent(self, e)
-

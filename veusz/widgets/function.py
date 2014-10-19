@@ -129,12 +129,12 @@ class FunctionPlotter(GenericPlotter):
             return
 
         # find axis to find variable range over
-        axis = self.lookupAxis( {'x': s.xAxis, 'y': s.yAxis}[s.variable] )
-        if not axis:
+        varaxis = self.lookupAxis( {'x': s.xAxis, 'y': s.yAxis}[s.variable] )
+        if not varaxis:
             return
 
         # get range of that axis
-        varaxrange = list(axis.getPlottedRange())
+        varaxrange = list(varaxis.getPlottedRange())
         if varaxrange[0] == varaxrange[1]:
             return
 
@@ -146,7 +146,7 @@ class FunctionPlotter(GenericPlotter):
 
         # work out function in steps
         try:
-            if axis.settings.log:
+            if varaxis.settings.log:
                 # log spaced steps 
                 l1, l2 = N.log(varaxrange[1]), N.log(varaxrange[0])
                 delta = (l2-l1)/20.
@@ -169,6 +169,9 @@ class FunctionPlotter(GenericPlotter):
 
         # get values which are finite: excluding nan and inf
         finitevals = vals[N.isfinite(vals)]
+
+        if axis.settings.log:
+            finitevals = finitevals[finitevals > 0]
 
         # update the automatic range
         if len(finitevals) > 0:
@@ -379,7 +382,8 @@ class FunctionPlotter(GenericPlotter):
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
 
         # draw the function line
-        if pxpts is None or pypts is None:
+        if ( pxpts is None or pypts is None or
+             pxpts.ndim != 1 or pypts.ndim != 1 ):
             # not sure how to deal with errors here
             painter.setPen( setting.settingdb.color('error') )
             f = qt4.QFont()

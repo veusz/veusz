@@ -477,7 +477,13 @@ def constructTree(hdf5file):
                 childnode = HDFGroupNode(parent, hchild)
                 addsub(childnode, hchild)
             elif isinstance(hchild, h5py.Dataset):
-                if hchild.dtype.kind == 'V':
+                try:
+                    dtype = hchild.dtype
+                except TypeError:
+                    # raised if datatype not supported by h5py
+                    continue
+
+                if dtype.kind == 'V':
                     # compound data type - add a special group for
                     # the compound, then its children
                     childnode = HDFCompoundNode(parent, hchild)

@@ -10,7 +10,37 @@ from distutils.dep_util import newer, newer_group
 import os
 import sys
 
-import PyQt4.pyqtconfig
+import sip
+sip.setapi('QString', 2)
+
+import sipconfig
+import PyQt4.QtCore
+
+##################################################################
+# try to get various useful things we need in order to build
+# this is likely to break, I'm sure
+
+QT_LIB_DIR = PyQt4.QtCore.QLibraryInfo.location(
+    PyQt4.QtCore.QLibraryInfo.LibrariesPath)
+QT_INC_DIR = PyQt4.QtCore.QLibraryInfo.location(
+    PyQt4.QtCore.QLibraryInfo.HeadersPath)
+QT_IS_FRAMEWORK = os.path.exists(
+    os.path.join(QT_LIB_DIR, 'QtCore.framework') )
+
+try:
+    # >= 4.10
+    SIP_FLAGS = PyQt4.QtCore.PYQT_CONFIGURATION['sip_flags']
+except:
+    import PyQt4.pyqtconfig
+    SIP_FLAGS = PyQt4.pyqtconfig.Configuration().pyqt_sip_flags
+
+PYQT_SIP_DIR = os.path.join(
+    sipconfig.Configuration().default_sip_dir, 'PyQt4')
+
+SIP_BIN = sipconfig.Configuration().sip_bin
+SIP_INC_DIR = sipconfig.Configuration().sip_inc_dir
+
+##################################################################
 
 def replace_suffix(path, new_suffix):
     return os.path.splitext(path)[0] + new_suffix
@@ -35,43 +65,34 @@ class build_ext (distutils.command.build_ext.build_ext):
 
         raise RuntimeError('cannot parse SIP-generated "%s"' % sbf)
 
-    def _find_sip(self):
-        cfg = PyQt4.pyqtconfig.Configuration()
-        return cfg.sip_bin
+    def get_includes(self):
 
-    def _sip_inc_dir(self):
-        cfg = PyQt4.pyqtconfig.Configuration()
-        return cfg.sip_inc_dir
-
-    def get_includes(self, cfg):
         incdirs = []
         for mod in ('QtCore', 'QtGui', 'QtXml'):
-            if cfg.qt_framework:
-                incdirs.append( os.path.join(cfg.qt_lib_dir,
-                                             mod + '.framework', 'Headers') )
+            if QT_IS_FRAMEWORK:
+                incdirs.append(
+                    os.path.join(QT_LIB_DIR, mod + '.framework', 'Headers') )
             else:
-                incdirs.append( os.path.join(cfg.qt_inc_dir, mod) )
+                incdirs.append( os.path.join(QT_INC_DIR, mod) )
         return incdirs
 
     def swig_sources (self, sources, extension=None):
         if not self.extensions:
             return
 
-        cfg = PyQt4.pyqtconfig.Configuration()
-
         # add directory of input files as include path
         indirs = list(set([os.path.dirname(x) for x in sources]))
 
         # Add the SIP and Qt include directories to the include path
         extension.include_dirs += [
-            cfg.sip_inc_dir,
-            cfg.qt_inc_dir,
-            ] + self.get_includes(cfg) + indirs
+            SIP_INC_DIR,
+            QT_INC_DIR,
+            ] + self.get_includes() + indirs
 
         # link against libraries
-        if cfg.qt_framework:
+        if QT_IS_FRAMEWORK:
             extension.extra_link_args = [
-                '-F', os.path.join(cfg.qt_lib_dir),
+                '-F', os.path.join(QT_LIB_DIR),
                 '-framework', 'QtGui',
                 '-framework', 'QtCore',
                 '-framework', 'QtXml'
@@ -80,7 +101,7 @@ class build_ext (distutils.command.build_ext.build_ext):
             extension.libraries = ['QtGui4', 'QtCore4', 'QtXml4']
         else:
             extension.libraries = ['QtGui', 'QtCore', 'QtXml']
-        extension.library_dirs = [cfg.qt_lib_dir]
+        extension.library_dirs = [QT_LIB_DIR]
 
         depends = extension.depends
 
@@ -101,25 +122,22 @@ class build_ext (distutils.command.build_ext.build_ext):
                          if not source.endswith('.sip')]
         generated_sources = []
 
-        sip_bin = self._find_sip()
-
         for sip in sip_sources:
             # Use the sbf file as dependency check
             sipbasename = os.path.basename(sip)
             sbf = os.path.join(self.build_temp,
                                replace_suffix(sipbasename, '.sbf'))
             if newer_group([sip]+depends, sbf) or self.force:
-                self._sip_compile(sip_bin, sip, sbf)
+                self._sip_compile(sip, sbf)
             out = self._get_sip_output_list(sbf)
             generated_sources.extend(out)
 
         return generated_sources + other_sources
 
-    def _sip_compile(self, sip_bin, source, sbf):
-        cfg = PyQt4.pyqtconfig.Configuration()
-        self.spawn([sip_bin,
+    def _sip_compile(self, source, sbf):
+        self.spawn([SIP_BIN,
                     '-c', self.build_temp,
-                    ] + cfg.pyqt_sip_flags.split() + [
-                    '-I', cfg.pyqt_sip_dir,
+                    ] + SIP_FLAGS.split() + [
+                    '-I', PYQT_SIP_DIR,
                     '-b', sbf,
                     source])

@@ -69,7 +69,7 @@ def controlLinePen():
 
 class _EdgeLine(qt4.QGraphicsLineItem):
     """Line used for edges of resizing box."""
-    def __init__(self, parent, ismovable = True):
+    def __init__(self, parent, ismovable=True):
         qt4.QGraphicsLineItem.__init__(self, parent)
         self.setPen(controlLinePen())
         self.setZValue(2.)
@@ -200,8 +200,8 @@ class _GraphMarginBox(qt4.QGraphicsItem):
                         for i in crange(4)]
 
         # lines connecting corners
-        self.lines = [_EdgeLine(self, ismovable=params.ismovable)
-                      for i in crange(4)]
+        self.lines = [
+            _EdgeLine(self, ismovable=params.ismovable) for i in crange(4)]
 
         # hide corners if box is not resizable
         if not params.isresizable:
@@ -230,7 +230,7 @@ class _GraphMarginBox(qt4.QGraphicsItem):
         # move corners
         for corner, (xindex, yindex) in czip(self.corners,
                                              self.mapcornertoposn):
-            corner.setPos( qt4.QPointF( pos[xindex], pos[yindex] ) )
+            corner.setPos(pos[xindex], pos[yindex])
 
         # move lines
         w, h = pos[2]-pos[0], pos[3]-pos[1]
@@ -333,7 +333,7 @@ class ControlResizableBox(object):
     def createGraphicsItem(self):
         return _GraphResizableBox(self)
 
-class _GraphResizableBox(qt4.QGraphicsRectItem):
+class _GraphResizableBox(qt4.QGraphicsItem):
     """Control a resizable box.
     Item resizes centred around a position
     """
@@ -343,18 +343,8 @@ class _GraphResizableBox(qt4.QGraphicsRectItem):
         Rotation is allowed if allowrotate is set
         """
 
-        qt4.QGraphicsRectItem.__init__(self,
-                                       params.posn[0], params.posn[1],
-                                       params.dims[0], params.dims[1])
+        qt4.QGraphicsItem.__init__(self)
         self.params = params
-        self.rotate(params.angle)
-
-        # initial setup
-        self.setCursor(qt4.Qt.SizeAllCursor)
-        self.setZValue(1.)
-        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
-        self.setPen(controlLinePen())
-        self.setBrush( qt4.QBrush() )
 
         # create child graphicsitem for each corner
         self.corners = [_ShapeCorner(self) for i in crange(4)]
@@ -362,6 +352,12 @@ class _GraphResizableBox(qt4.QGraphicsRectItem):
         self.corners[1].setCursor(qt4.Qt.SizeBDiagCursor)
         self.corners[2].setCursor(qt4.Qt.SizeBDiagCursor)
         self.corners[3].setCursor(qt4.Qt.SizeFDiagCursor)
+        for c in self.corners:
+            c.setToolTip(_('Hold shift to resize symmetrically'))
+
+        # lines connecting corners
+        self.lines = [
+            _EdgeLine(self, ismovable=True) for i in crange(4)]
 
         # whether box is allowed to be rotated
         self.rotator = None
@@ -370,28 +366,53 @@ class _GraphResizableBox(qt4.QGraphicsRectItem):
             self.rotator.setCursor(qt4.Qt.CrossCursor)
 
         self.updateCorners()
-        self.rotator.setPos( 0, -abs(params.dims[1]*0.5) )
 
     def updateFromCorner(self, corner, event):
         """Take position and update corners."""
 
         par = self.params
-        if corner in self.corners:
-            # compute size from corner position
-            par.dims[0] = abs(corner.pos().x()*2)
-            par.dims[1] = abs(corner.pos().y()*2)
-        elif corner == self.rotator:
-            # work out angle relative to centre of widget
-            delta = event.scenePos() - self.scenePos()
-            angle = math.atan2( delta.y(), delta.x() )
-            # change to degrees from correct direction
-            par.angle = (angle*(180/math.pi) + 90.) % 360
 
-            # apply rotation
-            selfpt = self.pos()
-            self.resetTransform()
-            self.setPos(selfpt)
-            self.rotate(par.angle)
+        x = corner.pos().x()-par.posn[0]
+        y = corner.pos().y()-par.posn[1]
+
+        if corner in self.corners:
+            # rotate position back
+            angle = -par.angle/180.*math.pi
+            s, c = math.sin(angle), math.cos(angle)
+            tx = x*c-y*s
+            ty = x*s+y*c
+
+            if event.modifiers() & qt4.Qt.ShiftModifier:
+                # expand around centre
+                par.dims[0] = abs(tx*2)
+                par.dims[1] = abs(ty*2)
+            else:
+                # moved distances of corner point
+                mdx = par.dims[0]*0.5 - abs(tx)
+                mdy = par.dims[1]*0.5 - abs(ty)
+
+                # The direction to move the centre depends on which corner
+                # it is. This makes the other side of the box stay in the
+                # same place.
+                signx = 1 if tx<0 else -1
+                signy = 1 if ty<0 else -1
+
+                # compute how much to move box centre by
+                dx = 0.5*signx*mdx
+                dy = 0.5*signy*mdy
+                rdx =  dx*c+dy*s  # rotate forwards again
+                rdy = -dx*s+dy*c
+
+                par.posn[0] += rdx
+                par.posn[1] += rdy
+                par.dims[0] -= mdx
+                par.dims[1] -= mdy
+
+        elif corner is self.rotator:
+            # work out angle relative to centre of widget
+            angle = math.atan2(y, x)
+            # change to degrees from correct direction
+            par.angle = round((angle*(180/math.pi) + 90.) % 360, 2)
 
         self.updateCorners()
 
@@ -399,34 +420,55 @@ class _GraphResizableBox(qt4.QGraphicsRectItem):
         """Update corners on size."""
         par = self.params
 
-        # update position and size
-        self.setPos( par.posn[0], par.posn[1] )
-        self.setRect( -par.dims[0]*0.5, -par.dims[1]*0.5,
-                       par.dims[0], par.dims[1] )
-
         # update corners
-        self.corners[0].setPos(-par.dims[0]*0.5, -par.dims[1]*0.5)
-        self.corners[1].setPos( par.dims[0]*0.5, -par.dims[1]*0.5)
-        self.corners[2].setPos(-par.dims[0]*0.5,  par.dims[1]*0.5)
-        self.corners[3].setPos( par.dims[0]*0.5,  par.dims[1]*0.5)
+        angle = par.angle/180.*math.pi
+        s, c = math.sin(angle), math.cos(angle)
+
+        for corn, (xd, yd) in czip(
+                self.corners, ((-1, -1), (1, -1), (-1, 1), (1, 1))):
+            dx, dy = xd*par.dims[0]*0.5, yd*par.dims[1]*0.5
+            corn.setPos(dx*c-dy*s + par.posn[0],
+                        dx*s+dy*c + par.posn[1])
 
         if self.rotator:
             # set rotator position (constant distance)
-            self.rotator.setPos( 0, -abs(par.dims[1]*0.5) )
+            dx, dy = 0, -par.dims[1]*0.5
+            nx = dx*c-dy*s
+            ny = dx*s+dy*c
+            self.rotator.setPos(nx+par.posn[0], ny+par.posn[1])
 
-    def mouseReleaseEvent(self, event):
-        """If the item has been moved, do and update."""
-        qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
-        self.updateWidget()
+        self.linepos = []
+        corn = self.corners
+        for i, (ci1, ci2) in enumerate(((0, 1), (2, 0), (1, 3), (2, 3))):
+            pos = (corn[ci1].x(), corn[ci1].y())
+            self.lines[i].setPos(*pos)
+            self.lines[i].setLine(
+                0, 0, corn[ci2].x()-pos[0], corn[ci2].y()-pos[1])
+            self.linepos.append(pos)
 
-    def mouseMoveEvent(self, event):
-        """Keep track of movement."""
-        qt4.QGraphicsRectItem.mouseMoveEvent(self, event)
-        self.params.posn = [self.pos().x(), self.pos().y()]
+    def updateFromLine(self, line, thispos):
+        """Edge line of box was moved - update bounding box."""
+
+        # need old coordinate to work out how far line has moved
+        oldpos = self.linepos[self.lines.index(line)]
+        dx = line.pos().x() - oldpos[0]
+        dy = line.pos().y() - oldpos[1]
+        self.params.posn[0] += dx
+        self.params.posn[1] += dy
+
+        # update corner coords and other line coordinates
+        self.updateCorners()
 
     def updateWidget(self):
         """Tell the user the graphicsitem has been moved or resized."""
         self.params.widget.updateControlItem(self.params)
+
+    def boundingRect(self):
+        """Intentionally zero bounding rect."""
+        return qt4.QRectF(0, 0, 0, 0)
+
+    def paint(self, painter, option, widget):
+        """Intentionally empty painter."""
 
 ##############################################################################
 

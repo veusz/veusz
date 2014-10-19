@@ -180,7 +180,11 @@ def convertDatasetToObject(data, slices):
     if slices:
         data = applySlices(data, slices)
 
-    kind = data.dtype.kind
+    try:
+        kind = data.dtype.kind
+    except TypeError:
+        raise _ConvertError(_("Could not get kind of HDF5 dataset"))
+
     if kind in ('b', 'i', 'u', 'f'):
         data = N.array(data, dtype=N.float64)
         if len(data.shape) > 2:
@@ -303,7 +307,13 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         """
 
         if isinstance(item, h5py.Dataset):
-            if item.dtype.kind == 'V':
+            try:
+                dtype = item.dtype
+            except TypeError:
+                # not supported by h5py
+                return
+
+            if dtype.kind == 'V':
                 # compound dataset - walk columns
                 if not names:
                     names = item.dtype.names 

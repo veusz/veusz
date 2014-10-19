@@ -1048,6 +1048,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
     def setZoomFactor(self, zoomfactor):
         """Set the zoom factor of the window."""
+        zoomfactor = max(0.05, min(20, zoomfactor))
         self.zoomfactor = float(zoomfactor)
         self.checkPlotUpdate()
 

@@ -1,5 +1,5 @@
-Veusz 1.21+
------------
+Veusz 1.22
+----------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -12,8 +12,40 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.21+
- * Add swap option on keys, swapping symbol and text
+Changes in 1.22:
+ * Add option to ignore white space following delimiters when importing CSVs
+ * Allow x/yedge and x/ycent to be inverted to change data order
+   when import 2D data
+ * Rewrite of widget tree internals to fix miscellaneous bugs
+ * Optionally use astropy for SAMP
+ * Add setting to extend the python import path
+ * Add option to select widgets with same name on page
+ * Resize rectangular shapes keeping other corners fixed. Old symmetric
+   resize behaviour is retained if shift is pressed.
+
+Bug fixes
+ * Fix faulty caching of datasets expressions
+ * Do not auto mirror axes if shared axis placed in grid and ignore
+   other hidden axes for mirroring purposes
+ * gridatedge 2D import option inverts values in rows
+ * y values for 2D datasets in data edit dialog are inverted
+ * Fix crash when constructing 2D dataset with constants
+ * Fix crash when interpreting date values with unicode
+ * Fix for crash when moving ellipses on broken axes
+ * Fix crash when editing datetime data
+ * Fix crash when renaming 2D datasets in dataset editor
+ * If 2d dataset does not exist, don't crash when using colorbar
+ * Ignore HDF5 data types which are not supported by h5py
+ * Catch recursion limit errors properly
+ * In sort and text sort plugins, clip length to minimum
+ * Do not plot functions with more than 1D in function plotter
+ * Catch error for shapes widgets with no coordinates
+ * Handle zero length datasets in subtract minimum or mean
+ * Clip range of zoom between 0.05 and 20x
+ * Catch errors in CSV date format
+ * Do not allow 2D datasets to be used for labels in label widget
+ * Handle unicode data correctly in clipboard data
+ * Fix data import dialog for fits files in unicode paths
 
 Features of package:
  Plotting features:
@@ -84,7 +116,7 @@ Optional requirements:
    http://dbus.freedesktop.org/doc/dbus-python/
  astropy (optional for VO table import)
    http://www.astropy.org/
- SAMPy (optional for SAMP support)
+ SAMPy or astropy >= 0.4 (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
 
 Veusz is Copyright (C) 2003-2014 Jeremy Sanders <jeremy@jeremysanders.net>

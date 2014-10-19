@@ -21,9 +21,10 @@ import csv
 
 from .. import qtall as qt4
 from ..dialogs import importdialog, veuszdialog
-from ..compat import crange, cnext
+from ..compat import crange, cnext, cstr
 from .. import utils
 from . import defn_csv
+from . import base
 
 def _(text, disambiguation=None, context="Import_CSV"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -54,6 +55,8 @@ class ImportTabCSV(importdialog.ImportTab):
         self.csvhelpbutton.clicked.connect(self.slotHelp)
         self.csvdelimitercombo.editTextChanged.connect(
             self.dialog.slotUpdatePreview)
+        self.csvskipwhitespacecheck.stateChanged.connect(
+            self.dialog.slotUpdatePreview)
         self.csvtextdelimitercombo.editTextChanged.connect(
             self.dialog.slotUpdatePreview)
         self.csvdelimitercombo.default = csv_delimiters
@@ -70,6 +73,7 @@ class ImportTabCSV(importdialog.ImportTab):
     def reset(self):
         """Reset controls."""
         self.csvdelimitercombo.setEditText(",")
+        self.csvskipwhitespacecheck.setChecked(False)
         self.csvtextdelimitercombo.setEditText('"')
         self.csvdirectioncombo.setCurrentIndex(0)
         self.csvignorehdrspin.setValue(0)
@@ -114,11 +118,14 @@ class ImportTabCSV(importdialog.ImportTab):
         if len(delimiter) != 1 or len(textdelimiter) != 1:
             return False
 
+        skipwhitespace = self.csvskipwhitespacecheck.isChecked()
+
         try:
             reader = utils.get_unicode_csv_reader(
                 filename,
                 delimiter=delimiter,
                 quotechar=textdelimiter,
+                skipinitialspace=skipwhitespace,
                 encoding=encoding )
 
             # construct list of rows
@@ -161,6 +168,7 @@ class ImportTabCSV(importdialog.ImportTab):
         except UnicodeEncodeError:
             return
 
+        skipwhitespace = self.csvskipwhitespacecheck.isChecked()
         numericlocale = csvLocaleIndexToLocale(
             self.csvnumfmtcombo.currentIndex() )
         headerignore = self.csvignorehdrspin.value()
@@ -176,6 +184,7 @@ class ImportTabCSV(importdialog.ImportTab):
             readrows=inrows,
             encoding=encoding,
             delimiter=delimiter,
+            skipwhitespace=skipwhitespace,
             textdelimiter=textdelimiter,
             headerignore=headerignore,
             rowsignore=rowsignore,
@@ -187,10 +196,16 @@ class ImportTabCSV(importdialog.ImportTab):
             tags=tags,
             linked=linked,
             )
-        op = defn_csv.OperationDataImportCSV(params)
 
-        # actually import the data
-        doc.applyOperation(op)
+        try:
+            op = defn_csv.OperationDataImportCSV(params)
+
+            # actually import the data
+            doc.applyOperation(op)
+
+        except (base.ImportingError, csv.Error) as e:
+            qt4.QMessageBox.warning(self, _("Veusz"), cstr(e))
+            return
 
         # update output, showing what datasets were imported
         lines = self.dialog.retnDatasetInfo(op.outnames, linked, filename)

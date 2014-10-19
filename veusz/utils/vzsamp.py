@@ -15,7 +15,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
+from __future__ import division, print_function
 import atexit
 
 from ..windows.mainwindow import MainWindow
@@ -29,10 +29,21 @@ try:
                       SAMP_STATUS_OK, SAMP_STATUS_ERROR
 
 except ImportError:
-    def setup():
-        print('SAMP: sampy module not available')
+
+    try:
+        from astropy.vo.samp import SAMPIntegratedClient, SAMPHubError, \
+                      SAMP_STATUS_OK, SAMP_STATUS_ERROR
+    except ImportError:
+        SM = False
+        def setup():
+            print('SAMP: sampy module not available')
+    else:
+        SM = True
 
 else:
+    SM = True
+
+if SM:
     def load_votable(private_key, sender_id, msg_id, mtype, params, extra):
         try:
             url = params['url']
@@ -75,8 +86,10 @@ else:
             samp.connect()
 
             atexit.register(close)
-
-            samp.bindReceiveCall('table.load.votable', load_votable)
+            try:
+                samp.bindReceiveCall('table.load.votable', load_votable)
+            except AttributeError:
+                samp.bind_receive_call('table.load.votable', load_votable)
 
         except SAMPHubError:
             print('SAMP: could not connect to hub')

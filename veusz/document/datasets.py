@@ -642,6 +642,17 @@ class Dataset1DBase(DatasetBase):
         else:
             return None
 
+    def rangeVisit(self, fn):
+        '''Call fn on data points and error values, in order to get range.'''
+        fn(self.data)
+        if self.serr is not None:
+            fn(self.data - self.serr)
+            fn(self.data + self.serr)
+        if self.nerr is not None:
+            fn(self.data + self.nerr)
+        if self.perr is not None:
+            fn(self.data + self.perr)
+
     def empty(self):
         '''Is the data defined?'''
         return self.data is None or len(self.data) == 0
@@ -865,6 +876,19 @@ class DatasetDateTime(DatasetDateTimeBase):
         if 'data' in rowdata:
             data[:len(rowdata['data'])] = N.array(rowdata['data'])
         self.data =  N.insert(self.data, [row]*numrows, data)
+        self.document.modifiedData(self)
+
+    def changeValues(self, thetype, vals):
+        """Change the requested part of the dataset to vals.
+
+        thetype == data
+        """
+        if thetype != 'data':
+            raise ValueError('invalid column %s' % thetype)
+
+        self.data = N.array(vals)
+
+        # tell the document that we've changed
         self.document.modifiedData(self)
 
 class DatasetText(DatasetBase):
@@ -1413,6 +1437,16 @@ def getSpacing(data):
     Function assumes that at least one of the steps is the minimum step size
     (i.e. steps are not all multiples of some mininimum)
     """
+
+    try:
+        data = N.array(data) + 0
+    except ValueError:
+        raise DatasetExpressionException('Expression is not an array')
+
+    if len(data.shape) != 1:
+        raise DatasetExpressionException('Array is not 1D')
+    if len(data) < 2:
+        raise DatasetExpressionException('Two values required to convert to 2D')
 
     uniquesorted = N.unique(data)
 

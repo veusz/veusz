@@ -18,6 +18,7 @@
 
 from __future__ import division
 import re
+import math
 
 from ..compat import crange
 
@@ -36,9 +37,10 @@ def scalePDFMediaBox(text, pagewidth,
     widthfactor = box[2] / pagewidth
     newbox = ('/MediaBox [%i %i %i %i]' % (
             0, 
-            int(box[3]-widthfactor*requiredheight),
-            int(widthfactor*requiredwidth),
-            int(box[3]))).encode('ascii')
+            int(math.floor(box[3]-widthfactor*requiredheight)),
+            int(math.ceil(widthfactor*requiredwidth)),
+            int(math.ceil(box[3]))
+            )).encode('ascii')
 
     text = text[:m.start()] + newbox + text[m.end():]
     return text

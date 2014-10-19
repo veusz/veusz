@@ -231,11 +231,17 @@ class Image(plotters.GenericPlotter):
 
         s = self.settings
         minval = s.min
-        if minval == 'Auto' and data is not None:
-            minval = N.nanmin(data.data)
+        if minval == 'Auto':
+            if data is not None:
+                minval = N.nanmin(data.data)
+            else:
+                minval = 0.
         maxval = s.max
-        if maxval == 'Auto' and data is not None:
-            maxval = N.nanmax(data.data)
+        if maxval == 'Auto':
+            if data is not None:
+                maxval = N.nanmax(data.data)
+            else:
+                maxval = minval + 1
 
         # this is used currently by colorbar objects
         return (minval, maxval)

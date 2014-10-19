@@ -150,15 +150,23 @@ class LinkedFileBase(object):
         return f
 
     def _deleteLinkedDatasets(self, document):
-        """Delete linked datasets from document linking to self."""
+        """Delete linked datasets from document linking to self.
+        Returns tags for deleted datasets.
+        """
 
+        tags = {}
         for name, ds in list(document.data.items()):
             if ds.linked == self:
+                tags[name] = document.data[name].tags
                 document.deleteData(name)
+        return tags
 
-    def _moveReadDatasets(self, tempdoc, document):
+    def _moveReadDatasets(self, tempdoc, document, tags):
         """Move datasets from tempdoc to document if they do not exist
-        in the destination."""
+        in the destination.
+
+        tags is a dict of tags for each dataset
+        """
 
         read = []
         for name, ds in list(tempdoc.data.items()):
@@ -171,6 +179,9 @@ class LinkedFileBase(object):
                     outname = self.params.renames[name]
 
                 ds.linked = self
+                if name in tags:
+                    ds.tags = tags[name]
+
                 document.setData(outname, ds)
         return read
 
@@ -196,9 +207,9 @@ class LinkedFileBase(object):
             return ([], errors)
 
         # delete datasets which are linked and imported here
-        self._deleteLinkedDatasets(document)
+        tags = self._deleteLinkedDatasets(document)
         # move datasets into document
-        read = self._moveReadDatasets(tempdoc, document)
+        read = self._moveReadDatasets(tempdoc, document, tags)
 
         # return errors (if any)
         errors = op.outinvalids

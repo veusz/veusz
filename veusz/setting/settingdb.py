@@ -21,6 +21,7 @@
 from __future__ import division, print_function
 import sys
 
+import numpy as N
 from .. import qtall as qt4
 
 def _(text, disambiguation=None, context="Preferences"):
@@ -72,7 +73,10 @@ defaultValues = {
 
     # log picked points to clipboard or to console
     'picker_to_clipboard': False,
-    'picker_to_console': True
+    'picker_to_console': True,
+
+    # add these directories to the python path (colon-separated)
+    'external_pythonpath': '',
     }
 
 class _SettingDB(object):
@@ -210,7 +214,13 @@ def updateUILocale():
 
 def ui_floattostring(f):
     """Convert float to string with more precision."""
-    if 1e-4 <= abs(f) <= 1e5 or f == 0:
+    if not N.isfinite(f):
+        if N.isnan(f):
+            return 'nan'
+        if f < 0:
+            return '-inf'
+        return 'inf'
+    elif 1e-4 <= abs(f) <= 1e5 or f == 0:
         s = '%.14g' % f
         # strip excess zeros to right
         if s.find('.') >= 0:

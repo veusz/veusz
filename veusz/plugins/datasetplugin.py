@@ -291,7 +291,9 @@ class DatasetPluginHelper(object):
                              perr=ds.perr, nerr=ds.nerr)
         elif ds.dimensions == 2:
             return Dataset2D(name, ds.data,
-                             rangex=ds.xrange, rangey=ds.yrange)
+                             xrange=ds.xrange, yrange=ds.yrange,
+                             xedge=ds.xedge, yedge=ds.yedge,
+                             xcent=ds.xcent, ycent=ds.ycent)
         else:
             raise RuntimeError("Invalid number of dimensions in dataset")
 
@@ -1014,11 +1016,13 @@ class SubtractMeanDatasetPlugin(_OneOutputDatasetPlugin):
         dsin = helper.getDataset(fields['ds_in'])
 
         vals = dsin.data
-        mean = vals[N.isfinite(vals)].mean()
-        vals = vals - mean
+        if len(vals) > 0:
+            mean = vals[N.isfinite(vals)].mean()
+            vals = vals - mean
 
         if fields['divstddev']:
-            vals /= vals[N.isfinite(vals)].std()
+            if len(vals) > 0:
+                vals /= vals[N.isfinite(vals)].std()
 
         self.dsout.update(
             data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
@@ -1044,8 +1048,9 @@ class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
         dsin = helper.getDataset(fields['ds_in'])
 
         vals = dsin.data
-        minval = vals[N.isfinite(vals)].min()
-        vals = vals - minval
+        if len(vals) > 0:
+            minval = vals[N.isfinite(vals)].min()
+            vals = vals - minval
 
         self.dsout.update(
             data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
@@ -1654,14 +1659,15 @@ class SortPlugin(_OneOutputDatasetPlugin):
         if fields['ds_sort'].strip():
             ds_sort = helper.getDataset(fields['ds_sort'])
 
-        idxs = N.argsort(ds_sort.data)
+        minlen = min(len(ds_sort.data), len(ds.data))
+        idxs = N.argsort(ds_sort.data[:minlen])
         if fields['reverse']:
             idxs = idxs[::-1]
 
-        out = { 'data': ds.data[idxs] }
-        if ds.serr is not None: out['serr'] = ds.serr[idxs]
-        if ds.perr is not None: out['perr'] = ds.perr[idxs]
-        if ds.nerr is not None: out['nerr'] = ds.nerr[idxs]
+        out = { 'data': ds.data[:minlen][idxs] }
+        if ds.serr is not None: out['serr'] = ds.serr[:minlen][idxs]
+        if ds.perr is not None: out['perr'] = ds.perr[:minlen][idxs]
+        if ds.nerr is not None: out['nerr'] = ds.nerr[:minlen][idxs]
 
         self.dsout.update(**out)
 
@@ -1694,7 +1700,10 @@ class SortTextPlugin(_OneOutputDatasetPlugin):
         ds = helper.getTextDataset(fields['ds_in']).data
         if fields['ds_sort'].strip():
             ds_sort = helper.getDataset(fields['ds_sort'])
-            idxs = N.argsort(ds_sort.data)
+            length = min(len(ds), len(ds_sort.data))
+            ds = ds[:length]
+
+            idxs = N.argsort(ds_sort.data[:length])
             dout = []
             for i in idxs:
                 dout.append(ds[i])
