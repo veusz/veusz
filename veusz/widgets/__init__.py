@@ -46,3 +46,5 @@ from .polar import Polar
 from .ternary import Ternary
 from .nonorthpoint import NonOrthPoint
 from .nonorthfunction import NonOrthFunction
+from .graph3d import Graph3D
+from .axis3d import Axis3D

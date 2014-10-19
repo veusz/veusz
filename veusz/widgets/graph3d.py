@@ -18,8 +18,11 @@
 
 from __future__ import division
 
-from . import widget
+from .. import qtall as qt4
+from .. import document
+from .. import setting
 from .. import threed
+from . import widget
 
 def _(text, disambiguation=None, context='Graph3D'):
     """Translate text."""
@@ -90,7 +93,7 @@ class Graph3D(widget.Widget):
         # recursively go back up the tree to find axes 
         w = self
         while w is not None and len(axes) < len(axesnames):
-             for c in w.children:
+            for c in w.children:
                 name = c.name
                 if ( name in axesnames and name not in axes and
                      hasattr(c.isaxis3d) and c.isaxis3d ):
@@ -117,7 +120,10 @@ class Graph3D(widget.Widget):
     def draw(self, parentposn, painthelper, outerbounds = None):
         '''Update the margins before drawing.'''
         bounds = self.computeBounds(parentposn, painthelper)
-        maxbounds = self.computeBounds(parentposn, painthelper, withmargin=False)
+        maxbounds = self.computeBounds(
+            parentposn, painthelper, withmargin=False)
+
+        s = self.settings
 
         # do no painting if hidden
         if s.hide:
@@ -126,7 +132,7 @@ class Graph3D(widget.Widget):
         # controls for adjusting graph margins
         painter = painthelper.painter(self, bounds)
 
-        bounds = self.adjustBoundsForAspect(bounds)
+        #bounds = self.adjustBoundsForAspect(bounds)
 
         axestodraw = {}
         axesofwidget = painthelper.plotteraxismap
@@ -140,12 +146,13 @@ class Graph3D(widget.Widget):
                     axestodraw[c.name] = c
 
         objs = []
-        for c in children:
-            objs.append( c.drawToObject() )
+        for c in self.children:
+            obj = c.drawToObject()
+            if obj:
+                objs.append(obj)
 
         compound = threed.Compound(objs)
         scene = threed.Scene()
-
 
         with painter:
 

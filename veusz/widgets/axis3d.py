@@ -81,7 +81,7 @@ class Axis3D(widget.Widget):
         s.add( setting.Bool('log', False,
                             descr = _('Whether axis is logarithmic'),
                             usertext=_('Log')) )
-        s.add( setting.AutoRange('autoRange') )
+        s.add( AutoRange('autoRange', 'next-tick') )
         s.add( setting.Choice('mode',
                               ('numeric', 'datetime', 'labels'),
                               'numeric',
@@ -108,8 +108,8 @@ class Axis3D(widget.Widget):
                              usertext=_('Scale')) )
 
         s.add( setting.Choice('direction',
-                              ['horizontal', 'vertical'],
-                              'horizontal',
+                              ['x', 'y', 'z'],
+                              'x',
                               descr = _('Direction of axis'),
                               usertext=_('Direction')) )
         s.add( setting.Float('lowerPosition', 0.,
@@ -157,7 +157,7 @@ class Axis3D(widget.Widget):
     @classmethod
     def allowedParentTypes(self):
         from . import graph3d
-        return (graph.Graph3d,)
+        return (graph3d.Graph3D,)
 
     @property
     def userdescription(self):
@@ -165,6 +165,10 @@ class Axis3D(widget.Widget):
         s = self.settings
         return "range %s to %s%s" % ( str(s.min), str(s.max),
                                       ['',' (log)'][s.log])
+
+    def isLinked(self):
+        """Whether is an axis linked to another."""
+        return False
 
     def setAutoRange(self, autorange):
         """Set the automatic range of this axis (called from page helper)."""
@@ -323,6 +327,9 @@ class Axis3D(widget.Widget):
         log1 = N.log(self.plottedrange[0])
         log2 = N.log(self.plottedrange[1])
         return (N.log(N.clip(v, 1e-99, 1e99)) - log1) / (log2 - log1)
+
+    def drawToObject(self):
+        return None
 
 # allow the factory to instantiate an axis
 document.thefactory.register( Axis3D )
