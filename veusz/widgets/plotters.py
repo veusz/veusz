@@ -116,7 +116,7 @@ class GenericPlotter(widget.Widget):
                                      self.settings.yAxis) )
 
         # fail if we don't have good axes
-        if ( None in axes or
+        if ( axes[0] is None or axes[1] is None or
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):
             return None
@@ -234,7 +234,7 @@ class FreePlotter(widget.Widget):
                                              s.yAxis) )
             else:
                 return None, None
-            if None in axes:
+            if axes[0] is None or axes[1] is None:
                 return None, None
 
             xpos = axes[0].dataToPlotterCoords(posn, xpos)
@@ -255,7 +255,7 @@ class FreePlotter(widget.Widget):
                 axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
             else:
                 return None, None
-            if None in axes:
+            if axes[0] is None or axes[1] is None:
                 return None, None
             
             xpos = axes[0].plotterToDataCoords(posn, xplt)

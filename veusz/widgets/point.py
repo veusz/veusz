@@ -730,7 +730,7 @@ class PointPlotter(GenericPlotter):
             length = xv.data.shape[0]
             yv = document.DatasetRange(length, (1,length))
 
-        if None in (text, xv, yv):
+        if text is None or xv is None or yv is None:
             return (None, None)
         if direction == 'horizontal':
             return (text, xv.data)

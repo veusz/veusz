@@ -122,7 +122,7 @@ class GenericPickable:
         if self.widget.settings.hide:
             return info
 
-        if None in (self.xvals, self.yvals):
+        if self.xvals is None or self.yvals is None:
             return info
         if len(self.xscreen) == 0 or len(self.yscreen) == 0:
             return info
@@ -166,7 +166,7 @@ class GenericPickable:
         if self.widget.settings.hide:
             return info
 
-        if None in (self.xvals, self.yvals):
+        if self.xvals is None or self.yvals is None:
             return info
 
         if oldindex.index is None:
