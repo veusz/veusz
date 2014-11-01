@@ -27,6 +27,7 @@ from .. import qtall as qt4
 from .. import document
 from .. import setting
 from .. import utils
+from .. import threed
 
 from . import widget
 from . import axisticks
@@ -120,10 +121,14 @@ class Axis3D(widget.Widget):
                              descr=_('Fractional position of upper end of '
                                      'axis on graph'),
                              usertext=_('Max position')) )
-        s.add( setting.Float('otherPosition', 0.,
+        s.add( setting.Float('otherPosition1', 0.,
                              descr=_('Fractional position of axis '
-                                     'in its perpendicular direction'),
-                             usertext=_('Axis position')) )
+                                     'in its perpendicular direction 1'),
+                             usertext=_('Axis position 1')) )
+        s.add( setting.Float('otherPosition2', 0.,
+                             descr=_('Fractional position of axis '
+                                     'in its perpendicular direction 2'),
+                             usertext=_('Axis position 2')) )
 
         s.add( setting.Line('Line',
                             descr = _('Axis line settings'),
@@ -201,7 +206,7 @@ class Axis3D(widget.Widget):
             self.plottedrange = overriderange
 
         # automatic lookup of minimum
-        if not matched and overriderange is None:
+        if overriderange is None:
             if s.min == 'Auto':
                 self.plottedrange[0] = self.autorange[0]
             if s.max == 'Auto':
@@ -307,6 +312,7 @@ class Axis3D(widget.Widget):
     def dataToLogicalCoords(self, vals):
         """Compute coordinates on graph to logical graph coordinates (0..1)"""
 
+        self.computePlottedRange()
         s = self.settings
 
         svals = vals * s.datascale
@@ -329,7 +335,24 @@ class Axis3D(widget.Widget):
         return (N.log(N.clip(v, 1e-99, 1e99)) - log1) / (log2 - log1)
 
     def drawToObject(self):
-        return None
+
+        s = self.settings
+        dirn = s.direction
+
+        op1, op2 = s.otherPosition1, s.otherPosition2
+        lower, upper = s.lowerPosition, s.upperPosition
+        if dirn == 'x':
+            axisline = [(lower,op1,op2,1),(upper,op1,op2,1)]
+        elif dirn == 'y':
+            axisline = [(op1,lower,op2,1),(op1,upper,op2,1)]
+        else:
+            axisline = [(op1,op2,lower,1),(op1,op2,upper,1)]
+        axislineprop = threed.LineProp()
+
+        objs = [
+            threed.Polyline(axisline, axislineprop),
+        ]
+        return threed.Compound(objs)
 
 # allow the factory to instantiate an axis
-document.thefactory.register( Axis3D )
+document.thefactory.register(Axis3D)

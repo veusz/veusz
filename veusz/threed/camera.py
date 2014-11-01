@@ -30,7 +30,7 @@ class Camera(object):
 
     def __init__(self):
         self.viewM = self.perspM = N.identity(4)
-        self.setPointing( (0,0,0), (0,0,1), (0,1,0) )
+        self.setPointing((0,0,0), (0,0,1), (0,1,0))
         self.setPerspective()
 
     def setPointing(self, eye, target, up):

@@ -48,3 +48,5 @@ from .nonorthpoint import NonOrthPoint
 from .nonorthfunction import NonOrthFunction
 from .graph3d import Graph3D
 from .axis3d import Axis3D
+from .plotters3d import GenericPlotter3D
+from .function3d import Function3D

@@ -48,7 +48,7 @@ class Graph3D(widget.Widget):
 
         s.add( setting.Distance(
                 'leftMargin',
-                '1.7cm',
+                '0.2cm',
                 descr=_('Distance from left of graph to edge'),
                 usertext=_('Left margin'),
                 formatting=True) )
@@ -66,7 +66,7 @@ class Graph3D(widget.Widget):
                 formatting=True) )
         s.add( setting.Distance(
                 'bottomMargin',
-                '1.7cm',
+                '0.2cm',
                 descr=_('Distance from bottom of graph to edge'),
                 usertext=_('Bottom margin'),
                 formatting=True) )
@@ -96,7 +96,7 @@ class Graph3D(widget.Widget):
             for c in w.children:
                 name = c.name
                 if ( name in axesnames and name not in axes and
-                     hasattr(c.isaxis3d) and c.isaxis3d ):
+                     hasattr(c, 'isaxis3d') and c.isaxis3d ):
                     axes[name] = c
             w = w.parent
 
@@ -109,6 +109,11 @@ class Graph3D(widget.Widget):
         # return list of found axes
         return axes
 
+    def getAxes(self, axesnames):
+        """Return a list of axes widgets given a list of names."""
+        ad = self.getAxesDict(axesnames)
+        return [ad[n] for n in axesnames]
+
     def getMargins(self, painthelper):
         """Use settings to compute margins."""
         s = self.settings
@@ -117,7 +122,7 @@ class Graph3D(widget.Widget):
                  s.get('rightMargin').convert(painthelper),
                  s.get('bottomMargin').convert(painthelper) )
 
-    def draw(self, parentposn, painthelper, outerbounds = None):
+    def draw(self, parentposn, painthelper, outerbounds=None):
         '''Update the margins before drawing.'''
         bounds = self.computeBounds(parentposn, painthelper)
         maxbounds = self.computeBounds(
@@ -128,9 +133,6 @@ class Graph3D(widget.Widget):
         # do no painting if hidden
         if s.hide:
             return bounds
-
-        # controls for adjusting graph margins
-        painter = painthelper.painter(self, bounds)
 
         #bounds = self.adjustBoundsForAspect(bounds)
 
@@ -151,12 +153,14 @@ class Graph3D(widget.Widget):
             if obj:
                 objs.append(obj)
 
-        compound = threed.Compound(objs)
+        borderlineprop = threed.LineProp()
         scene = threed.Scene()
+        scene.objects += objs
+        camera = threed.Camera()
+        camera.setPointing((-8,-8,-8), (0.5,0.5,0.5), (0,-1,0))
 
+        painter = painthelper.painter(self, bounds)
         with painter:
-
-
-            pass
+            scene.render(painter, camera, bounds)
 
 document.thefactory.register(Graph3D)

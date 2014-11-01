@@ -30,10 +30,12 @@ class SurfaceProp(object):
         self.trans = 0.
 
     def calcQColor(self):
-        return qt4.QColor(int(self.color[0]*255),
-                          int(self.color[1]*255),
-                          int(self.color[2]*255),
-                          int((1-self.trans)*255))
+        return qt4.QColor(
+            int(self.color[0]*255),
+            int(self.color[1]*255),
+            int(self.color[2]*255),
+            int((1-self.trans)*255)
+        )
 
     def makeQBrush(self):
         return qt4.QBrush(self.calcQColor())
@@ -48,13 +50,17 @@ class LineProp(object):
         self.thickness = 1.
 
     def calcQColor(self):
-        return qt4.QColor(int(self.color[0]*255),
-                          int(self.color[1]*255),
-                          int(self.color[2]*255),
-                          int((1-self.trans)*255))
+        return qt4.QColor(
+            int(self.color[0]*255),
+            int(self.color[1]*255),
+            int(self.color[2]*255),
+            int((1-self.trans)*255)
+        )
 
-    def makeQPen(self):
-        return qt4.QPen(qt4.QBrush(self.calcQColor), self.thickness)
+    def makeQPen(self, painter):
+        return qt4.QPen(
+            qt4.QBrush(self.calcQColor()),
+            self.thickness*painter.dpi*painter.scaling/72.)
 
 class Object(object):
     """Object in scene."""
@@ -87,8 +93,8 @@ class Triangle(Primary):
         self.surfaceprop = surfaceprop
 
     def draw(self, painter, projpts):
-        painter.setBrush( self.surfaceprop.makeQBrush() )
-        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+        painter.setBrush(self.surfaceprop.makeQBrush())
+        painter.setPen(qt4.QPen(qt4.Qt.NoPen))
         painter.drawPolygon(
             qt4.QPolygonF([ qt4.QPointF(projpts[0][0], projpts[0][1]),
                             qt4.QPointF(projpts[1][0], projpts[1][1]),
@@ -101,11 +107,11 @@ class Polyline(Primary):
         self.lineprop = lineprop
 
     def draw(self, painter, projpts):
-        painter.setBrush( qt4.QBrush() )
-        painter.setPen( self.lineprop.makeQPen() )
+        painter.setBrush(qt4.QBrush())
+        painter.setPen(self.lineprop.makeQPen(painter))
         poly = qt4.QPolygonF()
         utils.addNumpyToPolygonF(poly, projpts[:,0], projpts[:,1])
-        painter.drawPolygon(poly)
+        painter.drawPolyline(poly)
 
 class Compound(Object):
     """Object in scene made of other objects."""

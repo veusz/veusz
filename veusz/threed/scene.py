@@ -63,6 +63,7 @@ class Scene(object):
         sortobjects = self.depthsort(cam)
 
         for depth, obj, points in sortobjects:
+
             winpts = ( (points*0.5+0.5) *
                        N.array((outwin[2]-outwin[0], outwin[3]-outwin[1])) +
                        N.array((outwin[0], outwin[1])) )
