@@ -42,12 +42,16 @@ class SurfaceProp(object):
 
 class LineProp(object):
     """Describe line properties."""
-    def __init__(self):
-        self.color = (0.,0.,0.)
-        self.specular = 0.5
-        self.diffuse = 0.5
-        self.trans = 0.
-        self.thickness = 1.
+    def __init__(self,
+                 color=(0,0,0), specular=0.5, diffuse=0.5,
+                 trans=0, width=1, style=qt4.Qt.SolidLine, dashpattern=None):
+        self.color = color
+        self.specular = specular
+        self.diffuse = diffuse
+        self.trans = trans
+        self.width = width
+        self.style = style
+        self.dashpattern = dashpattern
 
     def calcQColor(self):
         return qt4.QColor(
@@ -58,9 +62,13 @@ class LineProp(object):
         )
 
     def makeQPen(self, painter):
-        return qt4.QPen(
+        p = qt4.QPen(
             qt4.QBrush(self.calcQColor()),
-            self.thickness*painter.dpi*painter.scaling/72.)
+            self.width*painter.dpi*painter.scaling/72.,
+            self.style)
+        if self.dashpattern:
+            p.setDashPattern(self.dashpattern)
+        return p
 
 class Object(object):
     """Object in scene."""

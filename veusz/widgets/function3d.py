@@ -98,6 +98,12 @@ class Function3D(plotters3d.GenericPlotter3D):
             descr=_('Function for z coordinate'),
             usertext=_('Z function') ), 3)
 
+        s.add(setting.Line3D(
+            'Line',
+            descr = _('Line settings'),
+            usertext = _('Plot line')),
+               pixmap = 'settings_plotline' )
+
     def affectsAxisRange(self):
         """Which axes this widget affects."""
         s = self.settings
@@ -236,6 +242,8 @@ class Function3D(plotters3d.GenericPlotter3D):
         if axes is None:
             return
 
+        lineprop = s.Line.makeLineProp()
+
         outobj = []
         if mode == 'x,y,z=fns(t)':
             retn = self.getLineVals()
@@ -245,7 +253,6 @@ class Function3D(plotters3d.GenericPlotter3D):
             lx = axes[0].dataToLogicalCoords(valsx)
             ly = axes[1].dataToLogicalCoords(valsy)
             lz = axes[2].dataToLogicalCoords(valsz)
-            lineprop = threed.LineProp()
 
             constructPolyline(outobj, lineprop, lx, ly, lz)
 
@@ -258,7 +265,6 @@ class Function3D(plotters3d.GenericPlotter3D):
             ly = axes[1].dataToLogicalCoords(valsy)
             lz = axes[2].dataToLogicalCoords(valsz)
 
-            lineprop = threed.LineProp()
             # draw grid over each axis
             for i in crange(lx.shape[0]):
                 constructPolyline(

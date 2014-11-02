@@ -20,6 +20,7 @@
 
 from __future__ import division
 from .. import qtall as qt4
+from .. import threed
 
 from . import setting
 from .settings import Settings
@@ -389,3 +390,45 @@ class MarkerColor(Settings):
                 'linear',
                 descr = _('Scaling to transform numbers to color'),
                 usertext=_('Scaling')))
+
+class Line3D(Settings):
+    '''3d line properties.'''
+
+    def __init__(self, name, **args):
+        Settings.__init__(self, name, **args)
+
+        self.add( setting.Color('color',
+                                setting.Reference('/StyleSheet/Line/color'),
+                                descr = _('Color of line'),
+                                usertext=_('Color')) )
+        self.add( setting.Float('width', 1.,
+                                minval=0., maxval=1000,
+                                descr = _('Width of line'),
+                                usertext=_('Width')) )
+        self.add( setting.LineStyle('style', 'solid',
+                                    descr = _('Line style'),
+                                    usertext=_('Style')) )
+        self.add( setting.Int( 'transparency', 0,
+                               descr = _('Transparency percentage'),
+                               usertext = _('Transparency'),
+                               minval = 0,
+                               maxval = 100 ) )
+        self.add( setting.Bool('hide', False,
+                               descr = _('Hide the line'),
+                               usertext=_('Hide')) )
+
+    def makeLineProp(self):
+        """Construct line properties object for assigning to 3D object."""
+
+        width = self.width
+        if self.hide or width == 0.:
+            style, dash = qt4.Qt.NoPen, None
+        else:
+            style, dash = setting.LineStyle._linecnvt[self.style]
+
+        col = qt4.QColor(self.color)
+        return threed.LineProp(
+            color=(col.redF(), col.greenF(), col.blueF()),
+            trans=self.transparency*0.01,
+            width=width,
+            style=style, dashpattern=dash)

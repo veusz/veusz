@@ -130,7 +130,7 @@ class Axis3D(widget.Widget):
                                      'in its perpendicular direction 2'),
                              usertext=_('Axis position 2')) )
 
-        s.add( setting.Line('Line',
+        s.add( setting.Line3D('Line',
                             descr = _('Axis line settings'),
                             usertext = _('Axis line')),
                pixmap='settings_axisline' )
@@ -347,7 +347,7 @@ class Axis3D(widget.Widget):
             axisline = [(op1,lower,op2,1),(op1,upper,op2,1)]
         else:
             axisline = [(op1,op2,lower,1),(op1,op2,upper,1)]
-        axislineprop = threed.LineProp()
+        axislineprop = s.Line.makeLineProp()
 
         objs = [
             threed.Polyline(axisline, axislineprop),
