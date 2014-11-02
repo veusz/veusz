@@ -23,11 +23,12 @@ from .. import qtall as qt4
 
 class SurfaceProp(object):
     """Describe surface properties."""
-    def __init__(self):
-        self.color = (1.,0.,0.)
-        self.specular = 0.5
-        self.diffuse = 0.5
-        self.trans = 0.
+    def __init__(self,
+                 color=(0.5,0.5,0.5), specular=0.5, diffuse=0.5, trans=0):
+        self.color = color
+        self.specular = specular
+        self.diffuse = diffuse
+        self.trans = trans
 
     def calcQColor(self):
         return qt4.QColor(

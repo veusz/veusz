@@ -52,6 +52,18 @@ def constructPolyline(outobj, lineprop, lx, ly, lz):
     else:
         outobj.append(threed.Polyline(stack, lineprop))
 
+def constructSurface(outobj, surfprop, lx, ly, lz):
+    """Split up gridded surface into triangles."""
+    w, h = lx.shape
+    for i in crange(w-1):
+        for j in crange(h-1):
+            p0 = (lx[i,j], ly[i,j], lz[i,j], 1)
+            p1 = (lx[i+1,j], ly[i+1,j], lz[i+1,j], 1)
+            p2 = (lx[i,j+1], ly[i,j+1], lz[i,j+1], 1)
+            p3 = (lx[i+1,j+1], ly[i+1,j+1], lz[i+1,j+1], 1)
+            outobj.append(threed.Triangle((p0,p1,p2), surfprop))
+            outobj.append(threed.Triangle((p3,p1,p2), surfprop))
+
 class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""
 
@@ -103,6 +115,11 @@ class Function3D(plotters3d.GenericPlotter3D):
             descr = _('Line settings'),
             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
+        s.add(setting.Surface3D(
+            'Surface',
+            descr = _('Surface fill settings'),
+            usertext=_('Surface')),
+              pixmap='settings_bgfill' )
 
     def affectsAxisRange(self):
         """Which axes this widget affects."""
@@ -254,7 +271,8 @@ class Function3D(plotters3d.GenericPlotter3D):
             ly = axes[1].dataToLogicalCoords(valsy)
             lz = axes[2].dataToLogicalCoords(valsz)
 
-            constructPolyline(outobj, lineprop, lx, ly, lz)
+            if not s.Line.hide:
+                constructPolyline(outobj, lineprop, lx, ly, lz)
 
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
             retn = self.getGridVals()
@@ -266,12 +284,17 @@ class Function3D(plotters3d.GenericPlotter3D):
             lz = axes[2].dataToLogicalCoords(valsz)
 
             # draw grid over each axis
-            for i in crange(lx.shape[0]):
-                constructPolyline(
-                    outobj, lineprop, lx[i, :], ly[i, :], lz[i, :])
-            for i in crange(lx.shape[1]):
-                constructPolyline(
-                    outobj, lineprop, lx[:, i], ly[:, i], lz[:, i])
+            if not s.Surface.hide:
+                surfprop = s.Surface.makeSurfaceProp()
+                constructSurface(outobj, surfprop, lx, ly, lz)
+
+            if not s.Line.hide:
+                for i in crange(lx.shape[0]):
+                    constructPolyline(
+                        outobj, lineprop, lx[i, :], ly[i, :], lz[i, :])
+                for i in crange(lx.shape[1]):
+                    constructPolyline(
+                        outobj, lineprop, lx[:, i], ly[:, i], lz[:, i])
 
         if len(outobj) == 0:
             return None

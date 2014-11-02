@@ -432,3 +432,29 @@ class Line3D(Settings):
             trans=self.transparency*0.01,
             width=width,
             style=style, dashpattern=dash)
+
+class Surface3D(Settings):
+    '''3d surface properties.'''
+
+    def __init__(self, name, **args):
+        Settings.__init__(self, name, **args)
+
+        self.add( setting.Color('color',
+                                'grey',
+                                descr = _('Color of surface'),
+                                usertext=_('Color')) )
+        self.add( setting.Int('transparency', 0,
+                              descr = _('Transparency percentage'),
+                              usertext = _('Transparency'),
+                              minval = 0,
+                              maxval = 100 ) )
+        self.add( setting.Bool('hide', False,
+                               descr = _('Hide surface'),
+                               usertext=_('Hide')) )
+
+    def makeSurfaceProp(self):
+        """Properties to assign to surface."""
+        col = qt4.QColor(self.color)
+        return threed.SurfaceProp(
+            color=(col.redF(), col.greenF(), col.blueF()),
+            trans=self.transparency*0.01)
