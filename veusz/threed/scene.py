@@ -17,6 +17,7 @@
 ##############################################################################
 
 from . import funcs
+from . import objects
 import numpy as N
 
 class LightSource(object):
@@ -31,38 +32,28 @@ class Scene(object):
 
     def depthsort(self, cam):
         """Return objects sorted by decreasing distance from observer."""
-        objpoints = []
-        # get points in view coordinates
-        for obj in self.objects:
-            objpoints += obj.getPoints(cam.viewM)
-
         outobjects = []
-        for obj, points in objpoints:
-            objprojpts = []
-            avdepth = 0.
-            for p in points:
-                # calculate radius of point
-                r = N.sqrt( p[0]**2 + p[1]**2 + p[2]**2 ) / p[3]
-                avdepth += r
+        # get points in view coordinates
+        camT = cam.perspM.T
+        for obj in self.objects:
+            for obj, points in obj.getPoints(cam.viewM):
+                projpoints = points.dot(camT)
+                pp2d = projpoints[:,:2] / projpoints[:,3:4]
+                depth = -projpoints[:,2] / projpoints[:,3]
+                outobjects.append( [depth.min(), depth.max(), obj, pp2d] )
 
-                # convert to projected coordinate
-                prend = cam.perspM.dot(p)
-                objprojpts.append( (prend[0]/prend[3], prend[1]/prend[3]) )
-            avdepth *= (1./len(obj.points))
-
-            outobjects.append( (avdepth, obj, N.array(objprojpts)) )
-
-        outobjects.sort(reverse=True)
-        return outobjects
+        sortmin = sorted(outobjects, reverse=True)
+        sortmax = sorted(outobjects, key=lambda x: -x[1])
+        return sortmin, sortmax
 
     def render(self, painter, cam, outwin):
         """Render objects to painter.
 
         outwin = (minx, miny, maxx, maxy)
         """
-        sortobjects = self.depthsort(cam)
+        sortmin, sortmax = self.depthsort(cam)
 
-        for depth, obj, points in sortobjects:
+        for mindepth, maxdepth, obj, points in sortmin:
 
             winpts = ( (points*0.5+0.5) *
                        N.array((outwin[2]-outwin[0], outwin[3]-outwin[1])) +
