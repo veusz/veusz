@@ -4,7 +4,6 @@
 #include <cmath>
 
 // 4-vector
-
 struct Vec4
 {
   Vec4()
@@ -148,22 +147,20 @@ struct Mat4
   Mat4(bool zero=true)
   {
     if(zero)
-      {
-	for(unsigned y=0; y<4; ++y)
-	  for(unsigned x=0; x<4; ++x)
-	    m[y][x] = 0;
-      }
+      for(unsigned y=0; y<4; ++y)
+	for(unsigned x=0; x<4; ++x)
+	  m[y][x] = 0;
   }
 
-  float& operator()(unsigned x, unsigned y) { return m[x][y]; }
-  float operator()(unsigned x, unsigned y) const { return m[x][y]; }
+  float& operator()(unsigned y, unsigned x) { return m[y][x]; }
+  float operator()(unsigned y, unsigned x) const { return m[y][x]; }
 
   Mat4 transpose() const
   {
-    Mat4 r;
-    for(unsigned x=0; x<4; ++x)
-      for(unsigned y=0; y<4; ++y)
-	r.m[x][y] = m[y][x];
+    Mat4 r(false);
+    for(unsigned y=0; y<4; ++y)
+      for(unsigned x=0; y<x; ++x)
+	r.m[y][x] = m[x][y];
     return r;
   }
 
@@ -201,8 +198,11 @@ inline Vec4 operator*(const Vec4& v, const Mat4& m)
 // identity matrix
 inline Mat4 identityM()
 {
-  Mat4 m;
-  m(0,0) = m(1,1) = m(2,2) = m(3,3) = 1;
+  Mat4 m(false);
+  m(0,0)=1; m(0,1)=0; m(0,2)=0; m(0,3)=0;
+  m(1,0)=0; m(1,1)=1; m(1,2)=0; m(1,3)=0;
+  m(2,0)=0; m(2,1)=0; m(2,2)=1; m(2,3)=0;
+  m(3,0)=0; m(3,1)=0; m(3,2)=0; m(3,3)=1;
   return m;
 }
 
@@ -211,5 +211,13 @@ Mat4 rotateM(float angle, Vec3 vec);
 
 // create a translation matrix
 Mat4 translationM(Vec3 vec);
+
+// do projection, getting x,y coordinate and depth
+inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
+{
+  Vec4 nv(projM*v);
+  float inv = 1./nv(3);
+  return Vec3(nv(0)*inv, nv(1)*inv, -nv(2)*inv);
+}
 
 #endif

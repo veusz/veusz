@@ -2,13 +2,16 @@
 #define SHAPES_H
 
 #include <vector>
+#include "camera.h"
 #include "mmaths.h"
 
-enum FragmentType {FR_TRIANGLE, FR_LINE, FR_PATH};
+
 
 // structure returned from object
 struct Fragment
 {
+  enum FragmentType {FR_TRIANGLE, FR_LINESEG, FR_PATH};
+
   // type of fragment
   FragmentType type;
 
@@ -26,26 +29,37 @@ class Object
 {
  public:
   Object()
+    : objM(identityM())
     {
-      sceneM = identityM();
     }
   virtual ~Object();
 
-  virtual void getFragments(const Mat4& outerM, FragmentVec& v) const = 0;
+  virtual void getFragments(const Mat4& outerM, const Camera& cam,
+			    FragmentVec& v) const = 0;
 
  public:
-  Mat4 sceneM;
+  Mat4 objM;
 };
 
 
 class Triangle : public Object
 {
  public:
-  void getFragments(const Mat4& outerM, FragmentVec& v) const;
+  void getFragments(const Mat4& outerM, const Camera& cam,
+		    FragmentVec& v) const;
 
  public:
   Vec4 points[3];
 };
 
+class PolyLine : public Object
+{
+ public:
+  void getFragments(const Mat4& outerM, const Camera& cam,
+		    FragmentVec& v) const;
+
+ public:
+  std::vector<Vec4> points;
+};
 
 #endif

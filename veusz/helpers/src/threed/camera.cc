@@ -48,7 +48,6 @@ void Camera::setPointing(const Vec3 &_eye, const Vec3 &target, const Vec3 &up)
 void Camera::setPerspective(float fovy_degrees, float aspect,
 			    float znear, float zfar)
 {
-
   float r = std::tan(fovy_degrees * (M_PI/180./2.)) * znear;
   float left = -r*aspect;
   float right = r*aspect;
@@ -76,35 +75,4 @@ void Camera::setPerspective(float fovy_degrees, float aspect,
   perspM(3,3) = 0;
 
   combM = perspM * viewM;
-}
-
-#include <stdio.h>
-#include <iostream>
-int main()
-{
-  Camera c;
-  c.setPointing(Vec3(0,0.1,-5), Vec3(0,0,1), Vec3(0,1,0.1));
-  Vec4 v(-0.5,1,10);
-
-  Mat4 rotM = rotateM(27., Vec3(0,0.3,0.1));
-  Mat4 tM = translationM(Vec3(1,5,21));
-
-  printf("foo\n");
-  Mat4 x=rotM*tM;
-  printf("foo %g\n", x(0,2));
-
-  Vec4 nv = rotM*v;//c.combM;
-
-  std::cout << nv(0) << ' ' << nv(1) << ' '
-	    << nv(2) << ' ' << nv(3) << '\n';
-
-  for(int i=0; i<4; ++i)
-    {
-      for(int j=0; j<4; ++j)
-	{
-	  std::cout << rotM(i, j) << ' ';
-	}
-      std::cout << '\n';
-    }
-  return 0;
 }
