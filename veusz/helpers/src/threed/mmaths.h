@@ -1,6 +1,7 @@
 #ifndef MATHS_H
 #define MATHS_H
 
+#include <vector>
 #include <cmath>
 
 // 4-vector
@@ -10,7 +11,7 @@ struct Vec4
   {
     v[0] = v[1] = v[2] = v[3] = 0;
   }
-  Vec4(float a, float b, float c, float d=1.)
+  Vec4(float a, float b, float c, float d=1)
   {
     v[0] = a; v[1] = b; v[2] = c; v[3] = d;
   }
@@ -30,7 +31,7 @@ struct Vec4
   }
   inline float rad() const { return std::sqrt(rad2()); }
 
-  inline void normalise() { operator*=(1./rad()); }
+  inline void normalise() { operator*=(1/rad()); }
 
 private:
   float v[4];
@@ -93,7 +94,7 @@ struct Vec3
   }
   inline float rad() const { return std::sqrt(rad2()); }
 
-  inline void normalise() { operator*=(1./rad()); }
+  inline void normalise() { operator*=(1/rad()); }
 
 private:
   float v[3];
@@ -216,8 +217,18 @@ Mat4 translationM(Vec3 vec);
 inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
 {
   Vec4 nv(projM*v);
-  float inv = 1./nv(3);
+  float inv = 1/nv(3);
   return Vec3(nv(0)*inv, nv(1)*inv, -nv(2)*inv);
 }
+
+inline Vec3 vec3to4(const Vec4& v)
+{
+  float inv = 1/v(3);
+  return Vec3(v(0)*inv, v(1)*inv, v(2)*inv);
+}
+
+typedef std::vector<Vec3> Vec3Vector;
+typedef std::vector<Vec4> Vec4Vector;
+
 
 #endif
