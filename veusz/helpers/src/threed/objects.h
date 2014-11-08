@@ -79,6 +79,11 @@ class Triangle : public Object
     : Object(), surfaceprop(0)
   {
   }
+  Triangle(const Vec4& a, const Vec4& b, const Vec4& c)
+  {
+    points[0] = a; points[1] = b; points[2] = c;
+    surfaceprop = 0;
+  }
 
   void getFragments(const Mat4& outerM, const Camera& cam,
 		    FragmentVector& v) const;
@@ -95,13 +100,17 @@ class PolyLine : public Object
     : Object(), lineprop(0)
   {
   }
+  void addPoint(const Vec4& v)
+  {
+    points.push_back(v);
+  }
 
   void getFragments(const Mat4& outerM, const Camera& cam,
 		    FragmentVector& v) const;
 
  public:
   Vec4Vector points;
-  LineProp const* lineprop;
+  const LineProp* lineprop;
 };
 
 // container of objects with transformation matrix of children

@@ -8,6 +8,9 @@
 class Scene
 {
  public:
+  Scene()
+  {
+  }
   void render(QPainter* painter, const Camera& cam,
 	      const Mat3& screenM);
 
@@ -16,8 +19,6 @@ class Scene
 
 private:
   FragmentVector fragments;
-
 };
-
 
 #endif

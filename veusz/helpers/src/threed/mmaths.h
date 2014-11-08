@@ -20,9 +20,6 @@ struct Vec4
   inline float& operator()(unsigned i) { return v[i]; }
   inline float operator()(unsigned i) const { return v[i]; }
 
-  inline void set(unsigned i, float f) { v[i] = f; }
-  inline float get(unsigned i) const { return v[i]; }
-
   inline void operator*=(float f)
   {
     v[0] *= f; v[1] *= f; v[2] *= f; v[3] *= f;
@@ -77,8 +74,6 @@ struct Vec3
 
   inline float& operator()(unsigned i) { return v[i]; }
   inline float operator()(unsigned i) const { return v[i]; }
-  inline void set(unsigned i, float f) { v[i] = f; }
-  inline float get(unsigned i) const { return v[i]; }
 
   inline void operator*=(float f)
   {
@@ -145,8 +140,6 @@ struct Mat4
 
   inline float& operator()(unsigned y, unsigned x) { return m[y][x]; }
   inline float operator()(unsigned y, unsigned x) const { return m[y][x]; }
-  inline void set(unsigned i, unsigned j, float f) { m[i][j] = f; }
-  inline float get(unsigned i, unsigned j) const { return m[i][j]; }
 
   // matrix multiply
   inline Mat4 operator*(const Mat4& o) const
@@ -222,8 +215,6 @@ struct Mat3
 
   inline float& operator()(unsigned y, unsigned x) { return m[y][x]; }
   inline float operator()(unsigned y, unsigned x) const { return m[y][x]; }
-  inline void set(unsigned i, unsigned j, float f) { m[i][j] = f; }
-  inline float get(unsigned i, unsigned j) const { return m[i][j]; }
 
   inline Mat3 operator*(const Mat3& o) const
   {
