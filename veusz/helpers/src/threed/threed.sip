@@ -68,6 +68,15 @@ struct Vec4
   Vec4(float, float, float, float);
 
   void set(unsigned, float);
+%MethodCode
+    if(a0 < 0 || a0 > 3)
+      {
+	sipIsErr = 1;
+	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=3");
+      }
+    else
+      sipCpp->operator()(a0) = a1;
+%End
   float get(unsigned) const;
 
   void operator*=(float);
@@ -117,6 +126,10 @@ struct Mat4
   Vec4 operator*(const Vec4& v) const;
   Mat4 transpose() const;
 };
+Vec4 operator*(const Vec4& v, const Mat4& o);
+Mat4 identityM4();
+Mat4 rotateM4(float angle, Vec3 vec);
+Mat4 translationM4(Vec3 vec);
 
 struct Mat3
 {
@@ -131,8 +144,8 @@ struct Mat3
   Vec3 operator*(const Vec3& v) const;
   Mat3 transpose() const;
 };
-
-
+Vec3 operator*(const Vec3& v, const Mat3& o);
+Mat3 identityM3();
 
 class Object
 {
