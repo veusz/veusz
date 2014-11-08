@@ -1,7 +1,7 @@
 #include <cmath>
 #include "mmaths.h"
 
-Mat4 rotateM(float angle, Vec3 vec)
+Mat4 rotateM4(float angle, Vec3 vec)
 {
   float c = std::cos(angle);
   float s = std::sin(angle);
@@ -34,7 +34,7 @@ Mat4 rotateM(float angle, Vec3 vec)
   return m;
 }
 
-Mat4 translationM(Vec3 vec)
+Mat4 translationM4(Vec3 vec)
 {
   Mat4 m;
 

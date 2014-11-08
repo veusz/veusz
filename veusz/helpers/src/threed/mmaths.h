@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 
+//////////////////////////////////////////////////////////////////////////////
 // 4-vector
 struct Vec4
 {
@@ -66,8 +67,9 @@ inline bool operator!=(const Vec4& a, const Vec4& b)
   return !(a==b);
 }
 
-
+//////////////////////////////////////////////////////////////////////////////
 // 3-vector
+
 struct Vec3
 {
   Vec3()
@@ -141,6 +143,7 @@ inline float dot(const Vec3& a, const Vec3& b)
   return a(0)*b(0)+a(1)*b(1)+a(2)*b(2);
 }
 
+//////////////////////////////////////////////////////////////////////////////
 // 4x4 matrix
 
 struct Mat4
@@ -197,7 +200,7 @@ inline Vec4 operator*(const Vec4& v, const Mat4& m)
 }
 
 // identity matrix
-inline Mat4 identityM()
+inline Mat4 identityM4()
 {
   Mat4 m(false);
   m(0,0)=1; m(0,1)=0; m(0,2)=0; m(0,3)=0;
@@ -208,10 +211,76 @@ inline Mat4 identityM()
 }
 
 // create a rotation matrix
-Mat4 rotateM(float angle, Vec3 vec);
+Mat4 rotateM4(float angle, Vec3 vec);
 
 // create a translation matrix
-Mat4 translationM(Vec3 vec);
+Mat4 translationM4(Vec3 vec);
+
+///////////////////////////////////////////////////////////////////////
+// 3-Matrix
+
+struct Mat3
+{
+  Mat3(bool zero=true)
+  {
+    if(zero)
+      for(unsigned y=0; y<3; ++y)
+	for(unsigned x=0; x<3; ++x)
+	  m[y][x] = 0;
+  }
+
+  float& operator()(unsigned y, unsigned x) { return m[y][x]; }
+  float operator()(unsigned y, unsigned x) const { return m[y][x]; }
+
+  Mat3 transpose() const
+  {
+    Mat3 r(false);
+    for(unsigned y=0; y<3; ++y)
+      for(unsigned x=0; y<x; ++x)
+	r.m[y][x] = m[x][y];
+    return r;
+  }
+
+private:
+  float m[3][3];
+};
+
+// matrix multiply
+inline Mat3 operator*(const Mat3& t, const Mat3& o)
+{
+  Mat3 ret(false);
+  for(unsigned y=0; y<3; ++y)
+    for(unsigned x=0; x<3; ++x)
+      ret(y,x) = t(y,0)*o(0,x) + t(y,1)*o(1,x) + t(y,2)*o(2,x);
+  return ret;
+}
+
+// multiply matrix by vector
+inline Vec3 operator*(const Mat3& m, const Vec3& v)
+{
+  return Vec3(v(0)*m(0,0)+v(1)*m(0,1)+v(2)*m(0,2),
+	      v(0)*m(1,0)+v(1)*m(1,1)+v(2)*m(1,2),
+	      v(0)*m(2,0)+v(1)*m(2,1)+v(2)*m(2,2));
+}
+inline Vec3 operator*(const Vec3& v, const Mat3& m)
+{
+  return Vec3(v(0)*m(0,0)+v(1)*m(1,0)+v(2)*m(2,0),
+	      v(0)*m(0,1)+v(1)*m(1,1)+v(2)*m(2,1),
+	      v(0)*m(0,2)+v(1)*m(1,2)+v(2)*m(2,2));
+}
+
+// identity matrix
+inline Mat3 identityM3()
+{
+  Mat3 m(false);
+  m(0,0)=1; m(0,1)=0; m(0,2)=0;
+  m(1,0)=0; m(1,1)=1; m(1,2)=0;
+  m(2,0)=0; m(2,1)=0; m(2,2)=1;
+  return m;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Helper functions
 
 // do projection, getting x,y coordinate and depth
 inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
@@ -227,8 +296,12 @@ inline Vec3 vec3to4(const Vec4& v)
   return Vec3(v(0)*inv, v(1)*inv, v(2)*inv);
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// Helper types
+
 typedef std::vector<Vec3> Vec3Vector;
 typedef std::vector<Vec4> Vec4Vector;
 
+//////////////////////////////////////////////////////////////////////////////
 
 #endif
