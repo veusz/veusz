@@ -4,6 +4,11 @@ Object::~Object()
 {
 }
 
+void Object::getFragments(const Mat4& outerM, const Camera& cam,
+			  FragmentVector& v) const
+{
+}
+
 void Triangle::getFragments(const Mat4& outerM, const Camera& cam,
 			    FragmentVector& v) const
 {

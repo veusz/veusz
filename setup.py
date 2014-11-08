@@ -169,6 +169,17 @@ setup(name = 'veusz',
                    ],
 
       ext_modules = [
+        # threed support
+        Extension('veusz.helpers.threed',
+                  ['veusz/helpers/src/threed/camera.cpp',
+                   'veusz/helpers/src/threed/mmaths.cpp',
+                   'veusz/helpers/src/threed/objects.cpp',
+                   'veusz/helpers/src/threed/scene.cpp',
+                   'veusz/helpers/src/threed/threed.sip'],
+                  language="c++",
+                  include_dirs=['veusz/helpers/src/threed'],
+                  ),
+
         # mathml widget
         Extension('veusz.helpers.qtmml',
                   ['veusz/helpers/src/qtmml/qtmmlwidget.cpp',

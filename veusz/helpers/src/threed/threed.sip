@@ -27,16 +27,15 @@ struct SurfaceProp
 #include <objects.h>
 %End
 
-  SurfaceProp(float _r=0.5f, float _g=0.5f, float _b=0.5f,
-	      float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
-	      _hide=false)
-    : r(_r), g(_g), b(_b),
-    specular(_specular), diffuse(_diffuse), trans(_trans), hide(_hide)
-  {
-  }
-
-  float r, g, b;
-  float specular, diffuse, trans;
+  SurfaceProp(float r=0.5, float g=0.5, float b=0.5,
+	      float specular=0.5, float diffuse=0.5, float trans=0,
+	      bool hide=0);
+  float r;
+  float g;
+  float b;
+  float specular;
+  float diffuse;
+  float trans;
   bool hide;
 };
 
@@ -46,17 +45,106 @@ struct LineProp
 #include <objects.h>
 %End
 
-  LineProp(float _r=0, float _g=0, float _b=0,
-	   float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
-	   float _width=1, _hide=false)
-    : r(_r), g(_g), b(_b),
-      specular(_specular), diffuse(_diffuse), trans(_trans),
-    width(_width), hide(_hide)
-  {
-  }
-
-  float r, g, b;
-  float specular, diffuse, trans;
+  LineProp(float r=0, float g=0, float b=0,
+	   float specular=0.5, float diffuse=0.5, float trans=0,
+	   float width=1, bool hide=0);
+  float r;
+  float g;
+  float b;
+  float specular;
+  float diffuse;
+  float trans;
   float width;
   bool hide;
+};
+
+struct Vec4
+{
+%TypeHeaderCode
+#include <mmaths.h>
+%End
+
+  Vec4();
+  Vec4(float, float, float, float);
+
+  void set(unsigned, float);
+  float get(unsigned) const;
+
+  void operator*=(float);
+  Vec4 operator+(const Vec4&) const;
+  Vec4 operator-(const Vec4&) const;
+  Vec4 operator*(float) const;
+  bool operator==(const Vec4&) const;
+  bool operator!=(const Vec4&) const;
+  float rad2() const;
+  float rad() const;
+  void normalise();
+};
+
+struct Vec3
+{
+%TypeHeaderCode
+#include <mmaths.h>
+%End
+
+  Vec3();
+  Vec3(float, float, float);
+
+  void set(unsigned, float);
+  float get(unsigned) const;
+
+  void operator*=(float);
+  Vec3 operator+(const Vec3&) const;
+  Vec3 operator-(const Vec3&) const;
+  Vec3 operator*(float) const;
+  bool operator==(const Vec3&) const;
+  bool operator!=(const Vec3&) const;
+  float rad2() const;
+  float rad() const;
+  void normalise();
+};
+
+struct Mat4
+{
+%TypeHeaderCode
+#include <mmaths.h>
+%End
+
+  Mat4();
+  void set(unsigned, unsigned, float);
+  float get(unsigned, unsigned) const;
+  Mat4 operator*(const Mat4& o) const;
+  Vec4 operator*(const Vec4& v) const;
+  Mat4 transpose() const;
+};
+
+struct Mat3
+{
+%TypeHeaderCode
+#include <mmaths.h>
+%End
+
+  Mat3();
+  void set(unsigned, unsigned, float);
+  float get(unsigned, unsigned) const;
+  Mat3 operator*(const Mat3& o) const;
+  Vec3 operator*(const Vec3& v) const;
+  Mat3 transpose() const;
+};
+
+
+
+class Object
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+};
+
+class Triangle : public Object
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+ public:
 };

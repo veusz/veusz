@@ -20,9 +20,32 @@ struct Vec4
   inline float& operator()(unsigned i) { return v[i]; }
   inline float operator()(unsigned i) const { return v[i]; }
 
+  inline void set(unsigned i, float f) { v[i] = f; }
+  inline float get(unsigned i) const { return v[i]; }
+
   inline void operator*=(float f)
   {
     v[0] *= f; v[1] *= f; v[2] *= f; v[3] *= f;
+  }
+  inline Vec4 operator+(const Vec4& o) const
+  {
+    return Vec4(v[0]+o.v[0], v[1]+o.v[1], v[2]+o.v[2], v[3]+o.v[3]);
+  }
+  inline Vec4 operator-(const Vec4& o) const
+  {
+    return Vec4(v[0]-o.v[0], v[1]-o.v[1], v[2]-o.v[2], v[3]-o.v[3]);
+  }
+  inline Vec4 operator*(float f) const
+  {
+    return Vec4(v[0]*f, v[1]*f, v[2]*f, v[3]*f);
+  }
+  inline bool operator==(const Vec4& o) const
+  {
+    return v[0]==o.v[0] && v[1]==o.v[1] && v[2]==o.v[2] && v[3]==o.v[3];
+  }
+  inline bool operator!=(const Vec4& o) const
+  {
+    return !(operator==(o));
   }
 
   // radius
@@ -37,35 +60,6 @@ struct Vec4
 private:
   float v[4];
 };
-
-// add two vectors
-inline Vec4 operator+(const Vec4& v1, const Vec4& v2)
-{
-  return Vec4(v1(0)+v2(0), v1(1)+v2(1), v1(2)+v2(2), v1(3)+v2(3));
-}
-
-// subtract two vectors
-inline Vec4 operator-(const Vec4& v1, const Vec4& v2)
-{
-  return Vec4(v1(0)-v2(0), v1(1)-v2(1), v1(2)-v2(2), v1(3)-v2(3));
-}
-
-// multiply by constant
-inline Vec4 operator*(const Vec4& v, float c)
-{
-  return Vec4(c*v(0), c*v(1), c*v(2), c*v(3));
-}
-
-// test for equality
-inline bool operator==(const Vec4& a, const Vec4& b)
-{
-  return a(0)==b(0) && a(1)==b(1) && a(2)==b(2) && a(3)==b(3);
-}
-
-inline bool operator!=(const Vec4& a, const Vec4& b)
-{
-  return !(a==b);
-}
 
 //////////////////////////////////////////////////////////////////////////////
 // 3-vector
@@ -83,10 +77,32 @@ struct Vec3
 
   inline float& operator()(unsigned i) { return v[i]; }
   inline float operator()(unsigned i) const { return v[i]; }
+  inline void set(unsigned i, float f) { v[i] = f; }
+  inline float get(unsigned i) const { return v[i]; }
 
   inline void operator*=(float f)
   {
     v[0] *= f; v[1] *= f; v[2] *= f;
+  }
+  inline Vec3 operator+(const Vec3& o) const
+  {
+    return Vec3(v[0]+o.v[0], v[1]+o.v[1], v[2]+o.v[2]);
+  }
+  inline Vec3 operator-(const Vec3& o) const
+  {
+    return Vec3(v[0]-o.v[0], v[1]-o.v[1], v[2]-o.v[2]);
+  }
+  inline Vec3 operator*(float f) const
+  {
+    return Vec3(v[0]*f, v[1]*f, v[2]*f);
+  }
+  inline bool operator==(const Vec3& o) const
+  {
+    return v[0]==o.v[0] && v[1]==o.v[1] && v[2]==o.v[2];
+  }
+  inline bool operator!=(const Vec3& o) const
+  {
+    return !(operator==(o));
   }
 
   // radius
@@ -101,35 +117,6 @@ struct Vec3
 private:
   float v[3];
 };
-
-// add two vectors
-inline Vec3 operator+(const Vec3& v1, const Vec3& v2)
-{
-  return Vec3(v1(0)+v2(0), v1(1)+v2(1), v1(2)+v2(2));
-}
-
-// subtract two vectors
-inline Vec3 operator-(const Vec3& v1, const Vec3& v2)
-{
-  return Vec3(v1(0)-v2(0), v1(1)-v2(1), v1(2)-v2(2));
-}
-
-// multiply by constant
-inline Vec3 operator*(const Vec3& v, float c)
-{
-  return Vec3(c*v(0), c*v(1), c*v(2));
-}
-
-// test for equality
-inline bool operator==(const Vec3& a, const Vec3& b)
-{
-  return a(0)==b(0) && a(1)==b(1) && a(2)==b(2);
-}
-
-inline bool operator!=(const Vec3& a, const Vec3& b)
-{
-  return !(a==b);
-}
 
 inline Vec3 cross(const Vec3& a, const Vec3& b)
 {
@@ -156,10 +143,32 @@ struct Mat4
 	  m[y][x] = 0;
   }
 
-  float& operator()(unsigned y, unsigned x) { return m[y][x]; }
-  float operator()(unsigned y, unsigned x) const { return m[y][x]; }
+  inline float& operator()(unsigned y, unsigned x) { return m[y][x]; }
+  inline float operator()(unsigned y, unsigned x) const { return m[y][x]; }
+  inline void set(unsigned i, unsigned j, float f) { m[i][j] = f; }
+  inline float get(unsigned i, unsigned j) const { return m[i][j]; }
 
-  Mat4 transpose() const
+  // matrix multiply
+  inline Mat4 operator*(const Mat4& o) const
+  {
+    Mat4 ret(false);
+    for(unsigned y=0; y<4; ++y)
+      for(unsigned x=0; x<4; ++x)
+	ret.m[y][x] = m[y][0]*o.m[0][x] + m[y][1]*o.m[1][x] +
+	  m[y][2]*o.m[2][x] + m[y][3]*o.m[3][x];
+    return ret;
+  }
+
+  inline Vec4 operator*(const Vec4& v) const
+  {
+    return Vec4(v(0)*m[0][0]+v(1)*m[0][1]+v(2)*m[0][2]+v(3)*m[0][3],
+		v(0)*m[1][0]+v(1)*m[1][1]+v(2)*m[1][2]+v(3)*m[1][3],
+		v(0)*m[2][0]+v(1)*m[2][1]+v(2)*m[2][2]+v(3)*m[2][3],
+		v(0)*m[3][0]+v(1)*m[3][1]+v(2)*m[3][2]+v(3)*m[3][3]);
+  }
+
+
+  inline Mat4 transpose() const
   {
     Mat4 r(false);
     for(unsigned y=0; y<4; ++y)
@@ -172,25 +181,7 @@ private:
   float m[4][4];
 };
 
-// matrix multiply
-inline Mat4 operator*(const Mat4& t, const Mat4& o)
-{
-  Mat4 ret(false);
-  for(unsigned y=0; y<4; ++y)
-    for(unsigned x=0; x<4; ++x)
-      ret(y,x) = t(y,0)*o(0,x) + t(y,1)*o(1,x) +
-	t(y,2)*o(2,x) + t(y,3)*o(3,x);
-  return ret;
-}
-
 // multiply matrix by vector
-inline Vec4 operator*(const Mat4& m, const Vec4& v)
-{
-  return Vec4(v(0)*m(0,0)+v(1)*m(0,1)+v(2)*m(0,2)+v(3)*m(0,3),
-	      v(0)*m(1,0)+v(1)*m(1,1)+v(2)*m(1,2)+v(3)*m(1,3),
-	      v(0)*m(2,0)+v(1)*m(2,1)+v(2)*m(2,2)+v(3)*m(2,3),
-	      v(0)*m(3,0)+v(1)*m(3,1)+v(2)*m(3,2)+v(3)*m(3,3));
-}
 inline Vec4 operator*(const Vec4& v, const Mat4& m)
 {
   return Vec4(v(0)*m(0,0)+v(1)*m(1,0)+v(2)*m(2,0)+v(3)*m(3,0),
@@ -229,13 +220,30 @@ struct Mat3
 	  m[y][x] = 0;
   }
 
-  float& operator()(unsigned y, unsigned x) { return m[y][x]; }
-  float operator()(unsigned y, unsigned x) const { return m[y][x]; }
+  inline float& operator()(unsigned y, unsigned x) { return m[y][x]; }
+  inline float operator()(unsigned y, unsigned x) const { return m[y][x]; }
+  inline void set(unsigned i, unsigned j, float f) { m[i][j] = f; }
+  inline float get(unsigned i, unsigned j) const { return m[i][j]; }
 
-  Mat3 transpose() const
+  inline Mat3 operator*(const Mat3& o) const
+  {
+    Mat3 ret(false);
+    for(unsigned y=0; y<3; ++y)
+      for(unsigned x=0; x<3; ++x)
+	ret.m[y][x] = m[y][0]*o.m[0][x] + m[y][1]*o.m[1][x] +
+	  m[y][2]*o.m[2][x];
+    return ret;
+  }
+  inline Vec3 operator*(const Vec3& v) const
+  {
+    return Vec3(v(0)*m[0][0]+v(1)*m[0][1]+v(2)*m[0][2],
+		v(0)*m[1][0]+v(1)*m[1][1]+v(2)*m[1][2],
+		v(0)*m[2][0]+v(1)*m[2][1]+v(2)*m[2][2]);
+  }
+  inline Mat3 transpose() const
   {
     Mat3 r(false);
-    for(unsigned y=0; y<3; ++y)
+    for(unsigned y=0; y<4; ++y)
       for(unsigned x=0; y<x; ++x)
 	r.m[y][x] = m[x][y];
     return r;
@@ -245,23 +253,6 @@ private:
   float m[3][3];
 };
 
-// matrix multiply
-inline Mat3 operator*(const Mat3& t, const Mat3& o)
-{
-  Mat3 ret(false);
-  for(unsigned y=0; y<3; ++y)
-    for(unsigned x=0; x<3; ++x)
-      ret(y,x) = t(y,0)*o(0,x) + t(y,1)*o(1,x) + t(y,2)*o(2,x);
-  return ret;
-}
-
-// multiply matrix by vector
-inline Vec3 operator*(const Mat3& m, const Vec3& v)
-{
-  return Vec3(v(0)*m(0,0)+v(1)*m(0,1)+v(2)*m(0,2),
-	      v(0)*m(1,0)+v(1)*m(1,1)+v(2)*m(1,2),
-	      v(0)*m(2,0)+v(1)*m(2,1)+v(2)*m(2,2));
-}
 inline Vec3 operator*(const Vec3& v, const Mat3& m)
 {
   return Vec3(v(0)*m(0,0)+v(1)*m(1,0)+v(2)*m(2,0),

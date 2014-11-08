@@ -11,7 +11,7 @@ struct SurfaceProp
 {
   SurfaceProp(float _r=0.5f, float _g=0.5f, float _b=0.5f,
 	      float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
-	      _hide=false)
+	      bool _hide=0)
     : r(_r), g(_g), b(_b),
     specular(_specular), diffuse(_diffuse), trans(_trans), hide(_hide)
   {
@@ -26,7 +26,7 @@ struct LineProp
 {
   LineProp(float _r=0, float _g=0, float _b=0,
 	   float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
-	   float _width=1, _hide=false)
+	   float _width=1, bool _hide=0)
     : r(_r), g(_g), b(_b),
       specular(_specular), diffuse(_diffuse), trans(_trans),
     width(_width), hide(_hide)
@@ -69,7 +69,7 @@ class Object
   virtual ~Object();
 
   virtual void getFragments(const Mat4& outerM, const Camera& cam,
-			    FragmentVector& v) const = 0;
+			    FragmentVector& v) const;
 };
 
 class Triangle : public Object
