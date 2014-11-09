@@ -177,10 +177,10 @@ Mat3 identityM3();
 /////////////////////////////////////////////////
 // Objects
 
-struct SurfaceProp
+struct SurfaceProp /NoDefaultCtors/
 {
 %TypeHeaderCode
-#include <objects.h>
+#include <properties.h>
 %End
 
   SurfaceProp(float r=0.5, float g=0.5, float b=0.5,
@@ -195,10 +195,10 @@ struct SurfaceProp
   bool hide;
 };
 
-struct LineProp
+struct LineProp /NoDefaultCtors/
 {
 %TypeHeaderCode
-#include <objects.h>
+#include <properties.h>
 %End
 
   LineProp(float r=0, float g=0, float b=0,
@@ -214,34 +214,31 @@ struct LineProp
   bool hide;
 };
 
-class Object
+class Object /NoDefaultCtors/
 {
 %TypeHeaderCode
 #include <objects.h>
 %End
 };
 
-class Triangle : public Object
+class Triangle : public Object /NoDefaultCtors/
 {
 %TypeHeaderCode
 #include <objects.h>
 %End
  public:
-  Triangle();
   Triangle(const Vec4&, const Vec4&, const Vec4&,
-	   const SurfaceProp* surfaceprop=0);
-  const SurfaceProp* surfaceprop;
+	   const SurfaceProp* surfaceprop /Transfer/);
 };
 
-class PolyLine : public Object
+class PolyLine : public Object /NoDefaultCtors/
 {
 %TypeHeaderCode
 #include <objects.h>
 %End
  public:
-  PolyLine(const LineProp* prop=0);
+  PolyLine(const LineProp* prop /Transfer/);
   void addPoint(const Vec4& v);
-  const LineProp* lineprop;
 };
 
 class ObjectContainer : public Object

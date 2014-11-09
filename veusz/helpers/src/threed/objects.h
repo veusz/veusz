@@ -6,75 +6,8 @@
 
 #include "camera.h"
 #include "mmaths.h"
-
-struct SurfaceProp
-{
-  SurfaceProp(float _r=0.5f, float _g=0.5f, float _b=0.5f,
-	      float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
-	      bool _hide=0)
-    : r(_r), g(_g), b(_b),
-      specular(_specular), diffuse(_diffuse), trans(_trans),
-      hide(_hide)
-  {
-  }
-
-  float r, g, b;
-  float specular, diffuse, trans;
-  bool hide;
-};
-
-struct LineProp
-{
-  LineProp(float _r=0, float _g=0, float _b=0,
-	   float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
-	   float _width=1, bool _hide=0)
-    : r(_r), g(_g), b(_b),
-      specular(_specular), diffuse(_diffuse), trans(_trans),
-      width(_width), hide(_hide)
-  {
-  }
-
-  float r, g, b;
-  float specular, diffuse, trans;
-  float width;
-  bool hide;
-};
-
-// structure returned from object
-struct Fragment
-{
-  enum FragmentType {FR_TRIANGLE, FR_LINESEG, FR_PATH};
-
-  // type of fragment
-  FragmentType type;
-
-  // 3D points
-  Vec4 points[3];
-
-  // projected points associated with fragment
-  Vec3 proj[3];
-
-  // point to object or QPainterPath
-  void* object;
-
-  // drawing style
-  SurfaceProp const* surfaceprop;
-  LineProp const* lineprop;
-
-  // number of points used by fragment type
-  unsigned nPoints() const
-  {
-    switch(type)
-      {
-      case FR_TRIANGLE: return 3;
-      case FR_LINESEG: return 2;
-      case FR_PATH: return 1;
-      default: return 0;
-      }
-  }
-};
-
-typedef std::vector<Fragment> FragmentVector;
+#include "fragment.h"
+#include "properties.h"
 
 class Object
 {
@@ -94,6 +27,7 @@ class Triangle : public Object
   }
   Triangle(const Vec4& a, const Vec4& b, const Vec4& c,
 	   const SurfaceProp* prop=0)
+    : surfaceprop(prop)
   {
     points[0] = a; points[1] = b; points[2] = c;
     surfaceprop = prop;
@@ -104,7 +38,7 @@ class Triangle : public Object
 
  public:
   Vec4 points[3];
-  const SurfaceProp* surfaceprop;
+  PropSmartPtr<const SurfaceProp> surfaceprop;
 };
 
 class PolyLine : public Object
@@ -114,6 +48,7 @@ class PolyLine : public Object
     : Object(), lineprop(prop)
   {
   }
+
   void addPoint(const Vec4& v)
   {
     points.push_back(v);
@@ -124,7 +59,7 @@ class PolyLine : public Object
 
  public:
   Vec4Vector points;
-  const LineProp* lineprop;
+  PropSmartPtr<const LineProp> lineprop;
 };
 
 // container of objects with transformation matrix of children

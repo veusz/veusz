@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <limits>
+#include <QtCore/QPointF>
+#include <QtGui/QPolygonF>
 #include <QtGui/QPen>
 #include <QtGui/QBrush>
 #include <QtGui/QColor>
@@ -114,12 +116,9 @@ namespace
 
   QPen LineProp2QPen(const LineProp& p)
   {
-      return QPen();
     if(p.hide)
       return QPen(Qt::NoPen);
     else
-      return QPen();
-
       return QPen(QBrush(QColor(int(p.r*255), int(p.g*255),
 				int(p.b*255), int((1-p.trans)*255))),
 		  p.width);
@@ -127,12 +126,9 @@ namespace
 
   QBrush SurfaceProp2QBrush(const SurfaceProp& p)
   {
-      return QBrush(QColor(255,0,0));
     if(p.hide)
       return QBrush();
     else
-      return QBrush(QColor(255,0,0));
-
       return QBrush(QColor(int(p.r*255), int(p.g*255),
 			   int(p.b*255), int((1-p.trans)*255)));
   }
@@ -177,10 +173,10 @@ void Scene::render(QPainter* painter, const Camera& cam,
 
   QPolygonF temppoly(3);
 
-  for(FragmentVector::const_iterator f=fragments.begin();
-      f != fragments.end(); ++f)
+  for(unsigned i=0, s=depths.size(); i<s; ++i)
     {
-      switch(f->type)
+      const Fragment& f(fragments[i]);
+      switch(f.type)
 	{
 	case Fragment::FR_TRIANGLE:
 	  if(lline != 0)
@@ -188,15 +184,15 @@ void Scene::render(QPainter* painter, const Camera& cam,
 	      painter->setPen(no_pen);
 	      lline = 0;
 	    }
-	  if(f->surfaceprop != 0 && lsurf != f->surfaceprop)
+	  if(f.surfaceprop != 0 && lsurf != f.surfaceprop)
 	    {
-	      lsurf = f->surfaceprop;
+	      lsurf = f.surfaceprop;
 	      painter->setBrush(SurfaceProp2QBrush(*lsurf));
 	    }
 
-	  temppoly[0] = vecToScreen(screenM, f->proj[0]);
-	  temppoly[1] = vecToScreen(screenM, f->proj[1]);
-	  temppoly[2] = vecToScreen(screenM, f->proj[2]);
+	  temppoly[0] = vecToScreen(screenM, f.proj[0]);
+	  temppoly[1] = vecToScreen(screenM, f.proj[1]);
+	  temppoly[2] = vecToScreen(screenM, f.proj[2]);
 	  painter->drawPolygon(temppoly);
 	  break;
 
@@ -206,14 +202,14 @@ void Scene::render(QPainter* painter, const Camera& cam,
 	      painter->setBrush(no_brush);
 	      lsurf = 0;
 	    }
-	  if(f->lineprop != 0 && lline != f->lineprop)
+	  if(f.lineprop != 0 && lline != f.lineprop)
 	    {
-	      lline = f->lineprop;
+	      lline = f.lineprop;
 	      painter->setPen(LineProp2QPen(*lline));
 	    }
 
-	  painter->drawLine(vecToScreen(screenM, f->proj[0]),
-			    vecToScreen(screenM, f->proj[1]));
+	  painter->drawLine(vecToScreen(screenM, f.proj[0]),
+			    vecToScreen(screenM, f.proj[1]));
 	  break;
 
 	case Fragment::FR_PATH:

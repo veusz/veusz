@@ -14,7 +14,7 @@ void Triangle::getFragments(const Mat4& outerM, const Camera& cam,
 {
   Fragment f;
   f.type = Fragment::FR_TRIANGLE;
-  f.surfaceprop = surfaceprop;
+  f.surfaceprop = surfaceprop.ptr();
   f.lineprop = 0;
   f.points[0] = outerM*points[0];
   f.proj[0] = calcProjVec(cam.perspM, f.points[0]);
@@ -36,7 +36,7 @@ void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
   Fragment f;
   f.type = Fragment::FR_LINESEG;
   f.surfaceprop = 0;
-  f.lineprop = lineprop;
+  f.lineprop = lineprop.ptr();
   f.object = const_cast<PolyLine*>(this);
 
   // iterators use many more instructions here...
