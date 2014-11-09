@@ -26,7 +26,7 @@ from ..compat import czip, crange
 from .. import qtall as qt4
 from .. import setting
 from .. import document
-from .. import threed
+from ..helpers import threed
 
 from . import plotters3d
 
@@ -47,10 +47,16 @@ def constructPolyline(outobj, lineprop, lx, ly, lz):
         last = 0
         for i in badidxs + [len(lx)]:
             if i-last > 2:
-                outobj.append(threed.Polyline(stack[last:i], lineprop))
+                line = threed.PolyLine(lineprop)
+                for p in stack[last:i]:
+                    line.addPoint(threed.Vec4(p))
+                outobj.append(line)
             last = i
     else:
-        outobj.append(threed.Polyline(stack, lineprop))
+        line = threed.PolyLine(lineprop)
+        for p in stack:
+            line.addPoint(threed.Vec4(*p))
+        outobj.append(line)
 
 def constructSurface(outobj, surfprop, lx, ly, lz):
     """Split up gridded surface into triangles."""
@@ -61,8 +67,10 @@ def constructSurface(outobj, surfprop, lx, ly, lz):
             p1 = (lx[i+1,j], ly[i+1,j], lz[i+1,j], 1)
             p2 = (lx[i,j+1], ly[i,j+1], lz[i,j+1], 1)
             p3 = (lx[i+1,j+1], ly[i+1,j+1], lz[i+1,j+1], 1)
-            outobj.append(threed.Triangle((p0,p1,p2), surfprop))
-            outobj.append(threed.Triangle((p3,p1,p2), surfprop))
+            outobj.append(threed.Triangle(threed.Vec4(*p0), threed.Vec4(*p1),
+                                          threed.Vec4(*p2), surfprop))
+            outobj.append(threed.Triangle(threed.Vec4(*p3), threed.Vec4(*p1),
+                                          threed.Vec4(*p2), surfprop))
 
 class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""
@@ -301,6 +309,9 @@ class Function3D(plotters3d.GenericPlotter3D):
         elif len(outobj) == 1:
             return outobj[0]
         else:
-            return threed.Compound(outobj)
+            cont = threed.ObjectContainer()
+            for o in outobj:
+                cont.addObject(o)
+            return cont
 
 document.thefactory.register(Function3D)

@@ -23,6 +23,7 @@ from .. import document
 from .. import setting
 from .. import threed
 from . import widget
+from ..helpers import threed
 
 def _(text, disambiguation=None, context='Graph3D'):
     """Translate text."""
@@ -134,8 +135,6 @@ class Graph3D(widget.Widget):
         if s.hide:
             return bounds
 
-        #bounds = self.adjustBoundsForAspect(bounds)
-
         axestodraw = {}
         axesofwidget = painthelper.plotteraxismap
 
@@ -147,20 +146,29 @@ class Graph3D(widget.Widget):
                 if c.isaxis:
                     axestodraw[c.name] = c
 
-        objs = []
+        scene = threed.Scene()
         for c in self.children:
             obj = c.drawToObject()
             if obj:
-                objs.append(obj)
+                scene.root.addObject(obj)
+
+        def printM(m):
+            for i in xrange(4):
+                s=''
+                for j in xrange(4):
+                    s += '%8.3f ' % m.get(i, j)
+                print(s)
 
         borderlineprop = threed.LineProp()
-        scene = threed.Scene()
-        scene.objects += objs
         camera = threed.Camera()
-        camera.setPointing((-8,-8,-8), (0.5,0.5,0.5), (0,-1,0))
+        camera.setPointing(
+            threed.Vec3(-8,-8,-8), threed.Vec3(0.,0.,0),
+            threed.Vec3(0,-1,0))
 
         painter = painthelper.painter(self, bounds)
         with painter:
-            scene.render(painter, camera, bounds)
+            scene.render(
+                painter, camera,
+                bounds[0], bounds[1], bounds[2], bounds[3])
 
 document.thefactory.register(Graph3D)

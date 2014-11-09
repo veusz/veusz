@@ -12,7 +12,7 @@ class Scene
   {
   }
   void render(QPainter* painter, const Camera& cam,
-	      const Mat3& screenM);
+	      float x1, float y1, float x2, float y2);
 
  public:
   ObjectContainer root;

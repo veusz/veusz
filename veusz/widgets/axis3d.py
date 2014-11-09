@@ -27,7 +27,7 @@ from .. import qtall as qt4
 from .. import document
 from .. import setting
 from .. import utils
-from .. import threed
+from ..helpers import threed
 
 from . import widget
 from . import axisticks
@@ -349,10 +349,12 @@ class Axis3D(widget.Widget):
             axisline = [(op1,op2,lower,1),(op1,op2,upper,1)]
         axislineprop = s.Line.makeLineProp()
 
-        objs = [
-            threed.Polyline(axisline, axislineprop),
-        ]
-        return threed.Compound(objs)
+        cont = threed.ObjectContainer()
+        line = threed.PolyLine(axislineprop)
+        line.addPoint(threed.Vec4(*axisline[0]))
+        line.addPoint(threed.Vec4(*axisline[1]))
+        cont.addObject(line)
+        return cont
 
 # allow the factory to instantiate an axis
 document.thefactory.register(Axis3D)

@@ -261,6 +261,24 @@ inline Mat3 identityM3()
   return m;
 }
 
+inline Mat3 scaleM3(float s)
+{
+  Mat3 m(false);
+  m(0,0)=s; m(0,1)=0; m(0,2)=0;
+  m(1,0)=0; m(1,1)=s; m(1,2)=0;
+  m(2,0)=0; m(2,1)=0; m(2,2)=1;
+  return m;
+}
+
+inline Mat3 translateM3(float dx, float dy)
+{
+  Mat3 m(false);
+  m(0,0)=1; m(0,1)=0; m(0,2)=dx;
+  m(1,0)=0; m(1,1)=1; m(1,2)=dy;
+  m(2,0)=0; m(2,1)=0; m(2,2)=1;
+  return m;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Helper functions
 

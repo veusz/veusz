@@ -20,7 +20,6 @@
 
 from __future__ import division
 from .. import qtall as qt4
-from .. import threed
 
 from . import setting
 from .settings import Settings
@@ -427,11 +426,12 @@ class Line3D(Settings):
             style, dash = setting.LineStyle._linecnvt[self.style]
 
         col = qt4.QColor(self.color)
+        from ..helpers import threed
         return threed.LineProp(
-            color=(col.redF(), col.greenF(), col.blueF()),
+            r=col.redF(), g=col.greenF(), b=col.blueF(),
             trans=self.transparency*0.01,
-            width=width,
-            style=style, dashpattern=dash)
+            width=width)
+#            style=style, dashpattern=dash)
 
 class Surface3D(Settings):
     '''3d surface properties.'''
@@ -455,6 +455,7 @@ class Surface3D(Settings):
     def makeSurfaceProp(self):
         """Properties to assign to surface."""
         col = qt4.QColor(self.color)
+        from ..helpers import threed
         return threed.SurfaceProp(
-            color=(col.redF(), col.greenF(), col.blueF()),
+            r=col.redF(), g=col.greenF(), b=col.blueF(),
             trans=self.transparency*0.01)

@@ -13,7 +13,8 @@ struct SurfaceProp
 	      float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
 	      bool _hide=0)
     : r(_r), g(_g), b(_b),
-    specular(_specular), diffuse(_diffuse), trans(_trans), hide(_hide)
+      specular(_specular), diffuse(_diffuse), trans(_trans),
+      hide(_hide)
   {
   }
 
@@ -29,7 +30,7 @@ struct LineProp
 	   float _width=1, bool _hide=0)
     : r(_r), g(_g), b(_b),
       specular(_specular), diffuse(_diffuse), trans(_trans),
-    width(_width), hide(_hide)
+      width(_width), hide(_hide)
   {
   }
 
@@ -59,7 +60,19 @@ struct Fragment
   // drawing style
   SurfaceProp const* surfaceprop;
   LineProp const* lineprop;
-};;
+
+  // number of points used by fragment type
+  unsigned nPoints() const
+  {
+    switch(type)
+      {
+      case FR_TRIANGLE: return 3;
+      case FR_LINESEG: return 2;
+      case FR_PATH: return 1;
+      default: return 0;
+      }
+  }
+};
 
 typedef std::vector<Fragment> FragmentVector;
 
@@ -79,10 +92,11 @@ class Triangle : public Object
     : Object(), surfaceprop(0)
   {
   }
-  Triangle(const Vec4& a, const Vec4& b, const Vec4& c)
+  Triangle(const Vec4& a, const Vec4& b, const Vec4& c,
+	   const SurfaceProp* prop=0)
   {
     points[0] = a; points[1] = b; points[2] = c;
-    surfaceprop = 0;
+    surfaceprop = prop;
   }
 
   void getFragments(const Mat4& outerM, const Camera& cam,
@@ -96,8 +110,8 @@ class Triangle : public Object
 class PolyLine : public Object
 {
  public:
-  PolyLine()
-    : Object(), lineprop(0)
+  PolyLine(const LineProp* prop=0)
+    : Object(), lineprop(prop)
   {
   }
   void addPoint(const Vec4& v)

@@ -185,7 +185,7 @@ struct SurfaceProp
 
   SurfaceProp(float r=0.5, float g=0.5, float b=0.5,
 	      float specular=0.5, float diffuse=0.5, float trans=0,
-	      bool hide=0);
+	      bool hide=0) /KeywordArgs="All"/;
   float r;
   float g;
   float b;
@@ -203,7 +203,7 @@ struct LineProp
 
   LineProp(float r=0, float g=0, float b=0,
 	   float specular=0.5, float diffuse=0.5, float trans=0,
-	   float width=1, bool hide=0);
+	   float width=1, bool hide=0) /KeywordArgs="All"/;
   float r;
   float g;
   float b;
@@ -228,7 +228,8 @@ class Triangle : public Object
 %End
  public:
   Triangle();
-  Triangle(const Vec4& a, const Vec4& b, const Vec4& c);
+  Triangle(const Vec4&, const Vec4&, const Vec4&,
+	   const SurfaceProp* surfaceprop=0);
   const SurfaceProp* surfaceprop;
 };
 
@@ -238,7 +239,7 @@ class PolyLine : public Object
 #include <objects.h>
 %End
  public:
-  PolyLine();
+  PolyLine(const LineProp* prop=0);
   void addPoint(const Vec4& v);
   const LineProp* lineprop;
 };
@@ -289,7 +290,7 @@ class Scene
  public:
   Scene();
   void render(QPainter* painter, const Camera& cam,
-	      const Mat3& screenM);
+	      float x1, float y1, float x2, float y2);
 
  public:
   ObjectContainer root;
