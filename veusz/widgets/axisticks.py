@@ -237,11 +237,7 @@ class AxisTicks(AxisTicksBase):
 
         # work out range and log range
         therange = self.maxval - self.minval
-
-        try:
-            intlogrange = int(N.log10(therange))
-        except OverflowError:
-            intlogrange = 1
+        intlogrange = int( N.log10( therange ) )
 
         # we step variable to move through log space to find best ticks
         logstep = intlogrange + 1

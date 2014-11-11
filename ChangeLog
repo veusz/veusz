@@ -2,7 +2,6 @@ Changes in <next release>:
 
 Minor changes
  * Fix incorrect use of None in (x,...) pattern
- * Catch error from infinite log ranges
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs
