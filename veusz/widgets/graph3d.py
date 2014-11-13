@@ -147,6 +147,9 @@ class Graph3D(widget.Widget):
                     axestodraw[c.name] = c
 
         scene = threed.Scene()
+        scene.root.objM = (
+            threed.rotateM4(135./180.*3.14159, threed.Vec3(0,0,1)) *
+            threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
         for c in self.children:
             obj = c.drawToObject()
             if obj:
@@ -162,8 +165,8 @@ class Graph3D(widget.Widget):
         borderlineprop = threed.LineProp()
         camera = threed.Camera()
         camera.setPointing(
-            threed.Vec3(-8,-8,-8), threed.Vec3(0.,0.,0),
-            threed.Vec3(0,-1,0))
+            threed.Vec3(-3,0.,0.), threed.Vec3(0.,0.,0.),
+            threed.Vec3(0,1,0))
 
         painter = painthelper.painter(self, bounds)
         with painter:

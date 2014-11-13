@@ -1,5 +1,4 @@
-#include <stdio.h>
-
+#include <cstdio>
 #include <cmath>
 #include <limits>
 #include <QtCore/QPointF>
@@ -12,50 +11,6 @@
 
 namespace
 {
-  float minDepth(const Fragment& f)
-  {
-    switch(f.type)
-      {
-      case Fragment::FR_TRIANGLE:
-	return std::min(f.proj[0](2), std::min(f.proj[1](2), f.proj[2](2)));
-      case Fragment::FR_LINESEG:
-	return std::min(f.proj[0](2), f.proj[1](2));
-      case Fragment::FR_PATH:
-	return f.proj[0](2);
-      default:
-	return std::numeric_limits<float>::infinity();
-      }
-  }
-
-  float maxDepth(const Fragment& f)
-  {
-    switch(f.type)
-      {
-      case Fragment::FR_TRIANGLE:
-	return std::max(f.proj[0](2), std::max(f.proj[1](2), f.proj[2](2)));
-      case Fragment::FR_LINESEG:
-	return std::max(f.proj[0](2), f.proj[1](2));
-      case Fragment::FR_PATH:
-	return f.proj[0](2);
-      default:
-	return -std::numeric_limits<float>::infinity();
-      }
-  }
-
-  float meanDepth(const Fragment& f)
-  {
-    switch(f.type)
-      {
-      case Fragment::FR_TRIANGLE:
-	return (f.proj[0](2) + f.proj[1](2) + f.proj[2](2))*(1/3.f);
-      case Fragment::FR_LINESEG:
-	return (f.proj[0](2) + f.proj[1](2))*0.5f;
-      case Fragment::FR_PATH:
-	return f.proj[0](2);
-      default:
-	return std::numeric_limits<float>::infinity();
-      }
-  }
 
   struct FragDepthCompare
   {
@@ -65,7 +20,14 @@ namespace
 
     bool operator()(unsigned i, unsigned j) const
     {
-      return meanDepth(vec[i]) > meanDepth(vec[j]);
+      float d1 = vec[i].maxDepth();
+      float d2 = vec[j].maxDepth();
+      if(d1==d2)
+	{
+	  // if the maxima are the same, then look at the minima
+	  return vec[i].minDepth() > vec[j].minDepth();
+	}
+      return d1 > d2;
     }
 
     FragmentVector& vec;
@@ -156,8 +118,45 @@ void Scene::render(QPainter* painter, const Camera& cam,
   for(unsigned i=0, s=fragments.size(); i<s; ++i)
     depths[i]=i;
 
-  // stable sort used to preserve original order
-  std::stable_sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
+  // sort depth of items
+  std::sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
+
+  for(unsigned idx=0; idx+1 < depths.size(); ++idx)
+    {
+      const Fragment& thisf = fragments[depths[idx]];
+      FragBounds thisbounds(thisf.bounds());
+      float thismindepth = thisf.minDepth();
+      float thismaxdepth = thisf.maxDepth();
+
+      if(thisf.type == Fragment::FR_TRIANGLE)
+	printf("%.1f,%.1f,%.1f %.1f,%.1f,%.1f %.1f,%.1f,%.1f\n",
+	       thisf.points[0](0), thisf.points[0](1), thisf.points[0](2),
+	       thisf.points[1](0), thisf.points[1](1), thisf.points[1](2),
+	       thisf.points[2](0), thisf.points[2](1), thisf.points[2](2));
+
+
+      for(unsigned idx2=idx+1; idx2<depths.size(); ++idx2)
+	{
+	  const Fragment& otherf = fragments[depths[idx2]];
+
+	  // don't compare object with self
+	  if(otherf.object == thisf.object)
+	    continue;
+
+	  printf("%i (%7.4f %7.4f) %i (%7.4f %7.4f)\n",
+	  	 idx, thismindepth, thismaxdepth,
+	  	 idx2, otherf.minDepth(), otherf.maxDepth());
+
+	  if(otherf.maxDepth() < thismindepth)
+	    // no others are overlapping
+	    break;
+
+	  if(otherf.overlaps(thisbounds))
+	    {
+	      printf("Potential overlap: %i, %i\n", depths[idx], depths[idx2]);
+	    }
+	}
+    }
 
   // how to transform points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
@@ -172,10 +171,16 @@ void Scene::render(QPainter* painter, const Camera& cam,
   painter->setBrush(no_brush);
 
   QPolygonF temppoly(3);
+  QPointF projpts[3];
 
   for(unsigned i=0, s=depths.size(); i<s; ++i)
     {
-      const Fragment& f(fragments[i]);
+      const Fragment& f(fragments[depths[i]]);
+
+      // convert projected points to screen
+      for(unsigned pi=0, s=f.nPoints(); pi<s; ++pi)
+	projpts[pi] = vecToScreen(screenM, f.proj[pi]);
+
       switch(f.type)
 	{
 	case Fragment::FR_TRIANGLE:
@@ -190,9 +195,9 @@ void Scene::render(QPainter* painter, const Camera& cam,
 	      painter->setBrush(SurfaceProp2QBrush(*lsurf));
 	    }
 
-	  temppoly[0] = vecToScreen(screenM, f.proj[0]);
-	  temppoly[1] = vecToScreen(screenM, f.proj[1]);
-	  temppoly[2] = vecToScreen(screenM, f.proj[2]);
+	  temppoly[0] = projpts[0];
+	  temppoly[1] = projpts[1];
+	  temppoly[2] = projpts[2];
 	  painter->drawPolygon(temppoly);
 	  break;
 
@@ -207,13 +212,12 @@ void Scene::render(QPainter* painter, const Camera& cam,
 	      lline = f.lineprop;
 	      painter->setPen(LineProp2QPen(*lline));
 	    }
-
-	  painter->drawLine(vecToScreen(screenM, f.proj[0]),
-			    vecToScreen(screenM, f.proj[1]));
+	  painter->drawLine(projpts[0], projpts[1]);
 	  break;
 
 	case Fragment::FR_PATH:
 	  break;
+
 	}
     }
 }

@@ -287,7 +287,7 @@ inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
 {
   Vec4 nv(projM*v);
   float inv = 1/nv(3);
-  return Vec3(nv(0)*inv, nv(1)*inv, -nv(2)*inv);
+  return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
 }
 
 inline Vec3 vec3to4(const Vec4& v)
