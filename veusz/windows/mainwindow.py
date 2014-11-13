@@ -44,20 +44,7 @@ from . import plotwindow
 from . import treeeditwindow
 from .datanavigator import DataNavigatorWindow
 
-from ..dialogs.aboutdialog import AboutDialog
-from ..dialogs.reloaddata import ReloadData
-from ..dialogs.datacreate import DataCreateDialog
-from ..dialogs.datacreate2d import DataCreate2DDialog
-from ..dialogs.preferences import PreferencesDialog
-from ..dialogs.errorloading import ErrorLoadingDialog
-from ..dialogs.capturedialog import CaptureDialog
-from ..dialogs.stylesheet import StylesheetDialog
-from ..dialogs.custom import CustomDialog
-from ..dialogs.safetyimport import SafetyImportDialog
-from ..dialogs.histodata import HistoDataDialog
 from ..dialogs.plugin import handlePlugin
-from ..dialogs import importdialog
-from ..dialogs import dataeditdialog
 
 def _(text, disambiguation=None, context='MainWindow'):
     """Translate text."""
@@ -354,15 +341,18 @@ class MainWindow(qt4.QMainWindow):
             self.document.redoOperation()
 
     def slotEditPreferences(self):
+        from ..dialogs.preferences import PreferencesDialog
         dialog = PreferencesDialog(self)
         dialog.exec_()
 
     def slotEditStylesheet(self):
+        from ..dialogs.stylesheet import StylesheetDialog
         dialog = StylesheetDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
     def slotEditCustom(self):
+        from ..dialogs.custom import CustomDialog
         dialog = CustomDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
@@ -711,6 +701,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataImport(self):
         """Display the import data dialog."""
+        from ..dialogs import importdialog
         dialog = importdialog.ImportDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
@@ -720,6 +711,7 @@ class MainWindow(qt4.QMainWindow):
 
         If editdataset is set to a dataset name, edit this dataset
         """
+        from ..dialogs import dataeditdialog
         dialog = dataeditdialog.DataEditDialog(self, self.document)
         self.showDialog(dialog)
         if editdataset is not None:
@@ -728,30 +720,35 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataCreate(self):
         """Create new datasets."""
+        from ..dialogs.datacreate import DataCreateDialog
         dialog = DataCreateDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
     def slotDataCreate2D(self):
         """Create new datasets."""
+        from ..dialogs.datacreate2d import DataCreate2DDialog
         dialog = DataCreate2DDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
     def slotDataCapture(self):
         """Capture remote data."""
+        from ..dialogs.capturedialog import CaptureDialog
         dialog = CaptureDialog(self.document, self)
         self.showDialog(dialog)
         return dialog
 
     def slotDataHistogram(self):
         """Histogram data."""
+        from ..dialogs.histodata import HistoDataDialog
         dialog = HistoDataDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
     def slotDataReload(self):
         """Reload linked datasets."""
+        from ..dialogs.reloaddata import ReloadData
         dialog = ReloadData(self.document, self)
         self.showDialog(dialog)
         return dialog
@@ -797,6 +794,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotHelpAbout(self):
         """Show about dialog."""
+        from ..dialogs.aboutdialog import AboutDialog
         AboutDialog(self).exec_()
 
     def queryOverwrite(self):
@@ -1057,6 +1055,7 @@ class MainWindow(qt4.QMainWindow):
                 callbackunsafe=_callbackunsafe)
 
         except document.LoadError as e:
+            from ..dialogs.errorloading import ErrorLoadingDialog
             qt4.QApplication.restoreOverrideCursor()
             if e.backtrace:
                 d = ErrorLoadingDialog(self, filename, cstr(e), e.backtrace)
@@ -1157,6 +1156,11 @@ class MainWindow(qt4.QMainWindow):
 
     def slotFileExport(self):
         """Export the graph."""
+
+        from ..dialogs.export import ExportDialog
+        dialog = ExportDialog(self)
+        dialog.exec_()
+        return
 
         # check there is a page
         if self.document.getNumberPages() == 0:
@@ -1337,6 +1341,6 @@ class MainWindow(qt4.QMainWindow):
 
     def slotAllowedImportsDoc(self, module, names):
         """Are allowed imports?"""
-
+        from ..dialogs.safetyimport import SafetyImportDialog
         d = SafetyImportDialog(self, module, names)
         d.exec_()
