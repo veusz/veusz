@@ -109,6 +109,23 @@ def fixupPDFIndices(text):
 
     return text
 
+def fixupPSBoundingBox(infname, outfname, pagewidth, size):
+    """Make bounding box for EPS/PS match size given."""
+    with open(infname, 'rU') as fin:
+        with open(outfname, 'w') as fout:
+            for line in fin:
+                if line[:14] == '%%BoundingBox:':
+                    # replace bounding box line by calculated one
+                    parts = line.split()
+                    widthfactor = float(parts[3]) / pagewidth
+                    origheight = float(parts[4])
+                    line = "%s %i %i %i %i\n" % (
+                        parts[0], 0,
+                        int(math.floor(origheight-widthfactor*size[1])),
+                        int(math.ceil(widthfactor*size[0])),
+                        int(math.ceil(origheight)) )
+                fout.write(line)
+
 class Export(object):
     """Class to do the document exporting.
     
@@ -118,6 +135,7 @@ class Export(object):
     formats = [
         (["bmp"], _("Windows bitmap")),
         (["eps"], _("Encapsulated Postscript")),
+        (["ps"], _("Postscript")),
         (["jpg", "jpeg"], _("Jpeg bitmap")),
         (["pdf"], _("Portable Document Format")),
         #(["pic"], _("QT Pic format")),
@@ -163,8 +181,8 @@ class Export(object):
 
         ext = os.path.splitext(self.filename)[1].lower()
 
-        if ext in ('.eps', '.pdf'):
-            self.exportPS(ext)
+        if ext in ('.eps', '.ps', '.pdf'):
+            self.exportPDFOrPS(ext)
 
         elif ext in ('.png', '.jpg', '.jpeg', '.bmp', '.tiff', '.xpm'):
             self.exportBitmap(ext)
@@ -243,7 +261,7 @@ class Export(object):
 
         writer.write(image)
 
-    def exportPS(self, ext):
+    def exportPDFOrPS(self, ext):
         """Export to EPS or PDF format."""
 
         # setup printer with requested parameters
@@ -254,7 +272,7 @@ class Export(object):
             qt4.QPrinter.Color if self.color else qt4.QPrinter.GrayScale)
         printer.setOutputFormat(
             qt4.QPrinter.PdfFormat if ext=='.pdf' else
-            qt4.QPrinter.PostscriptFormat)
+            qt4.QPrinter.PostScriptFormat)
         printer.setOutputFileName(self.filename)
         printer.setCreator('Veusz %s' % utils.version())
 
@@ -267,29 +285,17 @@ class Export(object):
         # render ranges and return size of each page
         sizes = self.doc.printTo(printer, pages)
 
-        # fixup eps/pdf file - yuck HACK! - hope qt gets fixed
-        # this makes the bounding box correct
-        # copy output to a temporary file
+        # We have to modify the page sizes or bounding boxes to match
+        # the document. This is copied to a temporary file.
         tmpfile = "%s.tmp.%i" % (self.filename, random.randint(0,1000000))
 
-        if ext == '.eps':
-            # adjust bounding box
-            fin = open(self.filename, 'rU')
-            fout = open(tmpfile, 'w')
+        if ext == '.eps' or ext == '.ps':
+            # only 1 size allowed for PS, so use maximum
+            maxsize = sizes[0]
+            for size in sizes[1:]:
+                maxsize = max(size[0], maxsize[0]), max(size[1], maxsize[1])
 
-            for line in fin:
-                if line[:14] == '%%BoundingBox:':
-                    # replace bounding box line by calculated one
-                    parts = line.split()
-                    widthfactor = float(parts[3]) / printer.width()
-                    origheight = float(parts[4])
-                    line = "%s %i %i %i %i\n" % (
-                        parts[0], 0,
-                        int(math.floor(origheight-widthfactor*height)),
-                        int(math.ceil(widthfactor*width)),
-                        int(math.ceil(origheight)) )
-                fout.write(line)
-
+            fixupPSBoundingBox(self.filename, tmpfile, printer.width(), maxsize)
         elif ext == '.pdf':
             # change pdf bounding box and correct pdf index
             with open(self.filename, 'rb') as fin:
@@ -298,7 +304,10 @@ class Export(object):
                 text = fixupPDFIndices(text)
                 with open(tmpfile, 'wb') as fout:
                     fout.write(text)
+        else:
+            raise RuntimeError('Invalid file type')
 
+        # replace original by temporary
         os.remove(self.filename)
         os.rename(tmpfile, self.filename)
 
