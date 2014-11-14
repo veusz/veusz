@@ -23,6 +23,7 @@ import os.path
 import random
 import math
 import codecs
+import re
 
 from ..compat import crange
 from .. import qtall as qt4
@@ -44,6 +45,69 @@ m_inch = 39.370079
 def _(text, disambiguation=None, context="Export"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+def scalePDFMediaBox(text, pagewidth, reqdsizes):
+    """Take the PDF file text and adjust the page size.
+    pagewidth: full page width
+    reqdsizes: list of tuples of width, height
+    """
+
+    outtext = ''
+    outidx = 0
+    for size, match in zip(
+            reqdsizes,
+            re.finditer(
+                br'^/MediaBox \[([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)\]$',
+                text, re.MULTILINE)):
+
+        box = [float(x) for x in match.groups()]
+        widthfactor = (box[2]-box[0])/pagewidth
+        newbox = ('/MediaBox [%i %i %i %i]' % (
+            int(box[0]),
+            int(math.floor(box[3]-widthfactor*size[1])),
+            int(math.ceil(box[0]+widthfactor*size[0])),
+            int(math.ceil(box[3]))
+        )).encode('ascii')
+
+        outtext += text[outidx:match.start()] + newbox
+        outidx = match.end()
+
+    outtext += text[outidx:]
+    return outtext
+
+def fixupPDFIndices(text):
+    """Fixup index table in PDF.
+
+    Basically, we need to find the start of each obj in the file
+    These indices are then placed in an xref table at the end
+    The index to the xref table is placed after a startxref
+    """
+
+    # find occurences of obj in string
+    indices = {}
+    for m in re.finditer(b'([0-9]+) 0 obj', text):
+        index = int(m.group(1))
+        indices[index] = m.start(0)
+
+    # build up xref block (note trailing spaces)
+    xref = [b'xref', ('0 %i' % (len(indices)+1)).encode('ascii'),
+            b'0000000000 65535 f ']
+    for i in crange(len(indices)):
+        xref.append( ('%010i %05i n ' % (indices[i+1], 0)).encode('ascii') )
+    xref.append(b'trailer\n')
+    xref = b'\n'.join(xref)
+
+    # replace current xref with this one
+    xref_match = re.search(b'^xref\n.*trailer\n', text, re.DOTALL | re.MULTILINE)
+    xref_index = xref_match.start(0)
+    text = text[:xref_index] + xref + text[xref_match.end(0):]
+
+    # put the correct index to the xref after startxref
+    startxref_re = re.compile(b'^startxref\n[0-9]+\n', re.DOTALL | re.MULTILINE)
+    text = startxref_re.sub( ('startxref\n%i\n' % xref_index).encode('ascii'),
+                             text)
+
+    return text
 
 class Export(object):
     """Class to do the document exporting.
@@ -73,7 +137,7 @@ class Export(object):
         """Initialise export class. Parameters are:
         doc: document to write
         filename: output filename
-        pagenumber: pagenumber to export
+        pagenumber: pagenumber to export or list of pages for some formats
         color: use color or try to use monochrome
         bitmapdpi: assume this dpi value when writing images
         antialias: antialias text and lines when writing bitmaps
@@ -182,30 +246,26 @@ class Export(object):
     def exportPS(self, ext):
         """Export to EPS or PDF format."""
 
+        # setup printer with requested parameters
         printer = qt4.QPrinter()
+        printer.setResolution(self.pdfdpi)
         printer.setFullPage(True)
-
-        # set printer parameters
-        printer.setColorMode( (qt4.QPrinter.GrayScale, qt4.QPrinter.Color)[
-                self.color] )
-
-        if ext == '.pdf':
-            fmt = qt4.QPrinter.PdfFormat
-        else:
-            fmt = qt4.QPrinter.PostScriptFormat
-        printer.setOutputFormat(fmt)
+        printer.setColorMode(
+            qt4.QPrinter.Color if self.color else qt4.QPrinter.GrayScale)
+        printer.setOutputFormat(
+            qt4.QPrinter.PdfFormat if ext=='.pdf' else
+            qt4.QPrinter.PostscriptFormat)
         printer.setOutputFileName(self.filename)
         printer.setCreator('Veusz %s' % utils.version())
-        printer.setResolution(self.pdfdpi)
 
-        # setup for printing
-        printer.newPage()
-        painter = painthelper.DirectPainter(printer)
+        # convert page to list if necessary
+        try:
+            pages = list(self.pagenumber)
+        except TypeError:
+            pages = [self.pagenumber]
 
-        # write to printer with correct dpi
-        dpi = (printer.logicalDpiX(), printer.logicalDpiY())
-        width, height = size = self.doc.pageSize(self.pagenumber, dpi=dpi)
-        self.renderPage(size, dpi, painter)
+        # render ranges and return size of each page
+        sizes = self.doc.printTo(printer, pages)
 
         # fixup eps/pdf file - yuck HACK! - hope qt gets fixed
         # this makes the bounding box correct
@@ -232,17 +292,13 @@ class Export(object):
 
         elif ext == '.pdf':
             # change pdf bounding box and correct pdf index
-            fin = open(self.filename, 'rb')
-            fout = open(tmpfile, 'wb')
+            with open(self.filename, 'rb') as fin:
+                text = fin.read()
+                text = scalePDFMediaBox(text, printer.width(), sizes)
+                text = fixupPDFIndices(text)
+                with open(tmpfile, 'wb') as fout:
+                    fout.write(text)
 
-            text = fin.read()
-            text = utils.scalePDFMediaBox(text, printer.width(),
-                                          width, height)
-            text = utils.fixupPDFIndices(text)
-            fout.write(text)
-
-        fout.close()
-        fin.close()
         os.remove(self.filename)
         os.rename(tmpfile, self.filename)
 
@@ -332,4 +388,4 @@ def printDialog(parentwindow, document, filename=None):
         pages *= prnt.numCopies()
 
         # do the printing
-        document.printTo( prnt, pages )
+        document.printTo(prnt, pages)
