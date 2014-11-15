@@ -113,23 +113,16 @@
         <item>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="1">
-           <widget class="QRadioButton" name="radioFormatPS">
+           <widget class="QRadioButton" name="radioFormatEPS">
             <property name="text">
-             <string>Postscript/EPS</string>
+             <string>EPS</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QRadioButton" name="radioFormatSVG">
             <property name="text">
              <string>SVG</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QRadioButton" name="radioFormatEMF">
-            <property name="text">
-             <string>EMF</string>
             </property>
            </widget>
           </item>
@@ -137,6 +130,20 @@
            <widget class="QRadioButton" name="radioFormatPDF">
             <property name="text">
              <string>PDF</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="radioButtonPS">
+            <property name="text">
+             <string>PS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QRadioButton" name="radioFormatEMF">
+            <property name="text">
+             <string>EMF</string>
             </property>
            </widget>
           </item>

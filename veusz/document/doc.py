@@ -424,6 +424,8 @@ class Document( qt4.QObject ):
                 painter.save()
                 size = self.pageSize(page, dpi=dpi)
                 sizes.append(size)
+                painter.setClipRect(qt4.QRectF(
+                    qt4.QPointF(0,0), qt4.QPointF(*size)))
                 helper = painthelper.PaintHelper(
                     size, dpi=dpi, directpaint=painter)
                 self.paintTo(helper, page)

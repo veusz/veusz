@@ -217,6 +217,13 @@ class Export(object):
     def exportBitmap(self, format):
         """Export to a bitmap format."""
 
+        try:
+            if len(self.pagenumber) != 1:
+                raise RuntimeError(
+                    'Only single pages allowed for bitmap formats')
+        except TypeError:
+            pass
+
         # get size for bitmap's dpi
         dpi = self.bitmapdpi
         size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi))
@@ -282,6 +289,10 @@ class Export(object):
         except TypeError:
             pages = [self.pagenumber]
 
+        if len(pages) != 1 and ext == '.eps':
+            raise RuntimeError(
+                'Only single pages allowed for .eps. Use .ps instead.')
+
         # render ranges and return size of each page
         sizes = self.doc.printTo(printer, pages)
 
@@ -296,6 +307,7 @@ class Export(object):
                 maxsize = max(size[0], maxsize[0]), max(size[1], maxsize[1])
 
             fixupPSBoundingBox(self.filename, tmpfile, printer.width(), maxsize)
+
         elif ext == '.pdf':
             # change pdf bounding box and correct pdf index
             with open(self.filename, 'rb') as fin:
@@ -313,6 +325,12 @@ class Export(object):
 
     def exportSVG(self):
         """Export document as SVG"""
+
+        try:
+            if len(self.pagenumber) != 1:
+                raise RuntimeError('Only single pages allowed for SVG')
+        except TypeError:
+            pass
 
         dpi = svg_export.dpi * 1.
         size = self.doc.pageSize(

@@ -700,7 +700,7 @@ class CommandInterface(qt4.QObject):
         """Export plot to filename.
 
         color is True or False if color is requested in output file
-        page is the pagenumber to export
+        page is the pagenumber to export (or list for multipage formats)
         dpi is the number of dots per inch for bitmap output files
         antialias antialiases output if True
         quality is a quality parameter for jpeg output
@@ -709,7 +709,7 @@ class CommandInterface(qt4.QObject):
         pdfdpi is the dpi to use when exporting eps or pdf files
         svgtextastext: write text in SVG as text, rather than curves
         """
-        
+
         e = export.Export(self.document, filename, page, color=color,
                           bitmapdpi=dpi, antialias=antialias,
                           quality=quality, backcolor=backcolor,
