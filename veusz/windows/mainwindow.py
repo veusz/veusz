@@ -1158,9 +1158,9 @@ class MainWindow(qt4.QMainWindow):
         """Export the graph."""
 
         from ..dialogs.export import ExportDialog
-        dialog = ExportDialog(self)
-        dialog.exec_()
-        return
+        dialog = ExportDialog(self, self.document, self.filename)
+        self.showDialog(dialog)
+        return dialog
 
         # check there is a page
         if self.document.getNumberPages() == 0:

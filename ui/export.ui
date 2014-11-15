@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>540</width>
-    <height>295</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -94,6 +94,13 @@
           </item>
          </layout>
         </item>
+        <item>
+         <widget class="QCheckBox" name="checkMultiPage">
+          <property name="text">
+           <string>Multiple pages per file</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
@@ -114,6 +121,9 @@
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="1">
            <widget class="QRadioButton" name="radioFormatEPS">
+            <property name="toolTip">
+             <string>Single page encapsulated Postscript for embedding</string>
+            </property>
             <property name="text">
              <string>EPS</string>
             </property>
@@ -121,6 +131,9 @@
           </item>
           <item row="2" column="0">
            <widget class="QRadioButton" name="radioFormatSVG">
+            <property name="toolTip">
+             <string>Single page scalable vector graphics</string>
+            </property>
             <property name="text">
              <string>SVG</string>
             </property>
@@ -128,13 +141,19 @@
           </item>
           <item row="0" column="0">
            <widget class="QRadioButton" name="radioFormatPDF">
+            <property name="toolTip">
+             <string>Single or multi-page PDF</string>
+            </property>
             <property name="text">
              <string>PDF</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QRadioButton" name="radioButtonPS">
+           <widget class="QRadioButton" name="radioFormatPS">
+            <property name="toolTip">
+             <string>Multi-page Postscript</string>
+            </property>
             <property name="text">
              <string>PS</string>
             </property>
@@ -142,6 +161,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QRadioButton" name="radioFormatEMF">
+            <property name="toolTip">
+             <string>Windows embedded metafile</string>
+            </property>
             <property name="text">
              <string>EMF</string>
             </property>
@@ -186,19 +208,19 @@
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QRadioButton" name="radioFormatXPM">
+            <property name="text">
+             <string>XPM</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="checkMultiPage">
-     <property name="text">
-      <string>Multiple pages per file</string>
-     </property>
-    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -214,14 +236,25 @@
     </spacer>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QLabel" name="labelStatus">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Close|QDialogButtonBox::Save</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
