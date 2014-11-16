@@ -136,7 +136,7 @@ class Export(object):
         (["bmp"], _("Windows bitmap")),
         (["eps"], _("Encapsulated Postscript")),
         (["ps"], _("Postscript")),
-        (["jpg", "jpeg"], _("Jpeg bitmap")),
+        (["jpg"], _("Jpeg bitmap")),
         (["pdf"], _("Portable Document Format")),
         #(["pic"], _("QT Pic format")),
         (["png"], _("Portable Network Graphics")),
@@ -202,7 +202,7 @@ class Export(object):
         else:
             raise RuntimeError("File type '%s' not supported" % ext)
 
-    def renderPage(self, size, dpi, painter):
+    def renderPage(self, page, size, dpi, painter):
         """Render page using paint helper to painter.
         This first renders to the helper, then to the painter
         """
@@ -210,23 +210,30 @@ class Export(object):
         painter.setClipRect( qt4.QRectF(
                 qt4.QPointF(0,0), qt4.QPointF(*size)) )
         painter.save()
-        self.doc.paintTo(helper, self.pagenumber)
+        self.doc.paintTo(helper, page)
         painter.restore()
         painter.end()
 
-    def exportBitmap(self, format):
-        """Export to a bitmap format."""
+    def getSinglePage(self):
+        """Check single number of pages or throw exception,
+        else return page number."""
 
         try:
             if len(self.pagenumber) != 1:
                 raise RuntimeError(
-                    'Only single pages allowed for bitmap formats')
+                    'Can only export a single page in this format')
+            return self.pagenumber[0]
         except TypeError:
-            pass
+            return self.pagenumber
+
+    def exportBitmap(self, format):
+        """Export to a bitmap format."""
+
+        page = self.getSinglePage()
 
         # get size for bitmap's dpi
         dpi = self.bitmapdpi
-        size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi))
+        size = self.doc.pageSize(page, dpi=(dpi,dpi))
 
         # create real output image
         backqcolor = utils.extendedColorToQColor(self.backcolor)
@@ -251,7 +258,7 @@ class Export(object):
         painter = painthelper.DirectPainter(image)
         painter.setRenderHint(qt4.QPainter.Antialiasing, self.antialias)
         painter.setRenderHint(qt4.QPainter.TextAntialiasing, self.antialias)
-        self.renderPage(size, (dpi,dpi), painter)
+        self.renderPage(page, size, (dpi,dpi), painter)
 
         # write image to disk
         writer = qt4.QImageWriter()
@@ -326,54 +333,55 @@ class Export(object):
     def exportSVG(self):
         """Export document as SVG"""
 
-        try:
-            if len(self.pagenumber) != 1:
-                raise RuntimeError('Only single pages allowed for SVG')
-        except TypeError:
-            pass
+        page = self.getSinglePage()
 
         dpi = svg_export.dpi * 1.
         size = self.doc.pageSize(
-            self.pagenumber, dpi=(dpi,dpi), integer=False)
+            page, dpi=(dpi,dpi), integer=False)
         with codecs.open(self.filename, 'w', 'utf-8') as f:
             paintdev = svg_export.SVGPaintDevice(
                 f, size[0]/dpi, size[1]/dpi, writetextastext=self.svgtextastext)
             painter = painthelper.DirectPainter(paintdev)
-            self.renderPage(size, (dpi,dpi), painter)
+            self.renderPage(page, size, (dpi,dpi), painter)
 
     def exportSelfTest(self):
         """Export document for testing"""
 
+        page = self.getSinglePage()
+
         dpi = svg_export.dpi * 1.
         size = width, height = self.doc.pageSize(
-            self.pagenumber, dpi=(dpi,dpi), integer=False)
+            page, dpi=(dpi,dpi), integer=False)
 
         f = open(self.filename, 'w')
         paintdev = selftest_export.SelfTestPaintDevice(f, width/dpi, height/dpi)
         painter = painthelper.DirectPainter(paintdev)
-        self.renderPage(size, (dpi,dpi), painter)
+        self.renderPage(page, size, (dpi,dpi), painter)
         f.close()
 
     def exportPIC(self):
         """Export document as Qt PIC"""
 
+        page = self.getSinglePage()
+
         pic = qt4.QPicture()
         painter = painthelper.DirectPainter(pic)
 
         dpi = (pic.logicalDpiX(), pic.logicalDpiY())
-        size = self.doc.pageSize(self.pagenumber, dpi=dpi)
-        self.renderPage(size, dpi, painter)
+        size = self.doc.pageSize(page, dpi=dpi)
+        self.renderPage(page, size, dpi, painter)
         pic.save(self.filename)
 
     def exportEMF(self):
         """Export document as EMF."""
 
-        dpi = 90.
-        size = self.doc.pageSize(self.pagenumber, dpi=(dpi,dpi), integer=False)
+        page = self.getSinglePage()
 
+        dpi = 90.
+        size = self.doc.pageSize(page, dpi=(dpi,dpi), integer=False)
         paintdev = emf_export.EMFPaintDevice(size[0]/dpi, size[1]/dpi, dpi=dpi)
         painter = painthelper.DirectPainter(paintdev)
-        self.renderPage(size, (dpi,dpi), painter)
+        self.renderPage(page, size, (dpi,dpi), painter)
         paintdev.paintEngine().saveFile(self.filename)
 
 def printDialog(parentwindow, document, filename=None):
