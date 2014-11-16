@@ -406,28 +406,36 @@ class Document( qt4.QObject ):
                     plugin, traceback.format_exc())
                 qt4.QMessageBox.critical(None, _("Error loading plugin"), err)
 
-    def printTo(self, printer, pages, scaling = 1., dpi = None,
-                antialias = False):
-        """Print onto printing device."""
+    def printTo(self, printer, pages, scaling=1., antialias=False):
+        """Print onto printing device.
+        Returns list of page sizes
+        """
 
-        dpi = (printer.logicalDpiX(), printer.logicalDpiY())
         painter = painthelper.DirectPainter(printer)
+        dpi = (printer.logicalDpiX(), printer.logicalDpiY())
         if antialias:
             painter.setRenderHint(qt4.QPainter.Antialiasing, True)
             painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
    
+        sizes = []
         with painter:
             # This all assumes that only pages can go into the root widget
             for count, page in enumerate(pages):
                 painter.save()
                 size = self.pageSize(page, dpi=dpi)
-                helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
+                sizes.append(size)
+                painter.setClipRect(qt4.QRectF(
+                    qt4.QPointF(0,0), qt4.QPointF(*size)))
+                helper = painthelper.PaintHelper(
+                    size, dpi=dpi, directpaint=painter)
                 self.paintTo(helper, page)
                 painter.restore()
 
                 # start new pages between each page
                 if count < len(pages)-1:
                     printer.newPage()
+
+        return sizes
 
     def paintTo(self, painthelper, page):
         """Paint page specified to the paint helper."""

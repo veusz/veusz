@@ -1,4 +1,6 @@
 Changes in <next release>:
+ * Add new export dialog box which can export multiple pages and
+   modify the export options
 
 Minor changes
  * Fix incorrect use of None in (x,...) pattern

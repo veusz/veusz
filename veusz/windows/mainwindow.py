@@ -44,20 +44,7 @@ from . import plotwindow
 from . import treeeditwindow
 from .datanavigator import DataNavigatorWindow
 
-from ..dialogs.aboutdialog import AboutDialog
-from ..dialogs.reloaddata import ReloadData
-from ..dialogs.datacreate import DataCreateDialog
-from ..dialogs.datacreate2d import DataCreate2DDialog
-from ..dialogs.preferences import PreferencesDialog
-from ..dialogs.errorloading import ErrorLoadingDialog
-from ..dialogs.capturedialog import CaptureDialog
-from ..dialogs.stylesheet import StylesheetDialog
-from ..dialogs.custom import CustomDialog
-from ..dialogs.safetyimport import SafetyImportDialog
-from ..dialogs.histodata import HistoDataDialog
 from ..dialogs.plugin import handlePlugin
-from ..dialogs import importdialog
-from ..dialogs import dataeditdialog
 
 def _(text, disambiguation=None, context='MainWindow'):
     """Translate text."""
@@ -354,15 +341,18 @@ class MainWindow(qt4.QMainWindow):
             self.document.redoOperation()
 
     def slotEditPreferences(self):
+        from ..dialogs.preferences import PreferencesDialog
         dialog = PreferencesDialog(self)
         dialog.exec_()
 
     def slotEditStylesheet(self):
+        from ..dialogs.stylesheet import StylesheetDialog
         dialog = StylesheetDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
     def slotEditCustom(self):
+        from ..dialogs.custom import CustomDialog
         dialog = CustomDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
@@ -711,6 +701,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataImport(self):
         """Display the import data dialog."""
+        from ..dialogs import importdialog
         dialog = importdialog.ImportDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
@@ -720,6 +711,7 @@ class MainWindow(qt4.QMainWindow):
 
         If editdataset is set to a dataset name, edit this dataset
         """
+        from ..dialogs import dataeditdialog
         dialog = dataeditdialog.DataEditDialog(self, self.document)
         self.showDialog(dialog)
         if editdataset is not None:
@@ -728,30 +720,35 @@ class MainWindow(qt4.QMainWindow):
 
     def slotDataCreate(self):
         """Create new datasets."""
+        from ..dialogs.datacreate import DataCreateDialog
         dialog = DataCreateDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
     def slotDataCreate2D(self):
         """Create new datasets."""
+        from ..dialogs.datacreate2d import DataCreate2DDialog
         dialog = DataCreate2DDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
     def slotDataCapture(self):
         """Capture remote data."""
+        from ..dialogs.capturedialog import CaptureDialog
         dialog = CaptureDialog(self.document, self)
         self.showDialog(dialog)
         return dialog
 
     def slotDataHistogram(self):
         """Histogram data."""
+        from ..dialogs.histodata import HistoDataDialog
         dialog = HistoDataDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
     def slotDataReload(self):
         """Reload linked datasets."""
+        from ..dialogs.reloaddata import ReloadData
         dialog = ReloadData(self.document, self)
         self.showDialog(dialog)
         return dialog
@@ -797,6 +794,7 @@ class MainWindow(qt4.QMainWindow):
 
     def slotHelpAbout(self):
         """Show about dialog."""
+        from ..dialogs.aboutdialog import AboutDialog
         AboutDialog(self).exec_()
 
     def queryOverwrite(self):
@@ -1057,6 +1055,7 @@ class MainWindow(qt4.QMainWindow):
                 callbackunsafe=_callbackunsafe)
 
         except document.LoadError as e:
+            from ..dialogs.errorloading import ErrorLoadingDialog
             qt4.QApplication.restoreOverrideCursor()
             if e.backtrace:
                 d = ErrorLoadingDialog(self, filename, cstr(e), e.backtrace)
@@ -1157,102 +1156,10 @@ class MainWindow(qt4.QMainWindow):
 
     def slotFileExport(self):
         """Export the graph."""
-
-        # check there is a page
-        if self.document.getNumberPages() == 0:
-            qt4.QMessageBox.warning(self, _("Error - Veusz"),
-                                    _("No pages to export"))
-            return
-
-        # File types we can export to in the form ([extensions], Name)
-        fd = qt4.QFileDialog(self, _('Export page'))
-        fd.setDirectory( self.dirname_export )
-
-        fd.setFileMode( qt4.QFileDialog.AnyFile )
-        fd.setAcceptMode( qt4.QFileDialog.AcceptSave )
-
-        # Create a mapping between a format string and extensions
-        filtertoext = {}
-        # convert extensions to filter
-        exttofilter = {}
-        filters = []
-        # a list of extensions which are allowed
-        validextns = []
-        formats = document.Export.formats
-        for extns, name in formats:
-            extensions = " ".join(["*." + item for item in extns])
-            # join eveything together to make a filter string
-            filterstr = '%s (%s)' % (name, extensions)
-            filtertoext[filterstr] = extns
-            for e in extns:
-                exttofilter[e] = filterstr
-            filters.append(filterstr)
-            validextns += extns
-        fd.setNameFilters(filters)
-
-        # restore last format if possible
-        try:
-            filt = setdb['export_lastformat']
-            fd.selectNameFilter(filt)
-            extn = formats[filters.index(filt)][0][0]
-        except (KeyError, IndexError, ValueError):
-            extn = 'pdf'
-            fd.selectNameFilter( exttofilter[extn] )
-
-        if self.filename:
-            # try to convert current filename to export name
-            filename = os.path.basename(self.filename)
-            filename = os.path.splitext(filename)[0] + '.' + extn
-            fd.selectFile(filename)
-
-        if fd.exec_() == qt4.QDialog.Accepted:
-            # save directory for next time
-            self.dirname_export = fd.directory().absolutePath()
-
-            filterused = str(fd.selectedFilter())
-            setdb['export_lastformat'] = filterused
-
-            chosenextns = filtertoext[filterused]
-
-            # show busy cursor
-            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-
-            filename = fd.selectedFiles()[0]
-
-            # Add a default extension if one isn't supplied
-            # this is the extension without the dot
-            ext = os.path.splitext(filename)[1][1:]
-            if (ext not in validextns) and (ext not in chosenextns):
-                filename += "." + chosenextns[0]
-
-            export = document.Export(
-                self.document,
-                filename,
-                self.plot.getPageNumber(),
-                bitmapdpi=setdb['export_DPI'],
-                pdfdpi=setdb['export_DPI_PDF'],
-                antialias=setdb['export_antialias'],
-                color=setdb['export_color'],
-                quality=setdb['export_quality'],
-                backcolor=setdb['export_background'],
-                svgtextastext=setdb['export_SVG_text_as_text'],
-                )
-
-            try:
-                export.export()
-            except (RuntimeError, EnvironmentError) as e:
-                if isinstance(e, EnvironmentError):
-                    msg = cstrerror(e)
-                else:
-                    msg = cstr(e)
-
-                qt4.QApplication.restoreOverrideCursor()
-                qt4.QMessageBox.critical(
-                    self, _("Error - Veusz"),
-                    _("Error exporting to file '%s'\n\n%s") %
-                    (filename, msg))
-            else:
-                qt4.QApplication.restoreOverrideCursor()
+        from ..dialogs.export import ExportDialog
+        dialog = ExportDialog(self, self.document, self.filename)
+        self.showDialog(dialog)
+        return dialog
 
     def slotFilePrint(self):
         """Print the document."""
@@ -1337,6 +1244,6 @@ class MainWindow(qt4.QMainWindow):
 
     def slotAllowedImportsDoc(self, module, names):
         """Are allowed imports?"""
-
+        from ..dialogs.safetyimport import SafetyImportDialog
         d = SafetyImportDialog(self, module, names)
         d.exec_()

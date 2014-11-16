@@ -26,7 +26,6 @@ from .fitlm import fitLM
 from .utilfuncs import *
 from .points import *
 from .action import *
-from .pdf import *
 from .dates import *
 from .formatting import *
 from .colormap import *

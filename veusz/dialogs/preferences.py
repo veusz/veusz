@@ -76,32 +76,6 @@ class PreferencesDialog(VeuszDialog):
             self.iconSizeCombo.findText(
                 str(setdb['toolbar_size'])))
 
-        # set export dpi
-        dpis = ('75', '90', '100', '150', '200', '300')
-        self.exportDPI.addItems(dpis)
-        self.exportDPIPDF.addItems(dpis)
-
-        self.exportDPI.setValidator( qt4.QIntValidator(10, 10000, self) )
-        self.exportDPI.setEditText( str(setdb['export_DPI']) )
-        self.exportDPIPDF.setValidator( qt4.QIntValidator(10, 10000, self) )
-        self.exportDPIPDF.setEditText( str(setdb['export_DPI_PDF']) )
-        self.exportSVGTextAsText.setChecked( setdb['export_SVG_text_as_text'] )
-
-        # set export antialias
-        self.exportAntialias.setChecked( setdb['export_antialias'])
-
-        # quality of jpeg export
-        self.exportQuality.setValue( setdb['export_quality'] )
-
-        # changing background color of bitmaps
-        self.exportBackgroundButton.clicked.connect(
-            self.slotExportBackgroundChanged )
-        self.updateExportBackground(setdb['export_background'])
-
-        # set color setting
-        self.exportColor.setCurrentIndex(
-            {True:0, False:1}[setdb['export_color']])
-
         # default stylesheet
         self.styleLineEdit.setText(setdb['stylesheet_default'])
         self.styleBrowseButton.clicked.connect(self.styleBrowseClicked)
@@ -181,27 +155,6 @@ class PreferencesDialog(VeuszDialog):
             pixmap.fill(val)
             self.colorbutton[name].setIcon( qt4.QIcon(pixmap) )
 
-    def updateExportBackground(self, colorname):
-        """Update color on export background."""
-        pixmap = qt4.QPixmap(16, 16)
-        col = utils.extendedColorToQColor(colorname)
-        pixmap.fill(col)
-
-        # update button (storing color in button itself - what fun!)
-        self.exportBackgroundButton.setIcon(qt4.QIcon(pixmap))
-        self.exportBackgroundButton.iconcolor = colorname
-
-    def slotExportBackgroundChanged(self):
-        """Button clicked to change background."""
-
-        color = qt4.QColorDialog.getColor(
-            utils.extendedColorToQColor(self.exportBackgroundButton.iconcolor),
-            self,
-            "Choose color",
-            qt4.QColorDialog.ShowAlphaChannel )
-        if color.isValid():
-            self.updateExportBackground( utils.extendedColorFromQColor(color) )
-
     def accept(self):
         """Keep settings if okay pressed."""
 
@@ -225,27 +178,6 @@ class PreferencesDialog(VeuszDialog):
             for widget in self.parent().children(): # find toolbars
                 if isinstance(widget, qt4.QToolBar):
                     widget.setIconSize( qt4.QSize(iconsize, iconsize) )
-
-        # update dpi if possible
-        # FIXME: requires some sort of visual notification of validator
-        for cntrl, setn in ((self.exportDPI, 'export_DPI'),
-                            (self.exportDPIPDF, 'export_DPI_PDF')):
-            try:
-                text = cntrl.currentText()
-                valid = cntrl.validator().validate(text, 0)[0]
-                if valid == qt4.QValidator.Acceptable:
-                    setdb[setn] = int(text)
-            except ValueError:
-                pass
-
-        # export settings
-        setdb['export_antialias'] = self.exportAntialias.isChecked()
-        setdb['export_quality'] = self.exportQuality.value()
-
-        setdb['export_color'] = {0: True, 1: False}[
-            self.exportColor.currentIndex()]
-        setdb['export_background'] = self.exportBackgroundButton.iconcolor
-        setdb['export_SVG_text_as_text'] = self.exportSVGTextAsText.isChecked()
 
         # new document settings
         setdb['stylesheet_default'] = self.styleLineEdit.text()
