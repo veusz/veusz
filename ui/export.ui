@@ -49,6 +49,9 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QRadioButton" name="radioPageSingle">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export the current page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Single</string>
           </property>
@@ -87,6 +90,9 @@
         </item>
         <item>
          <widget class="QCheckBox" name="checkMultiPage">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Write multiple pages to the output file, if supported by the file format&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>Multiple pages per file</string>
           </property>
@@ -229,9 +235,7 @@
       <item row="1" column="1">
        <widget class="QComboBox" name="exportDPI">
         <property name="toolTip">
-         <string>Dots Per Inch is used to convert from the physical size
-of the plot to the number of pixels in output bitmaps.
-Increase this to make output bitmaps have more pixels.</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dots Per Inch is used to convert from the physical size of the plot to the number of pixels in output bitmaps. Increase this to make output bitmap files have more pixels.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="editable">
          <bool>true</bool>
@@ -259,10 +263,7 @@ This is recommended for most purposes.</string>
       <item row="2" column="1">
        <widget class="QComboBox" name="exportDPIPDF">
         <property name="toolTip">
-         <string>The number of dots per inch used for writing PDF and EPS files.
-As these are vector formats, this does not make much difference
-to the output, but larger values improve the placement of
-characters and also make hatched fills finer.</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of dots per inch used for writing PDF and EPS files. As these are vector formats, this does not make much difference to the output, but larger values improve the placement of characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="editable">
          <bool>true</bool>
@@ -279,7 +280,7 @@ characters and also make hatched fills finer.</string>
       <item row="3" column="1">
        <widget class="QPushButton" name="exportBackgroundButton">
         <property name="toolTip">
-         <string>Use alpha channel values of 0 for transparency</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The background color for bitmap files. Use alpha channel values of 0 for transparency&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>
@@ -296,8 +297,7 @@ characters and also make hatched fills finer.</string>
       <item row="4" column="1">
        <widget class="QSpinBox" name="exportQuality">
         <property name="toolTip">
-         <string>Choose Jpeg quality setting. Lower values give
-poorer quality and are more compressed.</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose Jpeg quality setting. Lower values give poorer quality results and are more compressed, but have smaller file sizes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="minimum">
          <number>0</number>
@@ -313,14 +313,14 @@ poorer quality and are more compressed.</string>
       <item row="5" column="0">
        <widget class="QLabel" name="labelColor">
         <property name="text">
-         <string>Postscript color</string>
+         <string>Color</string>
         </property>
        </widget>
       </item>
       <item row="5" column="1">
        <widget class="QComboBox" name="exportColor">
         <property name="toolTip">
-         <string>Output postscript as full color, or convert to greyscale</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Output Postscript or PDF as full color, or convert to greyscale&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <item>
          <property name="text">
@@ -344,9 +344,7 @@ poorer quality and are more compressed.</string>
       <item row="6" column="1">
        <widget class="QCheckBox" name="exportSVGTextAsText">
         <property name="toolTip">
-         <string>Exports text in SVG files as text, rather than curves. Curves
-mean that the file will display the same on any system, but
-text can be edited easily in other programs.</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exports text in SVG files as text, rather than curves. Curves mean that the file will display the same on any system, but text can be edited easily in other programs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>
@@ -355,6 +353,9 @@ text can be edited easily in other programs.</string>
       </item>
       <item row="0" column="1">
        <widget class="QCheckBox" name="checkOverwrite">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Overwrite any files with the same name without confirmation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string/>
         </property>
