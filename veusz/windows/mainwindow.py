@@ -427,7 +427,7 @@ class MainWindow(qt4.QMainWindow):
                   self.slotFilePrint,
                   icon='kde-document-print', key='Ctrl+P'),
             'file.export':
-                a(self, _('Export the current page'), _('&Export...'),
+                a(self, _('Export to graphics formats'), _('&Export...'),
                   self.slotFileExport,
                   icon='kde-document-export'),
             'file.close':

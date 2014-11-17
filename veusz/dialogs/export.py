@@ -393,7 +393,7 @@ class ExportDialog(VeuszDialog):
             try:
                 # actually do the export
                 export.export()
-                pagecount[0] += 1
+                pagecount[0] += len(export.pagenumber)
             except (RuntimeError, EnvironmentError) as e:
                 # errors from the export
                 if isinstance(e, EnvironmentError):
@@ -412,7 +412,7 @@ class ExportDialog(VeuszDialog):
             # write pages to multiple files
             for page in pages:
                 pagename = self.document.getPage(page).name
-                export.pagenumber = page
+                export.pagenumber = [page]
                 export.filename = os.path.join(
                     os.path.dirname(filename),
                     os.path.basename(filename).replace(PAGENUM, str(page+1)).
