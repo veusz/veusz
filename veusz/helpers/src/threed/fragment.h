@@ -1,9 +1,12 @@
 #ifndef FRAGMENT_H
 #define FRAGMENT_H
 
+#include <stdio.h>
+
 #include <limits>
 #include <vector>
 #include "properties.h"
+#include "mmaths.h"
 
 #define LINE_DELTA_DEPTH 1e-4
 
@@ -88,36 +91,44 @@ struct Fragment
       }
   }
 
-  // get bounds of fragment
-  FragBounds bounds() const
-  {
-    FragBounds b;
-    b.minx = b.miny = b.minz = std::numeric_limits<float>::infinity();
-    b.maxx = b.maxy = b.maxz = -std::numeric_limits<float>::infinity();
-    for(unsigned i=0, s=nPoints(); i<s; ++i)
-      {
-	const Vec3& pt = points[i];
-	b.minx=std::min(b.minx, pt(0)); b.maxx=std::max(b.maxx, pt(0));
-	b.miny=std::min(b.miny, pt(1)); b.maxy=std::max(b.maxy, pt(1));
-	b.minz=std::min(b.minz, pt(2)); b.maxz=std::max(b.maxz, pt(2));
-      }
-    return b;
-  }
+  /* // get bounds of fragment */
+  /* FragBounds bounds() const */
+  /* { */
+  /*   FragBounds b; */
+  /*   b.minx = b.miny = b.minz = std::numeric_limits<float>::infinity(); */
+  /*   b.maxx = b.maxy = b.maxz = -std::numeric_limits<float>::infinity(); */
+  /*   for(unsigned i=0, s=nPoints(); i<s; ++i) */
+  /*     { */
+  /* 	const Vec3& pt = points[i]; */
+  /* 	b.minx=std::min(b.minx, pt(0)); b.maxx=std::max(b.maxx, pt(0)); */
+  /* 	b.miny=std::min(b.miny, pt(1)); b.maxy=std::max(b.maxy, pt(1)); */
+  /* 	b.minz=std::min(b.minz, pt(2)); b.maxz=std::max(b.maxz, pt(2)); */
+  /*     } */
 
-  // does this overlap with other fragment
-  bool overlaps(const FragBounds& b) const
-  {
-    // see whether other one is inside this region
-    for(unsigned i=0, s=nPoints(); i<s; ++i)
-      {
-	const Vec3& pt = points[i];
-	if(pt(0) > b.minx && pt(0) < b.maxx &&
-	   pt(1) > b.miny && pt(1) < b.maxy &&
-	   pt(2) > b.minz && pt(2) < b.maxz)
-	  return 1;
-      }
-    return 0;
-  }
+  /*   printf("bounds: x=%.2f:%.2f, y=%.2f:%.2f, z=%.2f:%.2f\n", */
+  /* 	   b.minx, b.maxx, b.miny, b.maxy, b.minz, b.maxz); */
+  /*   return b; */
+  /* } */
+
+  /* // does this overlap with other fragment */
+  /* bool overlaps(const FragBounds& b) const */
+  /* { */
+  /*   // see whether other one is inside this region */
+  /*   for(unsigned i=0, s=nPoints(); i<s; ++i) */
+  /*     { */
+  /* 	const Vec3& pt = points[i]; */
+  /* 	printf(" pt %i: %.2f, %.2f, %.2f\n", i, pt(0), pt(1), pt(2)); */
+
+  /* 	if(pt(0) > b.minx && pt(0) < b.maxx && */
+  /* 	   pt(1) > b.miny && pt(1) < b.maxy && */
+  /* 	   pt(2) > b.minz && pt(2) < b.maxz) */
+  /* 	  { */
+  /* 	    printf("found!\n"); */
+  /* 	    return 1; */
+  /* 	  } */
+  /*     } */
+  /*   return 0; */
+  /* } */
 
 };
 
