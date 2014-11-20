@@ -128,11 +128,11 @@ void Scene::render(QPainter* painter, const Camera& cam,
       float thismindepth = thisf.minDepth();
       float thismaxdepth = thisf.maxDepth();
 
-      if(thisf.type == Fragment::FR_TRIANGLE)
-	printf("%.1f,%.1f,%.1f %.1f,%.1f,%.1f %.1f,%.1f,%.1f\n",
-	       thisf.points[0](0), thisf.points[0](1), thisf.points[0](2),
-	       thisf.points[1](0), thisf.points[1](1), thisf.points[1](2),
-	       thisf.points[2](0), thisf.points[2](1), thisf.points[2](2));
+      // if(thisf.type == Fragment::FR_TRIANGLE)
+      // 	printf("%.1f,%.1f,%.1f %.1f,%.1f,%.1f %.1f,%.1f,%.1f\n",
+      // 	       thisf.points[0](0), thisf.points[0](1), thisf.points[0](2),
+      // 	       thisf.points[1](0), thisf.points[1](1), thisf.points[1](2),
+      // 	       thisf.points[2](0), thisf.points[2](1), thisf.points[2](2));
 
 
       for(unsigned idx2=idx+1; idx2<depths.size(); ++idx2)
@@ -143,9 +143,9 @@ void Scene::render(QPainter* painter, const Camera& cam,
 	  if(otherf.object == thisf.object)
 	    continue;
 
-	  printf("%i (%7.4f %7.4f) %i (%7.4f %7.4f)\n",
-	  	 idx, thismindepth, thismaxdepth,
-	  	 idx2, otherf.minDepth(), otherf.maxDepth());
+	  // printf("%i (%7.4f %7.4f) %i (%7.4f %7.4f)\n",
+	  // 	 idx, thismindepth, thismaxdepth,
+	  // 	 idx2, otherf.minDepth(), otherf.maxDepth());
 
 	  if(otherf.maxDepth() < thismindepth)
 	    // no others are overlapping

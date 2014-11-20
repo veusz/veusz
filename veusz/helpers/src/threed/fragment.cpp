@@ -18,24 +18,6 @@ namespace
     return std::abs(v) < EPS ? 0 : v;
   }
 
-  // calculate intersection of point with axis
-  void iSectPts(const Vec3& VTX0, const Vec3& VTX1, const Vec3& VTX2,
-		float VV0, float VV1, float VV2,
-		float D0, float D1, float D2,
-		float *isect0, float *isect1,
-		Vec3* isectpoint0, Vec3* isectpoint1)
-  {
-    float tmp1=D0/(D0-D1);
-    *isect0 = VV0+(VV1-VV0)*tmp1;
-    Vec3 diff1 = (VTX1-VTX0)*tmp1;
-    *isectpoint0 = VTX0 + diff1;
-
-    float tmp2=D0/(D0-D2);
-    *isect1 = VV0+(VV2-VV0)*tmp2;
-    Vec3 diff2 = (VTX2-VTX0)*tmp2;
-    *isectpoint1 = VTX0 + diff2;
-  }
-
   // return 0 if f1<f2, else 1 and swap f1, f2
   inline unsigned order(float& f1, float& f2)
   {
@@ -57,47 +39,52 @@ namespace
     return idx;
   }
 
-  bool computeISectInterval(const Vec3& VERT0, const Vec3& VERT1,
-			    const Vec3& VERT2,
+  bool computeISectInterval(const Vec3* verts,
 			    const Vec3& VV, const Vec3& D,
-			    float D0D1, float D0D2,
-			    float *isect0, float *isect1,
+			    float* isect0, float* isect1,
 			    Vec3* isectpoint0, Vec3* isectpoint1)
   {
-    if(D0D1>0)
+    // these are the appropriate vertices to do the computation on
+    unsigned i0, i1, i2;
+
+    if(D(0)*D(1)>0)
       {
 	// here we know that D0D2<=0.0 that is D(0), D(1) are on the
 	// same side, D(2) on the other or on the plane
-	iSectPts(VERT2, VERT0, VERT1, VV(2), VV(0), VV(1), D(2), D(0), D(1),
-		 isect0, isect1, isectpoint0, isectpoint1);
+        i0 = 2; i1 = 0; i2 = 1;
       }
-    else if(D0D2>0)
+    else if(D(0)*D(2)>0)
       {
 	// here we know that d0d1<=0.0
-	iSectPts(VERT1, VERT0, VERT2, VV(1), VV(0), VV(2), D(1), D(0), D(2),
-		 isect0, isect1, isectpoint0, isectpoint1);
+        i0 = 1; i1 = 0; i2 = 2;
       }
     else if(D(1)*D(2)>0 || D(0)!=0)
       {
 	// here we know that d0d1<=0.0 or that D(0)!=0.0
-	iSectPts(VERT0, VERT1, VERT2, VV(0), VV(1), VV(2), D(0), D(1), D(2),
-		 isect0, isect1, isectpoint0, isectpoint1);
+        i0 = 0; i1 = 1; i2 = 2;
       }
     else if(D(1)!=0)
       {
-	iSectPts(VERT1, VERT0, VERT2, VV(1), VV(0), VV(2), D(1), D(0), D(2),
-		 isect0, isect1, isectpoint0, isectpoint1);
+        i0 = 1; i1 = 0; i2 = 2;
       }
     else if(D(2)!=0)
       {
-	iSectPts(VERT2, VERT0, VERT1, VV(2), VV(0), VV(1), D(2), D(0), D(1),
-		 isect0, isect1, isectpoint0 ,isectpoint1);
+        i0 = 2; i1 = 0; i2 = 1;
       }
     else
       {
 	// triangles are coplanar
 	return 1;
       }
+
+    float tmp1 = D(i0)/(D(i0)-D(i1));
+    *isect0 = VV(i0)+(VV(i1)-VV(i0))*tmp1;
+    *isectpoint0 = verts[i0] + (verts[i1]-verts[i0])*tmp1;
+
+    float tmp2 = D(i0)/(D(i0)-D(i2));
+    *isect1 = VV(i0)+(VV(i2)-VV(i0))*tmp2;
+    *isectpoint1 = verts[i0] + (verts[i2]-verts[i0])*tmp2;
+
     return 0;
   }
 
@@ -115,15 +102,12 @@ bool triangleIntersection(const Vec3* U, const Vec3* V,
 
   // put U0,U1,U2 into plane equation 1 to compute signed distances to
   // the plane
-  Vec3 du(trimEps(dot(N1,U[0])+d1),
-	  trimEps(dot(N1,U[1])+d1),
-	  trimEps(dot(N1,U[2])+d1));
-
-  float du0du1 = du(0)*du(1);
-  float du0du2 = du(0)*du(2);
+  Vec3 dotU(trimEps(dot(N1,U[0])+d1),
+	    trimEps(dot(N1,U[1])+d1),
+	    trimEps(dot(N1,U[2])+d1));
 
   // same sign on all of them and != 0
-  if(du0du1>0 && du0du2>0)
+  if(dotU(0)*dotU(1)>0 && dotU(0)*dotU(2)>0)
     return 0;
 
   // compute plane of triangle (U0,U1,U2)
@@ -132,15 +116,12 @@ bool triangleIntersection(const Vec3* U, const Vec3* V,
   // plane equation 2: N2.X+d2=0 //
 
   // put V0,V1,V2 into plane equation 2
-  Vec3 dv(trimEps(dot(N2,V[0])+d2),
-	  trimEps(dot(N2,V[1])+d2),
-	  trimEps(dot(N2,V[2])+d2));
-
-  float dv0dv1 = dv(0)*dv(1);
-  float dv0dv2 = dv(0)*dv(2);
+  Vec3 dotV(trimEps(dot(N2,V[0])+d2),
+	    trimEps(dot(N2,V[1])+d2),
+	    trimEps(dot(N2,V[2])+d2));
 
   // same sign on all of them and != 0
-  if(dv0dv1>0 && dv0dv2>0)
+  if(dotV(0)*dotV(1)>0 && dotV(0)*dotV(2)>0)
     return 0;
 
   // compute direction of intersection line
@@ -156,8 +137,7 @@ bool triangleIntersection(const Vec3* U, const Vec3* V,
   // compute interval for triangle 1
   Vec3 isectpointA1, isectpointA2;
   float isect1[2];
-  *coplanar = computeISectInterval(V[0], V[1], V[2], vp, dv,
-				   dv0dv1, dv0dv2,
+  *coplanar = computeISectInterval(V, vp, dotV,
 				   &isect1[0], &isect1[1],
 				   &isectpointA1, &isectpointA2);
   if(*coplanar)
@@ -167,10 +147,9 @@ bool triangleIntersection(const Vec3* U, const Vec3* V,
   // compute interval for triangle 2
   Vec3 isectpointB1, isectpointB2;
   float isect2[2];
-  computeISectInterval(U[0], U[1], U[2], up, du,
-		       du0du1,du0du2,
+  computeISectInterval(U, up, dotU,
 		       &isect2[0], &isect2[1],
-		       &isectpointB1, &isectpointB2);
+                       &isectpointB1, &isectpointB2);
 
   // intervals need to be in increasing order
   unsigned smallest1 = order(isect1[0], isect1[1]);
