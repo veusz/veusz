@@ -8,6 +8,7 @@
 #include <QtGui/QColor>
 
 #include "scene.h"
+#include "fragment.h"
 
 namespace
 {
@@ -121,42 +122,64 @@ void Scene::render(QPainter* painter, const Camera& cam,
   // sort depth of items
   std::sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
 
-  for(unsigned idx=0; idx+1 < depths.size(); ++idx)
+  for(int idx1=0; idx1+1 < int(depths.size()); ++idx1)
     {
-      const Fragment& thisf = fragments[depths[idx]];
-      FragBounds thisbounds(thisf.bounds());
-      float thismindepth = thisf.minDepth();
-      float thismaxdepth = thisf.maxDepth();
+    redo:
+      float thismindepth = fragments[depths[idx1]].minDepth();
 
-      // if(thisf.type == Fragment::FR_TRIANGLE)
-      // 	printf("%.1f,%.1f,%.1f %.1f,%.1f,%.1f %.1f,%.1f,%.1f\n",
-      // 	       thisf.points[0](0), thisf.points[0](1), thisf.points[0](2),
-      // 	       thisf.points[1](0), thisf.points[1](1), thisf.points[1](2),
-      // 	       thisf.points[2](0), thisf.points[2](1), thisf.points[2](2));
-
-
-      for(unsigned idx2=idx+1; idx2<depths.size(); ++idx2)
+      for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
 	{
-	  const Fragment& otherf = fragments[depths[idx2]];
-
 	  // don't compare object with self
-	  if(otherf.object == thisf.object)
+	  if(fragments[depths[idx2]].object == fragments[depths[idx1]].object)
 	    continue;
 
-	  // printf("%i (%7.4f %7.4f) %i (%7.4f %7.4f)\n",
-	  // 	 idx, thismindepth, thismaxdepth,
-	  // 	 idx2, otherf.minDepth(), otherf.maxDepth());
-
-	  if(otherf.maxDepth() < thismindepth)
+	  if(fragments[depths[idx2]].maxDepth() < thismindepth)
 	    // no others are overlapping
 	    break;
 
-	  if(otherf.overlaps(thisbounds))
+	  unsigned newnum1=0, newnum2=0;
+	  fragmentFragments(fragments[depths[idx1]],
+			    fragments[depths[idx2]],
+			    fragments, &newnum1, &newnum2);
+	  if(newnum1>0)
 	    {
-	      printf("Potential overlap: %i, %i\n", depths[idx], depths[idx2]);
+	      printf("new frags 1: %i\n", newnum1);
+	      if(newnum1>1)
+		depths.insert(depths.begin()+idx1, newnum1-1, 0);
+	      unsigned base=fragments.size()-newnum1-newnum2;
+	      for(unsigned i=0; i<newnum1; ++i)
+		depths[idx1+i] = base+i;
+	    }
+	  if(newnum2>0)
+	    {
+	      printf("new frags 2: %i\n", newnum2);
+	      unsigned delta1 = newnum1 > 0 ? newnum1-1 : 0;
+	      if(newnum2>1)
+		depths.insert(depths.begin()+idx2+delta1, newnum2-1, 0);
+	      unsigned base=fragments.size()-newnum2;
+	      for(unsigned i=0; i<newnum2; ++i)
+		depths[idx2+i+delta1] = base+i;
+	    }
+	  if(newnum1+newnum2 > 0)
+	    {
+	      unsigned nlen = fragments.size();
+	      // calculate projected coordinates (with depths)
+	      for(unsigned i=nlen-(newnum1+newnum2); i != nlen; ++i)
+		fragments[i].updateProjCoords(cam.perspM);
+
+	      // sort depth of new items
+	      std::sort(depths.begin()+idx1, depths.begin()+
+			(idx2+newnum1+newnum2-2+1),
+			FragDepthCompare(fragments));
+	      goto redo;
 	    }
 	}
     }
+
+  for(unsigned i=0;i!=depths.size();++i)
+    printf("%i ", depths[i]);
+  printf("\n");
+
 
   // how to transform points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
@@ -165,6 +188,7 @@ void Scene::render(QPainter* painter, const Camera& cam,
   LineProp const* lline = 0;
   SurfaceProp const* lsurf = 0;
 
+  QPen solid;
   QPen no_pen(Qt::NoPen);
   QBrush no_brush(Qt::NoBrush);
   painter->setPen(no_pen);
@@ -195,6 +219,10 @@ void Scene::render(QPainter* painter, const Camera& cam,
 	      painter->setBrush(SurfaceProp2QBrush(*lsurf));
 	    }
 
+	  // debug
+	  painter->setPen(solid);
+	  //painter->setBrush(no_brush);
+
 	  temppoly[0] = projpts[0];
 	  temppoly[1] = projpts[1];
 	  temppoly[2] = projpts[2];
@@ -218,6 +246,8 @@ void Scene::render(QPainter* painter, const Camera& cam,
 	case Fragment::FR_PATH:
 	  break;
 
+	default:
+	  break;
 	}
     }
 }

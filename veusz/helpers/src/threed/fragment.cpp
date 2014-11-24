@@ -3,7 +3,7 @@
 #include "mmaths.h"
 #include "fragment.h"
 
-//#include <stdio.h>
+#include <stdio.h>
 
 #define EPS 1e-5f
 
@@ -45,7 +45,7 @@ namespace
   {
     // find non-zero index
     unsigned idx;
-    for(idx=0; std::abs(b(idx))<EPS && idx<3; ++idx)
+    for(idx=0; idx<3 && std::abs(b(idx))<EPS; ++idx)
       ;
     if(idx==3)
       return 0;
@@ -84,7 +84,7 @@ namespace
     // solve x*v1+a1 = b1
     // find non-zero index of v1
     unsigned idx;
-    for(idx=0; std::abs(v1(idx))<EPS && idx<3; ++idx)
+    for(idx=0; idx<3 && std::abs(v1(idx))<EPS; ++idx)
       ;
     if(idx==3)
       // a1==a2
@@ -257,7 +257,7 @@ namespace
   unsigned splitOnCorner(const Fragment& f, unsigned corner,
 			 FragmentVector& frags, const Vec3& vec)
   {
-    //printf("split on corner\n");
+    printf("split on corner\n");
 
     // line 1 is f.points[corner] + a*vec
     // line 2 is f.points[corner+1] + b*(f.points[corner+2]-f.points[corner])
@@ -294,10 +294,10 @@ namespace
 
   // if we have a vector pt1->pt2, find triangle edges which intercept
   // this and split into three triangles
-  unsigned splitOnEdges(const Fragment& f, const Vec3& pt1, const Vec3& pt2,
+  unsigned splitOnEdges(const Fragment& frag, const Vec3& pt1, const Vec3& pt2,
 			FragmentVector& frags)
   {
-    //printf("split on edges\n");
+    printf("split on edges\n");
 
     Vec3 cornerpos[3];
     unsigned cornersect[3];
@@ -312,9 +312,13 @@ namespace
 
     for(unsigned i=0; i<3; ++i)
       {
-	Vec3 P1 = f.points[startidx[i]];
-	Vec3 V1 = f.points[endidx[i]]-f.points[startidx[i]];
-	float scale = scaleFactor(cross(P2-P1, V2), cross(V1, V2));
+	Vec3 P1 = frag.points[startidx[i]];
+	Vec3 V1 = frag.points[endidx[i]]-frag.points[startidx[i]];
+
+	Vec3 c1 = cross(P2-P1, V2);
+	Vec3 c2 = cross(V1,V2);
+	//float scale = scaleFactor(cross(P2-P1, V2), cross(V1, V2));
+	float scale=scaleFactor(c1, c2);
 	if(scale>0 && scale<1)
 	  {
 	    cornersect[corneridx] = i;
@@ -338,13 +342,13 @@ namespace
       common = 2;
 
     // orignal normal of triangle
-    const Vec3 orignorm = triNormal(f.points);
+    const Vec3 orignorm = triNormal(frag.points);
 
     // copy fragment and make new triangles
-    Fragment newf = f;
+    Fragment newf(frag);
 
     // this is the triangle to one side of the crossing line
-    newf.points[0] = f.points[common];
+    newf.points[0] = frag.points[common];
     newf.points[1] = cornerpos[0];
     newf.points[2] = cornerpos[1];
     // keep normal in same direction
@@ -358,15 +362,16 @@ namespace
     static const unsigned otherpt1[3] = {1, 0, 0};
     static const unsigned otherpt2[3] = {2, 2, 1};
 
+    printf("idxs %i %i\n", otherpt1[common], otherpt2[common]);
     newf.points[0] = cornerpos[0];
-    newf.points[1] = f.points[otherpt1[common]];
-    newf.points[2] = f.points[otherpt2[common]];
+    newf.points[1] = frag.points[otherpt1[common]];
+    newf.points[2] = frag.points[otherpt2[common]];
     if(scaleFactor(triNormal(newf.points), orignorm) < 0)
       std::swap(newf.points[1], newf.points[2]);
     frags.push_back(newf);
 
     newf.points[0] = cornerpos[0];
-    newf.points[1] = f.points[otherpt2[common]];
+    newf.points[1] = frag.points[otherpt2[common]];
     newf.points[2] = cornerpos[1];
     if(scaleFactor(triNormal(newf.points), orignorm) < 0)
       std::swap(newf.points[1], newf.points[2]);
@@ -383,7 +388,7 @@ namespace
 	overlappingLine(f.points[1], f.points[2], pt1, pt2) ||
 	overlappingLine(f.points[2], f.points[0], pt1, pt2) )
       {
-	//printf("hit sides\n");
+	printf("hit sides\n");
 	return 0;
       }
 
@@ -401,21 +406,23 @@ namespace
   // end of namespace
 }
 
-unsigned fragmentFragments(const Fragment& f1, const Fragment& f2,
-			   FragmentVector& v)
+void fragmentFragments(const Fragment &f1, const Fragment &f2,
+		       FragmentVector& v, unsigned* num1, unsigned* num2)
 {
+  *num1 = *num2 = 0;
   if(f1.type == Fragment::FR_TRIANGLE && f2.type == Fragment::FR_TRIANGLE)
     {
       bool coplanar = 0;
       Vec3 pt1, pt2;
       if(triangleIntersection(f1.points, f2.points, &coplanar, &pt1, &pt2))
 	{
-	  return fragmentTriangle(f1, pt1, pt2, v) +
-	    fragmentTriangle(f2, pt1, pt2, v);
+	  // when new fragments are added, then f1/f2 are invalidated
+	  Fragment fcpy1(f1);
+	  Fragment fcpy2(f2);
+	  *num1 = fragmentTriangle(fcpy1, pt1, pt2, v);
+	  *num2 = fragmentTriangle(fcpy2, pt1, pt2, v);
 	}
     }
-
-  return 0;
 }
 
 // testing routines

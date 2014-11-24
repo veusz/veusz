@@ -151,9 +151,25 @@ class Graph3D(widget.Widget):
             threed.rotateM4(135./180.*3.14159, threed.Vec3(0,0,1)) *
             threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
         for c in self.children:
-            obj = c.drawToObject()
-            if obj:
-                scene.root.addObject(obj)
+           obj = c.drawToObject()
+           if obj:
+               scene.root.addObject(obj)
+
+        # scene.root.addObject(threed.Triangle(
+        #     threed.Vec4(0.7,0,0,1), threed.Vec4(0.7,0,1,1),
+        #     threed.Vec4(0.7,1,0,1),
+        #     threed.SurfaceProp(0,1,0,trans=0.5)
+        # ))
+        # scene.root.addObject(threed.Triangle(
+        #     threed.Vec4(1,0.1,0,1), threed.Vec4(0,0.1,0,1),
+        #     threed.Vec4(1,0.1,1,1),
+        #     threed.SurfaceProp(1,0,0,trans=0.5)
+        # ))
+        # scene.root.addObject(threed.Triangle(
+        #     threed.Vec4(0,0.1,0,1), threed.Vec4(1,0.1,1,1),
+        #     threed.Vec4(0,0.1,1,1),
+        #     threed.SurfaceProp(0,0,1,trans=0.5)
+        # ))
 
         def printM(m):
             for i in xrange(4):

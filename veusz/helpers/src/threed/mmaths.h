@@ -282,6 +282,17 @@ inline Mat3 translateM3(float dx, float dy)
 //////////////////////////////////////////////////////////////////////////////
 // Helper functions
 
+inline Vec3 vec4to3(const Vec4& v)
+{
+  float inv = 1/v(3);
+  return Vec3(v(0)*inv, v(1)*inv, v(2)*inv);
+}
+
+inline Vec4 vec3to4(const Vec3& v)
+{
+  return Vec4(v(0), v(1), v(2), 1);
+}
+
 // do projection, getting x,y coordinate and depth
 inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
 {
@@ -290,10 +301,11 @@ inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
   return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
 }
 
-inline Vec3 vec3to4(const Vec4& v)
+inline Vec3 calcProjVec(const Mat4& projM, const Vec3& v)
 {
-  float inv = 1/v(3);
-  return Vec3(v(0)*inv, v(1)*inv, v(2)*inv);
+  Vec4 nv(projM*vec3to4(v));
+  float inv = 1/nv(3);
+  return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
 }
 
 //////////////////////////////////////////////////////////////////////////////

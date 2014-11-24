@@ -17,13 +17,13 @@ void Triangle::getFragments(const Mat4& outerM, const Camera& cam,
   f.surfaceprop = surfaceprop.ptr();
   f.lineprop = 0;
   Vec4 p0 = outerM*points[0];
-  f.points[0] = vec3to4(p0);
+  f.points[0] = vec4to3(p0);
   f.proj[0] = calcProjVec(cam.perspM, p0);
   Vec4 p1 = outerM*points[1];
-  f.points[1] = vec3to4(p1);
+  f.points[1] = vec4to3(p1);
   f.proj[1] = calcProjVec(cam.perspM, p1);
   Vec4 p2 = outerM*points[2];
-  f.points[2] = vec3to4(p2);
+  f.points[2] = vec4to3(p2);
   f.proj[2] = calcProjVec(cam.perspM, p2);
   f.object = const_cast<Triangle*>(this);
 
@@ -48,10 +48,10 @@ void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
   lpproj(2) -= 1e-4;
   for(unsigned i=1, s=points.size(); i<s; ++i)
     {
-      f.points[0] = vec3to4(lp3d);
+      f.points[0] = vec4to3(lp3d);
       f.proj[0] = lpproj;
       lp3d = outerM*points[i];
-      f.points[1] = vec3to4(lp3d);
+      f.points[1] = vec4to3(lp3d);
       lpproj = calcProjVec(cam.perspM, lp3d);
       f.proj[1] = lpproj;
       v.push_back(f);
