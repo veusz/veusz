@@ -21,6 +21,9 @@ struct Fragment
   // type of fragment
   FragmentType type;
 
+  // number of times this has been split
+  unsigned splitcount;
+
   // point to object or QPainterPath
   void* object;
 
@@ -36,10 +39,11 @@ struct Fragment
 
   // zero on creation
   Fragment()
-    : type(FR_NONE),
-      object(0),
-      surfaceprop(0),
-      lineprop(0)
+  : type(FR_NONE),
+    splitcount(0),
+    object(0),
+    surfaceprop(0),
+    lineprop(0)
   {
   }
 
@@ -159,8 +163,8 @@ typedef std::vector<Fragment> FragmentVector;
 
 // try to split fragments into pieces if they overlap
 // returns number of pieces for each part after fragmentation
-void fragmentFragments(const Fragment& f1, const Fragment& f2,
-		       FragmentVector& v,
-		       unsigned* num1, unsigned* num2);
+void splitFragments(const Fragment& f1, const Fragment& f2,
+		    FragmentVector& v,
+		    unsigned* num1, unsigned* num2);
 
 #endif

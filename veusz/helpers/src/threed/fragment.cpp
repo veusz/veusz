@@ -328,8 +328,11 @@ namespace
 
     // the line should meet exactly 2 edges
     if(corneridx != 2)
-      // we shouldn't get here really
-      return 0;
+      {
+	printf("bailed out on number of overlaps: %i\n", corneridx);
+	// we shouldn't get here really
+	return 0;
+      }
 
     // this is the point index in common between the edges which are
     // intersected
@@ -380,8 +383,8 @@ namespace
     return 3;
   }
 
-  unsigned fragmentTriangle(const Fragment& f, const Vec3& pt1, const Vec3& pt2,
-			    FragmentVector& frags)
+  unsigned splitTriangle(const Fragment& f, const Vec3& pt1, const Vec3& pt2,
+			 FragmentVector& frags)
   {
     // if line is at edge of triangle, no fragment
     if( overlappingLine(f.points[0], f.points[1], pt1, pt2) ||
@@ -406,8 +409,8 @@ namespace
   // end of namespace
 }
 
-void fragmentFragments(const Fragment &f1, const Fragment &f2,
-		       FragmentVector& v, unsigned* num1, unsigned* num2)
+void splitFragments(const Fragment &f1, const Fragment &f2,
+		    FragmentVector& v, unsigned* num1, unsigned* num2)
 {
   *num1 = *num2 = 0;
   if(f1.type == Fragment::FR_TRIANGLE && f2.type == Fragment::FR_TRIANGLE)
@@ -416,11 +419,16 @@ void fragmentFragments(const Fragment &f1, const Fragment &f2,
       Vec3 pt1, pt2;
       if(triangleIntersection(f1.points, f2.points, &coplanar, &pt1, &pt2))
 	{
+	  printf("intersection!\n");
+	  printf(" point 1: %g, %g, %g\n", pt1(0), pt1(1), pt1(2));
+	  printf(" point 2: %g, %g, %g\n", pt2(0), pt2(1), pt2(2));
 	  // when new fragments are added, then f1/f2 are invalidated
 	  Fragment fcpy1(f1);
 	  Fragment fcpy2(f2);
-	  *num1 = fragmentTriangle(fcpy1, pt1, pt2, v);
-	  *num2 = fragmentTriangle(fcpy2, pt1, pt2, v);
+	  if(fcpy1.splitcount++ <= 6)
+	    *num1 = splitTriangle(fcpy1, pt1, pt2, v);
+	  if(fcpy2.splitcount++ <= 6)
+	    *num2 = splitTriangle(fcpy2, pt1, pt2, v);
 	}
     }
 }

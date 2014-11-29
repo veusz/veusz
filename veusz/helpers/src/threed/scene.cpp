@@ -23,7 +23,7 @@ namespace
     {
       float d1 = vec[i].maxDepth();
       float d2 = vec[j].maxDepth();
-      if(d1==d2)
+      if(std::abs(d1-d2)<1e-5)
 	{
 	  // if the maxima are the same, then look at the minima
 	  return vec[i].minDepth() > vec[j].minDepth();
@@ -33,6 +33,30 @@ namespace
 
     FragmentVector& vec;
   };
+
+
+  struct FragDepthCompareMin
+  {
+    FragDepthCompareMin(FragmentVector& v)
+      : vec(v)
+    {}
+
+    bool operator()(unsigned i, unsigned j) const
+    {
+      float d1 = vec[i].minDepth();
+      float d2 = vec[j].minDepth();
+
+      if(std::abs(d1-d2)<1e-5)
+	{
+	  // if the maxima are the same, then look at the minima
+	  return vec[i].maxDepth() > vec[j].maxDepth();
+	}
+      return d1 > d2;
+    }
+
+    FragmentVector& vec;
+  };
+
 
   // Make scaling matrix to move points to correct output range
   Mat3 makeScreenM(const FragmentVector& frags,
@@ -106,84 +130,67 @@ namespace
 
 };
 
-void Scene::render(QPainter* painter, const Camera& cam,
-		   float x1, float y1, float x2, float y2)
+void Scene::doSplitting(unsigned idx1, const Camera& cam)
 {
-  fragments.clear();
+  float thismindepth = fragments[depths[idx1]].minDepth();
 
-  // get fragments for whole scene
-  root.getFragments(cam.viewM, cam, fragments);
-
-  // store sorted indices to fragments here
-  std::vector<unsigned> depths(fragments.size());;
-  for(unsigned i=0, s=fragments.size(); i<s; ++i)
-    depths[i]=i;
-
-  // sort depth of items
-  std::sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
-
-  for(int idx1=0; idx1+1 < int(depths.size()); ++idx1)
+ start:
+  for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
     {
-    redo:
-      float thismindepth = fragments[depths[idx1]].minDepth();
+      // don't compare object with self
+      if(fragments[depths[idx2]].object == fragments[depths[idx1]].object)
+	continue;
 
-      for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
+      if(fragments[depths[idx2]].maxDepth() < thismindepth)
+	// no others are overlapping
+	break;
+
+      printf("%i %i\n", idx1, idx2);
+
+      unsigned newnum1=0, newnum2=0;
+      splitFragments(fragments[depths[idx1]],
+		     fragments[depths[idx2]],
+		     fragments, &newnum1, &newnum2);
+      if(newnum1>0)
 	{
-	  // don't compare object with self
-	  if(fragments[depths[idx2]].object == fragments[depths[idx1]].object)
-	    continue;
-
-	  if(fragments[depths[idx2]].maxDepth() < thismindepth)
-	    // no others are overlapping
-	    break;
-
-	  unsigned newnum1=0, newnum2=0;
-	  fragmentFragments(fragments[depths[idx1]],
-			    fragments[depths[idx2]],
-			    fragments, &newnum1, &newnum2);
-	  if(newnum1>0)
+	  printf("new frags 1: %i\n", newnum1);
+	  if(newnum1>1)
 	    {
-	      printf("new frags 1: %i\n", newnum1);
-	      if(newnum1>1)
-		depths.insert(depths.begin()+idx1, newnum1-1, 0);
-	      unsigned base=fragments.size()-newnum1-newnum2;
-	      for(unsigned i=0; i<newnum1; ++i)
-		depths[idx1+i] = base+i;
+	      depths.insert(depths.begin()+idx1, newnum1-1, 0);
+	      idx2 += newnum1-1;
 	    }
-	  if(newnum2>0)
-	    {
-	      printf("new frags 2: %i\n", newnum2);
-	      unsigned delta1 = newnum1 > 0 ? newnum1-1 : 0;
-	      if(newnum2>1)
-		depths.insert(depths.begin()+idx2+delta1, newnum2-1, 0);
-	      unsigned base=fragments.size()-newnum2;
-	      for(unsigned i=0; i<newnum2; ++i)
-		depths[idx2+i+delta1] = base+i;
-	    }
-	  if(newnum1+newnum2 > 0)
-	    {
-	      unsigned nlen = fragments.size();
-	      // calculate projected coordinates (with depths)
-	      for(unsigned i=nlen-(newnum1+newnum2); i != nlen; ++i)
-		fragments[i].updateProjCoords(cam.perspM);
+	  unsigned base=fragments.size()-newnum1-newnum2;
+	  for(unsigned i=0; i<newnum1; ++i)
+	    depths[idx1+i] = base+i;
+	}
+      if(newnum2>0)
+	{
+	  printf("new frags 2: %i\n", newnum2);
+	  if(newnum2>1)
+	    depths.insert(depths.begin()+idx2, newnum2-1, 0);
+	  unsigned base=fragments.size()-newnum2;
+	  for(unsigned i=0; i<newnum2; ++i)
+	    depths[idx2+i] = base+i;
+	}
+      if(newnum1+newnum2 > 0)
+	{
+	  unsigned nlen = fragments.size();
+	  // calculate projected coordinates (with depths)
+	  for(unsigned i=nlen-(newnum1+newnum2); i != nlen; ++i)
+	    fragments[i].updateProjCoords(cam.perspM);
 
-	      // sort depth of new items
-	      std::sort(depths.begin()+idx1, depths.begin()+
-			(idx2+newnum1+newnum2-2+1),
-			FragDepthCompare(fragments));
-	      goto redo;
-	    }
+	  // sort depth of new items
+	  std::sort(depths.begin()+idx1,
+		    depths.begin()+(idx2+newnum2-1+1),
+		    FragDepthCompare(fragments));
+	  // go back to start
+	  goto start;
 	}
     }
+}
 
-  for(unsigned i=0;i!=depths.size();++i)
-    printf("%i ", depths[i]);
-  printf("\n");
-
-
-  // how to transform points to screen
-  const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
-
+void Scene::doDrawing(QPainter* painter, const Mat3& screenM)
+{
   // draw fragments
   LineProp const* lline = 0;
   SurfaceProp const* lsurf = 0;
@@ -250,4 +257,38 @@ void Scene::render(QPainter* painter, const Camera& cam,
 	  break;
 	}
     }
+}
+
+
+void Scene::render(QPainter* painter, const Camera& cam,
+		   float x1, float y1, float x2, float y2)
+{
+  fragments.clear();
+
+  // get fragments for whole scene
+  root.getFragments(cam.viewM, cam, fragments);
+
+  // store sorted indices to fragments here
+  depths.resize(fragments.size());
+  for(unsigned i=0, s=fragments.size(); i<s; ++i)
+    depths[i]=i;
+
+  // sort depth of items
+  std::sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
+
+  for(unsigned idx=0; idx+1 < depths.size(); ++idx)
+    {
+      doSplitting(idx, cam);
+    }
+
+  // final sorting
+  std::sort(depths.begin(),
+	    depths.end(),
+	    FragDepthCompareMin(fragments));
+
+  // how to transform points to screen
+  const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
+
+  // finally draw items
+  doDrawing(painter, screenM);
 }
