@@ -280,6 +280,72 @@ inline Mat3 translateM3(float dx, float dy)
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// Two item vector
+
+struct Vec2
+{
+  Vec2()
+  {
+    v[0] = v[1] = 0;
+  }
+  Vec2(float a, float b)
+  {
+    v[0] = a; v[1] = b;
+  }
+
+  inline float& operator()(unsigned i) { return v[i]; }
+  inline float operator()(unsigned i) const { return v[i]; }
+
+  inline void operator*=(float f)
+  {
+    v[0] *= f; v[1] *= f;
+  }
+  inline Vec2 operator+(const Vec2& o) const
+  {
+    return Vec2(v[0]+o.v[0], v[1]+o.v[1]);
+  }
+  inline Vec2 operator-(const Vec2& o) const
+  {
+    return Vec2(v[0]-o.v[0], v[1]-o.v[1]);
+  }
+  inline Vec2 operator*(float f) const
+  {
+    return Vec2(v[0]*f, v[1]*f);
+  }
+  inline bool operator==(const Vec2& o) const
+  {
+    return v[0]==o.v[0] && v[1]==o.v[1];
+  }
+  inline bool operator!=(const Vec2& o) const
+  {
+    return !(operator==(o));
+  }
+
+  // radius
+  inline float rad2() const
+  {
+    return v[0]*v[0]+v[1]*v[1];
+  }
+  inline float rad() const { return std::sqrt(rad2()); }
+
+  inline void normalise() { operator*=(1/rad()); }
+
+private:
+  float v[2];
+};
+
+inline float cross(const Vec2& a, const Vec2& b)
+{
+  return a(0)*b(1)-a(1)*b(0);
+}
+
+inline float dot(const Vec2& a, const Vec2& b)
+{
+  return a(0)*b(0)+a(1)*b(1);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
 // Helper functions
 
 inline Vec3 vec4to3(const Vec4& v)
@@ -311,6 +377,7 @@ inline Vec3 calcProjVec(const Mat4& projM, const Vec3& v)
 //////////////////////////////////////////////////////////////////////////////
 // Helper types
 
+typedef std::vector<Vec2> Vec2Vector;
 typedef std::vector<Vec3> Vec3Vector;
 typedef std::vector<Vec4> Vec4Vector;
 

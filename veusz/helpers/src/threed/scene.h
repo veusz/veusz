@@ -20,6 +20,7 @@ public:
 private:
   void doSplitting(unsigned idx1, const Camera& cam);
   void doDrawing(QPainter* painter, const Mat3& screenM);
+  void fineZCompare();
 
 public:
   ObjectContainer root;

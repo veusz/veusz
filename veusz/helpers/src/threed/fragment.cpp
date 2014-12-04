@@ -257,8 +257,6 @@ namespace
   unsigned splitOnCorner(const Fragment& f, unsigned corner,
 			 FragmentVector& frags, const Vec3& vec)
   {
-    printf("split on corner\n");
-
     // line 1 is f.points[corner] + a*vec
     // line 2 is f.points[corner+1] + b*(f.points[corner+2]-f.points[corner])
     Vec3 p1 = f.points[corner];
@@ -297,8 +295,6 @@ namespace
   unsigned splitOnEdges(const Fragment& frag, const Vec3& pt1, const Vec3& pt2,
 			FragmentVector& frags)
   {
-    printf("split on edges\n");
-
     Vec3 cornerpos[3];
     unsigned cornersect[3];
     unsigned corneridx = 0;
@@ -329,7 +325,6 @@ namespace
     // the line should meet exactly 2 edges
     if(corneridx != 2)
       {
-	printf("bailed out on number of overlaps: %i\n", corneridx);
 	// we shouldn't get here really
 	return 0;
       }
@@ -365,7 +360,6 @@ namespace
     static const unsigned otherpt1[3] = {1, 0, 0};
     static const unsigned otherpt2[3] = {2, 2, 1};
 
-    printf("idxs %i %i\n", otherpt1[common], otherpt2[common]);
     newf.points[0] = cornerpos[0];
     newf.points[1] = frag.points[otherpt1[common]];
     newf.points[2] = frag.points[otherpt2[common]];
@@ -391,7 +385,6 @@ namespace
 	overlappingLine(f.points[1], f.points[2], pt1, pt2) ||
 	overlappingLine(f.points[2], f.points[0], pt1, pt2) )
       {
-	printf("hit sides\n");
 	return 0;
       }
 
@@ -419,9 +412,6 @@ void splitFragments(const Fragment &f1, const Fragment &f2,
       Vec3 pt1, pt2;
       if(triangleIntersection(f1.points, f2.points, &coplanar, &pt1, &pt2))
 	{
-	  printf("intersection!\n");
-	  printf(" point 1: %g, %g, %g\n", pt1(0), pt1(1), pt1(2));
-	  printf(" point 2: %g, %g, %g\n", pt2(0), pt2(1), pt2(2));
 	  // when new fragments are added, then f1/f2 are invalidated
 	  Fragment fcpy1(f1);
 	  Fragment fcpy2(f2);
@@ -432,6 +422,187 @@ void splitFragments(const Fragment &f1, const Fragment &f2,
 	}
     }
 }
+
+////////////////////////////////////////////////////////
+// 2D triangle intersection
+
+// is a to the left of p1->p2?
+// 1 if left, -1 if right, 0 if colinear
+inline bool SHInside(Vec2 p, Vec2 cp0, Vec2 cp1)
+{
+  return (cp1(0)-cp0(0))*(p(1)-cp0(1)) > (cp1(1)-cp0(1))*(p(0)-cp0(0));
+};
+
+// return whether lines intersect and return intersection point
+inline bool SHIntersection(Vec2 a0, Vec2 a1, Vec2 b0, Vec2 b1, Vec2* res)
+{
+  Vec2 da = a0-a1;
+  Vec2 db = b0-b1;
+  float n1 = cross(a0, a1);
+  float n2 = cross(b0, b1);
+  float denom = cross(da, db);
+  if(denom == 0)
+    return 0;
+  float idenom = 1/denom;
+  *res = db*(n1*idenom) - da*(n2*idenom);
+  return 1;
+}
+
+// Polygon with small number of points
+class Vec2SmallPoly
+{
+public:
+  Vec2SmallPoly(unsigned size=0) : count(size) {};
+  void push_back(Vec2 v) { points[count++] = v; }
+  unsigned size() const { return count; }
+  bool empty() const { return count == 0; }
+  void clear() { count = 0; }
+  Vec2& operator[](unsigned i) { return points[i]; }
+  Vec2 operator[](unsigned i) const { return points[i]; }
+private:
+  unsigned count;
+  Vec2 points[8];
+};
+
+// Sutherland–Hodgman algorithm for clipping polygon against
+// 2nd polygon. Requires clockwise orientation of points.
+Vec2SmallPoly polyEdgeClip(Vec2SmallPoly inPoly, const Vec2SmallPoly &clipPoly)
+{
+  if(clipPoly.empty())
+    return inPoly;
+  Vec2 cp1 = clipPoly[clipPoly.size()-1];
+  for(unsigned ci=0; ci != clipPoly.size() && !inPoly.empty(); ++ci)
+    {
+      Vec2 cp2 = clipPoly[ci];
+
+      Vec2SmallPoly outPoly;
+      Vec2 S = inPoly[inPoly.size()-1];
+      for(unsigned si=0; si != inPoly.size(); ++si)
+	{
+	  Vec2 E = inPoly[si];
+	  if(SHInside(E, cp1, cp2))
+	    {
+	      if(!SHInside(S, cp1, cp2))
+		{
+		  Vec2 isect;
+		  if(SHIntersection(S, E, cp1, cp2, &isect))
+		    outPoly.push_back(isect);
+		}
+	      outPoly.push_back(E);
+	    }
+	  else if(SHInside(S, cp1, cp2))
+	    {
+	      Vec2 isect;
+	      if(SHIntersection(S, E, cp1, cp2, &isect))
+		outPoly.push_back(isect);
+	    }
+	  S = E;
+	}
+      inPoly = outPoly;
+      cp1 = cp2;
+    }
+  return inPoly;
+}
+
+// is the triangle clockwise (suitable for use in SH clipping)
+inline bool triangleClockwise(const Vec2SmallPoly& pts)
+{
+  return (pts[1](0)-pts[0](0))*(pts[2](1)-pts[0](1)) -
+    (pts[2](0)-pts[0](0))*(pts[1](1)-pts[0](1)) > 0;
+}
+
+// given depths for corners of projected triangle tripts
+// interpolate to find average depth of pt[] there
+float interpolateTriangleDepth(const Vec2SmallPoly& pts, const Vec3* tripts)
+{
+  // solve pt = p0 + a*(p1-p0) + b*(p2-p0)
+  // where p0,1,2 are the points of the triangle
+
+  // We need to find a case where the x and y coordinates of p0/3 are
+  // different
+  float invx, invy, alower, invalower, sum;
+  unsigned baseidx;
+  Vec3 p0, p1, p2;
+
+  for(baseidx=0; baseidx<3; ++baseidx)
+    {
+      p0=tripts[baseidx];
+      p1=tripts[(baseidx+1)%3];
+      p2=tripts[(baseidx+2)%3];
+      if( std::abs(p0(0)-p2(0)) > 1e-5 && std::abs(p0(1)-p2(1)) > 1e-5 )
+	break;
+    }
+  // we didn't find this - perhaps it's not really a triangle, but
+  // return mean depth
+  if(baseidx == 3)
+    goto error;
+
+  invx = 1/(p2(0)-p0(0));
+  invy = 1/(p2(1)-p0(1));
+  alower = (p1(0)-p0(0))*invx-(p1(1)-p0(1))*invy;
+  if(alower == 0)
+    goto error;
+  invalower = 1/alower;
+
+  sum = 0;
+  for(unsigned i=0; i != pts.size(); ++i)
+    {
+      float aupper = (pts[i](0)-p0(0))*invx-(pts[i](1)-p0(1))*invy;
+      float a = aupper*invalower;
+      float b = (pts[i](0)-p0(0) - a*(p1(0)-p0(0)))*invx;
+      float depth = p0(2) + a*(p1(2)-p0(2)) + b*(p2(2)-p0(2));
+      sum += depth;
+    }
+  return sum/pts.size();
+
+  // much more efficient than an exception here
+ error:
+  return (tripts[0](3)+tripts[1](3)+tripts[2](3))*(1/3.f);
+}
+
+void overlapDepthTriangleTriangle(const Fragment& f1, const Fragment& f2,
+				  float* d1, float* d2)
+{
+  // copy points to 2D vectors
+  Vec2SmallPoly tri1(3);
+  for(unsigned i=0; i != 3; ++i)
+    {
+      tri1[i](0) = f1.proj[i](0); tri1[i](1) = f1.proj[i](1);
+    }
+  if(!triangleClockwise(tri1))
+    std::swap(tri1[0], tri1[1]);
+
+  Vec2SmallPoly tri2(3);
+  for(unsigned i=0; i != 3; ++i)
+    {
+      tri2[i](0) = f2.proj[i](0); tri2[i](1) = f2.proj[i](1);
+    }
+  if(!triangleClockwise(tri2))
+    std::swap(tri2[0], tri2[1]);
+
+  // look for overlap in 2D
+  Vec2SmallPoly clipped = polyEdgeClip(tri1, tri2);
+  if(! clipped.empty())
+    {
+      *d1 = interpolateTriangleDepth(clipped, f1.proj);
+      *d2 = interpolateTriangleDepth(clipped, f2.proj);
+    }
+}
+
+
+// get average depths of intersection in 2D
+void overlapDepth(const Fragment& f1, const Fragment& f2,
+		  float* d1, float* d2)
+{
+  if(f1.type == Fragment::FR_TRIANGLE && f2.type == Fragment::FR_TRIANGLE)
+    {
+      overlapDepthTriangleTriangle(f1, f2, d1, d2);
+    }
+
+  // fixme line and triangles
+}
+
+
 
 // testing routines
 // essential for testing whether this actually works

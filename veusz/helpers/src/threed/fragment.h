@@ -167,4 +167,8 @@ void splitFragments(const Fragment& f1, const Fragment& f2,
 		    FragmentVector& v,
 		    unsigned* num1, unsigned* num2);
 
+// get average depths of intersection in 2D
+void overlapDepth(const Fragment& f1, const Fragment& f2,
+		  float* d1, float* d2);
+
 #endif

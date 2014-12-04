@@ -128,7 +128,7 @@ namespace
     return QPointF(mult(0)*inv, mult(1)*inv);
   }
 
-};
+}; // namespace
 
 void Scene::doSplitting(unsigned idx1, const Camera& cam)
 {
@@ -145,15 +145,12 @@ void Scene::doSplitting(unsigned idx1, const Camera& cam)
 	// no others are overlapping
 	break;
 
-      printf("%i %i\n", idx1, idx2);
-
       unsigned newnum1=0, newnum2=0;
       splitFragments(fragments[depths[idx1]],
 		     fragments[depths[idx2]],
 		     fragments, &newnum1, &newnum2);
       if(newnum1>0)
 	{
-	  printf("new frags 1: %i\n", newnum1);
 	  if(newnum1>1)
 	    {
 	      depths.insert(depths.begin()+idx1, newnum1-1, 0);
@@ -165,7 +162,6 @@ void Scene::doSplitting(unsigned idx1, const Camera& cam)
 	}
       if(newnum2>0)
 	{
-	  printf("new frags 2: %i\n", newnum2);
 	  if(newnum2>1)
 	    depths.insert(depths.begin()+idx2, newnum2-1, 0);
 	  unsigned base=fragments.size()-newnum2;
@@ -227,7 +223,7 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM)
 	    }
 
 	  // debug
-	  painter->setPen(solid);
+	  //painter->setPen(solid);
 	  //painter->setBrush(no_brush);
 
 	  temppoly[0] = projpts[0];
@@ -259,6 +255,38 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM)
     }
 }
 
+void Scene::fineZCompare()
+{
+  // look at intersections between triangles (if any) and compare
+  // depths at these intersections to determine order
+
+  for(unsigned idx1=0; idx1+1 < depths.size(); ++idx1)
+    {
+      float thismindepth = fragments[depths[idx1]].minDepth();
+      unsigned loopcount = 0;
+
+    start:
+      for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
+	{
+	  if(fragments[depths[idx2]].maxDepth() < thismindepth)
+	    // no others are overlapping
+	    break;
+
+	  float d1 = -1;
+	  float d2 = -1;
+	  overlapDepth(fragments[depths[idx1]], fragments[depths[idx2]],
+		       &d1, &d2);
+	  if( d1-d2 < -1e-5 )
+	    {
+	      std::swap(depths[idx1], depths[idx2]);
+	      // avoid infinite loops
+	      if(loopcount++ < 16)
+		goto start;
+	    }
+	}
+    }
+}
+
 
 void Scene::render(QPainter* painter, const Camera& cam,
 		   float x1, float y1, float x2, float y2)
@@ -277,16 +305,16 @@ void Scene::render(QPainter* painter, const Camera& cam,
   std::sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
 
   for(unsigned idx=0; idx+1 < depths.size(); ++idx)
-    {
-      doSplitting(idx, cam);
-    }
+    doSplitting(idx, cam);
 
   // final sorting
   std::sort(depths.begin(),
-	    depths.end(),
-	    FragDepthCompareMin(fragments));
+  	    depths.end(),
+  	    FragDepthCompareMin(fragments));
 
-  // how to transform points to screen
+  fineZCompare();
+
+  // how to transform projected points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
 
   // finally draw items
