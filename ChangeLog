@@ -2,6 +2,7 @@ Changes in <next release>:
  * Add new export dialog box which can export multiple pages and
    modify the export options
  * Add cubehelix() functional colormap
+ * Add -stepN suffix for colormaps to make arbitrary numbers of steps
 
 Minor changes
  * Fix incorrect use of None in (x,...) pattern

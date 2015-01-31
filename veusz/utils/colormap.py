@@ -74,35 +74,8 @@ _defaultmaps = {
         (255, 0,   0,   255),
         (255, 255, 255, 255),
         ),
-    'spectrum-step': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (0,   0,   255, 255),
-        (0,   255, 255, 255),
-        (0,   255, 0,   255),
-        (255, 255, 0,   255),
-        (255, 0,   0,   255),
-        (255, 255, 255, 255),
-        ),
     'grey': (
         (0,   0,   0,   255),
-        (255, 255, 255, 255),
-        ),
-    'grey-step5': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (64,  64,  64,  255),
-        (128, 128, 128, 255),
-        (191, 191, 191, 255),
-        (255, 255, 255, 255),
-        ),
-    'grey-step6': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (51,  51,  51,  255),
-        (102, 102, 102, 255),
-        (153, 153, 153, 255),
-        (204, 204, 204, 255),
         (255, 255, 255, 255),
         ),
     'blue': (
@@ -127,24 +100,8 @@ _defaultmaps = {
         (161, 255, 0,   255),
         (255, 255, 255, 255),
         ),
-    'bluegreen-step': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (255, 123, 0,   255),
-        (255, 226, 72,  255),
-        (161, 255, 0,   255),
-        (255, 255, 255, 255),
-        ),
     'transblack': (
         (0,   0,   0,   255),
-        (0,   0,   0,   0),
-        ),
-    'transblack-step5': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (0,   0,   0,   191),
-        (0,   0,   0,   128),
-        (0,   0,   0,   64),
         (0,   0,   0,   0),
         ),
     'royal': (
@@ -154,24 +111,7 @@ _defaultmaps = {
         (0,   255, 255, 255),
         (255, 255, 255, 255),
         ),
-    'royal-step': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (128, 0,   0,   255),
-        (255, 0,   128, 255),
-        (0,   255, 255, 255),
-        (255, 255, 255, 255),
-        ),
     'complement': (
-        (0,   0,   0,   255),
-        (0,   255, 0,   255),
-        (255, 0,   255, 255),
-        (0,   0,   255, 255),
-        (0,   255, 255, 255),
-        (255, 255, 255, 255),
-        ),
-    'complement-step': (
-        (-1,  0,   0,   0),
         (0,   0,   0,   255),
         (0,   255, 0,   255),
         (255, 0,   255, 255),
@@ -204,11 +144,34 @@ def cubehelix(start, rots, hue, gamma, nlev=64):
 
     return N.column_stack( (b,g,r,a) ).astype(N.intc)
 
+def stepCMap(cmap, n):
+    """Give color map, interpolate to produce n steps and return stepped
+    colormap."""
+
+    if n == 0:
+        return N.vstack( ([-1,0,0,0], cmap) ).astype(N.intc)
+
+    cmap = N.array(cmap, dtype=N.float64)
+    x = N.linspace(0, 1, n)
+    xp = N.linspace(0, 1, len(cmap))
+
+    b = N.interp(x, xp, cmap[:,0])
+    g = N.interp(x, xp, cmap[:,1])
+    r = N.interp(x, xp, cmap[:,2])
+    a = N.interp(x, xp, cmap[:,3])
+
+    return N.vstack( ([-1,0,0,0], N.column_stack((b,g,r,a))) ).astype(N.intc)
+
 class ColorMaps(object):
     """Class representing defined color maps.
 
-    This is initialised from the default list, but also adds
-    user-defined and functional maps (e.g. cubehelix).
+    This is initialised from the default list.
+
+    Also supported are functional color maps,
+    e.g. cubehelix(start[,rotations[,hue[,gamma]]])
+
+    Colormaps with steps -stepN where N is an integer or missing are
+    also automatically generated.
     """
 
     def __init__(self):
@@ -221,34 +184,57 @@ class ColorMaps(object):
             return default
 
     def __getitem__(self, key):
-        key = key.strip()
-        try:
-            return self.maps[key]
-        except KeyError:
-            pass
+        """Lookup and return colormap."""
 
-        # match cubehelix(a,b,c,d), where b, c and d are optional numerics
-        # giving start, rotations, hue and gamma
-        m = re.match(
-            r'^cubehelix\s*\('
-            r'(?:\s*(-?[0-9.]+))?'
-            r'(?:\s*,\s*(-?[0-9.]+))?'
-            r'(?:\s*,\s*(-?[0-9.]+))?'
-            r'(?:\s*,\s*(-?[0-9.]+))?'
-            r'\s*\)$',
-            key)
+        origkey = key = key.strip()
 
-        if m is not None:
-            vals = []
-            for i, v in enumerate(m.groups()):
-                try:
-                    vals.append(float(v))
-                except (ValueError, TypeError):
-                    vals.append((0,1,1,1)[i])
-            self.maps[key] = cubehelix(*vals)
+        if key in self.maps:
             return self.maps[key]
 
-        raise KeyError('Invalid colormap name')
+        # does the name end in stepXXX ?
+        step = None
+        sm = re.match(r'^(.+)-step([0-9]*)$', key)
+        if sm is not None:
+            if sm.group(2):
+                step = int(sm.group(2))
+            else:
+                step = 0
+            key = sm.group(1)
+
+        cmap = None
+        if key in self.maps:
+            cmap = self.maps[key]
+        else:
+            # match cubehelix(a,b,c,d), where b, c and d are optional numerics
+            # giving start, rotations, hue and gamma
+            cm = re.match(
+                r'^cubehelix\s*\('
+                r'(?:\s*(-?[0-9.]+))?'
+                r'(?:\s*,\s*(-?[0-9.]+))?'
+                r'(?:\s*,\s*(-?[0-9.]+))?'
+                r'(?:\s*,\s*(-?[0-9.]+))?'
+                r'\s*\)$',
+                key)
+
+            if cm is not None:
+                vals = []
+                for i, v in enumerate(cm.groups()):
+                    try:
+                        vals.append(float(v))
+                    except (ValueError, TypeError):
+                        vals.append((0,1,1,1)[i])
+                cmap = cubehelix(*vals)
+
+        if cmap is None:
+            raise KeyError('Invalid colormap name')
+
+        # apply steps to colormap
+        if step is not None:
+            cmap = stepCMap(cmap, step)
+
+        # cache result and return
+        self.maps[origkey] = cmap
+        return cmap
 
     def __setitem__(self, key, val):
         self.maps[key] = val
@@ -260,6 +246,13 @@ class ColorMaps(object):
         items = set(self.maps)
         items.update([
             'cubehelix(0.5,-1.5,1,1)',
+            'bluegreen-step',
+            'complement-step',
+            'grey-step5',
+            'grey-step6',
+            'royal-step',
+            'spectrum-step',
+            'transblack-step5',
         ])
         return iter(items)
 
