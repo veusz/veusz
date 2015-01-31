@@ -17,6 +17,7 @@
 ###############################################################################
 
 from __future__ import division
+import re
 import numpy as N
 
 # use fast or slow helpers
@@ -37,7 +38,7 @@ except ImportError:
 # with (-1,0,0,0) which enables a step mode (this first value is
 # ignored)
 
-defaultcolormaps = {
+_defaultmaps = {
     'blank': (
         (0,   0,   0,   0),
         (0,   0,   0,   0),
@@ -179,6 +180,88 @@ defaultcolormaps = {
         (255, 255, 255, 255),
         ),
     }
+
+def cubehelix(start, rots, hue, gamma, nlev=64):
+    """Return a cube helix color scheme.
+    See https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/
+    Green, D. A., 2011, `A colour scheme for the display of astronomical
+    intensity images', Bulletin of the Astronomical Society of India, 39, 28
+    """
+
+    fract = N.linspace(0, 1, nlev)
+    angle = 2*N.pi*(start/3.+1.+rots*fract)
+    fract = fract**gamma
+    amp = 0.5*hue*fract*(1-fract)
+    c, s = N.cos(angle), N.sin(angle)
+    red   = fract+amp*(-0.14861*c+1.78277*s)
+    green = fract+amp*(-0.29227*c-0.90649*s)
+    blue  = fract+amp*( 1.97294*c)
+
+    r = N.clip(red*255, 0, 255)
+    g = N.clip(green*255, 0, 255)
+    b = N.clip(blue*255, 0, 255)
+    a = N.zeros(nlev)+255
+
+    return N.column_stack( (b,g,r,a) ).astype(N.intc)
+
+class ColorMaps(object):
+    """Class representing defined color maps.
+
+    This is initialised from the default list, but also adds
+    user-defined and functional maps (e.g. cubehelix).
+    """
+
+    def __init__(self):
+        self.maps = dict(_defaultmaps)
+
+    def get(self, idx, default=None):
+        try:
+            return self[idx]
+        except KeyError:
+            return default
+
+    def __getitem__(self, key):
+        key = key.strip()
+        try:
+            return self.maps[key]
+        except KeyError:
+            pass
+
+        # match cubehelix(a,b,c,d), where b, c and d are optional numerics
+        # giving start, rotations, hue and gamma
+        m = re.match(
+            r'^cubehelix\s*\('
+            r'(?:\s*(-?[0-9.]+))?'
+            r'(?:\s*,\s*(-?[0-9.]+))?'
+            r'(?:\s*,\s*(-?[0-9.]+))?'
+            r'(?:\s*,\s*(-?[0-9.]+))?'
+            r'\s*\)$',
+            key)
+
+        if m is not None:
+            vals = []
+            for i, v in enumerate(m.groups()):
+                try:
+                    vals.append(float(v))
+                except (ValueError, TypeError):
+                    vals.append((0,1,1,1)[i])
+            self.maps[key] = cubehelix(*vals)
+            return self.maps[key]
+
+        raise KeyError('Invalid colormap name')
+
+    def __setitem__(self, key, val):
+        self.maps[key] = val
+
+    def __contains__(self, key):
+        return self.get(key) is not None
+
+    def __iter__(self):
+        items = set(self.maps)
+        items.update([
+            'cubehelix(0.5,-1.5,1,1)',
+        ])
+        return iter(items)
 
 def applyScaling(data, mode, minval, maxval):
     """Apply a scaling transformation on the data.

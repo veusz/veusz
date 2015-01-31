@@ -1841,8 +1841,8 @@ class Colormap(Choice):
         # iterate over colour maps
         for name in names:
             val = document.colormaps.get(name, None)
-            if val in kls._icons:
-                icon = kls._icons[val]
+            if name in kls._icons:
+                icon = kls._icons[name]
             else:
                 if val is None:
                     # empty icon
@@ -1855,7 +1855,7 @@ class Colormap(Choice):
                                                 0., size[0]-1., 0)
                     pixmap = qt4.QPixmap.fromImage(image)
                 icon = qt4.QIcon(pixmap)
-                kls._icons[val] = icon
+                kls._icons[name] = icon
             retn.append(icon)
         return retn
 

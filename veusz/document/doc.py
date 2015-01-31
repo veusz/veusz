@@ -129,7 +129,7 @@ class Document( qt4.QObject ):
         self.updateEvalContext()
 
         # copy default colormaps
-        self.colormaps = dict(utils.defaultcolormaps)
+        self.colormaps = utils.ColorMaps()
 
         # copies of validated compiled expressions
         self.exprcompiled = {}
