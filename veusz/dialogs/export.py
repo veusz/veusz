@@ -98,12 +98,22 @@ class ExportDialog(VeuszDialog):
 
         setdb = setting.settingdb
 
+        eloc = setdb['dirname_export_location']
+
+        # where to export file
+        if eloc == 'doc':
+            self.dirname = os.path.dirname(os.path.abspath(docfilename))
+        elif eloc == 'cwd':
+            self.dirname = os.getcwd()
+        else: # 'prev'
+            self.dirname = setdb.get('dirname_export', qt4.QDir.homePath())
+
         # set default filename
         ext = setdb.get('export_format', 'pdf')
         if not docfilename:
             docfilename = 'export'
         filename = os.path.join(
-            setdb['dirname_export'],
+            self.dirname,
             os.path.splitext(os.path.basename(docfilename))[0] + '.' + ext)
         self.editFileName.setText(filename)
 
@@ -185,7 +195,10 @@ class ExportDialog(VeuszDialog):
 
         # File types we can export to in the form ([extensions], Name)
         fd = qt4.QFileDialog(self, _('Export page'))
-        fd.setDirectory(setdb['dirname_export'])
+
+        filename = self.editFileName.text()
+        dirname = os.path.dirname(self.editFileName.text())
+        fd.setDirectory(dirname if dirname else self.dirname)
 
         fd.setFileMode(qt4.QFileDialog.AnyFile)
         fd.setAcceptMode(qt4.QFileDialog.AcceptSave)
@@ -223,7 +236,6 @@ class ExportDialog(VeuszDialog):
             chosenext = filtertoext[filterused][0]
 
             filename = fd.selectedFiles()[0]
-            setdb['dirname_export'] = os.path.dirname(filename)
             fileext = os.path.splitext(filename)[1][1:]
             if fileext not in validextns or fileext != chosenext:
                 filename += "." + chosenext
@@ -424,5 +436,9 @@ class ExportDialog(VeuszDialog):
             export.pagenumber = pages
             export.filename = filename
             _checkAndExport()
+
+        dirname = os.path.dirname(filename)
+        if dirname:
+            setting.settingdb['dirname_export'] = dirname
 
         self.showMessage(_('Exported %i page(s)') % pagecount[0])

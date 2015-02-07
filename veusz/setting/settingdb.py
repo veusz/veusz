@@ -68,6 +68,9 @@ defaultValues = {
     # use cwd as starting directory
     'dirname_usecwd': False,
 
+    # use document directory for export
+    'dirname_export_location': 'doc',
+
     # ask tutorial before?
     'ask_tutorial': False,
 

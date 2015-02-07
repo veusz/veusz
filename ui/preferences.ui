@@ -127,18 +127,58 @@ Set to 0 to disable threads.</string>
       <attribute name="title">
        <string>File</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QCheckBox" name="cwdCheck">
-         <property name="toolTip">
-          <string>File dialogs will open in the current working directory when
-starting the program, rather than the one last used by Veusz
-when it was previously run
-</string>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Default document directory</string>
          </property>
-         <property name="text">
-          <string>Open file dialog in current working directory</string>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <widget class="QRadioButton" name="dirDocPrevRadio">
+            <property name="text">
+             <string>Previous session</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="dirDocCWDRadio">
+            <property name="text">
+             <string>Current working directory</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Default export directory</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QRadioButton" name="dirExportDocRadio">
+            <property name="text">
+             <string>Document directory</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="dirExportPrevRadio">
+            <property name="text">
+             <string>Previous session</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="dirExportCWDRadio">
+            <property name="text">
+             <string>Current working directory</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>

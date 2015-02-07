@@ -189,9 +189,8 @@ class MainWindow(qt4.QMainWindow):
 
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt4.QDir.homePath())
-        self.dirname_export = setdb.get('dirname_export', self.dirname)
         if setdb['dirname_usecwd']:
-            self.dirname = self.dirname_export = os.getcwd()
+            self.dirname = os.getcwd()
 
         # connect plot signals to main window
         self.plot.sigUpdatePage.connect(self.slotUpdatePage)
@@ -834,7 +833,6 @@ class MainWindow(qt4.QMainWindow):
 
         # store working directory
         setdb['dirname'] = self.dirname
-        setdb['dirname_export'] = self.dirname_export
 
         # store the current geometry in the settings database
         geometry = ( self.x(), self.y(), self.width(), self.height() )
@@ -1093,7 +1091,6 @@ class MainWindow(qt4.QMainWindow):
         # use current directory of file if not using cwd mode
         if not setdb['dirname_usecwd']:
             self.dirname = os.path.dirname( os.path.abspath(filename) )
-            self.dirname_export = self.dirname
 
         # notify cmpts which need notification that doc has finished opening
         self.documentOpened.emit()

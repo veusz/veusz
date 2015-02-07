@@ -69,7 +69,14 @@ class PreferencesDialog(VeuszDialog):
                                             "threaded drawing support"))
 
         # use cwd for file dialogs
-        self.cwdCheck.setChecked( setdb['dirname_usecwd'] )
+        (self.dirDocCWDRadio if setdb['dirname_usecwd'] else self.dirDocPrevRadio).click()
+
+        # exporting documents
+        {
+            'doc': self.dirExportDocRadio,
+            'cwd': self.dirExportCWDRadio,
+            'prev': self.dirExportPrevRadio,
+        }[setdb.get('dirname_export_location')].click()
 
         # set icon size
         self.iconSizeCombo.setCurrentIndex(
@@ -169,7 +176,15 @@ class PreferencesDialog(VeuszDialog):
         setdb['plot_numthreads'] = self.threadSpinBox.value()
 
         # use cwd
-        setdb['dirname_usecwd'] = self.cwdCheck.isChecked()
+        setdb['dirname_usecwd'] = self.dirDocCWDRadio.isChecked()
+
+        for radio, val in (
+                (self.dirExportDocRadio, 'doc'),
+                (self.dirExportCWDRadio, 'cwd'),
+                (self.dirExportPrevRadio, 'prev'),
+                ):
+            if radio.isChecked():
+                setdb['dirname_export_location'] = val
 
         # update icon size if necessary
         iconsize = int( self.iconSizeCombo.currentText() )
