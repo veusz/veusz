@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #    Copyright (C) 2013 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -16,8 +18,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
+from __future__ import division, print_function
 
+import math
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -46,6 +49,25 @@ class Graph3D(widget.Widget):
     def addSettings(klass, s):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
+
+        s.add( setting.FloatSlider(
+            'xRotation',
+            0,
+            minval=-180, maxval=180, step=15, tick=45,
+            descr=_(u'Rotation around x axis (°)'),
+            usertext=_('X rotation') ))
+        s.add( setting.FloatSlider(
+            'yRotation',
+            0,
+            minval=-180, maxval=180, step=15, tick=45,
+            descr=_(u'Rotation around y axis (°)'),
+            usertext=_('Y rotation') ))
+        s.add( setting.FloatSlider(
+            'zRotation',
+            0,
+            minval=-180, maxval=180, step=15, tick=45,
+            descr=_(u'Rotation around z axis (°)'),
+            usertext=_('Z rotation') ))
 
         s.add( setting.Distance(
                 'leftMargin',
@@ -148,7 +170,9 @@ class Graph3D(widget.Widget):
 
         scene = threed.Scene()
         scene.root.objM = (
-            threed.rotateM4(135./180.*3.14159, threed.Vec3(0,0,1)) *
+            threed.rotateM4(s.zRotation/180.*math.pi, threed.Vec3(0,0,1)) *
+            threed.rotateM4(s.yRotation/180.*math.pi, threed.Vec3(0,1,0)) *
+            threed.rotateM4(s.xRotation/180.*math.pi, threed.Vec3(1,0,0)) *
             threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
         for c in self.children:
            obj = c.drawToObject()

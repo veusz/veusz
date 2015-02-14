@@ -608,6 +608,28 @@ class FloatOrAuto(Float):
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
 
+class FloatSlider(Float):
+    """A float with a slider control."""
+
+    typename = 'float-slider'
+
+    def __init__(self, name, value, step=10, tick=50, **args):
+        """Step is the size to step by."""
+        Float.__init__(self, name, value, **args)
+        self.step = step
+        self.tick = tick
+
+    def copy(self):
+        return self._copyHelper((), (), {
+            'minval': self.minval,
+            'maxval': self.maxval,
+            'step': self.step,
+            'tick': self.tick,
+        })
+
+    def makeControl(self, *args):
+        return controls.FloatSlider(self, *args)
+
 class IntOrAuto(Setting):
     """Save an int or text auto."""
 

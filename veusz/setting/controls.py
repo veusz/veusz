@@ -263,6 +263,58 @@ class Int(qt4.QSpinBox):
         self.setValue( self.setting.val )
         self.ignorechange = False
 
+class FloatSlider(qt4.QWidget):
+    """A slider control for a numerical value.
+    Note: QSlider is integer only, so dragging slider makes values integers
+    """
+
+    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+
+    def __init__(self, setting, parent):
+        qt4.QWidget.__init__(self, parent)
+        self.setting = setting
+        self.setting.setOnModified(self.onModified)
+
+        layout = qt4.QHBoxLayout()
+        layout.setSpacing(0)
+        layout.setMargin(0)
+        self.setLayout(layout)
+
+        s = self.slider = qt4.QSlider(qt4.Qt.Horizontal)
+        s.setMinimum(setting.minval)
+        s.setMaximum(setting.maxval)
+        s.setPageStep(setting.step)
+        s.setTickInterval(setting.tick)
+        s.setTickPosition(qt4.QSlider.TicksAbove)
+        layout.addWidget(self.slider)
+
+        self.edit = qt4.QLineEdit()
+        layout.addWidget(self.edit)
+
+        self.edit.editingFinished.connect(self.validateAndSet)
+        self.slider.valueChanged.connect(self.movedPosition)
+
+        self.onModified()
+
+    def validateAndSet(self):
+        """Validate text is numeric."""
+        try:
+            val = self.setting.fromText(self.edit.text())
+            styleClear(self.edit)
+            self.sigSettingChanged.emit(self, self.setting, val)
+
+        except utils.InvalidType:
+            styleError(self.edit)
+
+    def movedPosition(self, val):
+        """Someone dragged the slider."""
+        self.sigSettingChanged.emit(self, self.setting, float(val))
+
+    @qt4.pyqtSlot()
+    def onModified(self):
+        self.edit.setText(self.setting.toText())
+        self.slider.setValue(int(self.setting.get()))
+
 class Bool(qt4.QCheckBox):
     """A check box for changing a bool setting."""
 
