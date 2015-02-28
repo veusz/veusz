@@ -624,23 +624,6 @@ namespace
     Vec2SmallPoly clipped = polyEdgeClip(tri1, tri2);
     if(! clipped.empty())
       {
-	for(unsigned i=0; i!=3; ++i)
-	  {
-	    printf("%.3f,%.3f,%.3f ", f1.proj[i](0), f1.proj[i](1), f1.proj[i](2));
-	  }
-	printf("\n");
-	for(unsigned i=0; i!=3; ++i)
-	  {
-	    printf("%.3f,%.3f,%.3f ", f2.proj[i](0), f2.proj[i](1), f2.proj[i](2));
-	  }
-	printf("\n");
-
-	for(unsigned i=0; i!=clipped.size(); ++i)
-	  {
-	    printf("%.3f,%.3f ", clipped[i](0), clipped[i](1));
-	  }
-	printf("\n");
-
 	*d1 = interpolateTriangleDepth(clipped, f1.proj);
 	*d2 = interpolateTriangleDepth(clipped, f2.proj);
       }

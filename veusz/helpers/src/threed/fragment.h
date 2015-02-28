@@ -68,30 +68,6 @@ struct Fragment
       }
   }
 
-  // void updateDepths()
-  // {
-  //   switch(type)
-  //     {
-  //     case FR_TRIANGLE:
-  // 	mindepth = std::min(proj[0](2), std::min(proj[1](2), proj[2](2)));
-  // 	maxdepth = std::max(proj[0](2), std::max(proj[1](2), proj[2](2)));
-  // 	meandepth = (proj[0](2)+proj[1](2)+proj[2](2))*(1/3.f);
-  // 	break;
-  //     case FR_LINESEG:
-  // 	mindepth = std::min(proj[0](2), proj[1](2)) - LINE_DELTA_DEPTH;
-  // 	maxdepth = std::max(proj[0](2), proj[1](2)) - LINE_DELTA_DEPTH;
-  // 	meandepth = (proj[0](2)+proj[1](2))*(1/2.f) - LINE_DELTA_DEPTH;
-  // 	break;
-  //     case FR_PATH:
-  // 	mindepth = maxdepth = meandepth = proj[0](2);
-  // 	break;
-  //     default:
-  // 	mindepth = maxdepth = meandepth =
-  // 	  std::numeric_limits<double>::infinity();
-  // 	break;
-  //     }
-  // }
-
   double minDepth() const
   {
     switch(type)

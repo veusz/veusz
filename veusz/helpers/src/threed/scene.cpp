@@ -73,6 +73,38 @@ namespace
     FragmentVector& vec;
   };
 
+
+  struct FragDepthCompareOverlap
+  {
+    FragDepthCompareOverlap(FragmentVector& v)
+      : vec(v)
+    {}
+
+    bool operator()(unsigned i, unsigned j) const
+    {
+      const Fragment& f1(vec[i]);
+      const Fragment& f2(vec[j]);
+
+      if( f1.maxDepth() <= f2.minDepth() )
+        // definitely f1 is in front of f2
+        return 0;
+      if( f1.minDepth() >= f2.maxDepth() )
+        // definitely f1 is behind f2
+        return 1;
+
+      double d1, d2;
+      d1 = d2 = std::numeric_limits<double>::min();
+      overlapDepth(f1, f2, &d1, &d2);
+      if( d1 == std::numeric_limits<double>::min() )
+        // did not get a sensible answer
+        return f1.meanDepth() >= f2.meanDepth();
+      else
+        return d1 >= d2;
+    }
+
+    FragmentVector& vec;
+  };
+
   // Make scaling matrix to move points to correct output range
   Mat3 makeScreenM(const FragmentVector& frags,
 		   double x1, double y1, double x2, double y2)
@@ -107,8 +139,6 @@ namespace
       {
 	maxy=1; miny=0;
       }
-
-    printf("pts: x: %g->%g, y: %g->%g\n", minx, maxx, miny, maxy);
 
     // now make matrix to scale to range x1->x2,y1->y2
     double minscale = std::min((x2-x1)/(maxx-minx), (y2-y1)/(maxy-miny));
@@ -151,23 +181,21 @@ namespace
 // fragments
 void Scene::doSplitting(unsigned idx1, const Camera& cam)
 {
-  printf("split: %i, %g\n", idx1, fragments[depths[idx1]].minDepth());
+  // printf("split: %i, %g\n", idx1, fragments[depths[idx1]].minDepth());
   double thismindepth = fragments[depths[idx1]].minDepth();
 
  start:
   for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
     {
-      //printf("idx: %i %i\n", idx1, idx2);
-
-      printf(" %i, %g, %g\n", idx2, fragments[depths[idx2]].minDepth(),
-             fragments[depths[idx2]].maxDepth());
+      // printf(" %i, %g, %g\n", idx2, fragments[depths[idx2]].minDepth(),
+      //        fragments[depths[idx2]].maxDepth());
 
       // don't compare object with self
       if(fragments[depths[idx2]].object == fragments[depths[idx1]].object)
 	continue;
 
       if(fragments[depths[idx2]].maxDepth() < thismindepth)
-	// no others fragmnets are overlapping, as any others would be
+	// no others fragments are overlapping, as any others would be
 	// less deep
 	break;
 
@@ -176,8 +204,6 @@ void Scene::doSplitting(unsigned idx1, const Camera& cam)
       splitFragments(fragments[depths[idx1]],
 		     fragments[depths[idx2]],
 		     fragments, &newnum1, &newnum2);
-      if(newnum1>0 || newnum2>0)
-        printf("frag: %i %i\n", newnum1, newnum2);
 
       if(newnum1>0)
 	{
@@ -292,7 +318,8 @@ void Scene::fineZCompare()
   // look at intersections between triangles (if any) and compare
   // depths at these intersections to determine order
 
-  for(unsigned idx1=0; idx1+1 < depths.size(); ++idx1)
+  const unsigned depthssize = depths.size();
+  for(unsigned idx1=0; idx1+1<depthssize; ++idx1)
     {
       unsigned loopcount = 0;
       double thismindepth;
@@ -300,7 +327,7 @@ void Scene::fineZCompare()
     start:
       thismindepth = fragments[depths[idx1]].minDepth();
 
-      for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
+      for(unsigned idx2=idx1+1; idx2<depthssize; ++idx2)
 	{
 	  if(fragments[depths[idx2]].maxDepth() < thismindepth)
 	    // no others are overlapping
@@ -311,32 +338,8 @@ void Scene::fineZCompare()
 	  overlapDepth(fragments[depths[idx1]], fragments[depths[idx2]],
 		       &d1, &d2);
 
-	  printf("%i %i (%i %i) %.5f %.5f\n", idx1, idx2,
-		 fragments[depths[idx1]].index,
-		 fragments[depths[idx2]].index,
-		 d1, d2);
-
-          // debug
-          if( fragments[depths[idx1]].index == 26 &&
-              fragments[depths[idx2]].index == 14 )
-            {
-              printf("(26c 14r) %.5f %.5f\n", d1, d2);
-
-              printf("(26c 14r): 26c: %g %g %g\n",
-                     fragments[depths[idx1]].proj[0](2),
-                     fragments[depths[idx1]].proj[1](2),
-                     fragments[depths[idx1]].proj[2](2));
-              printf("(26c 14r): 14r: %g %g %g\n",
-                     fragments[depths[idx2]].proj[0](2),
-                     fragments[depths[idx2]].proj[1](2),
-                     fragments[depths[idx2]].proj[2](2));
-            }
-
-
-	  if( d2-d1 > 1e-5f )
+	  if( d2-d1 > 1e-5 )
 	    {
-	      printf(" moving on up!\n");
-
 	      // bubble fragment above one at idx1
 	      unsigned tmp = depths[idx2];
 	      for(int i=int(idx2)-1; i >= int(idx1); --i)
@@ -351,7 +354,6 @@ void Scene::fineZCompare()
     }
 }
 
-
 void Scene::render(QPainter* painter, const Camera& cam,
 		   double x1, double y1, double x2, double y2)
 {
@@ -359,8 +361,6 @@ void Scene::render(QPainter* painter, const Camera& cam,
 
   // get fragments for whole scene
   root.getFragments(cam.viewM, cam, fragments);
-
-  printf("size0: %i\n", fragments.size());
 
   // store sorted indices to fragments here
   depths.resize(fragments.size());
@@ -370,33 +370,18 @@ void Scene::render(QPainter* painter, const Camera& cam,
   // sort depth of items
   std::sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
 
-  printf("size1: %i %i\n", depths.size(), fragments.size());
-
+  printf("before: %li %li\n", fragments.size(), depths.size());
   for(unsigned idx=0; idx+1 < depths.size(); ++idx)
     doSplitting(idx, cam);
-
-  printf("size2: %i %i\n", depths.size(), fragments.size());
+  printf("after:  %li %li\n", fragments.size(), depths.size());
 
   // final sorting
   std::sort(depths.begin(),
   	    depths.end(),
   	    FragDepthCompareMean(fragments));
 
-  // for(unsigned i=0, s=depths.size(); i<s; ++i)
-  //   {
-  //     //printf("%i %10g %10g\n", i, fragments[i].proj[0](2), fragments[i].points[0](2)/fragments[i].points[0](3));
-  //     const Fragment& f = fragments[depths[i]];
-  //     for(unsigned j=0; j!=f.nPoints(); ++j)
-  //       printf("%7.1f %7.1f %7.1f  ", f.points[j](0), f.points[j](1), f.points[j](2));
-  //     printf("\n");
-  //     for(unsigned j=0; j!=f.nPoints(); ++j)
-  //       printf("%7.3f %7.3f %7.3f, ", f.proj[j](0), f.proj[j](1), f.proj[j](2));
-  //     printf("\n");
-
-  //   }
-
-
   //fineZCompare();
+  printf("after2: %li %li\n", fragments.size(), depths.size());
 
   // how to transform projected points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
