@@ -1,10 +1,10 @@
 #include <cmath>
 #include "mmaths.h"
 
-Mat4 rotateM4(float angle, Vec3 vec)
+Mat4 rotateM4(double angle, Vec3 vec)
 {
-  float c = std::cos(angle);
-  float s = std::sin(angle);
+  double c = std::cos(angle);
+  double s = std::sin(angle);
 
   Vec3 a(vec);
   a.normalise();

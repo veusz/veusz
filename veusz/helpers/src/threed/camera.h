@@ -17,8 +17,8 @@ class Camera
   // znear: clip things nearer than this (should be as big as
   //        possible for precision)
   //zfar: far clipping plane.
-  void setPerspective(float fovy_degrees=45, float aspect=1,
-		      float znear=0.1f, float zfar=100);
+  void setPerspective(double fovy_degrees=45, double aspect=1,
+		      double znear=0.1, double zfar=100);
 
  public:
   Mat4 viewM;   // view matrix

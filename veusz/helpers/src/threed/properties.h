@@ -3,8 +3,8 @@
 
 struct SurfaceProp
 {
-  SurfaceProp(float _r=0.5f, float _g=0.5f, float _b=0.5f,
-	      float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
+  SurfaceProp(double _r=0.5f, double _g=0.5f, double _b=0.5f,
+	      double _specular=0.5f, double _diffuse=0.5f, double _trans=0,
 	      bool _hide=0)
     : r(_r), g(_g), b(_b),
       specular(_specular), diffuse(_diffuse), trans(_trans),
@@ -12,8 +12,8 @@ struct SurfaceProp
   {
   }
 
-  float r, g, b;
-  float specular, diffuse, trans;
+  double r, g, b;
+  double specular, diffuse, trans;
   bool hide;
 
   // used to reference count usages by Object() instances
@@ -22,18 +22,18 @@ struct SurfaceProp
 
 struct LineProp
 {
-  LineProp(float _r=0, float _g=0, float _b=0,
-	   float _specular=0.5f, float _diffuse=0.5f, float _trans=0,
-	   float _width=1, bool _hide=0)
+  LineProp(double _r=0, double _g=0, double _b=0,
+	   double _specular=0.5f, double _diffuse=0.5f, double _trans=0,
+	   double _width=1, bool _hide=0)
     : r(_r), g(_g), b(_b),
       specular(_specular), diffuse(_diffuse), trans(_trans),
       width(_width), hide(_hide), _ref_cnt(0)
   {
   }
 
-  float r, g, b;
-  float specular, diffuse, trans;
-  float width;
+  double r, g, b;
+  double specular, diffuse, trans;
+  double width;
   bool hide;
 
   // used to reference count usages by Object() instances

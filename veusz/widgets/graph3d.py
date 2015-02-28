@@ -205,8 +205,9 @@ class Graph3D(widget.Widget):
         borderlineprop = threed.LineProp()
         camera = threed.Camera()
         camera.setPointing(
-            threed.Vec3(-3,0.,0.), threed.Vec3(0.,0.,0.),
+            threed.Vec3(5,0.,0.), threed.Vec3(0.,0.,0.),
             threed.Vec3(0,1,0))
+        camera.setPerspective(45, 1, 4, 6)
 
         painter = painthelper.painter(self, bounds)
         with painter:

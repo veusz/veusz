@@ -45,14 +45,14 @@ void Camera::setPointing(const Vec3 &_eye, const Vec3 &target, const Vec3 &up)
   combM = perspM * viewM;
 }
 
-void Camera::setPerspective(float fovy_degrees, float aspect,
-			    float znear, float zfar)
+void Camera::setPerspective(double fovy_degrees, double aspect,
+			    double znear, double zfar)
 {
-  float r = std::tan(fovy_degrees * (M_PI/180./2.)) * znear;
-  float left = -r*aspect;
-  float right = r*aspect;
-  float bottom = -r;
-  float top = r;
+  double r = std::tan(fovy_degrees * (M_PI/180./2.)) * znear;
+  double left = -r*aspect;
+  double right = r*aspect;
+  double bottom = -r;
+  double top = r;
 
   perspM(0,0) = (2*znear)/(right-left);
   perspM(0,1) = 0;

@@ -21,8 +21,8 @@ namespace
 
     bool operator()(unsigned i, unsigned j) const
     {
-      float d1 = vec[i].maxDepth();
-      float d2 = vec[j].maxDepth();
+      double d1 = vec[i].maxDepth();
+      double d2 = vec[j].maxDepth();
       if(std::abs(d1-d2)<1e-5)
 	{
 	  // if the maxima are the same, then look at the minima
@@ -43,12 +43,12 @@ namespace
 
     bool operator()(unsigned i, unsigned j) const
     {
-      float d1 = vec[i].minDepth();
-      float d2 = vec[j].minDepth();
+      double d1 = vec[i].minDepth();
+      double d2 = vec[j].minDepth();
 
       if(std::abs(d1-d2)<1e-5)
 	{
-	  // if the maxima are the same, then look at the minima
+	  // if the minima are the same, then look at the maxima
 	  return vec[i].maxDepth() > vec[j].maxDepth();
 	}
       return d1 > d2;
@@ -57,22 +57,37 @@ namespace
     FragmentVector& vec;
   };
 
+  struct FragDepthCompareMean
+  {
+    FragDepthCompareMean(FragmentVector& v)
+      : vec(v)
+    {}
+
+    bool operator()(unsigned i, unsigned j) const
+    {
+      double d1 = vec[i].meanDepth();
+      double d2 = vec[j].meanDepth();
+      return d1 > d2;
+    }
+
+    FragmentVector& vec;
+  };
 
   // Make scaling matrix to move points to correct output range
   Mat3 makeScreenM(const FragmentVector& frags,
-		   float x1, float y1, float x2, float y2)
+		   double x1, double y1, double x2, double y2)
   {
     // get range of projected points in x and y
-    float minx, miny, maxx, maxy;
-    minx = miny = std::numeric_limits<float>::infinity();
-    maxx = maxy = -std::numeric_limits<float>::infinity();
+    double minx, miny, maxx, maxy;
+    minx = miny = std::numeric_limits<double>::infinity();
+    maxx = maxy = -std::numeric_limits<double>::infinity();
 
     for(FragmentVector::const_iterator f=frags.begin(); f!=frags.end(); ++f)
       {
 	for(unsigned p=0, np=f->nPoints(); p<np; ++p)
 	  {
-	    float x = f->proj[p](0);
-	    float y = f->proj[p](1);
+	    double x = f->proj[p](0);
+	    double y = f->proj[p](1);
 	    if(std::isfinite(x) && std::isfinite(y))
 	      {
 		minx = std::min(minx, x);
@@ -93,8 +108,10 @@ namespace
 	maxy=1; miny=0;
       }
 
+    printf("pts: x: %g->%g, y: %g->%g\n", minx, maxx, miny, maxy);
+
     // now make matrix to scale to range x1->x2,y1->y2
-    float minscale = std::min((x2-x1)/(maxx-minx), (y2-y1)/(maxy-miny));
+    double minscale = std::min((x2-x1)/(maxx-minx), (y2-y1)/(maxy-miny));
     return
       translateM3(0.5*(x1+x2), 0.5*(y1+y2)) *
       scaleM3(minscale) *
@@ -124,31 +141,44 @@ namespace
   QPointF vecToScreen(const Mat3& screenM, const Vec3& vec)
   {
     Vec3 mult(screenM*Vec3(vec(0), vec(1), 1));
-    float inv = 1/mult(2);
+    double inv = 1/mult(2);
     return QPointF(mult(0)*inv, mult(1)*inv);
   }
 
 }; // namespace
 
+// split up fragments which overlap in 3D into mutiple non-overlapping
+// fragments
 void Scene::doSplitting(unsigned idx1, const Camera& cam)
 {
-  float thismindepth = fragments[depths[idx1]].minDepth();
+  printf("split: %i, %g\n", idx1, fragments[depths[idx1]].minDepth());
+  double thismindepth = fragments[depths[idx1]].minDepth();
 
  start:
   for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
     {
+      //printf("idx: %i %i\n", idx1, idx2);
+
+      printf(" %i, %g, %g\n", idx2, fragments[depths[idx2]].minDepth(),
+             fragments[depths[idx2]].maxDepth());
+
       // don't compare object with self
       if(fragments[depths[idx2]].object == fragments[depths[idx1]].object)
 	continue;
 
       if(fragments[depths[idx2]].maxDepth() < thismindepth)
-	// no others are overlapping
+	// no others fragmnets are overlapping, as any others would be
+	// less deep
 	break;
 
+      // try to split, returning number of new fragments (if any)
       unsigned newnum1=0, newnum2=0;
       splitFragments(fragments[depths[idx1]],
 		     fragments[depths[idx2]],
 		     fragments, &newnum1, &newnum2);
+      if(newnum1>0 || newnum2>0)
+        printf("frag: %i %i\n", newnum1, newnum2);
+
       if(newnum1>0)
 	{
 	  if(newnum1>1)
@@ -168,6 +198,8 @@ void Scene::doSplitting(unsigned idx1, const Camera& cam)
 	  for(unsigned i=0; i<newnum2; ++i)
 	    depths[idx2+i] = base+i;
 	}
+
+      // calculate new depths for fragments and resort region
       if(newnum1+newnum2 > 0)
 	{
 	  unsigned nlen = fragments.size();
@@ -262,23 +294,55 @@ void Scene::fineZCompare()
 
   for(unsigned idx1=0; idx1+1 < depths.size(); ++idx1)
     {
-      float thismindepth = fragments[depths[idx1]].minDepth();
       unsigned loopcount = 0;
+      double thismindepth;
 
     start:
+      thismindepth = fragments[depths[idx1]].minDepth();
+
       for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
 	{
 	  if(fragments[depths[idx2]].maxDepth() < thismindepth)
 	    // no others are overlapping
 	    break;
 
-	  float d1 = -1;
-	  float d2 = -1;
+	  double d1 = -1;
+	  double d2 = -1;
 	  overlapDepth(fragments[depths[idx1]], fragments[depths[idx2]],
 		       &d1, &d2);
-	  if( d1-d2 < -1e-5 )
+
+	  printf("%i %i (%i %i) %.5f %.5f\n", idx1, idx2,
+		 fragments[depths[idx1]].index,
+		 fragments[depths[idx2]].index,
+		 d1, d2);
+
+          // debug
+          if( fragments[depths[idx1]].index == 26 &&
+              fragments[depths[idx2]].index == 14 )
+            {
+              printf("(26c 14r) %.5f %.5f\n", d1, d2);
+
+              printf("(26c 14r): 26c: %g %g %g\n",
+                     fragments[depths[idx1]].proj[0](2),
+                     fragments[depths[idx1]].proj[1](2),
+                     fragments[depths[idx1]].proj[2](2));
+              printf("(26c 14r): 14r: %g %g %g\n",
+                     fragments[depths[idx2]].proj[0](2),
+                     fragments[depths[idx2]].proj[1](2),
+                     fragments[depths[idx2]].proj[2](2));
+            }
+
+
+	  if( d2-d1 > 1e-5f )
 	    {
-	      std::swap(depths[idx1], depths[idx2]);
+	      printf(" moving on up!\n");
+
+	      // bubble fragment above one at idx1
+	      unsigned tmp = depths[idx2];
+	      for(int i=int(idx2)-1; i >= int(idx1); --i)
+		depths[i+1] = depths[i];
+	      depths[idx1] = tmp;
+
 	      // avoid infinite loops
 	      if(loopcount++ < 16)
 		goto start;
@@ -289,12 +353,14 @@ void Scene::fineZCompare()
 
 
 void Scene::render(QPainter* painter, const Camera& cam,
-		   float x1, float y1, float x2, float y2)
+		   double x1, double y1, double x2, double y2)
 {
   fragments.clear();
 
   // get fragments for whole scene
   root.getFragments(cam.viewM, cam, fragments);
+
+  printf("size0: %i\n", fragments.size());
 
   // store sorted indices to fragments here
   depths.resize(fragments.size());
@@ -304,19 +370,149 @@ void Scene::render(QPainter* painter, const Camera& cam,
   // sort depth of items
   std::sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
 
+  printf("size1: %i %i\n", depths.size(), fragments.size());
+
   for(unsigned idx=0; idx+1 < depths.size(); ++idx)
     doSplitting(idx, cam);
+
+  printf("size2: %i %i\n", depths.size(), fragments.size());
 
   // final sorting
   std::sort(depths.begin(),
   	    depths.end(),
-  	    FragDepthCompareMin(fragments));
+  	    FragDepthCompareMean(fragments));
 
-  fineZCompare();
+  // for(unsigned i=0, s=depths.size(); i<s; ++i)
+  //   {
+  //     //printf("%i %10g %10g\n", i, fragments[i].proj[0](2), fragments[i].points[0](2)/fragments[i].points[0](3));
+  //     const Fragment& f = fragments[depths[i]];
+  //     for(unsigned j=0; j!=f.nPoints(); ++j)
+  //       printf("%7.1f %7.1f %7.1f  ", f.points[j](0), f.points[j](1), f.points[j](2));
+  //     printf("\n");
+  //     for(unsigned j=0; j!=f.nPoints(); ++j)
+  //       printf("%7.3f %7.3f %7.3f, ", f.proj[j](0), f.proj[j](1), f.proj[j](2));
+  //     printf("\n");
+
+  //   }
+
+
+  //fineZCompare();
 
   // how to transform projected points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
 
   // finally draw items
   doDrawing(painter, screenM);
+
+  simpleDump();
+  objDump();
+}
+
+void Scene::objDump()
+{
+  FILE* fobj = fopen("dump.obj", "w");
+  FILE *fmtl = fopen("dump.mtl", "w");
+
+  fprintf(fobj, "mtllib dump.mtl\n");
+
+  unsigned ct = 1;
+  for(unsigned i=0, s=depths.size(); i<s; ++i)
+    {
+      const Fragment& f = fragments[depths[i]];
+      for(unsigned j=0; j!=f.nPoints(); ++j)
+        fprintf(fobj, "v %g %g %g\n", f.proj[j](0), f.proj[j](1), f.proj[j](2));
+
+      if(f.nPoints()==3)
+        {
+          double r = rand() / double(RAND_MAX);
+          double g = rand() / double(RAND_MAX);
+          double b = rand() / double(RAND_MAX);
+
+          fprintf(fmtl, "newmtl col%i\n", i);
+          fprintf(fmtl, "Ka %g %g %g\n", r, g, b);
+          fprintf(fmtl, "Kd %g %g %g\n", r, g, b);
+          fprintf(fmtl, "Ks %g %g %g\n", r, g, b);
+
+          fprintf(fobj, "usemtl col%i\n", i);
+          fprintf(fobj, "f %i %i %i\n", ct, ct+1, ct+2);
+        }
+
+      if(f.nPoints()==2)
+        fprintf(fobj, "l %i %i\n", ct, ct+1);
+
+      ct += f.nPoints();
+    }
+
+
+  fclose(fobj);
+  fclose(fmtl);
+}
+
+
+void Scene::simpleDump()
+{
+  FILE* file = fopen("dump.svg", "w");
+  fprintf(file, "<svg>\n");
+
+  double mind = 1e10;
+  double maxd = -1e10;
+  for(unsigned i=0, s=depths.size(); i<s; ++i)
+    {
+      const Fragment& f(fragments[depths[i]]);
+
+      if(f.type==Fragment::FR_TRIANGLE)
+        {
+          double av = (f.proj[0](2)+f.proj[1](2)+f.proj[2](2))/3.;
+          if(av<mind) mind=av;
+          if(av>maxd) maxd=av;
+        }
+    }
+  printf("%g %g\n", mind, maxd);
+
+  for(unsigned i=0, s=depths.size(); i<s; ++i)
+    {
+      const Fragment& f(fragments[depths[i]]);
+
+      double av = (f.proj[0](2)+f.proj[1](2)+f.proj[2](2))/3.;
+
+      switch(f.type)
+	{
+	  // debug
+	  //painter->setPen(solid);
+	  //painter->setBrush(no_brush);
+
+	case Fragment::FR_TRIANGLE:
+	  fprintf(file,
+		  "<polygon fill=\"#%02x%02x%02x\" "
+		  "id=\"p%i\" "
+		  "points=\"%g,%g %g,%g %g,%g\" "
+		  "/>\n",
+                  //		  int(f.surfaceprop->r*255),
+                  //		  int(f.surfaceprop->g*255),
+                  //		  int(f.surfaceprop->b*255),
+                  //int(f.surfaceprop->r*255),
+                  //int(f.surfaceprop->g*255),
+                  int((av-mind)/(maxd-mind)*255),
+                  int(f.surfaceprop->g*255),
+                  int((av-mind)/(maxd-mind)*255),
+		  f.index,
+		  f.proj[0](0)*300+300, f.proj[0](1)*300+300,
+		  f.proj[1](0)*300+300, f.proj[1](1)*300+300,
+		  f.proj[2](0)*300+300, f.proj[2](1)*300+300);
+
+	  break;
+
+	case Fragment::FR_LINESEG:
+	  break;
+
+	case Fragment::FR_PATH:
+	  break;
+
+	default:
+	  break;
+	}
+    }
+
+  fprintf(file, "</svg>\n");
+  fclose(file);
 }

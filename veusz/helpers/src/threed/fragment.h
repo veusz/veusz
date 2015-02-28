@@ -6,12 +6,7 @@
 #include "properties.h"
 #include "mmaths.h"
 
-#define LINE_DELTA_DEPTH 1e-4
-
-struct FragBounds
-{
-  float minx, miny, minz, maxx, maxy, maxz;
-};
+#define LINE_DELTA_DEPTH 1e-3
 
 // created by drawing Objects to draw to screen
 struct Fragment
@@ -20,9 +15,6 @@ struct Fragment
 
   // type of fragment
   FragmentType type;
-
-  // number of times this has been split
-  unsigned splitcount;
 
   // point to object or QPainterPath
   void* object;
@@ -37,14 +29,31 @@ struct Fragment
   // projected points associated with fragment
   Vec3 proj[3];
 
+  // number of times this has been split
+  unsigned splitcount;
+
+  // for debugging
+  unsigned index;
+
+  static unsigned _count;
+
   // zero on creation
   Fragment()
   : type(FR_NONE),
-    splitcount(0),
     object(0),
     surfaceprop(0),
-    lineprop(0)
+    lineprop(0),
+    //meandepth(-1), maxdepth(-1), meandepth(-1),
+    splitcount(0)
   {
+    index=_count;
+    ++_count;
+  }
+
+  void bumpIndex()
+  {
+    index=_count;
+    ++_count;
   }
 
   // number of points used by fragment type
@@ -59,7 +68,31 @@ struct Fragment
       }
   }
 
-  float minDepth() const
+  // void updateDepths()
+  // {
+  //   switch(type)
+  //     {
+  //     case FR_TRIANGLE:
+  // 	mindepth = std::min(proj[0](2), std::min(proj[1](2), proj[2](2)));
+  // 	maxdepth = std::max(proj[0](2), std::max(proj[1](2), proj[2](2)));
+  // 	meandepth = (proj[0](2)+proj[1](2)+proj[2](2))*(1/3.f);
+  // 	break;
+  //     case FR_LINESEG:
+  // 	mindepth = std::min(proj[0](2), proj[1](2)) - LINE_DELTA_DEPTH;
+  // 	maxdepth = std::max(proj[0](2), proj[1](2)) - LINE_DELTA_DEPTH;
+  // 	meandepth = (proj[0](2)+proj[1](2))*(1/2.f) - LINE_DELTA_DEPTH;
+  // 	break;
+  //     case FR_PATH:
+  // 	mindepth = maxdepth = meandepth = proj[0](2);
+  // 	break;
+  //     default:
+  // 	mindepth = maxdepth = meandepth =
+  // 	  std::numeric_limits<double>::infinity();
+  // 	break;
+  //     }
+  // }
+
+  double minDepth() const
   {
     switch(type)
       {
@@ -70,10 +103,10 @@ struct Fragment
       case FR_PATH:
 	return proj[0](2);
       default:
-	return std::numeric_limits<float>::infinity();
+	return std::numeric_limits<double>::infinity();
       }
   }
-  float maxDepth() const
+  double maxDepth() const
   {
     switch(type)
       {
@@ -84,10 +117,10 @@ struct Fragment
       case FR_PATH:
 	return proj[0](2);
       default:
-	return std::numeric_limits<float>::infinity();
+	return std::numeric_limits<double>::infinity();
       }
   }
-  float meanDepth() const
+  double meanDepth() const
   {
     switch(type)
       {
@@ -98,7 +131,7 @@ struct Fragment
       case FR_PATH:
 	return proj[0](2);
       default:
-	return std::numeric_limits<float>::infinity();
+	return std::numeric_limits<double>::infinity();
       }
   }
 
@@ -169,6 +202,6 @@ void splitFragments(const Fragment& f1, const Fragment& f2,
 
 // get average depths of intersection in 2D
 void overlapDepth(const Fragment& f1, const Fragment& f2,
-		  float* d1, float* d2);
+		  double* d1, double* d2);
 
 #endif
