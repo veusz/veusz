@@ -118,7 +118,7 @@ class StepWidgets2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
             self, _('''
-<p>Widget can often be placed inside each other. For instance, a graph
+<p>Widgets can often be placed inside each other. For instance, a graph
 widget is placed in a page widget or a grid widget. Plotting widgets
 are placed in graph widget.</p>
 
