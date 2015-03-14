@@ -285,11 +285,10 @@ def applyScaling(data, mode, minval, maxval):
 
     elif mode == 'log':
         # log scaling of image
-        # clip any values less than lowermin
-        lowermin = data < minval
-        chopvals = N.where(data > (minval-1), data - (minval-1), 1e-200)
-        data = N.log(chopvals) / N.log(maxval - (minval - 1))
-        data[lowermin] = 0.
+        with N.errstate(invalid='ignore', divide='ignore'):
+            invrange = 1./(N.log(maxval)-N.log(minval))
+            data = (N.log(data)-N.log(minval)) * invrange
+        data[~N.isfinite(data)] = 0
 
     elif mode == 'squared':
         # squared scaling
@@ -356,9 +355,7 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
         # do a linear color scaling
         vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
         colorscaling = scaling
-    else:
-        assert scaling == 'log'
-
+    elif scaling == 'log':
         # a logarithmic color scaling
         # we cheat here by actually plotting a linear colorbar
         # and telling veusz to put a log axis along it
@@ -367,6 +364,8 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
 
         vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
         colorscaling = 'linear'
+    else:
+        raise RuntimeError('Invalid scaling')
 
     # convert 1d array to 2d image
     if direction == 'horizontal':
