@@ -117,7 +117,7 @@ def executeScript(thedoc, filename, script, callbackunsafe=None):
                 if callbackunsafe is None or not callbackunsafe():
                     raise LoadError(_("Unsafe command in script"))
                 unsafe[0] = True
-                func(*args, **argsk)
+            func(*args, **argsk)
         return wrapped
     for name in interface.unsafe_commands:
         env[name] = _unsafecaller(getattr(interface, name))
