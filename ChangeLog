@@ -10,6 +10,7 @@ Minor changes
  * Fix incorrect use of None in (x,...) pattern
  * Catch crash if plotting nan/inf value in log space
  * Fix getData in dataset plugin for dimensions=2
+ * Catch error in too large float to date time conversion
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs
