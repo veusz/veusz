@@ -151,7 +151,11 @@ class GenericPickable:
         m = N.min(dist)
         # if there are multiple equidistant points, arbitrarily take
         # the first one
-        i = N.nonzero(dist == m)[0][0]
+
+        try:
+            i = N.nonzero(dist == m)[0][0]
+        except IndexError:
+            return info
 
         info.screenpos = self.xscreen[i], self.yscreen[i]
         info.coords = self.xvals[i], self.yvals[i]

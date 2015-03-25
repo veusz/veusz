@@ -11,6 +11,8 @@ Minor changes
  * Catch crash if plotting nan/inf value in log space
  * Fix getData in dataset plugin for dimensions=2
  * Catch error in too large float to date time conversion
+ * Catch disappeared file during import
+ * Index error fixed in pickable
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs

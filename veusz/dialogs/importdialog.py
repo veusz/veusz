@@ -276,6 +276,11 @@ class ImportDialog(VeuszDialog):
             importtab.doImport(self.document, filename, linked, encoding,
                                prefix, suffix, tags)
             qt4.QApplication.restoreOverrideCursor()
+        except IOError:
+            qt4.QApplication.restoreOverrideCursor()
+            qt4.QMessageBox.warning(
+                self, _("Veusz"),
+                _("Could not read file"))
         except Exception:
             qt4.QApplication.restoreOverrideCursor()
 
