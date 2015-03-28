@@ -215,7 +215,7 @@ def updateUILocale():
 
     qt4.QLocale.setDefault(uilocale)
 
-def ui_floattostring(f):
+def ui_floattostring(f, maxdp=14):
     """Convert float to string with more precision."""
     if not N.isfinite(f):
         if N.isnan(f):
@@ -224,12 +224,12 @@ def ui_floattostring(f):
             return '-inf'
         return 'inf'
     elif 1e-4 <= abs(f) <= 1e5 or f == 0:
-        s = '%.14g' % f
+        s = ('%.'+str(maxdp)+'g') % f
         # strip excess zeros to right
         if s.find('.') >= 0:
             s = s.rstrip('0').rstrip('.')
     else:
-        s = '%.14e' % f
+        s = ('%.'+str(maxdp)+'e') % f
         # split into mantissa/exponent and strip extra zeros, etc
         mant, expon = s.split('e')
         mant = mant.rstrip('0').rstrip('.')
