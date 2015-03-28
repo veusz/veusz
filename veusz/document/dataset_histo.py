@@ -315,6 +315,8 @@ class OperationDatasetHistogram(object):
             cumulative=self.cumulative,
             errors=self.errors)
 
+        self.oldposnsds = self.oldvaluesds = None
+
         if self.outvalues != '':
             self.oldvaluesds = document.data.get(self.outvalues, None)
             document.setData(self.outvalues, gen.generateValueDataset())

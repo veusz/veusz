@@ -15,6 +15,7 @@ Minor changes
  * Index error fixed in pickable
  * Catch error in data edit dialog if 2d dataset size changes
  * If root widget is selected with others, do not error on hide
+ * Fix undo for dataset histogram with a single output dataset
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs
