@@ -57,6 +57,11 @@ class DatasetHistoGenerator(object):
             d = evalDatasetExpression(self.document, self.inexpr)
             if d is not None:
                 d = d.data
+                # only use finite data
+                d = d[N.isfinite(d)]
+                if len(d) == 0:
+                    d = None
+
             self._cacheddata = d
             self.changeset = self.document.changeset
         return self._cacheddata
@@ -73,9 +78,9 @@ class DatasetHistoGenerator(object):
                 if data is None:
                     return N.array([])
                 if minval == 'Auto':
-                    minval = N.nanmin(data)
+                    minval = N.min(data)
                 if maxval == 'Auto':
-                    maxval = N.nanmax(data)
+                    maxval = N.max(data)
 
             if not islog:
                 delta = (maxval - minval) / numbins
