@@ -1134,7 +1134,8 @@ class TreeEditDock(qt4.QDockWidget):
         hideshow is True for hiding, False for showing
         """
         ops = [ document.OperationSettingSet(w.settings.get('hide'), hideshow)
-                for w in widgets ]
+                for w in widgets
+                if 'hide' in w.settings ]
         descr = ('show', 'hide')[hideshow]
         self.document.applyOperation(
             document.OperationMultiple(ops, descr=descr))
