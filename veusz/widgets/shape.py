@@ -170,10 +170,14 @@ class BoxShape(Shape):
         yw = abs(cgi.dims[1] / (cgi.widgetposn[1]-cgi.widgetposn[3]))
 
         # actually do the adjustment on the document
-        xp, yp = list(s.xPos), list(s.yPos)
-        w, h, r = list(s.width), list(s.height), list(s.rotate)
-        xp[cgi.index] = xpos
-        yp[cgi.index] = ypos
+        xp = list(s.get('xPos').getFloatArray(self.document))
+        yp = list(s.get('yPos').getFloatArray(self.document))
+        w = list(s.get('width').getFloatArray(self.document))
+        h = list(s.get('height').getFloatArray(self.document))
+        r = list(s.get('rotate').getFloatArray(self.document))
+
+        xp[min(cgi.index, len(xp)-1)] = xpos
+        yp[min(cgi.index, len(yp)-1)] = ypos
         w[min(cgi.index, len(w)-1)] = xw
         h[min(cgi.index, len(h)-1)] = yw
         r[min(cgi.index, len(r)-1)] = cgi.angle

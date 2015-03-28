@@ -16,6 +16,7 @@ Minor changes
  * Catch error in data edit dialog if 2d dataset size changes
  * If root widget is selected with others, do not error on hide
  * Fix undo for dataset histogram with a single output dataset
+ * Fix error resizing ellipse with a tuple width, height or position setting
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs
