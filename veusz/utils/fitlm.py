@@ -55,14 +55,6 @@ def fitLM(func, params, xvals, yvals, errors,
     Lambda: starting lambda value (as described in Bevington)
     """
 
-    # only use finite values for fitting
-    finite = N.logical_and(
-        N.logical_and( N.isfinite(xvals), N.isfinite(yvals)),
-        N.isfinite(errors) )
-    xvals = xvals[finite]
-    yvals = yvals[finite]
-    errors = errors[finite]
-
     # optimisation to avoid computing this all the time
     inve2 = 1. / errors**2
 

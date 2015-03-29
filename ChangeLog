@@ -21,6 +21,7 @@ Minor changes
  * Rewrite Line/FillSet setting controls for internal consistency and to fix
    new style extended fills
  * Do not crash with log date-time axes
+ * Also ignore non-finite values when fitting with minuit
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs

@@ -314,9 +314,6 @@ class Fit(FunctionPlotter):
             print("Fitting %s between %s and %s" % (s.variable, s.min, s.max))
 
         # various error checks
-        if len(xvals) == 0:
-            sys.stderr.write(_('No data values. Not fitting.\n'))
-            return
         if len(xvals) != len(yvals) or len(xvals) != len(yserr):
             sys.stderr.write(_('Fit data not equal in length. Not fitting.\n'))
             return
@@ -327,6 +324,17 @@ class Fit(FunctionPlotter):
         # actually do the fit, either via Minuit or our own LM fitter
         chi2 = 1
         dof = 1
+
+        # only consider finite values
+        finite = N.isfinite(xvals) & N.isfinite(yvals) & N.isfinite(yserr)
+        xvals = xvals[finite]
+        yvals = yvals[finite]
+        yserr = yserr[finite]
+
+        # check length after excluding non-finite values
+        if len(xvals) == 0:
+            sys.stderr.write(_('No data values. Not fitting.\n'))
+            return
 
         if minuit is not None:
             vals, chi2, dof = minuitFit(evalfunc, params, paramnames, s.values,
