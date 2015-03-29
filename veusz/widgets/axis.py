@@ -328,8 +328,9 @@ class Axis(widget.Widget):
     def userdescription(self):
         """User friendly description."""
         s = self.settings
-        return "range %s to %s%s" % ( str(s.min), str(s.max),
-                                      ['',' (log)'][s.log])
+        return "range %s to %s%s" % (
+            str(s.min), str(s.max),
+            ['',' (log)'][self.plottedLog()])
 
     def isLinked(self):
         """Whether is an axis linked to another."""
@@ -450,6 +451,12 @@ class Axis(widget.Widget):
 
         self.docchangeset = self.document.changeset
 
+    def plottedLog(self):
+        """Plotted in log?
+        This is overridden if the mode is incorrect."""
+        return (self.settings.log and
+                self.settings.mode in ('numeric', 'labels'))
+
     def computeTicks(self, allowauto=True):
         """Update ticks given plotted range.
         if allowauto is False, then do not allow ticks to be
@@ -471,7 +478,7 @@ class Axis(widget.Widget):
         axs = tickclass(self.plottedrange[0], self.plottedrange[1],
                         s.MajorTicks.number, s.MinorTicks.number,
                         extendmin = extendmin, extendmax = extendmax,
-                        logaxis = s.log )
+                        logaxis = self.plottedLog())
 
         axs.getTicks()
         self.plottedrange[0] = axs.minval
@@ -556,7 +563,7 @@ class Axis(widget.Widget):
         """Convert the coordinates assuming the machinery is in place."""
 
         # work out fractional posistions, then convert to pixels
-        if self.settings.log:
+        if self.plottedLog():
             fracposns = self.logConvertToPlotter(vals)
         else:
             fracposns = self.linearConvertToPlotter(vals)
@@ -583,7 +590,7 @@ class Axis(widget.Widget):
                  (self.coordParr2 - self.coordParr1) )
 
         # convert from fractional to graph
-        if self.settings.log:
+        if self.plottedLog():
             return self.logConvertFromPlotter(frac)
         else:
             return self.linearConvertFromPlotter(frac)

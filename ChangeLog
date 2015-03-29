@@ -20,6 +20,7 @@ Minor changes
  * Only use finite values in histogram
  * Rewrite Line/FillSet setting controls for internal consistency and to fix
    new style extended fills
+ * Do not crash with log date-time axes
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs
