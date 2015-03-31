@@ -145,7 +145,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
                 if dtype == 'colormap':
                     try:
                         value = ast.literal_eval(value)
-                    except ValueError:
+                    except (ValueError, SyntaxError):
                         ok = False
                     else:
                         ok = True
