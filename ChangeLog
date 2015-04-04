@@ -23,6 +23,7 @@ Minor changes
  * Do not crash with log date-time axes
  * Also ignore non-finite values when fitting with minuit
  * Avoid syntax error with invalid colormap
+ * Updates to setup.py and desktop files
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs
