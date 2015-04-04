@@ -22,24 +22,41 @@
 Veusz distutils setup script
 see the file INSTALL for details on how to install Veusz
 """
-
 from __future__ import division
+
 import glob
 import os.path
 import sys
 import numpy
-from distutils.command.install_data import install_data
-from distutils.command.install import install as orig_install
-import pyqtdistutils
 
-# try to get py2app if it exists
+extraoptions = {}
 try:
-    import py2app
+    import setuptools
     from setuptools import setup, Extension
-    py2app = True
+    from setuptools.command.install import install as orig_install
+    
+    extraoptions['install_requires'] = ['numpy']
+    extraoptions['extras_require'] = {
+        "optional": ['astropy', 'pyemf', 'sampy', 'pyMinuit', 'h5py']
+    }
+    
+    extraoptions['entry_points'] = {
+        'gui_scripts' : [
+            'veusz = veusz.veusz_main:run',
+            'veusz_listen = veusz.veusz_listen:run'
+            ]
+        }
+  
 except ImportError:
+    import distutils
     from distutils.core import setup, Extension
-    py2app = False
+    from distutils.command.install import install as orig_install
+
+    extraoptions['requires'] = ['numpy']
+    extraoptions['scripts'] =  ['scripts/veusz', 'scripts/veusz_listen']
+    
+from distutils.command.install_data import install_data
+import pyqtdistutils
 
 # get version
 version = open('VERSION').read().strip()
@@ -88,41 +105,6 @@ command-line, and scripting interfaces. Graphs are constructed from
 plotting functions, data with errors, keys, labels, stacked plots,
 multiple plots, and fitting data.'''
 
-if py2app and sys.platform == 'darwin':
-    # extra arguments for mac py2app to associate files
-    plist = {
-        'CFBundleName': 'Veusz',
-        'CFBundleShortVersionString': version,
-        'CFBundleIdentifier': 'org.python.veusz',
-        'CFBundleDocumentTypes': [{
-                'CFBundleTypeExtensions': ['vsz'],
-                'CFBundleTypeName': 'Veusz document',
-                'CFBundleTypeRole': 'Editor',
-                }]
-        }
-    
-    extraoptions = {
-        'setup_requires': ['py2app'],
-        'app': ['veusz/veusz_main.py'],
-        'options': { 'py2app': {'argv_emulation': False,
-                                'includes': ('veusz.helpers._nc_cntr',
-                                             'veusz.helpers.qtloops',
-                                             'h5py.defs',
-                                             'h5py.h5ac',
-                                             'h5py.utils',
-                                             'h5py._errors',
-                                             'h5py._proxy'),
-                                'plist': plist,
-                                'iconfile': 'icons/veusz.icns',
-                                }
-                     }
-	}
-else:
-    # otherwise package scripts
-    extraoptions = {
-        'scripts': ['scripts/veusz', 'scripts/veusz_listen']
-        }
-
 def findData(dirname, extns):
     """Return tuple for directory name and list of file extensions for data."""
     files = []
@@ -130,6 +112,43 @@ def findData(dirname, extns):
         files += glob.glob(os.path.join(dirname, '*.'+extn))
     files.sort()
     return (dirname, files)
+
+    
+if sys.platform == 'darwin':
+    try:
+        import py2app
+        # extra arguments for mac py2app to associate files
+        plist = {
+            'CFBundleName': 'Veusz',
+            'CFBundleShortVersionString': version,
+            'CFBundleIdentifier': 'org.python.veusz',
+            'CFBundleDocumentTypes': [{
+                    'CFBundleTypeExtensions': ['vsz'],
+                    'CFBundleTypeName': 'Veusz document',
+                    'CFBundleTypeRole': 'Editor',
+                    }]
+            }
+        
+        extraoptions = {
+            'setup_requires': ['py2app'],
+            'app': ['veusz/veusz_main.py'],
+            'options': { 'py2app': {'argv_emulation': False,
+                                    'includes': ('veusz.helpers._nc_cntr',
+                                                 'veusz.helpers.qtloops',
+                                                 'h5py.defs',
+                                                 'h5py.h5ac',
+                                                 'h5py.utils',
+                                                 'h5py._errors',
+                                                 'h5py._proxy'),
+                                    'plist': plist,
+                                    'iconfile': 'icons/veusz.icns',
+                                    }
+                         }
+        }
+        
+    # let's hope setuptools/distutils will do the right thing
+    except ImportError:
+        pass
 
 setup(name = 'veusz',
       version = version,
@@ -150,7 +169,7 @@ setup(name = 'veusz',
                       'License :: OSI Approved :: '
                       'GNU General Public License (GPL)',
                       'Topic :: Scientific/Engineering :: Visualization' ],
-      data_files = [ ('', ['VERSION']),
+      data_files = [ ('', ['VERSION', 'AUTHORS', 'ChangeLog', 'COPYING']),
                      findData('ui', ('ui',)),
                      findData('icons', ('png', 'svg')),
                      findData('examples', ('vsz', 'py', 'csv', 'dat')),
@@ -212,4 +231,4 @@ setup(name = 'veusz',
                   'install': install},
 
       **extraoptions
-      )
+)
