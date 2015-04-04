@@ -1,4 +1,4 @@
-Changes in <next release>:
+Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
    modify the export options
  * Add cubehelix() functional colormap

@@ -40,12 +40,12 @@ from veusz import utils
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2014 <jeremy@jeremysanders.net> and contributors
+Copyright (C) Jeremy Sanders 2003-2015 <jeremy@jeremysanders.net> and contributors
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
 splashcopyr='''<b><font color="purple">Veusz %s<br></font></b>
-Copyright (C) Jeremy Sanders 2003-2014 and contributors<br>
+Copyright (C) Jeremy Sanders 2003-2015 and contributors<br>
 Licenced under the GPL (version 2 or greater)
 '''
 
