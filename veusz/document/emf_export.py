@@ -373,7 +373,7 @@ class EMFPaintEngine(qt4.QPaintEngine):
             path.addRegion(state.clipRegion())
             self._updateClipPath(path, state.clipOperation())
         if ss & qt4.QPaintEngine.DirtyTransform:
-            self._updateTransform(state.matrix())
+            self._updateTransform(state.transform())
 
     def type(self):
         return qt4.QPaintEngine.PostScript
