@@ -58,7 +58,9 @@ def makeAction(parent, descr, menutext, slot, icon=None, key=None,
     a.setStatusTip(descr)
     a.setToolTip(textwrap.fill(descr, 25))
     if slot:
-        a.triggered[()].connect(slot)
+        def fn():
+            slot()
+        a.triggered.connect(fn)
     if icon:
         a.setIcon(getIcon(icon))
     if key:
@@ -142,7 +144,9 @@ def populateMenuToolbars(items, toolbar, menus):
         if callable(slot):
             # connect the action to the slot
             if slot is not None:
-                action.triggered[()].connect(slot)
+                def fn():
+                    slot()
+                action.triggered.connect(fn)
                 # add to menu
             if menus is not None:
                 menus[menu].addAction(action)

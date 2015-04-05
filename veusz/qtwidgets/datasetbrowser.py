@@ -385,9 +385,9 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         # stretch of columns
         hdr = self.header()
         hdr.setStretchLastSection(False)
-        hdr.setResizeMode(0, qt4.QHeaderView.Stretch)
+        hdr.setSectionResizeMode(0, qt4.QHeaderView.Stretch)
         for col in crange(1, 3):
-            hdr.setResizeMode(col, qt4.QHeaderView.ResizeToContents)
+            hdr.setSectionResizeMode(col, qt4.QHeaderView.ResizeToContents)
 
         # when documents have finished opening, expand all nodes
         if mainwin is not None:
@@ -763,7 +763,7 @@ class DatasetBrowserPopup(DatasetBrowser):
             if not frame.contains(event.pos()):
                 self.close()
                 return True
-        return qt4.QTextEdit.eventFilter(self, node, event)
+        return DatasetBrowser.eventFilter(self, node, event)
 
     def sizeHint(self):
         """A reasonable size for the text editor."""

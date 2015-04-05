@@ -421,8 +421,8 @@ class WidgetTreeView(qt4.QTreeView):
         # stretch header
         hdr = self.header()
         hdr.setStretchLastSection(False)
-        hdr.setResizeMode(0, qt4.QHeaderView.Stretch)
-        hdr.setResizeMode(1, qt4.QHeaderView.Custom)
+        hdr.setSectionResizeMode(0, qt4.QHeaderView.Stretch)
+        hdr.setSectionResizeMode(1, qt4.QHeaderView.Custom)
 
         # setup drag and drop
         self.setSelectionMode(qt4.QAbstractItemView.ExtendedSelection)

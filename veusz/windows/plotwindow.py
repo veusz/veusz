@@ -247,7 +247,6 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # for controlling plot elements
         g = self.controlgraphgroup = qt4.QGraphicsItemGroup()
-        g.setHandlesChildEvents(False)
         self.scene.addItem(g)
 
         # zoom rectangle for zooming into graph (not shown normally)
