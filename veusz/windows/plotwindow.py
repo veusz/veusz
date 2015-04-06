@@ -194,6 +194,16 @@ class RenderThread( qt4.QThread ):
                 sys.stderr.write(_("Error in rendering thread\n"))
                 traceback.print_exc(file=sys.stderr)
 
+class ControlGraphRoot(qt4.QGraphicsItem):
+    """Control graph items are connected to this root item.
+    We don't use a group here as it would swallow parent events."""
+    def __init__(self):
+        qt4.QGraphicsItem.__init__(self)
+    def paint(self, painter, option, widget=None):
+        pass
+    def boundingRect(self):
+        return qt4.QRectF()
+
 class PlotWindow( qt4.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
@@ -246,8 +256,8 @@ class PlotWindow( qt4.QGraphicsView ):
         self.vzactions = None
 
         # for controlling plot elements
-        g = self.controlgraphgroup = qt4.QGraphicsItemGroup()
-        self.scene.addItem(g)
+        self.controlgraphroot = ControlGraphRoot()
+        self.scene.addItem(self.controlgraphroot)
 
         # zoom rectangle for zooming into graph (not shown normally)
         self.zoomrect = self.scene.addRect( 0, 0, 100, 100,
@@ -651,12 +661,7 @@ class PlotWindow( qt4.QGraphicsView ):
         qt4.QGraphicsView.mousePressEvent(self, event)
 
         # work out whether user is clicking on a control point
-        # we have to ignore the item group which seems to be above
-        # its constituents
         items = self.items(event.pos())
-        if len(items) > 0 and isinstance(items[0], qt4.QGraphicsItemGroup):
-            del items[0]
-
         self.ignoreclick = ( len(items)==0 or
                              items[0] is not self.pixmapitem or
                              self.painthelper is None )
@@ -1209,21 +1214,17 @@ class PlotWindow( qt4.QGraphicsView ):
     def updateControlGraphs(self, widgets):
         """Add control graphs for the widgets given."""
 
-        cgg = self.controlgraphgroup
-
-        # delete old items
-        for c in cgg.childItems():
-            cgg.removeFromGroup(c)
+        # delete old items from root
+        for c in list(self.controlgraphroot.childItems()):
             self.scene.removeItem(c)
 
-        # add each item to the group
+        # add each item to the root
         if self.painthelper:
             for widget in widgets:
                 cgis = self.painthelper.getControlGraph(widget)
                 if cgis:
                     for control in cgis:
-                        graphitem = control.createGraphicsItem()
-                        cgg.addToGroup(graphitem)
+                        control.createGraphicsItem(self.controlgraphroot)
 
 class FullScreenPlotWindow(qt4.QScrollArea):
     """Window for showing plot in full-screen mode."""

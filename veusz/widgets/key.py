@@ -55,17 +55,19 @@ class ControlKey(object):
         self.dims = tuple(boxdims)
         self.textheight = textheight
 
-    def createGraphicsItem(self):
-        return _GraphControlKey(self)
+    def createGraphicsItem(self, parent):
+        return _GraphControlKey(parent, self)
 
 class _GraphControlKey(qt4.QGraphicsRectItem):
     """The graphical rectangle which is dragged around to reposition
     the key."""
 
-    def __init__(self, params):
-        qt4.QGraphicsRectItem.__init__(self,
-                                       params.posn[0], params.posn[1],
-                                       params.dims[0], params.dims[1])
+    def __init__(self, parent, params):
+        qt4.QGraphicsRectItem.__init__(
+            self,
+            params.posn[0], params.posn[1],
+            params.dims[0], params.dims[1],
+            parent)
         self.params = params
 
         self.setCursor(qt4.Qt.SizeAllCursor)
