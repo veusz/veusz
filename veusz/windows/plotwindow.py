@@ -828,7 +828,10 @@ class PlotWindow( qt4.QGraphicsView ):
         """For zooming in or moving."""
 
         if event.modifiers() & qt4.Qt.ControlModifier:
-            self.sumwheeldelta += event.delta()
+            # zoom in/out with ctrl held down
+            d = event.angleDelta()
+            delta = d.x() if d.x() != 0 else d.y()
+            self.sumwheeldelta += delta
             while self.sumwheeldelta <= -120:
                 self.slotViewZoomOut()
                 self.sumwheeldelta += 120
@@ -836,17 +839,11 @@ class PlotWindow( qt4.QGraphicsView ):
                 self.slotViewZoomIn()
                 self.sumwheeldelta -= 120
         elif event.modifiers() & qt4.Qt.ShiftModifier:
-            self.sumwheeldelta += event.delta()
-            while self.sumwheeldelta <= -120:
-                # scroll left
-                self.sumwheeldelta += 120
-                scrollx = self.horizontalScrollBar()
-                scrollx.setValue(scrollx.value() + 120)
-            while self.sumwheeldelta >= 120:
-                # scroll right
-                scrollx = self.horizontalScrollBar()
-                scrollx.setValue(scrollx.value() - 120)
-                self.sumwheeldelta -= 120
+            # scroll horizontally if shift is held down
+            d = event.pixelDelta()
+            delta = d.x() if d.x() != 0 else d.y()
+            scrollx = self.horizontalScrollBar()
+            scrollx.setValue(scrollx.value() + delta)
         else:
             qt4.QGraphicsView.wheelEvent(self, event)
 
