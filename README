@@ -38,6 +38,7 @@ Minor changes
  * Also ignore non-finite values when fitting with minuit
  * Avoid syntax error with invalid colormap
  * Updates to setup.py and desktop files
+ * Recreate dataset now works if dialog hasn't been opened already
 
 Features of package:
  Plotting features:

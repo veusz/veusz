@@ -24,6 +24,9 @@ import os.path
 from .. import qtall as qt4
 from .. import utils
 
+# register functions to open up dialogs to recreate a dataset
+recreate_register = {}
+
 class VeuszDialog(qt4.QDialog):
     """Base dialog class.
     - Loads self from ui file.

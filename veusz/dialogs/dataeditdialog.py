@@ -27,10 +27,7 @@ from .. import qtall as qt4
 from .. import document
 from .. import setting
 from ..qtwidgets.datasetbrowser import DatasetBrowser
-from .veuszdialog import VeuszDialog
-
-# register function to dataset class to edit dataset
-recreate_register = {}
+from .veuszdialog import VeuszDialog, recreate_register
 
 def _(text, disambiguation=None, context="DataEditDialog"):
     """Translate text."""
