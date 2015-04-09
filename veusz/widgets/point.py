@@ -454,7 +454,8 @@ class PointPlotter(GenericPlotter):
 
         if axis.settings.log:
             def updateRange(v):
-                chopzero = v[(v>0) & N.isfinite(v)]
+                with N.errstate(invalid='ignore'):
+                    chopzero = v[(v>0) & N.isfinite(v)]
                 if len(chopzero) > 0:
                     axrange[0] = min(axrange[0], chopzero.min())
                     axrange[1] = max(axrange[1], chopzero.max())
