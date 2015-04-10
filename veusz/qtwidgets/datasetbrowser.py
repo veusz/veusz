@@ -47,8 +47,8 @@ def datasetLinkFile(ds):
 class DatasetNode(TMNode):
     """Node for a dataset."""
 
-    def __init__(self, doc, dsname, cols, parent):
-        ds = doc.data[dsname]
+    def __init__(self, model, dsname, cols, parent):
+        ds = model.doc.data[dsname]
         data = []
         assert cols[0] == "name"
         for c in cols:
@@ -60,10 +60,13 @@ class DatasetNode(TMNode):
                 data.append( ds.dstype )
             elif c == "linkfile":
                 data.append( os.path.basename(datasetLinkFile(ds)) )
+            elif c == "tick":
+                data.append( dsname in model.ticked )
 
         TMNode.__init__(self, tuple(data), parent)
-        self.doc = doc
+        self.model = model
         self.cols = cols
+        self.dsname = dsname
 
     def getPreviewPixmap(self, ds):
         """Get a preview pixmap for a dataset."""
@@ -117,7 +120,7 @@ class DatasetNode(TMNode):
     def toolTip(self, column):
         """Return tooltip for column."""
         try:
-            ds = self.doc.data[self.data[0]]
+            ds = self.model.doc.data[self.data[0]]
         except KeyError:
             return None
 
@@ -146,7 +149,7 @@ class DatasetNode(TMNode):
     def dataset(self):
         """Get associated dataset."""
         try:
-            return self.doc.data[self.data[0]]
+            return self.model.doc.data[self.data[0]]
         except KeyError:
             return None
 
@@ -156,7 +159,8 @@ class DatasetNode(TMNode):
 
     def cloneTo(self, newroot):
         """Make a clone of self at the root given."""
-        return self.__class__(self.doc, self.data[0], self.cols, newroot)
+        return self.__class__(
+            self.model, self.dsname, self.cols, newroot)
 
 class FilenameNode(TMNode):
     """A special node for holding filenames of files."""
@@ -206,6 +210,7 @@ class DatasetRelationModel(TreeModel):
         self.readonly = readonly
         self.filterdims = filterdims
         self.filterdtype = filterdtype
+        self.ticked = set()
         self.refresh()
 
         doc.signalModified.connect(self.refresh)
@@ -239,15 +244,16 @@ class DatasetRelationModel(TreeModel):
         """Make tree with no grouping."""
         tree = TMNode( (_("Dataset"), _("Size"), _("Type"), _("File")), None )
         for name, ds in citems(self.doc.data):
-            child = DatasetNode( self.doc, name,
-                                 ("name", "size", "type", "linkfile"),
-                                 None )
+            child = DatasetNode(
+                self, name,
+                ("name", "size", "type", "linkfile"),
+                None)
 
             # add if not filtered for filtering
             if not self.datasetFilterOut(ds, child):
                 tree.insertChildSorted(child)
         return tree
-        
+
     def makeGrpTree(self, coltitles, colitems, grouper, GrpNodeClass):
         """Make a tree grouping with function:
         coltitles: tuple of titles of columns for user
@@ -257,7 +263,7 @@ class DatasetRelationModel(TreeModel):
         """
         grpnodes = {}
         for name, ds in citems(self.doc.data):
-            child = DatasetNode(self.doc, name, colitems, None)
+            child = DatasetNode(self, name, colitems, None)
 
             # check whether filtered out
             if not self.datasetFilterOut(ds, child):
@@ -318,21 +324,42 @@ class DatasetRelationModel(TreeModel):
         """Return model flags for index."""
         f = TreeModel.flags(self, idx)
         # allow dataset names to be edited
-        if ( idx.isValid() and isinstance(self.objFromIndex(idx), DatasetNode)
-             and not self.readonly and idx.column() == 0 ):
-            f |= qt4.Qt.ItemIsEditable
+        obj = self.objFromIndex(idx)
+        if idx.isValid() and isinstance(obj, DatasetNode):
+            col = idx.column()
+            if not self.readonly and col == 0:
+                # renameable dataset
+                f |= qt4.Qt.ItemIsEditable
+            elif obj.cols[col] == "tick":
+                # tickable dataset
+                f |= qt4.Qt.ItemIsUserCheckable
         return f
 
-    def setData(self, idx, newname, role):
+    def setData(self, idx, val, role):
         """Rename dataset."""
         dsnode = self.objFromIndex(idx)
-        if not utils.validateDatasetName(newname) or newname in self.doc.data:
-            return False
+        name = dsnode.cols[idx.column()]
 
-        self.doc.applyOperation(
-            document.OperationDatasetRename(dsnode.data[0], newname))
-        self.dataChanged.emit(idx, idx)
-        return True
+        if name == "name":
+            if( not utils.validateDatasetName(val) or
+                val in self.doc.data ):
+                return False
+
+            self.doc.applyOperation(
+                document.OperationDatasetRename(dsnode.data[0], val))
+            self.dataChanged.emit(idx, idx)
+            return True
+
+        elif name == "tick":
+            # toggle tick box
+            name = dsnode.dsname
+            if val:
+                self.ticked.add(name)
+            else:
+                self.ticked.remove(name)
+            # emitted by refresh self.dataChanged.emit(idx, idx)
+            self.refresh()
+            return True
 
     @qt4.pyqtSlot()
     def refresh(self):
@@ -368,9 +395,10 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         qt4.QTreeView.__init__(self, parent)
         self.doc = doc
         self.mainwindow = mainwin
-        self.model = DatasetRelationModel(doc, grouping, readonly=readonly,
-                                          filterdims=filterdims,
-                                          filterdtype=filterdtype)
+        self.model = DatasetRelationModel(
+            doc, grouping, readonly=readonly,
+            filterdims=filterdims,
+            filterdtype=filterdtype)
 
         self.setModel(self.model)
         self.setSelectionMode(qt4.QTreeView.ExtendedSelection)
@@ -696,10 +724,11 @@ class DatasetBrowser(qt4.QWidget):
         self.optslayout.addWidget(self.grpbutton)
 
         # filtering by entering text
-        self.optslayout.addWidget(qt4.QLabel(_("Filter")))
+        searchlabel = qt4.QLabel()
+        searchlabel.setPixmap(utils.getIcon('kde-search-jss').pixmap(18,18))
+        self.optslayout.addWidget(searchlabel)
         self.filteredit = LineEditWithClear()
-        self.filteredit.setToolTip(_("Enter text here to filter datasets"))
-
+        self.filteredit.setToolTip(_("Search for dataset names"))
         self.filteredit.textChanged.connect(self.slotFilterChanged)
         self.optslayout.addWidget(self.filteredit)
 
