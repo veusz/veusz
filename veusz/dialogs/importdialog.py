@@ -297,7 +297,7 @@ class ImportDialog(VeuszDialog):
         for name in dsnames:
             ds = self.document.getData(name)
             # build up description
-            lines.append( ' %s' % ds.description(showlinked=False) )
+            lines.append(_('%s: %s') % (name, ds.description()))
 
         # whether the data were linked
         if linked:

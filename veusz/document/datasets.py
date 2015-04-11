@@ -127,7 +127,11 @@ class DatasetException(Exception):
     pass
 
 class DatasetBase(object):
-    """A base dataset class."""
+    """Base class for all datasets."""
+
+class DatasetConcreteBase(DatasetBase):
+    """A base dataset class for datasets which are real, and not proxies,
+    etc."""
 
     # number of dimensions the dataset holds
     dimensions = 0
@@ -201,7 +205,7 @@ class DatasetBase(object):
     def name(self):
         """Get dataset name."""
         for name, ds in citems(self.document.data):
-            if ds == self:
+            if ds is self:
                 return name
         raise ValueError('Could not find self in document.data')
 
@@ -214,8 +218,8 @@ class DatasetBase(object):
         1, 2, 3, ..., 4, 5, 6."""
         return None
 
-    def description(self, showlinked=True):
-        """Get description of database."""
+    def description(self):
+        """Get description of dataset."""
         return ""
 
     def uiConvertToDataItem(self, val):
@@ -279,6 +283,10 @@ class DatasetBase(object):
         """Return an unlinked copy of self."""
         pass
 
+    def returnCopyWithNewData(self, **args):
+        """Return copy with new data given."""
+        pass
+
     def renameable(self):
         """Is it possible to rename this dataset?"""
         return self.linked is None
@@ -295,7 +303,7 @@ def regularGrid(vals):
     deltas = vals[1:] - vals[:-1]
     return N.all(N.abs(deltas - deltas[0]) < (deltas[0]*1e-5))
 
-class Dataset2DBase(DatasetBase):
+class Dataset2DBase(DatasetConcreteBase):
     """Ancestor for 2D datasets."""
 
     # number of dimensions the dataset holds
@@ -415,16 +423,13 @@ class Dataset2DBase(DatasetBase):
         """Return preview of data."""
         return dsPreviewHelper(self.data.flatten())
 
-    def description(self, showlinked=True):
+    def description(self):
         """Get description of dataset."""
 
-        text = self.name()
-        text += u' (%i×%i)' % self.data.shape
         xr, yr = self.getDataRanges()
-        text += ', x=%g->%g' % tuple(xr)
-        text += ', y=%g->%g' % tuple(yr)
-        if self.linked and showlinked:
-            text += ', linked to %s' % self.linked.filename
+        text = _(u"2D (%i×%i), numeric, x=%.4g->%.4g, y=%.4g->%.4g") % (
+            self.data.shape[0], self.data.shape[1],
+            xr[0], xr[1], yr[0], yr[1])
         return text
 
     def returnCopy(self):
@@ -433,12 +438,15 @@ class Dataset2DBase(DatasetBase):
                           xedge=self.xedge, yedge=self.yedge,
                           xcent=self.xcent, ycent=self.ycent )
 
+    def returnCopyWithNewData(self, **args):
+        return Dataset2D(**args)
+
 class Dataset2D(Dataset2DBase):
     '''Represents a two-dimensional dataset.'''
 
     editable = True
 
-    def __init__(self, data, xrange=None, yrange=None,
+    def __init__(self, data=None, xrange=None, yrange=None,
                  xedge=None, yedge=None,
                  xcent=None, ycent=None):
         '''Create a two dimensional dataset based on data.
@@ -564,7 +572,7 @@ def dsPreviewHelper(d):
         return line1
     return line1 + '\n' + line2
 
-class Dataset1DBase(DatasetBase):
+class Dataset1DBase(DatasetConcreteBase):
     """Base for 1D datasets."""
 
     # number of dimensions the dataset holds
@@ -584,21 +592,16 @@ class Dataset1DBase(DatasetBase):
         """Preview of data."""
         return dsPreviewHelper(self.data)
 
-    def description(self, showlinked=True):
+    def description(self):
         """Get description of dataset."""
 
-        text = self.name()
         if self.serr is not None:
-            text += ',+-'
-        if self.perr is not None:
-            text += ',+'
-        if self.nerr is not None:
-            text += ',-'
-        text += _(' (length %i)') % len(self.data)
-
-        if self.linked and showlinked:
-            text += _(' linked to %s') % self.linked.filename
-        return text
+            templ = _("1D (length %i, symmetric errors)")
+        elif self.perr is not None or self.nerr is not None:
+            templ = _("1D (length %i, asymmetric errors)")
+        else:
+            templ = _("1D (length %i)")
+        return templ % len(self.data)
 
     def invalidDataPoints(self):
         """Return a numpy bool detailing which datapoints are invalid."""
@@ -681,6 +684,10 @@ class Dataset1DBase(DatasetBase):
                        serr = _copyOrNone(self.serr),
                        perr = _copyOrNone(self.perr),
                        nerr = _copyOrNone(self.nerr))
+
+    def returnCopyWithNewData(self, **args):
+        """Return dataset of same type using the column data given."""
+        return Dataset(**args)
 
 class Dataset(Dataset1DBase):
     '''Represents a dataset.'''
@@ -796,11 +803,16 @@ class DatasetDateTimeBase(Dataset1DBase):
     dstype = _('Date')
     displaytype = 'date'
 
-    def description(self, showlinked=True):
-        text = _('%s (%i date/times)') % (self.name(), len(self.data))
-        if self.linked and showlinked:
-            text += ', linked to %s' % self.linked.filename
-        return text
+    def description(self):
+        return _('Date/time (length %i)') % len(self.data)
+
+    def returnCopy(self):
+        """Returns version of dataset with no linking."""
+        return DatasetDateTime(data=N.array(self.data))
+
+    def returnCopyWithNewData(self, **args):
+        """Return dataset of same type using the column data given."""
+        return DatasetDateTime(**args)
 
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
@@ -853,10 +865,6 @@ class DatasetDateTime(DatasetDateTimeBase):
         data.attrs['vsz_convert_datetime'] = 1
         data.attrs['vsz_name'] = name.encode('utf-8')
 
-    def returnCopy(self):
-        """Returns version of dataset with no linking."""
-        return DatasetDateTime(data=N.array(self.data))
-
     def deleteRows(self, row, numrows):
         """Delete numrows rows starting from row.
         Returns deleted rows as a dict of {column:data, ...}
@@ -891,7 +899,7 @@ class DatasetDateTime(DatasetDateTimeBase):
         # tell the document that we've changed
         self.document.modifiedData(self)
 
-class DatasetText(DatasetBase):
+class DatasetText(DatasetConcreteBase):
     """Represents a text dataset: holding an array of strings."""
 
     dimensions = 1
@@ -904,14 +912,11 @@ class DatasetText(DatasetBase):
     def __init__(self, data=None, linked=None):
         """Initialise dataset with data given. Data are a list of strings."""
 
-        DatasetBase.__init__(self, linked=linked)
+        DatasetConcreteBase.__init__(self, linked=linked)
         self.data = list(data)
 
-    def description(self, showlinked=True):
-        text = _('%s (%i items)') % (self.name(), len(self.data))
-        if self.linked and showlinked:
-            text += _(', linked to %s') % self.linked.filename
-        return text
+    def description(self):
+        return _('Text (length %i)') % len(self.data)
 
     def userSize(self):
         """Size of dataset."""
@@ -981,6 +986,10 @@ class DatasetText(DatasetBase):
     def returnCopy(self):
         """Returns version of dataset with no linking."""
         return DatasetText(self.data)
+
+    def returnCopyWithNewData(self, **args):
+        """Return dataset of same type using the column data given."""
+        return DatasetText(**args)
 
 class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
@@ -1330,7 +1339,7 @@ class DatasetExpression(Dataset1DBase):
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
-        We override this from DatasetBase as it would return a
+        We override this from DatasetConcreteBase as it would return a
         DatsetExpression otherwise, not chopped sets of data.
         """
         return Dataset(**self._getItemHelper(key))
@@ -1391,7 +1400,7 @@ class DatasetRange(Dataset1DBase):
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
-        We override this from DatasetBase as it would return a
+        We override this from DatasetConcreteBase as it would return a
         DatsetExpression otherwise, not chopped sets of data.
         """
         return Dataset(**self._getItemHelper(key))
@@ -1578,13 +1587,6 @@ class Dataset2DXYZExpression(Dataset2DBase):
         if ds is None:
             return N.array( [[]] )
         return ds
-
-    def description(self, showlinked=True):
-        # FIXME: dataeditdialog descriptions should be taken from here somewhere
-        text = self.name()
-        text += ' (%ix%i)' % self.data.shape
-        text += ', x=%g->%g' % tuple(self.xrange)
-        text += ', y=%g->%g' % tuple(self.yrange)
 
     def saveDataRelationToText(self, fileobj, name):
         '''Save expressions to file.
@@ -1841,7 +1843,7 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset1DBase):
     def __getitem__(self, key):
         """Return a dataset based on this dataset
 
-        We override this from DatasetBase as it would return a
+        We override this from DatasetConcreteBase as it would return a
         DatsetExpression otherwise, not chopped sets of data.
         """
         return Dataset(**self._getItemHelper(key))

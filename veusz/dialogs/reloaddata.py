@@ -105,39 +105,55 @@ class ReloadData(VeuszDialog):
     def reloadData(self):
         """Reload linked data. Show the user what was done."""
 
-        text = ''
+        lines = []
+        datasets = []
+        errors = {}
         self.document.suspendUpdates()
         try:
             # try to reload the datasets
             datasets, errors = self.document.reloadLinkedDatasets(
                 self.filenames)
-
-            # show errors in read data
-            for var, count in errors.items():
-                if count != 0:
-                    text += ( _('%i conversions failed for dataset "%s"\n') %
-                              (count, var) )
-
-            # show successes
-            if len(datasets) != 0:
-                text += _('Reloaded (%i)\n') % self.reloadct
-                self.reloadct += 1
-                for var in datasets:
-                    descr = self.document.data[var].description()
-                    if descr:
-                        text += ' %s\n' % descr
-                    else:
-                        text += ' %s\n' % var
-
         except EnvironmentError as e:
-            text = _('Error reading file:\n') + cstr(e)
+            lines.append(_("Error reading file: %s") % cstr(e))
         except:
             self.document.enableUpdates()
             raise
-
-        if text == '':
-            text = _('Nothing to do. No linked datasets.')
-
         self.document.enableUpdates()
-        self.outputedit.setPlainText(text)
-        
+
+        # header showing count
+        if len(datasets) > 0:
+            lines.append(_("Reloaded (%i)") % self.reloadct)
+            self.reloadct += 1
+
+        # show errors in read data
+        for var, count in errors.items():
+            if count:
+                lines.append(
+                    _('%i conversions failed for dataset "%s"') %
+                    (count, var)
+                )
+
+        # show successes
+        # group datasets by linked file
+        linked = set()
+        for var in datasets:
+            ds = self.document.data[var]
+            linked.add(ds.linked)
+
+        linked = [(l.filename, l) for l in linked]
+        linked.sort()
+
+        # list datasets for each linked file
+        for lname, link in linked:
+            lines.append('')
+            lines.append(_('Linked to %s') % lname)
+            for var in sorted(datasets):
+                ds = self.document.data[var]
+                if ds.linked is link:
+                    lines.append( ' %s: %s' % (
+                        var, ds.description()) )
+
+        if len(datasets) == 0:
+            lines.append(_('Nothing to do. No linked datasets.'))
+
+        self.outputedit.setPlainText('\n'.join(lines))
