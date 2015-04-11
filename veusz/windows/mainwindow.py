@@ -839,7 +839,7 @@ class MainWindow(qt4.QMainWindow):
         setdb['geometry_mainwindow'] = geometry
 
         # store docked windows
-        data = str(self.saveState())
+        data = self.saveState().data()
         setdb['geometry_mainwindowstate'] = data
 
         # save current setting db

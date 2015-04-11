@@ -39,6 +39,7 @@ Minor changes
  * Avoid syntax error with invalid colormap
  * Updates to setup.py and desktop files
  * Recreate dataset now works if dialog hasn't been opened already
+ * Restore dock layout when using Python3
 
 Features of package:
  Plotting features:
