@@ -202,13 +202,6 @@ class DatasetConcreteBase(DatasetBase):
         group is the group to save it in (h5py group)
         """
 
-    def name(self):
-        """Get dataset name."""
-        for name, ds in citems(self.document.data):
-            if ds is self:
-                return name
-        raise ValueError('Could not find self in document.data')
-
     def userSize(self):
         """Return dimensions of dataset for user."""
         return ""

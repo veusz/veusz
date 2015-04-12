@@ -162,13 +162,6 @@ class DatasetFiltered(DatasetBase):
         self.changeset = -1
         self._internalds = Dataset(data=[])
 
-    def name(self):
-        """Lookup name."""
-        for name, ds in citems(self.document.data):
-            if ds is self:
-                return name
-        raise ValueError('Could not find self in document.data')
-
     def _checkUpdate(self):
         """Recalculate if document has changed."""
         if self.document.changeset != self.changeset:
