@@ -72,14 +72,14 @@ class FilterDialog(VeuszDialog):
             return
 
         invert = self.invertcheck.isChecked()
-        replacenans = self.replacenancheck.isChecked()
+        replaceblanks = self.replaceblankscheck.isChecked()
 
-        op = document.OperationDatasetFilter(
+        op = document.OperationDatasetsFilter(
             expr,
             tofilter,
             prefix=prefix, suffix=suffix,
             invert=invert,
-            replacenans=replacenans)
+            replaceblanks=replaceblanks)
 
         self.document.applyOperation(op)
 

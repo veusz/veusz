@@ -29,14 +29,14 @@ class DatasetFilterGenerator(object):
 
     def __init__(self, inexpr, indatasets,
                  prefix="", suffix="",
-                 invert=False, replacenans=False):
+                 invert=False, replaceblanks=False):
         """
         inexpr = filter expression
         indatasets = list of input datasets
         prefix = output prefix
         suffix = output suffix
         invert = invert filter
-        replacenans = replace filtered values by nans
+        replaceblanks = replace filtered values by nans
         """
 
         self.changeset = -1
@@ -45,7 +45,7 @@ class DatasetFilterGenerator(object):
         self.prefix = prefix
         self.suffix = suffix
         self.invert = invert
-        self.replacenans = replacenans
+        self.replaceblanks = replaceblanks
 
         self.outdatasets = {}
 
@@ -59,7 +59,7 @@ class DatasetFilterGenerator(object):
                 filtered = None
             else:
                 filtered = N.array(data[:minlen])
-                if self.replacenans:
+                if self.replaceblanks:
                     filtered[N.logical_not(filterarr)] = N.nan
                 else:
                     filtered = filtered[filterarr]
@@ -68,7 +68,7 @@ class DatasetFilterGenerator(object):
 
     def filterText(self, ds, filterarr):
         """Filter a text dataset."""
-        if self.replacenans:
+        if self.replaceblanks:
             filtered = [(d if f else "")
                         for f, d in czip(filterarr, data)]
         else:
@@ -143,14 +143,15 @@ class DatasetFilterGenerator(object):
             args.append("suffix="+repr(self.suffix))
         if self.invert:
             args.append("invert=True")
-        if self.replacenans:
-            args.append("replacenans=True")
+        if self.replaceblanks:
+            args.append("replaceblanks=True")
 
         fileobj.write("FilterDatasets(%s)\n" % ", ".join(args))
 
 class DatasetFiltered(DatasetBase):
+    """A dataset which is another dataset filtered by an expression."""
 
-    dstype = 'Filtered'
+    dstype = "Filtered"
     dimensions = 1
     editable = False
 
@@ -160,7 +161,7 @@ class DatasetFiltered(DatasetBase):
         self.namein = name
         self.document = doc
         self.changeset = -1
-        self._internalds = Dataset(data=[])
+        self._internalds = None
 
     def _checkUpdate(self):
         """Recalculate if document has changed."""
@@ -169,9 +170,16 @@ class DatasetFiltered(DatasetBase):
             self.changeset = self.document.changeset
 
             ds = self.generator.outdatasets.get(self.namein)
-            self._internalds = Dataset(data=[]) if ds is None else ds
+            if ds is None:
+                self._internalds = Dataset(data=[])
+            else:
+                self._internalds = ds
 
-    def saveDataRelationToText(self, fileobj, name):
+    def linkedInformation(self):
+        return _("Filtered '%s' using '%s'") % (
+            self.namein, self.generator.inexpr)
+
+    def saveToFile(self, fileobj, name, **args):
         """Save plugin to file, if this is the first one."""
 
         # Am I the first dataset in the document with this generator?
@@ -189,222 +197,33 @@ class DatasetFiltered(DatasetBase):
 
     def __getattr__(self, attr):
         """Lookup attribute from internal dataset."""
+        self._checkUpdate()
         return getattr(self._internalds, attr)
 
-# class _DatasetFiltered(object):
-#     """Shared methods for filtered datasets."""
-
-#     dstype = _("Filtered")
-
-#     def __init__(self, gen, name):
-#         self.generator = gen
-#         self.namein = name
-
-#     def getFilteredData(self, attr):
-
-
-#     def linkedInformation(self):
-#         return _("Dataset '%s' filtered using '%s'") % (
-#             self.namein, self.generator.inexpr)
-
-#     def canUnlink(self):
-#         """Can relationship be unlinked?"""
-#         return True
-
-#     def deleteRows(self, row, numrows):
-#         pass
-
-#     def insertRows(self, row, numrows, rowdata):
-#         pass
-
-#     def saveDataRelationToText(self, fileobj, name):
-#         """Save plugin to file, if this is the first one."""
-
-#         # Am I the first dataset in the document with this generator?
-#         am1st = False
-#         for ds in sorted(self.document.data):
-#             data = self.document.data[ds]
-#             if data is self:
-#                 am1st = True
-#                 break
-#             elif getattr(data, "generator", None) is self.generator:
-#                 # not 1st
-#                 break
-#         if am1st:
-#             self.generator.saveToFile(self.document, fileobj)
-
-#     def saveDataDumpToText(self, fileobj, name):
-#         """Save data to text: not used."""
-
-#     def saveDataDumpToHDF5(self, group, name):
-#         """Save data to HDF5: not used."""
-
-# class Dataset1DFiltered(_DatasetFiltered, Dataset1DBase):
-#     """Return 1D dataset from a plugin."""
-
-#     def __init__(self, gen, name):
-#         _DatasetFiltered.__init__(self, gen, name)
-#         Dataset1DBase.__init__(self)
-
-#     def userSize(self):
-#         """Size of dataset."""
-#         return str( self.data.shape[0] )
-
-#     def __getitem__(self, key):
-#         """Return a dataset based on this dataset
-
-#         We override this from DatasetBase as it would return a
-#         DatsetExpression otherwise, not chopped sets of data.
-#         """
-#         return Dataset(**self._getItemHelper(key))
-
-#     # parent class sets these attributes, so override setattr to do nothing
-#     data = property( lambda self: self.getFilteredData('data'),
-#                      lambda self, val: None )
-#     serr = property( lambda self: self.getFilteredData('serr'),
-#                      lambda self, val: None )
-#     nerr = property( lambda self: self.getFilteredData('nerr'),
-#                      lambda self, val: None )
-#     perr = property( lambda self: self.getFilteredData('perr'),
-#                      lambda self, val: None )
-
-# class DatasetTextFiltered(_DatasetFiltered, DatasetText):
-#     """Return text dataset from a plugin."""
-
-#     def __init__(self, gen, name):
-#         _DatasetFiltered.__init__(self, gen, name)
-#         DatasetText.__init__(self, [])
-
-#     def __getitem__(self, key):
-#         return DatasetText(self.data[key])
-
-#     data = property( lambda self: self.getFilteredData('data'),
-#                      lambda self, val: None )
-
-# class DatasetDateTimeFiltered(_DatasetFiltered, DatasetDateTimeBase):
-#     """Return date dataset from plugin."""
-
-#     def __init__(self, gen, name):
-#         _DatasetFiltered.__init__(self, gen, name)
-#         DatasetDateTimeBase.__init__(self)
-#         self.serr = self.perr = self.nerr = None
-
-#     def __getitem__(self, key):
-#         return DatasetDateTime(self.data[key])
-
-#     data = property( lambda self: self.getFilteredData('data'),
-#                      lambda self, val: None )
-
-
-
-# class DatasetFiltered(DatasetBase):
-#     """A dataset filtered by an expression."""
-
-#     dimensions = 1
-
-#     def __init__(self, generator, namein, doc):
-#         DatasetBase.__init__(self)
-#         self.generator = generator
-#         self.document = doc
-#         self.namein = namein
-#         self.linked = None
-#         self.changeset = -1
-
-#         self._data = self._datatype = self._displaytype = None
-#         self._columns = self._column_descriptions = None
-
-#     def _checkUpdate(self):
-#         """Recalculate if document has changed."""
-#         if self.document.changeset != self.changeset:
-#             self.generator.checkUpdate(self.document)
-#             self.changeset = self.document.changeset
-
-#             data = self.generator.outdatasets.get(self.namein)
-#             if data is None:
-#                 self._data = {"data": N.array([], dtype=N.float64)}
-#                 self._datatype = Dataset1DBase.datatype
-#                 self._displaytype = Dataset1DBase.displaytype
-#                 self._columns = Dataset1DBase.columns
-#                 self._column_descriptions = Dataset1DBase.column_descriptions
-#             else:
-#                 (self._datatype, self._displaytype,
-#                  self._columns, self._column_descriptions,
-#                  self._data) = data
-
-#     def linkedInformation(self):
-#         return _("Dataset '%s' filtered using '%s'") % (
-#             self.namein, self.generator.inexpr)
-
-#     def userSize(self):
-#         return str(len(self.data))
-
-#     def saveDataRelationToText(self, fileobj, name):
-#         """Save in output file."""
-
-#         # Am I the first dataset in the document with this generator?
-#         am1st = False
-#         for ds in sorted(self.document.data):
-#             data = self.document.data[ds]
-#             if data is self:
-#                 am1st = True
-#                 break
-#             elif getattr(data, "generator", None) is self.generator:
-#                 # not 1st
-#                 break
-#         if am1st:
-#             self.generator.saveToFile(self.document, fileobj)
-
-#     # descriptors
-#     @property
-#     def datatype(self):
-#         self._checkUpdate()
-#         return self._datatype
-#     @property
-#     def displaytype(self):
-#         self._checkUpdate()
-#         return self._displaytype
-#     @property
-#     def columns(self):
-#         self._checkUpdate()
-#         return self._columns
-#     @property
-#     def column_descriptions(self):
-#         self._checkUpdate()
-#         return self._column_descriptions
-
-#     # data parts
-#     @property
-#     def data(self):
-#         self._checkUpdate()
-#         return self._data.get("data")
-#     @property
-#     def serr(self):
-#         self._checkUpdate()
-#         return self._data.get("serr")
-#     @property
-#     def perr(self):
-#         self._checkUpdate()
-#         return self._data.get("perr")
-#     @property
-#     def nerr(self):
-#         self._checkUpdate()
-#         return self._data.get("nerr")
-
-class OperationDatasetFilter(object):
+class OperationDatasetsFilter(object):
     """Operation to filter datasets."""
 
     descr = _("filter datasets")
 
     def __init__(self, inexpr, indatasets,
                  prefix="", suffix="",
-                 invert=False, replacenans=False):
-        assert prefix != "" or suffix != ""
+                 invert=False, replaceblanks=False):
+        """Initialise operation:
+        inexpr: input expression
+        indatasets: list of dataset names
+        prefix, suffix: output prefix/suffix
+        invert: invert filter expression
+        replaceblanks: replace output with blank/nan values.
+        """
+
+        if not prefix and not suffix:
+            raise ValueError("Prefix and/or suffix must be given")
         self.inexpr = inexpr
         self.indatasets = indatasets
         self.prefix = prefix
         self.suffix = suffix
         self.invert = invert
-        self.replacenans = replacenans
+        self.replaceblanks = replaceblanks
 
     def do(self, doc):
         """Do the operation."""
@@ -412,10 +231,9 @@ class OperationDatasetFilter(object):
         gen = DatasetFilterGenerator(
             self.inexpr, self.indatasets,
             prefix=self.prefix, suffix=self.suffix,
-            invert=self.invert, replacenans=self.replacenans)
+            invert=self.invert, replaceblanks=self.replaceblanks)
 
         self.olddatasets = {}
-        gen.checkUpdate(doc)
 
         for name in self.indatasets:
             outname = self.prefix + name + self.suffix

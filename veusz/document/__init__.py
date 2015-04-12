@@ -26,7 +26,7 @@ from .commandinterpreter import *
 from .operations import *
 from .mime import *
 from .dataset_histo import *
-from .dataset_filtered import DatasetFiltered, OperationDatasetFilter
+from .dataset_filtered import DatasetFiltered, OperationDatasetsFilter
 from .painthelper import *
 from .export import Export, printDialog
 from .dbusinterface import *
