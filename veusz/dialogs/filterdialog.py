@@ -81,11 +81,18 @@ class FilterDialog(VeuszDialog):
             invert=invert,
             replaceblanks=replaceblanks)
 
+        ok, log = op.check(self.document)
+        if not ok:
+            self.updateStatus("\n".join(log))
+            return
+
         self.document.applyOperation(op)
+        self.updateStatus(_("Filtered %i datasets") % len(tofilter))
 
     def resetClicked(self):
         for cntrl in self.exprcombo, self.prefixcombo, self.suffixcombo:
             cntrl.setEditText("")
         self.dsbrowser.reset()
+        self.invertcheck.setChecked(False)
+        self.replaceblankscheck.setChecked(False)
         self.updateStatus(_("Dialog reset"))
-

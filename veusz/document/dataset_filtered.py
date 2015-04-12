@@ -19,7 +19,7 @@
 from __future__ import division, print_function
 import numpy as N
 
-from ..compat import citems, czip
+from ..compat import citems, czip, crepr
 from .. import qtall as qt4
 from .datasets import Dataset, DatasetBase, evalDatasetExpression, _
 
@@ -76,11 +76,18 @@ class DatasetFilterGenerator(object):
         return ds.returnCopyWithNewData(data=filtered)
 
     def checkUpdate(self, doc):
-        """Update filtering calculation if doc changed."""
+        """Check whether datasets need to be updated."""
+        if doc.changeset != self.changeset:
+            self.changeset = doc.changeset
+            log = self.evaluateFilter(doc)
+            if log:
+                doc.log('\n'.join(log)+'\n')
 
-        if doc.changeset == self.changeset:
-            return
-        self.changeset = doc.changeset
+    def evaluateFilter(self, doc):
+        """Update filtering calculation if doc changed.
+
+        Returns log of errors
+        """
 
         # this is populated by output
         self.outdatasets = {}
@@ -88,27 +95,28 @@ class DatasetFilterGenerator(object):
         # evaluate filter expression
         d = evalDatasetExpression(doc, self.inexpr)
         if d is None:
-            return
+            return ["Invalid filter expression: '%s'" % self.inexpr]
         if d.dimensions != 1:
-            doc.log(
-                _("Invalid number of dimensions in filter expression '%s'\n") %
-                self.inexpr)
-            return
+            return [
+                _("Invalid number of dimensions in filter expression '%s'") %
+                self.inexpr]
         if d.datatype != "numeric":
-            doc.log(
-                _("Input filter expression non-numeric: '%s'\n") % self.inexpr)
-            return
+            return [
+                _("Input filter expression non-numeric: '%s'") % self.inexpr]
 
         filterarr = d.data.astype(N.bool)
         if self.invert:
             filterarr = N.logical_not(filterarr)
 
         # do filtering of datasets
+        log = []
         for name in self.indatasets:
             ds = doc.data.get(name)
-            if ds is None or ds.dimensions != 1:
-                doc.log(_("Filtered dataset '%s' has more than 1 dimension\n") %
-                        name)
+            if ds is None:
+                continue
+            if ds.dimensions != 1:
+                log.append(
+                    _("Filtered dataset '%s' has more than 1 dimension") % name)
                 continue
             minlen = min(len(ds.data), len(filterarr))
             filterarrchop = filterarr[:minlen]
@@ -118,10 +126,11 @@ class DatasetFilterGenerator(object):
             elif ds.datatype == "text":
                 filtered = self.filterText(ds, filterarrchop)
             else:
-                doc.log(_("Could not filter dataset '%s'\n") % name)
+                log.append(_("Could not filter dataset '%s'") % name)
                 continue
 
             self.outdatasets[name] = filtered
+        return log
 
     def saveToFile(self, doc, fileobj):
         """Save datasets to file."""
@@ -134,13 +143,13 @@ class DatasetFilterGenerator(object):
                 names.append(ds.namein)
 
         args = [
-            repr(self.inexpr),
-            repr(names),
+            crepr(self.inexpr),
+            crepr(names),
         ]
         if self.prefix:
-            args.append("prefix="+repr(self.prefix))
+            args.append("prefix="+crepr(self.prefix))
         if self.suffix:
-            args.append("suffix="+repr(self.suffix))
+            args.append("suffix="+crepr(self.suffix))
         if self.invert:
             args.append("invert=True")
         if self.replaceblanks:
@@ -152,7 +161,6 @@ class DatasetFiltered(DatasetBase):
     """A dataset which is another dataset filtered by an expression."""
 
     dstype = "Filtered"
-    dimensions = 1
     editable = False
 
     def __init__(self, gen, name, doc):
@@ -178,6 +186,9 @@ class DatasetFiltered(DatasetBase):
     def linkedInformation(self):
         return _("Filtered '%s' using '%s'") % (
             self.namein, self.generator.inexpr)
+
+    def canUnlink(self):
+        return True
 
     def saveToFile(self, fileobj, name, **args):
         """Save plugin to file, if this is the first one."""
@@ -225,22 +236,33 @@ class OperationDatasetsFilter(object):
         self.invert = invert
         self.replaceblanks = replaceblanks
 
-    def do(self, doc):
-        """Do the operation."""
-
-        gen = DatasetFilterGenerator(
+    def makeGen(self):
+        """Return generator object."""
+        return DatasetFilterGenerator(
             self.inexpr, self.indatasets,
             prefix=self.prefix, suffix=self.suffix,
             invert=self.invert, replaceblanks=self.replaceblanks)
 
-        self.olddatasets = {}
+    def check(self, doc):
+        """Check the filter is ok.
 
+        Return (ok, [list of errors])
+        """
+
+        log = self.makeGen().evaluateFilter(doc)
+        if log:
+            return (False, log)
+        return (True, [])
+
+    def do(self, doc):
+        """Do the operation."""
+
+        gen = self.makeGen()
+        self.olddatasets = {}
         for name in self.indatasets:
             outname = self.prefix + name + self.suffix
             self.olddatasets[outname] = doc.data.get(outname)
             doc.setData(outname, DatasetFiltered(gen, name, doc))
-
-        return gen.outdatasets
 
     def undo(self, doc):
         """Undo operation."""
