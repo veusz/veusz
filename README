@@ -40,6 +40,7 @@ Minor changes
  * Updates to setup.py and desktop files
  * Recreate dataset now works if dialog hasn't been opened already
  * Restore dock layout when using Python3
+ * Fix undo after loading stylesheet/custom definitions
 
 Features of package:
  Plotting features:
