@@ -696,6 +696,11 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         """Returns list of checked datasets (if checkable was True)."""
         return sorted(self.model.checked_datasets)
 
+    def setCheckedDatasets(self, checked):
+        """Update list of checked datasets."""
+        self.model.checked_datasets = set(checked)
+        self.model.refresh()
+
     def resetChecks(self):
         """Reset checked datasets."""
         self.model.checked_datasets.clear()
@@ -785,6 +790,10 @@ class DatasetBrowser(qt4.QWidget):
     def checkedDatasets(self):
         """Returns list of checked datasets (if checkable was True)."""
         return self.navtree.checkedDatasets()
+
+    def setCheckedDatasets(self, checked):
+        """Update list of checked datasets."""
+        self.navtree.setCheckedDatasets(checked)
 
     def reset(self):
         """Uncheck all items."""

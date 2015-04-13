@@ -90,9 +90,32 @@ class FilterDialog(VeuszDialog):
         self.updateStatus(_("Filtered %i datasets") % len(tofilter))
 
     def resetClicked(self):
+        """Reset controls to defaults."""
         for cntrl in self.exprcombo, self.prefixcombo, self.suffixcombo:
             cntrl.setEditText("")
         self.dsbrowser.reset()
         self.invertcheck.setChecked(False)
         self.replaceblankscheck.setChecked(False)
         self.updateStatus(_("Dialog reset"))
+
+    def reEditDialog(self, dataset):
+        """Load controls with settings from dataset."""
+        gen = dataset.generator
+
+        self.exprcombo.setEditText(gen.inexpr)
+        self.prefixcombo.setEditText(gen.prefix)
+        self.suffixcombo.setEditText(gen.suffix)
+        self.invertcheck.setChecked(gen.invert)
+        self.replaceblankscheck.setChecked(gen.replaceblanks)
+
+        datasets = [
+            d for d in gen.indatasets
+            if d in self.document.data
+            ]
+        self.dsbrowser.setCheckedDatasets(datasets)
+
+def recreateDataset(mainwindow, document, dataset, datasetname):
+    """Open dialog to recreate filter."""
+    dialog = FilterDialog(mainwindow, document)
+    mainwindow.showDialog(dialog)
+    dialog.reEditDialog(dataset)
