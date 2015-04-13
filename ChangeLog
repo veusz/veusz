@@ -27,6 +27,7 @@ Minor changes
  * Recreate dataset now works if dialog hasn't been opened already
  * Restore dock layout when using Python3
  * Fix undo after loading stylesheet/custom definitions
+ * Support unicode example filenames
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs

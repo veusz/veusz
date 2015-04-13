@@ -20,6 +20,7 @@
 """Implements the main window of the application."""
 
 from __future__ import division, print_function
+import os
 import os.path
 import sys
 import glob
@@ -634,7 +635,12 @@ class MainWindow(qt4.QMainWindow):
     def populateExamplesMenu(self):
         """Add examples to help menu."""
 
-        examples = glob.glob(os.path.join(utils.exampleDirectory, '*.vsz'))
+        # not cstr here forces to unicode for Python 2, getting
+        # filenames in unicode
+        examples = [ os.path.join(utils.exampleDirectory, f)
+                     for f in os.listdir(cstr(utils.exampleDirectory))
+                     if os.path.splitext(f)[1] == ".vsz" ]
+
         menu = self.menus["help.examples"]
         for ex in sorted(examples):
             name = os.path.splitext(os.path.basename(ex))[0]
