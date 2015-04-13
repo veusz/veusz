@@ -108,17 +108,12 @@ class ReloadData(VeuszDialog):
         lines = []
         datasets = []
         errors = {}
-        self.document.suspendUpdates()
         try:
             # try to reload the datasets
             datasets, errors = self.document.reloadLinkedDatasets(
                 self.filenames)
         except EnvironmentError as e:
             lines.append(_("Error reading file: %s") % cstr(e))
-        except:
-            self.document.enableUpdates()
-            raise
-        self.document.enableUpdates()
 
         # header showing count
         if len(datasets) > 0:

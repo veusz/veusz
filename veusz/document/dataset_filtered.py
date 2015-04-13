@@ -170,6 +170,7 @@ class DatasetFiltered(DatasetBase):
         self.document = doc
         self.changeset = -1
         self._internalds = None
+        self.tags = set()
 
     def _checkUpdate(self):
         """Recalculate if document has changed."""
@@ -210,6 +211,12 @@ class DatasetFiltered(DatasetBase):
         """Lookup attribute from internal dataset."""
         self._checkUpdate()
         return getattr(self._internalds, attr)
+
+    # these have to be overridden manually
+    def __getitem__(self, key):
+        return self._internalds[key]
+    def __len__(self):
+        return len(self._internalds)
 
 class OperationDatasetsFilter(object):
     """Operation to filter datasets."""

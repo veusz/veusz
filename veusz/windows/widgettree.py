@@ -87,8 +87,6 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         document.signalModified.connect(self.slotDocumentModified)
         document.sigWiped.connect(self.deleteTree)
 
-        # suspend signals to the view that the model has changed
-        self.suspendmodified = False
         # root node of document
         self.rootnode = _WidgetNode(None, document.basewidget)
         # map of widgets to nodes
@@ -107,8 +105,6 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def slotDocumentModified(self):
         """The document has been changed."""
-        if self.suspendmodified:
-            return
         self.syncTree()
 
     def syncTree(self):

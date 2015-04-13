@@ -1119,12 +1119,11 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
     raise DatasetExpressionException(err)
 
 def evalDatasetExpression(doc, origexpr, datatype='numeric',
-                          dimensions=1, part='data', log=True):
+                          dimensions=1, part='data'):
     """Evaluate expression and return an appropriate Dataset.
 
     part is 'data', 'serr', 'perr' or 'nerr' - these are the
     dataset parts which are evaluated by the expression
-    if log, write errors to the document log
 
     Returns None if error
     """
@@ -1162,8 +1161,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
     try:
         evalout = eval(comp, env)
     except Exception as ex:
-        if log:
-            doc.log("Error evaluating '%s': '%s'" % (origexpr, cstr(ex)))
+        doc.log("Error evaluating '%s': '%s'" % (origexpr, cstr(ex)))
         return None
 
     # return correct dataset for data type
@@ -1175,8 +1173,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
         else:
             raise RuntimeError('Invalid data type')
     except DatasetExpressionException as ex:
-        if log:
-            doc.log(_("Error evaluating '%s': %s\n") % (origexpr, cstr(ex)))
+        doc.log(_("Error evaluating '%s': %s\n") % (origexpr, cstr(ex)))
 
     return None
 
