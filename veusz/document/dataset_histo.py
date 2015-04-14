@@ -18,12 +18,8 @@
 
 from __future__ import division
 import numpy as N
-from .datasets import Dataset1DBase, evalDatasetExpression
+from .datasets import Dataset1DBase, evalDatasetExpression, _
 from .. import qtall as qt4
-
-def _(text, disambiguation=None, context="Datasets"):
-    """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class DatasetHistoGenerator(object):
     def __init__(self, document, inexpr,
@@ -284,7 +280,7 @@ class DatasetHistoValues(Dataset1DBase):
 class OperationDatasetHistogram(object):
     """Operation to make histogram from data."""
 
-    descr = 'make histogram'
+    descr = _("make histogram")
 
     def __init__(self, expr, outposns, outvalues,
                  binparams=None, binmanual=None, method='counts',

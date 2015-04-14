@@ -45,19 +45,6 @@ class LoadError(RuntimeError):
         RuntimeError.__init__(self, text)
         self.backtrace = backtrace
 
-class _UpdateSuspender(object):
-    """Handle document updates/suspensions."""
-
-    def __init__(self, doc):
-        self.doc = doc
-
-    def __enter__(self):
-        self.doc.suspendUpdates()
-        return self
-
-    def __exit__(self, type, value, traceback):
-        self.doc.enableUpdates()
-
 def bconv(s):
     """Sometimes h5py returns non-unicode strings,
     so hack to decode strings if in wrong format."""
@@ -127,7 +114,7 @@ def executeScript(thedoc, filename, script, callbackunsafe=None):
     # allow import to happen relative to loaded file
     interface.AddImportPath( os.path.dirname(os.path.abspath(filename)) )
 
-    with _UpdateSuspender(thedoc):
+    with thedoc.suspend():
         try:
             # actually run script text
             cexec(compiled, env)
@@ -199,7 +186,7 @@ def loadHDF5Doc(thedoc, filename, callbackunsafe=None):
     except ImportError:
         raise LoadError(_("No HDF5 support as h5py module is missing"))
 
-    with _UpdateSuspender(thedoc):
+    with thedoc.suspend():
         thedoc.wipe()
         hdffile = h5py.File(filename, 'r')
 

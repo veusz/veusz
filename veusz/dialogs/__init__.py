@@ -33,6 +33,9 @@ def _lazy_recreate_2d(*args):
 def _lazy_recreate_histo(*args):
     from .histodata import recreateDataset
     recreateDataset(*args)
+def _lazy_recreate_filtered(*args):
+    from .filterdialog import recreateDataset
+    recreateDataset(*args)
 def _lazy_recreate_plugin(*args):
     from .plugin import recreateDataset
     recreateDataset(*args)
@@ -45,6 +48,7 @@ for kls, fn in (
         (document.Dataset2DXYFunc, _lazy_recreate_2d),
         (document.DatasetHistoValues, _lazy_recreate_histo),
         (document.DatasetHistoBins, _lazy_recreate_histo),
+        (document.DatasetFiltered, _lazy_recreate_filtered),
         (document.Dataset1DPlugin, _lazy_recreate_plugin),
         (document.Dataset2DPlugin, _lazy_recreate_plugin),
         (document.DatasetTextPlugin, _lazy_recreate_plugin),

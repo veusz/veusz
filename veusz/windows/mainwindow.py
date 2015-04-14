@@ -510,6 +510,9 @@ class MainWindow(qt4.QMainWindow):
             'data.capture':
                 a(self, _('Capture remote data'), _('Ca&pture...'),
                   self.slotDataCapture, icon='veusz-capture-data'),
+            'data.filter':
+                a(self, _('Filter data'), _('&Filter...'),
+                  self.slotDataFilter, icon='kde-filter'),
             'data.histogram':
                 a(self, _('Histogram data'), _('&Histogram...'),
                   self.slotDataHistogram, icon='button_bar'),
@@ -549,10 +552,11 @@ class MainWindow(qt4.QMainWindow):
         tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszdatatoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, tb)
-        utils.addToolbarActions(tb, self.vzactions,
-                                ('data.import', 'data.edit',
-                                 'data.create', 'data.capture',
-                                 'data.reload'))
+        utils.addToolbarActions(
+            tb, self.vzactions,
+            ('data.import', 'data.edit',
+             'data.create', 'data.capture',
+             'data.filter', 'data.reload'))
 
         # menu structure
         filemenu = [
@@ -594,7 +598,7 @@ class MainWindow(qt4.QMainWindow):
         datamenu = [
             ['data.ops', _('&Operations'), datapluginsmenu],
             'data.import', 'data.edit', 'data.create',
-            'data.create2d', 'data.capture', 'data.histogram',
+            'data.create2d', 'data.capture', 'data.filter', 'data.histogram',
             'data.reload',
             ]
         helpmenu = [
@@ -741,6 +745,13 @@ class MainWindow(qt4.QMainWindow):
         """Capture remote data."""
         from ..dialogs.capturedialog import CaptureDialog
         dialog = CaptureDialog(self.document, self)
+        self.showDialog(dialog)
+        return dialog
+
+    def slotDataFilter(self):
+        """Filter datasets."""
+        from ..dialogs.filterdialog import FilterDialog
+        dialog = FilterDialog(self, self.document)
         self.showDialog(dialog)
         return dialog
 
