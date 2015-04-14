@@ -15,6 +15,7 @@ external sources such as Internet sockets or other programs.
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
    modify the export options
+ * Add new dataset filtering dialog
  * Add cubehelix() functional colormap
  * Add -stepN suffix for colormaps to make arbitrary numbers of steps
  * Fix incorrect colors in log images and log color scales
