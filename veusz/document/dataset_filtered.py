@@ -68,6 +68,7 @@ class DatasetFilterGenerator(object):
 
     def filterText(self, ds, filterarr):
         """Filter a text dataset."""
+        data = ds.data
         if self.replaceblanks:
             filtered = [(d if f else "")
                         for f, d in czip(filterarr, data)]
