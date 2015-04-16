@@ -621,7 +621,7 @@ class Axis(widget.Widget):
 
         log1 = N.log(self.plottedrange[0])
         log2 = N.log(self.plottedrange[1])
-        return ( N.log( N.clip(v, 1e-99, 1e99) ) - log1 )/(log2 - log1)
+        return (N.log(N.clip(v, 1e-99, 1e99)) - log1)/(log2 - log1)
 
     def logConvertFromPlotter(self, v):
         """Convert from fraction plotter coords to graph coords with log scale.

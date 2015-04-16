@@ -64,6 +64,9 @@ void plotBoxesToPainter(QPainter& painter,
 			const Numpy1DObj& x2, const Numpy1DObj& y2,
 			const QRectF* clip = 0, bool autoexpand = true);
 
+// add polygon to painter path as a cubic
+void addCubicsToPainterPath(QPainterPath& path, const QPolygonF& poly);
+
 QImage numpyToQImage(const Numpy2DObj& data, const Numpy2DIntObj &colors,
 		     bool forcetrans = false);
 

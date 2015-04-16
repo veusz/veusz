@@ -24,6 +24,7 @@
 #include <QRectF>
 #include <QPainter>
 #include <QPolygonF>
+#include <QVector>
 #include <QSizeF>
 
 // clip a line made up of the points given, returning true
@@ -37,6 +38,10 @@ void plotClippedPolyline(QPainter& painter,
                          const QPolygonF& poly,
                          bool autoexpand = true);
 
+
+// clip polyline to rectangle
+// return list of lines to plot
+QVector<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly);
 
 // Do the polygons intersect?
 bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b);
