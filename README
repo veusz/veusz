@@ -85,6 +85,7 @@ Features of package:
   * Scripting interface
   * Control with DBUS and SAMP
  Other features:
+  * Data filtering and manipulation
   * Data picker
   * Interactive tutorial
   * Multithreaded rendering
@@ -119,17 +120,12 @@ Optional requirements:
 
 Veusz is Copyright (C) 2003-2015 Jeremy Sanders <jeremy@jeremysanders.net>
  and contributors.
-It is licenced under the GPL (version 2 or greater).
+It is licensed under the GPL (version 2 or greater).
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
 examples are also useful documentation. Please also see and contribute
 to the Veusz wiki: https://github.com/jeremysanders/veusz/wiki
-
-Issues with the current version:
-
-  * Due to a bug in the Qt XML processing, some MathML elements
-    containing purely white space (e.g. thin space) will give an error.
 
 If you enjoy using Veusz, we would love to hear from you. Please join
 the mailing lists at
