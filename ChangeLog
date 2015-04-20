@@ -1,3 +1,8 @@
+Changes in <next release>:
+
+Minor changes
+ * Fix label colour in contour labelling
+
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
    modify the export options
