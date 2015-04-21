@@ -1,6 +1,12 @@
+Changes in <next release>:
+
+Minor changes
+ * Fix label colour in contour labelling
+
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
    modify the export options
+ * Add new dataset filtering dialog
  * Add cubehelix() functional colormap
  * Add -stepN suffix for colormaps to make arbitrary numbers of steps
  * Fix incorrect colors in log images and log color scales
@@ -24,6 +30,11 @@ Minor changes
  * Also ignore non-finite values when fitting with minuit
  * Avoid syntax error with invalid colormap
  * Updates to setup.py and desktop files
+ * Recreate dataset now works if dialog hasn't been opened already
+ * Restore dock layout when using Python3
+ * Fix undo after loading stylesheet/custom definitions
+ * Support unicode example filenames
+ * Clip bezier lines to avoid problems with log axes
 
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs

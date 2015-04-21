@@ -15,6 +15,7 @@ external sources such as Internet sockets or other programs.
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
    modify the export options
+ * Add new dataset filtering dialog
  * Add cubehelix() functional colormap
  * Add -stepN suffix for colormaps to make arbitrary numbers of steps
  * Fix incorrect colors in log images and log color scales
@@ -38,6 +39,11 @@ Minor changes
  * Also ignore non-finite values when fitting with minuit
  * Avoid syntax error with invalid colormap
  * Updates to setup.py and desktop files
+ * Recreate dataset now works if dialog hasn't been opened already
+ * Restore dock layout when using Python3
+ * Fix undo after loading stylesheet/custom definitions
+ * Support unicode example filenames
+ * Clip bezier lines to avoid problems with log axes
 
 Features of package:
  Plotting features:
@@ -79,6 +85,7 @@ Features of package:
   * Scripting interface
   * Control with DBUS and SAMP
  Other features:
+  * Data filtering and manipulation
   * Data picker
   * Interactive tutorial
   * Multithreaded rendering
@@ -113,17 +120,12 @@ Optional requirements:
 
 Veusz is Copyright (C) 2003-2015 Jeremy Sanders <jeremy@jeremysanders.net>
  and contributors.
-It is licenced under the GPL (version 2 or greater).
+It is licensed under the GPL (version 2 or greater).
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
 examples are also useful documentation. Please also see and contribute
 to the Veusz wiki: https://github.com/jeremysanders/veusz/wiki
-
-Issues with the current version:
-
-  * Due to a bug in the Qt XML processing, some MathML elements
-    containing purely white space (e.g. thin space) will give an error.
 
 If you enjoy using Veusz, we would love to hear from you. Please join
 the mailing lists at

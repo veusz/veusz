@@ -38,6 +38,7 @@ from .. import utils
 from . import datasets
 from . import operations
 from . import dataset_histo
+from . import dataset_filtered
 from . import mime
 from . import export
 
@@ -62,6 +63,7 @@ class CommandInterface(qt4.QObject):
         'CloneWidget',
         'CreateHistogram',
         'DatasetPlugin',
+        'FilterDatasets',
         'Get',
         'GetChildren',
         'GetData',
@@ -793,3 +795,27 @@ class CommandInterface(qt4.QObject):
         if self.verbose:
             print(_("Applied tag %s to datasets %s") % (
                 tag, ' '.join(datasets)))
+
+    def FilterDatasets(self, filterexpr, datasets,
+                       prefix="", suffix="",
+                       invert=False, replaceblanks=False):
+        """Apply filter expression to list of datasets.
+
+        filterexpr: input filter expression
+        datasets: list of input dataset names
+        prefix, suffix: output prefix/suffix to add to names (one must be set)
+        invert: invert results of filter expression
+        replaceblanks: replace filtered values with nan/blank in output.
+        """
+        op = dataset_filtered.OperationDatasetsFilter(
+            filterexpr, datasets,
+            prefix=prefix, suffix=suffix,
+            invert=invert, replaceblanks=replaceblanks)
+        self.document.applyOperation(op)
+
+        if self.verbose:
+            print(
+                _('Filtered datasets %s using expression %s. '
+                  'Output prefix=%s, suffix=%s') % (
+                      datasets, filterexpr, prefix, suffix)
+            )

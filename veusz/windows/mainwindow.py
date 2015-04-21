@@ -20,6 +20,7 @@
 """Implements the main window of the application."""
 
 from __future__ import division, print_function
+import os
 import os.path
 import sys
 import glob
@@ -509,6 +510,9 @@ class MainWindow(qt4.QMainWindow):
             'data.capture':
                 a(self, _('Capture remote data'), _('Ca&pture...'),
                   self.slotDataCapture, icon='veusz-capture-data'),
+            'data.filter':
+                a(self, _('Filter data'), _('&Filter...'),
+                  self.slotDataFilter, icon='kde-filter'),
             'data.histogram':
                 a(self, _('Histogram data'), _('&Histogram...'),
                   self.slotDataHistogram, icon='button_bar'),
@@ -548,10 +552,11 @@ class MainWindow(qt4.QMainWindow):
         tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszdatatoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, tb)
-        utils.addToolbarActions(tb, self.vzactions,
-                                ('data.import', 'data.edit',
-                                 'data.create', 'data.capture',
-                                 'data.reload'))
+        utils.addToolbarActions(
+            tb, self.vzactions,
+            ('data.import', 'data.edit',
+             'data.create', 'data.capture',
+             'data.filter', 'data.reload'))
 
         # menu structure
         filemenu = [
@@ -593,7 +598,7 @@ class MainWindow(qt4.QMainWindow):
         datamenu = [
             ['data.ops', _('&Operations'), datapluginsmenu],
             'data.import', 'data.edit', 'data.create',
-            'data.create2d', 'data.capture', 'data.histogram',
+            'data.create2d', 'data.capture', 'data.filter', 'data.histogram',
             'data.reload',
             ]
         helpmenu = [
@@ -634,7 +639,12 @@ class MainWindow(qt4.QMainWindow):
     def populateExamplesMenu(self):
         """Add examples to help menu."""
 
-        examples = glob.glob(os.path.join(utils.exampleDirectory, '*.vsz'))
+        # not cstr here forces to unicode for Python 2, getting
+        # filenames in unicode
+        examples = [ os.path.join(utils.exampleDirectory, f)
+                     for f in os.listdir(cstr(utils.exampleDirectory))
+                     if os.path.splitext(f)[1] == ".vsz" ]
+
         menu = self.menus["help.examples"]
         for ex in sorted(examples):
             name = os.path.splitext(os.path.basename(ex))[0]
@@ -738,6 +748,13 @@ class MainWindow(qt4.QMainWindow):
         self.showDialog(dialog)
         return dialog
 
+    def slotDataFilter(self):
+        """Filter datasets."""
+        from ..dialogs.filterdialog import FilterDialog
+        dialog = FilterDialog(self, self.document)
+        self.showDialog(dialog)
+        return dialog
+
     def slotDataHistogram(self):
         """Histogram data."""
         from ..dialogs.histodata import HistoDataDialog
@@ -833,7 +850,7 @@ class MainWindow(qt4.QMainWindow):
         setdb['geometry_mainwindow'] = geometry
 
         # store docked windows
-        data = str(self.saveState())
+        data = self.saveState().data()
         setdb['geometry_mainwindowstate'] = data
 
         # save current setting db

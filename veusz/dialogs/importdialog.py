@@ -272,9 +272,9 @@ class ImportDialog(VeuszDialog):
 
         try:
             qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-            self.document.suspendUpdates()
-            importtab.doImport(self.document, filename, linked, encoding,
-                               prefix, suffix, tags)
+            with self.document.suspend():
+                importtab.doImport(self.document, filename, linked, encoding,
+                                   prefix, suffix, tags)
             qt4.QApplication.restoreOverrideCursor()
         except IOError:
             qt4.QApplication.restoreOverrideCursor()
@@ -287,7 +287,6 @@ class ImportDialog(VeuszDialog):
             # show exception dialog
             d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
             d.exec_()
-        self.document.enableUpdates()
 
     def retnDatasetInfo(self, dsnames, linked, filename):
         """Return a list of information for the dataset names given."""
@@ -297,7 +296,7 @@ class ImportDialog(VeuszDialog):
         for name in dsnames:
             ds = self.document.getData(name)
             # build up description
-            lines.append( ' %s' % ds.description(showlinked=False) )
+            lines.append(_('%s: %s') % (name, ds.description()))
 
         # whether the data were linked
         if linked:

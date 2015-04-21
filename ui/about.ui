@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>412</width>
-    <height>398</height>
+    <width>525</width>
+    <height>586</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,23 +51,7 @@
    <item>
     <widget class="QLabel" name="copyrightlabel">
      <property name="text">
-      <string>&lt;b style=&quot;color:#800080&quot; &gt;Veusz %(version)s&lt;/b&gt;&lt;br&gt;
-Copyright © 2003-2015 Jeremy Sanders and contributors&lt;br&gt;
-&lt;a href=&quot;http://home.gna.org/veusz/&quot;&gt;http://home.gna.org/veusz/&lt;/a&gt;&lt;br&gt;
-&lt;br&gt;
-Main author:&lt;br&gt;
-Jeremy Sanders&lt;br&gt;
-&lt;br&gt;
-Other authors and contributors:&lt;br&gt;
-Graham Bell&lt;br&gt;
-James Graham&lt;br&gt;
-Bryan Harris&lt;br&gt;
-Dave Hughes&lt;br&gt;
-Valerio Mussi&lt;br&gt;
-Benjamin K. Stuhl&lt;br&gt;
-&lt;br&gt;
-Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;.
-</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#800080;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2015 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;http://home.gna.org/veusz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;http://home.gna.org/veusz/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell&lt;br/&gt;James Graham&lt;br/&gt;Bryan Harris&lt;br/&gt;Dave Hughes&lt;br/&gt;Valerio Mussi&lt;br/&gt;Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

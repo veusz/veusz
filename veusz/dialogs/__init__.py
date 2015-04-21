@@ -20,3 +20,37 @@
 
 # load custom widgets
 from .. import qtwidgets
+from .. import document
+from .veuszdialog import recreate_register
+
+# lazy loading recreation routines
+def _lazy_recreate_1d(*args):
+    from .datacreate import recreateDataset
+    recreateDataset(*args)
+def _lazy_recreate_2d(*args):
+    from .datacreate2d import recreateDataset
+    recreateDataset(*args)
+def _lazy_recreate_histo(*args):
+    from .histodata import recreateDataset
+    recreateDataset(*args)
+def _lazy_recreate_filtered(*args):
+    from .filterdialog import recreateDataset
+    recreateDataset(*args)
+def _lazy_recreate_plugin(*args):
+    from .plugin import recreateDataset
+    recreateDataset(*args)
+
+for kls, fn in (
+        (document.DatasetExpression, _lazy_recreate_1d),
+        (document.DatasetRange, _lazy_recreate_1d),
+        (document.Dataset2DXYZExpression, _lazy_recreate_2d),
+        (document.Dataset2DExpression, _lazy_recreate_2d),
+        (document.Dataset2DXYFunc, _lazy_recreate_2d),
+        (document.DatasetHistoValues, _lazy_recreate_histo),
+        (document.DatasetHistoBins, _lazy_recreate_histo),
+        (document.DatasetFiltered, _lazy_recreate_filtered),
+        (document.Dataset1DPlugin, _lazy_recreate_plugin),
+        (document.Dataset2DPlugin, _lazy_recreate_plugin),
+        (document.DatasetTextPlugin, _lazy_recreate_plugin),
+        ):
+    recreate_register[kls] = fn

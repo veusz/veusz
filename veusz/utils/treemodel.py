@@ -103,8 +103,15 @@ class TreeModel(qt4.QAbstractItemModel):
         """Get text or tooltip."""
         if index.isValid():
             item = self.objFromIndex(index)
-            if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
-                return item.nodeData(index.column())
+            data = item.nodeData(index.column())
+            if data is True:
+                if role == qt4.Qt.CheckStateRole:
+                    return qt4.Qt.Checked
+            elif data is False:
+                if role == qt4.Qt.CheckStateRole:
+                    return qt4.Qt.Unchecked
+            elif role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
+                return data
             elif role == qt4.Qt.ToolTipRole:
                 return item.toolTip(index.column())
 
@@ -242,6 +249,7 @@ class TreeModel(qt4.QAbstractItemModel):
                     idx = clookup[k]._idx
                     clone._idx = idx
                     self.nodes[idx] = clone
+                    c[i] = clone
 
                     self.dataChanged.emit(
                         self.index(i, 0, parentidx),

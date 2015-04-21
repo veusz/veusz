@@ -1644,6 +1644,22 @@ SetData('y', y)
       </section>
 
       <section>
+        <title>FilterDatasets</title>
+        <anchor id="Command.FilterDatasets" />
+
+        <para><command>FilterDatasets(filterexpr, datasets, prefix="",
+        suffix="", invert=False, replaceblanks=False)</command></para>
+
+        <para>Filter a list of datasets given. Creates new datasets
+        for each with prefix and suffix added to input dataset
+        names. filterexpr is an input numpy eexpression for filtering
+        the datasets. If invert is set, the filter condition is
+        inverted. If replaceblanks is set, filtered values are not
+        removed, but replaced with a blank or NaN value. This command
+        only works on 1D numeric, date or text datasets.</para>
+      </section>
+
+      <section>
 	<title>ForceUpdate</title>
 	<anchor id="Command.ForceUpdate" />
 

@@ -181,7 +181,10 @@ class ImportTabPlugins(importdialog.ImportTab):
 
         out = [_('Imported data for datasets:')]
         for ds in op.outnames:
-            out.append( doc.data[ds].description(showlinked=False) )
+            out.append( '%s: %s' % (
+                ds,
+                doc.data[ds].description())
+            )
         if op.outcustoms:
             out.append('')
             out.append(_('Set custom definitions:'))

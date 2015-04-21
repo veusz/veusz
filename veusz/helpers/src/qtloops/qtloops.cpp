@@ -308,6 +308,18 @@ void plotBoxesToPainter(QPainter& painter,
     painter.drawRects(rects);
 }
 
+void addCubicsToPainterPath(QPainterPath& path, const QPolygonF& poly)
+{
+  QPointF lastpt(-999999, -999999);
+  for(int i=0; i<poly.size()-3; i+=4)
+    {
+      if(lastpt != poly[i])
+        path.moveTo(poly[i]);
+      path.cubicTo(poly[i+1], poly[i+2], poly[i+3]);
+      lastpt = poly[i+3];
+    }
+}
+
 QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 		     bool forcetrans)
 {

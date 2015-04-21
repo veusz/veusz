@@ -52,7 +52,7 @@ def scalePDFMediaBox(text, pagewidth, reqdsizes):
     reqdsizes: list of tuples of width, height
     """
 
-    outtext = ''
+    outtext = b''
     outidx = 0
     for size, match in zip(
             reqdsizes,

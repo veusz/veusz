@@ -454,7 +454,8 @@ class PointPlotter(GenericPlotter):
 
         if axis.settings.log:
             def updateRange(v):
-                chopzero = v[(v>0) & N.isfinite(v)]
+                with N.errstate(invalid='ignore'):
+                    chopzero = v[(v>0) & N.isfinite(v)]
                 if len(chopzero) > 0:
                     axrange[0] = min(axrange[0], chopzero.min())
                     axrange[1] = max(axrange[1], chopzero.max())
@@ -568,29 +569,34 @@ class PointPlotter(GenericPlotter):
 
         return pts
 
-    def _getBezierLine(self, poly):
+    def _getBezierLine(self, poly, cliprect):
         """Try to draw a bezier line connecting the points."""
 
-        npts = qtloops.bezier_fit_cubic_multi(poly, 0.1, len(poly)+1)
-        i = 0
+        # clip to a larger box to help the lines get right angle
+        bigclip = qt4.QRectF(
+            cliprect.left()-cliprect.width()*0.5,
+            cliprect.top()-cliprect.height()*0.5,
+            cliprect.width()*2, cliprect.height()*2)
+
+        # clip poly to the rectangle and return the parts
+        polys = qtloops.clipPolyline(bigclip, poly)
+
+        # add each part as a bezier
         path = qt4.QPainterPath()
-        lastpt = qt4.QPointF(-999999,-999999)
-        while i < len(npts):
-            if lastpt != npts[i]:
-                path.moveTo(npts[i])
-            path.cubicTo(npts[i+1], npts[i+2], npts[i+3])
-            lastpt = npts[i+3]
-            i += 4
+        for lpoly in polys:
+            if len(lpoly) >= 2:
+                npts = qtloops.bezier_fit_cubic_multi(lpoly, 0.1, len(lpoly)+1)
+                qtloops.addCubicsToPainterPath(path, npts);
         return path
 
     def _drawBezierLine( self, painter, xvals, yvals, posn,
-                         xdata, ydata):
+                         xdata, ydata, cliprect ):
         """Handle bezier lines and fills."""
 
         pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
         if len(pts) < 2:
             return
-        path = self._getBezierLine(pts)
+        path = self._getBezierLine(pts, cliprect)
         s = self.settings
 
         # do filling
@@ -825,7 +831,7 @@ class PointPlotter(GenericPlotter):
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
                 if s.PlotLine.bezierJoin and hasqtloops:
                     self._drawBezierLine( painter, xplotter, yplotter, posn,
-                                          xvals, yvals )
+                                          xvals, yvals, cliprect )
                 else:
                     self._drawPlotLine( painter, xplotter, yplotter, posn,
                                         xvals, yvals, cliprect )

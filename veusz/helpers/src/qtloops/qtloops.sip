@@ -150,6 +150,8 @@ void plotBoxesToPainter(QPainter& painter,
    }
 %End
 
+void addCubicsToPainterPath(QPainterPath& path, const QPolygonF& poly);
+
 QImage numpyToQImage(SIP_PYOBJECT, SIP_PYOBJECT, bool forcetrans = false);
 %MethodCode
   {
@@ -215,6 +217,9 @@ void plotClippedPolyline(QPainter& painter,
 			 QRectF clip,
 			 const QPolygonF& poly,
 			 bool autoexpand = true);
+
+// clip polyline to rectangle and return polylines
+QVector<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly);
 
 // Do the polygons intersect?
 bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b);
