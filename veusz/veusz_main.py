@@ -163,7 +163,7 @@ class VeuszApp(qt4.QApplication):
                           'the session')
         parser.add_option('--translation', metavar='FILE',
                           help='load the translation .qm file given')
-        options, args = parser.parse_args(self.argv())
+        options, args = parser.parse_args(self.arguments())
 
         # export files to make images
         if options.export and len(options.export) != len(args)-1:

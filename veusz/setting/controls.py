@@ -169,7 +169,7 @@ class String(qt4.QWidget):
 
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
 
         self.edit = qt4.QLineEdit()
@@ -638,7 +638,7 @@ class Dataset(qt4.QWidget):
 
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         layout.addWidget(self.choice)
         layout.addWidget(b)
         self.setLayout(layout)
@@ -919,7 +919,7 @@ class Color(qt4.QWidget):
                      
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         layout.addWidget(c)
         layout.addWidget(b)
 
@@ -1088,7 +1088,8 @@ class ListSet(qt4.QFrame):
         self.setting = setting
         self.controls = []
         self.layout = qt4.QGridLayout(self)
-        self.layout.setMargin( self.layout.margin()//2 )
+        s = self.layout.contentsMargins().left()//2
+        self.layout.setContentsMargins(s,s,s,s)
         self.layout.setSpacing( self.layout.spacing()//4 )
 
         self.doneinit = False
@@ -1136,7 +1137,7 @@ class ListSet(qt4.QFrame):
         # buttons at end
         bbox = qt4.QWidget()
         h = qt4.QHBoxLayout(bbox)
-        h.setMargin(0)
+        h.setContentsMargins(0,0,0,0)
         bbox.setLayout(h)
         self.layout.addWidget(bbox, row+1, 0, 1, -1)
 
@@ -1493,7 +1494,7 @@ class MultiSettingWidget(qt4.QWidget):
 
         self.grid = layout = qt4.QGridLayout()
         layout.setHorizontalSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
 
         self.last = ()
@@ -1703,7 +1704,7 @@ class Filename(qt4.QWidget):
 
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
 
         # the actual edit control

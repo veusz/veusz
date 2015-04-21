@@ -304,7 +304,9 @@ def pentagonHolePath(painter, path, size):
 
 def squareRoundedPath(painter, path, size):
     """A square with rounded corners."""
-    path.addRoundRect( qt4.QRectF(-size, -size, size*2, size*2), 50, 50 )
+    path.addRoundedRect(
+        qt4.QRectF(-size, -size, size*2, size*2),
+        50, 50, qt4.Qt.RelativeSize)
 
 def dotPath(painter, path, size):
     """Draw a dot."""

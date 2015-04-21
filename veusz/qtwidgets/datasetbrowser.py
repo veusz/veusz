@@ -840,7 +840,7 @@ class DatasetBrowserPopup(DatasetBrowser):
             if not frame.contains(event.pos()):
                 self.close()
                 return True
-        return qt4.QTextEdit.eventFilter(self, node, event)
+        return DatasetBrowser.eventFilter(self, node, event)
 
     def sizeHint(self):
         """A reasonable size for the text editor."""

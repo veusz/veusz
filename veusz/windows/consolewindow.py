@@ -159,8 +159,9 @@ class ConsoleWindow(qt4.QDockWidget):
         self.vbox = qt4.QWidget()
         self.setWidget(self.vbox)
         vlayout = qt4.QVBoxLayout(self.vbox)
-        vlayout.setMargin( vlayout.margin()//4 )
-        vlayout.setSpacing( vlayout.spacing()//4 )
+        s = vlayout.contentsMargins().left()//4
+        vlayout.setContentsMargins(s,s,s,s)
+        vlayout.setSpacing(s)
 
         # start an interpreter instance to the document
         self.interpreter = document.CommandInterpreter(thedocument)
@@ -187,7 +188,7 @@ class ConsoleWindow(qt4.QDockWidget):
 
         self._hbox = qt4.QWidget()
         hlayout = qt4.QHBoxLayout(self._hbox)
-        hlayout.setMargin(0)
+        hlayout.setContentsMargins(0,0,0,0)
         vlayout.addWidget(self._hbox)
         
         self._prompt = qt4.QLabel(">>>")
