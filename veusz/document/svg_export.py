@@ -170,7 +170,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         self.clippath = None
         self.clipnum = 0
         self.existingclips = {}
-        self.matrix = qt4.QMatrix()
+        self.transform = qt4.QTransform()
 
         # svg root element for qt defaults
         self.rootelement = SVGElement(
@@ -244,7 +244,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
     def _updateClipPath(self, clippath, clipoperation):
         """Update clip path given state change."""
 
-        clippath = self.matrix.map(clippath)
+        clippath = self.transform.map(clippath)
 
         if clipoperation == qt4.Qt.NoClip:
             self.clippath = None
@@ -264,7 +264,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         # state is a list of transform, stroke/fill and clip states
         statevec = list(self.oldstate)
         if ss & qt4.QPaintEngine.DirtyTransform:
-            self.matrix = state.matrix()
+            self.transform = state.transform()
             statevec[0] = self.transformState()
         if ss & qt4.QPaintEngine.DirtyPen:
             self.pen = state.pen()
@@ -376,8 +376,8 @@ class SVGPaintEngine(qt4.QPaintEngine):
         return tuple(items)
 
     def transformState(self):
-        if not self.matrix.isIdentity():
-            m = self.matrix
+        if not self.transform.isIdentity():
+            m = self.transform
             dx, dy = m.dx(), m.dy()
             if (m.m11(), m.m12(), m.m21(), m.m22()) == (1., 0., 0., 1):
                 out = ('transform="translate(%s,%s)"' % (

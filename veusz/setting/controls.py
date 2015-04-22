@@ -169,7 +169,7 @@ class String(qt4.QWidget):
 
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
 
         self.edit = qt4.QLineEdit()
@@ -690,7 +690,7 @@ class Dataset(qt4.QWidget):
 
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         layout.addWidget(self.choice)
         layout.addWidget(b)
         self.setLayout(layout)
@@ -971,7 +971,7 @@ class Color(qt4.QWidget):
                      
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         layout.addWidget(c)
         layout.addWidget(b)
 
@@ -1133,31 +1133,39 @@ class ListSet(qt4.QFrame):
 
         parent is the parent widget.
         """
-        
+
         qt4.QFrame.__init__(self, parent)
         self.setFrameStyle(qt4.QFrame.Box)
         self.defaultval = defaultval
         self.setting = setting
         self.controls = []
         self.layout = qt4.QGridLayout(self)
-        self.layout.setMargin( self.layout.margin()//2 )
+        s = self.layout.contentsMargins().left()//2
+        self.layout.setContentsMargins(s,s,s,s)
         self.layout.setSpacing( self.layout.spacing()//4 )
 
-        # ignore changes if this set
-        self.ignorechange = False
-
-        self.populate()
+        self.doneinit = False
+        self.onModified()
         self.setting.setOnModified(self.onModified)
-    
-    def populateRow(self, row, val):
+
+    def populateRow(self, row):
         """Populate the row in the control.
 
         Returns a list of the widgets created.
         """
-        return None
-    
+        return []
+
+    def updateRow(self, cntrls, val):
+        """Set controls on row, given values for row, val."""
+        pass
+
     def populate(self):
         """Construct the list of controls."""
+
+        if len(self.setting.val) == len(self.controls) and self.doneinit:
+            # no change in number of controls
+            return
+        self.doneinit = True   # we need to add the add/remove buttons below
 
         # delete all children in case of refresh
         self.controls = []
@@ -1170,7 +1178,8 @@ class ListSet(qt4.QFrame):
         # iterate over each row
         row = -1
         for row, val in enumerate(self.setting.val):
-            cntrls = self.populateRow(row, val)
+            cntrls = self.populateRow(row)
+            self.updateRow(cntrls, val)
             for col in crange(len(cntrls)):
                 self.layout.addWidget(cntrls[col], row, col)
             for c in cntrls:
@@ -1180,10 +1189,10 @@ class ListSet(qt4.QFrame):
         # buttons at end
         bbox = qt4.QWidget()
         h = qt4.QHBoxLayout(bbox)
-        h.setMargin(0)
+        h.setContentsMargins(0,0,0,0)
         bbox.setLayout(h)
         self.layout.addWidget(bbox, row+1, 0, 1, -1)
-        
+
         # a button to add a new entry
         b = qt4.QPushButton('Add')
         h.addWidget(b)
@@ -1194,7 +1203,7 @@ class ListSet(qt4.QFrame):
         b = qt4.QPushButton('Delete')
         h.addWidget(b)
         b.clicked.connect(self.onDeleteClicked)
-        b.setEnabled( len(self.setting.val) > 0 )
+        b.setEnabled(len(self.setting.val) > 0)
         b.show()
 
     def onAddClicked(self):
@@ -1216,11 +1225,9 @@ class ListSet(qt4.QFrame):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-
-        if not self.ignorechange:
-            self.populate()
-        else:
-            self.ignorechange = False
+        self.populate()
+        for cntrls, row in czip(self.controls, self.setting.val):
+            self.updateRow(cntrls, row)
 
     def identifyPosn(self, widget):
         """Identify the position this widget is in.
@@ -1234,40 +1241,40 @@ class ListSet(qt4.QFrame):
                     return (row, col)
         return (None, None)
 
-    def addColorButton(self, row, col, tooltip):
+    def addColorButton(self, tooltip):
         """Add a color button to the list at the position specified."""
-
-        color = self.setting.val[row][col]
         wcolor = qt4.QPushButton()
         wcolor.setFlat(True)
         wcolor.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
         wcolor.setMaximumHeight(24)
         wcolor.setMaximumWidth(24)
-
-        pix = qt4.QPixmap(self.pixsize, self.pixsize)
-        pix.fill( utils.extendedColorToQColor(color) )
-        wcolor.setIcon( qt4.QIcon(pix) )
         wcolor.setToolTip(tooltip)
-
         wcolor.clicked.connect(self.onColorClicked)
         return wcolor
 
-    def addToggleButton(self, row, col, tooltip):
-        """Make a toggle button."""
+    def updateColorButton(self, cntrl, color):
+        """Given color control, update color."""
+        pix = qt4.QPixmap(self.pixsize, self.pixsize)
+        pix.fill(utils.extendedColorToQColor(color))
+        cntrl.setIcon(qt4.QIcon(pix))
 
-        toggle = self.setting.val[row][col]
+    def addToggleButton(self, tooltip):
+        """Make a toggle button."""
         wtoggle = qt4.QCheckBox()
-        wtoggle.setChecked(toggle)
         wtoggle.setToolTip(tooltip)
         wtoggle.toggled.connect(self.onToggled)
         return wtoggle
 
-    def addCombo(self, row, col, tooltip, values, icons, texts):
+    def updateToggleButton(self, cntrl, val):
+        """Update toggle with value."""
+        cntrl.setChecked(val)
+
+    def addCombo(self, tooltip, values, icons, texts):
         """Make an enumeration combo - choose from a set of icons."""
-        
-        val = self.setting.val[row][col]
 
         wcombo = qt4.QComboBox()
+        wcombo.setToolTip(tooltip)
+        wcombo.activated[int].connect(self.onComboChanged)
 
         if texts is None:
             for icon in icons:
@@ -1276,11 +1283,12 @@ class ListSet(qt4.QFrame):
             for text, icon in czip(texts, icons):
                 wcombo.addItem(icon, text)
 
-        wcombo.setCurrentIndex(values.index(val))
-        wcombo.setToolTip(tooltip)
-        wcombo.activated[int].connect(self.onComboChanged)
         wcombo._vz_values = values
         return wcombo
+
+    def updateCombo(self, cntrl, val):
+        """Update selected item in combo."""
+        cntrl.setCurrentIndex(cntrl._vz_values.index(val))
 
     def _updateRowCol(self, row, col, val):
         """Update value on row and column."""
@@ -1288,19 +1296,20 @@ class ListSet(qt4.QFrame):
         items = list(rows[row])
         items[col] = val
         rows[row] = tuple(items)
-        self.ignorechange = True
         self.sigSettingChanged.emit(self, self.setting, rows)
 
     def onToggled(self, on):
         """Checkbox toggled."""
         row, col = self.identifyPosn(self.sender())
-        self._updateRowCol(row, col, on)
+        if row is not None:
+            self._updateRowCol(row, col, on)
 
     def onComboChanged(self, val):
         """Update the setting if the combo changes."""
         sender = self.sender()
         row, col = self.identifyPosn(sender)
-        self._updateRowCol(row, col, sender._vz_values[val])
+        if row is not None:
+            self._updateRowCol(row, col, sender._vz_values[val])
 
     def onColorClicked(self):
         """Color button clicked for line."""
@@ -1330,10 +1339,10 @@ class LineSet(ListSet):
     """
 
     def __init__(self, setting, parent):
-        ListSet.__init__(self, ('solid', '1pt', 'black', False),
-                         setting, parent)
+        ListSet.__init__(
+            self, ('solid', '1pt', 'black', False), setting, parent)
 
-    def populateRow(self, row, val):
+    def populateRow(self, row):
         """Add the widgets for the row given."""
 
         # create line icons if not already created
@@ -1341,24 +1350,29 @@ class LineSet(ListSet):
             LineStyle._generateIcons()
 
         # make line style selector
-        wlinestyle = self.addCombo(row, 0, _('Line style'),
-                                   LineStyle._lines,
-                                   LineStyle._icons, None)
-        
+        wlinestyle = self.addCombo(
+            _('Line style'), LineStyle._lines, LineStyle._icons, None)
+
         # make line width edit box
         wwidth = qt4.QLineEdit()
-        wwidth.setText(self.setting.val[row][1])
-        wwidth.setToolTip('Line width')
+        wwidth.setToolTip(_('Line width'))
         wwidth.editingFinished.connect(self.onWidthChanged)
 
         # make color selector button
-        wcolor = self.addColorButton(row, 2, _('Line color'))
+        wcolor = self.addColorButton(_('Line color'))
 
         # make hide checkbox
-        whide = self.addToggleButton(row, 3, _('Hide line'))
+        whide = self.addToggleButton( _('Hide line'))
 
         # return created controls
         return [wlinestyle, wwidth, wcolor, whide]
+
+    def updateRow(self, cntrls, val):
+        """Update controls with row settings."""
+        self.updateCombo(cntrls[0], val[0])
+        cntrls[1].setText(val[1])
+        self.updateColorButton(cntrls[2], val[2])
+        self.updateToggleButton(cntrls[3], val[3])
 
     def onWidthChanged(self):
         """Width has changed - validate."""
@@ -1398,8 +1412,7 @@ class _FillBox(qt4.QScrollArea):
 
         self.extbrush = thesetting.returnBrushExtended(row)
 
-        from ..windows.treeeditwindow import SettingsProxySingle, \
-            PropertyList
+        from ..windows.treeeditwindow import SettingsProxySingle, PropertyList
 
         fbox = self
         class DirectSetProxy(SettingsProxySingle):
@@ -1466,28 +1479,27 @@ class FillSet(ListSet):
     """A list of fill settings."""
 
     def __init__(self, setting, parent):
-        ListSet.__init__(self, ('solid', 'black', False),
-                         setting, parent)
+        ListSet.__init__(
+            self, ('solid', 'black', False), setting, parent)
 
-    def populateRow(self, row, val):
+    def populateRow(self, row):
         """Add the widgets for the row given."""
 
         # construct fill icons if not already done
-        if FillStyle._icons is None:
-            FillStyle._generateIcons()
+        if FillStyleExtended._icons is None:
+            FillStyleExtended._generateIcons()
     
         # make fill style selector
-        wfillstyle = self.addCombo(row, 0, _("Fill style"),
-                                   FillStyle._fills,
-                                   FillStyle._icons,
-                                   FillStyle._fills)
+        wfillstyle = self.addCombo(
+            _("Fill style"),
+            utils.extfillstyles, FillStyleExtended._icons, utils.extfillstyles)
         wfillstyle.setMinimumWidth(self.pixsize)
 
         # make color selector button
-        wcolor = self.addColorButton(row, 1, _("Fill color"))
+        wcolor = self.addColorButton(_("Fill color"))
 
         # make hide checkbox
-        whide = self.addToggleButton(row, 2, _("Hide fill"))
+        whide = self.addToggleButton(_("Hide fill"))
 
         # extended options
         wmore = DotDotButton(tooltip=_("More options"))
@@ -1495,6 +1507,11 @@ class FillSet(ListSet):
 
         # return widgets
         return [wfillstyle, wcolor, whide, wmore]
+
+    def updateRow(self, cntrls, val):
+        self.updateCombo(cntrls[0], val[0])
+        self.updateColorButton(cntrls[1], val[1])
+        self.updateToggleButton(cntrls[2], val[2])
 
     def buttonAtRow(self, row):
         """Get .. button on row."""
@@ -1529,7 +1546,7 @@ class MultiSettingWidget(qt4.QWidget):
 
         self.grid = layout = qt4.QGridLayout()
         layout.setHorizontalSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
 
         self.last = ()
@@ -1739,7 +1756,7 @@ class Filename(qt4.QWidget):
 
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
 
         # the actual edit control
@@ -1893,8 +1910,8 @@ class Colormap(Choice):
         # iterate over colour maps
         for name in names:
             val = document.colormaps.get(name, None)
-            if val in kls._icons:
-                icon = kls._icons[val]
+            if name in kls._icons:
+                icon = kls._icons[name]
             else:
                 if val is None:
                     # empty icon
@@ -1907,7 +1924,7 @@ class Colormap(Choice):
                                                 0., size[0]-1., 0)
                     pixmap = qt4.QPixmap.fromImage(image)
                 icon = qt4.QIcon(pixmap)
-                kls._icons[val] = icon
+                kls._icons[name] = icon
             retn.append(icon)
         return retn
 

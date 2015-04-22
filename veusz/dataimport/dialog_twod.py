@@ -174,8 +174,10 @@ class ImportTab2D(importdialog.ImportTab):
 
             output = [_('Successfully read datasets:')]
             for ds in op.outnames:
-                output.append(' %s' % doc.data[ds].description(
-                        showlinked=False))
+                output.append('%s: %s' % (
+                    ds,
+                    doc.data[ds].description())
+                )
 
             output = '\n'.join(output)
         except simpleread.Read2DError as e:

@@ -26,7 +26,6 @@ from .. import qtall as qt4
 from .. import document
 from .. import plugins
 from . import exceptiondialog
-from . import dataeditdialog
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="PluginDialog"):
@@ -210,7 +209,3 @@ def recreateDataset(mainwindow, document, dataset, datasetname):
     dialog = PluginDialog(mainwindow, document, newplugin, kls)
     mainwindow.showDialog(dialog)
     dialog.reEditDataset(dataset, datasetname)
-
-dataeditdialog.recreate_register[document.Dataset1DPlugin] = recreateDataset
-dataeditdialog.recreate_register[document.Dataset2DPlugin] = recreateDataset
-dataeditdialog.recreate_register[document.DatasetTextPlugin] = recreateDataset

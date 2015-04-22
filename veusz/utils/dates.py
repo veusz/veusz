@@ -110,8 +110,11 @@ def floatToDateTime(f):
     """Convert float to datetime."""
     days = int(f/24/60/60)
     frac, sec = math.modf(f - days*24*60*60)
-    return datetime.timedelta(days,  sec,  frac*1e6) + offsetdate
-    
+    try:
+        return datetime.timedelta(days,  sec,  frac*1e6) + offsetdate
+    except OverflowError:
+        return datetime.datetime(8000, 1, 1)
+
 def dateFloatToString(f):
     """Convert date float to string."""
     if N.isfinite(f):

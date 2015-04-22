@@ -20,6 +20,7 @@
 from __future__ import division
 import os.path
 
+import sip
 from .. import qtall as qt4
 from .. import utils
 from .. import setting
@@ -118,7 +119,7 @@ class StepWidgets2(TutorialStep):
     def __init__(self, mainwin):
         TutorialStep.__init__(
             self, _('''
-<p>Widget can often be placed inside each other. For instance, a graph
+<p>Widgets can often be placed inside each other. For instance, a graph
 widget is placed in a page widget or a grid widget. Plotting widgets
 are placed in graph widget.</p>
 
@@ -350,6 +351,7 @@ class DataImport(TutorialStep):
         from ..dialogs.importdialog import ImportDialog
         if isinstance(dialog, ImportDialog):
             # make life easy by sticking in filename
+            dialog.slotReset()
             dialog.filenameedit.setText(
                 os.path.join(utils.exampleDirectory, 'tutorialdata.csv'))
             # and choosing tab
@@ -834,15 +836,15 @@ class TutorialDock(qt4.QDockWidget):
 
         # because we're flashing random UI components, the C++ object
         # might be deleted, so we have to check before doing things to
-        # it: hence the qt4.isdeleted
+        # it: hence the sip.isdeleted
 
         if ( self.flash is not self.oldflash and self.oldflash is not None
-             and not qt4.isdeleted(self.oldflash) ):
+             and not sip.isdeleted(self.oldflash) ):
             # clear any flashing on previous widget
             self.oldflash.setStyleSheet('')
             self.oldflash = None
 
-        if self.flash is not None and not qt4.isdeleted(self.flash):
+        if self.flash is not None and not sip.isdeleted(self.flash):
             # set flash state and toggle variable
             if self.flashon:
                 self.flash.setStyleSheet('background: yellow;')

@@ -24,8 +24,6 @@ from .. import utils
 from .. import document
 from .veuszdialog import VeuszDialog
 
-from . import dataeditdialog
-
 def _(text, disambiguation=None, context="DataCreateDialog"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -326,6 +324,3 @@ def recreateDataset(mainwindow, document, dataset, datasetname):
     dialog = DataCreateDialog(mainwindow, document)
     mainwindow.showDialog(dialog)
     dialog.reEditDataset(dataset, datasetname)
-
-dataeditdialog.recreate_register[document.DatasetExpression] = recreateDataset
-dataeditdialog.recreate_register[document.DatasetRange] = recreateDataset

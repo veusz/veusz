@@ -38,7 +38,6 @@ class HistoryCombo(qt4.QComboBox):
 
         # sane defaults
         self.setEditable(True)
-        self.setAutoCompletion(True)
         self.setMaxCount(50)
         self.setInsertPolicy(qt4.QComboBox.InsertAtTop)
         self.setDuplicatesEnabled(False)

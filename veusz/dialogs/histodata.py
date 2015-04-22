@@ -24,7 +24,6 @@ from .. import utils
 from .. import document
 
 from .veuszdialog import VeuszDialog
-from . import dataeditdialog
 
 def _(text, disambiguation=None, context="HistogramDialog"):
     """Translate text."""
@@ -292,5 +291,3 @@ def recreateDataset(mainwindow, document, dataset, datasetname):
     mainwindow.showDialog(dialog)
     dialog.reEditDataset(dataset, datasetname)
 
-dataeditdialog.recreate_register[document.DatasetHistoValues] = recreateDataset
-dataeditdialog.recreate_register[document.DatasetHistoBins] = recreateDataset

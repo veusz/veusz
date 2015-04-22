@@ -1,0 +1,120 @@
+# Veusz saved document (version 1.22.99)
+# Saved at 2015-04-14T17:42:14.659501
+
+AddImportPath(u'/home/jss/code/veusz/examples')
+FilterDatasets(u'filter_x>6', [u'filter_x', u'filter_y'], prefix=u'filter2_')
+FilterDatasets(u'y>2.5', [u'x', 'y'], prefix=u'filter_')
+SetDataRange(u'x', 50, (0.0, 10.0), linked=True)
+ImportString('y(numeric)','''
+2.528453e+00
+1.816528e+00
+1.502053e+00
+3.643409e+00
+2.191947e+00
+1.178337e+00
+4.517599e-01
+2.776858e+00
+4.134110e+00
+1.368582e+00
+1.520669e+00
+1.740393e+00
+1.145020e+00
+2.784998e+00
+1.718806e+00
+2.290992e-01
+2.750012e+00
+3.003834e+00
+8.065036e-01
+2.700813e+00
+8.253849e-01
+3.472289e+00
+1.620575e+00
+3.641267e+00
+4.154029e-01
+3.113261e+00
+1.846461e+00
+1.974401e+00
+2.230803e+00
+1.855437e+00
+-4.376838e-01
+1.718318e+00
+-3.487412e-01
+4.913468e+00
+2.695930e+00
+1.504972e+00
+1.737499e+00
+2.401471e+00
+3.216212e+00
+1.021641e+00
+2.452775e+00
+3.390762e+00
+3.383650e+00
+5.650132e-01
+2.609646e+00
+2.381425e+00
+2.313510e+00
+1.720346e+00
+2.206088e+00
+8.747802e-01
+''')
+Set('StyleSheet/Font/font', u'Liberation Mono')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+To('x')
+Set('label', u'X axis')
+To('..')
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('label', u'Y axis')
+Set('autoRange', u'+10%')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name=u'filtered', autoadd=False)
+To(u'filtered')
+Set('marker', u'square')
+Set('markerSize', u'5pt')
+Set('color', u'#ffaa00')
+Set('xData', u'filter_x')
+Set('yData', u'filter_y')
+Set('key', u'Filtered')
+Set('PlotLine/hide', True)
+To('..')
+Add('xy', name=u'original', autoadd=False)
+To(u'original')
+Set('key', u'Data')
+To('..')
+Add('function', name='function1', autoadd=False)
+To('function1')
+Set('function', u'2.5')
+Set('Line/color', u'grey')
+Set('Line/width', u'1pt')
+To('..')
+Add('key', name='key1', autoadd=False)
+To('key1')
+Set('Border/hide', True)
+Set('horzPosn', 'left')
+Set('vertPosn', 'bottom')
+Set('horzManual', 0.0)
+Set('vertManual', 0.0)
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('marker', u'diamond')
+Set('markerSize', u'8pt')
+Set('color', u'#aaaaff')
+Set('xData', u'filter2_filter_x')
+Set('yData', u'filter2_filter_y')
+Set('PlotLine/hide', True)
+To('..')
+Add('function', name='function2', autoadd=False)
+To('function2')
+Set('function', u'6')
+Set('variable', u'y')
+Set('Line/color', u'grey')
+Set('Line/width', u'1pt')
+To('..')
+To('..')
+To('..')

@@ -1,4 +1,4 @@
-Veusz 1.22
+Veusz 1.23
 ----------
 http://home.gna.org/veusz/
 
@@ -12,40 +12,38 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.22:
- * Add option to ignore white space following delimiters when importing CSVs
- * Allow x/yedge and x/ycent to be inverted to change data order
-   when import 2D data
- * Rewrite of widget tree internals to fix miscellaneous bugs
- * Optionally use astropy for SAMP
- * Add setting to extend the python import path
- * Add option to select widgets with same name on page
- * Resize rectangular shapes keeping other corners fixed. Old symmetric
-   resize behaviour is retained if shift is pressed.
+Changes in 1.23:
+ * Add new export dialog box which can export multiple pages and
+   modify the export options
+ * Add new dataset filtering dialog
+ * Add cubehelix() functional colormap
+ * Add -stepN suffix for colormaps to make arbitrary numbers of steps
+ * Fix incorrect colors in log images and log color scales
+ * Fix unsafe commands not being run
 
-Bug fixes
- * Fix faulty caching of datasets expressions
- * Do not auto mirror axes if shared axis placed in grid and ignore
-   other hidden axes for mirroring purposes
- * gridatedge 2D import option inverts values in rows
- * y values for 2D datasets in data edit dialog are inverted
- * Fix crash when constructing 2D dataset with constants
- * Fix crash when interpreting date values with unicode
- * Fix for crash when moving ellipses on broken axes
- * Fix crash when editing datetime data
- * Fix crash when renaming 2D datasets in dataset editor
- * If 2d dataset does not exist, don't crash when using colorbar
- * Ignore HDF5 data types which are not supported by h5py
- * Catch recursion limit errors properly
- * In sort and text sort plugins, clip length to minimum
- * Do not plot functions with more than 1D in function plotter
- * Catch error for shapes widgets with no coordinates
- * Handle zero length datasets in subtract minimum or mean
- * Clip range of zoom between 0.05 and 20x
- * Catch errors in CSV date format
- * Do not allow 2D datasets to be used for labels in label widget
- * Handle unicode data correctly in clipboard data
- * Fix data import dialog for fits files in unicode paths
+Minor changes
+ * Fix incorrect use of None in (x,...) pattern
+ * Catch crash if plotting nan/inf value in log space
+ * Fix getData in dataset plugin for dimensions=2
+ * Catch error in too large float to date time conversion
+ * Catch disappeared file during import
+ * Index error fixed in pickable
+ * Catch error in data edit dialog if 2d dataset size changes
+ * If root widget is selected with others, do not error on hide
+ * Fix undo for dataset histogram with a single output dataset
+ * Fix error resizing ellipse with a tuple width, height or position setting
+ * Only use finite values in histogram
+ * Rewrite Line/FillSet setting controls for internal consistency and to fix
+   new style extended fills
+ * Do not crash with log date-time axes
+ * Also ignore non-finite values when fitting with minuit
+ * Avoid syntax error with invalid colormap
+ * Updates to setup.py and desktop files
+ * Recreate dataset now works if dialog hasn't been opened already
+ * Restore dock layout when using Python3
+ * Fix undo after loading stylesheet/custom definitions
+ * Support unicode example filenames
+ * Clip bezier lines to avoid problems with log axes
 
 Features of package:
  Plotting features:
@@ -87,6 +85,7 @@ Features of package:
   * Scripting interface
   * Control with DBUS and SAMP
  Other features:
+  * Data filtering and manipulation
   * Data picker
   * Interactive tutorial
   * Multithreaded rendering
@@ -119,19 +118,14 @@ Optional requirements:
  SAMPy or astropy >= 0.4 (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
 
-Veusz is Copyright (C) 2003-2014 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2015 Jeremy Sanders <jeremy@jeremysanders.net>
  and contributors.
-It is licenced under the GPL (version 2 or greater).
+It is licensed under the GPL (version 2 or greater).
 
 For documentation on using Veusz, see the "Documents" directory. The
 manual is in PDF, HTML and text format (generated from docbook). The
 examples are also useful documentation. Please also see and contribute
 to the Veusz wiki: https://github.com/jeremysanders/veusz/wiki
-
-Issues with the current version:
-
-  * Due to a bug in the Qt XML processing, some MathML elements
-    containing purely white space (e.g. thin space) will give an error.
 
 If you enjoy using Veusz, we would love to hear from you. Please join
 the mailing lists at

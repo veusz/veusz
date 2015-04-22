@@ -114,8 +114,8 @@ class ControlMarginBox(object):
         self.scaling = painthelper.scaling
         self.dpi = painthelper.dpi
 
-    def createGraphicsItem(self):
-        return _GraphMarginBox(self)
+    def createGraphicsItem(self, parent):
+        return _GraphMarginBox(parent, self)
 
     def setWidgetMargins(self):
         """A helpful routine for setting widget margins after
@@ -187,10 +187,10 @@ class _GraphMarginBox(qt4.QGraphicsItem):
     # posn coords of each corner
     mapcornertoposn = ( (0, 1), (2, 1), (0, 3), (2, 3) )
 
-    def __init__(self, params):
+    def __init__(self, parent, params):
         """Create control box item."""
 
-        qt4.QGraphicsItem.__init__(self)
+        qt4.QGraphicsItem.__init__(self, parent)
         self.params = params
 
         self.setZValue(2.)
@@ -330,20 +330,20 @@ class ControlResizableBox(object):
         self.angle = angle
         self.allowrotate = allowrotate
 
-    def createGraphicsItem(self):
-        return _GraphResizableBox(self)
+    def createGraphicsItem(self, parent):
+        return _GraphResizableBox(parent, self)
 
 class _GraphResizableBox(qt4.QGraphicsItem):
     """Control a resizable box.
     Item resizes centred around a position
     """
 
-    def __init__(self, params):
+    def __init__(self, parent, params):
         """Initialise with widget and boxbounds shape.
         Rotation is allowed if allowrotate is set
         """
 
-        qt4.QGraphicsItem.__init__(self)
+        qt4.QGraphicsItem.__init__(self, parent)
         self.params = params
 
         # create child graphicsitem for each corner
@@ -485,12 +485,12 @@ class ControlMovableBox(ControlMarginBox):
         self.deltacrosspos = (crosspos[0] - self.posn[0],
                               crosspos[1] - self.posn[1])
 
-    def createGraphicsItem(self):
-        return _GraphMovableBox(self)
+    def createGraphicsItem(self, parent):
+        return _GraphMovableBox(parent, self)
 
 class _GraphMovableBox(_GraphMarginBox):
-    def __init__(self, params):
-        _GraphMarginBox.__init__(self, params)
+    def __init__(self, parent, params):
+        _GraphMarginBox.__init__(self, parent, params)
         self.cross = _ShapeCorner(self)
         self.cross.setCursor(qt4.Qt.SizeAllCursor)
         self.updateCornerPosns()
@@ -527,13 +527,14 @@ class ControlLine(object):
     def __init__(self, widget, x1, y1, x2, y2):
         self.widget = widget
         self.line = x1, y1, x2, y2
-    def createGraphicsItem(self):
-        return _GraphLine(self)
+    def createGraphicsItem(self, parent):
+        return _GraphLine(parent, self)
 
 class _GraphLine(qt4.QGraphicsLineItem):
     """Represents the line as a graphics item."""
-    def __init__(self, params):
-        qt4.QGraphicsLineItem.__init__(self, *params.line)
+    def __init__(self, parent, params):
+        l = params.line
+        qt4.QGraphicsLineItem.__init__(self, l[0], l[1], l[2], l[3], parent)
         self.params = params
 
         self.setCursor(qt4.Qt.SizeAllCursor)
@@ -612,8 +613,8 @@ class ControlAxisLine(object):
         return ( self.minpos != self.minorig or self.maxpos != self.maxorig or
                  self.axisorigpos != self.axispos )
 
-    def createGraphicsItem(self):
-        return _GraphAxisLine(self)
+    def createGraphicsItem(self, parent):
+        return _GraphAxisLine(parent, self)
 
 class _GraphAxisLine(qt4.QGraphicsItem):
 
@@ -622,9 +623,9 @@ class _GraphAxisLine(qt4.QGraphicsItem):
     curs_zoom = {True: qt4.Qt.SplitVCursor,
                  False: qt4.Qt.SplitHCursor}
 
-    def __init__(self, params):
+    def __init__(self, parent, params):
         """Line is about to be shown."""
-        qt4.QGraphicsItem.__init__(self)
+        qt4.QGraphicsItem.__init__(self, parent)
         self.params = params
         self.pts = [ _ShapeCorner(self), _ShapeCorner(self),
                      _ShapeCorner(self), _ShapeCorner(self) ]

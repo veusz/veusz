@@ -306,6 +306,7 @@ class PlotDrawCallback : public _PolyClipper
   QPainter& _painter;
 };
 
+// take polyline and paint to painter, clipping
 void plotClippedPolyline(QPainter& painter,
                          QRectF clip,
                          const QPolygonF& poly,
@@ -320,6 +321,31 @@ void plotClippedPolyline(QPainter& painter,
 
   PlotDrawCallback pcb(clip, painter);
   pcb.clipPolyline(poly);
+}
+
+//////////////////////////////////////////////////////
+// clip polyline and add polyines clipped to a vector
+
+class PolyAddCallback : public _PolyClipper
+{
+ public:
+  PolyAddCallback(QRectF clip)
+    : _PolyClipper(clip) {}
+
+  void emitPolyline(const QPolygonF& poly)
+  {
+    polys.push_back(poly);
+  }
+
+public:
+  QVector<QPolygonF> polys;
+};
+
+QVector<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly)
+{
+  PolyAddCallback pcb(clip);
+  pcb.clipPolyline(poly);
+  return pcb.polys;
 }
 
 //////////////////////////////////////////////////////

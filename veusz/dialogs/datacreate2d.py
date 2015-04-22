@@ -24,7 +24,6 @@ from .. import qtall as qt4
 from .. import utils
 from .. import document
 from .veuszdialog import VeuszDialog
-from . import dataeditdialog
 
 def _(text, disambiguation=None, context="DataCreate2D"):
     """Translate text."""
@@ -233,7 +232,3 @@ def recreateDataset(mainwindow, document, dataset, datasetname):
     dialog = DataCreate2DDialog(mainwindow, document)
     mainwindow.showDialog(dialog)
     dialog.reEditDataset(dataset, datasetname)
-
-for c in (document.Dataset2DXYZExpression, document.Dataset2DExpression,
-          document.Dataset2DXYFunc):
-    dataeditdialog.recreate_register[c] = recreateDataset

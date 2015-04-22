@@ -40,12 +40,12 @@ from veusz import utils
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2014 <jeremy@jeremysanders.net> and contributors
+Copyright (C) Jeremy Sanders 2003-2015 <jeremy@jeremysanders.net> and contributors
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
 splashcopyr='''<b><font color="purple">Veusz %s<br></font></b>
-Copyright (C) Jeremy Sanders 2003-2014 and contributors<br>
+Copyright (C) Jeremy Sanders 2003-2015 and contributors<br>
 Licenced under the GPL (version 2 or greater)
 '''
 
@@ -163,7 +163,7 @@ class VeuszApp(qt4.QApplication):
                           'the session')
         parser.add_option('--translation', metavar='FILE',
                           help='load the translation .qm file given')
-        options, args = parser.parse_args(self.argv())
+        options, args = parser.parse_args(self.arguments())
 
         # export files to make images
         if options.export and len(options.export) != len(args)-1:

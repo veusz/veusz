@@ -278,7 +278,7 @@ class FunctionPlotter(GenericPlotter):
 
         s = self.settings
 
-        if ( None in axes or
+        if ( axes[0] is None or axes[1] is None or
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):
             return None, None
@@ -312,7 +312,7 @@ class FunctionPlotter(GenericPlotter):
 
         s = self.settings
 
-        if ( None in axes or
+        if ( axes[0] is None or axes[1] is None or
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):
             return None, None

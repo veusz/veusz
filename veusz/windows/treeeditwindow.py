@@ -306,7 +306,7 @@ class PropertyList(qt4.QWidget):
 
         self.layout = qt4.QGridLayout(self)
         self.layout.setSpacing( self.layout.spacing()//2 )
-        self.layout.setMargin(4)
+        self.layout.setContentsMargins(4,4,4,4)
         
         self.childlist = []
         self.setncntrls = {}     # map setting name to controls
@@ -331,8 +331,9 @@ class PropertyList(qt4.QWidget):
 
             button = qt4.QPushButton(text)
             button.setToolTip(action.descr)
-            button.clicked[()].connect(
-                lambda a=action: setnsproxy.onAction(a, self.getConsole()))
+            button.clicked.connect(
+                lambda checked=True, a=action:
+                setnsproxy.onAction(a, self.getConsole()))
 
             self.layout.addWidget(button, row, 1)
             self.childlist.append(button)
@@ -580,7 +581,7 @@ class TabbedFormatting(qt4.QTabWidget):
 
         # layout for tab widget
         layout = qt4.QVBoxLayout()
-        layout.setMargin(2)
+        layout.setContentsMargins(2,2,2,2)
         layout.addWidget(scroll)
 
         # finally use layout containing items for tab
@@ -1137,7 +1138,8 @@ class TreeEditDock(qt4.QDockWidget):
         hideshow is True for hiding, False for showing
         """
         ops = [ document.OperationSettingSet(w.settings.get('hide'), hideshow)
-                for w in widgets ]
+                for w in widgets
+                if 'hide' in w.settings ]
         descr = ('show', 'hide')[hideshow]
         self.document.applyOperation(
             document.OperationMultiple(ops, descr=descr))
@@ -1232,7 +1234,7 @@ class SettingLabel(qt4.QWidget):
         self.setnsproxy = setnsproxy
 
         self.layout = qt4.QHBoxLayout(self)
-        self.layout.setMargin(2)
+        self.layout.setContentsMargins(2,2,2,2)
 
         if setting.usertext:
             text = setting.usertext
