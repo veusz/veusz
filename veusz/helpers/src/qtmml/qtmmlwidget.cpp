@@ -3392,7 +3392,7 @@ MmlNode *MmlDocument::domToMml(const QDomNode &dom_node, bool *ok, QString *erro
 
     QDomNamedNodeMap dom_attr = dom_node.attributes();
     MmlAttributeMap mml_attr;
-    for (int i = 0; i < dom_attr.length(); ++i) {
+    for (int i = 0; i < int(dom_attr.length()); ++i) {
 	QDomNode attr_node = dom_attr.item(i);
 	Q_ASSERT(!attr_node.nodeName().isNull());
 	Q_ASSERT(!attr_node.nodeValue().isNull());
