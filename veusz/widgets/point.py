@@ -331,6 +331,11 @@ class PointPlotter(GenericPlotter):
             usertext=_('Scale markers')), 6 )
 
         # formatting
+        s.add( setting.Int('errorthin', 1,
+                           minval=1,
+                           descr=_('Thin number of error bars plotted by this factor'),
+                           usertext=_('Thin errors'),
+                           formatting=True), 0 )
         s.add( setting.Int('thinfactor', 1,
                            minval=1,
                            descr=_('Thin number of markers plotted'
@@ -409,12 +414,17 @@ class PointPlotter(GenericPlotter):
         if style == 'none':
             return
 
+        # optional thinning of error bars plotted
+        thin = s.errorthin
+
         # default is no error bars
         xmin = xmax = ymin = ymax = None
 
         # draw horizontal error bars
         if xdata.hasErrors():
             xmin, xmax = xdata.getPointRanges()
+            if thin>1:
+                xmin, xmax = xmin[::thin], xmax[::thin]
 
             # convert xmin and xmax to graph coordinates
             xmin = axes[0].dataToPlotterCoords(posn, xmin)
@@ -423,6 +433,8 @@ class PointPlotter(GenericPlotter):
         # draw vertical error bars
         if ydata.hasErrors():
             ymin, ymax = ydata.getPointRanges()
+            if thin>1:
+                ymin, ymax = ymin[::thin], ymax[::thin]
 
             # convert ymin and ymax to graph coordinates
             ymin = axes[1].dataToPlotterCoords(posn, ymin)
@@ -431,6 +443,9 @@ class PointPlotter(GenericPlotter):
         # no error bars - break out of processing below
         if ymin is None and ymax is None and xmin is None and xmax is None:
             return
+
+        if thin>1:
+            xplotter, yplotter = xplotter[::thin], yplotter[::thin]
 
         # iterate to call the error bars functions required to draw style
         pen = s.ErrorBarLine.makeQPenWHide(painter)

@@ -1,4 +1,5 @@
 Changes in <next release>:
+ * Add option to "thin" error bars plotted
 
 Minor changes
  * Fix label colour in contour labelling
