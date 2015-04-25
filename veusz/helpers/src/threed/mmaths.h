@@ -361,19 +361,44 @@ inline Vec4 vec3to4(const Vec3& v)
   return Vec4(v(0), v(1), v(2), 1);
 }
 
+// round to 3 decimal places
+inline double rounddp(double v)
+{
+  return round(v*1000)*1e-3;
+}
+
 // do projection, getting x,y coordinate and depth
 inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
 {
   Vec4 nv(v*projM);
   double inv = 1/nv(3);
-  return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
+  return Vec3(rounddp(nv(0)*inv), rounddp(nv(1)*inv), rounddp(nv(2)*inv));
 }
 
 inline Vec3 calcProjVec(const Mat4& projM, const Vec3& v)
 {
   Vec4 nv(vec3to4(v)*projM);
   double inv = 1/nv(3);
-  return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
+  return Vec3(rounddp(nv(0)*inv), rounddp(nv(1)*inv), rounddp(nv(2)*inv));
+}
+
+// do 2d lines overlap?
+inline bool line2DOverlap(Vec2 A1, Vec2 A2, Vec2 B1, Vec2 B2)
+{
+  double d = cross(A2-A1, B2-B1);
+  double u = cross(B2-B1, A1-B1);
+  double v = cross(A2-A1, A1-B1);
+
+  if(d>=0)
+    return 0<=u && u<=d && 0<=v && v<=d;
+  else
+    return 0>=u && u>=d && 0>=v && v>=d;
+}
+
+// drop dimension of vector
+inline Vec2 dropDim(const Vec3 v)
+{
+  return Vec2(v(0), v(1));
 }
 
 //////////////////////////////////////////////////////////////////////////////

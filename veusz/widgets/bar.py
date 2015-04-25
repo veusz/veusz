@@ -307,6 +307,7 @@ class BarPlotter(GenericPlotter):
         brush = s.BarFill.get('fills').returnBrushExtended(dsnum)
         pen = s.BarLine.get('lines').makePen(painter, dsnum)
         lw = pen.widthF() * 2
+        print('line width', lw)
 
         # make clip box bigger to avoid lines showing
         extclip = qt4.QRectF(qt4.QPointF(clip.left()-lw, clip.top()-lw),

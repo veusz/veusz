@@ -13,9 +13,9 @@
 namespace
 {
 
-  struct FragDepthCompare
+  struct FragDepthCompareMax
   {
-    FragDepthCompare(FragmentVector& v)
+    FragDepthCompareMax(FragmentVector& v)
       : vec(v)
     {}
 
@@ -177,14 +177,51 @@ namespace
 
 }; // namespace
 
+// insert newnum1 fragments at idx1 and newnum2 fragments at idx2
+// into the depths array from the end of fragments
+// also sort the idx1->idx2+newnum1+newnum2 in depth order
+void Scene::insertFragmentsIntoDepths(unsigned idx1, unsigned newnum1,
+                                      unsigned idx2, unsigned newnum2)
+{
+  if(newnum1>0)
+    {
+      if(newnum1>1)
+        {
+          depths.insert(depths.begin()+idx1, newnum1-1, 0);
+          idx2 += newnum1-1;
+        }
+      unsigned base=fragments.size()-newnum1-newnum2;
+      for(unsigned i=0; i<newnum1; ++i)
+        depths[idx1+i] = base+i;
+    }
+  if(newnum2>0)
+    {
+      if(newnum2>1)
+        depths.insert(depths.begin()+idx2, newnum2-1, 0);
+      unsigned base=fragments.size()-newnum2;
+      for(unsigned i=0; i<newnum2; ++i)
+        depths[idx2+i] = base+i;
+    }
+
+  // calculate new depths for fragments and resort region
+  if(newnum1+newnum2 > 0)
+    {
+      // sort depth of new items
+      std::sort(depths.begin()+idx1,
+                depths.begin()+(idx2+newnum2-1+1),
+                FragDepthCompareMax(fragments));
+    }
+}
+
+
+
 // split up fragments which overlap in 3D into mutiple non-overlapping
 // fragments
 void Scene::doSplitting(unsigned idx1, const Camera& cam)
 {
-  // printf("split: %i, %g\n", idx1, fragments[depths[idx1]].minDepth());
-  double thismindepth = fragments[depths[idx1]].minDepth();
+ RESTART:
 
- start:
+  double thismindepth = fragments[depths[idx1]].minDepth();
   for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
     {
       // printf(" %i, %g, %g\n", idx2, fragments[depths[idx2]].minDepth(),
@@ -205,25 +242,8 @@ void Scene::doSplitting(unsigned idx1, const Camera& cam)
 		     fragments[depths[idx2]],
 		     fragments, &newnum1, &newnum2);
 
-      if(newnum1>0)
-	{
-	  if(newnum1>1)
-	    {
-	      depths.insert(depths.begin()+idx1, newnum1-1, 0);
-	      idx2 += newnum1-1;
-	    }
-	  unsigned base=fragments.size()-newnum1-newnum2;
-	  for(unsigned i=0; i<newnum1; ++i)
-	    depths[idx1+i] = base+i;
-	}
-      if(newnum2>0)
-	{
-	  if(newnum2>1)
-	    depths.insert(depths.begin()+idx2, newnum2-1, 0);
-	  unsigned base=fragments.size()-newnum2;
-	  for(unsigned i=0; i<newnum2; ++i)
-	    depths[idx2+i] = base+i;
-	}
+      // put and sort new fragments into depths
+      insertFragmentsIntoDepths(idx1, newnum1, idx2, newnum2);
 
       // calculate new depths for fragments and resort region
       if(newnum1+newnum2 > 0)
@@ -233,15 +253,47 @@ void Scene::doSplitting(unsigned idx1, const Camera& cam)
 	  for(unsigned i=nlen-(newnum1+newnum2); i != nlen; ++i)
 	    fragments[i].updateProjCoords(cam.perspM);
 
-	  // sort depth of new items
-	  std::sort(depths.begin()+idx1,
-		    depths.begin()+(idx2+newnum2-1+1),
-		    FragDepthCompare(fragments));
 	  // go back to start
-	  goto start;
+	  goto RESTART;
 	}
     }
 }
+
+void Scene::splitProjected()
+{
+
+  // assume depths already sorted in terms of maximum depth of
+  // fragments
+
+  // iterate over fragments
+  for(unsigned idx1=0; idx1+1<depths.size(); ++idx1)
+    {
+    RESTART:
+
+      double thismindepth = fragments[depths[idx1]].minDepth();
+      for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
+        {
+          // fragments beyond this do not overlap
+          if(fragments[depths[idx2]].maxDepth() < thismindepth)
+            break;
+
+          printf("%i %i /%li\n", idx1, idx2, depths.size());
+
+          unsigned num1=0, num2=0;
+          splitOn2DOverlap(fragments, depths[idx1], depths[idx2], &num1, &num2);
+
+          if(num1>0 || num2>0)
+            {
+              printf("num1=%i num2=%i\n", num1, num2);
+
+              // put and sort new fragments into depths
+              insertFragmentsIntoDepths(idx1, num1, idx2, num2);
+              goto RESTART;
+            }
+        }
+    }
+}
+
 
 void Scene::doDrawing(QPainter* painter, const Mat3& screenM)
 {
@@ -324,7 +376,7 @@ void Scene::fineZCompare()
       unsigned loopcount = 0;
       double thismindepth;
 
-    start:
+    RESTART:
       thismindepth = fragments[depths[idx1]].minDepth();
 
       for(unsigned idx2=idx1+1; idx2<depthssize; ++idx2)
@@ -348,7 +400,7 @@ void Scene::fineZCompare()
 
 	      // avoid infinite loops
 	      if(loopcount++ < 16)
-		goto start;
+		goto RESTART;
 	    }
 	}
     }
@@ -368,20 +420,19 @@ void Scene::render(QPainter* painter, const Camera& cam,
     depths[i]=i;
 
   // sort depth of items
-  std::sort(depths.begin(), depths.end(), FragDepthCompare(fragments));
+  std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
 
-  printf("before: %li %li\n", fragments.size(), depths.size());
   for(unsigned idx=0; idx+1 < depths.size(); ++idx)
     doSplitting(idx, cam);
-  printf("after:  %li %li\n", fragments.size(), depths.size());
+
+  std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
+  // split on sky
+  splitProjected();
 
   // final sorting
-  std::sort(depths.begin(),
-  	    depths.end(),
-  	    FragDepthCompareMean(fragments));
+  std::sort(depths.begin(), depths.end(), FragDepthCompareMean(fragments));
 
   //fineZCompare();
-  printf("after2: %li %li\n", fragments.size(), depths.size());
 
   // how to transform projected points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));

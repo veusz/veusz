@@ -190,9 +190,9 @@ class Graph3D(widget.Widget):
         #     threed.SurfaceProp(1,0,0,trans=0.5)
         # ))
         # scene.root.addObject(threed.Triangle(
-        #     threed.Vec4(0,0.1,0,1), threed.Vec4(1,0.1,1,1),
-        #     threed.Vec4(0,0.1,1,1),
-        #     threed.SurfaceProp(0,0,1,trans=0.5)
+        #    threed.Vec4(0,0.1,0,1), threed.Vec4(1,0.1,1,1),
+        #    threed.Vec4(0,0.1,1,1),
+        #    threed.SurfaceProp(0,0,1,trans=0.5)
         # ))
 
         def printM(m):

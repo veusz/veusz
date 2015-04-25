@@ -182,4 +182,12 @@ void splitFragments(const Fragment& f1, const Fragment& f2,
 void overlapDepth(const Fragment& f1, const Fragment& f2,
 		  double* d1, double* d2);
 
+// for split overlaps in 2D into triangles for the common section for
+// both input triangles (idx1/idx2 in fragments). Add the remaining
+// parts as triangles, too.
+void splitOn2DOverlap(FragmentVector& fragments,
+                      unsigned idx1, unsigned idx2,
+                      unsigned* n1, unsigned* n2);
+
+
 #endif
