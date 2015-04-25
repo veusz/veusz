@@ -1,3 +1,43 @@
+Changes in <next release>:
+ * Add option to "thin" error bars plotted
+
+Minor changes
+ * Fix label colour in contour labelling
+ * Remove use of deprecated Qt functions
+
+Changes in 1.23:
+ * Add new export dialog box which can export multiple pages and
+   modify the export options
+ * Add new dataset filtering dialog
+ * Add cubehelix() functional colormap
+ * Add -stepN suffix for colormaps to make arbitrary numbers of steps
+ * Fix incorrect colors in log images and log color scales
+ * Fix unsafe commands not being run
+
+Minor changes
+ * Fix incorrect use of None in (x,...) pattern
+ * Catch crash if plotting nan/inf value in log space
+ * Fix getData in dataset plugin for dimensions=2
+ * Catch error in too large float to date time conversion
+ * Catch disappeared file during import
+ * Index error fixed in pickable
+ * Catch error in data edit dialog if 2d dataset size changes
+ * If root widget is selected with others, do not error on hide
+ * Fix undo for dataset histogram with a single output dataset
+ * Fix error resizing ellipse with a tuple width, height or position setting
+ * Only use finite values in histogram
+ * Rewrite Line/FillSet setting controls for internal consistency and to fix
+   new style extended fills
+ * Do not crash with log date-time axes
+ * Also ignore non-finite values when fitting with minuit
+ * Avoid syntax error with invalid colormap
+ * Updates to setup.py and desktop files
+ * Recreate dataset now works if dialog hasn't been opened already
+ * Restore dock layout when using Python3
+ * Fix undo after loading stylesheet/custom definitions
+ * Support unicode example filenames
+ * Clip bezier lines to avoid problems with log axes
+
 Changes in 1.22:
  * Add option to ignore white space following delimiters when importing CSVs
  * Allow x/yedge and x/ycent to be inverted to change data order

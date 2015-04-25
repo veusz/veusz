@@ -24,7 +24,7 @@ import os.path
 import numpy as N
 import textwrap
 
-from ..compat import crange, citems, czip, cstr
+from ..compat import crange, citems, czip, cbasestr, cstr
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -39,16 +39,19 @@ def _(text, disambiguation=None, context="DatasetBrowser"):
 
 def datasetLinkFile(ds):
     """Get a linked filename from a dataset."""
-    if ds.linked is None:
-        return "/"
-    else:
-        return ds.linked.filename
+    return "/" if ds.linked is None else ds.linked.filename
+
+def wrap(text, width):
+    """Wrap text at columns. This needs to be split and rejoined."""
+    lines = text.split("\n\n")
+    out = [textwrap.fill(l, width).strip() for l in lines]
+    return "\n\n".join(out)
 
 class DatasetNode(TMNode):
     """Node for a dataset."""
 
-    def __init__(self, doc, dsname, cols, parent):
-        ds = doc.data[dsname]
+    def __init__(self, model, dsname, cols, parent):
+        ds = model.doc.data[dsname]
         data = []
         assert cols[0] == "name"
         for c in cols:
@@ -60,10 +63,13 @@ class DatasetNode(TMNode):
                 data.append( ds.dstype )
             elif c == "linkfile":
                 data.append( os.path.basename(datasetLinkFile(ds)) )
+            elif c == "check":
+                data.append( dsname in model.checked_datasets )
 
         TMNode.__init__(self, tuple(data), parent)
-        self.doc = doc
+        self.model = model
         self.cols = cols
+        self.dsname = dsname
 
     def getPreviewPixmap(self, ds):
         """Get a preview pixmap for a dataset."""
@@ -117,20 +123,18 @@ class DatasetNode(TMNode):
     def toolTip(self, column):
         """Return tooltip for column."""
         try:
-            ds = self.doc.data[self.data[0]]
+            ds = self.model.doc.data[self.data[0]]
         except KeyError:
             return None
 
         c = self.cols[column]
         if c == "name":
-            text = ds.description()
-            if text is None:
-                text = ''
-
+            text = '%s: %s' % (self.data[0], ds.description())
+            if ds.linked:
+                text += '\n\n' + _('Linked to %s') % ds.linked.filename
             if ds.tags:
                 text += '\n\n' + _('Tags: %s') % (' '.join(sorted(ds.tags)))
-
-            return textwrap.fill(text, 40)
+            return wrap(text, 40)
         elif c == "size" or (c == 'type' and 'size' not in self.cols):
             text = ds.userPreview()
             # add preview of dataset if possible
@@ -140,13 +144,13 @@ class DatasetNode(TMNode):
                 text = "<html>%s<br>%s</html>" % (text, utils.pixmapAsHtml(pix))
             return text
         elif c == "linkfile" or c == "type":
-            return textwrap.fill(ds.linkedInformation(), 40)
+            return wrap(ds.linkedInformation(), 40)
         return None
 
     def dataset(self):
         """Get associated dataset."""
         try:
-            return self.doc.data[self.data[0]]
+            return self.model.doc.data[self.data[0]]
         except KeyError:
             return None
 
@@ -156,7 +160,8 @@ class DatasetNode(TMNode):
 
     def cloneTo(self, newroot):
         """Make a clone of self at the root given."""
-        return self.__class__(self.doc, self.data[0], self.cols, newroot)
+        return self.__class__(
+            self.model, self.dsname, self.cols, newroot)
 
 class FilenameNode(TMNode):
     """A special node for holding filenames of files."""
@@ -190,12 +195,14 @@ def treeFromList(nodelist, rootdata):
 class DatasetRelationModel(TreeModel):
     """A model to show how the datasets are related to each file."""
     def __init__(self, doc, grouping="filename", readonly=False,
-                 filterdims=None, filterdtype=None):
+                 filterdims=None, filterdtype=None,
+                 checkable=False):
         """Model parameters:
         doc: document
         group: how to group datasets
         readonly: no modification of data
         filterdims/filterdtype: filter dimensions and datatypes.
+        checkable: whether datasets are checkable
         """
 
         TreeModel.__init__(self, (_("Dataset"), _("Size"), _("Type")))
@@ -206,6 +213,8 @@ class DatasetRelationModel(TreeModel):
         self.readonly = readonly
         self.filterdims = filterdims
         self.filterdtype = filterdtype
+        self.checkable = checkable
+        self.checked_datasets = set()
         self.refresh()
 
         doc.signalModified.connect(self.refresh)
@@ -218,9 +227,11 @@ class DatasetRelationModel(TreeModel):
         keep = True
         if self.filter != "":
             keep = False
-            if any([t.find(self.filter) >= 0 for t in ds.tags]):
+            if any([t.find(self.filter) >= 0 for t in ds.tags
+                    if isinstance(t, cbasestr)]):
                 keep = True
-            if any([t.find(self.filter) >= 0 for t in node.data]):
+            if any([t.find(self.filter) >= 0 for t in node.data
+                    if isinstance(t, cbasestr)]):
                 keep = True
         # check dimensions haven't been filtered
         if ( self.filterdims is not None and
@@ -237,17 +248,22 @@ class DatasetRelationModel(TreeModel):
 
     def makeGrpTreeNone(self):
         """Make tree with no grouping."""
-        tree = TMNode( (_("Dataset"), _("Size"), _("Type"), _("File")), None )
+
+        heads = [_("Dataset"), _("Size"), _("Type"), _("File")]
+        cols = ["name", "size", "type", "linkfile"]
+        if self.checkable:
+            heads += [_('Select')]
+            cols += [_('check')]
+
+        tree = TMNode(heads , None)
         for name, ds in citems(self.doc.data):
-            child = DatasetNode( self.doc, name,
-                                 ("name", "size", "type", "linkfile"),
-                                 None )
+            child = DatasetNode(self, name, cols, None)
 
             # add if not filtered for filtering
             if not self.datasetFilterOut(ds, child):
                 tree.insertChildSorted(child)
         return tree
-        
+
     def makeGrpTree(self, coltitles, colitems, grouper, GrpNodeClass):
         """Make a tree grouping with function:
         coltitles: tuple of titles of columns for user
@@ -255,9 +271,14 @@ class DatasetRelationModel(TreeModel):
         grouper: function of dataset to return text for grouping
         GrpNodeClass: class for creating grouping nodes
         """
+
+        if self.checkable:
+            coltitles = coltitles + [_('Select')]
+            colitems = colitems + [_('check')]
+
         grpnodes = {}
         for name, ds in citems(self.doc.data):
-            child = DatasetNode(self.doc, name, colitems, None)
+            child = DatasetNode(self, name, colitems, None)
 
             # check whether filtered out
             if not self.datasetFilterOut(ds, child):
@@ -274,8 +295,8 @@ class DatasetRelationModel(TreeModel):
     def makeGrpTreeFilename(self):
         """Make a tree of datasets grouped by linked file."""
         return self.makeGrpTree(
-            (_("Dataset"), _("Size"), _("Type")),
-            ("name", "size", "type"),
+            [_("Dataset"), _("Size"), _("Type")],
+            ["name", "size", "type"],
             lambda ds: (datasetLinkFile(ds),),
             FilenameNode
             )
@@ -283,8 +304,8 @@ class DatasetRelationModel(TreeModel):
     def makeGrpTreeSize(self):
         """Make a tree of datasets grouped by dataset size."""
         return self.makeGrpTree(
-            (_("Dataset"), _("Type"), _("Filename")),
-            ("name", "type", "linkfile"),
+            [_("Dataset"), _("Type"), _("Filename")],
+            ["name", "type", "linkfile"],
             lambda ds: (ds.userSize(),),
             TMNode
             )
@@ -292,8 +313,8 @@ class DatasetRelationModel(TreeModel):
     def makeGrpTreeType(self):
         """Make a tree of datasets grouped by dataset type."""
         return self.makeGrpTree(
-            (_("Dataset"), _("Size"), _("Filename")),
-            ("name", "size", "linkfile"),
+            [_("Dataset"), _("Size"), _("Filename")],
+            ["name", "size", "linkfile"],
             lambda ds: (ds.dstype,),
             TMNode
             )
@@ -308,8 +329,8 @@ class DatasetRelationModel(TreeModel):
                 return [_("None")]
 
         return self.makeGrpTree(
-            (_("Dataset"), _("Size"), _("Type"), _("Filename")),
-            ("name", "size", "type", "linkfile"),
+            [_("Dataset"), _("Size"), _("Type"), _("Filename")],
+            ["name", "size", "type", "linkfile"],
             getgrp,
             TMNode
             )
@@ -318,21 +339,42 @@ class DatasetRelationModel(TreeModel):
         """Return model flags for index."""
         f = TreeModel.flags(self, idx)
         # allow dataset names to be edited
-        if ( idx.isValid() and isinstance(self.objFromIndex(idx), DatasetNode)
-             and not self.readonly and idx.column() == 0 ):
-            f |= qt4.Qt.ItemIsEditable
+        obj = self.objFromIndex(idx)
+        if idx.isValid() and isinstance(obj, DatasetNode):
+            col = idx.column()
+            if not self.readonly and col == 0:
+                # renameable dataset
+                f |= qt4.Qt.ItemIsEditable
+            elif obj.cols[col] == "check":
+                # checkable dataset
+                f |= qt4.Qt.ItemIsUserCheckable
         return f
 
-    def setData(self, idx, newname, role):
+    def setData(self, idx, val, role):
         """Rename dataset."""
         dsnode = self.objFromIndex(idx)
-        if not utils.validateDatasetName(newname) or newname in self.doc.data:
-            return False
+        name = dsnode.cols[idx.column()]
 
-        self.doc.applyOperation(
-            document.OperationDatasetRename(dsnode.data[0], newname))
-        self.dataChanged.emit(idx, idx)
-        return True
+        if name == "name":
+            if( not utils.validateDatasetName(val) or
+                val in self.doc.data ):
+                return False
+
+            self.doc.applyOperation(
+                document.OperationDatasetRename(dsnode.data[0], val))
+            self.dataChanged.emit(idx, idx)
+            return True
+
+        elif name == "check":
+            # update check box
+            name = dsnode.dsname
+            if val:
+                self.checked_datasets.add(name)
+            else:
+                self.checked_datasets.remove(name)
+            # emitted by refresh: self.dataChanged.emit(idx, idx)
+            self.refresh()
+            return True
 
     @qt4.pyqtSlot()
     def refresh(self):
@@ -355,7 +397,8 @@ class DatasetsNavigatorTree(qt4.QTreeView):
     selecteddatasets = qt4.pyqtSignal(list)
 
     def __init__(self, doc, mainwin, grouping, parent,
-                 readonly=False, filterdims=None, filterdtype=None):
+                 readonly=False, filterdims=None, filterdtype=None,
+                 checkable=False):
         """Initialise the dataset tree view.
         doc: veusz document
         mainwin: veusz main window (or None if readonly)
@@ -363,14 +406,17 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         parent: parent window or None
         filterdims: if set, only show datasets with dimensions given
         filterdtype: if set, only show datasets with type given
+        checkable: allow datasets to be selected
         """
 
         qt4.QTreeView.__init__(self, parent)
         self.doc = doc
         self.mainwindow = mainwin
-        self.model = DatasetRelationModel(doc, grouping, readonly=readonly,
-                                          filterdims=filterdims,
-                                          filterdtype=filterdtype)
+        self.model = DatasetRelationModel(
+            doc, grouping, readonly=readonly,
+            filterdims=filterdims,
+            filterdtype=filterdtype,
+            checkable=checkable)
 
         self.setModel(self.model)
         self.setSelectionMode(qt4.QTreeView.ExtendedSelection)
@@ -646,6 +692,20 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                 pass
         return datasets
 
+    def checkedDatasets(self):
+        """Returns list of checked datasets (if checkable was True)."""
+        return sorted(self.model.checked_datasets)
+
+    def setCheckedDatasets(self, checked):
+        """Update list of checked datasets."""
+        self.model.checked_datasets = set(checked)
+        self.model.refresh()
+
+    def resetChecks(self):
+        """Reset checked datasets."""
+        self.model.checked_datasets.clear()
+        self.model.refresh()
+
 class DatasetBrowser(qt4.QWidget):
     """Widget which shows the document's datasets."""
 
@@ -660,7 +720,7 @@ class DatasetBrowser(qt4.QWidget):
         }
 
     def __init__(self, thedocument, mainwin, parent, readonly=False,
-                 filterdims=None, filterdtype=None):
+                 filterdims=None, filterdtype=None, checkable=False):
         """Initialise widget:
         thedocument: document to show
         mainwin: main window of application (or None if readonly)
@@ -668,6 +728,7 @@ class DatasetBrowser(qt4.QWidget):
         readonly: for choosing datasets only
         filterdims: if set, only show datasets with dimensions given
         filterdtype: if set, only show datasets with type given
+        checkable: allow datasets to be selected
         """
 
         qt4.QWidget.__init__(self, parent)
@@ -696,10 +757,11 @@ class DatasetBrowser(qt4.QWidget):
         self.optslayout.addWidget(self.grpbutton)
 
         # filtering by entering text
-        self.optslayout.addWidget(qt4.QLabel(_("Filter")))
+        searchlabel = qt4.QLabel()
+        searchlabel.setPixmap(utils.getIcon('kde-search-jss').pixmap(18,18))
+        self.optslayout.addWidget(searchlabel)
         self.filteredit = LineEditWithClear()
-        self.filteredit.setToolTip(_("Enter text here to filter datasets"))
-
+        self.filteredit.setToolTip(_("Search for dataset names"))
         self.filteredit.textChanged.connect(self.slotFilterChanged)
         self.optslayout.addWidget(self.filteredit)
 
@@ -708,7 +770,8 @@ class DatasetBrowser(qt4.QWidget):
         # the actual widget tree
         self.navtree = DatasetsNavigatorTree(
             thedocument, mainwin, self.grouping, None,
-            readonly=readonly, filterdims=filterdims, filterdtype=filterdtype)
+            readonly=readonly, filterdims=filterdims, filterdtype=filterdtype,
+            checkable=checkable)
         self.layout.addWidget(self.navtree)
 
     def slotGrpChanged(self, action):
@@ -723,6 +786,19 @@ class DatasetBrowser(qt4.QWidget):
     def selectDataset(self, dsname):
         """Find, and if possible select dataset name."""
         self.navtree.selectDataset(dsname)
+
+    def checkedDatasets(self):
+        """Returns list of checked datasets (if checkable was True)."""
+        return self.navtree.checkedDatasets()
+
+    def setCheckedDatasets(self, checked):
+        """Update list of checked datasets."""
+        self.navtree.setCheckedDatasets(checked)
+
+    def reset(self):
+        """Uncheck all items."""
+        self.navtree.resetChecks()
+        self.filteredit.clear()
 
 class DatasetBrowserPopup(DatasetBrowser):
     """Popup window for dataset browser for selecting datasets.
@@ -741,8 +817,9 @@ class DatasetBrowserPopup(DatasetBrowser):
         filterdtype: if set, only show datasets with type given
         """
 
-        DatasetBrowser.__init__(self, document, None, parent, readonly=True,
-                                filterdims=filterdims, filterdtype=filterdtype)
+        DatasetBrowser.__init__(
+            self, document, None, parent, readonly=True,
+            filterdims=filterdims, filterdtype=filterdtype)
         self.setWindowFlags(qt4.Qt.Popup)
         self.setAttribute(qt4.Qt.WA_DeleteOnClose)
         self.spacing = self.fontMetrics().height()
@@ -763,7 +840,7 @@ class DatasetBrowserPopup(DatasetBrowser):
             if not frame.contains(event.pos()):
                 self.close()
                 return True
-        return qt4.QTextEdit.eventFilter(self, node, event)
+        return DatasetBrowser.eventFilter(self, node, event)
 
     def sizeHint(self):
         """A reasonable size for the text editor."""

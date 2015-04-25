@@ -405,14 +405,14 @@ class BoxPlot(GenericPlotter):
             datasets = [ s.get(x).getData(doc) for x in
                          ('whiskermin', 'whiskermax', 'boxmin',
                           'boxmax', 'mean', 'median') ]
-            if None in datasets:
+            if N.any((d is None for d in datasets)):
                 return
 
         # get axes widgets
         axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
 
         # return if there are no proper axes
-        if ( None in axes or
+        if ( axes[0] is None or axes[1] is None or
              axes[0].settings.direction != 'horizontal' or
              axes[1].settings.direction != 'vertical' ):
             return

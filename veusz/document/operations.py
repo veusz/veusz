@@ -1071,14 +1071,14 @@ class OperationMultiple(object):
 
 class OperationLoadStyleSheet(OperationMultiple):
     """An operation to load a stylesheet."""
-    
+
     descr = _('load stylesheet')
 
     def __init__(self, filename):
         """Load stylesheet with filename."""
         OperationMultiple.__init__(self, [], descr=None)
         self.filename = os.path.abspath(filename)
-        
+
     def do(self, document):
         """Do the import."""
 
@@ -1095,7 +1095,8 @@ class OperationLoadStyleSheet(OperationMultiple):
         except:
             document.batchHistory(None)
             raise
-        
+        document.batchHistory(None)
+
 class OperationLoadCustom(OperationLoadStyleSheet):
     descr = _('load custom definitions')
 

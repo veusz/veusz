@@ -122,7 +122,7 @@ class GenericPickable:
         if self.widget.settings.hide:
             return info
 
-        if None in (self.xvals, self.yvals):
+        if self.xvals is None or self.yvals is None:
             return info
         if len(self.xscreen) == 0 or len(self.yscreen) == 0:
             return info
@@ -151,7 +151,11 @@ class GenericPickable:
         m = N.min(dist)
         # if there are multiple equidistant points, arbitrarily take
         # the first one
-        i = N.nonzero(dist == m)[0][0]
+
+        try:
+            i = N.nonzero(dist == m)[0][0]
+        except IndexError:
+            return info
 
         info.screenpos = self.xscreen[i], self.yscreen[i]
         info.coords = self.xvals[i], self.yvals[i]
@@ -166,7 +170,7 @@ class GenericPickable:
         if self.widget.settings.hide:
             return info
 
-        if None in (self.xvals, self.yvals):
+        if self.xvals is None or self.yvals is None:
             return info
 
         if oldindex.index is None:

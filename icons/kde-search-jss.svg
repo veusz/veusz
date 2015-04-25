@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="kde-zoom-original.svg"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:version="0.32"
+   id="svg1"
+   x="0"
+   y="0"
+   version="1.0"
+   _SVGFile__filename="oldscale/actions/viewmag1.svg"
+   width="60"
+   height="60">
+  <sodipodi:namedview
+     inkscape:current-layer="svg1"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:window-height="691"
+     inkscape:window-width="1020"
+     inkscape:cy="54.497069"
+     inkscape:cx="57.357927"
+     inkscape:zoom="3.4732669"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     showgrid="false"
+     inkscape:window-maximized="0" />
+  <defs
+     id="defs3" />
+  <metadata
+     id="metadata12">
+    <RDF
+       id="RDF13">
+      <Work
+         id="Work14"
+         about="">
+        <title
+           id="title15">Part of the Flat Icon Collection (Thu Aug 26 14:38:01 2004)</title>
+        <description
+           id="description17" />
+        <subject
+           id="subject18">
+          <Bag
+             id="Bag19">
+            <li
+               id="li20" />
+          </Bag>
+        </subject>
+        <publisher
+           id="publisher21">
+          <Agent
+             id="Agent22"
+             about="">
+            <title
+               id="title23" />
+          </Agent>
+        </publisher>
+        <creator
+           id="creator24">
+          <Agent
+             id="Agent25"
+             about="">
+            <title
+               id="title26">Danny Allen</title>
+          </Agent>
+        </creator>
+        <rights
+           id="rights28">
+          <Agent
+             id="Agent29"
+             about="">
+            <title
+               id="title30">Danny Allen</title>
+          </Agent>
+        </rights>
+        <date
+           id="date32" />
+        <format
+           id="format33">image/svg+xml</format>
+        <type
+           resource="http://purl.org/dc/dcmitype/StillImage"
+           id="type35" />
+        <license
+           resource="http://creativecommons.org/licenses/LGPL/2.1/"
+           id="license36">
+          <date
+             id="date37" />
+        </license>
+        <language
+           id="language38">en</language>
+      </Work>
+    </RDF>
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <path
+     transform="matrix(1.000310,0.000000,0.000000,1.000310,1.229048e-2,-1.988434e-4)"
+     id="path1096"
+     d="M 24.656250,4.6875000 C 13.637738,4.6875010 4.7187530,13.637728 4.7187500,24.656250 C 4.7187500,35.674771 13.637741,44.625000 24.656250,44.625000 C 29.180900,44.625000 33.338440,43.040411 36.687500,40.500000 C 45.913240,53.936500 52.386970,56.790399 54.593750,54.656250 C 56.857480,52.447361 53.372770,46.144104 40.687500,36.468750 C 43.138880,33.153546 44.625000,29.092829 44.625000,24.656250 C 44.625000,13.637729 35.674770,4.6875010 24.656250,4.6875000 z "
+     style="font-size:12.000000;fill:none;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#ffffff;stroke-width:8.1224833;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4.0000000;stroke-opacity:1.0000000;" />
+  <path
+     transform="matrix(0.969106,0.000000,0.000000,0.969106,0.687334,0.895520)"
+     id="path1184"
+     d="M 31.913680,32.618870 C 44.251640,53.717920 52.965610,58.090200 55.644410,55.499570 C 58.416270,52.794860 53.750530,44.426660 33.534360,30.966260 L 31.913680,32.618870 z "
+     style="stroke-opacity:1.0000000;stroke-linejoin:round;stroke-linecap:round;stroke-width:3.2246218;stroke:#000000;fill-rule:evenodd;fill-opacity:1.0000000;fill:#a49fcc;font-size:12.000000" />
+  <path
+     transform="matrix(0.969106,0.000000,0.000000,0.969106,0.687334,0.895520)"
+     id="path1185"
+     d="M 45.373020,24.517720 C 45.373020,35.891020 36.142510,45.121520 24.769210,45.121520 C 13.395920,45.121520 4.1654130,35.891020 4.1654130,24.517720 C 4.1654130,13.144420 13.395920,3.9139190 24.769210,3.9139180 C 36.142510,3.9139190 45.373020,13.144420 45.373020,24.517720 z "
+     style="font-size:12.000000;fill:#a49fcc;fill-opacity:1.0000000;fill-rule:evenodd;stroke:#000000;stroke-width:3.2246218;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1.0000000" />
+  <path
+     transform="matrix(1.000310,0.000000,0.000000,1.000310,1.229048e-2,-1.988434e-4)"
+     id="path1186"
+     d="M 40.385068,24.648355 C 40.385068,33.322298 33.345346,40.362020 24.671403,40.362020 C 15.997450,40.362020 8.9577310,33.322298 8.9577320,24.648355 C 8.9577310,15.974412 15.997450,8.9346881 24.671403,8.9346881 C 33.345346,8.9346881 40.385068,15.974412 40.385068,24.648355 z "
+     style="stroke-opacity:1;stroke-linejoin:round;stroke-linecap:round;stroke-width:2.49922610000000001;stroke:#000000;fill-rule:evenodd;fill-opacity:1;fill:#ffffff;font-size:12" />
+</svg>

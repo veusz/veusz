@@ -18,12 +18,8 @@
 
 from __future__ import division
 import numpy as N
-from .datasets import Dataset1DBase, evalDatasetExpression
+from .datasets import Dataset1DBase, evalDatasetExpression, _
 from .. import qtall as qt4
-
-def _(text, disambiguation=None, context="Datasets"):
-    """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class DatasetHistoGenerator(object):
     def __init__(self, document, inexpr,
@@ -57,6 +53,11 @@ class DatasetHistoGenerator(object):
             d = evalDatasetExpression(self.document, self.inexpr)
             if d is not None:
                 d = d.data
+                # only use finite data
+                d = d[N.isfinite(d)]
+                if len(d) == 0:
+                    d = None
+
             self._cacheddata = d
             self.changeset = self.document.changeset
         return self._cacheddata
@@ -73,9 +74,9 @@ class DatasetHistoGenerator(object):
                 if data is None:
                     return N.array([])
                 if minval == 'Auto':
-                    minval = N.nanmin(data)
+                    minval = N.min(data)
                 if maxval == 'Auto':
-                    maxval = N.nanmax(data)
+                    maxval = N.max(data)
 
             if not islog:
                 delta = (maxval - minval) / numbins
@@ -279,7 +280,7 @@ class DatasetHistoValues(Dataset1DBase):
 class OperationDatasetHistogram(object):
     """Operation to make histogram from data."""
 
-    descr = 'make histogram'
+    descr = _("make histogram")
 
     def __init__(self, expr, outposns, outvalues,
                  binparams=None, binmanual=None, method='counts',
@@ -314,6 +315,8 @@ class OperationDatasetHistogram(object):
             method=self.method,
             cumulative=self.cumulative,
             errors=self.errors)
+
+        self.oldposnsds = self.oldvaluesds = None
 
         if self.outvalues != '':
             self.oldvaluesds = document.data.get(self.outvalues, None)

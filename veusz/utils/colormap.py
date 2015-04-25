@@ -17,6 +17,7 @@
 ###############################################################################
 
 from __future__ import division
+import re
 import numpy as N
 
 # use fast or slow helpers
@@ -37,7 +38,7 @@ except ImportError:
 # with (-1,0,0,0) which enables a step mode (this first value is
 # ignored)
 
-defaultcolormaps = {
+_defaultmaps = {
     'blank': (
         (0,   0,   0,   0),
         (0,   0,   0,   0),
@@ -73,35 +74,8 @@ defaultcolormaps = {
         (255, 0,   0,   255),
         (255, 255, 255, 255),
         ),
-    'spectrum-step': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (0,   0,   255, 255),
-        (0,   255, 255, 255),
-        (0,   255, 0,   255),
-        (255, 255, 0,   255),
-        (255, 0,   0,   255),
-        (255, 255, 255, 255),
-        ),
     'grey': (
         (0,   0,   0,   255),
-        (255, 255, 255, 255),
-        ),
-    'grey-step5': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (64,  64,  64,  255),
-        (128, 128, 128, 255),
-        (191, 191, 191, 255),
-        (255, 255, 255, 255),
-        ),
-    'grey-step6': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (51,  51,  51,  255),
-        (102, 102, 102, 255),
-        (153, 153, 153, 255),
-        (204, 204, 204, 255),
         (255, 255, 255, 255),
         ),
     'blue': (
@@ -126,35 +100,11 @@ defaultcolormaps = {
         (161, 255, 0,   255),
         (255, 255, 255, 255),
         ),
-    'bluegreen-step': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (255, 123, 0,   255),
-        (255, 226, 72,  255),
-        (161, 255, 0,   255),
-        (255, 255, 255, 255),
-        ),
     'transblack': (
         (0,   0,   0,   255),
         (0,   0,   0,   0),
         ),
-    'transblack-step5': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (0,   0,   0,   191),
-        (0,   0,   0,   128),
-        (0,   0,   0,   64),
-        (0,   0,   0,   0),
-        ),
     'royal': (
-        (0,   0,   0,   255),
-        (128, 0,   0,   255),
-        (255, 0,   128, 255),
-        (0,   255, 255, 255),
-        (255, 255, 255, 255),
-        ),
-    'royal-step': (
-        (-1,  0,   0,   0),
         (0,   0,   0,   255),
         (128, 0,   0,   255),
         (255, 0,   128, 255),
@@ -169,16 +119,142 @@ defaultcolormaps = {
         (0,   255, 255, 255),
         (255, 255, 255, 255),
         ),
-    'complement-step': (
-        (-1,  0,   0,   0),
-        (0,   0,   0,   255),
-        (0,   255, 0,   255),
-        (255, 0,   255, 255),
-        (0,   0,   255, 255),
-        (0,   255, 255, 255),
-        (255, 255, 255, 255),
-        ),
     }
+
+def cubehelix(start, rots, hue, gamma, nlev=64):
+    """Return a cube helix color scheme.
+    See https://www.mrao.cam.ac.uk/~dag/CUBEHELIX/
+    Green, D. A., 2011, `A colour scheme for the display of astronomical
+    intensity images', Bulletin of the Astronomical Society of India, 39, 28
+    """
+
+    fract = N.linspace(0, 1, nlev)
+    angle = 2*N.pi*(start/3.+1.+rots*fract)
+    fract = fract**gamma
+    amp = 0.5*hue*fract*(1-fract)
+    c, s = N.cos(angle), N.sin(angle)
+    red   = fract+amp*(-0.14861*c+1.78277*s)
+    green = fract+amp*(-0.29227*c-0.90649*s)
+    blue  = fract+amp*( 1.97294*c)
+
+    r = N.clip(red*255, 0, 255)
+    g = N.clip(green*255, 0, 255)
+    b = N.clip(blue*255, 0, 255)
+    a = N.zeros(nlev)+255
+
+    return N.column_stack( (b,g,r,a) ).astype(N.intc)
+
+def stepCMap(cmap, n):
+    """Give color map, interpolate to produce n steps and return stepped
+    colormap."""
+
+    if n == 0:
+        return N.vstack( ([-1,0,0,0], cmap) ).astype(N.intc)
+
+    cmap = N.array(cmap, dtype=N.float64)
+    x = N.linspace(0, 1, n)
+    xp = N.linspace(0, 1, len(cmap))
+
+    b = N.interp(x, xp, cmap[:,0])
+    g = N.interp(x, xp, cmap[:,1])
+    r = N.interp(x, xp, cmap[:,2])
+    a = N.interp(x, xp, cmap[:,3])
+
+    return N.vstack( ([-1,0,0,0], N.column_stack((b,g,r,a))) ).astype(N.intc)
+
+class ColorMaps(object):
+    """Class representing defined color maps.
+
+    This is initialised from the default list.
+
+    Also supported are functional color maps,
+    e.g. cubehelix(start[,rotations[,hue[,gamma]]])
+
+    Colormaps with steps -stepN where N is an integer or missing are
+    also automatically generated.
+    """
+
+    def __init__(self):
+        self.maps = dict(_defaultmaps)
+
+    def get(self, idx, default=None):
+        try:
+            return self[idx]
+        except KeyError:
+            return default
+
+    def __getitem__(self, key):
+        """Lookup and return colormap."""
+
+        origkey = key = key.strip()
+
+        if key in self.maps:
+            return self.maps[key]
+
+        # does the name end in stepXXX ?
+        step = None
+        sm = re.match(r'^(.+)-step([0-9]*)$', key)
+        if sm is not None:
+            if sm.group(2):
+                step = int(sm.group(2))
+            else:
+                step = 0
+            key = sm.group(1)
+
+        cmap = None
+        if key in self.maps:
+            cmap = self.maps[key]
+        else:
+            # match cubehelix(a,b,c,d), where b, c and d are optional numerics
+            # giving start, rotations, hue and gamma
+            cm = re.match(
+                r'^cubehelix\s*\('
+                r'(?:\s*(-?[0-9.]+))?'
+                r'(?:\s*,\s*(-?[0-9.]+))?'
+                r'(?:\s*,\s*(-?[0-9.]+))?'
+                r'(?:\s*,\s*(-?[0-9.]+))?'
+                r'\s*\)$',
+                key)
+
+            if cm is not None:
+                vals = []
+                for i, v in enumerate(cm.groups()):
+                    try:
+                        vals.append(float(v))
+                    except (ValueError, TypeError):
+                        vals.append((0,1,1,1)[i])
+                cmap = cubehelix(*vals)
+
+        if cmap is None:
+            raise KeyError('Invalid colormap name')
+
+        # apply steps to colormap
+        if step is not None:
+            cmap = stepCMap(cmap, step)
+
+        # cache result and return
+        self.maps[origkey] = cmap
+        return cmap
+
+    def __setitem__(self, key, val):
+        self.maps[key] = val
+
+    def __contains__(self, key):
+        return self.get(key) is not None
+
+    def __iter__(self):
+        items = set(self.maps)
+        items.update([
+            'cubehelix(0.5,-1.5,1,1)',
+            'bluegreen-step',
+            'complement-step',
+            'grey-step5',
+            'grey-step6',
+            'royal-step',
+            'spectrum-step',
+            'transblack-step5',
+        ])
+        return iter(items)
 
 def applyScaling(data, mode, minval, maxval):
     """Apply a scaling transformation on the data.
@@ -209,11 +285,10 @@ def applyScaling(data, mode, minval, maxval):
 
     elif mode == 'log':
         # log scaling of image
-        # clip any values less than lowermin
-        lowermin = data < minval
-        chopvals = N.where(data > (minval-1), data - (minval-1), 1e-200)
-        data = N.log(chopvals) / N.log(maxval - (minval - 1))
-        data[lowermin] = 0.
+        with N.errstate(invalid='ignore', divide='ignore'):
+            invrange = 1./(N.log(maxval)-N.log(minval))
+            data = (N.log(data)-N.log(minval)) * invrange
+        data[~N.isfinite(data)] = 0
 
     elif mode == 'squared':
         # squared scaling
@@ -280,9 +355,7 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
         # do a linear color scaling
         vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
         colorscaling = scaling
-    else:
-        assert scaling == 'log'
-
+    elif scaling == 'log':
         # a logarithmic color scaling
         # we cheat here by actually plotting a linear colorbar
         # and telling veusz to put a log axis along it
@@ -291,6 +364,8 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
 
         vals = N.arange(barsize)/(barsize-1.0)*(maxval-minval) + minval
         colorscaling = 'linear'
+    else:
+        raise RuntimeError('Invalid scaling')
 
     # convert 1d array to 2d image
     if direction == 'horizontal':

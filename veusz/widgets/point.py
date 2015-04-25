@@ -331,6 +331,11 @@ class PointPlotter(GenericPlotter):
             usertext=_('Scale markers')), 6 )
 
         # formatting
+        s.add( setting.Int('errorthin', 1,
+                           minval=1,
+                           descr=_('Thin number of error bars plotted by this factor'),
+                           usertext=_('Thin errors'),
+                           formatting=True), 0 )
         s.add( setting.Int('thinfactor', 1,
                            minval=1,
                            descr=_('Thin number of markers plotted'
@@ -409,12 +414,17 @@ class PointPlotter(GenericPlotter):
         if style == 'none':
             return
 
+        # optional thinning of error bars plotted
+        thin = s.errorthin
+
         # default is no error bars
         xmin = xmax = ymin = ymax = None
 
         # draw horizontal error bars
         if xdata.hasErrors():
             xmin, xmax = xdata.getPointRanges()
+            if thin>1:
+                xmin, xmax = xmin[::thin], xmax[::thin]
 
             # convert xmin and xmax to graph coordinates
             xmin = axes[0].dataToPlotterCoords(posn, xmin)
@@ -423,6 +433,8 @@ class PointPlotter(GenericPlotter):
         # draw vertical error bars
         if ydata.hasErrors():
             ymin, ymax = ydata.getPointRanges()
+            if thin>1:
+                ymin, ymax = ymin[::thin], ymax[::thin]
 
             # convert ymin and ymax to graph coordinates
             ymin = axes[1].dataToPlotterCoords(posn, ymin)
@@ -431,6 +443,9 @@ class PointPlotter(GenericPlotter):
         # no error bars - break out of processing below
         if ymin is None and ymax is None and xmin is None and xmax is None:
             return
+
+        if thin>1:
+            xplotter, yplotter = xplotter[::thin], yplotter[::thin]
 
         # iterate to call the error bars functions required to draw style
         pen = s.ErrorBarLine.makeQPenWHide(painter)
@@ -454,7 +469,8 @@ class PointPlotter(GenericPlotter):
 
         if axis.settings.log:
             def updateRange(v):
-                chopzero = v[v>0 & N.isfinite(v)]
+                with N.errstate(invalid='ignore'):
+                    chopzero = v[(v>0) & N.isfinite(v)]
                 if len(chopzero) > 0:
                     axrange[0] = min(axrange[0], chopzero.min())
                     axrange[1] = max(axrange[1], chopzero.max())
@@ -568,29 +584,34 @@ class PointPlotter(GenericPlotter):
 
         return pts
 
-    def _getBezierLine(self, poly):
+    def _getBezierLine(self, poly, cliprect):
         """Try to draw a bezier line connecting the points."""
 
-        npts = qtloops.bezier_fit_cubic_multi(poly, 0.1, len(poly)+1)
-        i = 0
+        # clip to a larger box to help the lines get right angle
+        bigclip = qt4.QRectF(
+            cliprect.left()-cliprect.width()*0.5,
+            cliprect.top()-cliprect.height()*0.5,
+            cliprect.width()*2, cliprect.height()*2)
+
+        # clip poly to the rectangle and return the parts
+        polys = qtloops.clipPolyline(bigclip, poly)
+
+        # add each part as a bezier
         path = qt4.QPainterPath()
-        lastpt = qt4.QPointF(-999999,-999999)
-        while i < len(npts):
-            if lastpt != npts[i]:
-                path.moveTo(npts[i])
-            path.cubicTo(npts[i+1], npts[i+2], npts[i+3])
-            lastpt = npts[i+3]
-            i += 4
+        for lpoly in polys:
+            if len(lpoly) >= 2:
+                npts = qtloops.bezier_fit_cubic_multi(lpoly, 0.1, len(lpoly)+1)
+                qtloops.addCubicsToPainterPath(path, npts);
         return path
 
     def _drawBezierLine( self, painter, xvals, yvals, posn,
-                         xdata, ydata):
+                         xdata, ydata, cliprect ):
         """Handle bezier lines and fills."""
 
         pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
         if len(pts) < 2:
             return
-        path = self._getBezierLine(pts)
+        path = self._getBezierLine(pts, cliprect)
         s = self.settings
 
         # do filling
@@ -730,7 +751,7 @@ class PointPlotter(GenericPlotter):
             length = xv.data.shape[0]
             yv = document.DatasetRange(length, (1,length))
 
-        if None in (text, xv, yv):
+        if text is None or xv is None or yv is None:
             return (None, None)
         if direction == 'horizontal':
             return (text, xv.data)
@@ -825,7 +846,7 @@ class PointPlotter(GenericPlotter):
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
                 if s.PlotLine.bezierJoin and hasqtloops:
                     self._drawBezierLine( painter, xplotter, yplotter, posn,
-                                          xvals, yvals )
+                                          xvals, yvals, cliprect )
                 else:
                     self._drawPlotLine( painter, xplotter, yplotter, posn,
                                         xvals, yvals, cliprect )

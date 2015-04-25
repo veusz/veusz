@@ -79,6 +79,16 @@ def getSuitableParent(widgettype, initialwidget):
         parent = parent.parent
     return parent
 
+class DocSuspend(object):
+    """Handle document updates/suspensions."""
+    def __init__(self, doc):
+        self.doc = doc
+    def __enter__(self):
+        self.doc.suspendUpdates()
+        return self
+    def __exit__(self, type, value, traceback):
+        self.doc.enableUpdates()
+
 class Document( qt4.QObject ):
     """Document class for holding the graph data.
     """
@@ -129,7 +139,7 @@ class Document( qt4.QObject ):
         self.updateEvalContext()
 
         # copy default colormaps
-        self.colormaps = dict(utils.defaultcolormaps)
+        self.colormaps = utils.ColorMaps()
 
         # copies of validated compiled expressions
         self.exprcompiled = {}
@@ -166,6 +176,10 @@ class Document( qt4.QObject ):
             # bump this up as some watchers might ignore this otherwise
             self.changeset += 1
             self.setModified()
+
+    def suspend(self):
+        """Return context manager for suspending updates."""
+        return DocSuspend(self)
 
     def makeDefaultDoc(self):
         """Add default widgets to create document."""
@@ -338,11 +352,12 @@ class Document( qt4.QObject ):
 
         # load in the files, merging the vars read and errors
         if links:
-            for lf in links:
-                nread, nerrors = lf.reloadLinks(self)
-                read += nread
-                errors.update(nerrors)
-            self.setModified()
+            with self.suspend():
+                for lf in links:
+                    nread, nerrors = lf.reloadLinks(self)
+                    read += nread
+                    errors.update(nerrors)
+                self.setModified()
 
         read.sort()
         return (read, errors)
@@ -406,28 +421,36 @@ class Document( qt4.QObject ):
                     plugin, traceback.format_exc())
                 qt4.QMessageBox.critical(None, _("Error loading plugin"), err)
 
-    def printTo(self, printer, pages, scaling = 1., dpi = None,
-                antialias = False):
-        """Print onto printing device."""
+    def printTo(self, printer, pages, scaling=1., antialias=False):
+        """Print onto printing device.
+        Returns list of page sizes
+        """
 
-        dpi = (printer.logicalDpiX(), printer.logicalDpiY())
         painter = painthelper.DirectPainter(printer)
+        dpi = (printer.logicalDpiX(), printer.logicalDpiY())
         if antialias:
             painter.setRenderHint(qt4.QPainter.Antialiasing, True)
             painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
    
+        sizes = []
         with painter:
             # This all assumes that only pages can go into the root widget
             for count, page in enumerate(pages):
                 painter.save()
                 size = self.pageSize(page, dpi=dpi)
-                helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
+                sizes.append(size)
+                painter.setClipRect(qt4.QRectF(
+                    qt4.QPointF(0,0), qt4.QPointF(*size)))
+                helper = painthelper.PaintHelper(
+                    size, dpi=dpi, directpaint=painter)
                 self.paintTo(helper, page)
                 painter.restore()
 
                 # start new pages between each page
                 if count < len(pages)-1:
                     printer.newPage()
+
+        return sizes
 
     def paintTo(self, painthelper, page):
         """Paint page specified to the paint helper."""
@@ -872,7 +895,7 @@ class Document( qt4.QObject ):
             self.log( _("Error evaluating '%s': '%s'") %
                       (name, cstr(e)) )
 
-    def compileCheckedExpression(self, expr, origexpr=None):
+    def compileCheckedExpression(self, expr, origexpr=None, log=True):
         """Compile expression and check for errors.
 
         origexpr is an expression to show in error messages. This is
@@ -899,13 +922,15 @@ class Document( qt4.QObject ):
                 expr,
                 ignoresecurity=setting.transient_settings['unsafe_mode'])
         except utils.SafeEvalException as e:
-            self.log(
-                _("Unsafe expression '%s': %s") % (origexpr, cstr(e)))
+            if log:
+                self.log(
+                    _("Unsafe expression '%s': %s") % (origexpr, cstr(e)))
             self.exprfailed.add(expr)
             return None
         except Exception as e:
-            self.log(
-                _("Error in expression '%s': %s") % (origexpr, cstr(e)))
+            if log:
+                self.log(
+                    _("Error in expression '%s': %s") % (origexpr, cstr(e)))
             return None
         else:
             self.exprcompiled[expr] = checked

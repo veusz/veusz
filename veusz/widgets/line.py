@@ -125,7 +125,7 @@ class Line(plotters.FreePlotter):
         # get lengths and angles of lines
         length = s.get('length').getFloatArray(d)
         angle = s.get('angle').getFloatArray(d)
-        if None in (xpos, ypos, length, angle):
+        if xpos is None or ypos is None or length is None or angle is None:
             return None
         length *= lengthscaling
 
@@ -149,7 +149,7 @@ class Line(plotters.FreePlotter):
         # translate coordinates from axes or relative values
         xpos, ypos = self._getPlotterCoords(posn)
         xpos2, ypos2 = self._getPlotterCoords(posn, xsetting='xPos2', ysetting='yPos2')
-        if None in (xpos, ypos, xpos2, ypos2):
+        if xpos is None or ypos is None or xpos2 is None or ypos2 is None:
             return None
 
         maxlen = max( len(xpos), len(ypos), len(xpos2), len(ypos2) )

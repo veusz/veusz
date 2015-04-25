@@ -27,10 +27,7 @@ from .. import qtall as qt4
 from .. import document
 from .. import setting
 from ..qtwidgets.datasetbrowser import DatasetBrowser
-from .veuszdialog import VeuszDialog
-
-# register function to dataset class to edit dataset
-recreate_register = {}
+from .veuszdialog import VeuszDialog, recreate_register
 
 def _(text, disambiguation=None, context="DataEditDialog"):
     """Translate text."""
@@ -385,8 +382,11 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             except KeyError:
                 return None
             if data is not None:
-                num = data[data.shape[0]-index.row()-1, index.column()]
-                return float(num)
+                try:
+                    num = data[data.shape[0]-index.row()-1, index.column()]
+                    return float(num)
+                except IndexError:
+                    pass
 
         return None
 
@@ -401,7 +401,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             v = self.xcent[section] if xaxis else self.ycent[
                 len(self.ycent)-section-1]
             return '%i (%s)' % (
-                len(self.ycent)-section, setting.ui_floattostring(v))
+                len(self.ycent)-section, setting.ui_floattostring(v, maxdp=4))
 
         elif ds is not None and role == qt4.Qt.ToolTipRole:
             v1 = self.xedge[section] if xaxis else self.yedge[
