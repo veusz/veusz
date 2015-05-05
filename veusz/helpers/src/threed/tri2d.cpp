@@ -11,10 +11,11 @@
 
 //typedef std::vector FixedVector;
 
+//#include <vector>
 //template<class T, unsigned N> class FixedVector : public std::vector<T> {};
 
 // ignore differences in doubles < this
-#define EPS 1e-5
+#define EPS 1e-8
 // maximum number of points/nodes in polygons
 #define NODE_BITS 4 // Max of 16 nodes (0..2**NODE_BITS-1)
 #define MAXNODES (1<<NODE_BITS)
@@ -504,18 +505,29 @@ void makeTriangles(Graph& graph, const Nodes& nodes, TriangleVec &triangles)
         }
     }
 
-  // std::ofstream tris("tris_out.dat");
-  // for(unsigned i=0; i<triangles.size(); ++i)
-  //   {
-  //     Triangle t = triangles[i];
-  //     tris << "# Tri " << t.n1() << ' ' << t.n2() << ' ' << t.n3() << '\n'
-  //          << nodes[t.n1()](0) << ' ' << nodes[t.n1()](1) << '\n'
-  //          << nodes[t.n2()](0) << ' ' << nodes[t.n2()](1) << '\n'
-  //          << nodes[t.n3()](0) << ' ' << nodes[t.n3()](1) << '\n'
-  //          << nodes[t.n1()](0) << ' ' << nodes[t.n1()](1) << '\n'
-  //          << "nan nan\n";
-  //   }
 
+}
+
+// look for nodes inside triangles and don't include those triangles
+void filter_triangles(const TriangleVec& tin, const Nodes& nodes, TriangleVec& tout)
+{
+  for(unsigned t=0; t<tin.size(); ++t)
+    {
+      Triangle tri(tin[t]);
+      bool bad=0;
+      for(unsigned n=0; n<nodes.size(); ++n)
+        {
+          if( n == tri.n1() || n == tri.n2() || n == tri.n3() )
+            continue;
+
+          if(pointInTriangle(nodes[n], nodes[tri.n1()], nodes[tri.n2()], nodes[tri.n3()]))
+            {
+              bad=1; break;
+            }
+        }
+      if(!bad)
+        tout.push_back(tri);
+    }
 }
 
 void dumpgraph(const Graph& g)
@@ -534,8 +546,10 @@ int main()
   Vec2 p1[3];
   Vec2 p2[3];
 
-  for(unsigned ct=0; ct<1000; ++ct)
+  for(unsigned ct=0; ct<100000; ++ct)
     {
+      //std::cout << ct << '\n';
+
       for(unsigned i=0; i<3; ++i)
         {
           p1[i](0) = std::rand()*(1./RAND_MAX);
@@ -562,8 +576,11 @@ int main()
       Graph g2;
       poly2graph(g2, nodes, p2, 3);
       merge_graph(g1, nodes, g2);
+      TriangleVec triangles_pre;
+      makeTriangles(g1, nodes, triangles_pre);
+
       TriangleVec triangles;
-      makeTriangles(g1, nodes, triangles);
+      filter_triangles(triangles_pre, nodes, triangles);
 
       double a1=0, a2=0;
       for(unsigned i=0; i<triangles.size(); ++i)
@@ -586,7 +603,54 @@ int main()
       double a1tot = triangle_area(p1[0], p1[1], p1[2]);
       double a2tot = triangle_area(p2[0], p2[1], p2[2]);
 
-      std::cout << (std::abs(a1-a1tot)<EPS) << ' ' << (std::abs(a2-a2tot)<EPS) << '\n';
+      if((std::abs(a1-a1tot)>1e-4) || std::abs(a2-a2tot)>1e-4)
+        {
+          std::cout << "num " << ct << '\n';
+
+          std::ofstream f("tris_in.dat");
+          f << p1[0](0) << ' ' << p1[0](1) << '\n'
+            << p1[1](0) << ' ' << p1[1](1) << '\n'
+            << p1[2](0) << ' ' << p1[2](1) << '\n'
+            << p1[0](0) << ' ' << p1[0](1) << '\n'
+            << "nan nan\n"
+            << p2[0](0) << ' ' << p2[0](1) << '\n'
+            << p2[1](0) << ' ' << p2[1](1) << '\n'
+            << p2[2](0) << ' ' << p2[2](1) << '\n'
+            << p2[0](0) << ' ' << p2[0](1) << '\n';
+
+
+          std::ofstream tris("tris_out.dat");
+          for(unsigned i=0; i<triangles.size(); ++i)
+            {
+              Triangle t = triangles[i];
+              tris << "# Tri " << t.n1() << ' ' << t.n2() << ' ' << t.n3() << '\n'
+                   << nodes[t.n1()](0) << ' ' << nodes[t.n1()](1) << '\n'
+                   << nodes[t.n2()](0) << ' ' << nodes[t.n2()](1) << '\n'
+                   << nodes[t.n3()](0) << ' ' << nodes[t.n3()](1) << '\n'
+                   << nodes[t.n1()](0) << ' ' << nodes[t.n1()](1) << '\n'
+                   << "nan nan\n";
+            }
+          std::cout << "Nodes " << nodes.size() << '\n';
+          for(unsigned i=0; i!=nodes.size(); ++i)
+            std::cout << i << ' ' << nodes[i](0) << ' ' << nodes[i](1) << '\n';
+          std::cout << '\n';
+
+          dumpgraph(g1);
+
+          std::cout << '\n';
+          for(unsigned i=0; i<triangles.size(); ++i)
+            {
+              Triangle t = triangles[i];
+              std::cout << t.n1() << ' ' << t.n2() << ' ' << t.n3() << '\n';
+            }
+
+          std::cout << "area 1 " << a1 << ' ' << a1tot << '\n';
+          std::cout << "area 2 " << a2 << ' ' << a2tot << '\n';
+
+          break;
+
+        }
+
     }
 
   return 0;
