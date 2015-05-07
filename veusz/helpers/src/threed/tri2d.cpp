@@ -7,15 +7,15 @@
 #include <fstream>
 
 #include "mmaths.h"
-#include "fixedvector.h"
+//#include "fixedvector.h"
 
 //typedef std::vector FixedVector;
 
-//#include <vector>
-//template<class T, unsigned N> class FixedVector : public std::vector<T> {};
+#include <vector>
+template<class T, unsigned N> class FixedVector : public std::vector<T> {};
 
 // ignore differences in doubles < this
-#define EPS 1e-8
+#define EPS 1e-5
 // maximum number of points/nodes in polygons
 #define NODE_BITS 4 // Max of 16 nodes (0..2**NODE_BITS-1)
 #define MAXNODES (1<<NODE_BITS)
@@ -208,7 +208,6 @@ void poly2graph(Graph& outgraph, Nodes& nodes, const Vec2* pts, unsigned npts)
     }
 }
 
-#if 0
 // this is hard work: break Link given by linkidx by points posn1, posn2
 // which are along link (or may be at ends)
 void insert_overlapped_nodes(Graph& graph, Nodes& nodes, unsigned linkidx,
@@ -241,14 +240,14 @@ void insert_overlapped_nodes(Graph& graph, Nodes& nodes, unsigned linkidx,
       frac1 = frac2; frac2 = -1;
     }
 
-  std::cout << "fracs: " << frac1 << ' ' << frac2 << '\n';
+  //std::cout << "fracs: " << frac1 << ' ' << frac2 << '\n';
 
   unsigned newn1;
   if(frac1 > EPS && frac1 < (1-EPS))
     {
       newn1 = getOrAddNode(nodes, nodes[li.node1()]+vlink*frac1);
       graph[linkidx] = Link(li.node1(), newn1);
-      std::cout << "add one a\n";
+      //std::cout << "add one a\n";
     }
   else
     {
@@ -262,25 +261,24 @@ void insert_overlapped_nodes(Graph& graph, Nodes& nodes, unsigned linkidx,
       unsigned newn2 = getOrAddNode(nodes, nodes[li.node1()]+vlink*frac2);
       graph.push_back(Link(newn1, newn2));
       graph.push_back(Link(newn2, li.node2()));
-      std::cout << "add two\n";
+      //std::cout << "add two\n";
     }
   else
     {
       // one break point
       graph.push_back(Link(newn1, li.node2()));
-      std::cout << "add 1b\n";
+      //std::cout << "add 1b\n";
     }
 }
-#endif
 
-void identify_nodes(const Graph& graph1, const Graph& graph2, Nodes &nodes)
+void identify_nodes(Graph& graph1, Graph& graph2, Nodes &nodes)
 {
   Vec2 posn1, posn2;
   for(unsigned i1=0; i1<graph1.size(); ++i1)
     {
-      const Link l1 = graph1[i1];
       for(unsigned i2=0; i2<graph2.size(); ++i2)
       {
+        const Link l1 = graph1[i1];
         const Link l2 = graph2[i2];
         if(l1 == l2)
           continue;
@@ -292,12 +290,16 @@ void identify_nodes(const Graph& graph1, const Graph& graph2, Nodes &nodes)
 
         if(isectv == LINE_CROSS)
           {
-            getOrAddNode(nodes, posn1);
+            unsigned newnode = getOrAddNode(nodes, posn1);
+            graph1[i1] = Link(l1.node1(), newnode);
+            graph1.push_back(Link(newnode, l1.node2()));
+            graph2[i2] = Link(l2.node1(), newnode);
+            graph2.push_back(Link(newnode, l2.node2()));
           }
         else if(isectv == LINE_OVERLAP)
           {
-            getOrAddNode(nodes, posn1);
-            getOrAddNode(nodes, posn2);
+            insert_overlapped_nodes(graph1, nodes, i1, posn1, posn2);
+            insert_overlapped_nodes(graph2, nodes, i2, posn1, posn2);
           }
       }
     }
@@ -325,6 +327,7 @@ inline bool point_on_line(const Vec2 &p1, const Vec2 &p2, const Vec2 &p)
     }
 }
 
+#if 0
 void break_links(Graph& graph, const Nodes& nodes)
 {
   for(unsigned lidx=0; lidx<graph.size(); ++lidx)
@@ -350,13 +353,15 @@ void break_links(Graph& graph, const Nodes& nodes)
         }
     }
 }
+#endif
 
 
 // merge ingraph into outgraph
-void merge_graph(Graph& outgraph, Nodes& nodes, const Graph& mergegraph)
+void merge_graph(Graph& outgraph, Nodes& nodes, const Graph& tomerge)
 {
   // stage1: calculate intersection of every Link with every Link to
   // build up node list to include every intersection
+  Graph mergegraph(tomerge);
   identify_nodes(outgraph, mergegraph, nodes);
 
   // stage2: merge all the links
@@ -364,7 +369,7 @@ void merge_graph(Graph& outgraph, Nodes& nodes, const Graph& mergegraph)
     outgraph.push_back(mergegraph[i]);
 
   // stage3: check whether nodes lie along Links and break accordingly
-  break_links(outgraph, nodes);
+  //break_links(outgraph, nodes);
 }
 
 // represent a triangle with nodes n1,n2,n3
@@ -546,9 +551,9 @@ int main()
   Vec2 p1[3];
   Vec2 p2[3];
 
-  for(unsigned ct=0; ct<100000; ++ct)
+  for(unsigned ct=0; ct<1000000; ++ct)
     {
-      //std::cout << ct << '\n';
+      std::cout << ct << '\n';
 
       for(unsigned i=0; i<3; ++i)
         {
@@ -557,17 +562,19 @@ int main()
           p2[i](0) = std::rand()*(1./RAND_MAX);
           p2[i](1) = std::rand()*(1./RAND_MAX);
         }
+
+      unsigned cpt1 = std::rand() % 3;
+      unsigned cpt2 = (cpt1+1)%3;
+      unsigned dpt1 = std::rand() % 3;
+      unsigned dpt2 = (dpt1+1)%3;
+
       if(std::rand()*(1./RAND_MAX) < 0.1)
         {
-          unsigned i1 = std::rand() % 3;
-          unsigned i2 = std::rand() % 3;
-          p1[i1] = p2[i2];
+          p1[cpt1] = p2[dpt1];
         }
       if(std::rand()*(1./RAND_MAX) < 0.1)
         {
-          unsigned i1 = std::rand() % 3;
-          unsigned i2 = std::rand() % 3;
-          p1[i1] = p2[i2];
+          p1[cpt2] = p2[dpt2];
         }
 
       Nodes nodes;
@@ -575,6 +582,14 @@ int main()
       poly2graph(g1, nodes, p1, 3);
       Graph g2;
       poly2graph(g2, nodes, p2, 3);
+
+          std::cout << "Nodes " << nodes.size() << '\n';
+          for(unsigned i=0; i!=nodes.size(); ++i)
+            std::cout << i << ' ' << nodes[i](0) << ' ' << nodes[i](1) << '\n';
+          std::cout << '\n';
+
+
+
       merge_graph(g1, nodes, g2);
       TriangleVec triangles_pre;
       makeTriangles(g1, nodes, triangles_pre);
