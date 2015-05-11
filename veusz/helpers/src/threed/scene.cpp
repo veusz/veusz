@@ -217,7 +217,7 @@ void Scene::insertFragmentsIntoDepths(unsigned idx1, unsigned newnum1,
 
 // split up fragments which overlap in 3D into mutiple non-overlapping
 // fragments
-void Scene::doSplitting(unsigned idx1, const Camera& cam)
+void Scene::splitIntersectIn3D(unsigned idx1, const Camera& cam)
 {
  RESTART:
 
@@ -409,6 +409,7 @@ void Scene::fineZCompare()
 void Scene::render(QPainter* painter, const Camera& cam,
 		   double x1, double y1, double x2, double y2)
 {
+  printf("\nstarting\n");
   fragments.clear();
 
   // get fragments for whole scene
@@ -422,11 +423,14 @@ void Scene::render(QPainter* painter, const Camera& cam,
   // sort depth of items
   std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
 
+  printf("\nsplit in 3d\n");
   for(unsigned idx=0; idx+1 < depths.size(); ++idx)
-    doSplitting(idx, cam);
+    splitIntersectIn3D(idx, cam);
 
   std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
+
   // split on sky
+  printf("\nsplit projected\n");
   splitProjected();
 
   // final sorting
@@ -438,10 +442,13 @@ void Scene::render(QPainter* painter, const Camera& cam,
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
 
   // finally draw items
+  printf("\ndoing drawing\n");
   doDrawing(painter, screenM);
 
-  simpleDump();
-  objDump();
+  printf("ended\n");
+
+  //simpleDump();
+  //objDump();
 }
 
 void Scene::objDump()

@@ -599,7 +599,7 @@ namespace
 
     // much more efficient than an exception here
   error:
-    return (tripts[0](3)+tripts[1](3)+tripts[2](3))*(1/3.f);
+    return (tripts[0](3)+tripts[1](3)+tripts[2](3))*(1/3.);
   }
 
   void overlapDepthTriangleTriangle(const Fragment& f1, const Fragment& f2,
@@ -751,27 +751,26 @@ namespace
         int isectpt, isectline;
         if(findSelfIntersectPoly(polys[polyidx], &isectpt, &isectline))
           {
-            QPolygonF& poly = polys[polyidx];
-
-            // split left and right of point
-            QPolygonF poly1;
-            int pidx = isectpt-1;
-            for(;;)
-              {
-                pidx = (pidx+1) % poly.size();
-                poly1 << poly[pidx];
-                if(pidx == isectline)
-                  break;
-              }
-
-            QPolygonF poly2;
-            for(;;)
-              {
-                pidx = (pidx+1) % poly.size();
-                poly2 << poly[pidx];
-                if(pidx == isectpt)
-                  break;
-              }
+            QPolygonF poly1, poly2;
+            {
+              // split left and right of point
+              QPolygonF& poly = polys[polyidx];
+              int pidx = isectpt-1;
+              for(;;)
+                {
+                  pidx = (pidx+1) % poly.size();
+                  poly1 << poly[pidx];
+                  if(pidx == isectline)
+                    break;
+                }
+              for(;;)
+                {
+                  pidx = (pidx+1) % poly.size();
+                  poly2 << poly[pidx];
+                  if(pidx == isectpt)
+                    break;
+                }
+            }
 
             polys[polyidx] = poly1;
             polys.push_back(poly2);
@@ -799,29 +798,36 @@ namespace
                                 const QPainterPath& pp)
   {
     QList<QPolygonF> polylist(pp.toSubpathPolygons());
-    fixSelfIntersectPolygons(polylist);
+    //fixSelfIntersectPolygons(polylist);
 
     unsigned ct = 0;
-    for(int i=0; i<polylist.size(); ++i)
+    for(int polyi=0; polyi<polylist.size(); ++polyi)
       {
-        QPolygonF& poly = polylist[i];
+        printf("polyi=%i\n", polyi);
+        QPolygonF& poly = polylist[polyi];
         fixDuplicatePoints(poly);
 
-        for(int i=0; i<poly.size(); ++i)
-          printf("%g %g, ", poly[i].x(), poly[i].y());
-        printf("\n");
+        if(poly.empty())
+          {
+            printf(" - empty polygon! \n");
+            continue;
+          }
+
+        printf("inpoly {\n");
+        for(int q=0; q<(poly.size()+1); ++q)
+          printf("%g %g\n", poly[q%poly.size()].x(), poly[q%poly.size()].y());
+        printf("}\n\n");
 
         // this is the ear clipping algorithm
         bool dirn = polyDirection(poly);
-        int i = 0;
-        while(poly.size() > 2)
+        for(int ptidx=0; poly.size()>2; )
           {
-            printf("split %i, %i\n", i, poly.size());
+            printf("split %i, %i\n", ptidx, poly.size());
 
             QPolygonF tri;
-            tri << poly[i % poly.size()]
-                << poly[(i+1) % poly.size()]
-                << poly[(i+2) % poly.size()];
+            tri << poly[ptidx % poly.size()]
+                << poly[(ptidx+1) % poly.size()]
+                << poly[(ptidx+2) % poly.size()];
 
             bool ok = poly.size() == 3;
             // is triangle in correct direction and does it not
@@ -832,7 +838,7 @@ namespace
                 // check no vertex in the polygon is inside
                 for(int o=3; o<poly.size(); ++o)
                   {
-                    if(tri.containsPoint(poly[(i+o) % poly.size()],
+                    if(tri.containsPoint(poly[(ptidx+o) % poly.size()],
                                          Qt::OddEvenFill))
                       {
                         ok = 0; break;
@@ -847,19 +853,23 @@ namespace
                 f.bumpIndex();
                 for(unsigned j=0; j<3; ++j)
                   f.proj[j] = Vec3(rounddp(tri[j].x()), rounddp(tri[j].y()), 0);
-                printf("Add: %g %g, %g %g, %g %g\n",
+                printf("Add {\n%g %g\n%g %g\n%g %g\n%g %g\n}\n",
                        tri[0].x(), tri[0].y(),
                        tri[1].x(), tri[1].y(),
-                       tri[2].x(), tri[2].y());
+                       tri[2].x(), tri[2].y(),
+                       tri[0].x(), tri[0].y()
+                       );
                 updateTriangleDepths(templ.proj, f.proj);
                 frags.push_back(f);
-                poly.remove((i+1) % poly.size());
+                poly.remove((ptidx+1) % poly.size());
                 ++ct;
               }
             else
-              ++i;
-          }
+              ++ptidx;
+          } // loop over polygon
       } // list of polygons
+    printf("\n");
+
     return ct;
   }
 
@@ -872,35 +882,43 @@ namespace
     {
       const Fragment& f1 = frags[idx1];
       QPolygonF p1(3);
-      printf("frag1\n");
+      printf("frag1 {\n");
       for(unsigned i=0; i<3; ++i)
         {
           p1[i] = QPointF(f1.proj[i](0), f1.proj[i](1));
           printf("%g %g\n", p1[i].x(), p1[i].y());
         }
+      printf("}\n");
       pp1.addPolygon(p1);
       pp1.closeSubpath();
 
       const Fragment& f2 = frags[idx2];
       QPolygonF p2(3);
-      printf("frag2\n");
+      printf("frag2 {\n");
       for(unsigned i=0; i<3; ++i)
         {
           p2[i] = QPointF(f2.proj[i](0), f2.proj[i](1));
-          printf("%g %g\n", p1[i].x(), p1[i].y());
+          printf("%g %g\n", p2[i].x(), p2[i].y());
         }
+      printf("}\n");
       pp2.addPolygon(p2);
       pp2.closeSubpath();
     }
 
     QPainterPath ppu(pp1.intersected(pp2));
     if(ppu.isEmpty())
-      return;
+      {
+        printf(" - no intersection\n");
+        return;
+      }
 
-    QPainterPath pp1diff = pp1.subtracted(ppu);
-    QPainterPath pp2diff = pp2.subtracted(ppu);
+    QPainterPath pp1diff = pp1.subtracted(pp2);
+    QPainterPath pp2diff = pp2.subtracted(pp1);
     if(pp1diff.isEmpty() && pp2diff.isEmpty())
-      return;
+      {
+        printf(" - both empty\n");
+        return;
+      }
 
     *n1 = addPainterPathAsTris(frags, frags[idx1], ppu);
     if(! pp1diff.isEmpty())
@@ -914,7 +932,7 @@ namespace
         *n2 += addPainterPathAsTris(frags, frags[idx2], pp2diff);
       }
 
-    printf("n1=%i n2=%i\n", *n1, *n2);
+    printf(" - add n1=%i n2=%i\n", *n1, *n2);
   }
 
 };
@@ -1013,7 +1031,7 @@ b[2](0)=-1.31578947368421073083e-01; b[2](1)=3.72148131669521042841e-02; b[2](2)
 #endif
 
 
-#if 1
+#if 0
 int main()
 {
   FragmentVector v;
@@ -1049,3 +1067,32 @@ int main()
   return 0;
 }
 #endif
+
+
+
+
+int main()
+{
+  FragmentVector v;
+  Fragment f;
+  f.type = Fragment::FR_TRIANGLE;
+
+  f.proj[0] = Vec3(0.0383, 0.0451, 0.5);
+  f.proj[1] = Vec3(0.0425, 0.0447, 0.5);
+  f.proj[2] = Vec3(0.0381, 0.0451, 0.5);
+  v.push_back(f);
+
+  f.proj[0] = Vec3(0.0425, 0.0447, 0.5);
+  f.proj[1] = Vec3(0.0334, 0.0445, 0.5);
+  f.proj[2] = Vec3(0.0048, 0.0483, 0.5);
+  v.push_back(f);
+
+  unsigned n1=0;
+  unsigned n2=0;
+
+  splitOn2DOverlap(v, 0, 1, &n1, &n2);
+
+
+  return 0;
+
+}

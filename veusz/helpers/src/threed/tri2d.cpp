@@ -1,26 +1,36 @@
 #include <algorithm>
 #include <bitset>
-#include <cmath>
+#include <math.h>
 
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <cassert>
 
 #include "mmaths.h"
-//#include "fixedvector.h"
+#include "fixedvector.h"
 
 //typedef std::vector FixedVector;
 
-#include <vector>
-template<class T, unsigned N> class FixedVector : public std::vector<T> {};
+//#include <vector>
+//template<class T, unsigned N> class FixedVector : public std::vector<T> {};
 
 // ignore differences in doubles < this
-#define EPS 1e-5
+#define EPS 1e-8
 // maximum number of points/nodes in polygons
 #define NODE_BITS 4 // Max of 16 nodes (0..2**NODE_BITS-1)
 #define MAXNODES (1<<NODE_BITS)
 #define MAXLINKS 32
 #define MAXTRIANGLES 32
+
+#define SNAPDIST 1e-4
+#define ISCALE 1000
+
+inline double round4(double d)
+{
+  //return d;
+  return round(d*ISCALE)*(1./ISCALE);
+}
 
 enum isect { LINE_NOOVERLAP, LINE_CROSS, LINE_OVERLAP };
 
@@ -31,7 +41,7 @@ enum isect { LINE_NOOVERLAP, LINE_CROSS, LINE_OVERLAP };
 // if posn != 0, return crossing position if LINE_CROSS
 // if LINE_OVERLAP the two end points of overlap are returned in posn and posn2
 // Assumes that the line segments are finite.
-// Ignores intersections inside EPS of the start and end points
+
 isect calcLine2DIntersect(Vec2 p1, Vec2 p2, Vec2 q1, Vec2 q2, Vec2* posn=0, Vec2* posn2=0)
 {
   Vec2 dp = p2-p1;
@@ -48,7 +58,7 @@ isect calcLine2DIntersect(Vec2 p1, Vec2 p2, Vec2 q1, Vec2 q2, Vec2* posn=0, Vec2
       // colinear segments - do they overlap?
       double u0, u1;
       Vec2 dpq2 = p2-q1;
-      if(std::abs(dq(0)) > EPS)
+      if(std::abs(dq(0)) > std::abs(dq(1)))
         {
           u0 = dpq(0)*(1/dq(0));
           u1 = dpq2(0)*(1/dq(0));
@@ -62,7 +72,7 @@ isect calcLine2DIntersect(Vec2 p1, Vec2 p2, Vec2 q1, Vec2 q2, Vec2* posn=0, Vec2
       if(u0 > u1)
         std::swap(u0, u1);
 
-      if( u0>(1-EPS) || u1<EPS )
+      if( u0>(1+EPS) || u1<-EPS )
         return LINE_NOOVERLAP;
 
       u0 = std::max(u0, 0.);
@@ -70,8 +80,6 @@ isect calcLine2DIntersect(Vec2 p1, Vec2 p2, Vec2 q1, Vec2 q2, Vec2* posn=0, Vec2
       if(posn != 0)
         *posn = q1 + dq*u0;
       if( std::abs(u0-u1) < EPS )
-        // not sure this can really happen, unless the u0/u1
-        // constraint above is lifted
         return LINE_CROSS;
       if(posn2 != 0)
         *posn2 = q1 + dq*u1;
@@ -79,18 +87,17 @@ isect calcLine2DIntersect(Vec2 p1, Vec2 p2, Vec2 q1, Vec2 q2, Vec2* posn=0, Vec2
     }
 
   double s = cross(dq, dpq)*(1/denom);
-  if(s < EPS || s > (1-EPS))
+  if(s < -EPS || s > (1+EPS))
     return LINE_NOOVERLAP;
   double t = cross(dp, dpq)*(1/denom);
-  if(t < EPS || t > (1-EPS))
+  if(t < -EPS || t > (1+EPS))
     return LINE_NOOVERLAP;
 
   if(posn != 0)
-    *posn = p1 + dp*s;
+    *posn = p1 + dp * std::max(std::min(s, 1.), 0.);
 
   return LINE_CROSS;
 }
-
 
 // which half of line is point on (0 if it is on the line)
 inline int ptsign(Vec2 p1, Vec2 p2, Vec2 p3)
@@ -172,9 +179,10 @@ private:
   std::bitset< (1<<(2*NODE_BITS)) > _set;
 };
 
-// are two vectors close?
-inline bool close(const Vec2& a, const Vec2& b)
+// are two points close?
+inline bool close_pts(const Vec2& a, const Vec2& b)
 {
+  //std::cout << std::abs(a(0)-b(0)) << ' ' << std::abs(a(1)-b(1)) << '\n';
   return std::abs(a(0)-b(0))<EPS && std::abs(a(1)-b(1))<EPS;
 }
 
@@ -183,11 +191,53 @@ inline unsigned getOrAddNode(Nodes& nodes, Vec2 pt)
 {
   for(unsigned i=0; i<nodes.size(); ++i)
     {
-      if(close(nodes[i], pt))
+      if(close_pts(nodes[i], pt))
         return i;
     }
+  assert(nodes.size() < MAXNODES);
+  //std::cout << "add " << pt(0) << " " << pt(1) << "\n";
   nodes.push_back(pt);
   return nodes.size()-1;
+}
+
+// snap points to lines
+void snap_points(const Vec2* lpts, unsigned nlpts, Vec2* pts, unsigned npts)
+{
+  for(unsigned lineidx=0; lineidx<nlpts; ++lineidx)
+    {
+      const Vec2 lpt1 = lpts[lineidx];
+      const Vec2 lpt2 = lpts[(lineidx+1) % nlpts];
+      for(unsigned ptidx=0; ptidx<npts; ++ptidx)
+        {
+          Vec2 pt = pts[ptidx];
+
+          // check for bounds
+          if(pt(0) < std::min(lpt1(0), lpt2(0)) || pt(0) > std::max(lpt1(0), lpt2(0)) ||
+             pt(1) < std::min(lpt1(1), lpt2(1)) || pt(1) > std::max(lpt1(1), lpt2(1)))
+            continue;
+
+          if( std::abs(lpt1(0)-lpt2(0)) > std::abs(lpt1(1)-lpt2(1)) )
+            {
+              double grad = (lpt2(1)-lpt1(1))/(lpt2(0)-lpt1(0));
+              double ypt = (pt(0)-lpt1(0))*grad + lpt1(1);
+              if( std::abs(ypt-pt(1)) < SNAPDIST )
+                {
+                  //std::cout << "snapping " << ypt << " " << pt(1) << '\n';
+                  pts[ptidx](1) = ypt;
+                }
+            }
+          else
+            {
+              double grad = (lpt2(0)-lpt1(0))/(lpt2(1)-lpt1(1));
+              double xpt = (pt(1)-lpt1(1))*grad + lpt1(0);
+              if( std::abs(xpt-pt(0)) < SNAPDIST )
+                {
+                  //std::cout << "snapping " << xpt << " " << pt(0) << '\n';
+                  pts[ptidx](0) = xpt;
+                }
+            }
+        }
+    }
 }
 
 // convert an input polygon (pts*npts) to Graph and Nodes objects
@@ -213,14 +263,14 @@ void poly2graph(Graph& outgraph, Nodes& nodes, const Vec2* pts, unsigned npts)
 void insert_overlapped_nodes(Graph& graph, Nodes& nodes, unsigned linkidx,
                              const Vec2& posn1, const Vec2& posn2)
 {
-  // this is harder, as we to break the lines once or twice
   Link li = graph[linkidx];
   Vec2 vlink = nodes[li.node2()]-nodes[li.node1()];
   Vec2 vposn1 = posn1 - nodes[li.node1()];
   Vec2 vposn2 = posn2 - nodes[li.node1()];
+
   // work out fraction along that breaks occur
   double frac1, frac2;
-  if(std::abs(vlink(0)) > EPS)
+  if(std::abs(vlink(0)) > std::abs(vlink(1)))
     {
       frac1 = vposn1(0) * (1/vlink(0));
       frac2 = vposn2(0) * (1/vlink(0));
@@ -233,55 +283,51 @@ void insert_overlapped_nodes(Graph& graph, Nodes& nodes, unsigned linkidx,
   if(frac1 > frac2)
     std::swap(frac1, frac2);
 
-  // ignore frac1
-  if(frac1 < EPS || frac1 >= (1-EPS))
-    {
-      // frac1 is invalid, so shift frac2 into it
-      frac1 = frac2; frac2 = -1;
-    }
+  //std::cout << "fracs " << frac1 << " " << frac2 << "\n";
 
-  //std::cout << "fracs: " << frac1 << ' ' << frac2 << '\n';
+  // construct valid links
+  unsigned linkct = 0;
+  Link links[3];
 
-  unsigned newn1;
-  if(frac1 > EPS && frac1 < (1-EPS))
-    {
-      newn1 = getOrAddNode(nodes, nodes[li.node1()]+vlink*frac1);
-      graph[linkidx] = Link(li.node1(), newn1);
-      //std::cout << "add one a\n";
-    }
-  else
-    {
-      // both fracs are invalid
-      return;
-    }
+  unsigned newn1 = getOrAddNode(nodes, nodes[li.node1()]+vlink*frac1);
+  if(newn1 != li.node1())
+    links[linkct++] = Link(li.node1(), newn1);
 
-  if(frac2 > EPS && frac2 < (1-EPS) && std::abs(frac1-frac2) > EPS)
+  //std::cout << "pt " << nodes[newn1](0) << " " << nodes[newn1](1) << "\n";
+
+  unsigned newn2 = getOrAddNode(nodes, nodes[li.node1()]+vlink*frac2);
+  if(newn2 != newn1)
+    links[linkct++] = Link(newn1, newn2);
+
+  if(li.node2() != newn2)
+    links[linkct++] = Link(newn2, li.node2());
+
+  // insert into graph, replacing existing link
+  if(linkct > 0)
     {
-      // two break points
-      unsigned newn2 = getOrAddNode(nodes, nodes[li.node1()]+vlink*frac2);
-      graph.push_back(Link(newn1, newn2));
-      graph.push_back(Link(newn2, li.node2()));
-      //std::cout << "add two\n";
-    }
-  else
-    {
-      // one break point
-      graph.push_back(Link(newn1, li.node2()));
-      //std::cout << "add 1b\n";
+      graph[linkidx] = links[0];
+      for(unsigned i=1; i<linkct; ++i)
+        graph.push_back(links[i]);
     }
 }
 
-void identify_nodes(Graph& graph1, Graph& graph2, Nodes &nodes)
+void identify_split_nodes(Graph& graph1, Graph& graph2, Nodes &nodes)
 {
   Vec2 posn1, posn2;
   for(unsigned i1=0; i1<graph1.size(); ++i1)
     {
-      for(unsigned i2=0; i2<graph2.size(); ++i2)
+      for(unsigned i2=0; i2<graph2.size() ; ++i2)
       {
         const Link l1 = graph1[i1];
         const Link l2 = graph2[i2];
         if(l1 == l2)
           continue;
+
+        // std::cout
+        //   << nodes[l1.node1()](0) << ' ' << nodes[l1.node1()](1) << ", "
+        //   << nodes[l1.node2()](0) << ' ' << nodes[l1.node2()](1) << "  "
+        //   << nodes[l2.node1()](0) << ' ' << nodes[l2.node1()](1) << ", "
+        //   << nodes[l2.node2()](0) << ' ' << nodes[l2.node2()](1) << "\n";
 
         isect isectv = calcLine2DIntersect
           (nodes[l1.node1()], nodes[l1.node2()],
@@ -290,14 +336,23 @@ void identify_nodes(Graph& graph1, Graph& graph2, Nodes &nodes)
 
         if(isectv == LINE_CROSS)
           {
+            //std::cout << "x " << posn1(0) << ' ' << posn1(1) << '\n';
             unsigned newnode = getOrAddNode(nodes, posn1);
-            graph1[i1] = Link(l1.node1(), newnode);
-            graph1.push_back(Link(newnode, l1.node2()));
-            graph2[i2] = Link(l2.node1(), newnode);
-            graph2.push_back(Link(newnode, l2.node2()));
+            if(newnode != l1.node1() && newnode != l1.node2())
+              {
+                graph1[i1] = Link(l1.node1(), newnode);
+                graph1.push_back(Link(newnode, l1.node2()));
+              }
+            if(newnode != l2.node1() && newnode != l2.node2())
+              {
+                graph2[i2] = Link(l2.node1(), newnode);
+                graph2.push_back(Link(newnode, l2.node2()));
+              }
           }
         else if(isectv == LINE_OVERLAP)
           {
+            //std::cout << "ol1 " << posn1(0) << ' ' << posn1(1) << '\n';
+            //std::cout << "ol2 " << posn2(0) << ' ' << posn2(1) << '\n';
             insert_overlapped_nodes(graph1, nodes, i1, posn1, posn2);
             insert_overlapped_nodes(graph2, nodes, i2, posn1, posn2);
           }
@@ -305,71 +360,17 @@ void identify_nodes(Graph& graph1, Graph& graph2, Nodes &nodes)
     }
 }
 
-// is point on line (excluding endpoints)?
-inline bool point_on_line(const Vec2 &p1, const Vec2 &p2, const Vec2 &p)
-{
-  Vec2 dp12 = p2-p1;
-  Vec2 dp = p-p1;
-
-  if( std::abs(dp12(0)) > std::abs(dp12(1)) )
-    {
-      double ratio = dp(0)/dp12(0);
-      if(ratio < EPS || ratio > (1-EPS))
-        return 0;
-      return std::abs(dp12(1)*ratio-dp(1)) < EPS;
-    }
-  else
-    {
-      double ratio = dp(1)/dp12(1);
-      if(ratio < EPS || ratio > (1-EPS))
-        return 0;
-      return std::abs(dp12(0)*ratio-dp(0)) < EPS;
-    }
-}
-
-#if 0
-void break_links(Graph& graph, const Nodes& nodes)
-{
-  for(unsigned lidx=0; lidx<graph.size(); ++lidx)
-    {
-      for(unsigned nidx=0; nidx<nodes.size(); ++nidx)
-        {
-          // graph[lidx] may change below!
-          unsigned n1 = graph[lidx].node1();
-          unsigned n2 = graph[lidx].node2();
-
-          // node is on link already
-          if(nidx == n1 || nidx == n2)
-            continue;
-
-          Vec2 p1 = nodes[n1];
-          Vec2 p2 = nodes[n2];
-
-          if(point_on_line(p1, p2, nodes[nidx]))
-            {
-              graph[lidx] = Link(n1, nidx);
-              graph.push_back(Link(nidx, n2));
-            }
-        }
-    }
-}
-#endif
-
-
 // merge ingraph into outgraph
 void merge_graph(Graph& outgraph, Nodes& nodes, const Graph& tomerge)
 {
   // stage1: calculate intersection of every Link with every Link to
   // build up node list to include every intersection
   Graph mergegraph(tomerge);
-  identify_nodes(outgraph, mergegraph, nodes);
+  identify_split_nodes(outgraph, mergegraph, nodes);
 
   // stage2: merge all the links
   for(unsigned i=0; i<mergegraph.size(); ++i)
     outgraph.push_back(mergegraph[i]);
-
-  // stage3: check whether nodes lie along Links and break accordingly
-  //break_links(outgraph, nodes);
 }
 
 // represent a triangle with nodes n1,n2,n3
@@ -419,6 +420,8 @@ inline double triangle_area(Vec2 p1, Vec2 p2, Vec2 p3)
 // returns isect value, depending on whether other lines overlap or cross
 bool check_invalid_link(const Graph& graph, const Nodes& nodes, Link link)
 {
+  Vec2 posn;
+
   unsigned n1=link.node1();
   unsigned n2=link.node2();
 
@@ -428,18 +431,26 @@ bool check_invalid_link(const Graph& graph, const Nodes& nodes, Link link)
         {
           unsigned ln1 = graph[i].node1();
           unsigned ln2 = graph[i].node2();
-          isect isectv =
-            calcLine2DIntersect(nodes[n1], nodes[n2], nodes[ln1], nodes[ln2]);
 
-          if(isectv != LINE_NOOVERLAP)
+          isect isectv =
+            calcLine2DIntersect(nodes[n1], nodes[n2], nodes[ln1], nodes[ln2], &posn);
+
+          if(isectv == LINE_OVERLAP)
             return 1;
+          else if(isectv == LINE_CROSS)
+            {
+              // cross point is not one of the end points
+              if(!close_pts(posn, nodes[n1]) && !close_pts(posn, nodes[n2]) &&
+                 !close_pts(posn, nodes[ln1]) && !close_pts(posn, nodes[ln2]))
+                return 1;
+            }
         }
     }
   return 0;
 }
 
 // convert Graph and Nodes into a list of output triangles
-void makeTriangles(Graph& graph, const Nodes& nodes, TriangleVec &triangles)
+void make_triangles(Graph& graph, const Nodes& nodes, TriangleVec &triangles)
 {
   // don't double-check links by keeping track of what's already
   // included in two sets
@@ -525,7 +536,8 @@ void filter_triangles(const TriangleVec& tin, const Nodes& nodes, TriangleVec& t
           if( n == tri.n1() || n == tri.n2() || n == tri.n3() )
             continue;
 
-          if(pointInTriangle(nodes[n], nodes[tri.n1()], nodes[tri.n2()], nodes[tri.n3()]))
+          if(pointInTriangle(nodes[n], nodes[tri.n1()], nodes[tri.n2()],
+                             nodes[tri.n3()]))
             {
               bad=1; break;
             }
@@ -548,19 +560,24 @@ void dumpgraph(const Graph& g)
 int main()
 {
 
+  //for(unsigned ct=0;ct<(35000+275150)*16;ct++)
+  //  std::rand();
+
+
   Vec2 p1[3];
   Vec2 p2[3];
 
-  for(unsigned ct=0; ct<1000000; ++ct)
+  for(unsigned ct=0; ct<20000000; ++ct)
     {
-      std::cout << ct << '\n';
+      if(ct % 100000==0)
+        std::cout << ct << '\n';
 
       for(unsigned i=0; i<3; ++i)
         {
-          p1[i](0) = std::rand()*(1./RAND_MAX);
-          p1[i](1) = std::rand()*(1./RAND_MAX);
-          p2[i](0) = std::rand()*(1./RAND_MAX);
-          p2[i](1) = std::rand()*(1./RAND_MAX);
+          p1[i](0) = round4(std::rand()*(1./RAND_MAX)*100);
+          p1[i](1) = round4(std::rand()*(1./RAND_MAX)*100);
+          p2[i](0) = round4(std::rand()*(1./RAND_MAX)*100);
+          p2[i](1) = round4(std::rand()*(1./RAND_MAX)*100);
         }
 
       unsigned cpt1 = std::rand() % 3;
@@ -577,22 +594,45 @@ int main()
           p1[cpt2] = p2[dpt2];
         }
 
+      snap_points(p1, 3, p2, 3);
+      snap_points(p2, 3, p1, 3);
+
+      // std::cout << p1[0](0) << ' ' << p1[0](1) << '\n'
+      //           << p1[1](0) << ' ' << p1[1](1) << '\n'
+      //           << p1[2](0) << ' ' << p1[2](1) << '\n'
+      //           << p1[0](0) << ' ' << p1[0](1) << '\n'
+      //           << "nan nan\n"
+      //           << p2[0](0) << ' ' << p2[0](1) << '\n'
+      //           << p2[1](0) << ' ' << p2[1](1) << '\n'
+      //           << p2[2](0) << ' ' << p2[2](1) << '\n'
+      //           << p2[0](0) << ' ' << p2[0](1) << "\n\n";
+
+      double a1tot = triangle_area(p1[0], p1[1], p1[2]);
+      double a2tot = triangle_area(p2[0], p2[1], p2[2]);
+
+      if(a1tot < 1 || a2tot < 1)
+        continue;
+
       Nodes nodes;
       Graph g1;
       poly2graph(g1, nodes, p1, 3);
       Graph g2;
       poly2graph(g2, nodes, p2, 3);
 
-          std::cout << "Nodes " << nodes.size() << '\n';
-          for(unsigned i=0; i!=nodes.size(); ++i)
-            std::cout << i << ' ' << nodes[i](0) << ' ' << nodes[i](1) << '\n';
-          std::cout << '\n';
+      Nodes orignodes(nodes);
 
 
+          // std::cout << "Nodes " << orignodes.size() << '\n';
+          // for(unsigned i=0; i!=orignodes.size(); ++i)
+          //   std::cout << i << ' ' << orignodes[i](0) << ' ' << orignodes[i](1) << '\n';
+          // std::cout << '\n';
 
+
+      //std::cout << "merge\n";
       merge_graph(g1, nodes, g2);
       TriangleVec triangles_pre;
-      makeTriangles(g1, nodes, triangles_pre);
+      //std::cout << "tris\n";
+      make_triangles(g1, nodes, triangles_pre);
 
       TriangleVec triangles;
       filter_triangles(triangles_pre, nodes, triangles);
@@ -615,24 +655,22 @@ int main()
             }
         }
 
-      double a1tot = triangle_area(p1[0], p1[1], p1[2]);
-      double a2tot = triangle_area(p2[0], p2[1], p2[2]);
-
-      if((std::abs(a1-a1tot)>1e-4) || std::abs(a2-a2tot)>1e-4)
+      if((std::abs(a1-a1tot)>.1) || std::abs(a2-a2tot)>.1)
         {
           std::cout << "num " << ct << '\n';
 
-          std::ofstream f("tris_in.dat");
-          f << p1[0](0) << ' ' << p1[0](1) << '\n'
-            << p1[1](0) << ' ' << p1[1](1) << '\n'
-            << p1[2](0) << ' ' << p1[2](1) << '\n'
-            << p1[0](0) << ' ' << p1[0](1) << '\n'
-            << "nan nan\n"
-            << p2[0](0) << ' ' << p2[0](1) << '\n'
-            << p2[1](0) << ' ' << p2[1](1) << '\n'
-            << p2[2](0) << ' ' << p2[2](1) << '\n'
-            << p2[0](0) << ' ' << p2[0](1) << '\n';
-
+          {
+            std::ofstream f("tris_in.dat");
+            f << p1[0](0) << ' ' << p1[0](1) << '\n'
+              << p1[1](0) << ' ' << p1[1](1) << '\n'
+              << p1[2](0) << ' ' << p1[2](1) << '\n'
+              << p1[0](0) << ' ' << p1[0](1) << '\n'
+              << "nan nan\n"
+              << p2[0](0) << ' ' << p2[0](1) << '\n'
+              << p2[1](0) << ' ' << p2[1](1) << '\n'
+              << p2[2](0) << ' ' << p2[2](1) << '\n'
+              << p2[0](0) << ' ' << p2[0](1) << '\n';
+          }
 
           std::ofstream tris("tris_out.dat");
           for(unsigned i=0; i<triangles.size(); ++i)
@@ -726,7 +764,7 @@ int main()
 
   //scangraph(g1, nodes);
 
-  makeTriangles(g1, nodes);
+  make_triangles(g1, nodes);
 
   return 0;
 }

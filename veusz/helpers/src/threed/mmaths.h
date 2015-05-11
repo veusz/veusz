@@ -306,6 +306,10 @@ struct Vec2
   {
     return Vec2(v[0]+o.v[0], v[1]+o.v[1]);
   }
+  inline Vec2 operator-() const
+  {
+    return Vec2(-v[0], -v[1]);
+  }
   inline Vec2 operator-(const Vec2& o) const
   {
     return Vec2(v[0]-o.v[0], v[1]-o.v[1]);
@@ -346,7 +350,6 @@ inline double dot(const Vec2& a, const Vec2& b)
   return a(0)*b(0)+a(1)*b(1);
 }
 
-
 //////////////////////////////////////////////////////////////////////////////
 // Helper functions
 
@@ -364,7 +367,7 @@ inline Vec4 vec3to4(const Vec3& v)
 // round to 3 decimal places
 inline double rounddp(double v)
 {
-  return round(v*1000)*1e-3;
+  return round(v*10000)*1e-4;
 }
 
 // do projection, getting x,y coordinate and depth
@@ -400,6 +403,70 @@ inline Vec2 dropDim(const Vec3 v)
 {
   return Vec2(v(0), v(1));
 }
+
+//////////////////////////////////////////////////////////////////////////////
+
+// integer version of Vec2
+struct IVec2
+{
+  IVec2()
+  {
+    v[0] = v[1] = 0;
+  }
+  IVec2(int a, int b)
+  {
+    v[0] = a; v[1] = b;
+  }
+
+  inline bool iszero() const { return v[0]==0 && v[1]==0; }
+
+  inline int& operator()(unsigned i) { return v[i]; }
+  inline int operator()(unsigned i) const { return v[i]; }
+
+  inline void operator*=(int f)
+  {
+    v[0] *= f; v[1] *= f;
+  }
+  inline IVec2 operator+(const IVec2& o) const
+  {
+    return IVec2(v[0]+o.v[0], v[1]+o.v[1]);
+  }
+  inline IVec2 operator-() const
+  {
+    return IVec2(-v[0], -v[1]);
+  }
+  inline IVec2 operator-(const IVec2& o) const
+  {
+    return IVec2(v[0]-o.v[0], v[1]-o.v[1]);
+  }
+  inline IVec2 operator*(int f) const
+  {
+    return IVec2(v[0]*f, v[1]*f);
+  }
+  inline bool operator==(const IVec2& o) const
+  {
+    return v[0]==o.v[0] && v[1]==o.v[1];
+  }
+  inline bool operator!=(const IVec2& o) const
+  {
+    return !(operator==(o));
+  }
+
+private:
+  int v[2];
+};
+
+inline int cross(const IVec2& a, const IVec2& b)
+{
+  return a(0)*b(1)-a(1)*b(0);
+}
+
+inline int dot(const IVec2& a, const IVec2& b)
+{
+  return a(0)*b(0)+a(1)*b(1);
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Helper types
