@@ -1,14 +1,9 @@
 #include <algorithm>
 #include <bitset>
-#include <math.h>
-
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
-#include <cassert>
 
 #include "mmaths.h"
 #include "fixedvector.h"
+#include "tri2d.h"
 
 //typedef std::vector FixedVector;
 
@@ -16,21 +11,24 @@
 //template<class T, unsigned N> class FixedVector : public std::vector<T> {};
 
 // ignore differences in doubles < this
-#define EPS 1e-8
+#define EPS 1e-12
 // maximum number of points/nodes in polygons
 #define NODE_BITS 4 // Max of 16 nodes (0..2**NODE_BITS-1)
 #define MAXNODES (1<<NODE_BITS)
 #define MAXLINKS 32
 #define MAXTRIANGLES 32
 
-#define SNAPDIST 1e-4
+#define SNAPDIST 1e-6
 #define ISCALE 1000
 
-inline double round4(double d)
+namespace
 {
-  //return d;
-  return round(d*ISCALE)*(1./ISCALE);
-}
+
+// inline double round4(double d)
+// {
+//   //return d;
+//   return round(d*ISCALE)*(1./ISCALE);
+// }
 
 enum isect { LINE_NOOVERLAP, LINE_CROSS, LINE_OVERLAP };
 
@@ -110,7 +108,7 @@ inline int ptsign(Vec2 p1, Vec2 p2, Vec2 p3)
 // http://stackoverflow.com/questions/2049582/how-to-determine-a-point-
 // in-a-triangle
 // returns false if the point lies on the edge
-bool pointInTriangle(Vec2 pt, Vec2 v1, Vec2 v2, Vec2 v3)
+bool point_in_triangle(Vec2 pt, Vec2 v1, Vec2 v2, Vec2 v3)
 {
   int s1 = ptsign(pt, v1, v2);
   int s2 = ptsign(pt, v2, v3);
@@ -194,7 +192,7 @@ inline unsigned getOrAddNode(Nodes& nodes, Vec2 pt)
       if(close_pts(nodes[i], pt))
         return i;
     }
-  assert(nodes.size() < MAXNODES);
+  // assert(nodes.size() < MAXNODES);
   //std::cout << "add " << pt(0) << " " << pt(1) << "\n";
   nodes.push_back(pt);
   return nodes.size()-1;
@@ -536,8 +534,8 @@ void filter_triangles(const TriangleVec& tin, const Nodes& nodes, TriangleVec& t
           if( n == tri.n1() || n == tri.n2() || n == tri.n3() )
             continue;
 
-          if(pointInTriangle(nodes[n], nodes[tri.n1()], nodes[tri.n2()],
-                             nodes[tri.n3()]))
+          if(point_in_triangle(nodes[n], nodes[tri.n1()], nodes[tri.n2()],
+                               nodes[tri.n3()]))
             {
               bad=1; break;
             }
@@ -547,16 +545,78 @@ void filter_triangles(const TriangleVec& tin, const Nodes& nodes, TriangleVec& t
     }
 }
 
-void dumpgraph(const Graph& g)
+// void dumpgraph(const Graph& g)
+// {
+//   std::cout << "Graph " << g.size() << " (\n";
+//   for(unsigned i=0; i!=g.size(); ++i)
+//     std::cout << ' ' << g[i].node1()
+//               << ' ' << g[i].node2()
+//               << '\n';
+//   std::cout << ")\n";
+// }
+
+} // namespace
+
+#include <iostream>
+void clip_triangles_2d(const Triangle2D& tri1, const Triangle2D& tri2,
+                       std::vector<Triangle2D>& tris_both,
+                       std::vector<Triangle2D>& tris1,
+                       std::vector<Triangle2D>& tris2)
 {
-  std::cout << "Graph " << g.size() << " (\n";
-  for(unsigned i=0; i!=g.size(); ++i)
-    std::cout << ' ' << g[i].node1()
-              << ' ' << g[i].node2()
-              << '\n';
-  std::cout << ")\n";
+  Triangle2D tri1_snap(tri1);
+  Triangle2D tri2_snap(tri2);
+
+  std::cout << tri1[0](0) << ' ' << tri1[0](1) << ", "
+            << tri1[1](0) << ' ' << tri1[1](1) << ", "
+            << tri1[2](0) << ' ' << tri1[2](1) << "\n";
+  std::cout << tri2[0](0) << ' ' << tri2[0](1) << ", "
+            << tri2[1](0) << ' ' << tri2[1](1) << ", "
+            << tri2[2](0) << ' ' << tri2[2](1) << "\n";
+
+  snap_points(tri1_snap.pts, 3, tri2_snap.pts, 3);
+  snap_points(tri2_snap.pts, 3, tri1_snap.pts, 3);
+
+  Nodes nodes;
+  Graph g1;
+  poly2graph(g1, nodes, tri1_snap.pts, 3);
+  Graph g2;
+  poly2graph(g2, nodes, tri2_snap.pts, 3);
+  merge_graph(g1, nodes, g2);
+
+  TriangleVec triangles_pre;
+  make_triangles(g1, nodes, triangles_pre);
+  TriangleVec triangles;
+  filter_triangles(triangles_pre, nodes, triangles);
+
+  for(unsigned i=0; i<triangles.size(); ++i)
+    {
+      Triangle t(triangles[i]);
+      Triangle2D tri(nodes[t.n1()], nodes[t.n2()], nodes[t.n3()]);
+
+      Vec2 cenpt = (tri[0]+tri[1]+tri[2])*(1./3.);
+      bool intri1 = point_in_triangle(cenpt, tri1_snap[0],
+                                      tri1_snap[1], tri1_snap[2]);
+      bool intri2 = point_in_triangle(cenpt, tri2_snap[0],
+                                      tri2_snap[1], tri2_snap[2]);
+
+      std::cout
+        << intri1 << ' ' << intri2 << ' '
+        << tri[0](0) << ' ' << tri[0](1) << ", "
+        << tri[1](0) << ' ' << tri[1](1) << ", "
+        << tri[2](0) << ' ' << tri[2](1) << "\n";
+
+
+      if(intri1 && intri2)
+        tris_both.push_back(tri);
+      if(intri1)
+        tris1.push_back(tri);
+      if(intri2)
+        tris2.push_back(tri);
+    }
 }
 
+
+#if 0
 int main()
 {
 
@@ -708,7 +768,7 @@ int main()
 
   return 0;
 }
-
+#endif
 
 #if 0
 
