@@ -292,17 +292,31 @@ class Function3D(plotters3d.GenericPlotter3D):
             lz = axes[2].dataToLogicalCoords(valsz)
 
             # draw grid over each axis
+            surfprop = lineprop = None
             if not s.Surface.hide:
                 surfprop = s.Surface.makeSurfaceProp()
-                constructSurface(outobj, surfprop, lx, ly, lz)
-
             if not s.Line.hide:
-                for i in crange(lx.shape[0]):
-                    constructPolyline(
-                        outobj, lineprop, lx[i, :], ly[i, :], lz[i, :])
-                for i in crange(lx.shape[1]):
-                    constructPolyline(
-                        outobj, lineprop, lx[:, i], ly[:, i], lz[:, i])
+                lineprop = s.Line.makeLineProp()
+
+            print(lx)
+            print(ly)
+            print(lz)
+
+            vals1 = threed.ValVector()
+            for v in lx[:,0]:
+                print(v)
+                vals1.push_back(v)
+            vals2 = threed.ValVector()
+            for v in lz[0,:]:
+                print(v)
+                vals2.push_back(v)
+            grid = threed.ValVector()
+            for v in ly.flat:
+                grid.push_back(v)
+
+            mesh = threed.Mesh(vals1, vals2, grid, threed.Mesh.X_DIRN,
+                               lineprop, surfprop)
+            outobj.append(mesh)
 
         if len(outobj) == 0:
             return None

@@ -64,6 +64,41 @@ class PolyLine : public Object
   PropSmartPtr<const LineProp> lineprop;
 };
 
+// a grid of height values on a regular mesh with grid points given
+// heights has M*N elements where M and N are the length of pos1 & pos2
+class Mesh : public Object
+{
+public:
+  // X_DIRN: heights is X, a is Y, b is Z
+  // Y_DIRN: heights is Y, a is Z. b is X
+  // Z_DIRN: heights is Z, a is X, b is Y
+  enum Direction {X_DIRN, Y_DIRN, Z_DIRN};
+
+public:
+  Mesh(const ValVector& pos1, const ValVector& pos2,
+       const ValVector& heights,
+       Direction dir,
+       const LineProp* lprop=0, const SurfaceProp* sprop=0);
+
+  void getFragments(const Mat4& outerM, const Camera& cam,
+                    FragmentVector& v) const;
+
+private:
+  void getSurfaceFragments(const Mat4& outerM, const Camera& cam,
+                           FragmentVector& v) const;
+  void getLineFragments(const Mat4& outerM, const Camera& cam,
+                        FragmentVector& v) const;
+
+private:
+  // indices into vectors for each direction
+  unsigned hidx, didx1, didx2;
+
+public:
+  ValVector pos1, pos2, grid;
+  PropSmartPtr<const LineProp> lineprop;
+  PropSmartPtr<const SurfaceProp> surfaceprop;
+};
+
 // container of objects with transformation matrix of children
 
 // Note: object pointers passed to object will be deleted when this

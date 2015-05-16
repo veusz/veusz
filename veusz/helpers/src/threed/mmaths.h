@@ -56,6 +56,8 @@ struct Vec4
 
   inline void normalise() { operator*=(1/rad()); }
 
+  inline bool isfinite() const { return std::isfinite(v[0]+v[1]+v[2]+v[3]); }
+
 private:
   double v[4];
 };
@@ -110,6 +112,8 @@ struct Vec3
   inline double rad() const { return std::sqrt(rad2()); }
 
   inline void normalise() { operator*=(1/rad()); }
+
+  inline bool isfinite() const { return std::isfinite(v[0]+v[1]+v[2]); }
 
 private:
   double v[3];
@@ -336,6 +340,8 @@ struct Vec2
 
   inline void normalise() { operator*=(1/rad()); }
 
+  inline bool isfinite() const { return std::isfinite(v[0]+v[1]); }
+
 private:
   double v[2];
 };
@@ -404,6 +410,7 @@ inline Vec2 dropDim(const Vec3 v)
 typedef std::vector<Vec2> Vec2Vector;
 typedef std::vector<Vec3> Vec3Vector;
 typedef std::vector<Vec4> Vec4Vector;
+typedef std::vector<double> ValVector;
 
 //////////////////////////////////////////////////////////////////////////////
 

@@ -174,6 +174,30 @@ struct Mat3
 Vec3 operator*(const Vec3& v, const Mat3& o);
 Mat3 identityM3();
 
+
+// this is actually std::vector<double>
+class ValVector
+{
+%TypeHeaderCode
+#include <mmaths.h>
+%End
+public:
+  ValVector();
+  void push_back(double d);
+  double operator[](unsigned i) const;
+%MethodCode
+    if(a0 >= sipCpp->size())
+      {
+	sipIsErr = 1;
+	PyErr_SetString(PyExc_ValueError, "Index out of range");
+      }
+    else
+      sipRes = sipCpp->operator[](a0);
+%End
+  unsigned size() const;
+  bool empty() const;
+};
+
 /////////////////////////////////////////////////
 // Objects
 
@@ -239,6 +263,21 @@ class PolyLine : public Object /NoDefaultCtors/
  public:
   PolyLine(const LineProp* prop /Transfer/);
   void addPoint(const Vec4& v);
+};
+
+class Mesh : public Object /NoDefaultCtors/
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+ public:
+  enum Direction {X_DIRN, Y_DIRN, Z_DIRN};
+
+  Mesh(const ValVector& pos1, const ValVector& pos2,
+       const ValVector& heights,
+       Direction dir,
+       const LineProp* lprop /Transfer/,
+       const SurfaceProp* sprop /Transfer/);
 };
 
 class ObjectContainer : public Object
