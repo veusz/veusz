@@ -680,18 +680,8 @@ namespace
 	double a = aupper*invalower;
 	double b = (npts[i](0)-p0(0) - a*(p1(0)-p0(0)))*invx;
 	double depth = p0(2) + a*(p1(2)-p0(2)) + b*(p2(2)-p0(2));
-        npts[i](2) = rounddp(depth);
+        npts[i](2) = depth;
       }
-  }
-
-  template<class T> inline T min3(T a, T b, T c)
-  {
-    return (a<b && a<c) ? a : (b<c ? b : c);
-  }
-
-  template<class T> inline T max3(T a, T b, T c)
-  {
-    return (a>b && a>c) ? a : (b>c ? b : c);
   }
 
   bool close_2d(const Vec3& p1, const Vec3& p2)
@@ -699,6 +689,15 @@ namespace
     return std::abs(p1(0)-p2(0))<EPS && std::abs(p1(1)-p2(1))<EPS;
   }
 
+  // helper to find minimum and maximum of 3 points
+  struct minmax3
+  {
+    minmax3(double a, double b, double c)
+      : min(std::min(std::min(a, b), c)),
+        max(std::max(std::max(a, b), c))
+    {}
+    double min, max;
+  };
 
   void splitOn2DOverlap_tri_tri(FragmentVector& frags,
                                 unsigned idx1, unsigned idx2,
@@ -708,21 +707,13 @@ namespace
     const Fragment f2(frags[idx2]);
 
     // check bounding boxes overlap
-    double minx1 = min3(f1.proj[0](0), f1.proj[1](0), f1.proj[2](0));
-    double maxx2 = max3(f2.proj[0](0), f2.proj[1](0), f2.proj[2](0));
-    if(maxx2 <= minx1)
+    minmax3 mmx1(f1.proj[0](0), f1.proj[1](0), f1.proj[2](0));
+    minmax3 mmx2(f2.proj[0](0), f2.proj[1](0), f2.proj[2](0));
+    if(mmx1.min >= mmx2.max || mmx1.max <= mmx2.min)
       return;
-    double maxx1 = max3(f1.proj[0](0), f1.proj[1](0), f1.proj[2](0));
-    double minx2 = min3(f2.proj[0](0), f2.proj[1](0), f2.proj[2](0));
-    if(maxx1 <= minx2)
-      return;
-    double miny1 = min3(f1.proj[0](1), f1.proj[1](1), f1.proj[2](1));
-    double maxy2 = max3(f2.proj[0](1), f2.proj[1](1), f2.proj[2](1));
-    if(maxy2 <= miny1)
-      return;
-    double maxy1 = max3(f1.proj[0](1), f1.proj[1](1), f1.proj[2](1));
-    double miny2 = min3(f2.proj[0](1), f2.proj[1](1), f2.proj[2](1));
-    if(maxy1 <= miny2)
+    minmax3 mmy1(f1.proj[0](1), f1.proj[1](1), f1.proj[2](1));
+    minmax3 mmy2(f2.proj[0](1), f2.proj[1](1), f2.proj[2](1));
+    if(mmy1.min >= mmy2.max || mmy1.max <= mmy2.min)
       return;
 
     // ignore identical triangles
@@ -738,14 +729,13 @@ namespace
     for(unsigned i=0; i<3; ++i)
       tri2[i] = Vec2(f2.proj[i](0), f2.proj[i](1));
 
-    if(triangle_area(tri1)<1e-5 || triangle_area(tri2)<1e-5)
-      return;
-
     // compute intersection/difference
     std::vector<Triangle2D> tris_both, tris1, tris2;
-    clip_triangles_2d(tri1, tri2, tris_both, tris1, tris2);
+    bool retn = clip_triangles_2d(tri1, tri2, tris_both, tris1, tris2);
+    if(!retn)
+      return;
 
-    printf("calcisect: %li %li %li\n", tris_both.size(), tris1.size(), tris2.size());
+    //printf("calcisect: %li %li %li\n", tris_both.size(), tris1.size(), tris2.size());
 
     // return if no or full intersection
     if(tris_both.empty() || (tris1.size()==1 && tris2.size()==1))

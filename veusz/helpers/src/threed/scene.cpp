@@ -277,14 +277,14 @@ void Scene::splitProjected()
           if(fragments[depths[idx2]].maxDepth() < thismindepth)
             break;
 
-          printf("%i %i /%li\n", idx1, idx2, depths.size());
+          //printf("%i %i /%li\n", idx1, idx2, depths.size());
 
           unsigned num1=0, num2=0;
           splitOn2DOverlap(fragments, depths[idx1], depths[idx2], &num1, &num2);
 
           if(num1>0 || num2>0)
             {
-              printf("num1=%i num2=%i\n", num1, num2);
+              //printf("num1=%i num2=%i\n", num1, num2);
 
               // put and sort new fragments into depths
               insertFragmentsIntoDepths(idx1, num1, idx2, num2);
@@ -430,8 +430,8 @@ void Scene::render(QPainter* painter, const Camera& cam,
   std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
 
   // split on sky
-  printf("\nsplit projected\n");
-  splitProjected();
+  //printf("\nsplit projected\n");
+  //splitProjected();
 
   // final sorting
   std::sort(depths.begin(), depths.end(), FragDepthCompareMean(fragments));

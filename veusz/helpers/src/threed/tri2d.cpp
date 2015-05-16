@@ -1,6 +1,9 @@
 #include <algorithm>
 #include <bitset>
 
+#include <iostream>
+
+
 #include "mmaths.h"
 #include "fixedvector.h"
 #include "tri2d.h"
@@ -11,14 +14,15 @@
 //template<class T, unsigned N> class FixedVector : public std::vector<T> {};
 
 // ignore differences in doubles < this
-#define EPS 1e-12
 // maximum number of points/nodes in polygons
 #define NODE_BITS 4 // Max of 16 nodes (0..2**NODE_BITS-1)
 #define MAXNODES (1<<NODE_BITS)
 #define MAXLINKS 32
 #define MAXTRIANGLES 32
 
-#define SNAPDIST 1e-6
+#define SNAPDIST 1e-8
+#define CLOSEDIST 1e-8
+#define EPS 1e-12
 #define ISCALE 1000
 
 namespace
@@ -46,6 +50,8 @@ isect calcLine2DIntersect(Vec2 p1, Vec2 p2, Vec2 q1, Vec2 q2, Vec2* posn=0, Vec2
   Vec2 dq = q2-q1;
   Vec2 dpq = p1-q1;
   double denom = cross(dp, dq);
+
+  //std::cout << "denom " << denom << '\n';
 
   // parallel vectors or points below
   if(std::abs(denom) < EPS)
@@ -181,7 +187,7 @@ private:
 inline bool close_pts(const Vec2& a, const Vec2& b)
 {
   //std::cout << std::abs(a(0)-b(0)) << ' ' << std::abs(a(1)-b(1)) << '\n';
-  return std::abs(a(0)-b(0))<EPS && std::abs(a(1)-b(1))<EPS;
+  return std::abs(a(0)-b(0))<CLOSEDIST && std::abs(a(1)-b(1))<CLOSEDIST;
 }
 
 // return existing node or add a new one corresponding to pt
@@ -311,6 +317,7 @@ void insert_overlapped_nodes(Graph& graph, Nodes& nodes, unsigned linkidx,
 
 void identify_split_nodes(Graph& graph1, Graph& graph2, Nodes &nodes)
 {
+  //std::cout << "identify split nodes\n";
   Vec2 posn1, posn2;
   for(unsigned i1=0; i1<graph1.size(); ++i1)
     {
@@ -361,6 +368,7 @@ void identify_split_nodes(Graph& graph1, Graph& graph2, Nodes &nodes)
 // merge ingraph into outgraph
 void merge_graph(Graph& outgraph, Nodes& nodes, const Graph& tomerge)
 {
+  //std::cout << "merge graph\n";
   // stage1: calculate intersection of every Link with every Link to
   // build up node list to include every intersection
   Graph mergegraph(tomerge);
@@ -555,26 +563,64 @@ void filter_triangles(const TriangleVec& tin, const Nodes& nodes, TriangleVec& t
 //   std::cout << ")\n";
 // }
 
+  // area any of the points of tri1 in tri2?
+  // return true if no overlap
+  // following doesn't work if points are on edges!
+  // bool check_no_overlap(const Triangle2D& a, const Triangle2D& b)
+  // {
+  //   for(unsigned i=0; i<3; i++)
+  //     {
+  //       if(point_in_triangle(a[i], b[0], b[1], b[2]))
+  //         {
+  //           if(!close_pts(a[i], b[0]) &&
+  //              !close_pts(a[i], b[1]) &&
+  //              !close_pts(a[i], b[2]))
+  //             return 0;
+  //         }
+  //     }
+  //   return 1;
+  // }
+
 } // namespace
 
-#include <iostream>
-void clip_triangles_2d(const Triangle2D& tri1, const Triangle2D& tri2,
+bool clip_triangles_2d(const Triangle2D& tri1, const Triangle2D& tri2,
                        std::vector<Triangle2D>& tris_both,
                        std::vector<Triangle2D>& tris1,
                        std::vector<Triangle2D>& tris2)
 {
+
+  // for(unsigned i=0; i<4; i++)
+  //   std::cout << tri1[i%3](0) << ' ' << tri1[i%3](1) << '\n';
+  // std::cout << "nan nan\n";
+  // for(unsigned i=0; i<4; i++)
+  //   std::cout << tri2[i%3](0) << ' ' << tri2[i%3](1) << '\n';
+
   Triangle2D tri1_snap(tri1);
   Triangle2D tri2_snap(tri2);
-
-  std::cout << tri1[0](0) << ' ' << tri1[0](1) << ", "
-            << tri1[1](0) << ' ' << tri1[1](1) << ", "
-            << tri1[2](0) << ' ' << tri1[2](1) << "\n";
-  std::cout << tri2[0](0) << ' ' << tri2[0](1) << ", "
-            << tri2[1](0) << ' ' << tri2[1](1) << ", "
-            << tri2[2](0) << ' ' << tri2[2](1) << "\n";
-
   snap_points(tri1_snap.pts, 3, tri2_snap.pts, 3);
   snap_points(tri2_snap.pts, 3, tri1_snap.pts, 3);
+
+  // std::cout << "snap\n";
+  // for(unsigned i=0; i<4; i++)
+  //   std::cout << tri1[i%3](0) << ' ' << tri1[i%3](1) << '\n';
+  // std::cout << "nan nan\n";
+  // for(unsigned i=0; i<4; i++)
+  //   std::cout << tri2[i%3](0) << ' ' << tri2[i%3](1) << '\n';
+
+  // std::cout << triangle_area(tri1_snap) << ' ' << triangle_area(tri2_snap) << '\n';
+
+  // snapping might make triangle disappear
+  if(triangle_area(tri1_snap)<1e-8 || triangle_area(tri2_snap)<1e-8)
+    return 0;
+
+  // std::cout << "tri1 cross: "
+  //           << cross(tri1[0]-tri1[1], tri1[0]-tri1[2]) << ' '
+  //           << cross(tri1[0]-tri1[1], tri1[1]-tri1[2]) << ' '
+  //           << cross(tri1[0]-tri1[2], tri1[1]-tri1[2]) << '\n';
+  // std::cout << "tri2 cross: "
+  //           << cross(tri2[0]-tri2[1], tri2[0]-tri2[2]) << ' '
+  //           << cross(tri2[0]-tri2[1], tri2[1]-tri2[2]) << ' '
+  //           << cross(tri2[0]-tri2[2], tri2[1]-tri2[2]) << '\n';
 
   Nodes nodes;
   Graph g1;
@@ -599,12 +645,11 @@ void clip_triangles_2d(const Triangle2D& tri1, const Triangle2D& tri2,
       bool intri2 = point_in_triangle(cenpt, tri2_snap[0],
                                       tri2_snap[1], tri2_snap[2]);
 
-      std::cout
-        << intri1 << ' ' << intri2 << ' '
-        << tri[0](0) << ' ' << tri[0](1) << ", "
-        << tri[1](0) << ' ' << tri[1](1) << ", "
-        << tri[2](0) << ' ' << tri[2](1) << "\n";
-
+      // std::cout
+      //   << intri1 << ' ' << intri2 << ' '
+      //   << tri[0](0) << ',' << tri[1](0) << ","
+      //   << tri[2](0) << ' ' << tri[0](1) << ","
+      //   << tri[1](1) << ',' << tri[2](1) << "\n";
 
       if(intri1 && intri2)
         tris_both.push_back(tri);
@@ -613,220 +658,25 @@ void clip_triangles_2d(const Triangle2D& tri1, const Triangle2D& tri2,
       if(intri2)
         tris2.push_back(tri);
     }
-}
 
+  return 1;
+}
 
 #if 0
 int main()
 {
+  Triangle2D tri1(Vec2(-0.2317, 0.074085),
+                  Vec2(-0.231844, 0.0656526),
+                  Vec2(-0.246207, 0.0865563));
 
-  //for(unsigned ct=0;ct<(35000+275150)*16;ct++)
-  //  std::rand();
+  Triangle2D tri2(Vec2(-0.246274, 0.0867),
+                  Vec2(-0.231679, 0.0750825),
+                  Vec2(-0.231558, 0.0806746));
 
+  std::vector<Triangle2D> tris1, tris2, tris_both;
+  clip_triangles_2d(tri1, tri2, tris_both, tris1, tris2);
 
-  Vec2 p1[3];
-  Vec2 p2[3];
-
-  for(unsigned ct=0; ct<20000000; ++ct)
-    {
-      if(ct % 100000==0)
-        std::cout << ct << '\n';
-
-      for(unsigned i=0; i<3; ++i)
-        {
-          p1[i](0) = round4(std::rand()*(1./RAND_MAX)*100);
-          p1[i](1) = round4(std::rand()*(1./RAND_MAX)*100);
-          p2[i](0) = round4(std::rand()*(1./RAND_MAX)*100);
-          p2[i](1) = round4(std::rand()*(1./RAND_MAX)*100);
-        }
-
-      unsigned cpt1 = std::rand() % 3;
-      unsigned cpt2 = (cpt1+1)%3;
-      unsigned dpt1 = std::rand() % 3;
-      unsigned dpt2 = (dpt1+1)%3;
-
-      if(std::rand()*(1./RAND_MAX) < 0.1)
-        {
-          p1[cpt1] = p2[dpt1];
-        }
-      if(std::rand()*(1./RAND_MAX) < 0.1)
-        {
-          p1[cpt2] = p2[dpt2];
-        }
-
-      snap_points(p1, 3, p2, 3);
-      snap_points(p2, 3, p1, 3);
-
-      // std::cout << p1[0](0) << ' ' << p1[0](1) << '\n'
-      //           << p1[1](0) << ' ' << p1[1](1) << '\n'
-      //           << p1[2](0) << ' ' << p1[2](1) << '\n'
-      //           << p1[0](0) << ' ' << p1[0](1) << '\n'
-      //           << "nan nan\n"
-      //           << p2[0](0) << ' ' << p2[0](1) << '\n'
-      //           << p2[1](0) << ' ' << p2[1](1) << '\n'
-      //           << p2[2](0) << ' ' << p2[2](1) << '\n'
-      //           << p2[0](0) << ' ' << p2[0](1) << "\n\n";
-
-      double a1tot = triangle_area(p1[0], p1[1], p1[2]);
-      double a2tot = triangle_area(p2[0], p2[1], p2[2]);
-
-      if(a1tot < 1 || a2tot < 1)
-        continue;
-
-      Nodes nodes;
-      Graph g1;
-      poly2graph(g1, nodes, p1, 3);
-      Graph g2;
-      poly2graph(g2, nodes, p2, 3);
-
-      Nodes orignodes(nodes);
-
-
-          // std::cout << "Nodes " << orignodes.size() << '\n';
-          // for(unsigned i=0; i!=orignodes.size(); ++i)
-          //   std::cout << i << ' ' << orignodes[i](0) << ' ' << orignodes[i](1) << '\n';
-          // std::cout << '\n';
-
-
-      //std::cout << "merge\n";
-      merge_graph(g1, nodes, g2);
-      TriangleVec triangles_pre;
-      //std::cout << "tris\n";
-      make_triangles(g1, nodes, triangles_pre);
-
-      TriangleVec triangles;
-      filter_triangles(triangles_pre, nodes, triangles);
-
-      double a1=0, a2=0;
-      for(unsigned i=0; i<triangles.size(); ++i)
-        {
-          Triangle t(triangles[i]);
-          Vec2 pt((nodes[t.n1()](0)+nodes[t.n2()](0)+nodes[t.n3()](0))*(1./3.),
-                  (nodes[t.n1()](1)+nodes[t.n2()](1)+nodes[t.n3()](1))*(1./3.));
-
-          double area = triangle_area(nodes[t.n1()], nodes[t.n2()], nodes[t.n3()]);
-          if(pointInTriangle(pt, p1[0], p1[1], p1[2]))
-            {
-              a1 += area;
-            }
-          if(pointInTriangle(pt, p2[0], p2[1], p2[2]))
-            {
-              a2 += area;
-            }
-        }
-
-      if((std::abs(a1-a1tot)>.1) || std::abs(a2-a2tot)>.1)
-        {
-          std::cout << "num " << ct << '\n';
-
-          {
-            std::ofstream f("tris_in.dat");
-            f << p1[0](0) << ' ' << p1[0](1) << '\n'
-              << p1[1](0) << ' ' << p1[1](1) << '\n'
-              << p1[2](0) << ' ' << p1[2](1) << '\n'
-              << p1[0](0) << ' ' << p1[0](1) << '\n'
-              << "nan nan\n"
-              << p2[0](0) << ' ' << p2[0](1) << '\n'
-              << p2[1](0) << ' ' << p2[1](1) << '\n'
-              << p2[2](0) << ' ' << p2[2](1) << '\n'
-              << p2[0](0) << ' ' << p2[0](1) << '\n';
-          }
-
-          std::ofstream tris("tris_out.dat");
-          for(unsigned i=0; i<triangles.size(); ++i)
-            {
-              Triangle t = triangles[i];
-              tris << "# Tri " << t.n1() << ' ' << t.n2() << ' ' << t.n3() << '\n'
-                   << nodes[t.n1()](0) << ' ' << nodes[t.n1()](1) << '\n'
-                   << nodes[t.n2()](0) << ' ' << nodes[t.n2()](1) << '\n'
-                   << nodes[t.n3()](0) << ' ' << nodes[t.n3()](1) << '\n'
-                   << nodes[t.n1()](0) << ' ' << nodes[t.n1()](1) << '\n'
-                   << "nan nan\n";
-            }
-          std::cout << "Nodes " << nodes.size() << '\n';
-          for(unsigned i=0; i!=nodes.size(); ++i)
-            std::cout << i << ' ' << nodes[i](0) << ' ' << nodes[i](1) << '\n';
-          std::cout << '\n';
-
-          dumpgraph(g1);
-
-          std::cout << '\n';
-          for(unsigned i=0; i<triangles.size(); ++i)
-            {
-              Triangle t = triangles[i];
-              std::cout << t.n1() << ' ' << t.n2() << ' ' << t.n3() << '\n';
-            }
-
-          std::cout << "area 1 " << a1 << ' ' << a1tot << '\n';
-          std::cout << "area 2 " << a2 << ' ' << a2tot << '\n';
-
-          break;
-
-        }
-
-    }
 
   return 0;
 }
-#endif
-
-#if 0
-
-int main()
-{
-  Vec2 p1[3];
-  Vec2 p2[3];
-  // p1[0] = Vec2(0,0);
-  // p1[1] = Vec2(0,1);
-  // p1[2] = Vec2(1,0);
-  // p2[1] = Vec2(0.1,0.1);
-  // p2[0] = Vec2(0.1,1.1);
-  // p2[2] = Vec2(1.1,0.1);
-
-  // buggy
-  p1[0] = Vec2(0,0);
-  p1[1] = Vec2(0,1);
-  p1[2] = Vec2(1,0);
-  p2[1] = Vec2(0.3,0.3);
-  p2[0] = Vec2(0.3,0.8);
-  p2[2] = Vec2(0.8,0.3);
-
-  {
-    std::ofstream f("tris_in.dat");
-    f << p1[0](0) << ' ' << p1[0](1) << '\n'
-      << p1[1](0) << ' ' << p1[1](1) << '\n'
-      << p1[2](0) << ' ' << p1[2](1) << '\n'
-      << p1[0](0) << ' ' << p1[0](1) << '\n'
-      << "nan nan\n"
-      << p2[0](0) << ' ' << p2[0](1) << '\n'
-      << p2[1](0) << ' ' << p2[1](1) << '\n'
-      << p2[2](0) << ' ' << p2[2](1) << '\n'
-      << p2[0](0) << ' ' << p2[0](1) << '\n';
-  }
-
-  Nodes nodes;
-  Graph g1;
-  poly2graph(g1, nodes, p1, 3);
-  dumpgraph(g1);
-  Graph g2;
-  poly2graph(g2, nodes, p2, 3);
-  dumpgraph(g2);
-
-  merge_graph(g1, nodes, g2);
-  std::cout << "size1 " << g1.size() << '\n';
-  std::cout << "size2 " << g1.size() << '\n';
-
-  dumpgraph(g1);
-
-  std::cout << "Nodes " << nodes.size() << '\n';
-  for(unsigned i=0; i!=nodes.size(); ++i)
-    std::cout << nodes[i](0) << ' ' << nodes[i](1) << '\n';
-
-  //scangraph(g1, nodes);
-
-  make_triangles(g1, nodes);
-
-  return 0;
-}
-
 #endif

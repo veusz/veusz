@@ -364,25 +364,19 @@ inline Vec4 vec3to4(const Vec3& v)
   return Vec4(v(0), v(1), v(2), 1);
 }
 
-// round to 3 decimal places
-inline double rounddp(double v)
-{
-  return round(v*10000)*1e-4;
-}
-
 // do projection, getting x,y coordinate and depth
 inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
 {
   Vec4 nv(v*projM);
   double inv = 1/nv(3);
-  return Vec3(rounddp(nv(0)*inv), rounddp(nv(1)*inv), rounddp(nv(2)*inv));
+  return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
 }
 
 inline Vec3 calcProjVec(const Mat4& projM, const Vec3& v)
 {
   Vec4 nv(vec3to4(v)*projM);
   double inv = 1/nv(3);
-  return Vec3(rounddp(nv(0)*inv), rounddp(nv(1)*inv), rounddp(nv(2)*inv));
+  return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
 }
 
 // do 2d lines overlap?
@@ -403,70 +397,6 @@ inline Vec2 dropDim(const Vec3 v)
 {
   return Vec2(v(0), v(1));
 }
-
-//////////////////////////////////////////////////////////////////////////////
-
-// integer version of Vec2
-struct IVec2
-{
-  IVec2()
-  {
-    v[0] = v[1] = 0;
-  }
-  IVec2(int a, int b)
-  {
-    v[0] = a; v[1] = b;
-  }
-
-  inline bool iszero() const { return v[0]==0 && v[1]==0; }
-
-  inline int& operator()(unsigned i) { return v[i]; }
-  inline int operator()(unsigned i) const { return v[i]; }
-
-  inline void operator*=(int f)
-  {
-    v[0] *= f; v[1] *= f;
-  }
-  inline IVec2 operator+(const IVec2& o) const
-  {
-    return IVec2(v[0]+o.v[0], v[1]+o.v[1]);
-  }
-  inline IVec2 operator-() const
-  {
-    return IVec2(-v[0], -v[1]);
-  }
-  inline IVec2 operator-(const IVec2& o) const
-  {
-    return IVec2(v[0]-o.v[0], v[1]-o.v[1]);
-  }
-  inline IVec2 operator*(int f) const
-  {
-    return IVec2(v[0]*f, v[1]*f);
-  }
-  inline bool operator==(const IVec2& o) const
-  {
-    return v[0]==o.v[0] && v[1]==o.v[1];
-  }
-  inline bool operator!=(const IVec2& o) const
-  {
-    return !(operator==(o));
-  }
-
-private:
-  int v[2];
-};
-
-inline int cross(const IVec2& a, const IVec2& b)
-{
-  return a(0)*b(1)-a(1)*b(0);
-}
-
-inline int dot(const IVec2& a, const IVec2& b)
-{
-  return a(0)*b(0)+a(1)*b(1);
-}
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 // Helper types
