@@ -73,38 +73,6 @@ namespace
     FragmentVector& vec;
   };
 
-
-  struct FragDepthCompareOverlap
-  {
-    FragDepthCompareOverlap(FragmentVector& v)
-      : vec(v)
-    {}
-
-    bool operator()(unsigned i, unsigned j) const
-    {
-      const Fragment& f1(vec[i]);
-      const Fragment& f2(vec[j]);
-
-      if( f1.maxDepth() <= f2.minDepth() )
-        // definitely f1 is in front of f2
-        return 0;
-      if( f1.minDepth() >= f2.maxDepth() )
-        // definitely f1 is behind f2
-        return 1;
-
-      double d1, d2;
-      d1 = d2 = std::numeric_limits<double>::min();
-      overlapDepth(f1, f2, &d1, &d2);
-      if( d1 == std::numeric_limits<double>::min() )
-        // did not get a sensible answer
-        return f1.meanDepth() >= f2.meanDepth();
-      else
-        return d1 >= d2;
-    }
-
-    FragmentVector& vec;
-  };
-
   // Make scaling matrix to move points to correct output range
   Mat3 makeScreenM(const FragmentVector& frags,
 		   double x1, double y1, double x2, double y2)
@@ -365,47 +333,6 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM)
     }
 }
 
-void Scene::fineZCompare()
-{
-  // look at intersections between triangles (if any) and compare
-  // depths at these intersections to determine order
-
-  const unsigned depthssize = depths.size();
-  for(unsigned idx1=0; idx1+1<depthssize; ++idx1)
-    {
-      unsigned loopcount = 0;
-      double thismindepth;
-
-    RESTART:
-      thismindepth = fragments[depths[idx1]].minDepth();
-
-      for(unsigned idx2=idx1+1; idx2<depthssize; ++idx2)
-	{
-	  if(fragments[depths[idx2]].maxDepth() < thismindepth)
-	    // no others are overlapping
-	    break;
-
-	  double d1 = -1;
-	  double d2 = -1;
-	  overlapDepth(fragments[depths[idx1]], fragments[depths[idx2]],
-		       &d1, &d2);
-
-	  if( d2-d1 > 1e-5 )
-	    {
-	      // bubble fragment above one at idx1
-	      unsigned tmp = depths[idx2];
-	      for(int i=int(idx2)-1; i >= int(idx1); --i)
-		depths[i+1] = depths[i];
-	      depths[idx1] = tmp;
-
-	      // avoid infinite loops
-	      if(loopcount++ < 16)
-		goto RESTART;
-	    }
-	}
-    }
-}
-
 void Scene::render(QPainter* painter, const Camera& cam,
 		   double x1, double y1, double x2, double y2)
 {
@@ -435,8 +362,6 @@ void Scene::render(QPainter* painter, const Camera& cam,
 
   // final sorting
   std::sort(depths.begin(), depths.end(), FragDepthCompareMean(fragments));
-
-  //fineZCompare();
 
   // how to transform projected points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
