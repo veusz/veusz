@@ -112,6 +112,16 @@ class GenericPlotter3D(widget.Widget):
 
         return axes
 
+    def fetchAxis(self, var):
+        """Return a particular axis given x, y or z"""
+        if var == 'x':
+            setn = self.settings.xAxis
+        elif var == 'y':
+            setn = self.settings.yAxis
+        elif var == 'z':
+            setn = self.settings.zAxis
+        return self.parent.getAxes((setn,))[0]
+
     def lookupAxis(self, axisname):
         """Find widget associated with axisname."""
         w = self.parent

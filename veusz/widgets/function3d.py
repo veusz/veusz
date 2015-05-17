@@ -58,20 +58,6 @@ def constructPolyline(outobj, lineprop, lx, ly, lz):
             line.addPoint(threed.Vec4(*p))
         outobj.append(line)
 
-def constructSurface(outobj, surfprop, lx, ly, lz):
-    """Split up gridded surface into triangles."""
-    w, h = lx.shape
-    for i in crange(w-1):
-        for j in crange(h-1):
-            p0 = (lx[i,j], ly[i,j], lz[i,j], 1)
-            p1 = (lx[i+1,j], ly[i+1,j], lz[i+1,j], 1)
-            p2 = (lx[i,j+1], ly[i,j+1], lz[i,j+1], 1)
-            p3 = (lx[i+1,j+1], ly[i+1,j+1], lz[i+1,j+1], 1)
-            outobj.append(threed.Triangle(threed.Vec4(*p0), threed.Vec4(*p1),
-                                          threed.Vec4(*p2), surfprop))
-            outobj.append(threed.Triangle(threed.Vec4(*p3), threed.Vec4(*p1),
-                                          threed.Vec4(*p2), surfprop))
-
 class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""
 
@@ -188,49 +174,49 @@ class Function3D(plotters3d.GenericPlotter3D):
     def getGridVals(self):
         """Get values for 2D grid.
 
-        Return xgrid, ygrid, zgrid, depvariable
+        Return steps1, steps2, height, axidx, depvariable
+        axidx are the indices into the axes for height, step1, step2
         """
 
         s = self.settings
         mode = s.mode
 
-        var, ovar1, ovar2, ax1, ax2 = {
-            'z=fn(x,y)': ('z', 'x', 'y', 0, 1),
-            'x=fn(y,z)': ('x', 'y', 'z', 1, 2),
-            'y=fn(x,z)': ('y', 'x', 'z', 0, 2),
+        var, ovar1, ovar2, axidx = {
+            'x=fn(y,z)': ('x', 'y', 'z', (0, 1, 2)),
+            'y=fn(x,z)': ('y', 'z', 'x', (1, 2, 0)),
+            'z=fn(x,y)': ('z', 'x', 'y', (2, 0, 1)),
         }[mode]
         axes = self.fetchAxes()
 
         # range of other axes
-        pr1 = axes[ax1].getPlottedRange()
-        pr2 = axes[ax2].getPlottedRange()
+        pr1 = axes[axidx[1]].getPlottedRange()
+        pr2 = axes[axidx[2]].getPlottedRange()
         steps = s.surfacesteps
 
         # set variables in environment
         grid1, grid2 = N.indices((steps, steps))
-        grid1 = grid1 * ((pr1[1]-pr1[0])/(steps-1.)) + pr1[0]
-        grid2 = grid2 * ((pr2[1]-pr2[0])/(steps-1.)) + pr2[0]
+        del1 = (pr1[1]-pr1[0])/(steps-1.)
+        steps1 = N.arange(steps)*del1 + pr1[0]
+        grid1 = grid1*del1 + pr1[0]
+        del2 = (pr2[1]-pr2[0])/(steps-1.)
+        steps2 = N.arange(steps)*del2 + pr2[0]
+        grid2 = grid2*del2 + pr2[0]
         env = self.document.eval_context.copy()
         env[ovar1] = grid1
         env[ovar2] = grid2
 
-        comp = self.document.compileCheckedExpression(
-            getattr(s, 'fn%s' % var))
+        fn = getattr(s, 'fn%s' % var)  # get function from user
+        comp = self.document.compileCheckedExpression(fn)
         if comp is None:
             return None
 
         try:
-            height = eval(comp, env) + N.zeros((steps, steps), dtype=N.float64)
+            height = eval(comp, env) + N.zeros(grid1.shape, dtype=N.float64)
         except:
             # something wrong in the evaluation
             return None
 
-        if var == 'x':
-            return height, grid1, grid2, var
-        elif var == 'y':
-            return grid1, height, grid2, var
-        else:
-            return grid1, grid2, height, var
+        return height, steps1, steps2, axidx, var
 
     def getRange(self, axis, depname, axrange):
         mode = self.settings.mode
@@ -250,13 +236,48 @@ class Function3D(plotters3d.GenericPlotter3D):
             retn = self.getGridVals()
             if not retn:
                 return
-            xgrid, ygrid, zgrid, var = retn
+            height, steps1, steps2, axidx, var = retn
+            if axis is self.fetchAxis(var):
+                finite = height[N.isfinite(height)]
+                if len(finite) > 0:
+                    axrange[0] = min(axrange[0], finite.min())
+                    axrange[1] = max(axrange[1], finite.max())
 
-            v = {'x': xgrid, 'y': ygrid, 'z': zgrid}[var].ravel()
-            finite = v[N.isfinite(v)]
-            if len(finite) > 0:
-                axrange[0] = min(axrange[0], finite.min())
-                axrange[1] = max(axrange[1], finite.max())
+    def dataDrawSurface(self, axes, outobj):
+        """Draw a surface plot."""
+        retn = self.getGridVals()
+        if not retn:
+            return
+        height, steps1, steps2, axidx, depvar = retn
+        lheight = axes[axidx[0]].dataToLogicalCoords(height)
+        lsteps1 = axes[axidx[1]].dataToLogicalCoords(steps1)
+        lsteps2 = axes[axidx[2]].dataToLogicalCoords(steps2)
+
+        # draw grid over each axis
+        surfprop = lineprop = None
+        s = self.settings
+        if not s.Surface.hide:
+            surfprop = s.Surface.makeSurfaceProp()
+        if not s.Line.hide:
+            lineprop = s.Line.makeLineProp()
+
+        vals1 = threed.ValVector()
+        for v in lsteps1:
+            vals1.push_back(v)
+        vals2 = threed.ValVector()
+        for v in lsteps2:
+            vals2.push_back(v)
+        grid = threed.ValVector()
+        for v in lheight.flat:
+            grid.push_back(v)
+
+        dirn = {'x': threed.Mesh.X_DIRN,
+                'y': threed.Mesh.Y_DIRN,
+                'z': threed.Mesh.Z_DIRN}[depvar]
+
+        mesh = threed.Mesh(
+            vals1, vals2, grid, dirn, lineprop, surfprop)
+        outobj.append(mesh)
 
     def dataDrawToObject(self, axes):
 
@@ -266,8 +287,6 @@ class Function3D(plotters3d.GenericPlotter3D):
         axes = self.fetchAxes()
         if axes is None:
             return
-
-        lineprop = s.Line.makeLineProp()
 
         outobj = []
         if mode == 'x,y,z=fns(t)':
@@ -279,44 +298,12 @@ class Function3D(plotters3d.GenericPlotter3D):
             ly = axes[1].dataToLogicalCoords(valsy)
             lz = axes[2].dataToLogicalCoords(valsz)
 
+            lineprop = s.Line.makeLineProp()
             if not s.Line.hide:
                 constructPolyline(outobj, lineprop, lx, ly, lz)
 
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
-            retn = self.getGridVals()
-            if not retn:
-                return
-            valsx, valsy, valsz, var = retn
-            lx = axes[0].dataToLogicalCoords(valsx)
-            ly = axes[1].dataToLogicalCoords(valsy)
-            lz = axes[2].dataToLogicalCoords(valsz)
-
-            # draw grid over each axis
-            surfprop = lineprop = None
-            if not s.Surface.hide:
-                surfprop = s.Surface.makeSurfaceProp()
-            if not s.Line.hide:
-                lineprop = s.Line.makeLineProp()
-
-            print(lx)
-            print(ly)
-            print(lz)
-
-            vals1 = threed.ValVector()
-            for v in lx[:,0]:
-                print(v)
-                vals1.push_back(v)
-            vals2 = threed.ValVector()
-            for v in lz[0,:]:
-                print(v)
-                vals2.push_back(v)
-            grid = threed.ValVector()
-            for v in ly.flat:
-                grid.push_back(v)
-
-            mesh = threed.Mesh(vals1, vals2, grid, threed.Mesh.X_DIRN,
-                               lineprop, surfprop)
-            outobj.append(mesh)
+            self.dataDrawSurface(axes, outobj)
 
         if len(outobj) == 0:
             return None

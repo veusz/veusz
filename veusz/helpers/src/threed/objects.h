@@ -94,7 +94,7 @@ private:
   unsigned hidx, didx1, didx2;
 
 public:
-  ValVector pos1, pos2, grid;
+  ValVector pos1, pos2, heights;
   PropSmartPtr<const LineProp> lineprop;
   PropSmartPtr<const SurfaceProp> surfaceprop;
 };

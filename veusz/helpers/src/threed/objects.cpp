@@ -62,7 +62,7 @@ Mesh::Mesh(const ValVector& _pos1, const ValVector& _pos2,
            const ValVector& _heights,
            Direction dirn,
            const LineProp* lprop, const SurfaceProp* sprop)
-  : pos1(_pos1), pos2(_pos2), grid(_heights),
+  : pos1(_pos1), pos2(_pos2), heights(_heights),
     lineprop(lprop), surfaceprop(sprop)
 {
   switch(dirn)
@@ -96,7 +96,7 @@ void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
   fl.lineprop = lineprop.ptr();
   fl.object = const_cast<Mesh*>(this);
 
-  const unsigned n1 = pos1.size();
+  const unsigned n2 = pos2.size();
   Vec4 pt(0,0,0,1);
 
   for(unsigned stepindex=0; stepindex<=1; ++stepindex)
@@ -111,9 +111,9 @@ void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
           pt(constdidx) = constvec[consti];
           for(unsigned stepi=0; stepi<stepvec.size(); ++stepi)
             {
-              double gridval = grid[stepindex==0 ? stepi+consti*n1 : consti+stepi*n1];
+              double heightsval = heights[stepindex==0 ? stepi*n2+consti : consti*n2+stepi];
               pt(stepdidx) = stepvec[stepi];
-              pt(hidx) = gridval;
+              pt(hidx) = heightsval;
               Vec4 rpt = outerM*pt;
 
               // shuffle new to old positions and calculate new new
@@ -153,16 +153,16 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
     for(unsigned i2=0; (i2+1)<n2; ++i2)
       {
         // grid point coordinates
-        p0(hidx) = grid[i1*n2+i2];
+        p0(hidx) = heights[i1*n2+i2];
         p0(didx1) = pos1[i1];
         p0(didx2) = pos2[i2];
-        p1(hidx) = grid[(i1+1)*n2+i2];
+        p1(hidx) = heights[(i1+1)*n2+i2];
         p1(didx1) = pos1[i1+1];
         p1(didx2) = pos2[i2];
-        p2(hidx) = grid[i1*n2+(i2+1)];
+        p2(hidx) = heights[i1*n2+(i2+1)];
         p2(didx1) = pos1[i1];
         p2(didx2) = pos2[i2+1];
-        p3(hidx) = grid[(i1+1)*n2+(i2+1)];
+        p3(hidx) = heights[(i1+1)*n2+(i2+1)];
         p3(didx1) = pos1[i1+1];
         p3(didx2) = pos2[i2+1];
 
