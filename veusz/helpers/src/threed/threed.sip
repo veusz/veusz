@@ -303,6 +303,20 @@ class Mesh : public Object /NoDefaultCtors/
        const SurfaceProp* sprop /Transfer/);
 };
 
+class Points : public Object /NoDefaultCtors/
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+ public:
+  Points(const ValVector& px, const ValVector& py, const ValVector& pz,
+         QPainterPath pp,
+         const LineProp* pointedge /Transfer/,
+         const SurfaceProp* pointfill /Transfer/);
+
+  void setSizes(const ValVector& _sizes);
+};
+
 class ObjectContainer : public Object
 {
 %TypeHeaderCode

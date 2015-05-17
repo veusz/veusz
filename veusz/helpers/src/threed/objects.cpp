@@ -1,3 +1,21 @@
+//    Copyright (C) 2015 Jeremy S. Sanders
+//    Email: Jeremy Sanders <jeremy@jeremysanders.net>
+//
+//    This program is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License along
+//    with this program; if not, write to the Free Software Foundation, Inc.,
+//    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+/////////////////////////////////////////////////////////////////////////////
+
 #include <algorithm>
 #include "objects.h"
 
@@ -6,12 +24,15 @@ Object::~Object()
 }
 
 void Object::getFragments(const Mat4& outerM, const Camera& cam,
-			  FragmentVector& v) const
+			  FragmentVector& v)
 {
 }
 
+// Triangle
+///////////
+
 void Triangle::getFragments(const Mat4& outerM, const Camera& cam,
-			    FragmentVector& v) const
+			    FragmentVector& v)
 {
   Fragment f;
   f.type = Fragment::FR_TRIANGLE;
@@ -26,26 +47,30 @@ void Triangle::getFragments(const Mat4& outerM, const Camera& cam,
   Vec4 p2 = outerM*points[2];
   f.points[2] = vec4to3(p2);
   f.proj[2] = calcProjVec(cam.perspM, p2);
-  f.object = const_cast<Triangle*>(this);
+  f.object = this;
 
   v.push_back(f);
 }
 
+// PolyLine
+///////////
+
 void PolyLine::addPoints(const ValVector& x, const ValVector& y, const ValVector& z)
 {
   unsigned size = std::min(x.size(), std::min(y.size(), z.size()));
+  points.reserve(points.size()+size);
   for(unsigned i=0; i<size; ++i)
     points.push_back(Vec4(x[i], y[i], z[i], 1));
 }
 
 void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
-			    FragmentVector& v) const
+			    FragmentVector& v)
 {
   Fragment f;
   f.type = Fragment::FR_LINESEG;
   f.surfaceprop = 0;
   f.lineprop = lineprop.ptr();
-  f.object = const_cast<PolyLine*>(this);
+  f.object = this;
 
   // iterators use many more instructions here...
   for(unsigned i=0; i<points.size(); ++i)
@@ -65,6 +90,9 @@ void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
     }
 }
 
+// Mesh
+///////
+
 // get indices into vector for coordinates in height, pos1 and pos2 directions
 void Mesh::getVecIdxs(unsigned &vidx_h, unsigned &vidx_1, unsigned &vidx_2) const
 {
@@ -81,14 +109,14 @@ void Mesh::getVecIdxs(unsigned &vidx_h, unsigned &vidx_1, unsigned &vidx_2) cons
 }
 
 void Mesh::getFragments(const Mat4& outerM, const Camera& cam,
-                        FragmentVector& v) const
+                        FragmentVector& v)
 {
   getLineFragments(outerM, cam, v);
   getSurfaceFragments(outerM, cam, v);
 }
 
 void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
-                            FragmentVector& v) const
+                            FragmentVector& v)
 {
   if(lineprop.ptr() == 0)
     return;
@@ -100,7 +128,7 @@ void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
   fl.type = Fragment::FR_LINESEG;
   fl.surfaceprop = 0;
   fl.lineprop = lineprop.ptr();
-  fl.object = const_cast<Mesh*>(this);
+  fl.object = this;
 
   const unsigned n2 = pos2.size();
   Vec4 pt(0,0,0,1);
@@ -139,7 +167,7 @@ void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
 }
 
 void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
-                               FragmentVector& v) const
+                               FragmentVector& v)
 {
   if(surfaceprop.ptr() == 0)
     return;
@@ -151,7 +179,7 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
   fs.type = Fragment::FR_TRIANGLE;
   fs.surfaceprop = surfaceprop.ptr();
   fs.lineprop = 0;
-  fs.object = const_cast<Mesh*>(this);
+  fs.object = this;
 
   const unsigned n1 = pos1.size();
   const unsigned n2 = pos2.size();
@@ -201,14 +229,55 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
       }
 }
 
+// Points
+/////////
+
+void Points::getFragments(const Mat4& outerM, const Camera& cam,
+                          FragmentVector& v)
+{
+  fragparams.path = &path;
+  fragparams.scaleedges = scaleedges;
+
+  Fragment fp;
+  fp.type = Fragment::FR_PATH;
+  fp.object = &fragparams;
+  fp.surfaceprop = surfacefill.ptr();
+  fp.lineprop = lineedge.ptr();
+  fp.pathsize = 1;
+
+  unsigned size = std::min(x.size(), std::min(y.size(), z.size()));
+  bool hassizes = !sizes.empty();
+  if(hassizes)
+    size = std::min(size, unsigned(sizes.size()));
+
+  for(unsigned i=0; i<size; ++i)
+    {
+      Vec4 pt = outerM*Vec4(x[i], y[i], z[i], 1);
+      fp.points[0] = vec4to3(pt);
+      fp.proj[0] = calcProjVec(cam.perspM, pt);
+      if(hassizes)
+        fp.pathsize = sizes[i];
+
+      if(fp.points[0].isfinite())
+        {
+          v.push_back(fp);
+          fp.bumpIndex();
+        }
+    }
+}
+
+// ObjectContainer
+//////////////////
+
 ObjectContainer::~ObjectContainer()
 {
   for(unsigned i=0, s=objects.size(); i<s; ++i)
     delete objects[i];
 }
 
+
 void ObjectContainer::getFragments(const Mat4& outerM, const Camera& cam,
-				   FragmentVector& v) const
+				   FragmentVector& v)
 {
   Mat4 totM(outerM*objM);
   for(unsigned i=0, s=objects.size(); i<s; ++i)

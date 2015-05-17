@@ -1,8 +1,27 @@
 // -*-c++-*-
 
+//    Copyright (C) 2015 Jeremy S. Sanders
+//    Email: Jeremy Sanders <jeremy@jeremysanders.net>
+//
+//    This program is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License along
+//    with this program; if not, write to the Free Software Foundation, Inc.,
+//    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+/////////////////////////////////////////////////////////////////////////////
+
 #ifndef FRAGMENT_H
 #define FRAGMENT_H
 
+#include <QtGui/QPainterPath>
 #include <limits>
 #include <vector>
 #include "properties.h"
@@ -18,7 +37,10 @@ struct Fragment
   // type of fragment
   FragmentType type;
 
-  // point to object or QPainterPath
+  // pointer to object, to avoid self-comparison.
+
+  // For FR_PATH this should be a parameters object which constains
+  // the painter path, etc
   void* object;
 
   // drawing style
@@ -30,6 +52,9 @@ struct Fragment
 
   // projected points associated with fragment
   Vec3 proj[3];
+
+  // for path
+  float pathsize;
 
   // number of times this has been split
   unsigned splitcount;
@@ -45,17 +70,15 @@ struct Fragment
     object(0),
     surfaceprop(0),
     lineprop(0),
-    //meandepth(-1), maxdepth(-1), meandepth(-1),
-    splitcount(0)
+    pathsize(0),
+    splitcount(0),
+    index(_count++)
   {
-    index=_count;
-    ++_count;
   }
 
   void bumpIndex()
   {
-    index=_count;
-    ++_count;
+    index=_count++;
   }
 
   // number of points used by fragment type
@@ -79,7 +102,7 @@ struct Fragment
       case FR_LINESEG:
 	return std::min(proj[0](2), proj[1](2)) - LINE_DELTA_DEPTH;
       case FR_PATH:
-	return proj[0](2);
+	return proj[0](2) - 2*LINE_DELTA_DEPTH;
       default:
 	return std::numeric_limits<double>::infinity();
       }
@@ -93,7 +116,7 @@ struct Fragment
       case FR_LINESEG:
 	return std::max(proj[0](2), proj[1](2)) - LINE_DELTA_DEPTH;
       case FR_PATH:
-	return proj[0](2);
+	return proj[0](2) - 2*LINE_DELTA_DEPTH;
       default:
 	return std::numeric_limits<double>::infinity();
       }
@@ -107,7 +130,7 @@ struct Fragment
       case FR_LINESEG:
 	return (proj[0](2) + proj[1](2))*0.5f - LINE_DELTA_DEPTH;
       case FR_PATH:
-	return proj[0](2);
+	return proj[0](2) - 2*LINE_DELTA_DEPTH;
       default:
 	return std::numeric_limits<double>::infinity();
       }
@@ -124,53 +147,13 @@ struct Fragment
 
 typedef std::vector<Fragment> FragmentVector;
 
-// #include <cassert>
-// class FragmentVector
-// {
-//  public:
-//   //typedef const Fragment* const_iterator;
-
-//   class const_iterator
-//   {
-//   public:
-//     const_iterator(const FragmentVector& _v, unsigned _i)
-//       : v(_v), i(_i);
-
-//     const Fragment& operator->() const
-//     {
-//       assert(i<v.size());
-//       return v[i];
-//     }
-
-//     const FragmentVector& v;
-//     unsigned i;
-//   };
-
-
-//   FragmentVector():num(0) {};
-//   void clear() { num=0;}
-
-//   void push_back(const Fragment& f) { vecs[num++]=f; }
-
-//   Fragment& operator[](unsigned i) {
-//     assert(i<num);
-//     return vecs[i];
-//   }
-//   const Fragment& operator[](unsigned i) const {
-//     assert(i<num);
-//     return vecs[i];
-//   }
-//   unsigned size() const { return num; }
-
-//   Fragment* begin() { return &vecs[0]; }
-//   Fragment* end() { return &vecs[num]; }
-//   const Fragment* begin() const { return &vecs[0]; }
-//   const Fragment* end() const { return &vecs[num]; }
-
-//   unsigned num;
-//   Fragment vecs[1000];
-// };
-
+// this is passed to the renderer to get the parameters for painting
+// the path
+struct FragmentPathParameters
+{
+  QPainterPath* path;
+  bool scaleedges;
+};
 
 // try to split fragments into pieces if they overlap
 // returns number of pieces for each part after fragmentation
