@@ -75,10 +75,14 @@ public:
   enum Direction {X_DIRN, Y_DIRN, Z_DIRN};
 
 public:
-  Mesh(const ValVector& pos1, const ValVector& pos2,
-       const ValVector& heights,
-       Direction dir,
-       const LineProp* lprop=0, const SurfaceProp* sprop=0);
+  Mesh(const ValVector& _pos1, const ValVector& _pos2,
+       const ValVector& _heights,
+       Direction _dirn,
+       const LineProp* lprop=0, const SurfaceProp* sprop=0)
+    : pos1(_pos1), pos2(_pos2), heights(_heights),
+      dirn(_dirn), lineprop(lprop), surfaceprop(sprop)
+  {
+  }
 
   void getFragments(const Mat4& outerM, const Camera& cam,
                     FragmentVector& v) const;
@@ -89,12 +93,11 @@ private:
   void getLineFragments(const Mat4& outerM, const Camera& cam,
                         FragmentVector& v) const;
 
-private:
-  // indices into vectors for each direction
-  unsigned hidx, didx1, didx2;
+  void getVecIdxs(unsigned &vidx_h, unsigned &vidx_1, unsigned &vidx_2) const;
 
 public:
   ValVector pos1, pos2, heights;
+  Direction dirn;
   PropSmartPtr<const LineProp> lineprop;
   PropSmartPtr<const SurfaceProp> surfaceprop;
 };

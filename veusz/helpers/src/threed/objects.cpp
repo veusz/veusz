@@ -58,22 +58,18 @@ void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
     }
 }
 
-Mesh::Mesh(const ValVector& _pos1, const ValVector& _pos2,
-           const ValVector& _heights,
-           Direction dirn,
-           const LineProp* lprop, const SurfaceProp* sprop)
-  : pos1(_pos1), pos2(_pos2), heights(_heights),
-    lineprop(lprop), surfaceprop(sprop)
+// get indices into vector for coordinates in height, pos1 and pos2 directions
+void Mesh::getVecIdxs(unsigned &vidx_h, unsigned &vidx_1, unsigned &vidx_2) const
 {
   switch(dirn)
     {
     default:
     case X_DIRN:
-      hidx=0; didx1=1; didx2=2; break;
+      vidx_h=0; vidx_1=1; vidx_2=2; break;
     case Y_DIRN:
-      hidx=1; didx1=2; didx2=0; break;
+      vidx_h=1; vidx_1=2; vidx_2=0; break;
     case Z_DIRN:
-      hidx=2; didx1=0; didx2=1; break;
+      vidx_h=2; vidx_1=0; vidx_2=1; break;
     }
 }
 
@@ -90,6 +86,9 @@ void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
   if(lineprop.ptr() == 0)
     return;
 
+  unsigned vidx_h, vidx_1, vidx_2;
+  getVecIdxs(vidx_h, vidx_1, vidx_2);
+
   Fragment fl;
   fl.type = Fragment::FR_LINESEG;
   fl.surfaceprop = 0;
@@ -101,19 +100,19 @@ void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
 
   for(unsigned stepindex=0; stepindex<=1; ++stepindex)
     {
-      const ValVector& stepvec = stepindex==0 ? pos1 : pos2;
-      const ValVector& constvec = stepindex==0 ? pos2 : pos1;
-      const unsigned stepdidx = stepindex==0 ? didx1 : didx2;
-      const unsigned constdidx = stepindex==0 ? didx2 : didx1;
+      const ValVector& vec_step = stepindex==0 ? pos1 : pos2;
+      const ValVector& vec_const = stepindex==0 ? pos2 : pos1;
+      const unsigned vidx_step = stepindex==0 ? vidx_1 : vidx_2;
+      const unsigned vidx_const = stepindex==0 ? vidx_2 : vidx_1;
 
-      for(unsigned consti=0; consti<constvec.size(); ++consti)
+      for(unsigned consti=0; consti<vec_const.size(); ++consti)
         {
-          pt(constdidx) = constvec[consti];
-          for(unsigned stepi=0; stepi<stepvec.size(); ++stepi)
+          pt(vidx_const) = vec_const[consti];
+          for(unsigned stepi=0; stepi<vec_step.size(); ++stepi)
             {
               double heightsval = heights[stepindex==0 ? stepi*n2+consti : consti*n2+stepi];
-              pt(stepdidx) = stepvec[stepi];
-              pt(hidx) = heightsval;
+              pt(vidx_step) = vec_step[stepi];
+              pt(vidx_h) = heightsval;
               Vec4 rpt = outerM*pt;
 
               // shuffle new to old positions and calculate new new
@@ -138,6 +137,9 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
   if(surfaceprop.ptr() == 0)
     return;
 
+  unsigned vidx_h, vidx_1, vidx_2;
+  getVecIdxs(vidx_h, vidx_1, vidx_2);
+
   Fragment fs;
   fs.type = Fragment::FR_TRIANGLE;
   fs.surfaceprop = surfaceprop.ptr();
@@ -153,18 +155,18 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
     for(unsigned i2=0; (i2+1)<n2; ++i2)
       {
         // grid point coordinates
-        p0(hidx) = heights[i1*n2+i2];
-        p0(didx1) = pos1[i1];
-        p0(didx2) = pos2[i2];
-        p1(hidx) = heights[(i1+1)*n2+i2];
-        p1(didx1) = pos1[i1+1];
-        p1(didx2) = pos2[i2];
-        p2(hidx) = heights[i1*n2+(i2+1)];
-        p2(didx1) = pos1[i1];
-        p2(didx2) = pos2[i2+1];
-        p3(hidx) = heights[(i1+1)*n2+(i2+1)];
-        p3(didx1) = pos1[i1+1];
-        p3(didx2) = pos2[i2+1];
+        p0(vidx_h) = heights[i1*n2+i2];
+        p0(vidx_1) = pos1[i1];
+        p0(vidx_2) = pos2[i2];
+        p1(vidx_h) = heights[(i1+1)*n2+i2];
+        p1(vidx_1) = pos1[i1+1];
+        p1(vidx_2) = pos2[i2];
+        p2(vidx_h) = heights[i1*n2+(i2+1)];
+        p2(vidx_1) = pos1[i1];
+        p2(vidx_2) = pos2[i2+1];
+        p3(vidx_h) = heights[(i1+1)*n2+(i2+1)];
+        p3(vidx_1) = pos1[i1+1];
+        p3(vidx_2) = pos2[i2+1];
 
         if(! ((p0+p1+p2+p3).isfinite()) )
           continue;
