@@ -56,6 +56,8 @@ class PolyLine : public Object
     points.push_back(v);
   }
 
+  void addPoints(const ValVector& x, const ValVector& y, const ValVector& z);
+
   void getFragments(const Mat4& outerM, const Camera& cam,
 		    FragmentVector& v) const;
 

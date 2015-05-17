@@ -38,9 +38,9 @@ struct Vec4
 %End
 
   Vec4();
-  Vec4(float, float, float, float);
+  Vec4(double, double, double, double);
 
-  void set(unsigned, float);
+  void set(unsigned, double);
 %MethodCode
     if(a0 < 0 || a0 > 3)
       {
@@ -50,7 +50,7 @@ struct Vec4
     else
       sipCpp->operator()(a0) = a1;
 %End
-  float get(unsigned) const;
+  double get(unsigned) const;
 %MethodCode
     if(a0 < 0 || a0 > 3)
       {
@@ -61,14 +61,14 @@ struct Vec4
       sipRes = sipCpp->operator()(a0);
 %End
 
-  void operator*=(float);
+  void operator*=(double);
   Vec4 operator+(const Vec4&) const;
   Vec4 operator-(const Vec4&) const;
-  Vec4 operator*(float) const;
+  Vec4 operator*(double) const;
   bool operator==(const Vec4&) const;
   bool operator!=(const Vec4&) const;
-  float rad2() const;
-  float rad() const;
+  double rad2() const;
+  double rad() const;
   void normalise();
 };
 
@@ -79,9 +79,9 @@ struct Vec3
 %End
 
   Vec3();
-  Vec3(float, float, float);
+  Vec3(double, double, double);
 
-  void set(unsigned, float);
+  void set(unsigned, double);
 %MethodCode
     if(a0 < 0 || a0 > 2)
       {
@@ -91,7 +91,7 @@ struct Vec3
     else
       sipCpp->operator()(a0) = a1;
 %End
-  float get(unsigned) const;
+  double get(unsigned) const;
 %MethodCode
     if(a0 < 0 || a0 > 2)
       {
@@ -102,14 +102,14 @@ struct Vec3
       sipRes = sipCpp->operator()(a0);
 %End
 
-  void operator*=(float);
+  void operator*=(double);
   Vec3 operator+(const Vec3&) const;
   Vec3 operator-(const Vec3&) const;
-  Vec3 operator*(float) const;
+  Vec3 operator*(double) const;
   bool operator==(const Vec3&) const;
   bool operator!=(const Vec3&) const;
-  float rad2() const;
-  float rad() const;
+  double rad2() const;
+  double rad() const;
   void normalise();
 };
 
@@ -120,7 +120,7 @@ struct Mat4
 %End
 
   Mat4();
-  void set(unsigned, unsigned, float);
+  void set(unsigned, unsigned, double);
 %MethodCode
     if(a0 < 0 || a0 > 3 || a1 < 0 || a1 > 3)
       {
@@ -130,7 +130,7 @@ struct Mat4
     else
       sipCpp->operator()(a0, a1) = a2;
 %End
-  float get(unsigned, unsigned) const;
+  double get(unsigned, unsigned) const;
 %MethodCode
     if(a0 < 0 || a0 > 3 || a1 < 0 || a1 > 3)
       {
@@ -147,7 +147,7 @@ struct Mat4
 };
 Vec4 operator*(const Vec4& v, const Mat4& o);
 Mat4 identityM4();
-Mat4 rotateM4(float angle, Vec3 vec);
+Mat4 rotateM4(double angle, Vec3 vec);
 Mat4 translationM4(Vec3 vec);
 
 struct Mat3
@@ -157,7 +157,7 @@ struct Mat3
 %End
 
   Mat3();
-  void set(unsigned, unsigned, float);
+  void set(unsigned, unsigned, double);
 %MethodCode
     if(a0 < 0 || a0 > 2 || a1 < 0 || a1 > 2)
       {
@@ -167,7 +167,7 @@ struct Mat3
     else
       sipCpp->operator()(a0, a1) = a2;
 %End
-  float get(unsigned, unsigned) const;
+  double get(unsigned, unsigned) const;
 %MethodCode
     if(a0 < 0 || a0 > 2 || a1 < 0 || a1 > 2)
       {
@@ -229,15 +229,15 @@ struct SurfaceProp /NoDefaultCtors/
 #include <properties.h>
 %End
 
-  SurfaceProp(float r=0.5, float g=0.5, float b=0.5,
-	      float specular=0.5, float diffuse=0.5, float trans=0,
+  SurfaceProp(double r=0.5, double g=0.5, double b=0.5,
+	      double specular=0.5, double diffuse=0.5, double trans=0,
 	      bool hide=0) /KeywordArgs="All"/;
-  float r;
-  float g;
-  float b;
-  float specular;
-  float diffuse;
-  float trans;
+  double r;
+  double g;
+  double b;
+  double specular;
+  double diffuse;
+  double trans;
   bool hide;
 };
 
@@ -247,16 +247,16 @@ struct LineProp /NoDefaultCtors/
 #include <properties.h>
 %End
 
-  LineProp(float r=0, float g=0, float b=0,
-	   float specular=0.5, float diffuse=0.5, float trans=0,
-	   float width=1, bool hide=0) /KeywordArgs="All"/;
-  float r;
-  float g;
-  float b;
-  float specular;
-  float diffuse;
-  float trans;
-  float width;
+  LineProp(double r=0, double g=0, double b=0,
+	   double specular=0.5, double diffuse=0.5, double trans=0,
+	   double width=1, bool hide=0) /KeywordArgs="All"/;
+  double r;
+  double g;
+  double b;
+  double specular;
+  double diffuse;
+  double trans;
+  double width;
   bool hide;
 };
 
@@ -285,6 +285,7 @@ class PolyLine : public Object /NoDefaultCtors/
  public:
   PolyLine(const LineProp* prop /Transfer/);
   void addPoint(const Vec4& v);
+  void addPoints(const ValVector& x, const ValVector& y, const ValVector& z);
 };
 
 class Mesh : public Object /NoDefaultCtors/
@@ -326,8 +327,8 @@ class Camera
  public:
   Camera();
   void setPointing(const Vec3 &eye, const Vec3 &target, const Vec3 &up);
-  void setPerspective(float fovy_degrees=45, float aspect=1,
-		      float znear=0.1, float zfar=100.);
+  void setPerspective(double fovy_degrees=45, double aspect=1,
+		      double znear=0.1, double zfar=100.);
 
  public:
   Mat4 viewM;   // view matrix
@@ -348,7 +349,7 @@ class Scene
  public:
   Scene();
   void render(QPainter* painter, const Camera& cam,
-	      float x1, float y1, float x2, float y2);
+	      double x1, double y1, double x2, double y2);
 
  public:
   ObjectContainer root;

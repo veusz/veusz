@@ -34,30 +34,6 @@ def _(text, disambiguation=None, context='Function3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-def constructPolyline(outobj, lineprop, lx, ly, lz):
-    """Construct polyline object from coordinates.
-
-    Split up line into finite sections
-    """
-
-    stack = N.column_stack(( lx, ly, lz, N.ones(len(lx)) ))
-    notfinite = N.logical_not(N.isfinite(lx+ly+lz))
-    badidxs = list(N.where(notfinite)[0])
-    if badidxs:
-        last = 0
-        for i in badidxs + [len(lx)]:
-            if i-last > 2:
-                line = threed.PolyLine(lineprop)
-                for p in stack[last:i]:
-                    line.addPoint(threed.Vec4(p))
-                outobj.append(line)
-            last = i
-    else:
-        line = threed.PolyLine(lineprop)
-        for p in stack:
-            line.addPoint(threed.Vec4(*p))
-        outobj.append(line)
-
 class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""
 
@@ -285,14 +261,18 @@ class Function3D(plotters3d.GenericPlotter3D):
             retn = self.getLineVals()
             if not retn:
                 return
+            if s.Line.hide:
+                return
             valsx, valsy, valsz = retn
             lx = axes[0].dataToLogicalCoords(valsx)
             ly = axes[1].dataToLogicalCoords(valsy)
             lz = axes[2].dataToLogicalCoords(valsz)
-
             lineprop = s.Line.makeLineProp()
-            if not s.Line.hide:
-                constructPolyline(outobj, lineprop, lx, ly, lz)
+            line = threed.PolyLine(lineprop)
+            line.addPoints(
+                threed.ValVector(lx), threed.ValVector(ly),
+                threed.ValVector(lz))
+            outobj.append(line)
 
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
             self.dataDrawSurface(axes, outobj)

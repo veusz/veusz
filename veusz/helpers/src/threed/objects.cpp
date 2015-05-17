@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "objects.h"
 
 Object::~Object()
@@ -30,12 +31,16 @@ void Triangle::getFragments(const Mat4& outerM, const Camera& cam,
   v.push_back(f);
 }
 
+void PolyLine::addPoints(const ValVector& x, const ValVector& y, const ValVector& z)
+{
+  unsigned size = std::min(x.size(), std::min(y.size(), z.size()));
+  for(unsigned i=0; i<size; ++i)
+    points.push_back(Vec4(x[i], y[i], z[i], 1));
+}
+
 void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
 			    FragmentVector& v) const
 {
-  if(points.size()<2)
-    return;
-
   Fragment f;
   f.type = Fragment::FR_LINESEG;
   f.surfaceprop = 0;
@@ -43,18 +48,20 @@ void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
   f.object = const_cast<PolyLine*>(this);
 
   // iterators use many more instructions here...
-  Vec4 lp3d = outerM*points[0];
-  Vec3 lpproj = calcProjVec(cam.perspM, lp3d);
-  lpproj(2) -= 1e-4;
-  for(unsigned i=1, s=points.size(); i<s; ++i)
+  for(unsigned i=0; i<points.size(); ++i)
     {
-      f.points[0] = vec4to3(lp3d);
-      f.proj[0] = lpproj;
-      lp3d = outerM*points[i];
-      f.points[1] = vec4to3(lp3d);
-      lpproj = calcProjVec(cam.perspM, lp3d);
-      f.proj[1] = lpproj;
-      v.push_back(f);
+      f.points[1] = f.points[0];
+      f.proj[1] = f.proj[0];
+
+      Vec4 pt = outerM*points[i];
+      f.points[0] = vec4to3(pt);
+      f.proj[0] = calcProjVec(cam.perspM, pt);
+
+      if(i > 0 && (f.points[0]+f.points[1]).isfinite())
+        {
+          v.push_back(f);
+          f.bumpIndex();
+        }
     }
 }
 
