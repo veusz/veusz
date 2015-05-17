@@ -1,3 +1,5 @@
+// -*- mode: C++; -*-
+
 //    Copyright (C) 2014 Jeremy S. Sanders
 //    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 //
@@ -20,6 +22,14 @@
 
 %Import(name=QtCore/QtCoremod.sip)
 %Import(name=QtGui/QtGuimod.sip)
+
+%ModuleHeaderCode
+#include <numpy_helpers.h>
+%End
+
+%PostInitialisationCode
+doNumpyInitPackage();
+%End
 
 struct Vec4
 {
@@ -183,6 +193,18 @@ class ValVector
 %End
 public:
   ValVector();
+  ValVector(SIP_PYOBJECT obj);
+%MethodCode
+  try
+    {
+      sipCpp = new ValVector(numpyToValVector(a0));
+    }
+   catch(const char *msg)
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
+%End
+
   void push_back(double d);
   double operator[](unsigned i) const;
 %MethodCode

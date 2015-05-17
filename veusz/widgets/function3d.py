@@ -261,22 +261,14 @@ class Function3D(plotters3d.GenericPlotter3D):
         if not s.Line.hide:
             lineprop = s.Line.makeLineProp()
 
-        vals1 = threed.ValVector()
-        for v in lsteps1:
-            vals1.push_back(v)
-        vals2 = threed.ValVector()
-        for v in lsteps2:
-            vals2.push_back(v)
-        grid = threed.ValVector()
-        for v in lheight.flat:
-            grid.push_back(v)
-
         dirn = {'x': threed.Mesh.X_DIRN,
                 'y': threed.Mesh.Y_DIRN,
                 'z': threed.Mesh.Z_DIRN}[depvar]
 
         mesh = threed.Mesh(
-            vals1, vals2, grid, dirn, lineprop, surfprop)
+            threed.ValVector(lsteps1), threed.ValVector(lsteps2),
+            threed.ValVector(N.ravel(lheight)),
+            dirn, lineprop, surfprop)
         outobj.append(mesh)
 
     def dataDrawToObject(self, axes):
