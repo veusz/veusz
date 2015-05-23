@@ -226,8 +226,12 @@ class Export(object):
         except TypeError:
             return self.pagenumber
 
-    def exportBitmap(self, format):
+    def exportBitmap(self, ext):
         """Export to a bitmap format."""
+
+        format = ext[1:] # setFormat() doesn't want the leading '.'
+        if format == 'jpeg':
+            format = 'jpg'
 
         page = self.getSinglePage()
 
@@ -237,7 +241,7 @@ class Export(object):
 
         # create real output image
         backqcolor = utils.extendedColorToQColor(self.backcolor)
-        if format == '.png':
+        if format == 'png':
             # transparent output
             image = qt4.QImage(size[0], size[1],
                                qt4.QImage.Format_ARGB32_Premultiplied)
@@ -262,8 +266,7 @@ class Export(object):
 
         # write image to disk
         writer = qt4.QImageWriter()
-        # format below takes extension without dot
-        writer.setFormat(qt4.QByteArray(format[1:]))
+        writer.setFormat(qt4.QByteArray(format))
         writer.setFileName(self.filename)
 
         if format == 'png':
