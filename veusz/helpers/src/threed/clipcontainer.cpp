@@ -16,7 +16,6 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
 #include "clipcontainer.h"
 
 #define EPS 1e-8
@@ -24,10 +23,103 @@
 namespace
 {
 
+  // clip line by plane
+  void clipLine(Fragment& f, const Vec3& onplane, const Vec3& normal)
+  {
+    double dot0 = dot(f.points[0]-onplane, normal);
+    bool bad0 = dot0 < -EPS;
+    double dot1 = dot(f.points[1]-onplane, normal);
+    bool bad1 = dot1 < -EPS;
+
+    if(!bad0 && !bad1)
+      // both points on good side of plane
+      ;
+    else if(bad0 && bad1)
+      // both line points on bad side of plane
+      f.type = Fragment::FR_NONE;
+    else
+      {
+        // clip line to plane (bad1 or bad2, not both)
+        Vec3 linevec = f.points[1]-f.points[0];
+        double d = -dot0 / dot(linevec, normal);
+        f.points[bad0 ? 0 : 1] = f.points[0] + linevec*d;
+      }
+  }
+
+  // clip triangle by plane
+  void clipTriangle(FragmentVector& v, Fragment& f,
+                    const Vec3& onplane, const Vec3& normal)
+  {
+    double dotv[3];
+    int bad[3];
+    for(unsigned i=0; i<3; ++i)
+      {
+        dotv[i] = dot(f.points[i]-onplane, normal);
+        bad[i] = dotv[i] < -EPS;
+      }
+    int badsum = bad[0]+bad[1]+bad[2];
+
+    switch(badsum)
+      {
+      case 0:
+        // all points ok
+        break;
+      case 1:
+        // two points are good, one is bad
+        {
+          int badidx = bad[0] ? 0 : (bad[1] ? 1 : 2);
+
+          // calculate where vectors from good to bad points
+          // intercept plane
+          Vec3 good1 = f.points[(badidx+1)%3];
+          Vec3 linevec1 = good1 - f.points[badidx];
+          double d1 = -dotv[badidx] / dot(linevec1, normal);
+          Vec3 icept1 = f.points[badidx] + linevec1*d1;
+
+          Vec3 good2 = f.points[(badidx+2)%3];
+          Vec3 linevec2 = good2 - f.points[badidx];
+          double d2 = -dotv[badidx] / dot(linevec2, normal);
+          Vec3 icept2 = f.points[badidx] + linevec2*d2;
+
+          // break into two triangles from good points to intercepts
+          f.points[0] = good1;
+          f.points[1] = icept1;
+          f.points[2] = icept2;
+          v.push_back(f);
+          f.points[0] = good2;
+          f.points[1] = icept2;
+          f.points[2] = good1;
+        }
+        break;
+      case 2:
+        // one point is ok, the other two are bad
+        {
+          int goodidx = (bad[0] && bad[1]) ? 2 :
+            ((bad[0] && bad[2]) ? 1 : 0);
+
+          // work out where vectors from ok point intercept with plane
+          Vec3 linevec1 = f.points[(goodidx+1)%3] - f.points[goodidx];
+          double d1 = -dotv[goodidx] / dot(linevec1, normal);
+          f.points[(goodidx+1)%3] = f.points[goodidx] + linevec1*d1;
+
+          Vec3 linevec2 = f.points[(goodidx+2)%3] - f.points[goodidx];
+          double d2 = -dotv[goodidx] / dot(linevec2, normal);
+          f.points[(goodidx+2)%3] = f.points[goodidx] + linevec2*d2;
+        }
+        break;
+      case 3:
+        // all points are bad
+        f.type = Fragment::FR_NONE;
+        break;
+      }
+  }
+
+  // clip all fragments to the plane given
   void clipFragments(FragmentVector& v, unsigned start,
                      const Vec3& onplane, const Vec3& normal)
   {
-    for(unsigned i=start; i<v.size(); ++i)
+    unsigned nfrags = v.size();
+    for(unsigned i=start; i<nfrags; ++i)
       {
         Fragment& f = v[i];
         switch(f.type)
@@ -39,87 +131,11 @@ namespace
             break;
 
           case Fragment::FR_LINESEG:
-            {
-              double dot0 = dot(f.points[0]-onplane, normal);
-              bool bad0 = dot0 < -EPS;
-              double dot1 = dot(f.points[1]-onplane, normal);
-              bool bad1 = dot1 < -EPS;
-
-              if(!bad0 && !bad1)
-                // both points on good side of plane
-                ;
-              else if(bad0 && bad1)
-                // both line points on bad side of plane
-                f.type = Fragment::FR_NONE;
-              else
-                {
-                  // clip line to plane (bad1 or bad2, not both)
-                  Vec3 linevec = f.points[1]-f.points[0];
-                  double d = -dot0 / dot(linevec, normal);
-                  f.points[bad0 ? 0 : 1] = f.points[0] + linevec*d;
-                }
-            }
+            clipLine(f, onplane, normal);
             break;
 
           case Fragment::FR_TRIANGLE:
-            {
-              double dotv[3];
-              int bad[3];
-              for(unsigned i=0; i<3; ++i)
-                {
-                  dotv[i] = dot(f.points[i]-onplane, normal);
-                  bad[i] = dotv[i] < -EPS;
-                }
-              int badsum = bad[0]+bad[1]+bad[2];
-
-              if(badsum==0)
-                // all points are ok
-                ;
-              else if(badsum==3)
-                // all points are bad
-                f.type = Fragment::FR_NONE;
-              else if(badsum==2)
-                {
-                  // one point is ok, the other two are bad
-                  int goodidx = (bad[0] && bad[1]) ? 2 :
-                    ((bad[0] && bad[2]) ? 1 : 0);
-
-                  // work out where vectors from ok point intercept with plane
-                  Vec3 linevec1 = f.points[(goodidx+1)%3] - f.points[goodidx];
-                  double d1 = -dotv[goodidx] / dot(linevec1, normal);
-                  f.points[(goodidx+1)%3] = f.points[goodidx] + linevec1*d1;
-
-                  Vec3 linevec2 = f.points[(goodidx+2)%3] - f.points[goodidx];
-                  double d2 = -dotv[goodidx] / dot(linevec2, normal);
-                  f.points[(goodidx+2)%3] = f.points[goodidx] + linevec2*d2;
-                }
-              else
-                {
-                  // two points are good, one is bad
-                  int badidx = bad[0] ? 0 : (bad[1] ? 1 : 2);
-
-                  // calculate where vectors from good to bad points
-                  // intercept plane
-                  Vec3 good1 = f.points[(badidx+1)%3];
-                  Vec3 linevec1 = good1 - f.points[badidx];
-                  double d1 = -dotv[badidx] / dot(linevec1, normal);
-                  Vec3 icept1 = f.points[badidx] + linevec1*d1;
-
-                  Vec3 good2 = f.points[(badidx+2)%3];
-                  Vec3 linevec2 = good2 - f.points[badidx];
-                  double d2 = -dotv[badidx] / dot(linevec2, normal);
-                  Vec3 icept2 = f.points[badidx] + linevec2*d2;
-
-                  // break into two triangles from good points to intercepts
-                  f.points[0] = good1;
-                  f.points[1] = icept1;
-                  f.points[2] = icept2;
-                  v.push_back(f);
-                  f.points[0] = good2;
-                  f.points[1] = icept2;
-                  f.points[2] = good1;
-                }
-            }
+            clipTriangle(v, f, onplane, normal);
             break;
 
           default:
@@ -128,7 +144,7 @@ namespace
       }
   }
 
-}
+} // namespace
 
 
 void ClipContainer::getFragments(const Mat4& outerM, FragmentVector& v)
