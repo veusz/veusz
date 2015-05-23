@@ -269,6 +269,17 @@ class Export(object):
         writer.setFormat(qt4.QByteArray(format))
         writer.setFileName(self.filename)
 
+        # enable LZW compression for TIFFs
+        writer.setCompression(1)
+
+        try:
+            # try to enable optimal JPEG compression using new
+            # options added in Qt 5.5
+            writer.setOptimizedWrite(True)
+            writer.setProgressiveScanWrite(True)
+        except AttributeError:
+            pass
+
         if format == 'png':
             # min quality for png as it makes no difference to output
             # and makes file size smaller
