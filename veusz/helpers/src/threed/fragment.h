@@ -29,6 +29,22 @@
 
 #define LINE_DELTA_DEPTH 1e-3
 
+// from objects.h
+class Object;
+
+// this is passed to the renderer to get the parameters for painting
+// the path
+
+struct FragmentParameters
+{
+};
+
+struct FragmentPathParameters : public FragmentParameters
+{
+  QPainterPath* path;
+  bool scaleedges;
+};
+
 // created by drawing Objects to draw to screen
 struct Fragment
 {
@@ -38,10 +54,9 @@ struct Fragment
   FragmentType type;
 
   // pointer to object, to avoid self-comparison.
-
-  // For FR_PATH this should be a parameters object which constains
-  // the painter path, etc
-  void* object;
+  Object* object;
+  // optional pointer to a paramters object
+  FragmentParameters* params;
 
   // drawing style
   SurfaceProp const* surfaceprop;
@@ -68,6 +83,7 @@ struct Fragment
   Fragment()
   : type(FR_NONE),
     object(0),
+    params(0),
     surfaceprop(0),
     lineprop(0),
     pathsize(0),
@@ -139,21 +155,14 @@ struct Fragment
   // recalculate projected coordinates
   void updateProjCoords(const Mat4& projM)
   {
-    for(unsigned i=0, n=nPoints(); i<n; ++i)
+    unsigned n=nPoints();
+    for(unsigned i=0; i<n; ++i)
       proj[i] = calcProjVec(projM, points[i]);
   }
 
 };
 
 typedef std::vector<Fragment> FragmentVector;
-
-// this is passed to the renderer to get the parameters for painting
-// the path
-struct FragmentPathParameters
-{
-  QPainterPath* path;
-  bool scaleedges;
-};
 
 // try to split fragments into pieces if they overlap
 // returns number of pieces for each part after fragmentation

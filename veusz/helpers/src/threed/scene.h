@@ -39,11 +39,14 @@ public:
 
 private:
   void splitIntersectIn3D(unsigned idx1, const Camera& cam);
-  void doDrawing(QPainter* painter, const Mat3& screenM);
+  void doDrawing(QPainter* painter, const Mat3& screenM, double linescale);
   void fineZCompare();
   void splitProjected();
   void simpleDump();
   void objDump();
+
+  void drawPath(QPainter* painter, const Fragment& frag, QPointF pt,
+                double linescale);
 
   // insert newnum1 fragments at idx1 and newnum2 fragments at idx2
   // into the depths array from the end of fragments

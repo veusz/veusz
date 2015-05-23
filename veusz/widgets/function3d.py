@@ -16,7 +16,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-"""Generic 3D plotting widet."""
+"""3D function plotting widget."""
 
 from __future__ import division, print_function
 import itertools
@@ -277,14 +277,6 @@ class Function3D(plotters3d.GenericPlotter3D):
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
             self.dataDrawSurface(axes, outobj)
 
-        if len(outobj) == 0:
-            return None
-        elif len(outobj) == 1:
-            return outobj[0]
-        else:
-            cont = threed.ObjectContainer()
-            for o in outobj:
-                cont.addObject(o)
-            return cont
+        return self.simplifyObjectList(outobj)
 
 document.thefactory.register(Function3D)

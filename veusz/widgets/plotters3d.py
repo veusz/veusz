@@ -150,6 +150,18 @@ class GenericPlotter3D(widget.Widget):
         """Update range variable for axis with dependency name given."""
         pass
 
+    def simplifyObjectList(self, objlist):
+        """Simplify list of objects, if possible."""
+        if len(objlist) == 0:
+            return None
+        elif len(objlist) == 1:
+            return objlist[0]
+        else:
+            cont = threed.ObjectContainer()
+            for o in objlist:
+                cont.addObject(o)
+            return cont
+
     def drawToObject(self):
         # exit if hidden or function blank
         if self.settings.hide:

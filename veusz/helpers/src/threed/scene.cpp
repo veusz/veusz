@@ -134,23 +134,23 @@ namespace
       translateM3(-0.5*(minx+maxx), -0.5*(miny+maxy));
   }
 
-  QPen LineProp2QPen(const LineProp& p)
+  QPen LineProp2QPen(const LineProp* p, double linescale)
   {
-    if(p.hide)
+    if(p==0 || p->hide)
       return QPen(Qt::NoPen);
     else
-      return QPen(QBrush(QColor(int(p.r*255), int(p.g*255),
-				int(p.b*255), int((1-p.trans)*255))),
-		  p.width);
+      return QPen(QBrush(QColor(int(p->r*255), int(p->g*255),
+				int(p->b*255), int((1-p->trans)*255))),
+		  p->width*linescale);
   }
 
-  QBrush SurfaceProp2QBrush(const SurfaceProp& p)
+  QBrush SurfaceProp2QBrush(const SurfaceProp* p)
   {
-    if(p.hide)
+    if(p==0 || p->hide)
       return QBrush();
     else
-      return QBrush(QColor(int(p.r*255), int(p.g*255),
-			   int(p.b*255), int((1-p.trans)*255)));
+      return QBrush(QColor(int(p->r*255), int(p->g*255),
+			   int(p->b*255), int((1-p->trans)*255)));
   }
 
   // convert (x,y,depth) -> screen coordinates
@@ -280,8 +280,35 @@ void Scene::splitProjected()
     }
 }
 
+void Scene::drawPath(QPainter* painter, const Fragment& frag, QPointF pt, double linescale)
+{
+  FragmentPathParameters* pars = static_cast<FragmentPathParameters*>(frag.params);
+  double scale = frag.pathsize*linescale;
+  if(pars->scaleedges)
+    {
+      painter->save();
+      painter->translate(pt.x(), pt.y());
+      painter->scale(scale, scale);
+      painter->drawPath(*(pars->path));
+      painter->restore();
+    }
+  else
+    {
+      // scale point and relocate
+      QPainterPath path(*(pars->path));
+      int elementct = path.elementCount();
+      for(int i=0; i<elementct; ++i)
+        {
+          QPainterPath::Element el = path.elementAt(i);
+          path.setElementPositionAt(i,
+                                    el.x*scale+pt.x(),
+                                    el.y*scale+pt.y());
+        }
+      painter->drawPath(path);
+    }
+}
 
-void Scene::doDrawing(QPainter* painter, const Mat3& screenM)
+void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 {
   // draw fragments
   LineProp const* lline = 0;
@@ -293,56 +320,73 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM)
   painter->setPen(no_pen);
   painter->setBrush(no_brush);
 
-  QPolygonF temppoly(3);
   QPointF projpts[3];
 
   for(unsigned i=0, s=depths.size(); i<s; ++i)
     {
-      const Fragment& f(fragments[depths[i]]);
+      const Fragment& frag(fragments[depths[i]]);
 
       // convert projected points to screen
-      for(unsigned pi=0, s=f.nPoints(); pi<s; ++pi)
-	projpts[pi] = vecToScreen(screenM, f.proj[pi]);
+      for(unsigned pi=0, s=frag.nPoints(); pi<s; ++pi)
+	projpts[pi] = vecToScreen(screenM, frag.proj[pi]);
 
-      switch(f.type)
+      switch(frag.type)
 	{
 	case Fragment::FR_TRIANGLE:
-	  if(lline != 0)
-	    {
-	      painter->setPen(no_pen);
-	      lline = 0;
-	    }
-	  if(f.surfaceprop != 0 && lsurf != f.surfaceprop)
-	    {
-	      lsurf = f.surfaceprop;
-	      painter->setBrush(SurfaceProp2QBrush(*lsurf));
-	    }
+          if(frag.surfaceprop != 0 && !frag.surfaceprop->hide)
+            {
+              if(lline != 0)
+                {
+                  painter->setPen(no_pen);
+                  lline = 0;
+                }
+              if(lsurf != frag.surfaceprop)
+                {
+                  lsurf = frag.surfaceprop;
+                  painter->setBrush(SurfaceProp2QBrush(lsurf));
+                }
 
-	  // debug
-	  //painter->setPen(solid);
-	  //painter->setBrush(no_brush);
+              // debug
+              //painter->setPen(solid);
+              //painter->setBrush(no_brush);
 
-	  temppoly[0] = projpts[0];
-	  temppoly[1] = projpts[1];
-	  temppoly[2] = projpts[2];
-	  painter->drawPolygon(temppoly);
-	  break;
+              painter->drawPolygon(projpts, 3);
+            }
+          break;
 
 	case Fragment::FR_LINESEG:
-	  if(lsurf != 0)
-	    {
-	      painter->setBrush(no_brush);
-	      lsurf = 0;
-	    }
-	  if(f.lineprop != 0 && lline != f.lineprop)
-	    {
-	      lline = f.lineprop;
-	      painter->setPen(LineProp2QPen(*lline));
-	    }
-	  painter->drawLine(projpts[0], projpts[1]);
-	  break;
+          if(frag.lineprop != 0 && !frag.lineprop->hide)
+            {
+              if(lsurf != 0)
+                {
+                  painter->setBrush(no_brush);
+                  lsurf = 0;
+                }
+              if(lline != frag.lineprop)
+                {
+                  lline = frag.lineprop;
+                  painter->setPen(LineProp2QPen(lline, linescale));
+                }
+              painter->drawLine(projpts[0], projpts[1]);
+            }
+          break;
 
 	case Fragment::FR_PATH:
+          if( (frag.lineprop != 0 && !frag.lineprop->hide) ||
+              (frag.surfaceprop != 0 && !frag.surfaceprop->hide) )
+            {
+              if(lline != frag.lineprop)
+                {
+                  lline = frag.lineprop;
+                  painter->setPen(LineProp2QPen(lline, linescale));
+                }
+              if(lsurf != frag.surfaceprop)
+                {
+                  lsurf = frag.surfaceprop;
+                  painter->setBrush(SurfaceProp2QBrush(lsurf));
+                }
+              drawPath(painter, frag, projpts[0], linescale);
+            }
 	  break;
 
 	default:
@@ -354,7 +398,7 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM)
 void Scene::render(QPainter* painter, const Camera& cam,
 		   double x1, double y1, double x2, double y2)
 {
-  printf("\nstarting\n");
+  //printf("\nstarting\n");
   fragments.clear();
 
   // get fragments for whole scene
@@ -368,7 +412,7 @@ void Scene::render(QPainter* painter, const Camera& cam,
   // sort depth of items
   std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
 
-  printf("\nsplit in 3d\n");
+  //printf("\nsplit in 3d\n");
   for(unsigned idx=0; idx+1 < depths.size(); ++idx)
     splitIntersectIn3D(idx, cam);
 
@@ -384,11 +428,13 @@ void Scene::render(QPainter* painter, const Camera& cam,
   // how to transform projected points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
 
-  // finally draw items
-  printf("\ndoing drawing\n");
-  doDrawing(painter, screenM);
+  double linescale = std::max(std::abs(x2-x1), std::abs(y2-y1)) * (1./1000);
 
-  printf("ended\n");
+  // finally draw items
+  //printf("\ndoing drawing\n");
+  doDrawing(painter, screenM, linescale);
+
+  //printf("ended\n");
 
   //simpleDump();
   //objDump();

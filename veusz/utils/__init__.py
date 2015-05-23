@@ -24,7 +24,8 @@ from .safe_eval import compileChecked, SafeEvalException
 from .fitlm import fitLM
 
 from .utilfuncs import *
-from .points import *
+from .points import getPointPainterPath, MarkerCodes, plotMarkers, \
+    plotMarker, ArrowCodes, plotLineArrow
 from .action import *
 from .dates import *
 from .formatting import *

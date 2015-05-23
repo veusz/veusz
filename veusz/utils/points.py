@@ -221,15 +221,15 @@ def getPolygonPainterPath(name, size):
 #######################################################################
 ## draw symbols using a QPainterPath
 
-def squarePath(painter, path, size):
+def squarePath(path, size, linewidth):
     """Square path of size given."""
     path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
 
-def circlePath(painter, path, size):
+def circlePath(path, size, linewidth):
     """Circle path of size given."""
     path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
 
-def circlePlusPath(painter, path, size):
+def circlePlusPath(path, size, linewidth):
     """Circle path with plus."""
     path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
     path.moveTo(0, -size)
@@ -237,7 +237,7 @@ def circlePlusPath(painter, path, size):
     path.moveTo(-size, 0)
     path.lineTo(size, 0)
 
-def circleCrossPath(painter, path, size):
+def circleCrossPath(path, size, linewidth):
     """Circle path with cross."""
     path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
     m = N.sqrt(2.)*size*0.5
@@ -246,30 +246,30 @@ def circleCrossPath(painter, path, size):
     path.moveTo(-m, m)
     path.lineTo(m, -m)
 
-def circlePairPathHorz(painter, path, size):
+def circlePairPathHorz(path, size, linewidth):
     """2 circles next to each other (horizontal)."""
     path.addEllipse( qt4.QRectF(-size, -size*0.5, size, size) )
     path.addEllipse( qt4.QRectF(0,  -size*0.5, size, size) )
 
-def circlePairPathVert(painter, path, size):
+def circlePairPathVert(path, size, linewidth):
     """2 circles next to each other (vertical)."""
     path.addEllipse( qt4.QRectF(-size*0.5, -size, size, size) )
     path.addEllipse( qt4.QRectF(-size*0.5, 0, size, size) )
 
-def ellipseHorzPath(painter, path, size):
+def ellipseHorzPath(path, size, linewidth):
     """Horizontal ellipse path."""
     path.addEllipse( qt4.QRectF(-size, -size*0.5, size*2, size) )
 
-def ellipseVertPath(painter, path, size):
+def ellipseVertPath(path, size, linewidth):
     """Vertical ellipse path."""
     path.addEllipse( qt4.QRectF(-size*0.5, -size, size, size*2) )
 
-def circleHolePath(painter, path, size):
+def circleHolePath(path, size, linewidth):
     """Circle with centre missing."""
-    circlePath(painter, path, size)
-    circlePath(painter, path, size*0.5)
+    circlePath(path, size, linewidth)
+    circlePath(path, size*0.5, linewidth)
 
-def squarePlusPath(painter, path, size):
+def squarePlusPath(path, size, linewidth):
     """Square with plus sign."""
     path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
     path.moveTo(0, -size)
@@ -277,7 +277,7 @@ def squarePlusPath(painter, path, size):
     path.moveTo(-size, 0)
     path.lineTo(size, 0)
 
-def squareCrossPath(painter, path, size):
+def squareCrossPath(path, size, linewidth):
     """Square with cross sign."""
     path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
     path.moveTo(-size, -size)
@@ -285,45 +285,45 @@ def squareCrossPath(painter, path, size):
     path.moveTo(-size, size)
     path.lineTo(size, -size)
 
-def squareHolePath(painter, path, size):
+def squareHolePath(path, size, linewidth):
     """Square with centre missing."""
     path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
     path.addRect( qt4.QRectF(-size*0.5, -size*0.5, size, size) )
 
-def diamondHolePath(painter, path, size):
+def diamondHolePath(path, size, linewidth):
     """Diamond with centre missing."""
     pts = N.array(polygons['diamond'])*size
     addPolyPath(path, pts)
     addPolyPath(path, pts*0.5)
 
-def pentagonHolePath(painter, path, size):
+def pentagonHolePath(path, size, linewidth):
     """Pentagon with centre missing."""
     pts = N.array(polygons['pentagon'])*size
     addPolyPath(path, pts)
     addPolyPath(path, pts*0.5)
 
-def squareRoundedPath(painter, path, size):
+def squareRoundedPath(path, size, linewidth):
     """A square with rounded corners."""
     path.addRoundedRect(
         qt4.QRectF(-size, -size, size*2, size*2),
         50, 50, qt4.Qt.RelativeSize)
 
-def dotPath(painter, path, size):
+def dotPath(path, size, linewidth):
     """Draw a dot."""
-    w = painter.pen().widthF()
-    path.addEllipse( qt4.QRectF(-w*0.5, -w*0.5, w, w) )
+    path.addEllipse(qt4.QRectF(
+        -linewidth*0.5, -linewidth*0.5, linewidth, linewidth))
 
-def bullseyePath(painter, path, size):
+def bullseyePath(path, size, linewidth):
     """A filled circle inside a filled circle."""
     path.setFillRule(qt4.Qt.WindingFill)
-    circlePath(painter, path, size)
-    circlePath(painter, path, size*0.5)
+    circlePath(path, size, linewidth)
+    circlePath(path, size*0.5, linewidth)
 
-def circleDotPath(painter, path, size):
+def circleDotPath(path, size, linewidth):
     """A dot inside a circle."""
     path.setFillRule(qt4.Qt.WindingFill)
-    circlePath(painter, path, size)
-    dotPath(painter, path, size)
+    circlePath(path, size, linewidth)
+    dotPath(path, size, linewidth)
 
 pathsymbols = {
     'square': squarePath,
@@ -346,13 +346,33 @@ pathsymbols = {
     'circledot': circleDotPath,
     }
 
-def getSymbolPainterPath(painter, name, size):
+def getSymbolPainterPath(name, size, linewidth):
     """Get a painter path for a symbol shape."""
     path = qt4.QPainterPath()
-    pathsymbols[name](painter, path, size)
+    pathsymbols[name](path, size, linewidth)
     return path
 
-def getPainterPath(painter, name, size):
+# translate arrow shapes to point types (we reuse them)
+arrow_translate = {
+    'none': 'none',
+    'arrow': '_arrow',
+    'arrownarrow': '_arrownarrow',
+    'arrowtriangle': '_arrowtriangle',
+    'arrowreverse': '_arrowreverse',
+    'linearrow': '_linearrow',
+    'linearrowreverse': '_linearrowreverse',
+    'bar': 'linevert',
+    'linecross': 'linecross',
+    'asterisk': 'asterisk',
+    'circle': 'circle',
+    'square': 'square',
+    'diamond': 'diamond',
+}
+
+#######################################################################
+## external interfaces
+
+def getPointPainterPath(name, size, linewidth):
     """Return a painter path for the name and size.
 
     Returns (painterpath, enablefill)."""
@@ -361,14 +381,11 @@ def getPainterPath(painter, name, size):
     elif name in polygons:
         return getPolygonPainterPath(name, size), True
     elif name in pathsymbols:
-        return getSymbolPainterPath(painter, name, size), True
+        return getSymbolPainterPath(name, size, linewidth), True
     elif name == 'none':
         return qt4.QPainterPath(), True
     else:
         raise ValueError("Invalid marker name %s" % name)
-
-#######################################################################
-## external interfaces
 
 # list of codes supported
 MarkerCodes = (
@@ -429,7 +446,8 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
     painter.setPen(pen)
 
     # get path to draw and whether to fill
-    path, fill = getPainterPath(painter, markername, markersize)
+    path, fill = getPointPainterPath(
+        markername, markersize, painter.pen().widthF())
     if not fill:
         # turn off brush
         painter.setBrush( qt4.QBrush() )
@@ -453,23 +471,6 @@ def plotMarker(painter, xpos, ypos, markername, markersize):
     """Function to plot a marker on a painter, posn xpos, ypos, type and size
     """
     plotMarkers(painter, (xpos,), (ypos,), markername, markersize)
-
-# translate arrow shapes to point types (we reuse them)
-arrow_translate = {
-    'none': 'none',
-    'arrow': '_arrow',
-    'arrownarrow': '_arrownarrow',
-    'arrowtriangle': '_arrowtriangle',
-    'arrowreverse': '_arrowreverse',
-    'linearrow': '_linearrow',
-    'linearrowreverse': '_linearrowreverse',
-    'bar': 'linevert',
-    'linecross': 'linecross',
-    'asterisk': 'asterisk',
-    'circle': 'circle',
-    'square': 'square',
-    'diamond': 'diamond',
-}
 
 # codes of allowable arrows
 ArrowCodes = ( 'none', 'arrow', 'arrownarrow',

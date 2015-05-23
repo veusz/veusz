@@ -846,7 +846,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'rect', 'ellipse', 'imagefile',
                            'line', 'polygon', 'polar', 'ternary',
                            'nonorthpoint', 'nonorthfunc',
-                           'graph3d', 'function3d'):
+                           'graph3d', 'function3d', 'point3d'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             def slotfn(klass=wc):
@@ -927,6 +927,7 @@ class TreeEditDock(qt4.QDockWidget):
             'add.ternary',
             'add.graph3d',
             'add.function3d',
+            'add.point3d',
             'add.shapemenu',
             )
 

@@ -240,7 +240,8 @@ void Points::getFragments(const Mat4& outerM, const Camera& cam,
 
   Fragment fp;
   fp.type = Fragment::FR_PATH;
-  fp.object = &fragparams;
+  fp.object = this;
+  fp.params = &fragparams;
   fp.surfaceprop = surfacefill.ptr();
   fp.lineprop = lineedge.ptr();
   fp.pathsize = 1;
@@ -280,6 +281,7 @@ void ObjectContainer::getFragments(const Mat4& outerM, const Camera& cam,
 				   FragmentVector& v)
 {
   Mat4 totM(outerM*objM);
-  for(unsigned i=0, s=objects.size(); i<s; ++i)
+  unsigned s=objects.size();
+  for(unsigned i=0; i<s; ++i)
     objects[i]->getFragments(totM, cam, v);
 }
