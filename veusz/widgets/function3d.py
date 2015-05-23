@@ -219,7 +219,7 @@ class Function3D(plotters3d.GenericPlotter3D):
                     axrange[0] = min(axrange[0], finite.min())
                     axrange[1] = max(axrange[1], finite.max())
 
-    def dataDrawSurface(self, axes, outobj):
+    def dataDrawSurface(self, axes, container):
         """Draw a surface plot."""
         retn = self.getGridVals()
         if not retn:
@@ -245,7 +245,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             threed.ValVector(lsteps1), threed.ValVector(lsteps2),
             threed.ValVector(N.ravel(lheight)),
             dirn, lineprop, surfprop)
-        outobj.append(mesh)
+        container.addObject(mesh)
 
     def dataDrawToObject(self, axes):
 
@@ -256,7 +256,9 @@ class Function3D(plotters3d.GenericPlotter3D):
         if axes is None:
             return
 
-        outobj = []
+        s = self.settings
+
+        clipcontainer = self.makeClipContainer(axes)
         if mode == 'x,y,z=fns(t)':
             retn = self.getLineVals()
             if not retn:
@@ -272,11 +274,12 @@ class Function3D(plotters3d.GenericPlotter3D):
             line.addPoints(
                 threed.ValVector(lx), threed.ValVector(ly),
                 threed.ValVector(lz))
-            outobj.append(line)
+            
+            clipcontainer.addObject(line)
 
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
-            self.dataDrawSurface(axes, outobj)
+            self.dataDrawSurface(axes, clipcontainer)
 
-        return self.simplifyObjectList(outobj)
+        return clipcontainer
 
 document.thefactory.register(Function3D)

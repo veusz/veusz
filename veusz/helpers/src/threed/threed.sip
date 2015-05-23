@@ -221,7 +221,7 @@ public:
 };
 
 /////////////////////////////////////////////////
-// Objects
+// Properties
 
 struct SurfaceProp /NoDefaultCtors/
 {
@@ -259,6 +259,10 @@ struct LineProp /NoDefaultCtors/
   double width;
   bool hide;
 };
+
+
+///////////////////////////////////////////////////////////////
+// Objects
 
 class Object /NoDefaultCtors/
 {
@@ -327,6 +331,16 @@ class ObjectContainer : public Object
   void addObject(Object* obj /Transfer/);
 
   Mat4 objM;
+};
+
+class ClipContainer : public Object
+{
+%TypeHeaderCode
+#include <clipcontainer.h>
+%End
+ public:
+  ClipContainer(Vec3 minpt, Vec3 maxpt);
+  void addObject(Object* obj /Transfer/);
 };
 
 ////////////////////////////////////////////////////////////////

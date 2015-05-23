@@ -1,3 +1,5 @@
+// -*-c++-*-
+
 //    Copyright (C) 2015 Jeremy S. Sanders
 //    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 //
@@ -16,51 +18,37 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "numpy_helpers.h"
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "numpy/arrayobject.h"
+#ifndef CLIPCONTAINER_H
+#define CLIPCONTAINER_H
 
-namespace
+#include "objects.h"
+#include "fragment.h"
+
+// container which clips children in a 3D box
+class ClipContainer : public Object
 {
-  // python3 numpy import_array is a macro with a return (how stupid),
-  // so we have to wrap it up to get it to portably compile
-#if PY_MAJOR_VERSION >= 3
-  void* doImport()
+public:
+  ClipContainer(Vec3 _minpt, Vec3 _maxpt)
+    : minpt(_minpt), maxpt(_maxpt)
   {
-    import_array();
-    return 0;
   }
-#else
-  void doImport()
+
+  void getFragments(const Mat4& outerM, FragmentVector& v);
+
+  void addObject(Object* obj)
   {
-    import_array();
+    objects.push_back(obj);
   }
+
+  bool pointInBounds(Vec3 pt) const
+  {
+    return (pt(0) >= minpt(0) && pt(1) >= minpt(1) && pt(2) >= minpt(2) &&
+            pt(0) <= maxpt(0) && pt(1) <= maxpt(1) && pt(2) <= maxpt(2));
+  }
+
+ public:
+  Vec3 minpt, maxpt;
+  std::vector<Object*> objects;
+};
+
 #endif
-}
-
-void doNumpyInitPackage()
-{
-  doImport();
-}
-
-ValVector numpyToValVector(PyObject* obj)
-{
-  PyArrayObject *arrayobj = (PyArrayObject*)
-    PyArray_ContiguousFromAny(obj, NPY_DOUBLE, 1, 1);
-  if(arrayobj == NULL)
-    {
-      throw "Cannot covert item to 1D numpy array";
-    }
-
-  const double* data = (double*)PyArray_DATA(arrayobj);
-  unsigned dim = PyArray_DIMS(arrayobj)[0];
-
-  ValVector out;
-  out.reserve(dim);
-  for(unsigned i=0; i<dim; ++i)
-    out.push_back(data[i]);
-
-  Py_DECREF((PyObject*)arrayobj);
-
-  return out;
-}

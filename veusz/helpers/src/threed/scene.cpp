@@ -395,6 +395,16 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
     }
 }
 
+void Scene::projectFragments(const Camera& cam)
+{
+  for(unsigned i=0, s=fragments.size(); i<s; ++i)
+    {
+      Fragment& f = fragments[i];
+      for(unsigned pi=0, np=f.nPoints(); pi<np; ++pi)
+        f.proj[pi] = calcProjVec(cam.perspM, f.points[pi]);
+    }
+}
+
 void Scene::render(QPainter* painter, const Camera& cam,
 		   double x1, double y1, double x2, double y2)
 {
@@ -402,7 +412,10 @@ void Scene::render(QPainter* painter, const Camera& cam,
   fragments.clear();
 
   // get fragments for whole scene
-  root.getFragments(cam.viewM, cam, fragments);
+  root.getFragments(cam.viewM, fragments);
+
+  // work out projected coordinates
+  projectFragments(cam);
 
   // store sorted indices to fragments here
   depths.resize(fragments.size());

@@ -38,6 +38,7 @@ public:
 	      double x1, double y1, double x2, double y2);
 
 private:
+  void projectFragments(const Camera& cam);
   void splitIntersectIn3D(unsigned idx1, const Camera& cam);
   void doDrawing(QPainter* painter, const Mat3& screenM, double linescale);
   void fineZCompare();

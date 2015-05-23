@@ -23,30 +23,21 @@ Object::~Object()
 {
 }
 
-void Object::getFragments(const Mat4& outerM, const Camera& cam,
-			  FragmentVector& v)
+void Object::getFragments(const Mat4& outerM, FragmentVector& v)
 {
 }
 
 // Triangle
 ///////////
 
-void Triangle::getFragments(const Mat4& outerM, const Camera& cam,
-			    FragmentVector& v)
+void Triangle::getFragments(const Mat4& outerM, FragmentVector& v)
 {
   Fragment f;
   f.type = Fragment::FR_TRIANGLE;
   f.surfaceprop = surfaceprop.ptr();
   f.lineprop = 0;
-  Vec4 p0 = outerM*points[0];
-  f.points[0] = vec4to3(p0);
-  f.proj[0] = calcProjVec(cam.perspM, p0);
-  Vec4 p1 = outerM*points[1];
-  f.points[1] = vec4to3(p1);
-  f.proj[1] = calcProjVec(cam.perspM, p1);
-  Vec4 p2 = outerM*points[2];
-  f.points[2] = vec4to3(p2);
-  f.proj[2] = calcProjVec(cam.perspM, p2);
+  for(unsigned i=0; i<3; ++i)
+    f.points[i] = vec4to3(outerM*points[i]);
   f.object = this;
 
   v.push_back(f);
@@ -63,8 +54,7 @@ void PolyLine::addPoints(const ValVector& x, const ValVector& y, const ValVector
     points.push_back(Vec4(x[i], y[i], z[i], 1));
 }
 
-void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
-			    FragmentVector& v)
+void PolyLine::getFragments(const Mat4& outerM, FragmentVector& v)
 {
   Fragment f;
   f.type = Fragment::FR_LINESEG;
@@ -76,11 +66,7 @@ void PolyLine::getFragments(const Mat4& outerM, const Camera& cam,
   for(unsigned i=0; i<points.size(); ++i)
     {
       f.points[1] = f.points[0];
-      f.proj[1] = f.proj[0];
-
-      Vec4 pt = outerM*points[i];
-      f.points[0] = vec4to3(pt);
-      f.proj[0] = calcProjVec(cam.perspM, pt);
+      f.points[0] = vec4to3(outerM*points[i]);
 
       if(i > 0 && (f.points[0]+f.points[1]).isfinite())
         {
@@ -108,15 +94,13 @@ void Mesh::getVecIdxs(unsigned &vidx_h, unsigned &vidx_1, unsigned &vidx_2) cons
     }
 }
 
-void Mesh::getFragments(const Mat4& outerM, const Camera& cam,
-                        FragmentVector& v)
+void Mesh::getFragments(const Mat4& outerM, FragmentVector& v)
 {
-  getLineFragments(outerM, cam, v);
-  getSurfaceFragments(outerM, cam, v);
+  getLineFragments(outerM, v);
+  getSurfaceFragments(outerM, v);
 }
 
-void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
-                            FragmentVector& v)
+void Mesh::getLineFragments(const Mat4& outerM, FragmentVector& v)
 {
   if(lineprop.ptr() == 0)
     return;
@@ -148,13 +132,10 @@ void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
               double heightsval = heights[stepindex==0 ? stepi*n2+consti : consti*n2+stepi];
               pt(vidx_step) = vec_step[stepi];
               pt(vidx_h) = heightsval;
-              Vec4 rpt = outerM*pt;
 
               // shuffle new to old positions and calculate new new
               fl.points[1] = fl.points[0];
-              fl.points[0] = vec4to3(rpt);
-              fl.proj[1] = fl.proj[0];
-              fl.proj[0] = calcProjVec(cam.perspM, rpt);
+              fl.points[0] = vec4to3(outerM*pt);
 
               if(stepi > 0 && (fl.points[0]+fl.points[1]).isfinite())
                 {
@@ -166,8 +147,7 @@ void Mesh::getLineFragments(const Mat4& outerM, const Camera& cam,
     }
 }
 
-void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
-                               FragmentVector& v)
+void Mesh::getSurfaceFragments(const Mat4& outerM, FragmentVector& v)
 {
   if(surfaceprop.ptr() == 0)
     return;
@@ -206,24 +186,15 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
         if(! ((p0+p1+p2+p3).isfinite()) )
           continue;
 
-        // these are converted to the outer coordinate system
-        Vec4 rp0 = outerM*p0;
-        Vec4 rp1 = outerM*p1;
-        Vec4 rp2 = outerM*p2;
-        Vec4 rp3 = outerM*p3;
+        // convert to outer coordinate system
+        fs.points[1] = vec4to3(outerM*p1);
+        fs.points[2] = vec4to3(outerM*p2);
 
-        fs.points[1] = vec4to3(rp1);
-        fs.points[2] = vec4to3(rp2);
-        fs.proj[1] = calcProjVec(cam.perspM, rp1);
-        fs.proj[2] = calcProjVec(cam.perspM, rp2);
-
-        fs.points[0] = vec4to3(rp0);
-        fs.proj[0] = calcProjVec(cam.perspM, rp0);
+        fs.points[0] = vec4to3(outerM*p0);
         v.push_back(fs);
         fs.bumpIndex();
 
-        fs.points[0] = vec4to3(rp3);
-        fs.proj[0] = calcProjVec(cam.perspM, rp3);
+        fs.points[0] = vec4to3(outerM*p3);
         v.push_back(fs);
         fs.bumpIndex();
       }
@@ -232,8 +203,7 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, const Camera& cam,
 // Points
 /////////
 
-void Points::getFragments(const Mat4& outerM, const Camera& cam,
-                          FragmentVector& v)
+void Points::getFragments(const Mat4& outerM, FragmentVector& v)
 {
   fragparams.path = &path;
   fragparams.scaleedges = scaleedges;
@@ -253,9 +223,7 @@ void Points::getFragments(const Mat4& outerM, const Camera& cam,
 
   for(unsigned i=0; i<size; ++i)
     {
-      Vec4 pt = outerM*Vec4(x[i], y[i], z[i], 1);
-      fp.points[0] = vec4to3(pt);
-      fp.proj[0] = calcProjVec(cam.perspM, pt);
+      fp.points[0] = vec4to3(outerM*Vec4(x[i], y[i], z[i], 1));
       if(hassizes)
         fp.pathsize = sizes[i];
 
@@ -267,6 +235,8 @@ void Points::getFragments(const Mat4& outerM, const Camera& cam,
     }
 }
 
+// ClipContainer
+
 // ObjectContainer
 //////////////////
 
@@ -277,11 +247,10 @@ ObjectContainer::~ObjectContainer()
 }
 
 
-void ObjectContainer::getFragments(const Mat4& outerM, const Camera& cam,
-				   FragmentVector& v)
+void ObjectContainer::getFragments(const Mat4& outerM, FragmentVector& v)
 {
   Mat4 totM(outerM*objM);
   unsigned s=objects.size();
   for(unsigned i=0; i<s; ++i)
-    objects[i]->getFragments(totM, cam, v);
+    objects[i]->getFragments(totM, v);
 }

@@ -25,7 +25,6 @@
 #include <algorithm>
 #include <vector>
 
-#include "camera.h"
 #include "mmaths.h"
 #include "fragment.h"
 #include "properties.h"
@@ -35,8 +34,7 @@ class Object
  public:
   virtual ~Object();
 
-  virtual void getFragments(const Mat4& outerM, const Camera& cam,
-			    FragmentVector& v);
+  virtual void getFragments(const Mat4& outerM, FragmentVector& v);
 };
 
 class Triangle : public Object
@@ -53,8 +51,7 @@ class Triangle : public Object
     points[0] = a; points[1] = b; points[2] = c;
   }
 
-  void getFragments(const Mat4& outerM, const Camera& cam,
-		    FragmentVector& v);
+  void getFragments(const Mat4& outerM, FragmentVector& v);
 
  public:
   Vec4 points[3];
@@ -76,8 +73,7 @@ class PolyLine : public Object
 
   void addPoints(const ValVector& x, const ValVector& y, const ValVector& z);
 
-  void getFragments(const Mat4& outerM, const Camera& cam,
-		    FragmentVector& v);
+  void getFragments(const Mat4& outerM, FragmentVector& v);
 
  public:
   Vec4Vector points;
@@ -104,14 +100,11 @@ public:
   {
   }
 
-  void getFragments(const Mat4& outerM, const Camera& cam,
-                    FragmentVector& v);
+  void getFragments(const Mat4& outerM, FragmentVector& v);
 
 private:
-  void getSurfaceFragments(const Mat4& outerM, const Camera& cam,
-                           FragmentVector& v);
-  void getLineFragments(const Mat4& outerM, const Camera& cam,
-                        FragmentVector& v);
+  void getSurfaceFragments(const Mat4& outerM, FragmentVector& v);
+  void getLineFragments(const Mat4& outerM, FragmentVector& v);
 
   void getVecIdxs(unsigned &vidx_h, unsigned &vidx_1, unsigned &vidx_2) const;
 
@@ -138,8 +131,7 @@ public:
 
   void setSizes(const ValVector& _sizes) { sizes = _sizes; }
 
-  void getFragments(const Mat4& outerM, const Camera& cam,
-		    FragmentVector& v);
+  void getFragments(const Mat4& outerM, FragmentVector& v);
 
 private:
   FragmentPathParameters fragparams;
@@ -153,6 +145,7 @@ public:
   PropSmartPtr<const SurfaceProp> surfacefill;
 };
 
+
 // container of objects with transformation matrix of children
 // Note: object pointers passed to object will be deleted when this
 // container is deleted
@@ -164,8 +157,7 @@ class ObjectContainer : public Object
     {}
 
   ~ObjectContainer();
-  void getFragments(const Mat4& outerM, const Camera& cam,
-		    FragmentVector& v);
+  void getFragments(const Mat4& outerM, FragmentVector& v);
 
   void addObject(Object* obj)
   {

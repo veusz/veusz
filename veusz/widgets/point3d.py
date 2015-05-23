@@ -35,6 +35,12 @@ def _(text, disambiguation=None, context='Point3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+class PlotLine3D(setting.Line3D):
+    """Plot line."""
+    def __init__(self, name, **args):
+        setting.Line3D.__init__(self, name, **args)
+        self.get('hide').newDefault(True)
+
 class Point3D(plotters3d.GenericPlotter3D):
     """Plotting points in 3D."""
 
@@ -79,16 +85,21 @@ class Point3D(plotters3d.GenericPlotter3D):
             usertext=_('Marker'), formatting=True), 0 )
         s.add( setting.MarkerColor('Color') )
 
-        s.add( setting.Line3D(
-            'MarkerLine',
-            descr = _('Line around marker settings'),
-            usertext = _('Marker border')),
-               pixmap = 'settings_plotmarkerline' )
+        s.add( PlotLine3D(
+            'PlotLine',
+            descr = _('Plot line settings'),
+            usertext = _('Plot line')),
+               pixmap = 'settings_plotline' )
         s.add( setting.Surface3D(
             'MarkerFill',
             descr = _('Marker fill settings'),
             usertext=_('Marker fill')),
               pixmap='settings_plotmarkerfill' )
+        s.add( setting.Line3D(
+            'MarkerLine',
+            descr = _('Line around marker settings'),
+            usertext = _('Marker border')),
+               pixmap = 'settings_plotmarkerline' )
 
     def affectsAxisRange(self):
         """Which axes this widget affects."""
@@ -144,10 +155,6 @@ class Point3D(plotters3d.GenericPlotter3D):
         ycoord = threed.ValVector(axes[1].dataToLogicalCoords(yv.data))
         zcoord = threed.ValVector(axes[2].dataToLogicalCoords(zv.data))
 
-        outobj = []
-
-        s = self.settings
-
         pointpath, filled = utils.getPointPainterPath(
             s.marker, s.markerSize, s.MarkerLine.width)
 
@@ -157,10 +164,17 @@ class Point3D(plotters3d.GenericPlotter3D):
         if filled and not s.MarkerFill.hide:
             markerfillprop = s.MarkerFill.makeSurfaceProp()
 
-        ptobj = threed.Points(xcoord, ycoord, zcoord, pointpath,
-                              markerlineprop, markerfillprop)
-        outobj.append(ptobj)
+        clipcontainer = self.makeClipContainer(axes)
+        if markerlineprop or markerfillprop:
+            ptobj = threed.Points(xcoord, ycoord, zcoord, pointpath,
+                                  markerlineprop, markerfillprop)
+            clipcontainer.addObject(ptobj)
 
-        return self.simplifyObjectList(outobj)
+        if not s.PlotLine.hide:
+            lineobj = threed.PolyLine(s.PlotLine.makeLineProp())
+            lineobj.addPoints(xcoord, ycoord, zcoord)
+            clipcontainer.addObject(lineobj)
+
+        return clipcontainer
 
 document.thefactory.register(Point3D)
