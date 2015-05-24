@@ -288,8 +288,19 @@ class PolyLine : public Object /NoDefaultCtors/
 %End
  public:
   PolyLine(const LineProp* prop /Transfer/);
-  void addPoint(const Vec4& v);
+  void addPoint(const Vec3& v);
   void addPoints(const ValVector& x, const ValVector& y, const ValVector& z);
+};
+
+class LineSegments : public Object
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+ public:
+  LineSegments(const ValVector& x1, const ValVector& y1, const ValVector& z1,
+               const ValVector& x2, const ValVector& y2, const ValVector& z2,
+               const LineProp* prop /Transfer/);
 };
 
 class Mesh : public Object /NoDefaultCtors/

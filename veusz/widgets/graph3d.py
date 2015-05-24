@@ -21,6 +21,7 @@
 from __future__ import division, print_function
 
 import math
+import numpy as N
 from ..compat import cvalues
 from .. import qtall as qt4
 from .. import document
@@ -39,6 +40,21 @@ class Graph3D(widget.Widget):
     typename='graph3d'
     allowusercreation = True
     description = _('3d graph')
+
+    _borderedges = (
+        ((0,0,0), (1,0,0)),
+        ((0,0,0), (0,1,0)),
+        ((0,0,0), (0,0,1)),
+        ((0,0,1), (1,0,1)),
+        ((0,0,1), (0,1,1)),
+        ((0,1,0), (0,1,1)),
+        ((0,1,0), (1,1,0)),
+        ((0,1,1), (1,1,1)),
+        ((1,0,0), (1,0,1)),
+        ((1,0,0), (1,1,0)),
+        ((1,0,1), (1,1,1)),
+        ((1,1,0), (1,1,1)),
+    )
 
     def __init__(self, parent, name=None):
         """Initialise object and create axes."""
@@ -101,6 +117,12 @@ class Graph3D(widget.Widget):
                 descr=_('Distance from bottom of graph to edge'),
                 usertext=_('Bottom margin'),
                 formatting=True) )
+
+        s.add(setting.Line3D(
+            'Border',
+            descr = _('Graph border'),
+            usertext = _('Border')),
+               pixmap = 'settings_border' )
 
     @classmethod
     def allowedParentTypes(self):
@@ -185,10 +207,21 @@ class Graph3D(widget.Widget):
             threed.rotateM4(s.yRotation/180.*math.pi, threed.Vec3(0,1,0)) *
             threed.rotateM4(s.xRotation/180.*math.pi, threed.Vec3(1,0,0)) *
             threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
+
         for c in self.children:
            obj = c.drawToObject()
            if obj:
                scene.root.addObject(obj)
+
+        if not s.Border.hide:
+            lineprop = s.Border.makeLineProp()
+            edges = N.array(self._borderedges)
+            ls = threed.LineSegments(
+                threed.ValVector(edges[:,0,0]), threed.ValVector(edges[:,0,1]),
+                threed.ValVector(edges[:,0,2]), threed.ValVector(edges[:,1,0]),
+                threed.ValVector(edges[:,1,1]), threed.ValVector(edges[:,1,2]),
+                lineprop)
+            scene.root.addObject(ls)
 
         borderlineprop = threed.LineProp()
         camera = threed.Camera()

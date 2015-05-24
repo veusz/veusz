@@ -51,7 +51,7 @@ void PolyLine::addPoints(const ValVector& x, const ValVector& y, const ValVector
   unsigned size = std::min(x.size(), std::min(y.size(), z.size()));
   points.reserve(points.size()+size);
   for(unsigned i=0; i<size; ++i)
-    points.push_back(Vec4(x[i], y[i], z[i], 1));
+    points.push_back(Vec3(x[i], y[i], z[i]));
 }
 
 void PolyLine::getFragments(const Mat4& outerM, FragmentVector& v)
@@ -63,16 +63,52 @@ void PolyLine::getFragments(const Mat4& outerM, FragmentVector& v)
   f.object = this;
 
   // iterators use many more instructions here...
-  for(unsigned i=0; i<points.size(); ++i)
+  for(unsigned i=0, s=points.size(); i<s; ++i)
     {
       f.points[1] = f.points[0];
-      f.points[0] = vec4to3(outerM*points[i]);
+      f.points[0] = vec4to3(outerM*vec3to4(points[i]));
 
       if(i > 0 && (f.points[0]+f.points[1]).isfinite())
         {
           v.push_back(f);
           f.bumpIndex();
         }
+    }
+}
+
+// LineSegments
+///////////////
+
+LineSegments::LineSegments(const ValVector& x1, const ValVector& y1, const ValVector& z1,
+                           const ValVector& x2, const ValVector& y2, const ValVector& z2,
+                           const LineProp* prop)
+  : Object(), lineprop(prop)
+{
+  unsigned size = std::min( std::min(x1.size(), std::min(y1.size(), z1.size())),
+                            std::min(x2.size(), std::min(y2.size(), z2.size())) );
+  points.reserve(size*2);
+
+  for(unsigned i=0; i<size; ++i)
+    {
+      points.push_back(Vec3(x1[i], y1[i], z1[i]));
+      points.push_back(Vec3(x2[i], y2[i], z2[i]));
+    }
+}
+
+void LineSegments::getFragments(const Mat4& outerM, FragmentVector& v)
+{
+  Fragment f;
+  f.type = Fragment::FR_LINESEG;
+  f.surfaceprop = 0;
+  f.lineprop = lineprop.ptr();
+  f.object = this;
+
+  for(unsigned i=0, s=points.size(); i<s; i+=2)
+    {
+      f.points[0] = vec4to3(outerM*vec3to4(points[i]));
+      f.points[1] = vec4to3(outerM*vec3to4(points[i+1]));
+      v.push_back(f);
+      f.bumpIndex();
     }
 }
 

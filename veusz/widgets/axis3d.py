@@ -342,17 +342,17 @@ class Axis3D(widget.Widget):
         op1, op2 = s.otherPosition1, s.otherPosition2
         lower, upper = s.lowerPosition, s.upperPosition
         if dirn == 'x':
-            axisline = [(lower,op1,op2,1),(upper,op1,op2,1)]
+            axisline = [(lower,op1,op2),(upper,op1,op2)]
         elif dirn == 'y':
-            axisline = [(op1,lower,op2,1),(op1,upper,op2,1)]
+            axisline = [(op1,lower,op2),(op1,upper,op2)]
         else:
-            axisline = [(op1,op2,lower,1),(op1,op2,upper,1)]
+            axisline = [(op1,op2,lower),(op1,op2,upper)]
         axislineprop = s.Line.makeLineProp()
 
         cont = threed.ObjectContainer()
         line = threed.PolyLine(axislineprop)
-        line.addPoint(threed.Vec4(*axisline[0]))
-        line.addPoint(threed.Vec4(*axisline[1]))
+        line.addPoint(threed.Vec3(*axisline[0]))
+        line.addPoint(threed.Vec3(*axisline[1]))
         cont.addObject(line)
         return cont
 

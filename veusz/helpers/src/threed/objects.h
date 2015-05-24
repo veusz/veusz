@@ -60,13 +60,20 @@ class Triangle : public Object
 
 class PolyLine : public Object
 {
- public:
+public:
   PolyLine(const LineProp* prop=0)
     : Object(), lineprop(prop)
   {
   }
 
-  void addPoint(const Vec4& v)
+  PolyLine(const ValVector& x, const ValVector& y, const ValVector& z,
+           const LineProp* prop=0)
+    : Object(), lineprop(prop)
+  {
+    addPoints(x, y, z);
+  }
+
+  void addPoint(const Vec3& v)
   {
     points.push_back(v);
   }
@@ -75,8 +82,22 @@ class PolyLine : public Object
 
   void getFragments(const Mat4& outerM, FragmentVector& v);
 
- public:
-  Vec4Vector points;
+public:
+  Vec3Vector points;
+  PropSmartPtr<const LineProp> lineprop;
+};
+
+class LineSegments : public Object
+{
+public:
+  LineSegments(const ValVector& x1, const ValVector& y1, const ValVector& z1,
+               const ValVector& x2, const ValVector& y2, const ValVector& z2,
+               const LineProp* prop);
+
+  void getFragments(const Mat4& outerM, FragmentVector& v);
+
+public:
+  Vec3Vector points;
   PropSmartPtr<const LineProp> lineprop;
 };
 
