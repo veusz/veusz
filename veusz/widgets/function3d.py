@@ -40,6 +40,42 @@ class Function3D(plotters3d.GenericPlotter3D):
     typename='function3d'
     description=_('Plot a 3D function')
 
+    # list of the supported modes
+    _modes = [
+        'x=fn(y,z)', 'y=fn(x,z)', 'z=fn(x,y)',
+        'x,y,z=fns(t)',
+        'x,y=fns(z)', 'y,z=fns(x)', 'x,z=fns(y)'
+    ]
+
+    # which axes are affected by which modes
+    _affects = {
+        'z=fn(x,y)': (('zAxis', 'both'),),
+        'x=fn(y,z)': (('xAxis', 'both'),),
+        'y=fn(x,z)': (('yAxis', 'both'),),
+        'x,y,z=fns(t)': (('xAxis', 'sx'), ('yAxis', 'sy'), ('zAxis', 'sz')),
+        'x,y=fns(z)': (('xAxis', 'both'), ('yAxis', 'both')),
+        'y,z=fns(x)': (('yAxis', 'both'), ('zAxis', 'both')),
+        'x,z=fns(y)': (('xAxis', 'both'), ('zAxis', 'both')),
+    }
+
+    # which modes require which axes as inputs
+    _requires = {
+        'z=fn(x,y)': (('both', 'xAxis'), ('both', 'yAxis')),
+        'x=fn(y,z)': (('both', 'yAxis'), ('both', 'zAxis')),
+        'y=fn(x,z)': (('both', 'xAxis'), ('both', 'zAxis')),
+        'x,y,z=fns(t)': (),
+        'x,y=fns(z)': (('both', 'zAxis'),),
+        'y,z=fns(x)': (('both', 'xAxis'),),
+        'x,z=fns(y)': (('both', 'yAxis'),),
+    }
+
+    # which modes require which variables
+    _varmap = {
+        'x,y=fns(z)': ('x', 'y', 'z'),
+        'y,z=fns(x)': ('y', 'z', 'x'),
+        'x,z=fns(y)': ('x', 'z', 'y'),
+    }
+
     @classmethod
     def addSettings(klass, s):
         plotters3d.GenericPlotter3D.addSettings(s)
@@ -60,9 +96,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             usertext=_('Surface steps'),
             formatting=True ))
         s.add(setting.Choice(
-            'mode',
-            ['x=fn(y,z)', 'y=fn(x,z)', 'z=fn(x,y)',
-             'x,y,z=fns(t)', 'x,y=fns(z)', 'y,z=fns(x)', 'x,z=fns(y)'],
+            'mode', klass._modes,
             'x,y,z=fns(t)',
             descr=_('Type of function to plot'),
             usertext=_('Mode') ), 0)
@@ -94,30 +128,14 @@ class Function3D(plotters3d.GenericPlotter3D):
     def affectsAxisRange(self):
         """Which axes this widget affects."""
         s = self.settings
-        mode = s.mode
-        if mode == 'z=fn(x,y)':
-            return ((s.zAxis, 'both'),)
-        elif mode == 'x=fn(y,z)':
-            return ((s.xAxis, 'both'),)
-        elif mode == 'y=fn(x,z)':
-            return ((s.yAxis, 'both'),)
-        elif mode == 'x,y,z=fns(t)':
-            return ((s.xAxis, 'sx'), (s.yAxis, 'sy'), (s.zAxis, 'sz'))
-
-        # FIXME: more
+        affects = self._affects[s.mode]
+        return [(getattr(s, v[0]), v[1]) for v in affects]
 
     def requiresAxisRange(self):
         """Which axes this widget depends on."""
         s = self.settings
-        mode = s.mode
-        if mode == 'z=fn(x,y)':
-            return (('both', s.xAxis), ('both', s.yAxis))
-        elif mode == 'x=fn(y,z)':
-            return (('both', s.yAxis), ('both', s.zAxis))
-        elif mode == 'y=fn(x,z)':
-            return (('both', s.xAxis), ('both', s.zAxis))
-        elif mode == 'x,y,z=fns(t)':
-            return ()
+        requires = self._requires[s.mode]
+        return [(v[0], getattr(s, v[1])) for v in requires]
 
     def getLineVals(self):
         """Get vals for line plot."""
@@ -134,6 +152,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             if xcomp is None or ycomp is None or zcomp is None:
                 return None
 
+            # evaluate each expression
             env = self.document.eval_context.copy()
             env['t'] = N.linspace(0, 1, s.linesteps)
             zeros = N.zeros(s.linesteps, dtype=N.float64)
@@ -144,8 +163,45 @@ class Function3D(plotters3d.GenericPlotter3D):
             except:
                 # something wrong in the evaluation
                 return None
+            retn = (valsx, valsy, valsz)
 
-        return valsx, valsy, valsz
+        else:
+            # lookup variables to go with function
+            var = self._varmap[mode]
+            fns = [getattr(s, 'fn'+var[0]), getattr(s, 'fn'+var[1])]
+            if fns[0] is None or fns[1] is None:
+                return None
+
+            # get points to evaluate functions over
+            axis = self.fetchAxis(var[2])
+            if not axis:
+                return
+            arange = axis.getPlottedRange()
+            if axis.settings.log:
+                evalpts = N.logspace(
+                    N.log10(arange[0]), N.log10(arange[1]), s.linesteps)
+            else:
+                evalpts = N.linspace(arange[0], arange[1], s.linesteps)
+
+            # evaluate expressions
+            env = self.document.eval_context.copy()
+            env[var[2]] = evalpts
+            zeros = N.zeros(s.linesteps, dtype=N.float64)
+            try:
+                vals1 = eval(fns[0], env) + zeros
+                vals2 = eval(fns[1], env) + zeros
+            except:
+                # something wrong in the evaluation
+                return None
+
+            # assign correct output points
+            retn = [None]*3
+            idxs = ('x', 'y', 'z')
+            retn[idxs.index(var[0])] = vals1
+            retn[idxs.index(var[1])] = vals2
+            retn[idxs.index(var[2])] = evalpts
+
+        return retn
 
     def getGridVals(self):
         """Get values for 2D grid.
@@ -165,9 +221,17 @@ class Function3D(plotters3d.GenericPlotter3D):
         axes = self.fetchAxes()
 
         # range of other axes
-        pr1 = axes[axidx[1]].getPlottedRange()
-        pr2 = axes[axidx[2]].getPlottedRange()
+        ax1, ax2 = axes[axidx[1]], axes[axidx[2]]
+        pr1 = ax1.getPlottedRange()
+        pr2 = ax2.getPlottedRange()
         steps = s.surfacesteps
+        logax1, logax2 = ax1.settings.log, ax2.settings.log
+
+        # convert log ranges to linear temporarily
+        if logax1:
+            pr1 = N.log(pr1)
+        if logax2:
+            pr2 = N.log(pr2)
 
         # set variables in environment
         grid1, grid2 = N.indices((steps, steps))
@@ -177,6 +241,13 @@ class Function3D(plotters3d.GenericPlotter3D):
         del2 = (pr2[1]-pr2[0])/(steps-1.)
         steps2 = N.arange(steps)*del2 + pr2[0]
         grid2 = grid2*del2 + pr2[0]
+
+        # convert back to log
+        if logax1:
+            grid1 = N.exp(grid1)
+        if logax2:
+            grid2 = N.exp(grid2)
+
         env = self.document.eval_context.copy()
         env[ovar1] = grid1
         env[ovar2] = grid2
@@ -197,27 +268,41 @@ class Function3D(plotters3d.GenericPlotter3D):
     def getRange(self, axis, depname, axrange):
         mode = self.settings.mode
         if mode == 'x,y,z=fns(t)':
+            # get range of each variable
             retn = self.getLineVals()
             if not retn:
                 return
             valsx, valsy, valsz = retn
-
             coord = {'sx': valsx, 'sy': valsy, 'sz': valsz}[depname]
-            finite = coord[N.isfinite(coord)]
-            if len(finite) > 0:
-                axrange[0] = min(axrange[0], finite.min())
-                axrange[1] = max(axrange[1], finite.max())
+
+        elif mode in ('x,y=fns(z)', 'y,z=fns(x)', 'x,z=fns(y)'):
+            # is this axis one of the ones we affect?
+            var = self._varmap[mode]
+            if self.fetchAxis(var[0]) is axis:
+                v = var[0]
+            elif self.fetchAxis(var[1]) is axis:
+                v = var[1]
+            else:
+                return
+
+            retn = self.getLineVals()
+            if not retn:
+                return
+            coord = retn[('x', 'y', 'z').index(v)]
 
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
             retn = self.getGridVals()
             if not retn:
                 return
             height, steps1, steps2, axidx, var = retn
-            if axis is self.fetchAxis(var):
-                finite = height[N.isfinite(height)]
-                if len(finite) > 0:
-                    axrange[0] = min(axrange[0], finite.min())
-                    axrange[1] = max(axrange[1], finite.max())
+            if axis is not self.fetchAxis(var):
+                return
+            coord = height
+
+        finite = coord[N.isfinite(coord)]
+        if len(finite) > 0:
+            axrange[0] = min(axrange[0], finite.min())
+            axrange[1] = max(axrange[1], finite.max())
 
     def dataDrawSurface(self, axes, container):
         """Draw a surface plot."""
@@ -259,7 +344,7 @@ class Function3D(plotters3d.GenericPlotter3D):
         s = self.settings
 
         clipcontainer = self.makeClipContainer(axes)
-        if mode == 'x,y,z=fns(t)':
+        if mode in ('x,y,z=fns(t)', 'x,y=fns(z)', 'y,z=fns(x)', 'x,z=fns(y)'):
             retn = self.getLineVals()
             if not retn:
                 return
