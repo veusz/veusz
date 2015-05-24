@@ -70,6 +70,13 @@ class Graph3D(widget.Widget):
             descr=_(u'Rotation around z axis (°)'),
             usertext=_('Z rotation') ))
 
+        s.add( setting.FloatSlider(
+            'distance',
+            5,
+            minval=1, maxval=50, step=0.5, tick=5, scale=0.1,
+            descr=_(u'Viewing distance'),
+            usertext=_('Distance') ))
+
         s.add( setting.Distance(
                 'leftMargin',
                 '0.2cm',
@@ -186,7 +193,7 @@ class Graph3D(widget.Widget):
         borderlineprop = threed.LineProp()
         camera = threed.Camera()
         camera.setPointing(
-            threed.Vec3(5,0.,0.), threed.Vec3(0.,0.,0.),
+            threed.Vec3(s.distance, 0., 0.), threed.Vec3(0.,0.,0.),
             threed.Vec3(0,1,0))
         camera.setPerspective(45, 1, 4, 6)
 

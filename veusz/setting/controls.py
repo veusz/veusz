@@ -281,10 +281,10 @@ class FloatSlider(qt4.QWidget):
         self.setLayout(layout)
 
         s = self.slider = qt4.QSlider(qt4.Qt.Horizontal)
-        s.setMinimum(setting.minval)
-        s.setMaximum(setting.maxval)
-        s.setPageStep(setting.step)
-        s.setTickInterval(setting.tick)
+        s.setMinimum(int(setting.minval/setting.scale))
+        s.setMaximum(int(setting.maxval/setting.scale))
+        s.setPageStep(int(setting.step/setting.scale))
+        s.setTickInterval(int(setting.tick/setting.scale))
         s.setTickPosition(qt4.QSlider.TicksAbove)
         layout.addWidget(self.slider)
 
@@ -308,12 +308,13 @@ class FloatSlider(qt4.QWidget):
 
     def movedPosition(self, val):
         """Someone dragged the slider."""
-        self.sigSettingChanged.emit(self, self.setting, float(val))
+        self.sigSettingChanged.emit(
+            self, self.setting, float(val)*self.setting.scale)
 
     @qt4.pyqtSlot()
     def onModified(self):
         self.edit.setText(self.setting.toText())
-        self.slider.setValue(int(self.setting.get()))
+        self.slider.setValue(int(self.setting.get()/self.setting.scale))
 
 class Bool(qt4.QCheckBox):
     """A check box for changing a bool setting."""

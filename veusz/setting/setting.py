@@ -613,11 +613,12 @@ class FloatSlider(Float):
 
     typename = 'float-slider'
 
-    def __init__(self, name, value, step=10, tick=50, **args):
+    def __init__(self, name, value, step=10, tick=50, scale=1, **args):
         """Step is the size to step by."""
         Float.__init__(self, name, value, **args)
         self.step = step
         self.tick = tick
+        self.scale = scale
 
     def copy(self):
         return self._copyHelper((), (), {
@@ -625,6 +626,7 @@ class FloatSlider(Float):
             'maxval': self.maxval,
             'step': self.step,
             'tick': self.tick,
+            'scale': self.scale,
         })
 
     def makeControl(self, *args):
