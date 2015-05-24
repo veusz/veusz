@@ -106,10 +106,6 @@ class Point3D(plotters3d.GenericPlotter3D):
         s = self.settings
         return ((s.xAxis, 'sx'), (s.yAxis, 'sy'), (s.zAxis, 'sz'))
 
-    def requiresAxisRange(self):
-        """Which axes this widget depends on."""
-        return []
-
     def getRange(self, axis, depname, axrange):
         """Update axis range from data."""
 

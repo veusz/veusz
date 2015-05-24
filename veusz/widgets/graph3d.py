@@ -21,6 +21,7 @@
 from __future__ import division, print_function
 
 import math
+from ..compat import cvalues
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -168,6 +169,9 @@ class Graph3D(widget.Widget):
                 if c.isaxis:
                     axestodraw[c.name] = c
 
+        for axis in cvalues(axestodraw):
+            axis.computePlottedRange()
+
         scene = threed.Scene()
         scene.root.objM = (
             threed.rotateM4(s.zRotation/180.*math.pi, threed.Vec3(0,0,1)) *
@@ -178,29 +182,6 @@ class Graph3D(widget.Widget):
            obj = c.drawToObject()
            if obj:
                scene.root.addObject(obj)
-
-        # scene.root.addObject(threed.Triangle(
-        #     threed.Vec4(0.7,0,0,1), threed.Vec4(0.7,0,1,1),
-        #     threed.Vec4(0.7,1,0,1),
-        #     threed.SurfaceProp(0,1,0,trans=0.5)
-        # ))
-        # scene.root.addObject(threed.Triangle(
-        #     threed.Vec4(1,0.1,0,1), threed.Vec4(0,0.1,0,1),
-        #     threed.Vec4(1,0.1,1,1),
-        #     threed.SurfaceProp(1,0,0,trans=0.5)
-        # ))
-        # scene.root.addObject(threed.Triangle(
-        #    threed.Vec4(0,0.1,0,1), threed.Vec4(1,0.1,1,1),
-        #    threed.Vec4(0,0.1,1,1),
-        #    threed.SurfaceProp(0,0,1,trans=0.5)
-        # ))
-
-        def printM(m):
-            for i in xrange(4):
-                s=''
-                for j in xrange(4):
-                    s += '%8.3f ' % m.get(i, j)
-                print(s)
 
         borderlineprop = threed.LineProp()
         camera = threed.Camera()

@@ -18,7 +18,7 @@
 
 """Widget that represents a page in the document."""
 
-from __future__ import division
+from __future__ import division, print_function
 import collections
 import textwrap
 import numpy as N
@@ -188,7 +188,6 @@ class AxisDependHelper(object):
         axrange = self.ranges[axis]
         if axrange == defaultrange:
             axrange = None
-        # print "Updating", axis.name, axrange
         axis.setAutoRange(axrange)
         del self.ranges[axis]
 
@@ -224,7 +223,6 @@ class AxisDependHelper(object):
         # iterate over dependent widgets
         for widgetd, widgetd_dep in self.deps[dep]:
 
-            # print "Dep: ", widget.name, widgetd.name
             if ( widgetd.isplotter and
                  (not widgetd.settings.isSetting('hide') or
                   not widgetd.settings.hide) ):

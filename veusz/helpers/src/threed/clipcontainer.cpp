@@ -51,13 +51,13 @@ namespace
                     const Vec3& onplane, const Vec3& normal)
   {
     double dotv[3];
-    int bad[3];
+    unsigned bad[3];
     for(unsigned i=0; i<3; ++i)
       {
         dotv[i] = dot(f.points[i]-onplane, normal);
         bad[i] = dotv[i] < -EPS;
       }
-    int badsum = bad[0]+bad[1]+bad[2];
+    unsigned badsum = bad[0]+bad[1]+bad[2];
 
     switch(badsum)
       {
@@ -67,7 +67,7 @@ namespace
       case 1:
         // two points are good, one is bad
         {
-          int badidx = bad[0] ? 0 : (bad[1] ? 1 : 2);
+          unsigned badidx = bad[0] ? 0 : bad[1] ? 1 : 2;
 
           // calculate where vectors from good to bad points
           // intercept plane
@@ -94,8 +94,7 @@ namespace
       case 2:
         // one point is ok, the other two are bad
         {
-          int goodidx = (bad[0] && bad[1]) ? 2 :
-            ((bad[0] && bad[2]) ? 1 : 0);
+          unsigned goodidx = !bad[0] ? 0 : !bad[1] ? 1 : 2;
 
           // work out where vectors from ok point intercept with plane
           Vec3 linevec1 = f.points[(goodidx+1)%3] - f.points[goodidx];

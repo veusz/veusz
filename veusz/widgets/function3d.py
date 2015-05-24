@@ -96,11 +96,11 @@ class Function3D(plotters3d.GenericPlotter3D):
         s = self.settings
         mode = s.mode
         if mode == 'z=fn(x,y)':
-            return ((s.zAxis, 'sz'),)
+            return ((s.zAxis, 'both'),)
         elif mode == 'x=fn(y,z)':
-            return ((s.xAxis, 'sx'),)
+            return ((s.xAxis, 'both'),)
         elif mode == 'y=fn(x,z)':
-            return ((s.yAxis, 'sy'),)
+            return ((s.yAxis, 'both'),)
         elif mode == 'x,y,z=fns(t)':
             return ((s.xAxis, 'sx'), (s.yAxis, 'sy'), (s.zAxis, 'sz'))
 
@@ -111,11 +111,11 @@ class Function3D(plotters3d.GenericPlotter3D):
         s = self.settings
         mode = s.mode
         if mode == 'z=fn(x,y)':
-            return (('sx', s.xAxis), ('sy', s.yAxis))
+            return (('both', s.xAxis), ('both', s.yAxis))
         elif mode == 'x=fn(y,z)':
-            return (('sy', s.yAxis), ('sz', s.zAxis))
+            return (('both', s.yAxis), ('both', s.zAxis))
         elif mode == 'y=fn(x,z)':
-            return (('sx', s.xAxis), ('sz', s.zAxis))
+            return (('both', s.xAxis), ('both', s.zAxis))
         elif mode == 'x,y,z=fns(t)':
             return ()
 
