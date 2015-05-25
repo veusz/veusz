@@ -227,7 +227,7 @@ class Graph3D(widget.Widget):
         camera = threed.Camera()
         camera.setPointing(
             threed.Vec3(s.distance, 0., 0.), threed.Vec3(0.,0.,0.),
-            threed.Vec3(0,1,0))
+            threed.Vec3(0,0,1))
         camera.setPerspective(45, 1, 4, 6)
 
         painter = painthelper.painter(self, bounds)

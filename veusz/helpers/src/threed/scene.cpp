@@ -217,6 +217,10 @@ void Scene::splitIntersectIn3D(unsigned idx1, const Camera& cam)
       if(fragments[depths[idx2]].object == fragments[depths[idx1]].object)
 	continue;
 
+      // ignore FR_NONE fragments
+      if(fragments[depths[idx2]].type == Fragment::FR_NONE)
+        continue;
+
       if(fragments[depths[idx2]].maxDepth() < thismindepth)
 	// no others fragments are overlapping, as any others would be
 	// less deep
@@ -228,12 +232,12 @@ void Scene::splitIntersectIn3D(unsigned idx1, const Camera& cam)
 		     fragments[depths[idx2]],
 		     fragments, &newnum1, &newnum2);
 
-      // put and sort new fragments into depths
-      insertFragmentsIntoDepths(idx1, newnum1, idx2, newnum2);
-
       // calculate new depths for fragments and resort region
       if(newnum1+newnum2 > 0)
 	{
+          // put and sort new fragments into depths
+          insertFragmentsIntoDepths(idx1, newnum1, idx2, newnum2);
+
 	  unsigned nlen = fragments.size();
 	  // calculate projected coordinates (with depths)
 	  for(unsigned i=nlen-(newnum1+newnum2); i != nlen; ++i)
