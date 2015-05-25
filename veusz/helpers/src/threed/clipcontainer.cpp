@@ -47,9 +47,10 @@ namespace
   }
 
   // clip triangle by plane
-  void clipTriangle(FragmentVector& v, Fragment& f,
+  void clipTriangle(FragmentVector& v, unsigned idx,
                     const Vec3& onplane, const Vec3& normal)
   {
+    Fragment& f = v[idx];
     double dotv[3];
     unsigned bad[3];
     for(unsigned i=0; i<3; ++i)
@@ -82,13 +83,16 @@ namespace
           Vec3 icept2 = f.points[badidx] + linevec2*d2;
 
           // break into two triangles from good points to intercepts
-          f.points[0] = good1;
-          f.points[1] = icept1;
-          f.points[2] = icept2;
-          v.push_back(f);
+          // note: the push back invalidates the original, so we have
+          // to make a copy
           f.points[0] = good2;
           f.points[1] = icept2;
           f.points[2] = good1;
+          Fragment fcpy(f);
+          fcpy.points[0] = good1;
+          fcpy.points[1] = icept1;
+          fcpy.points[2] = icept2;
+          v.push_back(fcpy);
         }
         break;
       case 2:
@@ -134,7 +138,7 @@ namespace
             break;
 
           case Fragment::FR_TRIANGLE:
-            clipTriangle(v, f, onplane, normal);
+            clipTriangle(v, i, onplane, normal);
             break;
 
           default:

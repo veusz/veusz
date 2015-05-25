@@ -16,7 +16,6 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-#include <cstdio>
 #include <cmath>
 #include <limits>
 #include <QtCore/QPointF>
@@ -27,6 +26,10 @@
 
 #include "scene.h"
 #include "fragment.h"
+#include "bsp.h"
+
+#include <cstdio>
+#include <iostream>
 
 namespace
 {
@@ -418,29 +421,35 @@ void Scene::render(QPainter* painter, const Camera& cam,
   // get fragments for whole scene
   root.getFragments(cam.viewM, fragments);
 
+  depths.clear();
+  BSPNode* root = buildBSPTree(fragments);
+  buildBSPDepthList(root, depths);
+  std::cout << "depths " << depths.size() << '\n';
+  deleteBSPTree(root);
+
   // work out projected coordinates
   projectFragments(cam);
 
   // store sorted indices to fragments here
-  depths.resize(fragments.size());
-  for(unsigned i=0, s=fragments.size(); i<s; ++i)
-    depths[i]=i;
+  //depths.resize(fragments.size());
+  //for(unsigned i=0, s=fragments.size(); i<s; ++i)
+   // depths[i]=i;
 
   // sort depth of items
-  std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
+  //std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
 
   //printf("\nsplit in 3d\n");
-  for(unsigned idx=0; idx+1 < depths.size(); ++idx)
-    splitIntersectIn3D(idx, cam);
+  //for(unsigned idx=0; idx+1 < depths.size(); ++idx)
+  //  splitIntersectIn3D(idx, cam);
 
-  std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
+  //std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
 
   // split on sky
   //printf("\nsplit projected\n");
   //splitProjected();
 
   // final sorting
-  std::sort(depths.begin(), depths.end(), FragDepthCompareMean(fragments));
+  //std::sort(depths.begin(), depths.end(), FragDepthCompareMean(fragments));
 
   // how to transform projected points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
