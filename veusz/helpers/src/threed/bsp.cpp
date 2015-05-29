@@ -7,12 +7,13 @@
 
 #include <iostream>
 
-#define EPS 1e-5
+#define EPS 1e-6
+//#define EPSDIST 1e-3
 
 namespace
 {
-
-  double fragZ(const Fragment& f)
+  // calculate depth (Z) of fragment
+  inline double fragZ(const Fragment& f)
   {
     switch(f.type)
       {
@@ -27,6 +28,7 @@ namespace
       }
   }
 
+  // for sorting fragments in Z
   struct FragZCompareMin
   {
     FragZCompareMin(const FragmentVector& v)
@@ -36,121 +38,106 @@ namespace
     {
       return fragZ(vec[i]) > fragZ(vec[j]);
     }
-    const FragmentVector& vec;    
+    const FragmentVector& vec;
   };
 
-
-  // struct FragDepthCompareMin
-  // {
-  //   FragDepthCompareMin(FragmentVector& v)
-  //     : vec(v)
-  //   {}
-  //   bool operator()(unsigned i, unsigned j) const
-  //   {
-  //     return vec[i].minDepth() > vec[j].minDepth();
-  //   }
-  //   FragmentVector& vec;
-  // };
-
+  // are points close?
   inline bool close(const Vec3& p1, const Vec3& p2)
   {
-    return (std::abs(p1(0)-p2(0))<EPS && std::abs(p1(1)-p2(1))<EPS &&
-            std::abs(p1(2)-p2(2))<EPS);
+    return (std::abs(p1(0)-p2(0))<1e-2 && std::abs(p1(1)-p2(1))<1e-2 &&
+            std::abs(p1(2)-p2(2))<1e-2);
   }
 
-  inline bool badNormal(const Vec3* pts)
+  bool _addPoint(unsigned& ptct, Vec3* pts, const Vec3& pt)
   {
-    double d1x = pts[1](0)-pts[0](0);
-    double d1y = pts[1](1)-pts[0](1);
-    double d2x = pts[2](0)-pts[0](0);
-    double d2y = pts[2](1)-pts[0](1);
-    return std::abs(d1x*d2y-d2x*d1y) < EPS;
+    // don't add points close to existing points
+    for(unsigned i=0; i<ptct; ++i)
+      if(close(pts[i], pt))
+        return 0;
+
+    // don't add parallel vectors
+    if(ptct == 2)
+      {
+        Vec3 norm = cross(pt-pts[0], pts[1]-pts[0]);
+        //std::cout << "norm here " << norm(0) << ' ' << norm(1) << ' ' << norm(2) << '\n';
+        if(std::abs(norm(0)) < EPS && std::abs(norm(1)) < EPS && std::abs(norm(2)) < EPS)
+          return 0;
+      }
+    pts[ptct++] = pt;
+    return ptct == 3;
   }
 
   // find set of three points to define a plane
   // needs to find points which are not the same
   // return 1 if ok
-  bool findPlane(const IdxVector& idxs, FragmentVector& v,
-                 Vec3* pts)
+  bool findPlane(const IdxVector& idxs, unsigned startidx,
+                 FragmentVector& v, Vec3* pts)
   {
-    const unsigned size = idxs.size();
-    const unsigned centre = size/2;
+    const unsigned endidx = idxs.size();
+    const unsigned nelem = endidx-startidx;
+    const unsigned centre = (startidx+endidx)/2;
 
-    unsigned totpts = 0;
-    unsigned ptct = 0;
-    for(unsigned delta=0; delta<=centre; ++delta)
+    // std::cout << "nelem " << nelem << '\n';
+
+    // choose triangle first
+    for(unsigned i=startidx; i<endidx; ++i)
       {
-        if(centre+delta < size)
+        if(v[idxs[i]].type == Fragment::FR_TRIANGLE)
           {
-            const Fragment& f = v[idxs[centre+delta]];
-            for(unsigned i=0; i<f.nPoints(); ++i)
-              {
-                bool diff = 1;
-                for(unsigned j=0; j<ptct && diff; ++j)
-                  if(close(f.points[i], pts[j]))
-                    diff = 0;
-                if(diff)
-                  {
-                    pts[ptct++] = f.points[i];
-                    if(ptct==3)
-                      {
-                        if(badNormal(pts))
-                          ptct--;
-                        else
-                          return 1;
-                      }
-                  }
-              }
-            totpts += f.nPoints();
-          }
-        if(delta > 0)
-          {
-            const Fragment& f = v[idxs[centre-delta]];
-            for(unsigned i=0; i<f.nPoints(); ++i)
-              {
-                bool diff = 1;
-                for(unsigned j=0; j<ptct && diff; ++j)
-                  if(close(f.points[i], pts[j]))
-                    diff = 0;
-                if(diff)
-                  {
-                    pts[ptct++] = f.points[i];
-                    if(ptct==3)
-                      {
-                        if(badNormal(pts))
-                          ptct--;
-                        else
-                          return 1;
-                      }
-                  }
-              }
+            for(unsigned j=0; j<3; ++j)
+              pts[j] = v[idxs[i]].points[j];
+            return 1;
           }
       }
+
+    unsigned ptct = 0;
+    for(unsigned delta=0; delta<=nelem/2; ++delta)
+      {
+        if(centre+delta < endidx)
+          {
+            // std::cout << "+ve\n";
+            const Fragment& f = v[idxs[centre+delta]];
+            for(unsigned i=0; i<f.nPoints(); ++i)
+              if( _addPoint(ptct, pts, f.points[i]) )
+                return 1;
+          }
+        if(delta > 0 && startidx+delta<=centre)
+          {
+            // std::cout << "-ve\n";
+            const Fragment& f = v[idxs[centre-delta]];
+            for(unsigned i=0; i<f.nPoints(); ++i)
+              if( _addPoint(ptct, pts, f.points[i]) )
+                return 1;
+          }
+      }
+    // std::cout << "bail out\n";
     return 0;
   }
 
+  // sign of calculated dot
   inline int dotsign(double dot)
   {
     return dot > EPS ? 1 : dot < -EPS ? -1 : 0;
   }
 
+  // is path in front, on or behind plane?
   void handlePath(const Vec3& norm, const Vec3& plane0,
                   FragmentVector& v, unsigned fidx,
-                  IdxVector& idxsame, IdxVector& idxmore, IdxVector& idxless)
+                  IdxVector& idxsame, IdxVector& idxfront, IdxVector& idxback)
   {
-    Fragment& f = v[fidx];
-    int sign = dotsign(dot(norm, f.points[0]-plane0));
+    int sign = dotsign(dot(norm, v[fidx].points[0]-plane0));
     switch(sign)
       {
-      case 1: idxmore.push_back(fidx); break;
-      case -1: idxless.push_back(fidx); break;
+      case 1: idxfront.push_back(fidx); break;
+      case -1: idxback.push_back(fidx); break;
       default: idxsame.push_back(fidx); break;
       }
   }
 
+  // is line in front, on or behind plane
   void handleLine(const Vec3& norm, const Vec3& plane0,
                   FragmentVector& fragvec, unsigned fidx,
-                  IdxVector& idxsame, IdxVector& idxmore, IdxVector& idxless)
+                  IdxVector& idxsame, IdxVector& idxfront, IdxVector& idxback)
   {
     Fragment& f = fragvec[fidx];
 
@@ -163,9 +150,9 @@ namespace
     if(sign0==0 && sign1==0)
       idxsame.push_back(fidx);
     else if(signsum > 0)
-      idxmore.push_back(fidx);
+      idxfront.push_back(fidx);
     else if(signsum < 0)
-      idxless.push_back(fidx);
+      idxback.push_back(fidx);
     else
       {
         // split line. Note: we change original, then push a copy, as
@@ -177,18 +164,19 @@ namespace
 
         // overwrite original with +ve part
         f.points[sign0 < 0 ? 0 : 1] = newpt;
-        idxmore.push_back(fidx);
+        idxfront.push_back(fidx);
 
         // write copy with -ve part
         fcpy.points[sign0 < 0 ? 1 : 0] = newpt;
-        idxless.push_back(fragvec.size());
+        idxback.push_back(fragvec.size());
         fragvec.push_back(fcpy);
       }
   }
 
+  // is triangle in front, behind or on plane?
   void handleTriangle(const Vec3& norm, const Vec3& plane0,
                       FragmentVector& fragvec, unsigned fidx,
-                      IdxVector& idxsame, IdxVector& idxmore, IdxVector& idxless)
+                      IdxVector& idxsame, IdxVector& idxfront, IdxVector& idxback)
   {
     Fragment& f = fragvec[fidx];
 
@@ -202,21 +190,17 @@ namespace
     int signsum = signs[0]+signs[1]+signs[2];
     int nzero = (signs[0]==0)+(signs[1]==0)+(signs[2]==0);
 
-    //std::cout << "signsum " << signsum << " nzero " << nzero << '\n';
-
     if(nzero == 3)
       // all on plane
       idxsame.push_back(fidx);
     else if(signsum+nzero == 3)
       // all +ve or on plane
-      idxmore.push_back(fidx);                
+      idxfront.push_back(fidx);
     else if(signsum-nzero == -3)
       // all -ve or on plane
-      idxless.push_back(fidx);
+      idxback.push_back(fidx);
     else if(nzero == 1)
       {
-        //std::cout << "Split in two\n";
-
         // split triangle into two as one point is on the plane and
         // the other two are either side
         // index of point on plane
@@ -230,17 +214,15 @@ namespace
 
         // modify original
         f.points[(idx0+2)%3] = newpt;
-        (dots[(idx0+1)%3]>0 ? idxmore : idxless).push_back(fidx);
+        (dots[(idx0+1)%3]>0 ? idxfront : idxback).push_back(fidx);
 
         // then make a copy for the other side
         fcpy.points[(idx0+1)%3] = newpt;
-        (dots[(idx0+2)%3]>0 ? idxmore : idxless).push_back(fragvec.size());
+        (dots[(idx0+2)%3]>0 ? idxfront : idxback).push_back(fragvec.size());
         fragvec.push_back(fcpy);
       }
     else
       {
-        //std::cout << "Split in 3\n";
-
         // nzero==0
         // split triangle into three, as no points are on the plane
 
@@ -262,153 +244,215 @@ namespace
         // modify original: triangle by itself on one side
         f.points[(diffidx+1)%3] = newpt_p1;
         f.points[(diffidx+2)%3] = newpt_p2;
-        (dots[diffidx] > 0 ? idxmore : idxless).push_back(fidx);
+        (dots[diffidx] > 0 ? idxfront : idxback).push_back(fidx);
 
         // then add the other two on the other side
         fcpy1.points[diffidx] = newpt_p1;
         fcpy1.points[(diffidx+2)%3] = newpt_p2;
-        (dots[diffidx] < 0 ? idxmore : idxless).push_back(fragvec.size());
+        (dots[diffidx] < 0 ? idxfront : idxback).push_back(fragvec.size());
         fragvec.push_back(fcpy1);
         fcpy2.points[diffidx] = newpt_p2;
-        (dots[diffidx] < 0 ? idxmore : idxless).push_back(fragvec.size());
+        (dots[diffidx] < 0 ? idxfront : idxback).push_back(fragvec.size());
         fragvec.push_back(fcpy2);
       }
   }
 
-  void split(const IdxVector& idxs, BSPNode* node, FragmentVector& fragvec)
+  struct BSPStackItem
   {
-    Vec3 planepts[3];
-    if(!findPlane(idxs, fragvec, planepts))
-      {
-        // can't find a place to split the points, so we stick
-        // everything into the final node
-        node->more = node->less = 0;
-        node->fragidxs = idxs;
-        return;
-      }
-
-    // for(unsigned i=0; i<3; ++i)
-    //   {
-    //     std::cout << "plane " << i << ' '
-    //               << planepts[i](0) << ' ' << planepts[i](1) << ' ' << planepts[i](2) << '\n';
-    //   }
-
-    Vec3 norm = cross(planepts[1]-planepts[0], planepts[2]-planepts[0]);
-
-    // make sure normal is pointing towards viewer
-    // FIXME: if normal is perp, what happens?
-    if(norm(2) < 0)
-      {
-        norm(0) = -norm(0);
-        norm(1) = -norm(1);
-        norm(2) = -norm(2);
-      }
-
-    //std::cout << "Norm " << norm(0) << ' ' << norm(1) << ' ' << norm(2) << '\n';
-
-    IdxVector idxless;
-    IdxVector idxmore;
-    for(unsigned i=0, s=idxs.size(); i<s; ++i)
-      {
-        unsigned fidx = idxs[i];
-        switch(fragvec[fidx].type)
-          {
-          case Fragment::FR_PATH:
-            handlePath(norm, planepts[0], fragvec, fidx,
-                       node->fragidxs, idxmore, idxless);
-            break;
-
-          case Fragment::FR_LINESEG:
-            handleLine(norm, planepts[0], fragvec, fidx,
-                       node->fragidxs, idxmore, idxless);
-            break;
-
-          case Fragment::FR_TRIANGLE:
-            handleTriangle(norm, planepts[0], fragvec, fidx,
-                           node->fragidxs, idxmore, idxless);
-            break;
-
-          default:
-            break;
-          }
-      }
-
-    if(!idxless.empty())
-      {
-        BSPNode* newless = new BSPNode;
-        std::sort(idxless.begin(), idxless.end(), FragZCompareMin(fragvec));
-        split(idxless, newless, fragvec);
-        node->less = newless;
-      }
-    else
-      node->less = 0;
-
-    if(!idxmore.empty())
-      {
-        BSPNode* newmore = new BSPNode;
-        std::sort(idxmore.begin(), idxmore.end(), FragZCompareMin(fragvec));
-        split(idxmore, newmore, fragvec);
-        node->more = newmore;
-      }
-    else
-      node->more = 0;
-  }
+    BSPStackItem(unsigned _bspidx, unsigned _nidxs)
+      : bspidx(_bspidx), nidxs(_nidxs)
+    {}
+    unsigned bspidx;
+    unsigned nidxs;
+  };
 
 }
 
-BSPNode* buildBSPTree(FragmentVector& fragvec)
+BSPBuilder::BSPBuilder(FragmentVector& fragvec)
 {
-  std::vector<unsigned> idxs;
-  idxs.reserve(fragvec.size());
+  // initial record
+  bsp_recs.reserve(fragvec.size());
+  bsp_recs.push_back(BSPRecord());
+
+  // add every non-empty fragment onto a list of fragments to process
+  IdxVector to_process;
+  to_process.reserve(fragvec.size()*2);
   for(unsigned i=0, s=fragvec.size(); i<s; ++i)
     {
       if(fragvec[i].type != Fragment::FR_NONE)
-        idxs.push_back(i);
+        to_process.push_back(i);
     }
 
-  std::sort(idxs.begin(), idxs.end(), FragZCompareMin(fragvec));
+  // these are where indices for the front and back side of the plane
+  IdxVector idxback;
+  IdxVector idxfront;
+  idxback.reserve(fragvec.size());
+  idxfront.reserve(fragvec.size());
+  Vec3 planepts[3];
 
-  BSPNode* root = new BSPNode;
-  split(idxs, root, fragvec);
+  // stack of items to process
+  std::vector<BSPStackItem> stack;
+  stack.reserve(128);
+  stack.push_back( BSPStackItem(0, to_process.size()) );
 
-  return root;
+  while( !stack.empty() )
+    {
+      BSPStackItem stackitem(stack.back());
+      stack.pop_back();
+
+      // this is the bsp record with which the items are associated
+      BSPRecord& rec = bsp_recs[stackitem.bspidx];
+      rec.minfragidxidx = frag_idxs.size(); // where the items get added
+
+      // if more than item to process then choose a plane, then split
+      if( stackitem.nidxs > 1 &&
+          findPlane(to_process, to_process.size()-stackitem.nidxs,
+                    fragvec, planepts) )
+        {
+          // norm of plane (making sure it points to observer)
+          Vec3 norm = cross(planepts[1]-planepts[0], planepts[2]-planepts[0]);
+          if(norm(2) < 0)
+            norm = -norm;
+          norm *= 1./(std::abs(norm(0))+std::abs(norm(1))+std::abs(norm(2)));
+
+          unsigned to_process_size = to_process.size();
+          for(unsigned i=to_process_size-stackitem.nidxs; i<to_process_size; ++i)
+            {
+              unsigned fidx = to_process[i];
+              switch(fragvec[fidx].type)
+                {
+                  case Fragment::FR_PATH:
+                  handlePath(norm, planepts[0], fragvec, fidx,
+                             frag_idxs, idxfront, idxback);
+                  break;
+                case Fragment::FR_LINESEG:
+                  handleLine(norm, planepts[0], fragvec, fidx,
+                             frag_idxs, idxfront, idxback);
+                  break;
+                case Fragment::FR_TRIANGLE:
+                  handleTriangle(norm, planepts[0], fragvec, fidx,
+                                 frag_idxs, idxfront, idxback);
+                  break;
+                default:
+                  break;
+                }
+            }
+
+          // number added to this node
+          rec.nfrags = frag_idxs.size()-rec.minfragidxidx;
+          // remove items to process
+          to_process.resize(to_process_size-stackitem.nidxs);
+
+          if(rec.nfrags == 0 && (idxfront.empty() && !idxback.empty()))
+            {
+              frag_idxs.insert(frag_idxs.end(), idxback.begin(), idxback.end());
+              rec.nfrags = idxback.size();
+              idxback.resize(0);
+            }
+          if(rec.nfrags == 0 && (idxback.empty() && !idxfront.empty()))
+            {
+              frag_idxs.insert(frag_idxs.end(), idxfront.begin(), idxfront.end());
+              rec.nfrags = idxfront.size();
+              idxfront.resize(0);
+            }
+
+          // push_back invalidates rec, so we don't use it below
+          if(!idxfront.empty())
+            {
+              unsigned newbspidx = bsp_recs.size();
+              bsp_recs[stackitem.bspidx].frontidx = newbspidx;
+              bsp_recs.push_back(BSPRecord());
+              stack.push_back( BSPStackItem(newbspidx, idxfront.size()) );
+              to_process.insert(to_process.end(), idxfront.begin(), idxfront.end());
+              idxfront.resize(0);
+            }
+
+          if(!idxback.empty())
+            {
+              unsigned newbspidx = bsp_recs.size();
+              bsp_recs[stackitem.bspidx].backidx = newbspidx;
+              // add the record to be processed
+              bsp_recs.push_back(BSPRecord());
+              // new set of items to process
+              stack.push_back( BSPStackItem(newbspidx, idxback.size()) );
+              // and add onto to process list
+              to_process.insert(to_process.end(), idxback.begin(), idxback.end());
+              idxback.resize(0);
+            }
+        }
+      else
+        {
+          if(stackitem.nidxs > 1)
+            {
+              std::cout << "couldn't find plane! " << stackitem.nidxs << "\n";
+            }
+
+          // single item to process or plane couldn't be found
+          frag_idxs.insert(frag_idxs.end(),
+                           to_process.begin()+
+                           (to_process.size()-stackitem.nidxs),
+                           to_process.end());
+          to_process.resize(to_process.size()-stackitem.nidxs);
+          rec.nfrags = stackitem.nidxs;
+        }
+    }
+
+  std::cout << "to process finish " << to_process.size() << '\n';
+}
+
+namespace
+{
+  struct WalkStackItem
+  {
+    WalkStackItem(unsigned _idx, unsigned _stage)
+      : bsp_idx(_idx), stage(_stage)
+    {}
+
+    unsigned bsp_idx;
+    unsigned stage;
+  };
 };
 
-void deleteBSPTree(BSPNode *node)
-{
-  if(node->more)
-    deleteBSPTree(node->more);
-  if(node->less)
-    deleteBSPTree(node->less);
-  delete node;
-}
+// This is a non-recursive function to walk the tree. We keep a
+// "stack" to do the walking. Because we have to walk the back before
+// the current items and then the front, we have two types of stack
+// items: WALK_START and WALK_RECS
 
-void printTree(BSPNode *node, unsigned level)
+IdxVector BSPBuilder::getFragmentIdxs() const
 {
-  std::cout << level << " leaf:\n";
-  for(unsigned i=0; i<node->fragidxs.size(); ++i)
-    std::cout << ' ' << node->fragidxs[i];
-  std::cout << '\n';
+  IdxVector retn;
 
-  std::cout << level << " more:\n";
-  if(node->more)
-    printTree(node->more, level+1);
-  std::cout << level << " less:\n";
-  if(node->less)
-    printTree(node->less, level+1);
-}
+  std::vector<WalkStackItem> stack;
+  stack.reserve(128);
+  stack.push_back(WalkStackItem(0, 0));
 
-void printfragments(FragmentVector& v)
-{
-  for(unsigned i=0; i<v.size(); ++i)
+  while( !stack.empty() )
     {
-      for(unsigned j=0;j<4;++j)
+      WalkStackItem stackitem(stack.back());
+      stack.pop_back();
+
+      // std::cout << "BSP idx " << stackitem.bsp_idx << '\n';
+
+      const BSPRecord &rec = bsp_recs[stackitem.bsp_idx];
+      // std::cout << " front "<< rec.frontidx << " back " << rec.backidx << '\n';
+
+      if(stackitem.stage == 0)
         {
-          Vec3 p = v[i].points[j%3];
-          std::cout << p(0) << ' ' << p(1) << ' ' << p(2) << '\n';
+          if(rec.frontidx != EMPTY_BSP_IDX)
+            stack.push_back( WalkStackItem(rec.frontidx, 0) );
+          stack.push_back( WalkStackItem(stackitem.bsp_idx, 1) );
+          if(rec.backidx != EMPTY_BSP_IDX)
+            stack.push_back( WalkStackItem(rec.backidx, 0) );
         }
-      std::cout << "\n\n";
+      else
+        {
+          retn.insert(retn.end(), frag_idxs.begin()+rec.minfragidxidx,
+                      frag_idxs.begin()+rec.minfragidxidx+rec.nfrags);
+
+        }
     }
+
+  return retn;
 }
 
 #if 0
@@ -416,24 +460,27 @@ int main()
 {
   FragmentVector v;
 
-  Fragment f;
-  f.type = Fragment::FR_TRIANGLE;
-
-  for(unsigned i=0; i<20; ++i)
+  for(unsigned i=0; i<10; ++i)
     {
-      f.points[0] = Vec3(0,i,i);
-      f.points[1] = Vec3(0,i+1,i);
-      f.points[2] = Vec3(0,i,1+i);
+      Fragment f;
+      f.type =Fragment::FR_TRIANGLE;
+
+      for(unsigned j=0;j<3;j++)
+        f.points[j] = Vec3(rand()*1./RAND_MAX, rand()*1./RAND_MAX, rand()*1./RAND_MAX);
+
       v.push_back(f);
     }
 
-  BSPNode* root = buildBSPTree(v);
+  BSPBuilder builder(v);
 
-  //std::cout << v.size() << '\n';
+  std::cout << "BSP recs size " << builder.bsp_recs.size() << '\n';
+  std::cout << "Fragment size " << v.size() << '\n';
 
-  //printTree(root, 0);
-  printfragments(v);
+  IdxVector out = builder.getFragmentIdxs();
+  for(unsigned i=0; i<out.size(); ++i)
+    std::cout << ' ' << out[i];
+  std::cout << '\n';
 
-  deleteTree(root);
-}
+  return 0;
+};
 #endif

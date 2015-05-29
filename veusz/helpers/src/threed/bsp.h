@@ -26,50 +26,29 @@
 
 typedef std::vector<unsigned> IdxVector;
 
-struct BSPNode
+#define EMPTY_BSP_IDX (std::numeric_limits<unsigned>::max())
+
+struct BSPRecord
 {
-  IdxVector fragidxs;
-  BSPNode* less;
-  BSPNode* more;
-};
-
-BSPNode* buildBSPTree(FragmentVector& fragvec);
-void deleteBSPTree(BSPNode *node);
-
-class BSPTreeIterate
-{
-public:
-  BSPTreeIterate(FragmentVector& _vec)
-    : vec(_vec)
-  {}
-  void operator()(Fragment& f) {};
-
-  void iterate(BSPNode *root)
+  BSPRecord()
+    : minfragidxidx(0), nfrags(0),
+      frontidx(EMPTY_BSP_IDX), backidx(EMPTY_BSP_IDX)
   {
-    if(root->less)
-      iterate(root->less);
-
-    for(unsigned i=0, s=root->fragidxs.size(); i<s; ++i)
-      operator()(vec[root->fragidxs[i]]);
-
-    if(root->more)
-      iterate(root->more);
   }
 
-  FragmentVector& vec;
+  unsigned minfragidxidx, nfrags;
+  unsigned frontidx, backidx;
 };
 
-inline void buildBSPDepthList(BSPNode* node, IdxVector& out)
+class BSPBuilder
 {
-  if(node->less)
-    buildBSPDepthList(node->less, out);
+public:
+  BSPBuilder(FragmentVector& fragvec);
+  IdxVector getFragmentIdxs() const;
 
-  for(unsigned i=0, s=node->fragidxs.size(); i<s; ++i)
-    out.push_back(node->fragidxs[i]);
-
-  if(node->more)
-    buildBSPDepthList(node->more, out);
-}
+  std::vector<BSPRecord> bsp_recs;
+  IdxVector frag_idxs;
+};
 
 
 #endif

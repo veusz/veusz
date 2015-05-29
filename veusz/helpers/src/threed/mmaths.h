@@ -105,6 +105,10 @@ struct Vec3
   {
     return Vec3(v[0]+o.v[0], v[1]+o.v[1], v[2]+o.v[2]);
   }
+  inline Vec3 operator-() const
+  {
+    return Vec3(-v[0], -v[1], -v[2]);
+  }
   inline Vec3 operator-(const Vec3& o) const
   {
     return Vec3(v[0]-o.v[0], v[1]-o.v[1], v[2]-o.v[2]);

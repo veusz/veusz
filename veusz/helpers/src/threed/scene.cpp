@@ -416,16 +416,27 @@ void Scene::render(QPainter* painter, const Camera& cam,
 		   double x1, double y1, double x2, double y2)
 {
   //printf("\nstarting\n");
-  fragments.clear();
+  fragments.resize(0);
 
   // get fragments for whole scene
   root.getFragments(cam.viewM, fragments);
 
-  depths.clear();
-  BSPNode* root = buildBSPTree(fragments);
-  buildBSPDepthList(root, depths);
-  std::cout << "depths " << depths.size() << '\n';
-  deleteBSPTree(root);
+  std::cout << "\nFragment size 1 " << fragments.size() << '\n';
+
+
+  BSPBuilder bsp(fragments);
+  depths = bsp.getFragmentIdxs();
+
+  std::cout << "BSP recs size " << bsp.bsp_recs.size() << '\n';
+  std::cout << "Fragment size 2 " << fragments.size() << '\n';
+
+  unsigned ct=0;
+  for(unsigned i=0; i<fragments.size(); ++i)
+    if(fragments[i].type != Fragment::FR_NONE)
+      ++ct;
+  std::cout << "Used fragments " << ct << '\n';
+  std::cout << "Num indexs " << depths.size() << '\n';
+
 
   // work out projected coordinates
   projectFragments(cam);
