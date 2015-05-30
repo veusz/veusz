@@ -384,11 +384,14 @@ class Scene
 %TypeHeaderCode
 #include <scene.h>
 %End
+ public:
+  enum RenderMode {RENDER_PAINTERS, RENDER_BSP};
 
  public:
   Scene();
   void render(QPainter* painter, const Camera& cam,
-	      double x1, double y1, double x2, double y2);
+	      double x1, double y1, double x2, double y2,
+              RenderMode mode);
 
  public:
   ObjectContainer root;

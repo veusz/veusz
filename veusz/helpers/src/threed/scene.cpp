@@ -33,7 +33,6 @@
 
 namespace
 {
-
   struct FragDepthCompareMax
   {
     FragDepthCompareMax(FragmentVector& v)
@@ -44,50 +43,6 @@ namespace
     {
       double d1 = vec[i].maxDepth();
       double d2 = vec[j].maxDepth();
-      if(std::abs(d1-d2)<1e-5)
-	{
-	  // if the maxima are the same, then look at the minima
-	  return vec[i].minDepth() > vec[j].minDepth();
-	}
-      return d1 > d2;
-    }
-
-    FragmentVector& vec;
-  };
-
-
-  struct FragDepthCompareMin
-  {
-    FragDepthCompareMin(FragmentVector& v)
-      : vec(v)
-    {}
-
-    bool operator()(unsigned i, unsigned j) const
-    {
-      double d1 = vec[i].minDepth();
-      double d2 = vec[j].minDepth();
-
-      if(std::abs(d1-d2)<1e-5)
-	{
-	  // if the minima are the same, then look at the maxima
-	  return vec[i].maxDepth() > vec[j].maxDepth();
-	}
-      return d1 > d2;
-    }
-
-    FragmentVector& vec;
-  };
-
-  struct FragDepthCompareMean
-  {
-    FragDepthCompareMean(FragmentVector& v)
-      : vec(v)
-    {}
-
-    bool operator()(unsigned i, unsigned j) const
-    {
-      double d1 = vec[i].meanDepth();
-      double d2 = vec[j].meanDepth();
       return d1 > d2;
     }
 
@@ -167,37 +122,37 @@ namespace
 }; // namespace
 
 // insert newnum1 fragments at idx1 and newnum2 fragments at idx2
-// into the depths array from the end of fragments
+// into the draworder array from the end of fragments
 // also sort the idx1->idx2+newnum1+newnum2 in depth order
-void Scene::insertFragmentsIntoDepths(unsigned idx1, unsigned newnum1,
-                                      unsigned idx2, unsigned newnum2)
+void Scene::insertFragmentsIntoDrawOrder(unsigned idx1, unsigned newnum1,
+                                         unsigned idx2, unsigned newnum2)
 {
   if(newnum1>0)
     {
       if(newnum1>1)
         {
-          depths.insert(depths.begin()+idx1, newnum1-1, 0);
+          draworder.insert(draworder.begin()+idx1, newnum1-1, 0);
           idx2 += newnum1-1;
         }
       unsigned base=fragments.size()-newnum1-newnum2;
       for(unsigned i=0; i<newnum1; ++i)
-        depths[idx1+i] = base+i;
+        draworder[idx1+i] = base+i;
     }
   if(newnum2>0)
     {
       if(newnum2>1)
-        depths.insert(depths.begin()+idx2, newnum2-1, 0);
+        draworder.insert(draworder.begin()+idx2, newnum2-1, 0);
       unsigned base=fragments.size()-newnum2;
       for(unsigned i=0; i<newnum2; ++i)
-        depths[idx2+i] = base+i;
+        draworder[idx2+i] = base+i;
     }
 
-  // calculate new depths for fragments and resort region
+  // calculate new draworder for fragments and resort region
   if(newnum1+newnum2 > 0)
     {
       // sort depth of new items
-      std::sort(depths.begin()+idx1,
-                depths.begin()+(idx2+newnum2-1+1),
+      std::sort(draworder.begin()+idx1,
+                draworder.begin()+(idx2+newnum2-1+1),
                 FragDepthCompareMax(fragments));
     }
 }
@@ -210,39 +165,39 @@ void Scene::splitIntersectIn3D(unsigned idx1, const Camera& cam)
 {
  RESTART:
 
-  double thismindepth = fragments[depths[idx1]].minDepth();
-  for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
+  double thismindepth = fragments[draworder[idx1]].minDepth();
+  for(unsigned idx2=idx1+1; idx2<draworder.size(); ++idx2)
     {
-      // printf(" %i, %g, %g\n", idx2, fragments[depths[idx2]].minDepth(),
-      //        fragments[depths[idx2]].maxDepth());
+      // printf(" %i, %g, %g\n", idx2, fragments[draworder[idx2]].minDepth(),
+      //        fragments[draworder[idx2]].maxDepth());
 
       // don't compare object with self
-      if(fragments[depths[idx2]].object == fragments[depths[idx1]].object)
+      if(fragments[draworder[idx2]].object == fragments[draworder[idx1]].object)
 	continue;
 
       // ignore FR_NONE fragments
-      if(fragments[depths[idx2]].type == Fragment::FR_NONE)
+      if(fragments[draworder[idx2]].type == Fragment::FR_NONE)
         continue;
 
-      if(fragments[depths[idx2]].maxDepth() < thismindepth)
+      if(fragments[draworder[idx2]].maxDepth() < thismindepth)
 	// no others fragments are overlapping, as any others would be
 	// less deep
 	break;
 
       // try to split, returning number of new fragments (if any)
       unsigned newnum1=0, newnum2=0;
-      splitFragments(fragments[depths[idx1]],
-		     fragments[depths[idx2]],
+      splitFragments(fragments[draworder[idx1]],
+		     fragments[draworder[idx2]],
 		     fragments, &newnum1, &newnum2);
 
-      // calculate new depths for fragments and resort region
+      // calculate new draworder for fragments and resort region
       if(newnum1+newnum2 > 0)
 	{
-          // put and sort new fragments into depths
-          insertFragmentsIntoDepths(idx1, newnum1, idx2, newnum2);
+          // put and sort new fragments into draworder
+          insertFragmentsIntoDrawOrder(idx1, newnum1, idx2, newnum2);
 
 	  unsigned nlen = fragments.size();
-	  // calculate projected coordinates (with depths)
+	  // calculate projected coordinates (with draworder)
 	  for(unsigned i=nlen-(newnum1+newnum2); i != nlen; ++i)
 	    fragments[i].updateProjCoords(cam.perspM);
 
@@ -255,32 +210,32 @@ void Scene::splitIntersectIn3D(unsigned idx1, const Camera& cam)
 void Scene::splitProjected()
 {
 
-  // assume depths already sorted in terms of maximum depth of
+  // assume draworder already sorted in terms of maximum depth of
   // fragments
 
   // iterate over fragments
-  for(unsigned idx1=0; idx1+1<depths.size(); ++idx1)
+  for(unsigned idx1=0; idx1+1<draworder.size(); ++idx1)
     {
     RESTART:
 
-      double thismindepth = fragments[depths[idx1]].minDepth();
-      for(unsigned idx2=idx1+1; idx2<depths.size(); ++idx2)
+      double thismindepth = fragments[draworder[idx1]].minDepth();
+      for(unsigned idx2=idx1+1; idx2<draworder.size(); ++idx2)
         {
           // fragments beyond this do not overlap
-          if(fragments[depths[idx2]].maxDepth() < thismindepth)
+          if(fragments[draworder[idx2]].maxDepth() < thismindepth)
             break;
 
-          //printf("%i %i /%li\n", idx1, idx2, depths.size());
+          //printf("%i %i /%li\n", idx1, idx2, draworder.size());
 
           unsigned num1=0, num2=0;
-          splitOn2DOverlap(fragments, depths[idx1], depths[idx2], &num1, &num2);
+          splitOn2DOverlap(fragments, draworder[idx1], draworder[idx2], &num1, &num2);
 
           if(num1>0 || num2>0)
             {
               //printf("num1=%i num2=%i\n", num1, num2);
 
-              // put and sort new fragments into depths
-              insertFragmentsIntoDepths(idx1, num1, idx2, num2);
+              // put and sort new fragments into draworder
+              insertFragmentsIntoDrawOrder(idx1, num1, idx2, num2);
               goto RESTART;
             }
         }
@@ -329,9 +284,9 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 
   QPointF projpts[3];
 
-  for(unsigned i=0, s=depths.size(); i<s; ++i)
+  for(unsigned i=0, s=draworder.size(); i<s; ++i)
     {
-      const Fragment& frag(fragments[depths[i]]);
+      const Fragment& frag(fragments[draworder[i]]);
 
       // convert projected points to screen
       for(unsigned pi=0, s=frag.nPoints(); pi<s; ++pi)
@@ -412,56 +367,52 @@ void Scene::projectFragments(const Camera& cam)
     }
 }
 
-void Scene::render(QPainter* painter, const Camera& cam,
-		   double x1, double y1, double x2, double y2)
+void Scene::renderPainters(const Camera& cam)
 {
-  //printf("\nstarting\n");
+  projectFragments(cam);
+
+  // simple painter's algorithm
+  draworder.reserve(fragments.size());
+  for(unsigned i=0; i<fragments.size(); ++i)
+    draworder.push_back(i);
+
+  std::sort(draworder.begin(), draworder.end(),
+            FragDepthCompareMax(fragments));
+}
+
+void Scene::renderBSP(const Camera& cam)
+{
+  //std::cout << "\nFragment size 1 " << fragments.size() << '\n';
+
+  BSPBuilder bsp(fragments, Vec3(0,0,1));
+  draworder = bsp.getFragmentIdxs(fragments);
+
+  //std::cout << "BSP recs size " << bsp.bsp_recs.size() << '\n';
+  //std::cout << "Fragment size 2 " << fragments.size() << '\n';
+
+  projectFragments(cam);
+}
+
+void Scene::render(QPainter* painter, const Camera& cam,
+		   double x1, double y1, double x2, double y2,
+                   RenderMode mode)
+{
   fragments.resize(0);
 
   // get fragments for whole scene
   root.getFragments(cam.viewM, fragments);
 
-  std::cout << "\nFragment size 1 " << fragments.size() << '\n';
-
-  // does this assume a particular layout for the view matrix?
-  Vec3 viewdirn(-cam.viewM(2,0), -cam.viewM(2,1), -cam.viewM(2,2));
-  BSPBuilder bsp(fragments, viewdirn);
-  depths = bsp.getFragmentIdxs(fragments);
-
-  std::cout << "BSP recs size " << bsp.bsp_recs.size() << '\n';
-  std::cout << "Fragment size 2 " << fragments.size() << '\n';
-
-  unsigned ct=0;
-  for(unsigned i=0; i<fragments.size(); ++i)
-    if(fragments[i].type != Fragment::FR_NONE)
-      ++ct;
-  std::cout << "Used fragments " << ct << '\n';
-  std::cout << "Num indexs " << depths.size() << '\n';
-
-
-  // work out projected coordinates
-  projectFragments(cam);
-
-  // store sorted indices to fragments here
-  //depths.resize(fragments.size());
-  //for(unsigned i=0, s=fragments.size(); i<s; ++i)
-   // depths[i]=i;
-
-  // sort depth of items
-  //std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
-
-  //printf("\nsplit in 3d\n");
-  //for(unsigned idx=0; idx+1 < depths.size(); ++idx)
-  //  splitIntersectIn3D(idx, cam);
-
-  //std::sort(depths.begin(), depths.end(), FragDepthCompareMax(fragments));
-
-  // split on sky
-  //printf("\nsplit projected\n");
-  //splitProjected();
-
-  // final sorting
-  //std::sort(depths.begin(), depths.end(), FragDepthCompareMean(fragments));
+  switch(mode)
+    {
+    case RENDER_BSP:
+      renderBSP(cam);
+      break;
+    case RENDER_PAINTERS:
+      renderPainters(cam);
+      break;
+    default:
+      break;
+    }
 
   // how to transform projected points to screen
   const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
@@ -469,120 +420,5 @@ void Scene::render(QPainter* painter, const Camera& cam,
   double linescale = std::max(std::abs(x2-x1), std::abs(y2-y1)) * (1./1000);
 
   // finally draw items
-  //printf("\ndoing drawing\n");
   doDrawing(painter, screenM, linescale);
-
-  //printf("ended\n");
-
-  //simpleDump();
-  //objDump();
-}
-
-void Scene::objDump()
-{
-  FILE* fobj = fopen("dump.obj", "w");
-  FILE *fmtl = fopen("dump.mtl", "w");
-
-  fprintf(fobj, "mtllib dump.mtl\n");
-
-  unsigned ct = 1;
-  for(unsigned i=0, s=depths.size(); i<s; ++i)
-    {
-      const Fragment& f = fragments[depths[i]];
-      for(unsigned j=0; j!=f.nPoints(); ++j)
-        fprintf(fobj, "v %g %g %g\n", f.proj[j](0), f.proj[j](1), f.proj[j](2));
-
-      if(f.nPoints()==3)
-        {
-          double r = rand() / double(RAND_MAX);
-          double g = rand() / double(RAND_MAX);
-          double b = rand() / double(RAND_MAX);
-
-          fprintf(fmtl, "newmtl col%i\n", i);
-          fprintf(fmtl, "Ka %g %g %g\n", r, g, b);
-          fprintf(fmtl, "Kd %g %g %g\n", r, g, b);
-          fprintf(fmtl, "Ks %g %g %g\n", r, g, b);
-
-          fprintf(fobj, "usemtl col%i\n", i);
-          fprintf(fobj, "f %i %i %i\n", ct, ct+1, ct+2);
-        }
-
-      if(f.nPoints()==2)
-        fprintf(fobj, "l %i %i\n", ct, ct+1);
-
-      ct += f.nPoints();
-    }
-
-
-  fclose(fobj);
-  fclose(fmtl);
-}
-
-
-void Scene::simpleDump()
-{
-  FILE* file = fopen("dump.svg", "w");
-  fprintf(file, "<svg>\n");
-
-  double mind = 1e10;
-  double maxd = -1e10;
-  for(unsigned i=0, s=depths.size(); i<s; ++i)
-    {
-      const Fragment& f(fragments[depths[i]]);
-
-      if(f.type==Fragment::FR_TRIANGLE)
-        {
-          double av = (f.proj[0](2)+f.proj[1](2)+f.proj[2](2))/3.;
-          if(av<mind) mind=av;
-          if(av>maxd) maxd=av;
-        }
-    }
-  printf("%g %g\n", mind, maxd);
-
-  for(unsigned i=0, s=depths.size(); i<s; ++i)
-    {
-      const Fragment& f(fragments[depths[i]]);
-
-      double av = (f.proj[0](2)+f.proj[1](2)+f.proj[2](2))/3.;
-
-      switch(f.type)
-	{
-	  // debug
-	  //painter->setPen(solid);
-	  //painter->setBrush(no_brush);
-
-	case Fragment::FR_TRIANGLE:
-	  fprintf(file,
-		  "<polygon fill=\"#%02x%02x%02x\" "
-		  "id=\"p%i\" "
-		  "points=\"%g,%g %g,%g %g,%g\" "
-		  "/>\n",
-                  //		  int(f.surfaceprop->r*255),
-                  //		  int(f.surfaceprop->g*255),
-                  //		  int(f.surfaceprop->b*255),
-                  //int(f.surfaceprop->r*255),
-                  //int(f.surfaceprop->g*255),
-                  int((av-mind)/(maxd-mind)*255),
-                  int(f.surfaceprop->g*255),
-                  int((av-mind)/(maxd-mind)*255),
-		  f.index,
-		  f.proj[0](0)*300+300, f.proj[0](1)*300+300,
-		  f.proj[1](0)*300+300, f.proj[1](1)*300+300,
-		  f.proj[2](0)*300+300, f.proj[2](1)*300+300);
-
-	  break;
-
-	case Fragment::FR_LINESEG:
-	  break;
-
-	case Fragment::FR_PATH:
-	  break;
-
-	default:
-	  break;
-	}
-    }
-
-  fprintf(file, "</svg>\n");
-  fclose(file);
 }

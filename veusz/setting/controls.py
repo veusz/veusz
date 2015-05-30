@@ -380,23 +380,28 @@ class Choice(qt4.QComboBox):
     sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
 
     def __init__(self, setting, iseditable, vallist, parent, icons=None,
+                 uilist=None,
                  descriptions=None):
         qt4.QComboBox.__init__(self, parent)
 
         self.setting = setting
-
+        self.vallist = vallist
+        self.uilist = uilist
         self.setEditable(iseditable)
 
         # stops combobox readjusting in size to fit contents
         self.setSizeAdjustPolicy(
             qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
 
+        # whether to show ui text to replace some items
+        toadd = uilist if uilist is not None else vallist
+
         if icons is None:
             # add items to list (text only)
-            self.addItems( list(vallist) )
+            self.addItems( list(toadd) )
         else:
             # add pixmaps and text to list
-            for icon, text in czip(icons, vallist):
+            for icon, text in czip(icons, toadd):
                 self.addItem(icon, text)
 
         # use tooltip descriptions if requested
@@ -435,6 +440,13 @@ class Choice(qt4.QComboBox):
         """If a different item is chosen."""
 
         text = self.currentText()
+
+        # convert to ui text if set
+        if self.uilist is not None:
+            idx = self.uilist.index(text)
+            if idx >= 0:
+                text = self.vallist[idx]
+
         try:
             val = self.setting.fromText(text)
             styleClear(self)
@@ -447,6 +459,13 @@ class Choice(qt4.QComboBox):
     def onModified(self):
         """called when the setting is changed remotely"""
         text = self.setting.toText()
+
+        # convert to ui text
+        if self.uilist is not None:
+            idx = self.vallist.index(text)
+            if idx >= 0:
+                text = self.uilist[idx]
+
         index = self.findText(text)
         if index >= 0:
             self.setCurrentIndex(index)

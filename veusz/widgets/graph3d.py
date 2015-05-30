@@ -93,6 +93,15 @@ class Graph3D(widget.Widget):
             descr=_(u'Viewing distance'),
             usertext=_('Distance') ))
 
+        s.add( setting.Choice(
+            'rendermode',
+            ('painters', 'bsp'),
+            'painters',
+            uilist=("Fast (Painter's)",
+                    "Accurate (BSP)"),
+            usertext=_('Render method'),
+            descr=_('Method used to draw 3D plot') ))
+
         s.add( setting.Distance(
                 'leftMargin',
                 '0.2cm',
@@ -230,10 +239,16 @@ class Graph3D(widget.Widget):
             threed.Vec3(0,0,1))
         camera.setPerspective(45, 1, 4, 6)
 
+        mode = {
+            'painters': threed.Scene.RENDER_PAINTERS,
+            'bsp': threed.Scene.RENDER_BSP,
+        }[s.rendermode]
+
         painter = painthelper.painter(self, bounds)
         with painter:
             scene.render(
                 painter, camera,
-                bounds[0], bounds[1], bounds[2], bounds[3])
+                bounds[0], bounds[1], bounds[2], bounds[3],
+                mode)
 
 document.thefactory.register(Graph3D)

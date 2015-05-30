@@ -886,24 +886,27 @@ class Choice(Setting):
 
     typename = 'choice'
 
-    def __init__(self, name, vallist, val, **args):
+    def __init__(self, name, vallist, val, descriptions=None,
+                 uilist=None, **args):
         """Setting val must be in vallist.
         descriptions is an optional addon to put a tooltip on each item
         in the control.
+        uilist is a tuple/list of text to show to the user, instead of vallist
         """
 
         assert type(vallist) in (list, tuple)
 
         self.vallist = vallist
-        self.descriptions = args.get('descriptions', None)
-        if self.descriptions:
-            del args['descriptions']
+        self.descriptions = descriptions
+        self.uilist = uilist
 
         Setting.__init__(self, name, val, **args)
 
     def copy(self):
         """Make a copy of the setting."""
-        return self._copyHelper((self.vallist,), (), {})
+        return self._copyHelper(
+            (self.vallist,), (), {
+                'descriptions': self.descriptions, 'uilist': self.uilist})
 
     def convertTo(self, val):
         if val in self.vallist:
@@ -921,8 +924,9 @@ class Choice(Setting):
             raise utils.InvalidType
 
     def makeControl(self, *args):
-        argsv = {'descriptions': self.descriptions}
-        return controls.Choice(self, False, self.vallist, *args, **argsv)
+        return controls.Choice(self, False, self.vallist,
+                               descriptions=self.descriptions,
+                               uilist=self.uilist, *args)
 
 class ChoiceOrMore(Setting):
     """One out of a list of strings, or anything else."""
@@ -931,22 +935,21 @@ class ChoiceOrMore(Setting):
 
     typename = 'choice-or-more'
 
-    def __init__(self, name, vallist, val, **args):
+    def __init__(self, name, vallist, val, descriptions=None, **args):
         """Setting has val must be in vallist.
         descriptions is an optional addon to put a tooltip on each item
         in the control
         """
 
         self.vallist = vallist
-        self.descriptions = args.get('descriptions', None)
-        if self.descriptions:
-            del args['descriptions']
-
+        self.descriptions = descriptions
         Setting.__init__(self, name, val, **args)
 
     def copy(self):
         """Make a copy of the setting."""
-        return self._copyHelper((self.vallist,), (), {})
+        return self._copyHelper(
+            (self.vallist,), (), {
+                'descriptions': self.descriptions})
 
     def convertTo(self, val):
         return val
