@@ -78,10 +78,10 @@ class Polygon(plotters.FreePlotter):
                                    qt4.QPointF(x2+pw, y2+pw) )
 
             # this is a hack as we generate temporary fake datasets
-            path = qt4.QPainterPath()
             for xvals, yvals in document.generateValidDatasetParts(
                 document.Dataset(xp), document.Dataset(yp)):
 
+                path = qt4.QPainterPath()
                 poly = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(poly, xvals.data, yvals.data)
                 clippedpoly = qt4.QPolygonF()
@@ -89,7 +89,7 @@ class Polygon(plotters.FreePlotter):
                 path.addPolygon(clippedpoly)
                 path.closeSubpath()
 
-            utils.brushExtFillPath(painter, s.Fill, path, stroke=pen)
+                utils.brushExtFillPath(painter, s.Fill, path, stroke=pen)
 
 # allow the factory to instantiate this
 document.thefactory.register( Polygon )
