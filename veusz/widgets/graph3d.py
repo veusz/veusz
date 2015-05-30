@@ -26,9 +26,12 @@ from ..compat import cvalues
 from .. import qtall as qt4
 from .. import document
 from .. import setting
-from .. import threed
 from . import widget
-from ..helpers import threed
+
+try:
+    from ..helpers import threed
+except ImportError:
+    threed = None
 
 def _(text, disambiguation=None, context='Graph3D'):
     """Translate text."""
@@ -189,6 +192,9 @@ class Graph3D(widget.Widget):
         bounds = self.computeBounds(parentposn, painthelper)
         maxbounds = self.computeBounds(
             parentposn, painthelper, withmargin=False)
+
+        if threed is None:
+            return bounds
 
         s = self.settings
 

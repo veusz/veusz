@@ -27,9 +27,13 @@ from .. import qtall as qt4
 from .. import setting
 from .. import document
 from .. import utils
-from ..helpers import threed
 
 from . import plotters3d
+
+try:
+    from ..helpers import threed
+except ImportError:
+    threed = None
 
 def _(text, disambiguation=None, context='Point3D'):
     """Translate text."""

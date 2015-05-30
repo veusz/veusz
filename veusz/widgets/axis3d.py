@@ -27,7 +27,11 @@ from .. import qtall as qt4
 from .. import document
 from .. import setting
 from .. import utils
-from ..helpers import threed
+
+try:
+    from ..helpers import threed
+except ImportError:
+    threed = None
 
 from . import widget
 from . import axisticks

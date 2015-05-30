@@ -26,7 +26,10 @@ from ..compat import czip, crange
 from .. import qtall as qt4
 from .. import setting
 from .. import document
-from ..helpers import threed
+try:
+    from ..helpers import threed
+except ImportError:
+    threed = None
 
 from . import plotters3d
 

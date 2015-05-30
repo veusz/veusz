@@ -23,8 +23,12 @@ from .. import qtall as qt4
 import numpy as N
 
 from .. import setting
-from ..helpers import threed
 from . import widget
+
+try:
+    from ..helpers import threed
+except ImportError:
+    threed = None
 
 def _(text, disambiguation=None, context='Plotters3D'):
     """Translate text."""
