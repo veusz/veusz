@@ -36,17 +36,35 @@ struct BSPRecord
   {
   }
 
+  // fragments stored in this node, in terms of the index to an array
+  // of indexes, frag_idxs
   unsigned minfragidxidx, nfrags;
+  // indices in bsp_recs to the BSPRecord items in front and behind
   unsigned frontidx, backidx;
 };
+
+// This class defines a specialised Binary Space Paritioning (BSP)
+// buliding routine. 3D space is split recursively by planes to
+// separate objects into front and back entries. The idea is to only
+// use the BSP tree _once_, which is unlike normal uses of BSP. It is
+// used to create a robust back->front ordering for a particular
+// viewing direction. To avoid lots of dynamic memory allocation and
+// to reduce overheads, the nodes in the BSP tree are stored in a
+// vector.
 
 class BSPBuilder
 {
 public:
-  BSPBuilder(FragmentVector& fragvec);
-  IdxVector getFragmentIdxs() const;
+  // construct the BSP tree from the fragments given and a particular
+  // viewing direction
+  BSPBuilder(FragmentVector& fragvec, Vec3 viewdirn);
 
+  // return a vector of fragment indexes in drawing order
+  IdxVector getFragmentIdxs(const FragmentVector& fragvec) const;
+
+  // the nodes in the tree
   std::vector<BSPRecord> bsp_recs;
+  // vector of indices to the fragments vector
   IdxVector frag_idxs;
 };
 

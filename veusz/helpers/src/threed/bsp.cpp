@@ -5,22 +5,19 @@
 #include "fragment.h"
 #include "bsp.h"
 
-#include <iostream>
-
 #define EPS 1e-6
-//#define EPSDIST 1e-3
 
 namespace
 {
+  // proportional to the area-squared of the triangle of points given
   inline double triAreaSqd(const Vec3* pts)
   {
     Vec3 temp = cross(pts[1]-pts[0], pts[2]-pts[0]);
     return dot(temp, temp);
   }
 
-  // find set of three points to define a plane
-  // needs to find points which are not the same
-  // return 1 if ok
+  // Find set of three points to define a plane (pts).
+  // Needs to find points which are not the same return true if ok
   bool findPlane(const IdxVector& idxs, unsigned startidx,
                  const FragmentVector& frags, Vec3* pts)
   {
@@ -235,13 +232,18 @@ namespace
     BSPStackItem(unsigned _bspidx, unsigned _nidxs)
       : bspidx(_bspidx), nidxs(_nidxs)
     {}
-    unsigned bspidx;
-    unsigned nidxs;
+    unsigned bspidx; // BSPRecord we are working on here
+    unsigned nidxs;  // Number of fragment indices in to_process
   };
 
 }
 
-BSPBuilder::BSPBuilder(FragmentVector& fragvec)
+// This is a non-recursive BSP building routines. Fragment indices to
+// examine are built up on the to_process vector. A stack of
+// BSPStackItem items is used to keep track which BSP record the
+// fragment indices belong to.
+
+BSPBuilder::BSPBuilder(FragmentVector& fragvec, Vec3 viewdirn)
 {
   // initial record
   bsp_recs.reserve(fragvec.size());
@@ -284,8 +286,9 @@ BSPBuilder::BSPBuilder(FragmentVector& fragvec)
         {
           // norm of plane (making sure it points to observer)
           Vec3 norm = cross(planepts[1]-planepts[0], planepts[2]-planepts[0]);
-          if(norm(2) < 0)
+          if(dot(norm, viewdirn) < 0)
             norm = -norm;
+          // approximately normalise
           norm *= 1./(std::abs(norm(0))+std::abs(norm(1))+std::abs(norm(2)));
 
           unsigned to_process_size = to_process.size();
@@ -316,17 +319,20 @@ BSPBuilder::BSPBuilder(FragmentVector& fragvec)
           // remove items to process
           to_process.resize(to_process_size-stackitem.nidxs);
 
-          if(rec.nfrags == 0 && (idxfront.empty() && !idxback.empty()))
+          if(rec.nfrags == 0)
             {
-              frag_idxs.insert(frag_idxs.end(), idxback.begin(), idxback.end());
-              rec.nfrags = idxback.size();
-              idxback.resize(0);
-            }
-          if(rec.nfrags == 0 && (idxback.empty() && !idxfront.empty()))
-            {
-              frag_idxs.insert(frag_idxs.end(), idxfront.begin(), idxfront.end());
-              rec.nfrags = idxfront.size();
-              idxfront.resize(0);
+              if(idxfront.empty() && !idxback.empty())
+                {
+                  frag_idxs.insert(frag_idxs.end(), idxback.begin(), idxback.end());
+                  rec.nfrags = idxback.size();
+                  idxback.resize(0);
+                }
+              else if(idxback.empty() && !idxfront.empty())
+                {
+                  frag_idxs.insert(frag_idxs.end(), idxfront.begin(), idxfront.end());
+                  rec.nfrags = idxfront.size();
+                  idxfront.resize(0);
+                }
             }
 
           // push_back invalidates rec, so we don't use it below
@@ -362,13 +368,14 @@ BSPBuilder::BSPBuilder(FragmentVector& fragvec)
           to_process.resize(to_process.size()-stackitem.nidxs);
           rec.nfrags = stackitem.nidxs;
         }
-    }
 
-  std::cout << "to process finish " << to_process.size() << '\n';
+    } // while !stack.empty()
 }
 
 namespace
 {
+  // Similar stack item to keep track of the tree navigation while
+  // "drawing" the tree
   struct WalkStackItem
   {
     WalkStackItem(unsigned _idx, unsigned _stage)
@@ -385,7 +392,7 @@ namespace
 // the current items and then the front, we have two types of stack
 // items: WALK_START and WALK_RECS
 
-IdxVector BSPBuilder::getFragmentIdxs() const
+IdxVector BSPBuilder::getFragmentIdxs(const FragmentVector& fragvec) const
 {
   IdxVector retn;
 
@@ -398,10 +405,7 @@ IdxVector BSPBuilder::getFragmentIdxs() const
       WalkStackItem stackitem(stack.back());
       stack.pop_back();
 
-      // std::cout << "BSP idx " << stackitem.bsp_idx << '\n';
-
       const BSPRecord &rec = bsp_recs[stackitem.bsp_idx];
-      // std::cout << " front "<< rec.frontidx << " back " << rec.backidx << '\n';
 
       if(stackitem.stage == 0)
         {
@@ -413,9 +417,20 @@ IdxVector BSPBuilder::getFragmentIdxs() const
         }
       else
         {
-          retn.insert(retn.end(), frag_idxs.begin()+rec.minfragidxidx,
-                      frag_idxs.begin()+rec.minfragidxidx+rec.nfrags);
-
+          // add on in order of triangle, line segment, path. this is
+          // to make edges of polygons show up and error bars put
+          // behind points
+          unsigned minidx = rec.minfragidxidx;
+          unsigned maxidx = minidx+rec.nfrags;
+          for(unsigned i=minidx; i<maxidx; ++i)
+            if(fragvec[frag_idxs[i]].type == Fragment::FR_TRIANGLE)
+              retn.push_back(frag_idxs[i]);
+          for(unsigned i=minidx; i<maxidx; ++i)
+            if(fragvec[frag_idxs[i]].type == Fragment::FR_LINESEG)
+              retn.push_back(frag_idxs[i]);
+          for(unsigned i=minidx; i<maxidx; ++i)
+            if(fragvec[frag_idxs[i]].type == Fragment::FR_PATH)
+              retn.push_back(frag_idxs[i]);
         }
     }
 
@@ -423,6 +438,7 @@ IdxVector BSPBuilder::getFragmentIdxs() const
 }
 
 #if 0
+#include <iostream>
 int main()
 {
   FragmentVector v;

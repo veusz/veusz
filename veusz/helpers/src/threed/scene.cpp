@@ -423,9 +423,10 @@ void Scene::render(QPainter* painter, const Camera& cam,
 
   std::cout << "\nFragment size 1 " << fragments.size() << '\n';
 
-
-  BSPBuilder bsp(fragments);
-  depths = bsp.getFragmentIdxs();
+  // does this assume a particular layout for the view matrix?
+  Vec3 viewdirn(-cam.viewM(2,0), -cam.viewM(2,1), -cam.viewM(2,2));
+  BSPBuilder bsp(fragments, viewdirn);
+  depths = bsp.getFragmentIdxs(fragments);
 
   std::cout << "BSP recs size " << bsp.bsp_recs.size() << '\n';
   std::cout << "Fragment size 2 " << fragments.size() << '\n';
