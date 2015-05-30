@@ -12,106 +12,79 @@
 
 namespace
 {
-  // calculate depth (Z) of fragment
-  inline double fragZ(const Fragment& f)
+  inline double triAreaSqd(const Vec3* pts)
   {
-    switch(f.type)
-      {
-      case Fragment::FR_PATH:
-        return f.points[0](2);
-      case Fragment::FR_LINESEG:
-        return (f.points[0](2)+f.points[1](2))*(1./2);
-      case Fragment::FR_TRIANGLE:
-        return (f.points[0](2)+f.points[1](2)+f.points[2](2))*(1./3);
-      default:
-        return std::numeric_limits<double>::max();
-      }
-  }
-
-  // for sorting fragments in Z
-  struct FragZCompareMin
-  {
-    FragZCompareMin(const FragmentVector& v)
-      : vec(v)
-    {}
-    bool operator()(unsigned i, unsigned j) const
-    {
-      return fragZ(vec[i]) > fragZ(vec[j]);
-    }
-    const FragmentVector& vec;
-  };
-
-  // are points close?
-  inline bool close(const Vec3& p1, const Vec3& p2)
-  {
-    return (std::abs(p1(0)-p2(0))<1e-2 && std::abs(p1(1)-p2(1))<1e-2 &&
-            std::abs(p1(2)-p2(2))<1e-2);
-  }
-
-  bool _addPoint(unsigned& ptct, Vec3* pts, const Vec3& pt)
-  {
-    // don't add points close to existing points
-    for(unsigned i=0; i<ptct; ++i)
-      if(close(pts[i], pt))
-        return 0;
-
-    // don't add parallel vectors
-    if(ptct == 2)
-      {
-        Vec3 norm = cross(pt-pts[0], pts[1]-pts[0]);
-        //std::cout << "norm here " << norm(0) << ' ' << norm(1) << ' ' << norm(2) << '\n';
-        if(std::abs(norm(0)) < EPS && std::abs(norm(1)) < EPS && std::abs(norm(2)) < EPS)
-          return 0;
-      }
-    pts[ptct++] = pt;
-    return ptct == 3;
+    Vec3 temp = cross(pts[1]-pts[0], pts[2]-pts[0]);
+    return dot(temp, temp);
   }
 
   // find set of three points to define a plane
   // needs to find points which are not the same
   // return 1 if ok
   bool findPlane(const IdxVector& idxs, unsigned startidx,
-                 FragmentVector& v, Vec3* pts)
+                 const FragmentVector& frags, Vec3* pts)
   {
+    double maxtriarea2 = -1;
+    unsigned besttri = EMPTY_BSP_IDX;
+
+    Vec3 temppts[3];
+    unsigned ptct = 0;
+    double maxptsarea2 = -1;
+
+    // Algorithm is to find the biggest triangle, then if none, the
+    // set of 3 points with the largest area. We prefer triangles as
+    // splitting them is expensive in terms of numbers of fragments.
+
+    // Using larger triangles is a heuristic to prevent lots of split
+    // triangles. Empirically it seems to reduce the number of final
+    // fragments by quite a lot.
     const unsigned endidx = idxs.size();
-    const unsigned nelem = endidx-startidx;
-    const unsigned centre = (startidx+endidx)/2;
-
-    // std::cout << "nelem " << nelem << '\n';
-
-    // choose triangle first
     for(unsigned i=startidx; i<endidx; ++i)
       {
-        if(v[idxs[i]].type == Fragment::FR_TRIANGLE)
+        const Fragment& f = frags[idxs[i]];
+        if(f.type == Fragment::FR_TRIANGLE)
           {
-            for(unsigned j=0; j<3; ++j)
-              pts[j] = v[idxs[i]].points[j];
-            return 1;
+            double areasqd = triAreaSqd(f.points);
+            if(areasqd > maxtriarea2)
+              {
+                maxtriarea2 = areasqd;
+                besttri = i;
+              }
+          }
+        else if(besttri == EMPTY_BSP_IDX)
+          // only bother looking at other points if we haven't found a
+          // triangle yet
+          {
+            // this is a crude rotating buffer looking for larger triangles
+            if(f.type == Fragment::FR_LINESEG || f.type == Fragment::FR_PATH)
+              temppts[(ptct++)%3] = f.points[0];
+            if(f.type == Fragment::FR_LINESEG)
+              temppts[(ptct++)%3] = f.points[1];
+            if(ptct >= 3)
+              {
+                double areasqd = triAreaSqd(temppts);
+                if(areasqd > maxptsarea2)
+                  {
+                    for(unsigned j=0; j<3; ++j)
+                      pts[j] = temppts[j];
+                    maxptsarea2 = areasqd;
+                  }
+              }
           }
       }
 
-    unsigned ptct = 0;
-    for(unsigned delta=0; delta<=nelem/2; ++delta)
+    // return triangle
+    if(besttri != EMPTY_BSP_IDX)
       {
-        if(centre+delta < endidx)
-          {
-            // std::cout << "+ve\n";
-            const Fragment& f = v[idxs[centre+delta]];
-            for(unsigned i=0; i<f.nPoints(); ++i)
-              if( _addPoint(ptct, pts, f.points[i]) )
-                return 1;
-          }
-        if(delta > 0 && startidx+delta<=centre)
-          {
-            // std::cout << "-ve\n";
-            const Fragment& f = v[idxs[centre-delta]];
-            for(unsigned i=0; i<f.nPoints(); ++i)
-              if( _addPoint(ptct, pts, f.points[i]) )
-                return 1;
-          }
+        for(unsigned i=0; i<3; ++i)
+          pts[i] = frags[idxs[besttri]].points[i];
+        return 1;
       }
-    // std::cout << "bail out\n";
-    return 0;
+    else
+      {
+        // is the returned triangle valid?
+        return maxptsarea2 > EPS;
+      }
   }
 
   // sign of calculated dot
@@ -382,15 +355,9 @@ BSPBuilder::BSPBuilder(FragmentVector& fragvec)
         }
       else
         {
-          if(stackitem.nidxs > 1)
-            {
-              std::cout << "couldn't find plane! " << stackitem.nidxs << "\n";
-            }
-
           // single item to process or plane couldn't be found
           frag_idxs.insert(frag_idxs.end(),
-                           to_process.begin()+
-                           (to_process.size()-stackitem.nidxs),
+                           to_process.end()-stackitem.nidxs,
                            to_process.end());
           to_process.resize(to_process.size()-stackitem.nidxs);
           rec.nfrags = stackitem.nidxs;
