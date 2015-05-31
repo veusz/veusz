@@ -277,7 +277,7 @@ class Triangle : public Object /NoDefaultCtors/
 #include <objects.h>
 %End
  public:
-  Triangle(const Vec4&, const Vec4&, const Vec4&,
+  Triangle(const Vec3&, const Vec3&, const Vec3&,
 	   const SurfaceProp* surfaceprop /Transfer/);
 };
 
@@ -346,14 +346,33 @@ class ObjectContainer : public Object
   Mat4 objM;
 };
 
-class ClipContainer : public Object
+class TriangleFacing : public Triangle
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+public:
+  TriangleFacing(const Vec3& a, const Vec3& b, const Vec3& c,
+                 const SurfaceProp* prop /Transfer/);
+};
+
+class FacingContainer : public ObjectContainer
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+public:
+  FacingContainer(Vec3 _norm);
+  Vec3 norm;
+};
+
+class ClipContainer : public ObjectContainer
 {
 %TypeHeaderCode
 #include <clipcontainer.h>
 %End
  public:
   ClipContainer(Vec3 minpt, Vec3 maxpt);
-  void addObject(Object* obj /Transfer/);
 };
 
 ////////////////////////////////////////////////////////////////

@@ -44,7 +44,7 @@ class Triangle : public Object
     : Object(), surfaceprop(0)
   {
   }
-  Triangle(const Vec4& a, const Vec4& b, const Vec4& c,
+  Triangle(const Vec3& a, const Vec3& b, const Vec3& c,
 	   const SurfaceProp* prop=0)
     : surfaceprop(prop)
   {
@@ -54,7 +54,7 @@ class Triangle : public Object
   void getFragments(const Mat4& outerM, FragmentVector& v);
 
  public:
-  Vec4 points[3];
+  Vec3 points[3];
   PropSmartPtr<const SurfaceProp> surfaceprop;
 };
 
@@ -168,6 +168,17 @@ public:
   PropSmartPtr<const SurfaceProp> surfacefill;
 };
 
+// A triangle only visible if its norm (translated to viewing space) is +ve
+class TriangleFacing : public Triangle
+{
+public:
+  TriangleFacing(const Vec3& a, const Vec3& b, const Vec3& c,
+	   const SurfaceProp* prop=0)
+    : Triangle(a, b, c, prop)
+  {}
+
+  void getFragments(const Mat4& outerM, FragmentVector& v);
+};
 
 // container of objects with transformation matrix of children
 // Note: object pointers passed to object will be deleted when this
@@ -191,5 +202,22 @@ class ObjectContainer : public Object
   Mat4 objM;
   std::vector<Object*> objects;
 };
+
+// container which only draws contents if the norm is pointing in +ve
+// z direction
+
+class FacingContainer : public ObjectContainer
+{
+public:
+  FacingContainer(Vec3 _norm)
+    : ObjectContainer(), norm(_norm)
+  {
+  }
+  void getFragments(const Mat4& outerM, FragmentVector& v);
+
+public:
+  Vec3 norm;
+};
+
 
 #endif

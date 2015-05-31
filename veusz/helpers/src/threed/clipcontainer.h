@@ -25,20 +25,15 @@
 #include "fragment.h"
 
 // container which clips children in a 3D box
-class ClipContainer : public Object
+class ClipContainer : public ObjectContainer
 {
 public:
   ClipContainer(Vec3 _minpt, Vec3 _maxpt)
-    : minpt(_minpt), maxpt(_maxpt)
+    : ObjectContainer(), minpt(_minpt), maxpt(_maxpt)
   {
   }
 
   void getFragments(const Mat4& outerM, FragmentVector& v);
-
-  void addObject(Object* obj)
-  {
-    objects.push_back(obj);
-  }
 
   bool pointInBounds(Vec3 pt) const
   {
@@ -48,7 +43,6 @@ public:
 
  public:
   Vec3 minpt, maxpt;
-  std::vector<Object*> objects;
 };
 
 #endif

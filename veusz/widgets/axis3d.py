@@ -396,11 +396,53 @@ class Axis3D(widget.Widget):
         log2 = N.log(self.plottedrange[1])
         return (N.log(N.clip(v, 1e-99, 1e99)) - log1) / (log2 - log1)
 
-    def addAxisTicks(self, tickprops, tickvals, cont, dirn, op1, op2):
+    def getAutoMirrorCombs(self):
+        """Get combinations of other position for auto mirroring."""
+        s = self.settings
+        op1 = s.otherPosition1
+        op2 = s.otherPosition2
+        if not s.autoMirror:
+            return ((op1, op2),)
+        if op1 == 0 or op1 == 1:
+            op1list = [0, 1]
+        else:
+            op1list = [op1]
+        if op2 == 0 or op2 == 1:
+            op2list = [0, 1]
+        else:
+            op2list = [op2]
+        return itertools.product(op1list, op2list)
+
+    def addAxisLine(self, cont, dirn):
+        """Build list of lines to draw axis line, mirroring if necessary."""
+
+        s = self.settings
+        if s.Line.hide:
+            return
+        lower, upper = s.lowerPosition, s.upperPosition
+
+        outstart = []
+        outend = []
+        for op1, op2 in self.getAutoMirrorCombs():
+            if dirn == 'x':
+                outstart += [lower, op1, op2]
+                outend += [upper, op1, op2]
+            elif dirn == 'y':
+                outstart += [op1, lower, op2]
+                outend += [op1, upper, op2]
+            else:
+                outstart += [op1, op2, lower]
+                outend += [op1, op2, upper]
+
+        startpts = threed.ValVector(outstart)
+        endpts = threed.ValVector(outend)
+        lineprop = s.Line.makeLineProp()
+        cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
+
+    def addAxisTicks(self, tickprops, tickvals, cont, dirn):
         """Add ticks for the vals and tick properties class given.
         cont: container to add ticks
         dirn: 'x', 'y', 'z' for axis
-        op1, op2: position of axis in other directions
         """
 
         if tickprops.hide:
@@ -409,27 +451,13 @@ class Axis3D(widget.Widget):
         ticklen = tickprops.length * 1e-3
         tfracs = self.dataToLogicalCoords(tickvals)
 
-        if self.settings.autoMirror:
-            if op1 == 0 or op1 == 1:
-                op1list = [0, 1]
-            else:
-                op1list = [op1]
-            if op2 == 0 or op2 == 1:
-                op2list = [0, 1]
-            else:
-                op2list = [op2]
-        else:
-            op1list = [op1]
-            op2list = [op2]
-
         outstart = []
         outend = []
-        # generate combinations of op1list and op2list
-        for op1v, op2v in itertools.product(op1list, op2list):
-            op1pts = N.full_like(tfracs, op1v)
-            op2pts = N.full_like(tfracs, op2v)
-            op1pts2 = N.full_like(tfracs, op1v+ticklen*(1 if op1v < 0.5 else -1))
-            op2pts2 = N.full_like(tfracs, op2v+ticklen*(1 if op2v < 0.5 else -1))
+        for op1, op2 in self.getAutoMirrorCombs():
+            op1pts = N.full_like(tfracs, op1)
+            op2pts = N.full_like(tfracs, op2)
+            op1pts2 = N.full_like(tfracs, op1+ticklen*(1 if op1 < 0.5 else -1))
+            op2pts2 = N.full_like(tfracs, op2+ticklen*(1 if op2 < 0.5 else -1))
 
             if dirn == 'x':
                 pts1 = (tfracs, op1pts, op2pts)
@@ -457,28 +485,11 @@ class Axis3D(widget.Widget):
         s = self.settings
         dirn = s.direction
 
-        op1, op2 = s.otherPosition1, s.otherPosition2
-        lower, upper = s.lowerPosition, s.upperPosition
-        if dirn == 'x':
-            axisline = [(lower,op1,op2),(upper,op1,op2)]
-        elif dirn == 'y':
-            axisline = [(op1,lower,op2),(op1,upper,op2)]
-        else:
-            axisline = [(op1,op2,lower),(op1,op2,upper)]
-        axislineprop = s.Line.makeLineProp()
-
         cont = threed.ObjectContainer()
 
-        # axis line
-        line = threed.PolyLine(axislineprop)
-        line.addPoint(threed.Vec3(*axisline[0]))
-        line.addPoint(threed.Vec3(*axisline[1]))
-        cont.addObject(line)
-
-        self.addAxisTicks(
-            s.MajorTicks, self.majortickscalc, cont, dirn, op1, op2)
-        self.addAxisTicks(
-            s.MinorTicks, self.minortickscalc, cont, dirn, op1, op2)
+        self.addAxisLine(cont, dirn)
+        self.addAxisTicks(s.MajorTicks, self.majortickscalc, cont, dirn)
+        self.addAxisTicks(s.MinorTicks, self.minortickscalc, cont, dirn)
 
         return cont
 

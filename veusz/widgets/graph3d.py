@@ -37,6 +37,11 @@ def _(text, disambiguation=None, context='Graph3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+class BackSurface(setting.Surface3D):
+    def __init__(self, name, **args):
+        setting.Surface3D.__init__(self, name, **args)
+        self.get('color').newDefault('white')
+
 class Graph3D(widget.Widget):
     """3D graph (orthogonal) containing other widgets."""
     
@@ -44,12 +49,13 @@ class Graph3D(widget.Widget):
     allowusercreation = True
     description = _('3d graph')
 
+    # start and end points of edges of cube
     _borderedges = (
-        ((0,0,0), (1,0,0)),
-        ((0,0,0), (0,1,0)),
         ((0,0,0), (0,0,1)),
-        ((0,0,1), (1,0,1)),
+        ((0,0,0), (0,1,0)),
+        ((0,0,0), (1,0,0)),
         ((0,0,1), (0,1,1)),
+        ((0,0,1), (1,0,1)),
         ((0,1,0), (0,1,1)),
         ((0,1,0), (1,1,0)),
         ((0,1,1), (1,1,1)),
@@ -57,6 +63,16 @@ class Graph3D(widget.Widget):
         ((1,0,0), (1,1,0)),
         ((1,0,1), (1,1,1)),
         ((1,1,0), (1,1,1)),
+    )
+
+    # centres of each face
+    _facecentres = (
+        (0.0, 0.5, 0.5),
+        (0.5, 0.0, 0.5),
+        (0.5, 0.5, 0.0),
+        (0.5, 0.5, 1.0),
+        (0.5, 1.0, 0.5),
+        (1.0, 0.5, 0.5),
     )
 
     def __init__(self, parent, name=None):
@@ -135,6 +151,11 @@ class Graph3D(widget.Widget):
             descr = _('Graph border'),
             usertext = _('Border')),
                pixmap = 'settings_border' )
+        s.add(BackSurface(
+            'Back',
+            descr = _('Graph back'),
+            usertext = _('Back')),
+               pixmap = 'settings_bgfill' )
 
     @classmethod
     def allowedParentTypes(self):
@@ -187,6 +208,43 @@ class Graph3D(widget.Widget):
                  s.get('rightMargin').convert(painthelper),
                  s.get('bottomMargin').convert(painthelper) )
 
+    def addBorder(self, root):
+        s = self.settings
+        if s.Border.hide:
+            return
+        lineprop = s.Border.makeLineProp()
+        edges = N.array(self._borderedges)
+        ls = threed.LineSegments(
+            threed.ValVector(N.ravel(edges[:,0,:])),
+            threed.ValVector(N.ravel(edges[:,1,:])),
+            lineprop)
+        root.addObject(ls)
+
+    def addBackSurface(self, root):
+        back = self.settings.Back
+        if back.hide:
+            return
+        prop = back.makeSurfaceProp()
+
+        # triangles with the correct orientation of the norm vector
+        # not to draw the surface if it is pointing towards the viewer
+        for p1, p2, p3 in (
+                ((0,0,0), (0,0,1), (1,0,0)),
+                ((0,0,1), (0,0,0), (0,1,0)),
+                ((0,1,0), (0,1,1), (0,0,1)),
+                ((0,1,0), (1,1,0), (0,1,1)),
+                ((0,1,0), (0,0,0), (1,0,0)),
+                ((0,1,1), (1,0,1), (0,0,1)),
+                ((0,1,1), (1,1,1), (1,0,1)),
+                ((1,0,0), (1,1,0), (0,1,0)),
+                ((1,0,1), (1,0,0), (0,0,1)),
+                ((1,0,1), (1,1,0), (1,0,0)),
+                ((1,0,1), (1,1,1), (1,1,0)),
+                ((1,1,0), (1,1,1), (0,1,1)),
+        ):
+            root.addObject(threed.TriangleFacing(
+                threed.Vec3(*p1), threed.Vec3(*p2), threed.Vec3(*p3), prop))
+
     def draw(self, parentposn, painthelper, outerbounds=None):
         '''Update the margins before drawing.'''
         bounds = self.computeBounds(parentposn, painthelper)
@@ -228,16 +286,9 @@ class Graph3D(widget.Widget):
            if obj:
                scene.root.addObject(obj)
 
-        if not s.Border.hide:
-            lineprop = s.Border.makeLineProp()
-            edges = N.array(self._borderedges)
-            ls = threed.LineSegments(
-                threed.ValVector(N.ravel(edges[:,0,:])),
-                threed.ValVector(N.ravel(edges[:,1,:])),
-                lineprop)
-            scene.root.addObject(ls)
+        self.addBorder(scene.root)
+        self.addBackSurface(scene.root)
 
-        borderlineprop = threed.LineProp()
         camera = threed.Camera()
         camera.setPointing(
             threed.Vec3(s.distance, 0., 0.), threed.Vec3(0.,0.,0.),

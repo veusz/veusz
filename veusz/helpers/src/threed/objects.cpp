@@ -37,7 +37,7 @@ void Triangle::getFragments(const Mat4& outerM, FragmentVector& v)
   f.surfaceprop = surfaceprop.ptr();
   f.lineprop = 0;
   for(unsigned i=0; i<3; ++i)
-    f.points[i] = vec4to3(outerM*points[i]);
+    f.points[i] = vec4to3(outerM*vec3to4(points[i]));
   f.object = this;
 
   v.push_back(f);
@@ -283,7 +283,19 @@ void Points::getFragments(const Mat4& outerM, FragmentVector& v)
     }
 }
 
-// ClipContainer
+// TriangleFacing
+/////////////////
+
+void TriangleFacing::getFragments(const Mat4& outerM, FragmentVector& v)
+{
+  Vec3 torigin = vec4to3(outerM*Vec4(0,0,0,1));
+  Vec3 norm = cross(points[1]-points[0], points[2]-points[0]);
+  Vec3 tnorm = vec4to3(outerM*vec3to4(norm));
+
+  // norm points towards +z
+  if(tnorm(2) > torigin(2))
+    Triangle::getFragments(outerM, v);
+}
 
 // ObjectContainer
 //////////////////
@@ -301,4 +313,16 @@ void ObjectContainer::getFragments(const Mat4& outerM, FragmentVector& v)
   unsigned s=objects.size();
   for(unsigned i=0; i<s; ++i)
     objects[i]->getFragments(totM, v);
+}
+
+// FacingContainer
+
+void FacingContainer::getFragments(const Mat4& outerM, FragmentVector& v)
+{
+  Vec3 origin = vec4to3(outerM*Vec4(0,0,0,1));
+  Vec3 tnorm = vec4to3(outerM*vec3to4(norm));
+
+  // norm points towards +z
+  if(tnorm(2) > origin(2))
+    ObjectContainer::getFragments(outerM, v);
 }
