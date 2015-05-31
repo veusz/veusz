@@ -21,7 +21,11 @@ positions."""
 
 from __future__ import division
 import numpy as N
+import itertools
 
+from . import widget
+from . import axisticks
+from .axis import AxisLabel, TickLabel, AutoRange
 from ..compat import czip
 from .. import qtall as qt4
 from .. import document
@@ -33,14 +37,68 @@ try:
 except ImportError:
     threed = None
 
-from . import widget
-from . import axisticks
-from .axis import (MajorTick, MinorTick, GridLine, MinorGridLine,
-                   AxisLabel, TickLabel, AutoRange)
-
 def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+class MajorTick(setting.Line3D):
+    '''Major tick settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line3D.__init__(self, name, **args)
+        self.get('color').newDefault('grey')
+        self.add(setting.Float(
+            'length',
+            20.,
+            descr = _('Length of major ticks'),
+            usertext= _('Length')))
+        self.add(setting.Int(
+            'number',
+            6,
+            descr = _('Number of major ticks to aim for'),
+            usertext= _('Number')))
+        self.add(setting.FloatList(
+            'manualTicks',
+            [],
+            descr = _('List of tick values'
+                      ' overriding defaults'),
+            usertext= _('Manual ticks')))
+
+class MinorTick(setting.Line3D):
+    '''Minor tick settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line3D.__init__(self, name, **args)
+        self.get('color').newDefault('grey')
+        self.add( setting.Float(
+            'length',
+            10,
+            descr = _('Length of minor ticks'),
+            usertext= _('Length')))
+        self.add( setting.Int(
+            'number',
+            20,
+            descr = _('Number of minor ticks to aim for'),
+            usertext= _('Number')))
+
+class GridLine(setting.Line3D):
+    '''Grid line settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line3D.__init__(self, name, **args)
+
+        self.get('color').newDefault('grey')
+        self.get('hide').newDefault(True)
+
+class MinorGridLine(setting.Line3D):
+    '''Minor tick grid line settings.'''
+
+    def __init__(self, name, **args):
+        setting.Line3D.__init__(self, name, **args)
+
+        self.get('color').newDefault('lightgrey')
+        self.get('hide').newDefault(True)
+
 
 class Axis3D(widget.Widget):
     """Manages and draws an axis."""
@@ -338,6 +396,62 @@ class Axis3D(widget.Widget):
         log2 = N.log(self.plottedrange[1])
         return (N.log(N.clip(v, 1e-99, 1e99)) - log1) / (log2 - log1)
 
+    def addAxisTicks(self, tickprops, tickvals, cont, dirn, op1, op2):
+        """Add ticks for the vals and tick properties class given.
+        cont: container to add ticks
+        dirn: 'x', 'y', 'z' for axis
+        op1, op2: position of axis in other directions
+        """
+
+        if tickprops.hide:
+            return
+
+        ticklen = tickprops.length * 1e-3
+        tfracs = self.dataToLogicalCoords(tickvals)
+
+        if self.settings.autoMirror:
+            if op1 == 0 or op1 == 1:
+                op1list = [0, 1]
+            else:
+                op1list = [op1]
+            if op2 == 0 or op2 == 1:
+                op2list = [0, 1]
+            else:
+                op2list = [op2]
+        else:
+            op1list = [op1]
+            op2list = [op2]
+
+        outstart = []
+        outend = []
+        # generate combinations of op1list and op2list
+        for op1v, op2v in itertools.product(op1list, op2list):
+            op1pts = N.full_like(tfracs, op1v)
+            op2pts = N.full_like(tfracs, op2v)
+            op1pts2 = N.full_like(tfracs, op1v+ticklen*(1 if op1v < 0.5 else -1))
+            op2pts2 = N.full_like(tfracs, op2v+ticklen*(1 if op2v < 0.5 else -1))
+
+            if dirn == 'x':
+                pts1 = (tfracs, op1pts, op2pts)
+                pts2 = (tfracs, op1pts2, op2pts)
+                pts3 = (tfracs, op1pts, op2pts2)
+            elif dirn == 'y':
+                pts1 = (op1pts, tfracs, op2pts)
+                pts2 = (op1pts2, tfracs, op2pts)
+                pts3 = (op1pts, tfracs, op2pts2)
+            else:
+                pts1 = (op1pts, op2pts, tfracs)
+                pts2 = (op1pts2, op2pts, tfracs)
+                pts3 = (op1pts, op2pts2, tfracs)
+
+            outstart += [N.ravel(N.column_stack(pts1)), N.ravel(N.column_stack(pts1))]
+            outend += [N.ravel(N.column_stack(pts2)), N.ravel(N.column_stack(pts3))]
+
+        startpts = threed.ValVector(N.concatenate(outstart))
+        endpts = threed.ValVector(N.concatenate(outend))
+        lineprop = tickprops.makeLineProp()
+        cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
+
     def drawToObject(self):
 
         s = self.settings
@@ -354,10 +468,18 @@ class Axis3D(widget.Widget):
         axislineprop = s.Line.makeLineProp()
 
         cont = threed.ObjectContainer()
+
+        # axis line
         line = threed.PolyLine(axislineprop)
         line.addPoint(threed.Vec3(*axisline[0]))
         line.addPoint(threed.Vec3(*axisline[1]))
         cont.addObject(line)
+
+        self.addAxisTicks(
+            s.MajorTicks, self.majortickscalc, cont, dirn, op1, op2)
+        self.addAxisTicks(
+            s.MinorTicks, self.minortickscalc, cont, dirn, op1, op2)
+
         return cont
 
 # allow the factory to instantiate an axis

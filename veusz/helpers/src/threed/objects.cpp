@@ -95,6 +95,18 @@ LineSegments::LineSegments(const ValVector& x1, const ValVector& y1, const ValVe
     }
 }
 
+LineSegments::LineSegments(const ValVector& pts1, const ValVector& pts2,
+                           const LineProp* prop)
+  : Object(), lineprop(prop)
+{
+  unsigned size = std::min(pts1.size(), pts2.size());
+  for(unsigned i=0; i<size; i+=3)
+    {
+      points.push_back(Vec3(pts1[i], pts1[i+1], pts1[i+2]));
+      points.push_back(Vec3(pts2[i], pts2[i+1], pts2[i+2]));
+    }
+}
+
 void LineSegments::getFragments(const Mat4& outerM, FragmentVector& v)
 {
   Fragment f;

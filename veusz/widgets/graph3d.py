@@ -232,9 +232,8 @@ class Graph3D(widget.Widget):
             lineprop = s.Border.makeLineProp()
             edges = N.array(self._borderedges)
             ls = threed.LineSegments(
-                threed.ValVector(edges[:,0,0]), threed.ValVector(edges[:,0,1]),
-                threed.ValVector(edges[:,0,2]), threed.ValVector(edges[:,1,0]),
-                threed.ValVector(edges[:,1,1]), threed.ValVector(edges[:,1,2]),
+                threed.ValVector(N.ravel(edges[:,0,:])),
+                threed.ValVector(N.ravel(edges[:,1,:])),
                 lineprop)
             scene.root.addObject(ls)
 

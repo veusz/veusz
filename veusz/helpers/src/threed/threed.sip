@@ -301,6 +301,8 @@ class LineSegments : public Object
   LineSegments(const ValVector& x1, const ValVector& y1, const ValVector& z1,
                const ValVector& x2, const ValVector& y2, const ValVector& z2,
                const LineProp* prop /Transfer/);
+  LineSegments(const ValVector& pts1, const ValVector& pts2,
+               const LineProp* prop /Transfer/);
 };
 
 class Mesh : public Object /NoDefaultCtors/

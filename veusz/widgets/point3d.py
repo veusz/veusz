@@ -149,7 +149,7 @@ class Point3D(plotters3d.GenericPlotter3D):
         if not xv or not yv or not zv:
             return
 
-        scalepoints = s.get('scalePoints').getData(doc)
+        scalepts = s.get('scalePoints').getData(doc)
 
         xcoord = threed.ValVector(axes[0].dataToLogicalCoords(xv.data))
         ycoord = threed.ValVector(axes[1].dataToLogicalCoords(yv.data))
@@ -168,6 +168,8 @@ class Point3D(plotters3d.GenericPlotter3D):
         if markerlineprop or markerfillprop:
             ptobj = threed.Points(xcoord, ycoord, zcoord, pointpath,
                                   markerlineprop, markerfillprop)
+            if scalepts:
+                ptobj.setSizes(threed.ValVector(scalepts.data))
             clipcontainer.addObject(ptobj)
 
         if not s.PlotLine.hide:
