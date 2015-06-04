@@ -69,10 +69,7 @@ void PolyLine::getFragments(const Mat4& outerM, FragmentVector& v)
       f.points[0] = vec4to3(outerM*vec3to4(points[i]));
 
       if(i > 0 && (f.points[0]+f.points[1]).isfinite())
-        {
-          v.push_back(f);
-          f.bumpIndex();
-        }
+        v.push_back(f);
     }
 }
 
@@ -120,7 +117,6 @@ void LineSegments::getFragments(const Mat4& outerM, FragmentVector& v)
       f.points[0] = vec4to3(outerM*vec3to4(points[i]));
       f.points[1] = vec4to3(outerM*vec3to4(points[i+1]));
       v.push_back(f);
-      f.bumpIndex();
     }
 }
 
@@ -186,10 +182,7 @@ void Mesh::getLineFragments(const Mat4& outerM, FragmentVector& v)
               fl.points[0] = vec4to3(outerM*pt);
 
               if(stepi > 0 && (fl.points[0]+fl.points[1]).isfinite())
-                {
-                  v.push_back(fl);
-                  fl.bumpIndex();
-                }
+                v.push_back(fl);
             }
         }
     }
@@ -240,11 +233,9 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, FragmentVector& v)
 
         fs.points[0] = vec4to3(outerM*p0);
         v.push_back(fs);
-        fs.bumpIndex();
 
         fs.points[0] = vec4to3(outerM*p3);
         v.push_back(fs);
-        fs.bumpIndex();
       }
 }
 
@@ -276,10 +267,7 @@ void Points::getFragments(const Mat4& outerM, FragmentVector& v)
         fp.pathsize = sizes[i];
 
       if(fp.points[0].isfinite())
-        {
-          v.push_back(fp);
-          fp.bumpIndex();
-        }
+        v.push_back(fp);
     }
 }
 

@@ -24,8 +24,6 @@
 
 #define EPS 1e-5
 
-unsigned Fragment::_count = 0;
-
 namespace
 {
   inline double trimEpsSqd(double v)
@@ -320,7 +318,6 @@ namespace
     Vec3 orignorm = triNormal(f.points);
 
     Fragment newf = f;
-    newf.bumpIndex();
     newf.points[0] = f.points[corner];
     newf.points[1] = newcorner;
     newf.points[2] = f.points[(corner+1)%3];
@@ -329,7 +326,6 @@ namespace
       std::swap(newf.points[1], newf.points[2]);
     frags.push_back(newf);
 
-    newf.bumpIndex();
     newf.points[1] = newcorner;
     newf.points[2] = f.points[(corner+2)%3];
     if(scaleFactor(triNormal(newf.points), orignorm) < 0)
@@ -397,7 +393,6 @@ namespace
     Fragment newf(frag);
 
     // this is the triangle to one side of the crossing line
-    newf.bumpIndex();
     newf.points[0] = frag.points[common];
     newf.points[1] = cornerpos[0];
     newf.points[2] = cornerpos[1];
@@ -412,7 +407,6 @@ namespace
     static const unsigned otherpt1[3] = {1, 0, 0};
     static const unsigned otherpt2[3] = {2, 2, 1};
 
-    newf.bumpIndex();
     newf.points[0] = cornerpos[0];
     newf.points[1] = frag.points[otherpt1[common]];
     newf.points[2] = frag.points[otherpt2[common]];
@@ -420,7 +414,6 @@ namespace
       std::swap(newf.points[1], newf.points[2]);
     frags.push_back(newf);
 
-    newf.bumpIndex();
     newf.points[0] = cornerpos[0];
     newf.points[1] = frag.points[otherpt2[common]];
     newf.points[2] = cornerpos[1];
@@ -585,7 +578,6 @@ namespace
       {
         const Triangle2D& t = tris1[i];
         Fragment templ(f1);
-        templ.bumpIndex();
         templ.splitcount++;
         for(unsigned j=0; j<3; ++j)
           templ.proj[j] = Vec3(t[j](0), t[j](1), 0);
@@ -598,7 +590,6 @@ namespace
       {
         const Triangle2D& t = tris2[i];
         Fragment templ(f2);
-        templ.bumpIndex();
         templ.splitcount++;
         for(unsigned j=0; j<3; ++j)
           templ.proj[j] = Vec3(t[j](0), t[j](1), 0);

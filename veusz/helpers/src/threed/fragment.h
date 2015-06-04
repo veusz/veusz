@@ -77,8 +77,6 @@ struct Fragment
   // for debugging
   unsigned index;
 
-  static unsigned _count;
-
   // zero on creation
   Fragment()
   : type(FR_NONE),
@@ -88,13 +86,8 @@ struct Fragment
     lineprop(0),
     pathsize(0),
     splitcount(0),
-    index(_count++)
+    index(0)
   {
-  }
-
-  void bumpIndex()
-  {
-    index=_count++;
   }
 
   // number of points used by fragment type
