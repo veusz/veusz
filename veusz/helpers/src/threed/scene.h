@@ -50,8 +50,8 @@ private:
   void simpleDump();
   void objDump();
 
-  void drawPath(QPainter* painter, const Fragment& frag, QPointF pt,
-                double linescale);
+  void drawPath(QPainter* painter, const Fragment& frag,
+                QPointF pt1, QPointF pt2, double linescale);
 
   // insert newnum1 fragments at idx1 and newnum2 fragments at idx2
   // into the depths array from the end of fragments

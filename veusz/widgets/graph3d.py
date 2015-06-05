@@ -20,6 +20,7 @@
 
 from __future__ import division, print_function
 
+import sys
 import math
 import numpy as N
 from ..compat import cvalues
@@ -31,6 +32,7 @@ from . import widget
 try:
     from ..helpers import threed
 except ImportError:
+    sys.stderr.write('Cannot import threed helper modules\n')
     threed = None
 
 def _(text, disambiguation=None, context='Graph3D'):

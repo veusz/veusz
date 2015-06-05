@@ -60,7 +60,7 @@ namespace
 
     for(FragmentVector::const_iterator f=frags.begin(); f!=frags.end(); ++f)
       {
-	for(unsigned p=0, np=f->nPoints(); p<np; ++p)
+	for(unsigned p=0, np=f->nPointsVisible(); p<np; ++p)
 	  {
 	    double x = f->proj[p](0);
 	    double y = f->proj[p](1);
@@ -242,14 +242,24 @@ void Scene::splitProjected()
     }
 }
 
-void Scene::drawPath(QPainter* painter, const Fragment& frag, QPointF pt, double linescale)
+void Scene::drawPath(QPainter* painter, const Fragment& frag,
+                     QPointF pt1, QPointF pt2, double linescale)
 {
-  FragmentPathParameters* pars = static_cast<FragmentPathParameters*>(frag.params);
+  FragmentPathParameters* pars =
+    static_cast<FragmentPathParameters*>(frag.params);
   double scale = frag.pathsize*linescale;
+
+  // hook into drawing routine
+  if(pars->runcallback)
+    {
+      pars->callback(painter, pt1, pt2, frag.index, scale, linescale);
+      return;
+    }
+
   if(pars->scaleedges)
     {
       painter->save();
-      painter->translate(pt.x(), pt.y());
+      painter->translate(pt1.x(), pt1.y());
       painter->scale(scale, scale);
       painter->drawPath(*(pars->path));
       painter->restore();
@@ -263,8 +273,8 @@ void Scene::drawPath(QPainter* painter, const Fragment& frag, QPointF pt, double
         {
           QPainterPath::Element el = path.elementAt(i);
           path.setElementPositionAt(i,
-                                    el.x*scale+pt.x(),
-                                    el.y*scale+pt.y());
+                                    el.x*scale+pt1.x(),
+                                    el.y*scale+pt1.y());
         }
       painter->drawPath(path);
     }
@@ -289,7 +299,7 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
       const Fragment& frag(fragments[draworder[i]]);
 
       // convert projected points to screen
-      for(unsigned pi=0, s=frag.nPoints(); pi<s; ++pi)
+      for(unsigned pi=0, s=frag.nPointsTotal(); pi<s; ++pi)
 	projpts[pi] = vecToScreen(screenM, frag.proj[pi]);
 
       switch(frag.type)
@@ -334,8 +344,6 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
           break;
 
 	case Fragment::FR_PATH:
-          if( (frag.lineprop != 0 && !frag.lineprop->hide) ||
-              (frag.surfaceprop != 0 && !frag.surfaceprop->hide) )
             {
               if(lline != frag.lineprop)
                 {
@@ -347,7 +355,7 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   lsurf = frag.surfaceprop;
                   painter->setBrush(SurfaceProp2QBrush(lsurf));
                 }
-              drawPath(painter, frag, projpts[0], linescale);
+              drawPath(painter, frag, projpts[0], projpts[1], linescale);
             }
 	  break;
 
@@ -362,7 +370,7 @@ void Scene::projectFragments(const Camera& cam)
   for(unsigned i=0, s=fragments.size(); i<s; ++i)
     {
       Fragment& f = fragments[i];
-      for(unsigned pi=0, np=f.nPoints(); pi<np; ++pi)
+      for(unsigned pi=0, np=f.nPointsTotal(); pi<np; ++pi)
         f.proj[pi] = calcProjVec(cam.perspM, f.points[pi]);
     }
 }

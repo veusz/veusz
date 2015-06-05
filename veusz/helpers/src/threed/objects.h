@@ -22,6 +22,7 @@
 #define SHAPES_H
 
 #include <QtGui/QPainterPath>
+#include <QtGui/QPainter>
 #include <algorithm>
 #include <vector>
 
@@ -103,6 +104,7 @@ public:
   PropSmartPtr<const LineProp> lineprop;
 };
 
+
 // a grid of height values on a regular mesh with grid points given
 // heights has M*N elements where M and N are the length of pos1 & pos2
 class Mesh : public Object
@@ -166,6 +168,33 @@ public:
   bool scaleedges;
   PropSmartPtr<const LineProp> lineedge;
   PropSmartPtr<const SurfaceProp> surfacefill;
+};
+
+// a "text" class which calls back draw() when drawing is requested
+class Text : public Object
+{
+public:
+  // pos1 and pos2 contain a list of x,y,z values
+  Text(const ValVector& _pos1, const ValVector& _pos2);
+
+  void getFragments(const Mat4& outerM, FragmentVector& v);
+
+  virtual void draw(QPainter* painter, QPointF pt1, QPointF pt2,
+                    unsigned index, double scale, double linescale);
+
+private:
+  class TextPathParameters : public FragmentPathParameters
+  {
+  public:
+    void callback(QPainter* painter, QPointF pt1, QPointF pt2,
+                  unsigned index,  double scale, double linescale);
+    Text* text;
+  };
+
+  TextPathParameters fragparams;
+
+public:
+  ValVector pos1, pos2;
 };
 
 // A triangle only visible if its norm (translated to viewing space) is +ve

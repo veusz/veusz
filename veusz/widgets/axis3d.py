@@ -41,6 +41,26 @@ def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+foo = []
+
+class AxisTickText(threed.Text):
+    """For drawing text at 3D locations."""
+    def __init__(self, posns, textlist, font, params):
+        threed.Text.__init__(
+            self, threed.ValVector(posns), threed.ValVector(posns))
+        self.textlist = textlist
+        self.font = font
+        self.params = params
+
+    def draw(self, painter, pt1, pt2, index, scale, linescale):
+        painter.save()
+        painter.setPen(qt4.QPen())
+        r = utils.Renderer(
+            painter, self.font, pt1.x(), pt1.y(), self.textlist[index],
+            *self.params)
+        r.render()
+        painter.restore()
+
 class MajorTick(setting.Line3D):
     '''Major tick settings.'''
 
@@ -474,6 +494,12 @@ class Axis3D(widget.Widget):
 
             outstart += [N.ravel(N.column_stack(pts1)), N.ravel(N.column_stack(pts1))]
             outend += [N.ravel(N.column_stack(pts2)), N.ravel(N.column_stack(pts3))]
+
+        text = ['%g' % t for t in tickvals]
+        att = AxisTickText(N.ravel(N.column_stack(pts1)), text,
+                           qt4.QFont(), {})
+        cont.addObject(att)
+        foo.append(att)
 
         startpts = threed.ValVector(N.concatenate(outstart))
         endpts = threed.ValVector(N.concatenate(outend))

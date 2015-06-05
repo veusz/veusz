@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <iostream>
 #include "objects.h"
 
 Object::~Object()
@@ -246,6 +247,7 @@ void Points::getFragments(const Mat4& outerM, FragmentVector& v)
 {
   fragparams.path = &path;
   fragparams.scaleedges = scaleedges;
+  fragparams.runcallback = 0;
 
   Fragment fp;
   fp.type = Fragment::FR_PATH;
@@ -269,6 +271,54 @@ void Points::getFragments(const Mat4& outerM, FragmentVector& v)
       if(fp.points[0].isfinite())
         v.push_back(fp);
     }
+}
+
+
+// Text
+///////
+
+Text::Text(const ValVector& _pos1, const ValVector& _pos2)
+  : pos1(_pos1), pos2(_pos2)
+{
+  fragparams.text = this;
+  fragparams.path = 0;
+  fragparams.scaleedges = 0;
+  fragparams.runcallback = 1;
+}
+
+void Text::TextPathParameters::callback(QPainter* painter, QPointF pt1,
+                                        QPointF pt2, unsigned index,
+                                        double scale, double linescale)
+{
+  text->draw(painter, pt1, pt2, index, scale, linescale);
+}
+
+void Text::getFragments(const Mat4& outerM, FragmentVector& v)
+{
+  Fragment fp;
+  fp.type = Fragment::FR_PATH;
+  fp.object = this;
+  fp.params = &fragparams;
+  fp.surfaceprop = 0;
+  fp.lineprop = 0;
+  fp.pathsize = 1;
+
+  unsigned numitems = std::min(pos1.size(), pos2.size()) / 3;
+  for(unsigned i=0; i<numitems; ++i)
+    {
+      unsigned base = i*3;
+      Vec4 pt1(pos1[base], pos1[base+1], pos1[base+2]);
+      fp.points[0] = vec4to3(outerM*pt1);
+      Vec4 pt2(pos2[base], pos2[base+1], pos2[base+2]);
+      fp.points[1] = vec4to3(outerM*pt2);
+      fp.index = i;
+      v.push_back(fp);
+    }
+}
+
+void Text::draw(QPainter* painter, QPointF pt1, QPointF pt2,
+                unsigned index, double scale, double linescale)
+{
 }
 
 // TriangleFacing

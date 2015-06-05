@@ -24,6 +24,15 @@
 
 #define EPS 1e-5
 
+FragmentParameters::~FragmentParameters()
+{
+}
+
+void FragmentPathParameters::callback(QPainter* painter, QPointF pt1, QPointF pt2,
+                                      unsigned index, double scale, double linescale)
+{
+}
+
 namespace
 {
   inline double trimEpsSqd(double v)

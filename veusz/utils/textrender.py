@@ -1472,8 +1472,8 @@ class _MmlRenderer(_Renderer):
 mml_re = re.compile(r'^\s*<math.*</math\s*>\s*$', re.DOTALL)
 
 def Renderer(painter, font, x, y, text,
-                alignhorz = -1, alignvert = -1, angle = 0,
-                usefullheight = False):
+             alignhorz = -1, alignvert = -1, angle = 0,
+             usefullheight = False):
     """Return an appropriate Renderer object depending on the text.
     This looks like a class name, because it was a class originally.
 

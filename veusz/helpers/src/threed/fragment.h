@@ -21,6 +21,7 @@
 #ifndef FRAGMENT_H
 #define FRAGMENT_H
 
+#include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <limits>
 #include <vector>
@@ -37,12 +38,17 @@ class Object;
 
 struct FragmentParameters
 {
+  virtual ~FragmentParameters();
 };
 
 struct FragmentPathParameters : public FragmentParameters
 {
   QPainterPath* path;
   bool scaleedges;
+  bool runcallback;
+  // optional callback function if runcallback is set
+  virtual void callback(QPainter* painter, QPointF pt1, QPointF pt2,
+                        unsigned index,  double scale, double linescale);
 };
 
 // created by drawing Objects to draw to screen
@@ -90,14 +96,27 @@ struct Fragment
   {
   }
 
-  // number of points used by fragment type
-  unsigned nPoints() const
+  // number of (visible) points used by fragment type
+  unsigned nPointsVisible() const
   {
     switch(type)
       {
       case FR_TRIANGLE: return 3;
       case FR_LINESEG: return 2;
       case FR_PATH: return 1;
+      default: return 0;
+      }
+  }
+
+  // number of points used by fragment, including hidden ones
+  // FR_PATH has an optional 2nd point for keeping track of a baseline
+  unsigned nPointsTotal() const
+  {
+    switch(type)
+      {
+      case FR_TRIANGLE: return 3;
+      case FR_LINESEG: return 2;
+      case FR_PATH: return 2;
       default: return 0;
       }
   }
@@ -148,7 +167,7 @@ struct Fragment
   // recalculate projected coordinates
   void updateProjCoords(const Mat4& projM)
   {
-    unsigned n=nPoints();
+    unsigned n=nPointsTotal();
     for(unsigned i=0; i<n; ++i)
       proj[i] = calcProjVec(projM, points[i]);
   }

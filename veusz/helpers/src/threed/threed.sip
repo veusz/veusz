@@ -269,6 +269,8 @@ class Object /NoDefaultCtors/
 %TypeHeaderCode
 #include <objects.h>
 %End
+  public:
+   virtual ~Object();
 };
 
 class Triangle : public Object /NoDefaultCtors/
@@ -332,6 +334,20 @@ class Points : public Object /NoDefaultCtors/
          const SurfaceProp* pointfill /Transfer/);
 
   void setSizes(const ValVector& _sizes);
+};
+
+// a "text" class which calls back draw() when drawing is requested
+class Text : public Object
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+public:
+  // pos1 and pos2 contain a list of x,y,z values
+  Text(const ValVector& _pos1, const ValVector& _pos2);
+
+  virtual void draw(QPainter* painter, QPointF pt1, QPointF pt2,
+                    unsigned index, double scale, double linescale);
 };
 
 class ObjectContainer : public Object
@@ -413,7 +429,5 @@ class Scene
   void render(QPainter* painter, const Camera& cam,
 	      double x1, double y1, double x2, double y2,
               RenderMode mode);
-
- public:
   ObjectContainer root;
 };
