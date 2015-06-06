@@ -44,21 +44,10 @@ public:
 
 private:
   void projectFragments(const Camera& cam);
-  void splitIntersectIn3D(unsigned idx1, const Camera& cam);
   void doDrawing(QPainter* painter, const Mat3& screenM, double linescale);
-  void fineZCompare();
-  void splitProjected();
-  void simpleDump();
-  void objDump();
 
   void drawPath(QPainter* painter, const Fragment& frag,
                 QPointF pt1, QPointF pt2, double linescale);
-
-  // insert newnum1 fragments at idx1 and newnum2 fragments at idx2
-  // into the depths array from the end of fragments
-  // also sort the idx1->idx2+newnum1+newnum2 in depth order
-  void insertFragmentsIntoDrawOrder(unsigned idx1, unsigned newnum1,
-                                    unsigned idx2, unsigned newnum2);
 
   // different rendering modes
   void renderPainters(const Camera& cam);

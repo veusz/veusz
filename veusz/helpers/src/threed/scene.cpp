@@ -28,7 +28,6 @@
 #include "fragment.h"
 #include "bsp.h"
 
-#include <cstdio>
 #include <iostream>
 
 namespace
@@ -119,128 +118,9 @@ namespace
     return QPointF(mult(0)*inv, mult(1)*inv);
   }
 
+  unsigned init_fragments_size = 512;
+
 }; // namespace
-
-// insert newnum1 fragments at idx1 and newnum2 fragments at idx2
-// into the draworder array from the end of fragments
-// also sort the idx1->idx2+newnum1+newnum2 in depth order
-void Scene::insertFragmentsIntoDrawOrder(unsigned idx1, unsigned newnum1,
-                                         unsigned idx2, unsigned newnum2)
-{
-  if(newnum1>0)
-    {
-      if(newnum1>1)
-        {
-          draworder.insert(draworder.begin()+idx1, newnum1-1, 0);
-          idx2 += newnum1-1;
-        }
-      unsigned base=fragments.size()-newnum1-newnum2;
-      for(unsigned i=0; i<newnum1; ++i)
-        draworder[idx1+i] = base+i;
-    }
-  if(newnum2>0)
-    {
-      if(newnum2>1)
-        draworder.insert(draworder.begin()+idx2, newnum2-1, 0);
-      unsigned base=fragments.size()-newnum2;
-      for(unsigned i=0; i<newnum2; ++i)
-        draworder[idx2+i] = base+i;
-    }
-
-  // calculate new draworder for fragments and resort region
-  if(newnum1+newnum2 > 0)
-    {
-      // sort depth of new items
-      std::sort(draworder.begin()+idx1,
-                draworder.begin()+(idx2+newnum2-1+1),
-                FragDepthCompareMax(fragments));
-    }
-}
-
-
-
-// split up fragments which overlap in 3D into mutiple non-overlapping
-// fragments
-void Scene::splitIntersectIn3D(unsigned idx1, const Camera& cam)
-{
- RESTART:
-
-  double thismindepth = fragments[draworder[idx1]].minDepth();
-  for(unsigned idx2=idx1+1; idx2<draworder.size(); ++idx2)
-    {
-      // printf(" %i, %g, %g\n", idx2, fragments[draworder[idx2]].minDepth(),
-      //        fragments[draworder[idx2]].maxDepth());
-
-      // don't compare object with self
-      if(fragments[draworder[idx2]].object == fragments[draworder[idx1]].object)
-	continue;
-
-      // ignore FR_NONE fragments
-      if(fragments[draworder[idx2]].type == Fragment::FR_NONE)
-        continue;
-
-      if(fragments[draworder[idx2]].maxDepth() < thismindepth)
-	// no others fragments are overlapping, as any others would be
-	// less deep
-	break;
-
-      // try to split, returning number of new fragments (if any)
-      unsigned newnum1=0, newnum2=0;
-      splitFragments(fragments[draworder[idx1]],
-		     fragments[draworder[idx2]],
-		     fragments, &newnum1, &newnum2);
-
-      // calculate new draworder for fragments and resort region
-      if(newnum1+newnum2 > 0)
-	{
-          // put and sort new fragments into draworder
-          insertFragmentsIntoDrawOrder(idx1, newnum1, idx2, newnum2);
-
-	  unsigned nlen = fragments.size();
-	  // calculate projected coordinates (with draworder)
-	  for(unsigned i=nlen-(newnum1+newnum2); i != nlen; ++i)
-	    fragments[i].updateProjCoords(cam.perspM);
-
-	  // go back to start
-	  goto RESTART;
-	}
-    }
-}
-
-void Scene::splitProjected()
-{
-
-  // assume draworder already sorted in terms of maximum depth of
-  // fragments
-
-  // iterate over fragments
-  for(unsigned idx1=0; idx1+1<draworder.size(); ++idx1)
-    {
-    RESTART:
-
-      double thismindepth = fragments[draworder[idx1]].minDepth();
-      for(unsigned idx2=idx1+1; idx2<draworder.size(); ++idx2)
-        {
-          // fragments beyond this do not overlap
-          if(fragments[draworder[idx2]].maxDepth() < thismindepth)
-            break;
-
-          //printf("%i %i /%li\n", idx1, idx2, draworder.size());
-
-          unsigned num1=0, num2=0;
-          splitOn2DOverlap(fragments, draworder[idx1], draworder[idx2], &num1, &num2);
-
-          if(num1>0 || num2>0)
-            {
-              //printf("num1=%i num2=%i\n", num1, num2);
-
-              // put and sort new fragments into draworder
-              insertFragmentsIntoDrawOrder(idx1, num1, idx2, num2);
-              goto RESTART;
-            }
-        }
-    }
-}
 
 void Scene::drawPath(QPainter* painter, const Fragment& frag,
                      QPointF pt1, QPointF pt2, double linescale)
@@ -405,7 +285,9 @@ void Scene::render(Object* root,
                    QPainter* painter, const Camera& cam,
 		   double x1, double y1, double x2, double y2)
 {
+  fragments.reserve(init_fragments_size);
   fragments.resize(0);
+  draworder.resize(0);
 
   // get fragments for whole scene
   root->getFragments(cam.viewM, fragments);
@@ -429,4 +311,9 @@ void Scene::render(Object* root,
 
   // finally draw items
   doDrawing(painter, screenM, linescale);
+
+  // don't decrease size of fragments unnecessarily, unless it is large
+  init_fragments_size = fragments.size();
+  if(init_fragments_size > 65536)
+    init_fragments_size /= 2;
 }
