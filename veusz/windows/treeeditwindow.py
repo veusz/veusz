@@ -798,7 +798,8 @@ class TreeEditDock(qt4.QDockWidget):
             selw = self.selwidgets[0]
 
         # has to be visible if is to be enabled (yuck)
-        nonorth = self.vzactions['add.nonorthpoint'].setVisible(True)
+        self.vzactions['add.nonorthpoint'].setVisible(True)
+        self.vzactions['add.point3d'].setVisible(True)
 
         # check whether each button can have this widget
         # (or a parent) as parent
@@ -814,10 +815,15 @@ class TreeEditDock(qt4.QDockWidget):
 
         # exclusive widgets
         nonorth = self.vzactions['add.nonorthpoint'].isEnabled()
+        threed = self.vzactions['add.point3d'].isEnabled()
         self.vzactions['add.nonorthpoint'].setVisible(nonorth)
-        self.vzactions['add.xy'].setVisible(not nonorth)
+        self.vzactions['add.point3d'].setVisible(threed)
+        self.vzactions['add.xy'].setVisible(not nonorth and not threed)
         self.vzactions['add.nonorthfunc'].setVisible(nonorth)
-        self.vzactions['add.function'].setVisible(not nonorth)
+        self.vzactions['add.function'].setVisible(not nonorth and not threed)
+        self.vzactions['add.function3d'].setVisible(threed)
+        self.vzactions['add.axismenu'].setVisible(not threed)
+        self.vzactions['add.axis3d'].setVisible(threed)
 
         # certain actions shouldn't work on root
         isnotroot = not any([isinstance(w, widgets.Root)
@@ -846,7 +852,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'rect', 'ellipse', 'imagefile',
                            'line', 'polygon', 'polar', 'ternary',
                            'nonorthpoint', 'nonorthfunc',
-                           'graph3d', 'function3d', 'point3d'):
+                           'graph3d', 'function3d', 'point3d', 'axis3d'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             def slotfn(klass=wc):
@@ -910,12 +916,15 @@ class TreeEditDock(qt4.QDockWidget):
             'add.grid',
             'add.graph',
             'add.axismenu',
+            'add.axis3d',
             'add.xy',
             'add.nonorthpoint',
+            'add.point3d',
             'add.bar',
             'add.fit',
             'add.function',
             'add.nonorthfunc',
+            'add.function3d',
             'add.boxplot',
             'add.image',
             'add.contour',
@@ -926,8 +935,6 @@ class TreeEditDock(qt4.QDockWidget):
             'add.polar',
             'add.ternary',
             'add.graph3d',
-            'add.function3d',
-            'add.point3d',
             'add.shapemenu',
             )
 

@@ -20,6 +20,7 @@
 positions."""
 
 from __future__ import division
+import math
 import numpy as N
 import itertools
 
@@ -41,21 +42,43 @@ def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-class AxisTickText(threed.Text):
+class _AxisTickText(threed.Text):
     """For drawing text at 3D locations."""
-    def __init__(self, posns, textlist, font, params):
+    def __init__(self, posns, posnsalong, textlist, labelprop, params):
         threed.Text.__init__(
-            self, threed.ValVector(posns), threed.ValVector(posns))
+            self, threed.ValVector(posns), threed.ValVector(posnsalong))
         self.textlist = textlist
-        self.font = font
+        self.labelprop = labelprop
         self.params = params
 
     def draw(self, painter, pt1, pt2, index, scale, linescale):
         painter.save()
         painter.setPen(qt4.QPen())
+        delpt = pt2-pt1
+
+        font = self.labelprop.makeQFont(painter)
+        fm = utils.FontMetrics(font, painter.device())
+        offset = self.labelprop.get('offset').convert(painter)
+        offset += fm.leading() + fm.descent()
+
+        # convert offset into perp dirn from delpt
+        # normalise vector
+        delpt = delpt * (offset/math.sqrt(delpt.x()**2+delpt.y()**2))
+
+        ptrans = qt4.QPointF(pt1.x()-delpt.y(), pt1.y()+delpt.x())
+
+        painter.translate(ptrans)
+
+        angle = math.atan2(delpt.y(), delpt.x()) * 180/math.pi
+        # prevent text going upside down
+        alignvert = 1
+        if angle < -90 or angle > 90:
+            angle = 180+angle
+            alignvert = -alignvert
+        painter.rotate(angle)
         r = utils.Renderer(
-            painter, self.font, pt1.x(), pt1.y(), self.textlist[index],
-            *self.params)
+            painter, font, 0, 0, self.textlist[index],
+            alignhorz=0, alignvert=alignvert)
         r.render()
         painter.restore()
 
@@ -457,8 +480,28 @@ class Axis3D(widget.Widget):
         lineprop = s.Line.makeLineProp()
         cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
 
-    def addAxisTicks(self, tickprops, tickvals, cont, dirn):
+    def addTickLabels(self, cont, labelprops, pts, ptsalong, tickvals):
+        """Make tick labels for axis."""
+
+        if labelprops.hide:
+            return None
+
+        # make strings for labels
+        fmt = labelprops.format
+        if fmt.lower() == 'auto':
+            fmt = self.autoformat
+        scale = labelprops.scale
+        text = [ utils.formatNumber(v*scale, fmt, locale=self.document.locale)
+                 for v in tickvals ]
+
+        att = _AxisTickText(
+            N.ravel(N.column_stack(pts)), N.ravel(N.column_stack(ptsalong)),
+            text, labelprops, {})
+        cont.addObject(att)
+
+    def addAxisTicks(self, tickprops, labelprops, tickvals, cont, dirn):
         """Add ticks for the vals and tick properties class given.
+        labelprops: properties of label, or None
         cont: container to add ticks
         dirn: 'x', 'y', 'z' for axis
         """
@@ -472,31 +515,34 @@ class Axis3D(widget.Widget):
         outstart = []
         outend = []
         for op1, op2 in self.getAutoMirrorCombs():
+            # where to draw tick from
             op1pts = N.full_like(tfracs, op1)
             op2pts = N.full_like(tfracs, op2)
+            # where to draw tick to
             op1pts2 = N.full_like(tfracs, op1+ticklen*(1 if op1 < 0.5 else -1))
             op2pts2 = N.full_like(tfracs, op2+ticklen*(1 if op2 < 0.5 else -1))
 
             if dirn == 'x':
-                pts1 = (tfracs, op1pts, op2pts)
-                pts2 = (tfracs, op1pts2, op2pts)
-                pts3 = (tfracs, op1pts, op2pts2)
+                ptsonaxis = (tfracs, op1pts, op2pts)
+                ptsoff1 = (tfracs, op1pts2, op2pts)
+                ptsoff2 = (tfracs, op1pts, op2pts2)
+                ptsalong = (tfracs+1e-3, op1pts, op2pts)
             elif dirn == 'y':
-                pts1 = (op1pts, tfracs, op2pts)
-                pts2 = (op1pts2, tfracs, op2pts)
-                pts3 = (op1pts, tfracs, op2pts2)
+                ptsonaxis = (op1pts, tfracs, op2pts)
+                ptsoff1 = (op1pts2, tfracs, op2pts)
+                ptsoff2 = (op1pts, tfracs, op2pts2)
+                ptsalong = (op1pts, tfracs+1e-3, op2pts)
             else:
-                pts1 = (op1pts, op2pts, tfracs)
-                pts2 = (op1pts2, op2pts, tfracs)
-                pts3 = (op1pts, op2pts2, tfracs)
+                ptsonaxis = (op1pts, op2pts, tfracs)
+                ptsoff1 = (op1pts2, op2pts, tfracs)
+                ptsoff2 = (op1pts, op2pts2, tfracs)
+                ptsalong = (op1pts, op2pts, tfracs+1e-3)
 
-            outstart += [N.ravel(N.column_stack(pts1)), N.ravel(N.column_stack(pts1))]
-            outend += [N.ravel(N.column_stack(pts2)), N.ravel(N.column_stack(pts3))]
+            outstart += [N.ravel(N.column_stack(ptsonaxis)), N.ravel(N.column_stack(ptsonaxis))]
+            outend += [N.ravel(N.column_stack(ptsoff1)), N.ravel(N.column_stack(ptsoff2))]
 
-        text = ['%g' % t for t in tickvals]
-        att = AxisTickText(N.ravel(N.column_stack(pts1)), text,
-                           qt4.QFont(), {})
-        cont.addObject(att)
+        if labelprops is not None:
+            self.addTickLabels(cont, labelprops, ptsonaxis, ptsalong, tickvals)
 
         startpts = threed.ValVector(N.concatenate(outstart))
         endpts = threed.ValVector(N.concatenate(outend))
@@ -511,8 +557,8 @@ class Axis3D(widget.Widget):
         cont = threed.ObjectContainer()
 
         self.addAxisLine(cont, dirn)
-        self.addAxisTicks(s.MajorTicks, self.majortickscalc, cont, dirn)
-        self.addAxisTicks(s.MinorTicks, self.minortickscalc, cont, dirn)
+        self.addAxisTicks(s.MajorTicks, s.TickLabels, self.majortickscalc, cont, dirn)
+        self.addAxisTicks(s.MinorTicks, None, self.minortickscalc, cont, dirn)
 
         return cont
 

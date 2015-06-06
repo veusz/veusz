@@ -6,6 +6,8 @@ veusz/helpers/*.pyd
 veusz/helpers/*.so
 *~
 MANIFEST
+*.so
+*.o
 dist/
 
 # generated files
@@ -14,6 +16,5 @@ Documents/manual.pdf
 Documents/manual.txt
 Documents/veusz.1
 Documents/veusz_listen.1
-
 .idea/
 veusz.egg-info/
