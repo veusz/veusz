@@ -425,9 +425,8 @@ class Scene
   enum RenderMode {RENDER_PAINTERS, RENDER_BSP};
 
  public:
-  Scene();
-  void render(QPainter* painter, const Camera& cam,
-	      double x1, double y1, double x2, double y2,
-              RenderMode mode);
-  ObjectContainer root;
+  Scene(RenderMode mode);
+  void render(Object* root,
+              QPainter* painter, const Camera& cam,
+	      double x1, double y1, double x2, double y2);
 };

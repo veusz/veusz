@@ -276,8 +276,8 @@ class Graph3D(widget.Widget):
         for axis in cvalues(axestodraw):
             axis.computePlottedRange()
 
-        scene = threed.Scene()
-        scene.root.objM = (
+        root = threed.ObjectContainer()
+        root.objM = (
             threed.rotateM4(s.zRotation/180.*math.pi, threed.Vec3(0,0,1)) *
             threed.rotateM4(s.yRotation/180.*math.pi, threed.Vec3(0,1,0)) *
             threed.rotateM4(s.xRotation/180.*math.pi, threed.Vec3(1,0,0)) *
@@ -286,10 +286,10 @@ class Graph3D(widget.Widget):
         for c in self.children:
            obj = c.drawToObject()
            if obj:
-               scene.root.addObject(obj)
+               root.addObject(obj)
 
-        self.addBorder(scene.root)
-        self.addBackSurface(scene.root)
+        self.addBorder(root)
+        self.addBackSurface(root)
 
         camera = threed.Camera()
         camera.setPointing(
@@ -301,12 +301,13 @@ class Graph3D(widget.Widget):
             'painters': threed.Scene.RENDER_PAINTERS,
             'bsp': threed.Scene.RENDER_BSP,
         }[s.rendermode]
+        scene = threed.Scene(mode)
 
         painter = painthelper.painter(self, bounds)
         with painter:
             scene.render(
+                root,
                 painter, camera,
-                bounds[0], bounds[1], bounds[2], bounds[3],
-                mode)
+                bounds[0], bounds[1], bounds[2], bounds[3])
 
 document.thefactory.register(Graph3D)

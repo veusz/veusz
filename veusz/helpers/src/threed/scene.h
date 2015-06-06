@@ -33,13 +33,14 @@ public:
   enum RenderMode {RENDER_PAINTERS, RENDER_BSP};
 
 public:
-  Scene()
+  Scene(RenderMode _mode)
+    : mode(_mode)
   {
   }
 
-  void render(QPainter* painter, const Camera& cam,
-	      double x1, double y1, double x2, double y2,
-              RenderMode mode);
+  void render(Object* root,
+              QPainter* painter, const Camera& cam,
+	      double x1, double y1, double x2, double y2);
 
 private:
   void projectFragments(const Camera& cam);
@@ -63,10 +64,8 @@ private:
   void renderPainters(const Camera& cam);
   void renderBSP(const Camera& cam);
 
-public:
-  ObjectContainer root;
-
 private:
+  RenderMode mode;
   FragmentVector fragments;
   std::vector<unsigned> draworder;
 };

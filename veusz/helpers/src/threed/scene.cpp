@@ -401,14 +401,14 @@ void Scene::renderBSP(const Camera& cam)
   projectFragments(cam);
 }
 
-void Scene::render(QPainter* painter, const Camera& cam,
-		   double x1, double y1, double x2, double y2,
-                   RenderMode mode)
+void Scene::render(Object* root,
+                   QPainter* painter, const Camera& cam,
+		   double x1, double y1, double x2, double y2)
 {
   fragments.resize(0);
 
   // get fragments for whole scene
-  root.getFragments(cam.viewM, fragments);
+  root->getFragments(cam.viewM, fragments);
 
   switch(mode)
     {

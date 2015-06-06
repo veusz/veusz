@@ -41,8 +41,6 @@ def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-foo = []
-
 class AxisTickText(threed.Text):
     """For drawing text at 3D locations."""
     def __init__(self, posns, textlist, font, params):
@@ -499,7 +497,6 @@ class Axis3D(widget.Widget):
         att = AxisTickText(N.ravel(N.column_stack(pts1)), text,
                            qt4.QFont(), {})
         cont.addObject(att)
-        foo.append(att)
 
         startpts = threed.ValVector(N.concatenate(outstart))
         endpts = threed.ValVector(N.concatenate(outend))
