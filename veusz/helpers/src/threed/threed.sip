@@ -232,12 +232,14 @@ struct SurfaceProp /NoDefaultCtors/
   SurfaceProp(double r=0.5, double g=0.5, double b=0.5,
 	      double specular=0.5, double diffuse=0.5, double trans=0,
 	      bool hide=0) /KeywordArgs="All"/;
+
   double r;
   double g;
   double b;
   double specular;
   double diffuse;
   double trans;
+  QImage colorimage;
   bool hide;
 };
 
@@ -250,6 +252,7 @@ struct LineProp /NoDefaultCtors/
   LineProp(double r=0, double g=0, double b=0,
 	   double specular=0.5, double diffuse=0.5, double trans=0,
 	   double width=1, bool hide=0) /KeywordArgs="All"/;
+
   double r;
   double g;
   double b;
@@ -257,6 +260,7 @@ struct LineProp /NoDefaultCtors/
   double diffuse;
   double trans;
   double width;
+  QImage colorimage;
   bool hide;
 };
 

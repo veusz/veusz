@@ -80,7 +80,7 @@ struct Fragment
   // number of times this has been split
   unsigned splitcount;
 
-  // for debugging
+  // passed to path plotting or as index to color bar
   unsigned index;
 
   // zero on creation

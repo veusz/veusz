@@ -459,3 +459,21 @@ class Surface3D(Settings):
         return threed.SurfaceProp(
             r=col.redF(), g=col.greenF(), b=col.blueF(),
             trans=self.transparency*0.01)
+
+class Surface3DWColorMap(Surface3D):
+    '''3d surface with color map setting.'''
+
+    def __init__(self, name, **args):
+        Surface3D.__init__(self, name, **args)
+
+        self.add( setting.Colormap(
+            'colorMap', 'grey',
+            descr = _('If color markers dataset is given, use this colormap '
+                      'instead of the fill color'),
+            usertext=_('Color map'),
+            formatting=True) )
+        self.add( setting.Bool(
+            'colorMapInvert', False,
+            descr = _('Invert color map'),
+            usertext = _('Invert map'),
+            formatting=True) )

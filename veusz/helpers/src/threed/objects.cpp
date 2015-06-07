@@ -267,6 +267,7 @@ void Points::getFragments(const Mat4& outerM, FragmentVector& v)
       fp.points[0] = vec4to3(outerM*Vec4(x[i], y[i], z[i], 1));
       if(hassizes)
         fp.pathsize = sizes[i];
+      fp.index = i;
 
       if(fp.points[0].isfinite())
         v.push_back(fp);

@@ -94,7 +94,7 @@ class Point3D(plotters3d.GenericPlotter3D):
             descr = _('Plot line settings'),
             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
-        s.add( setting.Surface3D(
+        s.add( setting.Surface3DWColorMap(
             'MarkerFill',
             descr = _('Marker fill settings'),
             usertext=_('Marker fill')),
@@ -163,6 +163,16 @@ class Point3D(plotters3d.GenericPlotter3D):
             markerlineprop = s.MarkerLine.makeLineProp()
         if filled and not s.MarkerFill.hide:
             markerfillprop = s.MarkerFill.makeSurfaceProp()
+            cvals = s.Color.get('points').getData(doc)
+            if cvals is not None:
+                colorvals = utils.applyScaling(
+                    cvals.data, s.Color.scaling, s.Color.min, s.Color.max)
+                cmap = self.document.getColormap(
+                    s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
+                color2d = colorvals.reshape(1, len(colorvals))
+                colorimg = utils.applyColorMap(
+                    cmap, 'linear', color2d, 0., 1., s.MarkerFill.transparency)
+                markerfillprop.colorimage = colorimg
 
         clipcontainer = self.makeClipContainer(axes)
         if markerlineprop or markerfillprop:

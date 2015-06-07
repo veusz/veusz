@@ -21,6 +21,13 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
+#include <QtGui/QImage>
+
+// These classes describe the color and properties of a surface or line
+
+// A reference counting scheme (PropSmartPtr) is used to keep track of
+// when to delete them
+
 struct SurfaceProp
 {
   SurfaceProp(double _r=0.5f, double _g=0.5f, double _b=0.5f,
@@ -32,8 +39,11 @@ struct SurfaceProp
   {
   }
 
+  bool hasColorImage() const { return !colorimage.isNull(); }
+
   double r, g, b;
   double specular, diffuse, trans;
+  QImage colorimage;
   bool hide;
 
   // used to reference count usages by Object() instances
@@ -51,9 +61,12 @@ struct LineProp
   {
   }
 
+  bool hasColorImage() const { return !colorimage.isNull(); }
+
   double r, g, b;
   double specular, diffuse, trans;
   double width;
+  QImage colorimage;
   bool hide;
 
   // used to reference count usages by Object() instances

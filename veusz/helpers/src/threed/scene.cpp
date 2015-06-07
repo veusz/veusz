@@ -91,23 +91,42 @@ namespace
       translateM3(-0.5*(minx+maxx), -0.5*(miny+maxy));
   }
 
-  QPen LineProp2QPen(const LineProp* p, double linescale)
+  QColor getImageColor(const QImage& img, unsigned idx)
+  {
+    unsigned clip = std::min(idx, unsigned(img.width()-1));
+    return QColor::fromRgba(img.pixel(clip, 0));
+  }
+
+  QPen LineProp2QPen(const LineProp* p, double linescale, unsigned colindex)
   {
     if(p==0 || p->hide)
       return QPen(Qt::NoPen);
     else
-      return QPen(QBrush(QColor(int(p->r*255), int(p->g*255),
-				int(p->b*255), int((1-p->trans)*255))),
-		  p->width*linescale);
+      {
+        QColor col;
+        if(p->hasColorImage())
+          col = getImageColor(p->colorimage, colindex);
+        else
+          col = QColor(int(p->r*255), int(p->g*255),
+                       int(p->b*255), int((1-p->trans)*255));
+        return QPen(QBrush(col), p->width*linescale);
+      }
   }
 
-  QBrush SurfaceProp2QBrush(const SurfaceProp* p)
+  QBrush SurfaceProp2QBrush(const SurfaceProp* p, unsigned colindex)
   {
     if(p==0 || p->hide)
       return QBrush();
     else
-      return QBrush(QColor(int(p->r*255), int(p->g*255),
-			   int(p->b*255), int((1-p->trans)*255)));
+      {
+        QColor col;
+        if(p->hasColorImage())
+          col = getImageColor(p->colorimage, colindex);
+        else
+          col = QColor(int(p->r*255), int(p->g*255),
+                       int(p->b*255), int((1-p->trans)*255));
+        return QBrush(col);
+      }
   }
 
   // convert (x,y,depth) -> screen coordinates
@@ -192,15 +211,12 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   painter->setPen(no_pen);
                   lline = 0;
                 }
-              if(lsurf != frag.surfaceprop)
+              if(lsurf != frag.surfaceprop ||
+                 ((frag.surfaceprop!=0 && frag.surfaceprop->hasColorImage())))
                 {
                   lsurf = frag.surfaceprop;
-                  painter->setBrush(SurfaceProp2QBrush(lsurf));
+                  painter->setBrush(SurfaceProp2QBrush(lsurf, frag.index));
                 }
-
-              // debug
-              //painter->setPen(solid);
-              //painter->setBrush(no_brush);
 
               painter->drawPolygon(projpts, 3);
             }
@@ -214,10 +230,11 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   painter->setBrush(no_brush);
                   lsurf = 0;
                 }
-              if(lline != frag.lineprop)
+              if(lline != frag.lineprop ||
+                 ((frag.lineprop!=0 && frag.lineprop->hasColorImage())))
                 {
                   lline = frag.lineprop;
-                  painter->setPen(LineProp2QPen(lline, linescale));
+                  painter->setPen(LineProp2QPen(lline, linescale, frag.index));
                 }
               painter->drawLine(projpts[0], projpts[1]);
             }
@@ -225,15 +242,17 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 
 	case Fragment::FR_PATH:
             {
-              if(lline != frag.lineprop)
+              if(lline != frag.lineprop ||
+                 ((frag.lineprop!=0 && frag.lineprop->hasColorImage())))
                 {
                   lline = frag.lineprop;
-                  painter->setPen(LineProp2QPen(lline, linescale));
+                  painter->setPen(LineProp2QPen(lline, linescale, frag.index));
                 }
-              if(lsurf != frag.surfaceprop)
+              if(lsurf != frag.surfaceprop ||
+                 ((frag.surfaceprop!=0 && frag.surfaceprop->hasColorImage())))
                 {
                   lsurf = frag.surfaceprop;
-                  painter->setBrush(SurfaceProp2QBrush(lsurf));
+                  painter->setBrush(SurfaceProp2QBrush(lsurf, frag.index));
                 }
               drawPath(painter, frag, projpts[0], projpts[1], linescale);
             }
