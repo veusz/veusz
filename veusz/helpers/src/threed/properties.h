@@ -22,6 +22,7 @@
 #define PROPERTIES_H
 
 #include <vector>
+#include <algorithm>
 #include <QtGui/QColor>
 #include <QtGui/QImage>
 
@@ -38,8 +39,7 @@ inline void _qimage2rgbvec(const QImage& img, RGBVec& vec)
   unsigned size=unsigned(img.width());
   vec.resize(size);
   const QRgb* row = (const QRgb*)(img.scanLine(0));
-  for(unsigned i=0; i<size; ++i)
-    vec[i] = row[i];
+  std::copy(row, row+size, &vec[0]);
 }
 
 struct SurfaceProp

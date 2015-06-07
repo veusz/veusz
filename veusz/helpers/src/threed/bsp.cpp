@@ -9,11 +9,13 @@
 
 namespace
 {
-  // proportional to the area-squared of the triangle of points given
-  inline double triAreaSqd(const Vec3* pts)
+  // 2d triangle area squared (only considering X/Y)
+  inline double triAreaSqd2D(const Vec3* pts)
   {
-    Vec3 temp = cross(pts[1]-pts[0], pts[2]-pts[0]);
-    return dot(temp, temp);
+    double a = (pts[0](0)*pts[1](1)-pts[0](1)*pts[1](0)+
+                pts[1](0)*pts[2](1)-pts[1](1)*pts[2](0)+
+                pts[2](0)*pts[0](1)-pts[2](1)*pts[0](0));
+    return a*a;
   }
 
   // Find set of three points to define a plane (pts).
@@ -28,9 +30,13 @@ namespace
     unsigned ptct = 0;
     double maxptsarea2 = -1;
 
-    // Algorithm is to find the biggest triangle, then if none, the
-    // set of 3 points with the largest area. We prefer triangles as
-    // splitting them is expensive in terms of numbers of fragments.
+    // Algorithm is to find the biggest triangle on the plane of the
+    // image (X/Y), then if none, the set of 3 points with the largest
+    // area. We prefer triangles as splitting them is expensive in
+    // terms of numbers of fragments.
+
+    // Plane of image triangles are preferred as splitting in the
+    // opposite directions gives a weird viewing order for points
 
     // Using larger triangles is a heuristic to prevent lots of split
     // triangles. Empirically it seems to reduce the number of final
@@ -41,7 +47,7 @@ namespace
         const Fragment& f = frags[idxs[i]];
         if(f.type == Fragment::FR_TRIANGLE)
           {
-            double areasqd = triAreaSqd(f.points);
+            double areasqd = triAreaSqd2D(f.points);
             if(areasqd > maxtriarea2)
               {
                 maxtriarea2 = areasqd;
@@ -53,13 +59,14 @@ namespace
           // triangle yet
           {
             // this is a crude rotating buffer looking for larger triangles
+            // in the plane of the image
             if(f.type == Fragment::FR_LINESEG || f.type == Fragment::FR_PATH)
               temppts[(ptct++)%3] = f.points[0];
             if(f.type == Fragment::FR_LINESEG)
               temppts[(ptct++)%3] = f.points[1];
             if(ptct >= 3)
               {
-                double areasqd = triAreaSqd(temppts);
+                double areasqd = triAreaSqd2D(temppts);
                 if(areasqd > maxptsarea2)
                   {
                     for(unsigned j=0; j<3; ++j)
@@ -236,6 +243,36 @@ namespace
     unsigned nidxs;  // Number of fragment indices in to_process
   };
 
+  // get Z component of fragment, nudging points and lines forward
+  // Z decreases away from viewer
+  double fragZ(const Fragment& f)
+  {
+    switch(f.type)
+      {
+      case Fragment::FR_TRIANGLE:
+	return std::min(f.points[0](2), std::min(f.points[1](2),
+                                                 f.points[2](2)));
+      case Fragment::FR_LINESEG:
+	return std::min(f.points[0](2), f.points[1](2)) + 1e-5;
+      case Fragment::FR_PATH:
+	return f.points[0](2) + 2e-5;
+      default:
+	return std::numeric_limits<double>::infinity();
+      }
+  }
+
+  struct FragZCompare
+  {
+    FragZCompare(const FragmentVector& _v)
+      : v(_v)
+    {}
+    bool operator()(unsigned a, unsigned b)
+    {
+      return fragZ(v[a])<fragZ(v[b]);
+    }
+    const FragmentVector& v;
+  };
+
 }
 
 // This is a non-recursive BSP building routines. Fragment indices to
@@ -400,6 +437,8 @@ IdxVector BSPBuilder::getFragmentIdxs(const FragmentVector& fragvec) const
   stack.reserve(128);
   stack.push_back(WalkStackItem(0, 0));
 
+  IdxVector temp;
+
   while( !stack.empty() )
     {
       WalkStackItem stackitem(stack.back());
@@ -417,20 +456,15 @@ IdxVector BSPBuilder::getFragmentIdxs(const FragmentVector& fragvec) const
         }
       else
         {
-          // add on in order of triangle, line segment, path. this is
-          // to make edges of polygons show up and error bars put
-          // behind points
-          unsigned minidx = rec.minfragidxidx;
-          unsigned maxidx = minidx+rec.nfrags;
-          for(unsigned i=minidx; i<maxidx; ++i)
-            if(fragvec[frag_idxs[i]].type == Fragment::FR_TRIANGLE)
-              retn.push_back(frag_idxs[i]);
-          for(unsigned i=minidx; i<maxidx; ++i)
-            if(fragvec[frag_idxs[i]].type == Fragment::FR_LINESEG)
-              retn.push_back(frag_idxs[i]);
-          for(unsigned i=minidx; i<maxidx; ++i)
-            if(fragvec[frag_idxs[i]].type == Fragment::FR_PATH)
-              retn.push_back(frag_idxs[i]);
+          // Sort images in plane by Z. This is helpful for points
+          // which may overlap.
+          temp.resize(0);
+          temp.insert(temp.end(),
+                      frag_idxs.begin()+rec.minfragidxidx,
+                      frag_idxs.begin()+(rec.minfragidxidx+rec.nfrags));
+
+          std::sort(temp.begin(), temp.end(), FragZCompare(fragvec));
+          retn.insert(retn.end(), temp.begin(), temp.end());
         }
     }
 
