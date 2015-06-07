@@ -91,12 +91,6 @@ namespace
       translateM3(-0.5*(minx+maxx), -0.5*(miny+maxy));
   }
 
-  QColor getImageColor(const QImage& img, unsigned idx)
-  {
-    unsigned clip = std::min(idx, unsigned(img.width()-1));
-    return QColor::fromRgba(img.pixel(clip, 0));
-  }
-
   QPen LineProp2QPen(const LineProp* p, double linescale, unsigned colindex)
   {
     if(p==0 || p->hide)
@@ -104,8 +98,9 @@ namespace
     else
       {
         QColor col;
-        if(p->hasColorImage())
-          col = getImageColor(p->colorimage, colindex);
+        if(p->hasRGBs())
+          col = QColor::fromRgba
+            ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,colindex)] );
         else
           col = QColor(int(p->r*255), int(p->g*255),
                        int(p->b*255), int((1-p->trans)*255));
@@ -120,8 +115,9 @@ namespace
     else
       {
         QColor col;
-        if(p->hasColorImage())
-          col = getImageColor(p->colorimage, colindex);
+        if(p->hasRGBs())
+          col = QColor::fromRgba
+            ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,colindex)] );
         else
           col = QColor(int(p->r*255), int(p->g*255),
                        int(p->b*255), int((1-p->trans)*255));
@@ -212,7 +208,7 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   lline = 0;
                 }
               if(lsurf != frag.surfaceprop ||
-                 ((frag.surfaceprop!=0 && frag.surfaceprop->hasColorImage())))
+                 ((frag.surfaceprop!=0 && frag.surfaceprop->hasRGBs())))
                 {
                   lsurf = frag.surfaceprop;
                   painter->setBrush(SurfaceProp2QBrush(lsurf, frag.index));
@@ -231,7 +227,7 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   lsurf = 0;
                 }
               if(lline != frag.lineprop ||
-                 ((frag.lineprop!=0 && frag.lineprop->hasColorImage())))
+                 ((frag.lineprop!=0 && frag.lineprop->hasRGBs())))
                 {
                   lline = frag.lineprop;
                   painter->setPen(LineProp2QPen(lline, linescale, frag.index));
@@ -243,13 +239,13 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 	case Fragment::FR_PATH:
             {
               if(lline != frag.lineprop ||
-                 ((frag.lineprop!=0 && frag.lineprop->hasColorImage())))
+                 ((frag.lineprop!=0 && frag.lineprop->hasRGBs())))
                 {
                   lline = frag.lineprop;
                   painter->setPen(LineProp2QPen(lline, linescale, frag.index));
                 }
               if(lsurf != frag.surfaceprop ||
-                 ((frag.surfaceprop!=0 && frag.surfaceprop->hasColorImage())))
+                 ((frag.surfaceprop!=0 && frag.surfaceprop->hasRGBs())))
                 {
                   lsurf = frag.surfaceprop;
                   painter->setBrush(SurfaceProp2QBrush(lsurf, frag.index));

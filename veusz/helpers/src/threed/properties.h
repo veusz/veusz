@@ -21,12 +21,26 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
+#include <vector>
+#include <QtGui/QColor>
 #include <QtGui/QImage>
 
 // These classes describe the color and properties of a surface or line
 
 // A reference counting scheme (PropSmartPtr) is used to keep track of
 // when to delete them
+
+typedef std::vector<QRgb> RGBVec;
+
+// helper to convert images to list of rgbs
+inline void _qimage2rgbvec(const QImage& img, RGBVec& vec)
+{
+  unsigned size=unsigned(img.width());
+  vec.resize(size);
+  const QRgb* row = (const QRgb*)(img.scanLine(0));
+  for(unsigned i=0; i<size; ++i)
+    vec[i] = row[i];
+}
 
 struct SurfaceProp
 {
@@ -39,11 +53,12 @@ struct SurfaceProp
   {
   }
 
-  bool hasColorImage() const { return !colorimage.isNull(); }
-
+  bool hasRGBs() const { return !rgbs.empty(); };
+  void setRGBs(const QImage& img) { _qimage2rgbvec(img, rgbs); }
+  
   double r, g, b;
   double specular, diffuse, trans;
-  QImage colorimage;
+  RGBVec rgbs;
   bool hide;
 
   // used to reference count usages by Object() instances
@@ -61,12 +76,13 @@ struct LineProp
   {
   }
 
-  bool hasColorImage() const { return !colorimage.isNull(); }
+  bool hasRGBs() const { return !rgbs.empty(); };
+  void setRGBs(const QImage& img) { _qimage2rgbvec(img, rgbs); }
 
   double r, g, b;
   double specular, diffuse, trans;
   double width;
-  QImage colorimage;
+  RGBVec rgbs;
   bool hide;
 
   // used to reference count usages by Object() instances

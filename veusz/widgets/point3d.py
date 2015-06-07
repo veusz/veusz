@@ -172,7 +172,7 @@ class Point3D(plotters3d.GenericPlotter3D):
                 color2d = colorvals.reshape(1, len(colorvals))
                 colorimg = utils.applyColorMap(
                     cmap, 'linear', color2d, 0., 1., s.MarkerFill.transparency)
-                markerfillprop.colorimage = colorimg
+                markerfillprop.setRGBs(colorimg)
 
         clipcontainer = self.makeClipContainer(axes)
         if markerlineprop or markerfillprop:
