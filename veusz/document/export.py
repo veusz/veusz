@@ -333,10 +333,10 @@ class Export(object):
             # change pdf bounding box and correct pdf index
             with open(self.filename, 'rb') as fin:
                 text = fin.read()
-                text = scalePDFMediaBox(text, printer.width(), sizes)
-                text = fixupPDFIndices(text)
-                with open(tmpfile, 'wb') as fout:
-                    fout.write(text)
+            text = scalePDFMediaBox(text, printer.width(), sizes)
+            text = fixupPDFIndices(text)
+            with open(tmpfile, 'wb') as fout:
+                fout.write(text)
         else:
             raise RuntimeError('Invalid file type')
 
