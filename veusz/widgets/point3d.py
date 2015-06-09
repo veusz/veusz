@@ -104,6 +104,11 @@ class Point3D(plotters3d.GenericPlotter3D):
             descr = _('Line around marker settings'),
             usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
+        s.add( setting.Line3D(
+            'Error',
+            descr = _('Error bar settings'),
+            usertext = _('Error bar')),
+               pixmap = 'settings_ploterrorline' )
 
     def affectsAxisRange(self):
         """Which axes this widget affects."""
@@ -134,26 +139,12 @@ class Point3D(plotters3d.GenericPlotter3D):
         if data:
             data.rangeVisit(updateRange)
 
-    def dataDrawToObject(self, axes):
+    def dataDrawPointsLine(self, cont, coord):
+        """Draw point and plot line."""
 
         s = self.settings
-
-        axes = self.fetchAxes()
-        if axes is None:
-            return
-
         doc = self.document
-        xv = s.get('xData').getData(doc)
-        yv = s.get('yData').getData(doc)
-        zv = s.get('zData').getData(doc)
-        if not xv or not yv or not zv:
-            return
-
         scalepts = s.get('scalePoints').getData(doc)
-
-        xcoord = threed.ValVector(axes[0].dataToLogicalCoords(xv.data))
-        ycoord = threed.ValVector(axes[1].dataToLogicalCoords(yv.data))
-        zcoord = threed.ValVector(axes[2].dataToLogicalCoords(zv.data))
 
         pointpath, filled = utils.getPointPainterPath(
             s.marker, s.markerSize, s.MarkerLine.width)
@@ -174,19 +165,85 @@ class Point3D(plotters3d.GenericPlotter3D):
                     cmap, 'linear', color2d, 0., 1., s.MarkerFill.transparency)
                 markerfillprop.setRGBs(colorimg)
 
-        clipcontainer = self.makeClipContainer(axes)
         if markerlineprop or markerfillprop:
-            ptobj = threed.Points(xcoord, ycoord, zcoord, pointpath,
+            ptobj = threed.Points(coord[0], coord[1], coord[2], pointpath,
                                   markerlineprop, markerfillprop)
             if scalepts:
                 ptobj.setSizes(threed.ValVector(scalepts.data))
-            clipcontainer.addObject(ptobj)
+            cont.addObject(ptobj)
 
         if not s.PlotLine.hide:
             lineobj = threed.PolyLine(s.PlotLine.makeLineProp())
             lineobj.addPoints(xcoord, ycoord, zcoord)
-            clipcontainer.addObject(lineobj)
+            cont.addObject(lineobj)
 
-        return clipcontainer
+    def dataDrawErrorBars(self, cont, axes, coord, datasets):
+        """Draw error bars for points."""
+
+        # TODO: Different error styles
+
+        err = self.settings.Error
+        if err.hide:
+            return
+
+        prop = err.makeLineProp()
+
+        for i in range(3):
+            ds = datasets[i]
+            if not ds.hasErrors():
+                continue
+
+            neg = pos = None
+            if ds.nerr is not None:
+                neg = ds.data+ds.nerr
+            elif ds.serr is not None:
+                neg = ds.data-ds.serr
+
+            if ds.perr is not None:
+                pos = ds.data+ds.perr
+            elif ds.serr is not None:
+                pos = ds.data+ds.serr
+
+            coordend = list(coord)
+            if neg is not None:
+                coordend[i] = threed.ValVector(axes[i].dataToLogicalCoords(neg))
+                line = threed.LineSegments(coord[0], coord[1], coord[2],
+                                           coordend[0], coordend[1], coordend[2],
+                                           prop)
+                cont.addObject(line)
+            if pos is not None:
+                coordend[i] = threed.ValVector(axes[i].dataToLogicalCoords(pos))
+                line = threed.LineSegments(coord[0], coord[1], coord[2],
+                                           coordend[0], coordend[1], coordend[2],
+                                           prop)
+                cont.addObject(line)
+
+    def dataDrawToObject(self, axes):
+        """Do drawing of axis."""
+
+        s = self.settings
+
+        axes = self.fetchAxes()
+        if axes is None:
+            return
+
+        doc = self.document
+        xv = s.get('xData').getData(doc)
+        yv = s.get('yData').getData(doc)
+        zv = s.get('zData').getData(doc)
+        if not xv or not yv or not zv:
+            return
+
+        coord = [
+            threed.ValVector(axes[0].dataToLogicalCoords(xv.data)),
+            threed.ValVector(axes[1].dataToLogicalCoords(yv.data)),
+            threed.ValVector(axes[2].dataToLogicalCoords(zv.data))
+        ]
+
+        clipcont = self.makeClipContainer(axes)
+        self.dataDrawPointsLine(clipcont, coord)
+        self.dataDrawErrorBars(clipcont, axes, coord, [xv, yv, zv])
+
+        return clipcont
 
 document.thefactory.register(Point3D)

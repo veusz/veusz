@@ -272,12 +272,12 @@ def applyScaling(data, mode, minval, maxval):
         
     if mode == 'linear':
         # linear scaling
-        data = (data - minval) / (maxval - minval)
+        data = (data - minval) * (1./(maxval - minval))
 
     elif mode == 'sqrt':
         # sqrt scaling
         # translate into fractions of range
-        data = (data - minval) / (maxval - minval)
+        data = (data - minval) * (1./(maxval - minval))
         # clip off any bad sqrts
         data[data < 0.] = 0.
         # actually do the sqrt transform
