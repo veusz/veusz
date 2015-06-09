@@ -68,6 +68,7 @@ void PolyLine::getFragments(const Mat4& outerM, FragmentVector& v)
     {
       f.points[1] = f.points[0];
       f.points[0] = vec4to3(outerM*vec3to4(points[i]));
+      f.index = i;
 
       if(i > 0 && (f.points[0]+f.points[1]).isfinite())
         v.push_back(f);
@@ -117,6 +118,7 @@ void LineSegments::getFragments(const Mat4& outerM, FragmentVector& v)
     {
       f.points[0] = vec4to3(outerM*vec3to4(points[i]));
       f.points[1] = vec4to3(outerM*vec3to4(points[i+1]));
+      f.index = i;
       v.push_back(f);
     }
 }
@@ -184,6 +186,7 @@ void Mesh::getLineFragments(const Mat4& outerM, FragmentVector& v)
 
               if(stepi > 0 && (fl.points[0]+fl.points[1]).isfinite())
                 v.push_back(fl);
+              ++fl.index;
             }
         }
     }
@@ -225,18 +228,24 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, FragmentVector& v)
         p3(vidx_1) = pos1[i1+1];
         p3(vidx_2) = pos2[i2+1];
 
-        if(! ((p0+p1+p2+p3).isfinite()) )
-          continue;
+        if( p1.isfinite() && p2.isfinite() )
+          {
+            fs.points[1] = vec4to3(outerM*p1);
+            fs.points[2] = vec4to3(outerM*p2);
 
-        // convert to outer coordinate system
-        fs.points[1] = vec4to3(outerM*p1);
-        fs.points[2] = vec4to3(outerM*p2);
-
-        fs.points[0] = vec4to3(outerM*p0);
-        v.push_back(fs);
-
-        fs.points[0] = vec4to3(outerM*p3);
-        v.push_back(fs);
+            if( p0.isfinite() )
+              {
+                // convert to outer coordinate system
+                fs.points[0] = vec4to3(outerM*p0);
+                v.push_back(fs);
+              }
+            if( p3.isfinite() )
+              {
+                fs.points[0] = vec4to3(outerM*p3);
+                v.push_back(fs);
+              }
+          }
+        ++fs.index;
       }
 }
 

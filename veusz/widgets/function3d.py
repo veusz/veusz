@@ -26,6 +26,7 @@ from ..compat import czip, crange
 from .. import qtall as qt4
 from .. import setting
 from .. import document
+from .. import utils
 try:
     from ..helpers import threed
 except ImportError:
@@ -116,13 +117,17 @@ class Function3D(plotters3d.GenericPlotter3D):
             'fnz', '',
             descr=_('Function for z coordinate'),
             usertext=_('Z function') ), 3)
+        s.add(setting.Str(
+            'fncolor', '',
+            descr=_('Function to give color (0-1)'),
+            usertext=_('Color function') ), 3)
 
         s.add(setting.Line3D(
             'Line',
             descr = _('Line settings'),
             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
-        s.add(setting.Surface3D(
+        s.add(setting.Surface3DWColorMap(
             'Surface',
             descr = _('Surface fill settings'),
             usertext=_('Surface')),
@@ -172,7 +177,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             # lookup variables to go with function
             var = self._varmap[mode]
             fns = [getattr(s, 'fn'+var[0]), getattr(s, 'fn'+var[1])]
-            if fns[0] is None or fns[1] is None:
+            if not fns[0] or not fns[1]:
                 return None
 
             # get points to evaluate functions over
@@ -221,6 +226,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             'y=fn(x,z)': ('y', 'z', 'x', (1, 2, 0)),
             'z=fn(x,y)': ('z', 'x', 'y', (2, 0, 1)),
         }[mode]
+
         axes = self.fetchAxes()
 
         # range of other axes
@@ -245,6 +251,15 @@ class Function3D(plotters3d.GenericPlotter3D):
         steps2 = N.arange(steps)*del2 + pr2[0]
         grid2 = grid2*del2 + pr2[0]
 
+        fncolor = s.fncolor.strip()
+        if fncolor:
+            colgrid1 = 0.5*(grid1[1:,1:]+grid1[:-1,:-1])
+            colgrid2 = 0.5*(grid2[1:,1:]+grid2[:-1,:-1])
+            if logax1:
+                colgrid1 = N.exp(colgrid1)
+            if logax2:
+                colgrid2 = N.exp(colgrid2)
+
         # convert back to log
         if logax1:
             grid1 = N.exp(grid1)
@@ -256,19 +271,39 @@ class Function3D(plotters3d.GenericPlotter3D):
         env[ovar2] = grid2
 
         fn = getattr(s, 'fn%s' % var)  # get function from user
+        if not fn:
+            return
         comp = self.document.compileCheckedExpression(fn)
         if comp is None:
             return None
 
         try:
             height = eval(comp, env) + N.zeros(grid1.shape, dtype=N.float64)
-        except:
+        except Exception:
             # something wrong in the evaluation
             return None
 
-        return height, steps1, steps2, axidx, var
+        if fncolor:
+            compcolor = self.document.compileCheckedExpression(fncolor)
+            if not compcolor:
+                return
+            env[ovar1] = colgrid1
+            env[ovar2] = colgrid2
+
+            try:
+                colors = eval(compcolor, env) + N.zeros(
+                    colgrid1.shape, dtype=N.float64)
+            except Exception:
+                # something wrong in the evaluation
+                return None
+            colors = N.clip(colors, 0, 1)
+        else:
+            colors = None
+
+        return height, steps1, steps2, axidx, var, colors
 
     def getRange(self, axis, depname, axrange):
+        """Get range of axis."""
         mode = self.settings.mode
         if mode == 'x,y,z=fns(t)':
             # get range of each variable
@@ -297,7 +332,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             retn = self.getGridVals()
             if not retn:
                 return
-            height, steps1, steps2, axidx, var = retn
+            height, steps1, steps2, axidx, var, color = retn
             if axis is not self.fetchAxis(var):
                 return
             coord = height
@@ -312,7 +347,7 @@ class Function3D(plotters3d.GenericPlotter3D):
         retn = self.getGridVals()
         if not retn:
             return
-        height, steps1, steps2, axidx, depvar = retn
+        height, steps1, steps2, axidx, depvar, colors = retn
         lheight = axes[axidx[0]].dataToLogicalCoords(height)
         lsteps1 = axes[axidx[1]].dataToLogicalCoords(steps1)
         lsteps2 = axes[axidx[2]].dataToLogicalCoords(steps2)
@@ -322,6 +357,14 @@ class Function3D(plotters3d.GenericPlotter3D):
         s = self.settings
         if not s.Surface.hide:
             surfprop = s.Surface.makeSurfaceProp()
+            if colors is not None:
+                cmap = self.document.getColormap(
+                    s.Surface.colorMap, s.Surface.colorMapInvert)
+                color2d = colors.reshape((1, colors.size))
+                colorimg = utils.applyColorMap(
+                    cmap, 'linear', color2d, 0., 1., s.Surface.transparency)
+                surfprop.setRGBs(colorimg)
+
         if not s.Line.hide:
             lineprop = s.Line.makeLineProp()
 
@@ -336,6 +379,7 @@ class Function3D(plotters3d.GenericPlotter3D):
         container.addObject(mesh)
 
     def dataDrawToObject(self, axes):
+        """Do actual drawing of function."""
 
         s = self.settings
         mode = s.mode
