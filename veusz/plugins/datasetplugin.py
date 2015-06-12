@@ -1432,7 +1432,10 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
         ds_in = helper.getDataset(fields['ds_in'])
         filt = helper.evaluateExpression(fields['filter'])
 
-        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+        data = ds_in.data
+        serr = getattr(ds_in, 'serr', None)
+        perr = getattr(ds_in, 'perr', None)
+        nerr = getattr(ds_in, 'nerr', None)
 
         if filt is None:
             # select nothing

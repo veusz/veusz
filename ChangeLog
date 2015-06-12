@@ -6,6 +6,7 @@ Minor changes
  * Remove use of deprecated Qt functions
  * Fix clone widget tools plugin
  * Fix EPS/PDF crash with broken axis widget
+ * Do not crash filter plugin if using date datatype
 
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
