@@ -1470,6 +1470,10 @@ def getSpacing(data):
                     raise DatasetExpressionException(
                         'Variable spacings not yet supported '
                         'in constructing 2D datasets')
+
+    if mindelta is None or mindelta == 0:
+        raise DatasetExpressionException('Could not identify delta')
+
     return (uniquesorted[0], uniquesorted[-1], mindelta,
             int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
 

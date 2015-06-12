@@ -9,6 +9,7 @@ Minor changes
  * Do not crash filter plugin if using date datatype
  * Avoid crashes in normalise, subtract minimum and divide maximum plugins
  * Avoid crash in image widget
+ * Avoid issue in identifying spacing in 1D->2D conversion
 
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
