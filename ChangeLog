@@ -10,6 +10,7 @@ Minor changes
  * Avoid crashes in normalise, subtract minimum and divide maximum plugins
  * Avoid crash in image widget
  * Avoid issue in identifying spacing in 1D->2D conversion
+ * Add Gnuplot 2D data import plugin (Joerg Meyer)
 
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
