@@ -1043,17 +1043,17 @@ class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do scaling of dataset."""
+        """Do subtraction of dataset."""
 
         dsin = helper.getDataset(fields['ds_in'])
 
-        vals = dsin.data
-        if len(vals) > 0:
-            minval = vals[N.isfinite(vals)].min()
-            vals = vals - minval
+        data = dsin.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) != 0:
+            data = data - filtered.min()
 
         self.dsout.update(
-            data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
+            data=data, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
 
 class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to multiply two or more datasets."""
@@ -1150,10 +1150,16 @@ class DivideMaxPlugin(_OneOutputDatasetPlugin):
     def updateDatasets(self, fields, helper):
 
         inds = helper.getDataset( fields['ds_in'] )
-        maxval = N.nanmax( inds.data )
+
+        data = inds.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) == 0:
+            maxval = N.nan
+        else:
+            maxval = filtered.max()
 
         # divide data
-        data = inds.data / maxval
+        data = data / maxval
         # divide error bars
         serr = perr = nerr = None
         if inds.serr: serr = inds.serr / maxval
@@ -1180,10 +1186,16 @@ class DivideNormalizePlugin(_OneOutputDatasetPlugin):
     def updateDatasets(self, fields, helper):
 
         inds = helper.getDataset( fields['ds_in'] )
-        tot = N.nansum( inds.data )
+
+        data = inds.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) == 0:
+            tot = 0
+        else:
+            tot = N.sum(filtered)
 
         # divide data
-        data = inds.data / tot
+        data = data / tot
         # divide error bars
         serr = perr = nerr = None
         if inds.serr: serr = inds.serr / tot
