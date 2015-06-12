@@ -92,9 +92,15 @@ class OperationDataImportPlugin(base.OperationDataImportBase):
         # strip out parameters for plugin itself
         p = self.params
 
+        # set defaults for import plugins
+        pparams = dict(p.pluginpars)
+        for field in plugin.fields:
+            if field.name not in pparams:
+                pparams[field.name] = field.default
+
         # stick back together the plugin parameter object
         plugparams = plugins.ImportPluginParams(
-            p.filename, p.encoding,  p.pluginpars)
+            p.filename, p.encoding, pparams)
         results = plugin.doImport(plugparams)
 
         # make link for file
