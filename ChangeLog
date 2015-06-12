@@ -8,6 +8,7 @@ Minor changes
  * Fix EPS/PDF crash with broken axis widget
  * Do not crash filter plugin if using date datatype
  * Avoid crashes in normalise, subtract minimum and divide maximum plugins
+ * Avoid crash in image widget
 
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and

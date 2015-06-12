@@ -300,6 +300,11 @@ class Image(plotters.GenericPlotter):
         pltrangex = axes[0].dataToPlotterCoords(posn, N.array(rangex))
         pltrangey = axes[1].dataToPlotterCoords(posn, N.array(rangey))
 
+        # abort if coordinate range is too small
+        if(abs(pltrangex[0]-pltrangex[1])<1e-2 or
+           abs(pltrangey[0]-pltrangey[1])<1e-2):
+            return
+
         # make QImage from data
         cmap = d.getColormap(s.colorMap, s.colorInvert)
         datavaluerange = self.getDataValueRange(data)
