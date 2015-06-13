@@ -1,7 +1,6 @@
-Changes in <next release>:
+Changes in 1.23.1:
+ * Enable compression in exported files (Benjamin K. Stuhl)
  * Add option to "thin" error bars plotted
-
-Minor changes
  * Fix label colour in contour labelling
  * Remove use of deprecated Qt functions
  * Fix clone widget tools plugin
