@@ -1,7 +1,6 @@
 # Veusz saved document (version 1.23)
 # Saved at 2015-06-12T19:04:07.152029
 
-AddImportPath(u'/home/jss/code/veusz/tests/selftests')
 ImportFilePlugin(u'Gnuplot 2D data import plugin', u'gnuplot_2d.dat', linked=True, name=u'name')
 Add('page', name='page1', autoadd=False)
 To('page1')
