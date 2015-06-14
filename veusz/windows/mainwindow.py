@@ -500,7 +500,7 @@ class MainWindow(qt4.QMainWindow):
                   self.slotDataImport, icon='kde-vzdata-import'),
             'data.edit':
                 a(self, _('Edit and enter new datasets'), _('&Editor...'),
-                  self.slotDataEdit, icon='kde-edit-veuszedit'),
+                  lambda: self.slotDataEdit(), icon='kde-edit-veuszedit'),
             'data.create':
                 a(self, _('Create new datasets using ranges, parametrically or as functions of existing datasets'), _('&Create...'),
                   self.slotDataCreate, icon='kde-dataset-new-veuszedit'),
