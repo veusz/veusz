@@ -27,6 +27,7 @@ Changes in 1.23.1:
  * Add Gnuplot 2D data import plugin (Joerg Meyer)
  * When loading data from import plugins, provide default values
  * Remove some deprecated Qt uses
+ * Fix issue when plotting non-plain datasets with nan values
 
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and

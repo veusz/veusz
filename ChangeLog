@@ -1,5 +1,6 @@
 Changes in 1.23.1:
  * Enable compression in exported files (Benjamin K. Stuhl)
+ * Fix saving histogram datasets
  * Add option to "thin" error bars plotted
  * Fix label colour in contour labelling
  * Remove use of deprecated Qt functions
@@ -11,6 +12,7 @@ Changes in 1.23.1:
  * Avoid issue in identifying spacing in 1D->2D conversion
  * Add Gnuplot 2D data import plugin (Joerg Meyer)
  * When loading data from import plugins, provide default values
+ * Remove some deprecated Qt uses
  * Fix issue when plotting non-plain datasets with nan values
 
 Changes in 1.23:
