@@ -243,7 +243,7 @@ class DatasetConcreteBase(DatasetBase):
 
         e.g. dataset[5:100] - make a dataset based on items 5 to 99 inclusive
         """
-        return type(self)(**self._getItemHelper(key))
+        return self.returnCopyWithNewData(**self._getItemHelper(key))
 
     def __len__(self):
         """Return length of dataset."""

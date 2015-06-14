@@ -11,6 +11,7 @@ Changes in 1.23.1:
  * Avoid issue in identifying spacing in 1D->2D conversion
  * Add Gnuplot 2D data import plugin (Joerg Meyer)
  * When loading data from import plugins, provide default values
+ * Fix issue when plotting non-plain datasets with nan values
 
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and
