@@ -477,3 +477,21 @@ class Surface3DWColorMap(Surface3D):
             descr = _('Invert color map'),
             usertext = _('Invert map'),
             formatting=True) )
+
+class Line3DWColorMap(Line3D):
+    '''3d line with color map setting.'''
+
+    def __init__(self, name, **args):
+        Line3D.__init__(self, name, **args)
+
+        self.add( setting.Colormap(
+            'colorMap', 'grey',
+            descr = _('If color markers dataset is given, use this colormap '
+                      'instead of the fill color'),
+            usertext=_('Color map'),
+            formatting=True) )
+        self.add( setting.Bool(
+            'colorMapInvert', False,
+            descr = _('Invert color map'),
+            usertext = _('Invert map'),
+            formatting=True) )

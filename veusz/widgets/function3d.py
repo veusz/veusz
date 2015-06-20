@@ -120,9 +120,9 @@ class Function3D(plotters3d.GenericPlotter3D):
         s.add(setting.Str(
             'fncolor', '',
             descr=_('Function to give color (0-1)'),
-            usertext=_('Color function') ), 3)
+            usertext=_('Color function') ), 4)
 
-        s.add(setting.Line3D(
+        s.add(setting.Line3DWColorMap(
             'Line',
             descr = _('Line settings'),
             usertext = _('Plot line')),
@@ -146,7 +146,7 @@ class Function3D(plotters3d.GenericPlotter3D):
         return [(v[0], getattr(s, v[1])) for v in requires]
 
     def getLineVals(self):
-        """Get vals for line plot."""
+        """Get vals for line plot by evaluating function."""
         s = self.settings
         mode = s.mode
 
@@ -171,7 +171,18 @@ class Function3D(plotters3d.GenericPlotter3D):
             except:
                 # something wrong in the evaluation
                 return None
-            retn = (valsx, valsy, valsz)
+
+            fncolor = s.fncolor.strip()
+            if fncolor:
+                fncolor = self.document.compileCheckedExpression(fncolor)
+                try:
+                    valscolor = eval(fncolor, env) + zeros
+                except:
+                    return None
+            else:
+                valscolor = None
+
+            retn = (valsx, valsy, valsz, valscolor)
 
         else:
             # lookup variables to go with function
@@ -202,12 +213,23 @@ class Function3D(plotters3d.GenericPlotter3D):
                 # something wrong in the evaluation
                 return None
 
+            fncolor = s.fncolor.strip()
+            if fncolor:
+                fncolor = self.document.compileCheckedExpression(fncolor)
+                try:
+                    valscolor = eval(fncolor, env) + zeros
+                except:
+                    return None
+            else:
+                valscolor = None
+
             # assign correct output points
-            retn = [None]*3
+            retn = [None]*4
             idxs = ('x', 'y', 'z')
             retn[idxs.index(var[0])] = vals1
             retn[idxs.index(var[1])] = vals2
             retn[idxs.index(var[2])] = evalpts
+            retn[3] = valscolor
 
         return retn
 
@@ -310,7 +332,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             retn = self.getLineVals()
             if not retn:
                 return
-            valsx, valsy, valsz = retn
+            valsx, valsy, valsz, valscolor = retn
             coord = {'sx': valsx, 'sy': valsy, 'sz': valsz}[depname]
 
         elif mode in ('x,y=fns(z)', 'y,z=fns(x)', 'x,z=fns(y)'):
@@ -342,6 +364,19 @@ class Function3D(plotters3d.GenericPlotter3D):
             axrange[0] = min(axrange[0], finite.min())
             axrange[1] = max(axrange[1], finite.max())
 
+    def updatePropColorMap(self, prop, setn, colorvals):
+        """Update line/surface properties given color map values.
+
+        prop is updated to use the data values colorvars (0-1) to apply
+        a color map from the setting setn given."""
+
+        cmap = self.document.getColormap(
+            setn.colorMap, setn.colorMapInvert)
+        color2d = colorvals.reshape((1, colorvals.size))
+        colorimg = utils.applyColorMap(
+            cmap, 'linear', color2d, 0., 1., setn.transparency)
+        prop.setRGBs(colorimg)
+
     def dataDrawSurface(self, axes, container):
         """Draw a surface plot."""
         retn = self.getGridVals()
@@ -358,12 +393,7 @@ class Function3D(plotters3d.GenericPlotter3D):
         if not s.Surface.hide:
             surfprop = s.Surface.makeSurfaceProp()
             if colors is not None:
-                cmap = self.document.getColormap(
-                    s.Surface.colorMap, s.Surface.colorMapInvert)
-                color2d = colors.reshape((1, colors.size))
-                colorimg = utils.applyColorMap(
-                    cmap, 'linear', color2d, 0., 1., s.Surface.transparency)
-                surfprop.setRGBs(colorimg)
+                self.updatePropColorMap(surfprop, s.Surface, colors)
 
         if not s.Line.hide:
             lineprop = s.Line.makeLineProp()
@@ -377,6 +407,33 @@ class Function3D(plotters3d.GenericPlotter3D):
             threed.ValVector(N.ravel(lheight)),
             dirn, lineprop, surfprop)
         container.addObject(mesh)
+
+    def dataDrawLine(self, axes, clipcontainer):
+        """Draw a line function."""
+
+        s = self.settings
+        if s.Line.hide:
+            return
+
+        retn = self.getLineVals()
+        if not retn:
+            return
+
+        valsx, valsy, valsz, valscolor = retn
+        lineprop = s.Line.makeLineProp()
+        if valscolor is not None:
+            self.updatePropColorMap(lineprop, s.Line, valscolor)
+
+        lx = axes[0].dataToLogicalCoords(valsx)
+        ly = axes[1].dataToLogicalCoords(valsy)
+        lz = axes[2].dataToLogicalCoords(valsz)
+
+        line = threed.PolyLine(lineprop)
+        line.addPoints(
+            threed.ValVector(lx), threed.ValVector(ly),
+            threed.ValVector(lz))
+
+        clipcontainer.addObject(line)
 
     def dataDrawToObject(self, axes):
         """Do actual drawing of function."""
@@ -392,23 +449,7 @@ class Function3D(plotters3d.GenericPlotter3D):
 
         clipcontainer = self.makeClipContainer(axes)
         if mode in ('x,y,z=fns(t)', 'x,y=fns(z)', 'y,z=fns(x)', 'x,z=fns(y)'):
-            retn = self.getLineVals()
-            if not retn:
-                return
-            if s.Line.hide:
-                return
-            valsx, valsy, valsz = retn
-            lx = axes[0].dataToLogicalCoords(valsx)
-            ly = axes[1].dataToLogicalCoords(valsy)
-            lz = axes[2].dataToLogicalCoords(valsz)
-            lineprop = s.Line.makeLineProp()
-            line = threed.PolyLine(lineprop)
-            line.addPoints(
-                threed.ValVector(lx), threed.ValVector(ly),
-                threed.ValVector(lz))
-            
-            clipcontainer.addObject(line)
-
+            self.dataDrawLine(axes, clipcontainer)
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
             self.dataDrawSurface(axes, clipcontainer)
 
