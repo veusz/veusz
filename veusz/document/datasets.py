@@ -243,7 +243,7 @@ class DatasetConcreteBase(DatasetBase):
 
         e.g. dataset[5:100] - make a dataset based on items 5 to 99 inclusive
         """
-        return type(self)(**self._getItemHelper(key))
+        return self.returnCopyWithNewData(**self._getItemHelper(key))
 
     def __len__(self):
         """Return length of dataset."""
@@ -1470,6 +1470,10 @@ def getSpacing(data):
                     raise DatasetExpressionException(
                         'Variable spacings not yet supported '
                         'in constructing 2D datasets')
+
+    if mindelta is None or mindelta == 0:
+        raise DatasetExpressionException('Could not identify delta')
+
     return (uniquesorted[0], uniquesorted[-1], mindelta,
             int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
 

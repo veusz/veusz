@@ -1043,17 +1043,17 @@ class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do scaling of dataset."""
+        """Do subtraction of dataset."""
 
         dsin = helper.getDataset(fields['ds_in'])
 
-        vals = dsin.data
-        if len(vals) > 0:
-            minval = vals[N.isfinite(vals)].min()
-            vals = vals - minval
+        data = dsin.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) != 0:
+            data = data - filtered.min()
 
         self.dsout.update(
-            data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
+            data=data, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
 
 class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to multiply two or more datasets."""
@@ -1150,10 +1150,16 @@ class DivideMaxPlugin(_OneOutputDatasetPlugin):
     def updateDatasets(self, fields, helper):
 
         inds = helper.getDataset( fields['ds_in'] )
-        maxval = N.nanmax( inds.data )
+
+        data = inds.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) == 0:
+            maxval = N.nan
+        else:
+            maxval = filtered.max()
 
         # divide data
-        data = inds.data / maxval
+        data = data / maxval
         # divide error bars
         serr = perr = nerr = None
         if inds.serr: serr = inds.serr / maxval
@@ -1180,10 +1186,16 @@ class DivideNormalizePlugin(_OneOutputDatasetPlugin):
     def updateDatasets(self, fields, helper):
 
         inds = helper.getDataset( fields['ds_in'] )
-        tot = N.nansum( inds.data )
+
+        data = inds.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) == 0:
+            tot = 0
+        else:
+            tot = N.sum(filtered)
 
         # divide data
-        data = inds.data / tot
+        data = data / tot
         # divide error bars
         serr = perr = nerr = None
         if inds.serr: serr = inds.serr / tot
@@ -1432,7 +1444,10 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
         ds_in = helper.getDataset(fields['ds_in'])
         filt = helper.evaluateExpression(fields['filter'])
 
-        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+        data = ds_in.data
+        serr = getattr(ds_in, 'serr', None)
+        perr = getattr(ds_in, 'perr', None)
+        nerr = getattr(ds_in, 'nerr', None)
 
         if filt is None:
             # select nothing

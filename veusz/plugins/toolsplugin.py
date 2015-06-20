@@ -404,7 +404,8 @@ class WidgetsClone(ToolsPlugin):
             """Walk nodes, changing datasets."""
             if node.type == 'setting':
                 if node.settingtype in (
-                    'dataset', 'dataset-or-floatlist', 'dataset-or-str'):
+                        'dataset', 'dataset-extended',
+                        'dataset-or-floatlist', 'dataset-or-str'):
                     # handle single datasets
                     if node.val == dsname:
                         node.val = dsrepl

@@ -45,8 +45,6 @@ from . import plotwindow
 from . import treeeditwindow
 from .datanavigator import DataNavigatorWindow
 
-from ..dialogs.plugin import handlePlugin
-
 def _(text, disambiguation=None, context='MainWindow'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -365,12 +363,14 @@ class MainWindow(qt4.QMainWindow):
         menuname: string giving prefix for new menu entries (inside actions)
         """
 
+        def getLoadDialog(pluginkls):
+            def _loadPlugin():
+                from ..dialogs.plugin import handlePlugin
+                handlePlugin(self, self.document, pluginkls)
+            return _loadPlugin
+
         menu = []
         for pluginkls in pluginlist:
-            def loaddialog(pluginkls=pluginkls):
-                """Load plugin dialog"""
-                handlePlugin(self, self.document, pluginkls)
-
             actname = menuname + '.' + '.'.join(pluginkls.menu)
             text = pluginkls.menu[-1]
             if pluginkls.has_parameters:
@@ -379,7 +379,7 @@ class MainWindow(qt4.QMainWindow):
                 self,
                 pluginkls.description_short,
                 text,
-                loaddialog)
+                getLoadDialog(pluginkls))
 
             # build up menu from tuple of names
             menulook = menu
@@ -500,7 +500,7 @@ class MainWindow(qt4.QMainWindow):
                   self.slotDataImport, icon='kde-vzdata-import'),
             'data.edit':
                 a(self, _('Edit and enter new datasets'), _('&Editor...'),
-                  self.slotDataEdit, icon='kde-edit-veuszedit'),
+                  lambda: self.slotDataEdit(), icon='kde-edit-veuszedit'),
             'data.create':
                 a(self, _('Create new datasets using ranges, parametrically or as functions of existing datasets'), _('&Create...'),
                   self.slotDataCreate, icon='kde-dataset-new-veuszedit'),
@@ -1141,30 +1141,30 @@ class MainWindow(qt4.QMainWindow):
         """Populate the recently opened files menu with a list of
         recently opened files"""
 
+        def opener(path):
+            def _fileOpener():
+                self.openFile(path)
+            return _fileOpener
+
         menu = self.menus["file.filerecent"]
         menu.clear()
 
-        newMenuItems = []
         if setdb['main_recentfiles']:
             files = [f for f in setdb['main_recentfiles']
                      if os.path.isfile(f)]
-            self._openRecentFunctions = []
 
             # add each recent file to menu
+            newmenuitems = []
             for i, path in enumerate(files):
-
-                def fileOpener(filename=path):
-                    self.openFile(filename)
-
-                self._openRecentFunctions.append(fileOpener)
-                newMenuItems.append(('filerecent%i' % i, _('Open File %s') % path,
-                                     os.path.basename(path),
-                                     'file.filerecent', fileOpener,
-                                     '', False, ''))
+                newmenuitems.append(
+                    ('filerecent%i' % i,_('Open File %s') % path,
+                     os.path.basename(path),
+                     'file.filerecent', opener(path),
+                     '', False, ''))
 
             menu.setEnabled(True)
             self.recentFileActions = utils.populateMenuToolbars(
-                newMenuItems, self.maintoolbar, self.menus)
+                newmenuitems, self.maintoolbar, self.menus)
         else:
             menu.setEnabled(False)
 

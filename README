@@ -1,5 +1,5 @@
-Veusz 1.23
-----------
+Veusz 1.23.1
+------------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -11,6 +11,23 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 1.23.1:
+ * Enable compression in exported files (Benjamin K. Stuhl)
+ * Fix saving histogram datasets
+ * Add option to "thin" error bars plotted
+ * Fix label colour in contour labelling
+ * Remove use of deprecated Qt functions
+ * Fix clone widget tools plugin
+ * Fix EPS/PDF crash with broken axis widget
+ * Do not crash filter plugin if using date datatype
+ * Avoid crashes in normalise, subtract minimum and divide maximum plugins
+ * Avoid crash in image widget
+ * Avoid issue in identifying spacing in 1D->2D conversion
+ * Add Gnuplot 2D data import plugin (Joerg Meyer)
+ * When loading data from import plugins, provide default values
+ * Remove some deprecated Qt uses
+ * Fix issue when plotting non-plain datasets with nan values
 
 Changes in 1.23:
  * Add new export dialog box which can export multiple pages and

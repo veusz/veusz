@@ -838,6 +838,9 @@ class TreeEditDock(qt4.QDockWidget):
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
 
+        def slotklass(klass):
+            return lambda: self.slotMakeWidgetButton(klass)
+
         iconsize = setting.settingdb['toolbar_size']
         self.addtoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
         self.edittoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
@@ -855,9 +858,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'graph3d', 'function3d', 'point3d', 'axis3d'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
-            def slotfn(klass=wc):
-                return lambda: self.slotMakeWidgetButton(klass)
-            slot = slotfn(wc)
+            slot = slotklass(wc)
             self.addslots[wc] = slot
 
             actionname = 'add.' + widgettype

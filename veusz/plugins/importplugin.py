@@ -674,10 +674,74 @@ class ImportPluginBinary(ImportPlugin):
         data = data.astype(N.float64)
         return [ datasetplugin.Dataset1D(name, data) ]
 
+class ImportPluginGnuplot2D(ImportPlugin):
+    """A Veusz plugin for reading data in Gnuplot 2D data format from a file."""
+
+    name = "Gnuplot 2D data import plugin"
+    author = "Joerg Meyer, j.meyer@chem.leidenuniv.nl"
+    description = "Reads data in Gnuplot 2D format from a text file."
+
+    file_extensions = set(['.data','.elbow'])
+
+    def __init__(self):
+        ImportPlugin.__init__(self)
+        self.fields = [
+            field.FieldText(
+                "name", descr="Dataset name", default="name"),
+            field.FieldFloat(
+                "subtract", descr="Offset to subtract", default=0.0),
+            field.FieldFloat(
+                "mult", descr="Multiplication factor", default=1),
+            ]
+
+    def doImport(self, params):
+        """Actually import data
+        params is a ImportPluginParams object.
+        Return a list of ImportDataset1D, ImportDataset2D objects
+        """
+
+        sub = float(params.field_results["subtract"])
+        mult = params.field_results["mult"]
+        f = params.openFileWithEncoding()
+        data_gp = []
+        data_gp_block = []
+        for line in f:
+            fields = line.split()
+            if not fields:
+                if data_gp_block:
+                    data_gp.append( data_gp_block )
+                    data_gp_block = []
+                else:                        # ignore initial blank lines
+                    continue
+            elif '#' in fields[0]:            # ignore comment lines
+                continue
+            else:
+                x,y,z = map(float, fields[0:3])
+                data_gp_block.append( [x,y,(z-sub)*mult] )
+
+        if data_gp_block:                    # append last block if necessary
+            data_gp.append( data_gp_block )
+            data_gp_block = []
+
+        data = N.array(data_gp)
+        S = data.shape
+        data_for_sorting = data.reshape((S[0]*S[1],S[2]))
+        ind = N.lexsort( [data_for_sorting[:,0], data_for_sorting[:,1]] )
+        data_veusz = data_for_sorting[ind].reshape(S)[:,:,2]
+        rangex = (data[:,:,0].min(),data[:,:,0].max())
+        rangey = (data[:,:,1].min(),data[:,:,1].max())
+
+        return [
+            datasetplugin.Dataset2D(
+                params.field_results["name"],
+                data=data_veusz, rangex=rangex, rangey=rangey)
+        ]
+
 importpluginregistry += [
     ImportPluginNpy,
     ImportPluginNpz,
     ImportPluginQdp,
     ImportPluginBinary,
     ImportPluginExample,
+    ImportPluginGnuplot2D,
     ]
