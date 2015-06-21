@@ -326,6 +326,20 @@ class Mesh : public Object /NoDefaultCtors/
        const SurfaceProp* sprop /Transfer/);
 };
 
+class DataMesh : public Object /NoDefaultCtors/
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+ public:
+  DataMesh(const ValVector& edges1, const ValVector& edges2,
+           const ValVector& vals,
+           unsigned idxval, unsigned idxedge1, unsigned idxedge2,
+           bool highres,
+           const LineProp* lprop /Transfer/,
+           const SurfaceProp* sprop /Transfer/);
+};
+
 class Points : public Object /NoDefaultCtors/
 {
 %TypeHeaderCode

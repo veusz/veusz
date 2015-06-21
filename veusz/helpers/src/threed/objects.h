@@ -140,6 +140,37 @@ public:
   PropSmartPtr<const SurfaceProp> surfaceprop;
 };
 
+
+// Grid of data values, where the centres of the bins are specified.
+// There should be 1 more values along edges than values in array.
+// idxval, edge1, edge2 give the index of the axis (x=0,y=1,z=2) for
+// that direction.
+class DataMesh : public Object
+{
+public:
+  DataMesh(const ValVector& _edges1, const ValVector& _edges2,
+           const ValVector& _vals,
+           unsigned _idxval, unsigned _idxedge1, unsigned _idxedge2,
+           bool _highres,
+           const LineProp* lprop=0, const SurfaceProp* sprop=0)
+    : edges1(_edges1), edges2(_edges2), vals(_vals),
+      idxval(_idxval), idxedge1(_idxedge1), idxedge2(_idxedge2),
+      highres(_highres),
+      lineprop(lprop), surfaceprop(sprop)
+  {
+  }
+
+  void getFragments(const Mat4& outerM, FragmentVector& v);
+
+public:
+  ValVector edges1, edges2, vals;
+  unsigned idxval, idxedge1, idxedge2;
+  bool highres;
+
+  PropSmartPtr<const LineProp> lineprop;
+  PropSmartPtr<const SurfaceProp> surfaceprop;
+};
+
 // a set of points to plot
 class Points : public Object
 {

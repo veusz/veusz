@@ -19,10 +19,8 @@
 """3D function plotting widget."""
 
 from __future__ import division, print_function
-import itertools
 import numpy as N
 
-from ..compat import czip, crange
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -42,7 +40,7 @@ class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""
 
     typename='function3d'
-    description=_('Plot a 3D function')
+    description=_('3D function')
 
     # list of the supported modes
     _modes = [

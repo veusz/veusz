@@ -17,7 +17,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
-#include <iostream>
+#include <cstdio>
+#include <cmath>
 #include "objects.h"
 
 Object::~Object()
@@ -247,6 +248,164 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, FragmentVector& v)
           }
         ++fs.index;
       }
+}
+
+// DataMesh
+///////////
+
+void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
+{
+  // check indices
+  bool found[3] = {0, 0, 0};
+  unsigned idxs[3] = {idxval, idxedge1, idxedge2};
+  for(unsigned i=0; i<3; ++i)
+    if(idxs[i]<=2)
+      found[idxs[i]]=1;
+  if(!found[0] || !found[1] || !found[2])
+    {
+      std::fprintf(stderr, "DataMesh: invalid indices\n");
+      return;
+    }
+
+  // check that data sizes agree
+  if( (int(edges1.size())-1)*(int(edges2.size())-1) != int(vals.size()) )
+    {
+      std::fprintf(stderr, "DataMesh: invalid size\n");
+      return;
+    }
+
+  // nothing to draw
+  if( lineprop.ptr()==0 && surfaceprop.ptr()==0 )
+    return;
+
+  // used to draw the grid and surface
+  Fragment ft;
+  ft.type = Fragment::FR_TRIANGLE;
+  ft.surfaceprop = surfaceprop.ptr();
+  ft.lineprop = 0;
+  ft.object = this;
+
+  Fragment fl;
+  fl.type = Fragment::FR_LINESEG;
+  fl.surfaceprop = 0;
+  fl.lineprop = lineprop.ptr();
+  fl.object = this;
+
+  // these are the corner indices used for drawing low and high resolution surfaces
+  static const unsigned trilist_lowres[2][3] = {{0,2,4},{0,6,4}};
+  static const unsigned trilist_highres[8][3]  = {
+    {8,0,1},{8,1,2},{8,2,3},{8,3,4},{8,4,5},{8,5,6},{8,6,7},{8,7,0}};
+  static const unsigned linelist_lowres[4][2] = {
+    {0,2},{0,6},{4,2},{4,6}};
+  static const unsigned linelist_highres[8][2] = {
+    {0,1},{1,2},{2,3},{3,4},{4,5},{5,6},{6,7},{7,0}};
+
+  // select list above depending on high or low resolution
+  const unsigned (*trilist)[3] = highres ? trilist_highres : trilist_lowres;
+  const unsigned (*linelist)[2] = highres ? linelist_highres : linelist_lowres;
+  const unsigned ntris = highres ? 8 : 2;
+  const unsigned nlines = highres ? 8 : 4;
+
+  // store corners and neighbouring cell values
+  double neigh[9];
+  Vec4 corners[9];   // 4d corners
+  for(unsigned i=0; i<9; ++i)
+    corners[i](3) = 1;
+  Vec3 corners3[9];  // 3d version of above
+
+  const int n1=int(edges1.size())-1;
+  const int n2=int(edges2.size())-1;
+
+  // loop over 2d array
+  for(int i1=0; i1<n1; ++i1)
+    for(int i2=0; i2<n2; ++i2)
+      {
+        double centre = vals[i1*n2+i2];
+        if( ! std::isfinite(centre) )
+          continue;
+
+        // get values of neighbouring cells (clipping at edges)
+        // -1,-1 -1,0 -1,1   0,-1 0,0 0,1   1,-1 1,0 1,1
+        for(int d1=-1; d1<=1; ++d1)
+          for(int d2=-1; d2<=1; ++d2)
+            {
+              int clip1 = std::max(std::min(i1+d1, n1-1), 0);
+              int clip2 = std::max(std::min(i2+d2, n2-1), 0);
+              double val = vals[clip1*n2+clip2];
+              if(! std::isfinite(val))  // use centre if invalid neighbour
+                val = centre;
+              neigh[(d1+1)*3+(d2+1)] = val;
+            }
+
+        // compute "corners" - these are the clockwise corners and
+        // edge centres from the top left (d1==d2==-1), followed by
+        // the cell centre
+        corners[0](idxs[0]) = 0.25*(neigh[0]+neigh[3]+neigh[4]+neigh[1]);
+        corners[0](idxs[1]) = edges1[i1];
+        corners[0](idxs[2]) = edges2[i2];
+
+        corners[1](idxs[0]) = 0.5*(neigh[4]+neigh[3]);
+        corners[1](idxs[1]) = 0.5*(edges1[i1]+edges1[i1+1]);
+        corners[1](idxs[2]) = edges2[i2];
+
+        corners[2](idxs[0]) = 0.25*(neigh[3]+neigh[6]+neigh[7]+neigh[4]);
+        corners[2](idxs[1]) = edges1[i1+1];
+        corners[2](idxs[2]) = edges2[i2];
+
+        corners[3](idxs[0]) = 0.5*(neigh[4]+neigh[7]);
+        corners[3](idxs[1]) = edges1[i1+1];
+        corners[3](idxs[2]) = 0.5*(edges2[i2]+edges2[i2+1]);
+
+        corners[4](idxs[0]) = 0.25*(neigh[4]+neigh[7]+neigh[8]+neigh[5]);
+        corners[4](idxs[1]) = edges1[i1+1];
+        corners[4](idxs[2]) = edges2[i2+1];
+
+        corners[5](idxs[0]) = 0.5*(neigh[4]+neigh[5]);
+        corners[5](idxs[1]) = 0.5*(edges1[i1]+edges1[i1+1]);
+        corners[5](idxs[2]) = edges2[i2+1];
+
+        corners[6](idxs[0]) = 0.25*(neigh[1]+neigh[4]+neigh[5]+neigh[2]);
+        corners[6](idxs[1]) = edges1[i1];
+        corners[6](idxs[2]) = edges2[i2+1];
+
+        corners[7](idxs[0]) = 0.5*(neigh[4]+neigh[1]);
+        corners[7](idxs[1]) = edges1[i1];
+        corners[7](idxs[2]) = 0.5*(edges2[i2]+edges2[i2+1]);
+
+        corners[8](idxs[0]) = centre;
+        corners[8](idxs[1]) = 0.5*(edges1[i1]+edges1[i1+1]);
+        corners[8](idxs[2]) = 0.5*(edges2[i2]+edges2[i2+1]);
+
+        // convert to 3d coordinates
+        for(unsigned i=0; i<9; ++i)
+          corners3[i] = vec4to3(outerM*corners[i]);
+
+        // draw triangles
+        if(ft.surfaceprop!=0)
+          {
+            ft.index = i1*n2+i2;
+            for(unsigned i=0; i<ntris; ++i)
+              {
+                ft.points[0] = corners3[trilist[i][0]];
+                ft.points[1] = corners3[trilist[i][1]];
+                ft.points[2] = corners3[trilist[i][2]];
+                v.push_back(ft);
+              }
+          }
+
+        // draw lines
+        if(fl.lineprop!=0)
+          {
+            fl.index = i1*n2+i2;
+            for(unsigned i=0; i<nlines; ++i)
+              {
+                fl.points[0] = corners3[linelist[i][0]];
+                fl.points[1] = corners3[linelist[i][1]];
+                v.push_back(fl);
+              }
+          }
+
+      } // loop over points
 }
 
 // Points

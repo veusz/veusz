@@ -18,7 +18,7 @@
 
 """Generic 3D plotting widet."""
 
-from __future__ import division
+from __future__ import division, print_function
 from .. import qtall as qt4
 import numpy as N
 
@@ -37,7 +37,7 @@ def _(text, disambiguation=None, context='Plotters3D'):
 class GenericPlotter3D(widget.Widget):
     """Generic plotter."""
 
-    typename='genericplotter3d'
+    typename = 'genericplotter3d'
     isplotter = True
 
     def __init__(self, parent, name=None):
@@ -54,10 +54,10 @@ class GenericPlotter3D(widget.Widget):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
 
-        s.add( setting.Str(
-            'key', '',
-            descr = _('Description of the plotted data to appear in key'),
-            usertext=_('Key text')) )
+        # s.add( setting.Str(
+        #     'key', '',
+        #     descr = _('Description of the plotted data to appear in key'),
+        #     usertext=_('Key text')) )
         s.add( setting.Axis(
             'xAxis', 'x', 'x',
             descr = _('Name of X-axis to use'),

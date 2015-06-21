@@ -419,6 +419,9 @@ class Line3D(Settings):
     def makeLineProp(self):
         """Construct line properties object for assigning to 3D object."""
 
+        if self.hide:
+            return None
+
         width = self.width
         if self.hide or width == 0.:
             style, dash = qt4.Qt.NoPen, None
@@ -454,6 +457,9 @@ class Surface3D(Settings):
 
     def makeSurfaceProp(self):
         """Properties to assign to surface."""
+        if self.hide:
+            return None
+
         col = qt4.QColor(self.color)
         from ..helpers import threed
         return threed.SurfaceProp(

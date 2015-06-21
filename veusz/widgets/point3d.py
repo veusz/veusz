@@ -19,10 +19,8 @@
 """3D point plotting widget."""
 
 from __future__ import division, print_function
-import itertools
 import numpy as N
 
-from ..compat import czip, crange
 from .. import qtall as qt4
 from .. import setting
 from .. import document
@@ -49,7 +47,7 @@ class Point3D(plotters3d.GenericPlotter3D):
     """Plotting points in 3D."""
 
     typename='point3d'
-    description=_('Plot 3D points')
+    description=_('3D points')
 
     @classmethod
     def addSettings(klass, s):

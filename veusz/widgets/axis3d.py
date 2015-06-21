@@ -140,13 +140,12 @@ class MinorGridLine(setting.Line3D):
         self.get('color').newDefault('lightgrey')
         self.get('hide').newDefault(True)
 
-
 class Axis3D(widget.Widget):
     """Manages and draws an axis."""
 
     typename = 'axis3d'
     allowusercreation = True
-    description = 'Axis on 3d graph'
+    description = _('3D axis')
     isaxis = True
     isaxis3d = True
 
