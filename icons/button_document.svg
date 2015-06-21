@@ -14,7 +14,7 @@
    height="16"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.48.5 r10040"
    version="1.0"
    sodipodi:docname="button_document.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -34,27 +34,7 @@
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient3490"
-       id="linearGradient3496"
-       x1="8.3337603"
-       y1="8.429863"
-       x2="3.1587982"
-       y2="3.3648069"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.0203025,0,0,1.0409558,-0.2260154,-0.2749194)" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3490"
        id="linearGradient2992"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.0203025,0,0,1.0409558,-0.2260154,-0.2749194)"
-       x1="8.3337603"
-       y1="8.429863"
-       x2="3.1587982"
-       y2="3.3648069" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3490-5"
-       id="linearGradient2992-0"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(1.0203025,0,0,1.0409558,-0.2260154,-0.2749194)"
        x1="8.3337603"
@@ -82,16 +62,6 @@
        id="linearGradient3011"
        xlink:href="#linearGradient3490-5"
        inkscape:collect="always" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3490-1"
-       id="linearGradient2992-2"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.0203025,0,0,1.0409558,-0.2260154,-0.2749194)"
-       x1="8.3337603"
-       y1="8.429863"
-       x2="3.1587982"
-       y2="3.3648069" />
     <linearGradient
        id="linearGradient3490-1">
       <stop

@@ -18,19 +18,7 @@
    sodipodi:docname="button_function3d.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
-     id="defs4">
-    <linearGradient
-       id="linearGradient2989">
-      <stop
-         style="stop-color:#ff006c;stop-opacity:1;"
-         offset="0"
-         id="stop2991" />
-      <stop
-         style="stop-color:#b519ff;stop-opacity:1;"
-         offset="1"
-         id="stop2993" />
-    </linearGradient>
-  </defs>
+     id="defs4" />
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"

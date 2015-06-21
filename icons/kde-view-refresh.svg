@@ -8,7 +8,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    sodipodi:docname="kde-view-refresh.svg"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.48.5 r10040"
    sodipodi:version="0.32"
    id="svg1"
    x="0"
@@ -39,7 +39,7 @@
     <rdf:RDF>
       <Work
          rdf:about=""
-         id="Work6">
+         id="Work1289">
         <dc:title>Part of the Flat Icon Collection (Thu Aug 26 14:38:01 2004)</dc:title>
         <dc:description />
         <dc:subject>
@@ -50,21 +50,21 @@
         <dc:publisher>
           <Agent
              rdf:about=""
-             id="Agent8">
+             id="Agent1291">
             <dc:title />
           </Agent>
         </dc:publisher>
         <dc:creator>
           <Agent
              rdf:about=""
-             id="Agent10">
+             id="Agent1293">
             <dc:title>Danny Allen</dc:title>
           </Agent>
         </dc:creator>
         <dc:rights>
           <Agent
              rdf:about=""
-             id="Agent12">
+             id="Agent1295">
             <dc:title>Danny Allen</dc:title>
           </Agent>
         </dc:rights>
@@ -74,7 +74,7 @@
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
         <license
            rdf:resource="http://creativecommons.org/licenses/LGPL/2.1/"
-           id="license14">
+           id="license1297">
           <dc:date />
         </license>
         <dc:language>en</dc:language>
