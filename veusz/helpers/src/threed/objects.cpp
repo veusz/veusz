@@ -253,6 +253,55 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, FragmentVector& v)
 // DataMesh
 ///////////
 
+namespace
+{
+  // average ignoring nan values
+  double average4(double a, double b, double c, double d)
+  {
+    unsigned ct=0;
+    double tot=0.;
+    if(std::isfinite(a)) { tot+=a; ++ct; }
+    if(std::isfinite(b)) { tot+=b; ++ct; }
+    if(std::isfinite(c)) { tot+=c; ++ct; }
+    if(std::isfinite(d)) { tot+=d; ++ct; }
+    return tot/ct;
+  }
+
+  double average2(double a, double b)
+  {
+    unsigned ct=0;
+    double tot=0.;
+    if(std::isfinite(a)) { tot+=a; ++ct; }
+    if(std::isfinite(b)) { tot+=b; ++ct; }
+    return tot/ct;
+  }
+
+  // keep track of which lines are drawn in the grid, so they aren't
+  // drawn again. We have a grid point for each edge, and a line
+  // index, stored as a bit
+  struct LineCellTracker
+  {
+    LineCellTracker(unsigned _n1, unsigned _n2)
+      : n1(_n1), n2(_n2), data(n1*n2, 0)
+    {
+    }
+
+    void setLine(unsigned i1, unsigned i2, unsigned idx)
+    {
+      data[i1*n2+i2] |= 1<<idx;
+    }
+
+    bool isLineSet(unsigned i1, unsigned i2, unsigned idx) const
+    {
+      return data[i1*n2+i2] & 1<<idx;
+    }
+
+    unsigned n1, n2;
+    std::vector<unsigned> data;
+  };
+};
+
+
 void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
 {
   // check indices
@@ -300,9 +349,20 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
   static const unsigned linelist_highres[8][2] = {
     {0,1},{1,2},{2,3},{3,4},{4,5},{5,6},{6,7},{7,0}};
 
+  // this is to avoid double-drawing lines
+  // xidx, yidx, lineidx
+  static const unsigned linecell_lowres[4][3] = {
+    {0,0,0}, {0,0,1}, {0,1,0}, {1,0,1}
+  };
+  static const unsigned linecell_highres[8][3] = {
+    {0,0,0}, {0,0,1}, {1,0,2}, {1,0,3}, {0,1,1}, {0,1,0}, {0,0,3}, {0,0,2}
+  };
+
   // select list above depending on high or low resolution
-  const unsigned (*trilist)[3] = highres ? trilist_highres : trilist_lowres;
-  const unsigned (*linelist)[2] = highres ? linelist_highres : linelist_lowres;
+  const unsigned (*tris)[3] = highres ? trilist_highres : trilist_lowres;
+  const unsigned (*lines)[2] = highres ? linelist_highres : linelist_lowres;
+  const unsigned (*linecells)[3] = highres ? linecell_highres :
+    linecell_lowres;
   const unsigned ntris = highres ? 8 : 2;
   const unsigned nlines = highres ? 8 : 4;
 
@@ -313,6 +373,10 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
     corners[i](3) = 1;
   Vec3 corners3[9];  // 3d version of above
 
+  // don't draw lines twice by keeping track if which edges of which
+  // cells have been drawn already
+  LineCellTracker linetracker(edges1.size(), edges2.size());
+
   const int n1=int(edges1.size())-1;
   const int n2=int(edges2.size())-1;
 
@@ -320,8 +384,8 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
   for(int i1=0; i1<n1; ++i1)
     for(int i2=0; i2<n2; ++i2)
       {
-        double centre = vals[i1*n2+i2];
-        if( ! std::isfinite(centre) )
+        // skip bad data values
+        if( ! std::isfinite(vals[i1*n2+i2]) )
           continue;
 
         // get values of neighbouring cells (clipping at edges)
@@ -332,47 +396,45 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
               int clip1 = std::max(std::min(i1+d1, n1-1), 0);
               int clip2 = std::max(std::min(i2+d2, n2-1), 0);
               double val = vals[clip1*n2+clip2];
-              if(! std::isfinite(val))  // use centre if invalid neighbour
-                val = centre;
               neigh[(d1+1)*3+(d2+1)] = val;
             }
 
         // compute "corners" - these are the clockwise corners and
         // edge centres from the top left (d1==d2==-1), followed by
         // the cell centre
-        corners[0](idxs[0]) = 0.25*(neigh[0]+neigh[3]+neigh[4]+neigh[1]);
+        corners[0](idxs[0]) = average4(neigh[0],neigh[3],neigh[4],neigh[1]);
         corners[0](idxs[1]) = edges1[i1];
         corners[0](idxs[2]) = edges2[i2];
 
-        corners[1](idxs[0]) = 0.5*(neigh[4]+neigh[3]);
+        corners[1](idxs[0]) = average2(neigh[4],neigh[3]);
         corners[1](idxs[1]) = 0.5*(edges1[i1]+edges1[i1+1]);
         corners[1](idxs[2]) = edges2[i2];
 
-        corners[2](idxs[0]) = 0.25*(neigh[3]+neigh[6]+neigh[7]+neigh[4]);
+        corners[2](idxs[0]) = average4(neigh[3],neigh[6],neigh[7],neigh[4]);
         corners[2](idxs[1]) = edges1[i1+1];
         corners[2](idxs[2]) = edges2[i2];
 
-        corners[3](idxs[0]) = 0.5*(neigh[4]+neigh[7]);
+        corners[3](idxs[0]) = average2(neigh[4],neigh[7]);
         corners[3](idxs[1]) = edges1[i1+1];
         corners[3](idxs[2]) = 0.5*(edges2[i2]+edges2[i2+1]);
 
-        corners[4](idxs[0]) = 0.25*(neigh[4]+neigh[7]+neigh[8]+neigh[5]);
+        corners[4](idxs[0]) = average4(neigh[4],neigh[7],neigh[8],neigh[5]);
         corners[4](idxs[1]) = edges1[i1+1];
         corners[4](idxs[2]) = edges2[i2+1];
 
-        corners[5](idxs[0]) = 0.5*(neigh[4]+neigh[5]);
+        corners[5](idxs[0]) = average2(neigh[4],neigh[5]);
         corners[5](idxs[1]) = 0.5*(edges1[i1]+edges1[i1+1]);
         corners[5](idxs[2]) = edges2[i2+1];
 
-        corners[6](idxs[0]) = 0.25*(neigh[1]+neigh[4]+neigh[5]+neigh[2]);
+        corners[6](idxs[0]) = average4(neigh[1],neigh[4],neigh[5],neigh[2]);
         corners[6](idxs[1]) = edges1[i1];
         corners[6](idxs[2]) = edges2[i2+1];
 
-        corners[7](idxs[0]) = 0.5*(neigh[4]+neigh[1]);
+        corners[7](idxs[0]) = average2(neigh[4],neigh[1]);
         corners[7](idxs[1]) = edges1[i1];
         corners[7](idxs[2]) = 0.5*(edges2[i2]+edges2[i2+1]);
 
-        corners[8](idxs[0]) = centre;
+        corners[8](idxs[0]) = neigh[4];
         corners[8](idxs[1]) = 0.5*(edges1[i1]+edges1[i1+1]);
         corners[8](idxs[2]) = 0.5*(edges2[i2]+edges2[i2+1]);
 
@@ -386,9 +448,9 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
             ft.index = i1*n2+i2;
             for(unsigned i=0; i<ntris; ++i)
               {
-                ft.points[0] = corners3[trilist[i][0]];
-                ft.points[1] = corners3[trilist[i][1]];
-                ft.points[2] = corners3[trilist[i][2]];
+                ft.points[0] = corners3[tris[i][0]];
+                ft.points[1] = corners3[tris[i][1]];
+                ft.points[2] = corners3[tris[i][2]];
                 v.push_back(ft);
               }
           }
@@ -399,13 +461,20 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
             fl.index = i1*n2+i2;
             for(unsigned i=0; i<nlines; ++i)
               {
-                fl.points[0] = corners3[linelist[i][0]];
-                fl.points[1] = corners3[linelist[i][1]];
-                v.push_back(fl);
+                if(! linetracker.isLineSet(i1+linecells[i][0], i2+linecells[i][1],
+                                           linecells[i][2]))
+                  {
+                    fl.points[0] = corners3[lines[i][0]];
+                    fl.points[1] = corners3[lines[i][1]];
+                    if(fl.points[0].isfinite() && fl.points[1].isfinite())
+                      v.push_back(fl);
+                    linetracker.setLine(i1+linecells[i][0], i2+linecells[i][1],
+                                        linecells[i][2]);
+                  }
               }
           }
-
       } // loop over points
+
 }
 
 // Points
