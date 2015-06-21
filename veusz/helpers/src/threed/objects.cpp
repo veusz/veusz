@@ -278,29 +278,29 @@ namespace
 
   // keep track of which lines are drawn in the grid, so they aren't
   // drawn again. We have a grid point for each edge, and a line
-  // index, stored as a bit
+  // index (0-3)
+#define MAXLINEIDX 4
   struct LineCellTracker
   {
     LineCellTracker(unsigned _n1, unsigned _n2)
-      : n1(_n1), n2(_n2), data(n1*n2, 0)
+      : n1(_n1), n2(_n2), data(n1*n2*MAXLINEIDX, 0)
     {
     }
 
-    void setLine(unsigned i1, unsigned i2, unsigned idx)
+    void setLine(unsigned i1, unsigned i2, unsigned lineidx)
     {
-      data[i1*n2+i2] |= 1<<idx;
+      data[(i1*n2+i2)*MAXLINEIDX+lineidx] = 1;
     }
 
-    bool isLineSet(unsigned i1, unsigned i2, unsigned idx) const
+    bool isLineSet(unsigned i1, unsigned i2, unsigned lineidx) const
     {
-      return data[i1*n2+i2] & 1<<idx;
+      return data[(i1*n2+i2)*MAXLINEIDX+lineidx];
     }
 
     unsigned n1, n2;
-    std::vector<unsigned> data;
+    std::vector<char> data;
   };
 };
-
 
 void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
 {
@@ -349,7 +349,8 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
   static const unsigned linelist_highres[8][2] = {
     {0,1},{1,2},{2,3},{3,4},{4,5},{5,6},{6,7},{7,0}};
 
-  // this is to avoid double-drawing lines
+  // This is to avoid double-drawing lines. Lines are given an x/yindex to say which
+  // side of the grid cell is being drawn and a lineidx which is unique for sub-lines
   // xidx, yidx, lineidx
   static const unsigned linecell_lowres[4][3] = {
     {0,0,0}, {0,0,1}, {0,1,0}, {1,0,1}
@@ -455,7 +456,7 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
               }
           }
 
-        // draw lines
+        // draw lines (if they haven't been drawn before)
         if(fl.lineprop!=0)
           {
             fl.index = i1*n2+i2;

@@ -366,29 +366,31 @@ class PointLabel(Text):
                                     usertext=_('Horz position'),
                                     formatting=True), 0 )
 
-class MarkerColor(Settings):
+class DataColor(Settings):
     """Settings for a coloring points using data values."""
 
-    def __init__(self, name):
+    def __init__(self, name, dimensions=1):
         Settings.__init__(self, name, setnsmode='groupedsetting')
         self.add( setting.DatasetExtended(
-                'points', '',
-                descr = _('Use color value (0-1) in dataset to paint points'),
-                usertext=_('Color markers')), 7 )
+            'data', '',
+            descr = _('Use color values in dataset'),
+            dimensions=dimensions,
+            usertext=_('Color data')) )
         self.add( setting.Float(
-                'min', 0.,
-                descr = _('Minimum value of color dataset'),
-                usertext = _('Min val') ))
+            'min', 0.,
+            descr = _('Minimum value of color dataset'),
+            usertext = _('Min val') ))
         self.add( setting.Float(
-                'max', 1.,
-                descr = _('Maximum value of color dataset'),
-                usertext = _('Max val') ))
+            'max', 1.,
+            descr = _('Maximum value of color dataset'),
+            usertext = _('Max val') ))
         self.add( setting.Choice(
-                'scaling',
-                ['linear', 'sqrt', 'log', 'squared'],
-                'linear',
-                descr = _('Scaling to transform numbers to color'),
-                usertext=_('Scaling')))
+            'scaling',
+            ['linear', 'sqrt', 'log', 'squared'],
+            'linear',
+            descr = _('Scaling to transform numbers to color'),
+            usertext=_('Scaling')))
+        self.add( setting.SettingBackwardCompat('points', 'data', None) )
 
 class Line3D(Settings):
     '''3d line properties.'''

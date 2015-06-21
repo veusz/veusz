@@ -74,7 +74,7 @@ class NonOrthPoint(Widget):
                 descr = _('Scale size of plotted markers by this dataset, '
                           ' list of values or expression'),
                 usertext=_('Scale markers')) )
-        s.add( setting.MarkerColor('Color') )
+        s.add( setting.DataColor('Color') )
 
         s.add( setting.Color('color',
                              'black',
@@ -199,7 +199,7 @@ class NonOrthPoint(Widget):
         d1 = s.get('data1').getData(d)
         d2 = s.get('data2').getData(d)
         dscale = s.get('scalePoints').getData(d)
-        colorpoints = s.Color.get('points').getData(d)
+        colorpoints = s.Color.get('data').getData(d)
         text = s.get('labels').getData(d, checknull=True)
         if not d1 or not d2:
             return

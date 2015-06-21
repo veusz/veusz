@@ -1,6 +1,7 @@
-# Veusz saved document (version 1.17.1)
+# Veusz saved document (version 1.23.1)
+# Saved at 2015-06-21T15:38:09.523457
 
-ImportFileCSV('axis_function_linked.csv', blanksaredata=True, delimiter='\t', linked=True, numericlocale='en_GB')
+ImportFileCSV(u'axis_function_linked.csv', blanksaredata=True, delimiter='\t', linked=True, numericlocale='en_GB')
 Set('height', u'12cm')
 Set('StyleSheet/Font/font', u'DejaVu Serif')
 Set('StyleSheet/axis/TickLabels/size', u'12pt')
@@ -56,7 +57,7 @@ Add('xy', name=u'snmag', autoadd=False)
 To(u'snmag')
 Set('xData', u'z')
 Set('yData', u'Bmag')
-Set('Color/points', u'colour')
+Set('Color/data', u'colour')
 Set('Color/min', -0.301)
 Set('Color/max', 0.302)
 Set('PlotLine/hide', True)

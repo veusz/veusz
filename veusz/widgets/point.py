@@ -355,7 +355,7 @@ class PointPlotter(GenericPlotter):
                               'circle',
                               descr = _('Type of marker to plot'),
                               usertext=_('Marker'), formatting=True), 0 )
-        s.add( setting.MarkerColor('Color') )
+        s.add( setting.DataColor('Color') )
 
         s.add( setting.ErrorStyle('errorStyle',
                                   'bar',
@@ -792,7 +792,7 @@ class PointPlotter(GenericPlotter):
         yv = s.get('yData').getData(doc)
         text = s.get('labels').getData(doc, checknull=True)
         scalepoints = s.get('scalePoints').getData(doc)
-        colorpoints = s.Color.get('points').getData(doc)
+        colorpoints = s.Color.get('data').getData(doc)
 
         # if a missing dataset, make a fake dataset for the second one
         # based on a row number

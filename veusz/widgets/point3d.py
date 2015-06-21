@@ -85,7 +85,7 @@ class Point3D(plotters3d.GenericPlotter3D):
             'marker', 'circle',
             descr = _('Type of marker to plot'),
             usertext=_('Marker'), formatting=True), 0 )
-        s.add( setting.MarkerColor('Color') )
+        s.add( setting.DataColor('Color') )
 
         s.add( PlotLine3D(
             'PlotLine',
@@ -152,7 +152,7 @@ class Point3D(plotters3d.GenericPlotter3D):
             markerlineprop = s.MarkerLine.makeLineProp()
         if filled and not s.MarkerFill.hide:
             markerfillprop = s.MarkerFill.makeSurfaceProp()
-            cvals = s.Color.get('points').getData(doc)
+            cvals = s.Color.get('data').getData(doc)
             if cvals is not None:
                 colorvals = utils.applyScaling(
                     cvals.data, s.Color.scaling, s.Color.min, s.Color.max)

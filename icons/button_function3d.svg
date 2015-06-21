@@ -18,7 +18,19 @@
    sodipodi:docname="button_function3d.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
-     id="defs4" />
+     id="defs4">
+    <linearGradient
+       id="linearGradient2989">
+      <stop
+         style="stop-color:#ff006c;stop-opacity:1;"
+         offset="0"
+         id="stop2991" />
+      <stop
+         style="stop-color:#b519ff;stop-opacity:1;"
+         offset="1"
+         id="stop2993" />
+    </linearGradient>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -29,17 +41,17 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="49.393274"
-     inkscape:cx="15.43545"
-     inkscape:cy="6.7050752"
+     inkscape:zoom="24.696637"
+     inkscape:cx="0.41438118"
+     inkscape:cy="8.3247289"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1025"
-     inkscape:window-x="-2"
-     inkscape:window-y="-3"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1391"
+     inkscape:window-height="872"
+     inkscape:window-x="218"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -81,22 +93,54 @@
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:#87cdde;stroke:none"
-       d="M 3.3607816,7.1323958 9.18994,4.7572272 14.293444,6.9704304 14.17197,12.396271 9.1901993,12.95498 3.3607816,12.558236 z"
-       id="path3005"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccc" />
+       sodipodi:type="arc"
+       style="fill:#ff7f2a;stroke:none"
+       id="path3765"
+       sodipodi:cx="8.5031824"
+       sodipodi:cy="8.549593"
+       sodipodi:rx="5.1424007"
+       sodipodi:ry="3.8061862"
+       d="m 13.645583,8.549593 a 5.1424007,3.8061862 0 1 1 -10.2848013,0 5.1424007,3.8061862 0 1 1 10.2848013,0 z"
+       transform="matrix(1.1968504,0,0,1.3617022,-1.6738548,-4.9304407)" />
     <path
-       style="fill:#00ffff;stroke:none"
-       d="M 8.8068671,7.8409943 8.8271128,2.3139261 13.159686,9.2379457 8.7866214,12.193814 z"
-       id="path2985"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccc" />
+       sodipodi:type="arc"
+       style="fill:#ffd42a;stroke:none"
+       id="path3767"
+       sodipodi:cx="9.3130093"
+       sodipodi:cy="4.6421781"
+       sodipodi:rx="2.4294806"
+       sodipodi:ry="1.9233388"
+       d="m 11.74249,4.6421781 a 2.4294806,1.9233388 0 1 1 -4.8589613,0 2.4294806,1.9233388 0 1 1 4.8589613,0 z"
+       transform="matrix(1.8886499,0,0,1.9282813,-9.0858315,-1.8734661)" />
     <path
-       style="fill:#00aad4;stroke:none"
-       d="M 8.8878498,6.767974 8.8271128,2.3139259 4.4945393,9.2379454 8.8676042,12.193813 z"
-       id="path2985-4"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccc" />
+       sodipodi:type="arc"
+       style="fill:#ff6600;stroke:none"
+       id="path3769"
+       sodipodi:cx="7.9160576"
+       sodipodi:cy="7.6182919"
+       sodipodi:rx="2.409235"
+       sodipodi:ry="0.93130088"
+       d="m 10.325293,7.6182919 a 2.409235,0.93130088 0 1 1 -4.8184704,0 2.409235,0.93130088 0 1 1 4.8184704,0 z"
+       transform="matrix(1.5199541,0,0,2.8409706,-3.5288617,-15.198544)" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ffd42a;stroke:none"
+       id="path3771"
+       sodipodi:cx="8.2197428"
+       sodipodi:cy="8.3066444"
+       sodipodi:rx="1.9435844"
+       sodipodi:ry="0.72884417"
+       d="m 10.163327,8.3066444 a 1.9435844,0.72884417 0 1 1 -3.8871687,0 1.9435844,0.72884417 0 1 1 3.8871687,0 z"
+       transform="matrix(1.3960573,0,0,2.2433149,-2.9720494,-11.728255)" />
+    <path
+       sodipodi:type="arc"
+       style="fill:#ff6600;stroke:none"
+       id="path3773"
+       sodipodi:cx="-4.3933105"
+       sodipodi:cy="5.9379015"
+       sodipodi:rx="1.35646"
+       sodipodi:ry="0.50614178"
+       d="m -3.0368506,5.9379015 a 1.35646,0.50614178 0 1 1 -2.7129199,0 1.35646,0.50614178 0 1 1 2.7129199,0 z"
+       transform="matrix(1.0896057,0,0,1.1742739,13.290158,-0.58420778)" />
   </g>
 </svg>
