@@ -45,10 +45,10 @@ inline void _qimage2rgbvec(const QImage& img, RGBVec& vec)
 struct SurfaceProp
 {
   SurfaceProp(double _r=0.5f, double _g=0.5f, double _b=0.5f,
-	      double _specular=0.5f, double _diffuse=0.5f, double _trans=0,
+	      double _specular=0.2f, double _trans=0,
 	      bool _hide=0)
     : r(_r), g(_g), b(_b),
-      specular(_specular), diffuse(_diffuse), trans(_trans),
+      specular(_specular), trans(_trans),
       hide(_hide), _ref_cnt(0)
   {
   }
@@ -57,7 +57,7 @@ struct SurfaceProp
   void setRGBs(const QImage& img) { _qimage2rgbvec(img, rgbs); }
   
   double r, g, b;
-  double specular, diffuse, trans;
+  double specular, trans;
   RGBVec rgbs;
   bool hide;
 
@@ -68,10 +68,10 @@ struct SurfaceProp
 struct LineProp
 {
   LineProp(double _r=0, double _g=0, double _b=0,
-	   double _specular=0.5f, double _diffuse=0.5f, double _trans=0,
+	   double _trans=0,
 	   double _width=1, bool _hide=0)
     : r(_r), g(_g), b(_b),
-      specular(_specular), diffuse(_diffuse), trans(_trans),
+      trans(_trans),
       width(_width), hide(_hide), _ref_cnt(0)
   {
   }
@@ -80,7 +80,7 @@ struct LineProp
   void setRGBs(const QImage& img) { _qimage2rgbvec(img, rgbs); }
 
   double r, g, b;
-  double specular, diffuse, trans;
+  double trans;
   double width;
   RGBVec rgbs;
   bool hide;

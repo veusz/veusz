@@ -453,6 +453,11 @@ class Surface3D(Settings):
                               usertext = _('Transparency'),
                               minval = 0,
                               maxval = 100 ) )
+        self.add( setting.Int('reflectivity', 50,
+                              descr = _('Reflectivity percentage'),
+                              usertext = _('Reflectivity'),
+                              minval = 0,
+                              maxval = 100 ) )
         self.add( setting.Bool('hide', False,
                                descr = _('Hide surface'),
                                usertext=_('Hide')) )
@@ -466,7 +471,7 @@ class Surface3D(Settings):
         from ..helpers import threed
         return threed.SurfaceProp(
             r=col.redF(), g=col.greenF(), b=col.blueF(),
-            trans=self.transparency*0.01)
+            trans=self.transparency*0.01, specular=self.reflectivity*0.01)
 
 class Surface3DWColorMap(Surface3D):
     '''3d surface with color map setting.'''
@@ -503,3 +508,29 @@ class Line3DWColorMap(Line3D):
             descr = _('Invert color map'),
             usertext = _('Invert map'),
             formatting=True) )
+
+class Lighting3D(Settings):
+    '''Lighting options.'''
+
+    def __init__(self, name, **args):
+        Settings.__init__(self, name, **args)
+
+        self.add( setting.Bool(
+            'enable', True,
+            descr=_('Enable lighting'),
+            usertext=_('Enable')) )
+        self.add( setting.FloatSlider(
+            'x', 0.,
+            minval=-20, maxval=20, tick=4, step=0.2,
+            descr=_('X coordinate of light (positive is right)'),
+            usertext=_('X position')) )
+        self.add( setting.FloatSlider(
+            'y', 0.,
+            minval=-20, maxval=20, tick=4, step=0.2,
+            descr=_('Y coordinate of light (positive is below)'),
+            usertext=_('Y position')) )
+        self.add( setting.FloatSlider(
+            'z', 10,
+            minval=-20, maxval=20, tick=4, step=0.2,
+            descr=_('Z coordinate of light (positive is towards viewer)'),
+            usertext=_('Z position')) )

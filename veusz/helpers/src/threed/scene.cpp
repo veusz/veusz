@@ -28,7 +28,8 @@
 #include "fragment.h"
 #include "bsp.h"
 
-#include <iostream>
+// gamma value used in calculating brightness for lighting
+#define GAMMA 2.2
 
 namespace
 {
@@ -76,11 +77,11 @@ namespace
     // catch bad values or empty arrays
     if(maxx == minx || !std::isfinite(minx) || !std::isfinite(maxx))
       {
-	maxx=1; minx=0;
+        maxx=1; minx=0;
       }
     if(maxy == miny || !std::isfinite(miny) || !std::isfinite(maxy))
       {
-	maxy=1; miny=0;
+        maxy=1; miny=0;
       }
 
     // now make matrix to scale to range x1->x2,y1->y2
@@ -89,40 +90,6 @@ namespace
       translateM3(0.5*(x1+x2), 0.5*(y1+y2)) *
       scaleM3(minscale) *
       translateM3(-0.5*(minx+maxx), -0.5*(miny+maxy));
-  }
-
-  QPen LineProp2QPen(const LineProp* p, double linescale, unsigned colindex)
-  {
-    if(p==0 || p->hide)
-      return QPen(Qt::NoPen);
-    else
-      {
-        QColor col;
-        if(p->hasRGBs())
-          col = QColor::fromRgba
-            ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,colindex)] );
-        else
-          col = QColor(int(p->r*255), int(p->g*255),
-                       int(p->b*255), int((1-p->trans)*255));
-        return QPen(QBrush(col), p->width*linescale);
-      }
-  }
-
-  QBrush SurfaceProp2QBrush(const SurfaceProp* p, unsigned colindex)
-  {
-    if(p==0 || p->hide)
-      return QBrush();
-    else
-      {
-        QColor col;
-        if(p->hasRGBs())
-          col = QColor::fromRgba
-            ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,colindex)] );
-        else
-          col = QColor(int(p->r*255), int(p->g*255),
-                       int(p->b*255), int((1-p->trans)*255));
-        return QBrush(col);
-      }
   }
 
   // convert (x,y,depth) -> screen coordinates
@@ -136,6 +103,56 @@ namespace
   unsigned init_fragments_size = 512;
 
 }; // namespace
+
+QPen Scene::LineProp2QPen(const LineProp* p, double linescale,
+                          unsigned colindex) const
+{
+  if(p==0 || p->hide)
+    return QPen(Qt::NoPen);
+  else
+    {
+      QColor col;
+      if(p->hasRGBs())
+        col = QColor::fromRgba
+          ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,colindex)] );
+      else
+        col = QColor(int(p->r*255), int(p->g*255),
+                     int(p->b*255), int((1-p->trans)*255));
+      return QPen(QBrush(col), p->width*linescale);
+    }
+}
+
+QBrush Scene::SurfaceProp2QBrush(const SurfaceProp* p,
+                                 const Fragment& frag) const
+{
+  if(p==0 || p->hide)
+    return QBrush();
+  else
+    {
+      double r, g, b, a;
+
+      if(p->hasRGBs())
+        {
+          QColor col = QColor::fromRgba
+            ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)] );
+          r=col.redF(); g=col.greenF(); b=col.blueF(); a=col.alphaF();
+        }
+      else
+        {
+          r=p->r; g=p->g; b=p->b; a=1-p->trans;
+        }
+
+      // use directional lighting
+      if(lighton)
+        {
+          double scale = 1 - p->specular * (1-frag.lighting);
+          scale = std::pow(scale, 1./GAMMA);
+          r*=scale; g*=scale; b*=scale;
+        }
+
+      return QBrush(QColor(int(r*255), int(g*255), int(b*255), int(a*255)));
+    }
+}
 
 void Scene::drawPath(QPainter* painter, const Fragment& frag,
                      QPointF pt1, QPointF pt2, double linescale)
@@ -208,10 +225,11 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   lline = 0;
                 }
               if(lsurf != frag.surfaceprop ||
-                 ((frag.surfaceprop!=0 && frag.surfaceprop->hasRGBs())))
+                 (frag.surfaceprop!=0 && (frag.surfaceprop->hasRGBs() ||
+                                          (lighton && frag.surfaceprop->specular!=0))))
                 {
                   lsurf = frag.surfaceprop;
-                  painter->setBrush(SurfaceProp2QBrush(lsurf, frag.index));
+                  painter->setBrush(SurfaceProp2QBrush(lsurf, frag));
                 }
 
               painter->drawPolygon(projpts, 3);
@@ -245,10 +263,11 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   painter->setPen(LineProp2QPen(lline, linescale, frag.index));
                 }
               if(lsurf != frag.surfaceprop ||
-                 ((frag.surfaceprop!=0 && frag.surfaceprop->hasRGBs())))
+                 (frag.surfaceprop!=0 && (frag.surfaceprop->hasRGBs() ||
+                                          (lighton && frag.surfaceprop->specular!=0))))
                 {
                   lsurf = frag.surfaceprop;
-                  painter->setBrush(SurfaceProp2QBrush(lsurf, frag.index));
+                  painter->setBrush(SurfaceProp2QBrush(lsurf, frag));
                 }
               drawPath(painter, frag, projpts[0], projpts[1], linescale);
             }
@@ -260,8 +279,37 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
     }
 }
 
+void Scene::calcLighting()
+{
+  // lighting is full on
+  if(!lighton)
+    return;
+
+  for(unsigned i=0, s=fragments.size(); i<s; ++i)
+    {
+      Fragment& f = fragments[i];
+      if(f.type == Fragment::FR_TRIANGLE)
+        {
+          // Calculate triangle norm. Make sure norm points towards
+          // the viewer @ (0,0,0)
+          Vec3 tripos = (f.points[0]+f.points[1]+f.points[2])*(1./3.);
+          Vec3 norm = cross(f.points[1]-f.points[0], f.points[2]-f.points[0]);
+          if(dot(tripos, norm)<0)
+            norm = -norm;
+          norm.normalise();
+
+          // Now dot vector from light source to triangle with norm
+          Vec3 light2tri = tripos-lightposn;
+          light2tri.normalise();
+
+          f.lighting = std::max(0., dot(light2tri, norm));
+        }
+    }
+}
+
 void Scene::projectFragments(const Camera& cam)
 {
+  // convert 3d to 2d coordinates using the Camera
   for(unsigned i=0, s=fragments.size(); i<s; ++i)
     {
       Fragment& f = fragments[i];
@@ -272,6 +320,7 @@ void Scene::projectFragments(const Camera& cam)
 
 void Scene::renderPainters(const Camera& cam)
 {
+  calcLighting();
   projectFragments(cam);
 
   // simple painter's algorithm
@@ -285,6 +334,8 @@ void Scene::renderPainters(const Camera& cam)
 
 void Scene::renderBSP(const Camera& cam)
 {
+  calcLighting();
+
   //std::cout << "\nFragment size 1 " << fragments.size() << '\n';
 
   BSPBuilder bsp(fragments, Vec3(0,0,1));

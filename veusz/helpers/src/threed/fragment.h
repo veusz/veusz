@@ -77,6 +77,9 @@ struct Fragment
   // for path
   float pathsize;
 
+  // calculated lighting norm (updated by Scene)
+  float lighting;
+
   // number of times this has been split
   unsigned splitcount;
 
@@ -91,6 +94,7 @@ struct Fragment
     surfaceprop(0),
     lineprop(0),
     pathsize(0),
+    lighting(1),
     splitcount(0),
     index(0)
   {

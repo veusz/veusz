@@ -207,45 +207,43 @@ void Mesh::getSurfaceFragments(const Mat4& outerM, FragmentVector& v)
   fs.lineprop = 0;
   fs.object = this;
 
+  // for each grid point we alternatively draw one of two sets of
+  // triangles, to make a symmetric diamond pattern, which looks
+  // better when striped
+  static const unsigned tidxs[2][2][3] = {
+    {{0,1,2},{3,1,2}}, {{1,0,3},{2,0,3}} };
+
   const unsigned n1 = pos1.size();
   const unsigned n2 = pos2.size();
 
-  Vec4 p0, p1, p2, p3;
-  p0(3) = p1(3) = p2(3) = p3(3) = 1;
+  Vec4 p[4];
+  Vec3 pproj[4];
+  p[0](3) = p[1](3) = p[2](3) = p[3](3) = 1;
   for(unsigned i1=0; (i1+1)<n1; ++i1)
     for(unsigned i2=0; (i2+1)<n2; ++i2)
       {
-        // grid point coordinates
-        p0(vidx_h) = heights[i1*n2+i2];
-        p0(vidx_1) = pos1[i1];
-        p0(vidx_2) = pos2[i2];
-        p1(vidx_h) = heights[(i1+1)*n2+i2];
-        p1(vidx_1) = pos1[i1+1];
-        p1(vidx_2) = pos2[i2];
-        p2(vidx_h) = heights[i1*n2+(i2+1)];
-        p2(vidx_1) = pos1[i1];
-        p2(vidx_2) = pos2[i2+1];
-        p3(vidx_h) = heights[(i1+1)*n2+(i2+1)];
-        p3(vidx_1) = pos1[i1+1];
-        p3(vidx_2) = pos2[i2+1];
-
-        if( p1.isfinite() && p2.isfinite() )
+        // update coordinates of corners of square and project
+        for(unsigned i=0; i<4; ++i)
           {
-            fs.points[1] = vec4to3(outerM*p1);
-            fs.points[2] = vec4to3(outerM*p2);
+            unsigned j1 = i1+i%2, j2 = i2+i/2;
+            p[i](vidx_h) = heights[j1*n2+j2];
+            p[i](vidx_1) = pos1[j1];
+            p[i](vidx_2) = pos2[j2];
+            pproj[i] = vec4to3(outerM*p[i]);
+          }
 
-            if( p0.isfinite() )
+        // add two triangles, using indices of corners
+        for(unsigned tri=0; tri<2; ++tri)
+          {
+            const unsigned *idxs = tidxs[(i1+i2)%2][tri];
+            if( (p[idxs[0]]+p[idxs[1]]+p[idxs[2]]).isfinite() )
               {
-                // convert to outer coordinate system
-                fs.points[0] = vec4to3(outerM*p0);
-                v.push_back(fs);
-              }
-            if( p3.isfinite() )
-              {
-                fs.points[0] = vec4to3(outerM*p3);
+                for(unsigned i=0; i<3; ++i)
+                  fs.points[i] = pproj[idxs[i]];
                 v.push_back(fs);
               }
           }
+
         ++fs.index;
       }
 }
@@ -341,9 +339,12 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
   fl.object = this;
 
   // these are the corner indices used for drawing low and high resolution surfaces
-  static const unsigned trilist_lowres[2][3] = {{0,2,4},{0,6,4}};
   static const unsigned trilist_highres[8][3]  = {
     {8,0,1},{8,1,2},{8,2,3},{8,3,4},{8,4,5},{8,5,6},{8,6,7},{8,7,0}};
+  // there are two low resolution triangle lists, as we want to
+  // alternate them in each grid point to make a symmetric pattern
+  static const unsigned trilist_lowres1[2][3] = {{0,2,4},{0,6,4}};
+  static const unsigned trilist_lowres2[2][3] = {{2,0,6},{2,4,6}};
   static const unsigned linelist_lowres[4][2] = {
     {0,2},{0,6},{4,2},{4,6}};
   static const unsigned linelist_highres[8][2] = {
@@ -360,7 +361,7 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
   };
 
   // select list above depending on high or low resolution
-  const unsigned (*tris)[3] = highres ? trilist_highres : trilist_lowres;
+  //const unsigned (*tris)[3] = highres ? trilist_highres : trilist_lowres;
   const unsigned (*lines)[2] = highres ? linelist_highres : linelist_lowres;
   const unsigned (*linecells)[3] = highres ? linecell_highres :
     linecell_lowres;
@@ -446,6 +447,10 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
         // draw triangles
         if(ft.surfaceprop!=0)
           {
+            // alternate triangle list to make a symmetric pattern for lowres
+            const unsigned (*tris)[3] = highres ? trilist_highres :
+              (i1+i2)%2==0 ? trilist_lowres1 : trilist_lowres2;
+
             ft.index = i1*n2+i2;
             for(unsigned i=0; i<ntris; ++i)
               {

@@ -43,6 +43,7 @@ class BackSurface(setting.Surface3D):
     def __init__(self, name, **args):
         setting.Surface3D.__init__(self, name, **args)
         self.get('color').newDefault('white')
+        self.get('reflectivity').newDefault(0)
 
 class Graph3D(widget.Widget):
     """3D graph (orthogonal) containing other widgets."""
@@ -158,6 +159,11 @@ class Graph3D(widget.Widget):
             descr = _('Graph back'),
             usertext = _('Back')),
                pixmap = 'settings_bgfill' )
+        s.add(setting.Lighting3D(
+            'Lighting',
+            descr=_('Lighting'),
+            usertext=_('Lighting')),
+               pixmap = 'settings_lighting' )
 
     @classmethod
     def allowedParentTypes(self):
@@ -302,6 +308,10 @@ class Graph3D(widget.Widget):
             'bsp': threed.Scene.RENDER_BSP,
         }[s.rendermode]
         scene = threed.Scene(mode)
+
+        if s.Lighting.enable:
+            scene.enableLighting(threed.Vec3(
+                s.Lighting.x, s.Lighting.y, s.Lighting.z))
 
         painter = painthelper.painter(self, bounds)
         with painter:
