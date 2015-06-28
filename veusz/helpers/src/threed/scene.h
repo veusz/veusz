@@ -67,10 +67,10 @@ private:
   void renderBSP(const Camera& cam);
 
   // create pens/brushes
-  QPen LineProp2QPen(const LineProp* p, double linescale,
-                     unsigned colindex) const;
-  QBrush SurfaceProp2QBrush(const SurfaceProp* p,
-                            const Fragment& frag) const;
+  QPen lineProp2QPen(const Fragment& frag, double linescale) const;
+  QColor surfaceProp2QColor(const Fragment& frag) const;
+  QBrush surfaceProp2QBrush(const Fragment& frag) const;
+  QPen surfaceProp2QPen(const Fragment& frag) const;
 
 private:
   RenderMode mode;

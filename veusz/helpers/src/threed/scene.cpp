@@ -104,9 +104,9 @@ namespace
 
 }; // namespace
 
-QPen Scene::LineProp2QPen(const LineProp* p, double linescale,
-                          unsigned colindex) const
+QPen Scene::lineProp2QPen(const Fragment& frag, double linescale) const
 {
+  const LineProp* p = frag.lineprop;
   if(p==0 || p->hide)
     return QPen(Qt::NoPen);
   else
@@ -114,7 +114,7 @@ QPen Scene::LineProp2QPen(const LineProp* p, double linescale,
       QColor col;
       if(p->hasRGBs())
         col = QColor::fromRgba
-          ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,colindex)] );
+          ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)] );
       else
         col = QColor(int(p->r*255), int(p->g*255),
                      int(p->b*255), int((1-p->trans)*255));
@@ -122,36 +122,49 @@ QPen Scene::LineProp2QPen(const LineProp* p, double linescale,
     }
 }
 
-QBrush Scene::SurfaceProp2QBrush(const SurfaceProp* p,
-                                 const Fragment& frag) const
+// calculate color, including reflection
+QColor Scene::surfaceProp2QColor(const Fragment& frag) const
 {
-  if(p==0 || p->hide)
-    return QBrush();
+  const SurfaceProp* p = frag.surfaceprop;
+  double r, g, b, a;
+
+  if(p->hasRGBs())
+    {
+      QColor col = QColor::fromRgba
+        ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)] );
+      r=col.redF(); g=col.greenF(); b=col.blueF(); a=col.alphaF();
+    }
   else
     {
-      double r, g, b, a;
-
-      if(p->hasRGBs())
-        {
-          QColor col = QColor::fromRgba
-            ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)] );
-          r=col.redF(); g=col.greenF(); b=col.blueF(); a=col.alphaF();
-        }
-      else
-        {
-          r=p->r; g=p->g; b=p->b; a=1-p->trans;
-        }
-
-      // use directional lighting
-      if(lighton)
-        {
-          double scale = 1 - p->specular * (1-frag.lighting);
-          scale = std::pow(scale, 1./GAMMA);
-          r*=scale; g*=scale; b*=scale;
-        }
-
-      return QBrush(QColor(int(r*255), int(g*255), int(b*255), int(a*255)));
+      r=p->r; g=p->g; b=p->b; a=1-p->trans;
     }
+
+  // use directional lighting
+  if(lighton)
+    {
+      double scale = 1 - p->specular * (1-frag.lighting);
+      scale = std::pow(scale, 1./GAMMA);
+      r*=scale; g*=scale; b*=scale;
+    }
+
+  return QColor(int(r*255), int(g*255), int(b*255), int(a*255));
+}
+
+QBrush Scene::surfaceProp2QBrush(const Fragment& frag) const
+{
+  if(frag.surfaceprop==0 || frag.surfaceprop->hide)
+    return QBrush();
+  else
+    return QBrush(surfaceProp2QColor(frag));
+}
+
+
+QPen Scene::surfaceProp2QPen(const Fragment& frag) const
+{
+  if(frag.surfaceprop==0 || frag.surfaceprop->hide)
+    return QPen(Qt::NoPen);
+  else
+    return QPen(surfaceProp2QColor(frag));
 }
 
 void Scene::drawPath(QPainter* painter, const Fragment& frag,
@@ -197,8 +210,8 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
   // draw fragments
   LineProp const* lline = 0;
   SurfaceProp const* lsurf = 0;
+  Fragment::FragmentType ltype = Fragment::FR_NONE;
 
-  QPen solid;
   QPen no_pen(Qt::NoPen);
   QBrush no_brush(Qt::NoBrush);
   painter->setPen(no_pen);
@@ -219,17 +232,21 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 	case Fragment::FR_TRIANGLE:
           if(frag.surfaceprop != 0 && !frag.surfaceprop->hide)
             {
-              if(lline != 0)
-                {
-                  painter->setPen(no_pen);
-                  lline = 0;
-                }
-              if(lsurf != frag.surfaceprop ||
+
+              if(ltype != frag.type || lsurf != frag.surfaceprop ||
                  (frag.surfaceprop!=0 && (frag.surfaceprop->hasRGBs() ||
                                           (lighton && frag.surfaceprop->specular!=0))))
                 {
                   lsurf = frag.surfaceprop;
-                  painter->setBrush(SurfaceProp2QBrush(lsurf, frag));
+                  painter->setBrush(surfaceProp2QBrush(frag));
+
+                  // use a pen if the surface is not transparent, to
+                  // fill up the gaps between triangles when there is
+                  // anti-aliasing
+                  if(frag.surfaceprop->trans == 0)
+                    painter->setPen(surfaceProp2QPen(frag));
+                  else
+                    painter->setPen(no_pen);
                 }
 
               painter->drawPolygon(projpts, 3);
@@ -239,16 +256,16 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 	case Fragment::FR_LINESEG:
           if(frag.lineprop != 0 && !frag.lineprop->hide)
             {
-              if(lsurf != 0)
+              if(ltype != frag.type || lsurf != 0)
                 {
                   painter->setBrush(no_brush);
                   lsurf = 0;
                 }
-              if(lline != frag.lineprop ||
+              if(ltype != frag.type || lline != frag.lineprop ||
                  ((frag.lineprop!=0 && frag.lineprop->hasRGBs())))
                 {
                   lline = frag.lineprop;
-                  painter->setPen(LineProp2QPen(lline, linescale, frag.index));
+                  painter->setPen(lineProp2QPen(frag, linescale));
                 }
               painter->drawLine(projpts[0], projpts[1]);
             }
@@ -256,18 +273,18 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 
 	case Fragment::FR_PATH:
             {
-              if(lline != frag.lineprop ||
+              if(ltype != frag.type || lline != frag.lineprop ||
                  ((frag.lineprop!=0 && frag.lineprop->hasRGBs())))
                 {
                   lline = frag.lineprop;
-                  painter->setPen(LineProp2QPen(lline, linescale, frag.index));
+                  painter->setPen(lineProp2QPen(frag, linescale));
                 }
-              if(lsurf != frag.surfaceprop ||
+              if(ltype != frag.type || lsurf != frag.surfaceprop ||
                  (frag.surfaceprop!=0 && (frag.surfaceprop->hasRGBs() ||
                                           (lighton && frag.surfaceprop->specular!=0))))
                 {
                   lsurf = frag.surfaceprop;
-                  painter->setBrush(SurfaceProp2QBrush(lsurf, frag));
+                  painter->setBrush(surfaceProp2QBrush(frag));
                 }
               drawPath(painter, frag, projpts[0], projpts[1], linescale);
             }
@@ -276,6 +293,8 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 	default:
 	  break;
 	}
+
+      ltype = frag.type;
     }
 }
 

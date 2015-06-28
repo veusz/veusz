@@ -43,6 +43,12 @@ class PlotLine3D(setting.Line3D):
         setting.Line3D.__init__(self, name, **args)
         self.get('hide').newDefault(True)
 
+class MarkerFill3D(setting.Surface3DWColorMap):
+    """Fill for markers."""
+    def __init__(self, name, **args):
+        setting.Surface3DWColorMap.__init__(self, name, **args)
+        self.get('reflectivity').hidden = True
+
 class Point3D(plotters3d.GenericPlotter3D):
     """Plotting points in 3D."""
 
@@ -92,7 +98,7 @@ class Point3D(plotters3d.GenericPlotter3D):
             descr = _('Plot line settings'),
             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
-        s.add( setting.Surface3DWColorMap(
+        s.add( MarkerFill3D(
             'MarkerFill',
             descr = _('Marker fill settings'),
             usertext=_('Marker fill')),
