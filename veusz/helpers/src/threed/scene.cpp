@@ -304,15 +304,14 @@ void Scene::calcLighting()
   if(!lighton)
     return;
 
-  for(unsigned i=0, s=fragments.size(); i<s; ++i)
+  for(FragmentVector::iterator f=fragments.begin(); f!=fragments.end(); ++f)
     {
-      Fragment& f = fragments[i];
-      if(f.type == Fragment::FR_TRIANGLE)
+      if(f->type == Fragment::FR_TRIANGLE)
         {
           // Calculate triangle norm. Make sure norm points towards
           // the viewer @ (0,0,0)
-          Vec3 tripos = (f.points[0]+f.points[1]+f.points[2])*(1./3.);
-          Vec3 norm = cross(f.points[1]-f.points[0], f.points[2]-f.points[0]);
+          Vec3 tripos = (f->points[0]+f->points[1]+f->points[2])*(1./3.);
+          Vec3 norm = cross(f->points[1]-f->points[0], f->points[2]-f->points[0]);
           if(dot(tripos, norm)<0)
             norm = -norm;
           norm.normalise();
@@ -321,7 +320,7 @@ void Scene::calcLighting()
           Vec3 light2tri = tripos-lightposn;
           light2tri.normalise();
 
-          f.lighting = std::max(0., dot(light2tri, norm));
+          f->lighting = std::max(0., dot(light2tri, norm));
         }
     }
 }
@@ -329,12 +328,9 @@ void Scene::calcLighting()
 void Scene::projectFragments(const Camera& cam)
 {
   // convert 3d to 2d coordinates using the Camera
-  for(unsigned i=0, s=fragments.size(); i<s; ++i)
-    {
-      Fragment& f = fragments[i];
-      for(unsigned pi=0, np=f.nPointsTotal(); pi<np; ++pi)
-        f.proj[pi] = calcProjVec(cam.perspM, f.points[pi]);
-    }
+  for(FragmentVector::iterator f=fragments.begin(); f!=fragments.end(); ++f)
+    for(unsigned pi=0, np=f->nPointsTotal(); pi<np; ++pi)
+      f->proj[pi] = calcProjVec(cam.perspM, f->points[pi]);
 }
 
 void Scene::renderPainters(const Camera& cam)
@@ -356,6 +352,26 @@ void Scene::renderBSP(const Camera& cam)
   calcLighting();
 
   //std::cout << "\nFragment size 1 " << fragments.size() << '\n';
+
+  // This is a hack to force lines to be rendered in front of
+  // triangles and paths to be rendered in front of lines. Suggestions
+  // to fix this are welcome.
+  for(FragmentVector::iterator f=fragments.begin(); f!=fragments.end(); ++f)
+    {
+      switch(f->type)
+        {
+        case Fragment::FR_LINESEG:
+          f->points[0](2) += 1e-3;
+          f->points[1](2) += 1e-3;
+          break;
+        case Fragment::FR_PATH:
+          f->points[0](2) += 2e-3;
+          f->points[1](2) += 2e-3;
+          break;
+        default:
+          break;
+        }
+    }
 
   BSPBuilder bsp(fragments, Vec3(0,0,1));
   draworder = bsp.getFragmentIdxs(fragments);

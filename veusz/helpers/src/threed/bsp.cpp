@@ -464,7 +464,13 @@ IdxVector BSPBuilder::getFragmentIdxs(const FragmentVector& fragvec) const
                       frag_idxs.begin()+(rec.minfragidxidx+rec.nfrags));
 
           std::sort(temp.begin(), temp.end(), FragZCompare(fragvec));
-          retn.insert(retn.end(), temp.begin(), temp.end());
+
+          for(int type=Fragment::FR_TRIANGLE; type<=Fragment::FR_PATH; ++type)
+            {
+              for(IdxVector::const_iterator i=temp.begin(); i!=temp.end(); ++i)
+                if(fragvec[*i].type == type)
+                  retn.push_back(*i);
+            }
         }
     }
 
