@@ -147,19 +147,14 @@ QColor Scene::surfaceProp2QColor(const Fragment& frag) const
     return QColor::fromRgba(frag.calccolor);
 
   const SurfaceProp* p = frag.surfaceprop;
-  double r, g, b, a;
   if(p->hasRGBs())
     {
-      QColor col = QColor::fromRgba
-        ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)] );
-      r=col.redF(); g=col.greenF(); b=col.blueF(); a=col.alphaF();
-    }
-  else
-    {
-      r=p->r; g=p->g; b=p->b; a=1-p->trans;
+      QRgb rgb = p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)];
+      return QColor::fromRgba(rgb);
     }
 
-  return QColor(int(r*255), int(g*255), int(b*255), int(a*255));
+  return QColor(int(p->r*255), int(p->g*255), int(p->b*255),
+                int((1-p->trans)*255));
 }
 
 QBrush Scene::surfaceProp2QBrush(const Fragment& frag) const
