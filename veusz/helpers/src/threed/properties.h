@@ -44,7 +44,7 @@ inline void _qimage2rgbvec(const QImage& img, RGBVec& vec)
 
 struct SurfaceProp
 {
-  SurfaceProp(double _r=0.5f, double _g=0.5f, double _b=0.5f,
+  SurfaceProp(double _r=0.5, double _g=0.5, double _b=0.5,
 	      double _refl=0.5, double _trans=0,
 	      bool _hide=0)
     : r(_r), g(_g), b(_b),

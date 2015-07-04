@@ -144,7 +144,7 @@ QPen Scene::lineProp2QPen(const Fragment& frag, double linescale) const
 QColor Scene::surfaceProp2QColor(const Fragment& frag) const
 {
   if(frag.usecalccolor)
-    return QColor::fromRgb(frag.calccolor);
+    return QColor::fromRgba(frag.calccolor);
 
   const SurfaceProp* p = frag.surfaceprop;
   double r, g, b, a;

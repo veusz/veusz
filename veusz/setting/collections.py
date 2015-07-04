@@ -457,12 +457,12 @@ class Surface3D(Settings):
         self.add( setting.FloatSlider(
             'transparency', 0.,
             minval=0., maxval=100., tick=20., scale=1., step=1.,
-            descr=_('Fractional transparency'),
+            descr=_('Transparency percentage'),
             usertext=_('Transparency')) )
         self.add( setting.FloatSlider(
             'reflectivity', 0.,
             minval=0., maxval=100., tick=20., scale=1., step=1.,
-            descr=_('Fractional reflectivity'),
+            descr=_('Reflectivity percentage'),
             usertext=_('Reflectivity')) )
         self.add( setting.Bool(
             'hide', False,
