@@ -32,18 +32,22 @@ class Scene
 public:
   enum RenderMode {RENDER_PAINTERS, RENDER_BSP};
 
+private:
+  // internal light color and position
+  struct Light
+  {
+    Vec3 posn;
+    double r, g, b;
+  };
+
 public:
   Scene(RenderMode _mode)
-    : mode(_mode),
-      lighton(0)
+    : mode(_mode)
   {
   }
 
-  // switch on lighting and set the position of the light
-  void enableLighting(Vec3 _lightposn)
-  {
-    lighton=1; lightposn=_lightposn;
-  }
+  // add a light to a list
+  void addLight(Vec3 posn, QColor col, double intensity);
 
   // render scene to painter in coordinate range given
   void render(Object* root,
@@ -76,9 +80,7 @@ private:
   RenderMode mode;
   FragmentVector fragments;
   std::vector<unsigned> draworder;
-
-  bool lighton;
-  Vec3 lightposn;
+  std::vector<Light> lights;
 };
 
 #endif

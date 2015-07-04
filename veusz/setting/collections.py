@@ -398,25 +398,30 @@ class Line3D(Settings):
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
 
-        self.add( setting.Color('color',
-                                setting.Reference('/StyleSheet/Line/color'),
-                                descr = _('Color of line'),
-                                usertext=_('Color')) )
-        self.add( setting.Float('width', 1.,
-                                minval=0., maxval=1000,
-                                descr = _('Width of line'),
-                                usertext=_('Width')) )
-        self.add( setting.LineStyle('style', 'solid',
-                                    descr = _('Line style'),
-                                    usertext=_('Style')) )
-        self.add( setting.Int( 'transparency', 0,
-                               descr = _('Transparency percentage'),
-                               usertext = _('Transparency'),
-                               minval = 0,
-                               maxval = 100 ) )
-        self.add( setting.Bool('hide', False,
-                               descr = _('Hide the line'),
-                               usertext=_('Hide')) )
+        self.add( setting.Color(
+            'color',
+            setting.Reference('/StyleSheet/Line/color'),
+            descr = _('Color of line'),
+            usertext=_('Color')) )
+        self.add( setting.Float(
+            'width', 1.,
+            minval=0., maxval=1000,
+            descr = _('Width of line'),
+            usertext=_('Width')) )
+        self.add( setting.LineStyle(
+            'style', 'solid',
+            descr = _('Line style'),
+            usertext=_('Style')) )
+        self.add( setting.Int(
+            'transparency', 0,
+            descr = _('Transparency percentage'),
+            usertext = _('Transparency'),
+            minval = 0,
+            maxval = 100 ) )
+        self.add( setting.Bool(
+            'hide', False,
+            descr = _('Hide the line'),
+            usertext=_('Hide')) )
 
     def makeLineProp(self):
         """Construct line properties object for assigning to 3D object."""
@@ -444,23 +449,25 @@ class Surface3D(Settings):
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
 
-        self.add( setting.Color('color',
-                                'grey',
-                                descr = _('Color of surface'),
-                                usertext=_('Color')) )
-        self.add( setting.Int('transparency', 0,
-                              descr = _('Transparency percentage'),
-                              usertext = _('Transparency'),
-                              minval = 0,
-                              maxval = 100 ) )
-        self.add( setting.Int('reflectivity', 50,
-                              descr = _('Reflectivity percentage'),
-                              usertext = _('Reflectivity'),
-                              minval = 0,
-                              maxval = 100 ) )
-        self.add( setting.Bool('hide', False,
-                               descr = _('Hide surface'),
-                               usertext=_('Hide')) )
+        self.add( setting.Color(
+            'color',
+            'grey',
+            descr = _('Color of surface'),
+            usertext=_('Color')) )
+        self.add( setting.FloatSlider(
+            'transparency', 0.,
+            minval=0., maxval=100., tick=20., scale=1., step=1.,
+            descr=_('Fractional transparency'),
+            usertext=_('Transparency')) )
+        self.add( setting.FloatSlider(
+            'reflectivity', 0.,
+            minval=0., maxval=100., tick=20., scale=1., step=1.,
+            descr=_('Fractional reflectivity'),
+            usertext=_('Reflectivity')) )
+        self.add( setting.Bool(
+            'hide', False,
+            descr = _('Hide surface'),
+            usertext=_('Hide')) )
 
     def makeSurfaceProp(self):
         """Properties to assign to surface."""
@@ -471,7 +478,7 @@ class Surface3D(Settings):
         from ..helpers import threed
         return threed.SurfaceProp(
             r=col.redF(), g=col.greenF(), b=col.blueF(),
-            trans=self.transparency*0.01, specular=self.reflectivity*0.01)
+            trans=self.transparency*0.01, refl=self.reflectivity*0.01)
 
 class Surface3DWColorMap(Surface3D):
     '''3d surface with color map setting.'''
@@ -519,18 +526,27 @@ class Lighting3D(Settings):
             'enable', True,
             descr=_('Enable lighting'),
             usertext=_('Enable')) )
+        self.add( setting.Color(
+            'color', 'white',
+            descr = _('Color of lighting'),
+            usertext=_('Color')) )
+        self.add( setting.FloatSlider(
+            'intensity', 100.,
+            minval=0., maxval=400., tick=100., scale=5., step=1.,
+            descr=_('Light intensity percentage'),
+            usertext=_('Intensity')) )
         self.add( setting.FloatSlider(
             'x', 0.,
-            minval=-20, maxval=20, tick=4, step=0.2,
+            minval=-20, maxval=20, tick=5., scale=0.1, step=1.,
             descr=_('X coordinate of light (positive is right)'),
             usertext=_('X position')) )
         self.add( setting.FloatSlider(
             'y', 0.,
-            minval=-20, maxval=20, tick=4, step=0.2,
+            minval=-20, maxval=20, tick=5., scale=0.1, step=1.,
             descr=_('Y coordinate of light (positive is below)'),
             usertext=_('Y position')) )
         self.add( setting.FloatSlider(
             'z', 10,
-            minval=-20, maxval=20, tick=4, step=0.2,
+            minval=-20, maxval=20, tick=4., scale=0.1, step=1.,
             descr=_('Z coordinate of light (positive is towards viewer)'),
             usertext=_('Z position')) )

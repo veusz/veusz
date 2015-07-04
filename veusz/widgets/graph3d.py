@@ -45,6 +45,19 @@ class BackSurface(setting.Surface3D):
         self.get('color').newDefault('white')
         self.get('reflectivity').newDefault(0)
 
+class Lighting3D_2(setting.Lighting3D):
+    def __init__(self, name, **args):
+        setting.Lighting3D.__init__(self, name, **args)
+        self.get('enable').newDefault(False)
+        self.get('color').newDefault('red')
+        self.get('x').newDefault(2)
+class Lighting3D_3(setting.Lighting3D):
+    def __init__(self, name, **args):
+        setting.Lighting3D.__init__(self, name, **args)
+        self.get('enable').newDefault(False)
+        self.get('color').newDefault('blue')
+        self.get('x').newDefault(-2)
+
 class Graph3D(widget.Widget):
     """3D graph (orthogonal) containing other widgets."""
     
@@ -160,9 +173,19 @@ class Graph3D(widget.Widget):
             usertext = _('Back')),
                pixmap = 'settings_bgfill' )
         s.add(setting.Lighting3D(
-            'Lighting',
-            descr=_('Lighting'),
-            usertext=_('Lighting')),
+            'Lighting1',
+            descr=_('Lighting (1)'),
+            usertext=_('Lighting (1)')),
+               pixmap = 'settings_lighting' )
+        s.add(Lighting3D_2(
+            'Lighting2',
+            descr=_('Lighting (2)'),
+            usertext=_('Lighting (2)')),
+               pixmap = 'settings_lighting' )
+        s.add(Lighting3D_3(
+            'Lighting3',
+            descr=_('Lighting (3)'),
+            usertext=_('Lighting (3)')),
                pixmap = 'settings_lighting' )
 
     @classmethod
@@ -309,9 +332,12 @@ class Graph3D(widget.Widget):
         }[s.rendermode]
         scene = threed.Scene(mode)
 
-        if s.Lighting.enable:
-            scene.enableLighting(threed.Vec3(
-                s.Lighting.x, s.Lighting.y, s.Lighting.z))
+        for light in s.Lighting1, s.Lighting2, s.Lighting3:
+            if light.enable:
+                scene.addLight(
+                    threed.Vec3(light.x, light.y, light.z),
+                    light.get('color').color(),
+                    light.intensity*0.01)
 
         painter = painthelper.painter(self, bounds)
         with painter:

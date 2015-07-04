@@ -21,6 +21,7 @@
 #ifndef FRAGMENT_H
 #define FRAGMENT_H
 
+#include <QtGui/QRgb>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <limits>
@@ -56,8 +57,11 @@ struct Fragment
 {
   enum FragmentType {FR_NONE, FR_TRIANGLE, FR_LINESEG, FR_PATH};
 
-  // type of fragment
-  FragmentType type;
+  // 3D points
+  Vec3 points[3];
+
+  // projected points associated with fragment
+  Vec3 proj[3];
 
   // pointer to object, to avoid self-comparison.
   Object* object;
@@ -68,17 +72,11 @@ struct Fragment
   SurfaceProp const* surfaceprop;
   LineProp const* lineprop;
 
-  // 3D points
-  Vec3 points[3];
-
-  // projected points associated with fragment
-  Vec3 proj[3];
-
   // for path
   float pathsize;
 
-  // calculated lighting norm (updated by Scene)
-  float lighting;
+  // calculated color from lighting
+  QRgb calccolor;
 
   // number of times this has been split
   unsigned splitcount;
@@ -86,17 +84,24 @@ struct Fragment
   // passed to path plotting or as index to color bar
   unsigned index;
 
+  // type of fragment
+  FragmentType type;
+
+  // use calculated color
+  bool usecalccolor;
+
   // zero on creation
   Fragment()
-  : type(FR_NONE),
-    object(0),
-    params(0),
-    surfaceprop(0),
-    lineprop(0),
-    pathsize(0),
-    lighting(1),
-    splitcount(0),
-    index(0)
+    : object(0),
+      params(0),
+      surfaceprop(0),
+      lineprop(0),
+      pathsize(0),
+      calccolor(0),
+      splitcount(0),
+      index(0),
+      type(FR_NONE),
+      usecalccolor(0)
   {
   }
 

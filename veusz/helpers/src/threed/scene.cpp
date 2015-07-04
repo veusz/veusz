@@ -100,34 +100,54 @@ namespace
     return QPointF(mult(0)*inv, mult(1)*inv);
   }
 
+  template<class T> T clip(const T& val, const T& minval, const T& maxval)
+  {
+    return std::min(std::max(val, minval), maxval);
+  }
+
   unsigned init_fragments_size = 512;
 
 }; // namespace
+
+void Scene::addLight(Vec3 posn, QColor col, double intensity)
+{
+  Light light;
+  light.posn = posn;
+  light.r = col.redF()*intensity;
+  light.g = col.greenF()*intensity;
+  light.b = col.blueF()*intensity;
+  lights.push_back(light);
+}
 
 QPen Scene::lineProp2QPen(const Fragment& frag, double linescale) const
 {
   const LineProp* p = frag.lineprop;
   if(p==0 || p->hide)
     return QPen(Qt::NoPen);
+
+  QColor col;
+  if(frag.usecalccolor)
+    col = QColor::fromRgb(frag.calccolor);
   else
     {
-      QColor col;
       if(p->hasRGBs())
         col = QColor::fromRgba
           ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)] );
       else
         col = QColor(int(p->r*255), int(p->g*255),
                      int(p->b*255), int((1-p->trans)*255));
-      return QPen(QBrush(col), p->width*linescale);
     }
+  return QPen(QBrush(col), p->width*linescale);
 }
 
 // calculate color, including reflection
 QColor Scene::surfaceProp2QColor(const Fragment& frag) const
 {
+  if(frag.usecalccolor)
+    return QColor::fromRgb(frag.calccolor);
+
   const SurfaceProp* p = frag.surfaceprop;
   double r, g, b, a;
-
   if(p->hasRGBs())
     {
       QColor col = QColor::fromRgba
@@ -137,14 +157,6 @@ QColor Scene::surfaceProp2QColor(const Fragment& frag) const
   else
     {
       r=p->r; g=p->g; b=p->b; a=1-p->trans;
-    }
-
-  // use directional lighting
-  if(lighton)
-    {
-      double scale = 1 - p->specular * (1-frag.lighting);
-      scale = std::pow(scale, 1./GAMMA);
-      r*=scale; g*=scale; b*=scale;
     }
 
   return QColor(int(r*255), int(g*255), int(b*255), int(a*255));
@@ -157,7 +169,6 @@ QBrush Scene::surfaceProp2QBrush(const Fragment& frag) const
   else
     return QBrush(surfaceProp2QColor(frag));
 }
-
 
 QPen Scene::surfaceProp2QPen(const Fragment& frag) const
 {
@@ -235,7 +246,7 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 
               if(ltype != frag.type || lsurf != frag.surfaceprop ||
                  (frag.surfaceprop!=0 && (frag.surfaceprop->hasRGBs() ||
-                                          (lighton && frag.surfaceprop->specular!=0))))
+                                          frag.usecalccolor)))
                 {
                   lsurf = frag.surfaceprop;
                   painter->setBrush(surfaceProp2QBrush(frag));
@@ -281,7 +292,7 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                 }
               if(ltype != frag.type || lsurf != frag.surfaceprop ||
                  (frag.surfaceprop!=0 && (frag.surfaceprop->hasRGBs() ||
-                                          (lighton && frag.surfaceprop->specular!=0))))
+                                          frag.usecalccolor)))
                 {
                   lsurf = frag.surfaceprop;
                   painter->setBrush(surfaceProp2QBrush(frag));
@@ -301,26 +312,60 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
 void Scene::calcLighting()
 {
   // lighting is full on
-  if(!lighton)
+  if(lights.empty())
     return;
 
-  for(FragmentVector::iterator f=fragments.begin(); f!=fragments.end(); ++f)
+  for(FragmentVector::iterator frag=fragments.begin();
+      frag!=fragments.end(); ++frag)
     {
-      if(f->type == Fragment::FR_TRIANGLE)
+      if(frag->type == Fragment::FR_TRIANGLE && frag->surfaceprop != 0)
         {
           // Calculate triangle norm. Make sure norm points towards
           // the viewer @ (0,0,0)
-          Vec3 tripos = (f->points[0]+f->points[1]+f->points[2])*(1./3.);
-          Vec3 norm = cross(f->points[1]-f->points[0], f->points[2]-f->points[0]);
+          Vec3 tripos = (frag->points[0] + frag->points[1] +
+                         frag->points[2]) * (1./3.);
+          Vec3 norm = cross(frag->points[1] - frag->points[0],
+                            frag->points[2] - frag->points[0]);
           if(dot(tripos, norm)<0)
             norm = -norm;
           norm.normalise();
 
-          // Now dot vector from light source to triangle with norm
-          Vec3 light2tri = tripos-lightposn;
-          light2tri.normalise();
+          // get color of surface
+          const SurfaceProp* prop = frag->surfaceprop;
+          double r, g, b, a;
 
-          f->lighting = std::max(0., dot(light2tri, norm));
+          if(prop->hasRGBs())
+            {
+              QRgb rgb = prop->
+                rgbs[std::min(frag->index, unsigned(prop->rgbs.size())-1)];
+              r=qRed(rgb)*(1./255.); g=qGreen(rgb)*(1./255.);
+              b=qBlue(rgb)*(1./255.); a=qAlpha(rgb)*(1./255.);
+            }
+          else
+            {
+              r=prop->r; g=prop->g; b=prop->b; a=1-prop->trans;
+            }
+
+          // add lighting contributions
+          for(std::vector<Light>::const_iterator light = lights.begin();
+              light != lights.end(); ++light)
+            {
+              // Now dot vector from light source to triangle with norm
+              Vec3 light2tri = tripos-light->posn;
+              light2tri.normalise();
+
+              // add new lighting index
+              double dotprod = std::max(0., dot(light2tri, norm));
+
+              double delta = prop->refl * dotprod;
+              r += delta*light->r; g += delta*light->g; b += delta*light->b;
+            }
+
+          frag->calccolor = qRgba( clip(int(r*255), 0, 255),
+                                   clip(int(g*255), 0, 255),
+                                   clip(int(b*255), 0, 255),
+                                   clip(int(a*255), 0, 255) );
+          frag->usecalccolor = 1;
         }
     }
 }

@@ -230,14 +230,14 @@ struct SurfaceProp /NoDefaultCtors/
 %End
 
   SurfaceProp(double r=0.5, double g=0.5, double b=0.5,
-	      double specular=0.2, double trans=0,
+	      double refl=0.5, double trans=0,
 	      bool hide=0) /KeywordArgs="All"/;
   void setRGBs(const QImage& img);
 
   double r;
   double g;
   double b;
-  double specular;
+  double refl;
   double trans;
   bool hide;
 };
@@ -441,7 +441,7 @@ class Scene
 
  public:
   Scene(RenderMode mode);
-  void enableLighting(Vec3 posn);
+  void addLight(Vec3 posn, QColor col, double intensity);
   void render(Object* root,
               QPainter* painter, const Camera& cam,
 	      double x1, double y1, double x2, double y2);

@@ -314,7 +314,8 @@ class FloatSlider(qt4.QWidget):
     @qt4.pyqtSlot()
     def onModified(self):
         self.edit.setText(self.setting.toText())
-        self.slider.setValue(int(self.setting.get()/self.setting.scale))
+        self.slider.setValue(int(round(
+            self.setting.get()/self.setting.scale)))
 
 class Bool(qt4.QCheckBox):
     """A check box for changing a bool setting."""
