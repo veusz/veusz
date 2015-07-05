@@ -228,6 +228,17 @@ Mat4 rotateM4(double angle, Vec3 vec);
 // create a translation matrix
 Mat4 translationM4(Vec3 vec);
 
+// create a scaling matrix
+inline Mat4 scaleM4(Vec3 s)
+{
+  Mat4 m(false);
+  m(0,0)=s(0); m(0,1)=0;    m(0,2)=0;    m(0,3)=0;
+  m(1,0)=0;    m(1,1)=s(1); m(1,2)=0;    m(1,3)=0;
+  m(2,0)=0;    m(2,1)=0;    m(2,2)=s(2); m(2,3)=0;
+  m(3,0)=0;    m(3,1)=0;    m(3,2)=0;    m(3,3)=1;
+  return m;
+}
+
 ///////////////////////////////////////////////////////////////////////
 // 3-Matrix
 

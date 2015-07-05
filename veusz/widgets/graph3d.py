@@ -137,6 +137,22 @@ class Graph3D(widget.Widget):
             usertext=_('Render method'),
             descr=_('Method used to draw 3D plot') ))
 
+        s.add( setting.Float(
+            'xAspect', 1.,
+            minval=0.01, maxval=100,
+            descr=_('X aspect scaling'),
+            usertext=_('X aspect') ))
+        s.add( setting.Float(
+            'yAspect', 1.,
+            minval=0.01, maxval=100,
+            descr=_('Y aspect scaling'),
+            usertext=_('Y aspect') ))
+        s.add( setting.Float(
+            'zAspect', 1.,
+            minval=0.01, maxval=100,
+            descr=_('Z aspect scaling'),
+            usertext=_('Z aspect') ))
+
         s.add( setting.Distance(
                 'leftMargin',
                 '0.2cm',
@@ -305,11 +321,17 @@ class Graph3D(widget.Widget):
         for axis in cvalues(axestodraw):
             axis.computePlottedRange()
 
+        # scale according to aspect ratio
+        maxaspect = max(s.xAspect,s.yAspect,s.zAspect)
+        scaleM = threed.scaleM4(threed.Vec3(
+            s.xAspect/maxaspect, s.yAspect/maxaspect, s.zAspect/maxaspect))
+
         root = threed.ObjectContainer()
         root.objM = (
             threed.rotateM4(s.zRotation/180.*math.pi, threed.Vec3(0,0,1)) *
             threed.rotateM4(s.yRotation/180.*math.pi, threed.Vec3(0,1,0)) *
             threed.rotateM4(s.xRotation/180.*math.pi, threed.Vec3(1,0,0)) *
+            scaleM *
             threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
 
         for c in self.children:
@@ -321,9 +343,13 @@ class Graph3D(widget.Widget):
         self.addBackSurface(root)
 
         camera = threed.Camera()
+        # camera necessary to make x,y,z coordinates point in the
+        # right direction, with the origin in the lower left towards
+        # the viewer
         camera.setPointing(
-            threed.Vec3(s.distance, 0., 0.), threed.Vec3(0.,0.,0.),
-            threed.Vec3(0,0,1))
+            threed.Vec3(0,  0, -s.distance),
+            threed.Vec3(0,  0,  0),
+            threed.Vec3(0, -1,  0))
         camera.setPerspective(45, 1, 4, 6)
 
         mode = {

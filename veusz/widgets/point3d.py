@@ -178,7 +178,7 @@ class Point3D(plotters3d.GenericPlotter3D):
 
         if not s.PlotLine.hide:
             lineobj = threed.PolyLine(s.PlotLine.makeLineProp())
-            lineobj.addPoints(xcoord, ycoord, zcoord)
+            lineobj.addPoints(*coord)
             cont.addObject(lineobj)
 
     def dataDrawErrorBars(self, cont, axes, coord, datasets):

@@ -74,7 +74,7 @@ class _AxisTickText(threed.Text):
         alignvert = 1
         if angle < -90 or angle > 90:
             angle = 180+angle
-            alignvert = -alignvert
+            #alignvert = -alignvert
         painter.rotate(angle)
         r = utils.Renderer(
             painter, font, 0, 0, self.textlist[index],
@@ -423,7 +423,8 @@ class Axis3D(widget.Widget):
         else:
             fracposns = self.linearConvertToPlotter(svals)
 
-        return s.lowerPosition + fracposns*(s.upperPosition-s.lowerPosition)
+        lower, upper = s.lowerPosition, s.upperPosition
+        return lower + fracposns*(upper-lower)
 
     def linearConvertToPlotter(self, v):
         """Convert graph coordinates to 0..1 coordinates"""
@@ -444,11 +445,11 @@ class Axis3D(widget.Widget):
         if not s.autoMirror:
             return ((op1, op2),)
         if op1 == 0 or op1 == 1:
-            op1list = [0, 1]
+            op1list = [1, 0]
         else:
             op1list = [op1]
         if op2 == 0 or op2 == 1:
-            op2list = [0, 1]
+            op2list = [1, 0]
         else:
             op2list = [op2]
         return itertools.product(op1list, op2list)
@@ -521,6 +522,7 @@ class Axis3D(widget.Widget):
             op1pts2 = N.full_like(tfracs, op1+ticklen*(1 if op1 < 0.5 else -1))
             op2pts2 = N.full_like(tfracs, op2+ticklen*(1 if op2 < 0.5 else -1))
 
+            # the small 1e-3 offset is to define where up is on the label
             if dirn == 'x':
                 ptsonaxis = (tfracs, op1pts, op2pts)
                 ptsoff1 = (tfracs, op1pts2, op2pts)
