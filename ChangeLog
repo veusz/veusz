@@ -1,3 +1,6 @@
+Changes in <next release>:
+ * Add data clipping dataset plugin
+
 Changes in 1.23.1:
  * Enable compression in exported files (Benjamin K. Stuhl)
  * Fix saving histogram datasets

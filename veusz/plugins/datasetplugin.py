@@ -20,7 +20,7 @@
 
 """Plugins for creating datasets."""
 
-from __future__ import division
+from __future__ import division, print_function
 import numpy as N
 from . import field
 
@@ -212,7 +212,7 @@ class Function(object):
 # class to pass to plugin to give parameters
 class DatasetPluginHelper(object):
     """Helpers to get existing datasets for plugins."""
-    
+
     def __init__(self, doc):
         """Construct helper object to pass to DatasetPlugins."""
         self._doc = doc
@@ -287,7 +287,7 @@ class DatasetPluginHelper(object):
         if isinstance(ds, document.DatasetDateTime):
             return DatasetDateTime(name, data=ds.data)
         elif ds.dimensions == 1:
-            return Dataset1D(name, data=ds.data, serr=ds.serr, 
+            return Dataset1D(name, data=ds.data, serr=ds.serr,
                              perr=ds.perr, nerr=ds.nerr)
         elif ds.dimensions == 2:
             return Dataset2D(name, ds.data,
@@ -327,7 +327,7 @@ class DatasetPluginManager(object):
         doc - document instance
         fields - fields to pass to plugin
         """
-        
+
         self.plugin = plugin
         self.document = doc
         self.helper = DatasetPluginHelper(doc)
@@ -487,7 +487,7 @@ def combineAddedErrors(inds, length):
         f = N.isfinite(d.data)
 
         if errortype == 'symmetric' and d.serr is not None:
-            serr[f] += d.serr[f]**2 
+            serr[f] += d.serr[f]**2
         elif errortype == 'asymmetric':
             if d.serr is not None:
                 v = (d.serr[f])**2
@@ -521,7 +521,7 @@ def combineMultipliedErrors(inds, length, data):
             f = f[:length]
 
         if errortype == 'symmetric' and d.serr is not None:
-            serr[f] += (d.serr[f]/d.data[f])**2 
+            serr[f] += (d.serr[f]/d.data[f])**2
         elif errortype == 'asymmetric':
             if d.serr is not None:
                 v = (d.serr[f]/d.data[f])**2
@@ -548,7 +548,7 @@ class MultiplyDatasetPlugin(_OneOutputDatasetPlugin):
     description_short = _('Multiply dataset by a constant')
     description_full = _('Multiply a dataset by a factor. '
                          'Error bars are also scaled.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -579,7 +579,7 @@ class AddDatasetPlugin(_OneOutputDatasetPlugin):
     description_short = _('Add a constant to a dataset')
     description_full = _('Add a dataset by adding a value. '
                          'Error bars remain the same.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -948,7 +948,7 @@ class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
     description_short = _('Subtract two datasets')
     description_full = _('Subtract two datasets. '
                          'Combined error bars are also calculated.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1063,7 +1063,7 @@ class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     description_short = _('Multiply two or more datasets')
     description_full = _('Multiply two or more datasets. '
                          'Combined error bars are also calculated.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1103,7 +1103,7 @@ class DivideDatasetsPlugin(_OneOutputDatasetPlugin):
                           ' between two datasets')
     description_full = _('Divide or compute fractional difference'
                          ' between two datasets')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1427,7 +1427,7 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
     description_short = _('Filter a dataset using an expression')
     description_full = _('Filter a dataset using an expression, '
                          'e.g. "x>10" or "(x>1) & (y<2)"')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1482,7 +1482,7 @@ class MovingAveragePlugin(_OneOutputDatasetPlugin):
     description_full = _('Compute moving average for regularly spaced data.'
                          'Average is computed either\nside of each data point '
                          'by number of points given.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1493,7 +1493,7 @@ class MovingAveragePlugin(_OneOutputDatasetPlugin):
                             default=True),
             field.FieldDataset('ds_out', _('Output dataset')),
             ]
-    
+
     def updateDatasets(self, fields, helper):
         """Do shifting of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
@@ -1873,6 +1873,68 @@ class ConvertNumbersToText(DatasetPlugin):
 
         self.dsout.update(data=data)
 
+class ClipPlugin(_OneOutputDatasetPlugin):
+    """Compute moving average for dataset."""
+
+    menu = (_('Compute'), _('Clipped dataset'),)
+    name = 'Clip'
+    description_short = _('Clip data between a minimum and maximum')
+    description_full = _('Clip data points to minimum and/or maximum values')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldFloat('minimum', _('Minimum'), default=0.),
+            field.FieldBool('disablemin', _('Disable minimum')),
+            field.FieldFloat('maximum', _('Maximum'), default=1.),
+            field.FieldBool('disablemax', _('Disable maximum')),
+            field.FieldBool('cliperrs', _('Clip error bars'), default=True),
+            field.FieldDataset('ds_out', _('Output dataset')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do shifting of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        data = N.array(ds_in.data)
+        perr = getattr(ds_in, 'perr')
+        nerr = getattr(ds_in, 'nerr')
+        serr = getattr(ds_in, 'serr')
+
+        cliperrs = fields['cliperrs']
+        # force asymmetric errors if clipping error bars
+        if cliperrs and serr is not None and (nerr is None or perr is None):
+            perr = serr
+            nerr = -serr
+            serr = None
+
+        # we have to clip the ranges, so calculate these first
+        upper = (data+perr) if (cliperrs and perr is not None) else None
+        lower = (data+nerr) if (cliperrs and nerr is not None) else None
+
+        # note: this preserves nan values
+        if not fields['disablemin']:
+            minv = fields['minimum']
+            data[data<minv] = minv
+            if upper is not None:
+                upper[upper<minv] = minv
+            if lower is not None:
+                lower[lower<minv] = minv
+        if not fields['disablemax']:
+            maxv = fields['maximum']
+            data[data>maxv] = maxv
+            if upper is not None:
+                upper[upper>maxv] = maxv
+            if lower is not None:
+                lower[lower>maxv] = maxv
+
+        if upper is not None:
+            perr = upper-data
+        if lower is not None:
+            nerr = lower-data
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -1887,6 +1949,7 @@ datasetpluginregistry += [
     MeanDatasetPlugin,
     ExtremesDatasetPlugin,
     CumulativePlugin,
+    ClipPlugin,
 
     ConcatenateDatasetPlugin,
     InterleaveDatasetPlugin,
