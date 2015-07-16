@@ -280,4 +280,42 @@ public:
 };
 
 
+// This class draws tick labels with correct choice of axis
+
+class AxisTickLabels : public Object
+{
+public:
+  // cube defined to be between these corners
+  AxisTickLabels(const Vec3& _box1, const Vec3& _box2,
+                 const ValVector& _tickfracs);
+
+  void addAxisChoice(const Vec3& start, const Vec3& end);
+
+  // override this: draw reqested label at origin, with alignment
+  // given
+  virtual void drawLabel(QPainter* painter, unsigned index,
+                         int alignhorz, int alignvert);
+
+  void getFragments(const Mat4& outerM, FragmentVector& v);
+
+private:
+  bool faceOverlap(const Vec2 linepts[2], const Vec2 facepts[4]) const;
+
+private:
+  Vec3 box1, box2;
+  ValVector tickfracs;
+  std::vector<Vec3> starts, ends;
+
+private:
+  class PathParameters : public FragmentPathParameters
+  {
+  public:
+    void callback(QPainter* painter, QPointF pt1, QPointF pt2,
+                  unsigned index,  double scale, double linescale);
+    AxisTickLabels* tl;
+  };
+
+  PathParameters fragparams;
+};
+
 #endif

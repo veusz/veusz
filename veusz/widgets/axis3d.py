@@ -42,6 +42,26 @@ def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+class _AxisTickLabels(threed.AxisTickLabels):
+    """For drawing tick labels."""
+
+    def __init__(self, box1, box2, fracs, labels, labelsprop):
+        threed.AxisTickLabels.__init__(self, box1, box2, fracs)
+        self.labels = labels
+        self.labelsprop = labelsprop
+
+    def drawLabel(self, painter, index, alignhorz, alignvert):
+        """Draw the label, as requested by the Scene."""
+
+        painter.setPen(qt4.QPen())
+
+        font = self.labelsprop.makeQFont(painter)
+        painter.setFont(font)
+        r = utils.Renderer(
+            painter, font, 0, 0, self.labels[index],
+            alignhorz=alignhorz, alignvert=alignvert)
+        r.render()
+
 class _AxisTickText(threed.Text):
     """For drawing text at 3D locations."""
     def __init__(self, posns, posnsalong, textlist, labelprop, params):
@@ -54,7 +74,6 @@ class _AxisTickText(threed.Text):
     def draw(self, painter, pt1, pt2, index, scale, linescale):
         painter.save()
         painter.setPen(qt4.QPen())
-        delpt = pt2-pt1
 
         font = self.labelprop.makeQFont(painter)
         fm = utils.FontMetrics(font, painter.device())
@@ -63,18 +82,21 @@ class _AxisTickText(threed.Text):
 
         # convert offset into perp dirn from delpt
         # normalise vector
-        delpt = delpt * (offset/math.sqrt(delpt.x()**2+delpt.y()**2))
 
-        ptrans = qt4.QPointF(pt1.x()-delpt.y(), pt1.y()+delpt.x())
+        delpt = (pt2.x()-pt1.x(), pt2.y()-pt1.y())
+        scale = offset / math.sqrt(delpt[0]**2+delpt[1]**2)
+        delpt = (delpt[0]*scale, delpt[1]*scale)
+
+        ptrans = qt4.QPointF(pt1.x()-delpt[1], pt1.y()+delpt[0])
 
         painter.translate(ptrans)
 
-        angle = math.atan2(delpt.y(), delpt.x()) * 180/math.pi
+        angle = math.atan2(delpt[1], delpt[0]) * 180/math.pi
         # prevent text going upside down
         alignvert = 1
-        if angle < -90 or angle > 90:
-            angle = 180+angle
-            #alignvert = -alignvert
+        #if angle < -90 or angle > 90:
+        #    angle = 180+angle
+        #    #alignvert = -alignvert
         painter.rotate(angle)
         r = utils.Renderer(
             painter, font, 0, 0, self.textlist[index],
@@ -172,93 +194,115 @@ class Axis3D(widget.Widget):
     def addSettings(klass, s):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
-        s.add( setting.Str('label', '',
-                           descr=_('Axis label text'),
-                           usertext=_('Label')) )
-        s.add( setting.AxisBound('min', 'Auto',
-                                 descr=_('Minimum value of axis'),
-                                 usertext=_('Min')) )
-        s.add( setting.AxisBound('max', 'Auto',
-                                 descr=_('Maximum value of axis'),
-                                 usertext=_('Max')) )
-        s.add( setting.Bool('log', False,
-                            descr = _('Whether axis is logarithmic'),
-                            usertext=_('Log')) )
-        s.add( AutoRange('autoRange', 'next-tick') )
-        s.add( setting.Choice('mode',
-                              ('numeric', 'datetime', 'labels'),
-                              'numeric',
-                              descr = _('Type of ticks to show on on axis'),
-                              usertext=_('Mode')) )
+        s.add( setting.Str(
+            'label', '',
+            descr=_('Axis label text'),
+            usertext=_('Label')) )
+        s.add( setting.AxisBound(
+            'min', 'Auto',
+            descr=_('Minimum value of axis'),
+            usertext=_('Min')) )
+        s.add( setting.AxisBound(
+            'max', 'Auto',
+            descr=_('Maximum value of axis'),
+            usertext=_('Max')) )
+        s.add( setting.Bool(
+            'log', False,
+            descr = _('Whether axis is logarithmic'),
+            usertext=_('Log')) )
+        s.add( AutoRange(
+            'autoRange', 'next-tick') )
+        s.add( setting.Choice(
+            'mode',
+            ('numeric', 'datetime', 'labels'),
+            'numeric',
+            descr = _('Type of ticks to show on on axis'),
+            usertext=_('Mode')) )
 
-        s.add( setting.Bool('autoMirror', True,
-                            descr = _('Place axis on opposite side of graph '
-                                      'if none'),
-                            usertext=_('Auto mirror'),
-                            formatting=True) )
-        s.add( setting.Bool('reflect', False,
-                            descr = _('Place axis text and ticks on other side'
-                                      ' of axis'),
-                            usertext=_('Reflect'),
-                            formatting=True) )
-        s.add( setting.Bool('outerticks', False,
-                            descr = _('Place ticks on outside of graph'),
-                            usertext=_('Outer ticks'),
-                            formatting=True) )
+        s.add( setting.Bool(
+            'autoMirror', True,
+            descr = _('Place axis on opposite side of graph '
+                      'if none'),
+            usertext=_('Auto mirror'),
+            formatting=True) )
+        s.add( setting.Bool(
+            'reflect', False,
+            descr = _('Place axis text and ticks on other side'
+                      ' of axis'),
+            usertext=_('Reflect'),
+            formatting=True) )
+        s.add( setting.Bool(
+            'outerticks', False,
+            descr = _('Place ticks on outside of graph'),
+            usertext=_('Outer ticks'),
+            formatting=True) )
 
-        s.add( setting.Float('datascale', 1.,
-                             descr=_('Scale data plotted by this factor'),
-                             usertext=_('Scale')) )
+        s.add( setting.Float(
+            'datascale', 1.,
+            descr=_('Scale data plotted by this factor'),
+            usertext=_('Scale')) )
 
-        s.add( setting.Choice('direction',
-                              ['x', 'y', 'z'],
-                              'x',
-                              descr = _('Direction of axis'),
-                              usertext=_('Direction')) )
-        s.add( setting.Float('lowerPosition', 0.,
-                             descr=_('Fractional position of lower end of '
-                                     'axis on graph'),
-                             usertext=_('Min position')) )
-        s.add( setting.Float('upperPosition', 1.,
-                             descr=_('Fractional position of upper end of '
-                                     'axis on graph'),
-                             usertext=_('Max position')) )
-        s.add( setting.Float('otherPosition1', 0.,
-                             descr=_('Fractional position of axis '
-                                     'in its perpendicular direction 1'),
-                             usertext=_('Axis position 1')) )
-        s.add( setting.Float('otherPosition2', 0.,
-                             descr=_('Fractional position of axis '
-                                     'in its perpendicular direction 2'),
-                             usertext=_('Axis position 2')) )
+        s.add( setting.Choice(
+            'direction',
+            ['x', 'y', 'z'],
+            'x',
+            descr = _('Direction of axis'),
+            usertext=_('Direction')) )
+        s.add( setting.Float(
+            'lowerPosition', 0.,
+            descr=_('Fractional position of lower end of '
+                    'axis on graph'),
+            usertext=_('Min position')) )
+        s.add( setting.Float(
+            'upperPosition', 1.,
+            descr=_('Fractional position of upper end of '
+                    'axis on graph'),
+            usertext=_('Max position')) )
+        s.add( setting.Float(
+            'otherPosition1', 0.,
+            descr=_('Fractional position of axis '
+                    'in its perpendicular direction 1'),
+            usertext=_('Axis position 1')) )
+        s.add( setting.Float(
+            'otherPosition2', 0.,
+            descr=_('Fractional position of axis '
+                    'in its perpendicular direction 2'),
+            usertext=_('Axis position 2')) )
 
-        s.add( setting.Line3D('Line',
-                            descr = _('Axis line settings'),
-                            usertext = _('Axis line')),
+        s.add( setting.Line3D(
+            'Line',
+            descr = _('Axis line settings'),
+            usertext = _('Axis line')),
                pixmap='settings_axisline' )
-        s.add( AxisLabel('Label',
-                         descr = _('Axis label settings'),
-                         usertext = _('Axis label')),
+        s.add( AxisLabel(
+            'Label',
+            descr = _('Axis label settings'),
+            usertext = _('Axis label')),
                pixmap='settings_axislabel' )
-        s.add( TickLabel('TickLabels',
-                         descr = _('Tick label settings'),
-                         usertext = _('Tick labels')),
+        s.add( TickLabel(
+            'TickLabels',
+            descr = _('Tick label settings'),
+            usertext = _('Tick labels')),
                pixmap='settings_axisticklabels' )
-        s.add( MajorTick('MajorTicks',
-                         descr = _('Major tick line settings'),
-                         usertext = _('Major ticks')),
+        s.add( MajorTick(
+            'MajorTicks',
+            descr = _('Major tick line settings'),
+            usertext = _('Major ticks')),
                pixmap='settings_axismajorticks' )
-        s.add( MinorTick('MinorTicks',
-                         descr = _('Minor tick line settings'),
-                         usertext = _('Minor ticks')),
+        s.add( MinorTick(
+            'MinorTicks',
+            descr = _('Minor tick line settings'),
+            usertext = _('Minor ticks')),
                pixmap='settings_axisminorticks' )
-        s.add( GridLine('GridLines',
-                        descr = _('Grid line settings'),
-                        usertext = _('Grid lines')),
+        s.add( GridLine(
+            'GridLines',
+            descr = _('Grid line settings'),
+            usertext = _('Grid lines')),
                pixmap='settings_axisgridlines' )
-        s.add( MinorGridLine('MinorGridLines',
-                             descr = _('Minor grid line settings'),
-                             usertext = _('Grid lines for minor ticks')),
+        s.add( MinorGridLine(
+            'MinorGridLines',
+            descr = _('Minor grid line settings'),
+            usertext = _('Grid lines for minor ticks')),
                pixmap='settings_axisminorgridlines' )
 
     @classmethod
@@ -455,59 +499,86 @@ class Axis3D(widget.Widget):
         return itertools.product(op1list, op2list)
 
     def addAxisLine(self, cont, dirn):
-        """Build list of lines to draw axis line, mirroring if necessary."""
+        """Build list of lines to draw axis line, mirroring if necessary.
+
+        Returns list of start and end points of axis lines
+        """
 
         s = self.settings
-        if s.Line.hide:
-            return
         lower, upper = s.lowerPosition, s.upperPosition
 
         outstart = []
         outend = []
         for op1, op2 in self.getAutoMirrorCombs():
             if dirn == 'x':
-                outstart += [lower, op1, op2]
-                outend += [upper, op1, op2]
+                outstart += [(lower, op1, op2)]
+                outend += [(upper, op1, op2)]
             elif dirn == 'y':
-                outstart += [op1, lower, op2]
-                outend += [op1, upper, op2]
+                outstart += [(op1, lower, op2)]
+                outend += [(op1, upper, op2)]
             else:
-                outstart += [op1, op2, lower]
-                outend += [op1, op2, upper]
+                outstart += [(op1, op2, lower)]
+                outend += [(op1, op2, upper)]
 
-        startpts = threed.ValVector(outstart)
-        endpts = threed.ValVector(outend)
-        lineprop = s.Line.makeLineProp()
-        cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
+        if not s.Line.hide:
+            startpts = threed.ValVector(N.ravel(outstart))
+            endpts = threed.ValVector(N.ravel(outend))
+            lineprop = s.Line.makeLineProp()
+            cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
 
-    def addTickLabels(self, cont, labelprops, pts, ptsalong, tickvals):
+        return list(zip(outstart, outend))
+
+    def addTickLabels(self, linecoords, cont, labelsprop, pts,
+                      ptsalong, tickvals):
         """Make tick labels for axis."""
 
-        if labelprops.hide:
+        if labelsprop.hide:
             return None
 
         # make strings for labels
-        fmt = labelprops.format
+        fmt = labelsprop.format
         if fmt.lower() == 'auto':
             fmt = self.autoformat
-        scale = labelprops.scale
+        scale = labelsprop.scale
         text = [ utils.formatNumber(v*scale, fmt, locale=self.document.locale)
                  for v in tickvals ]
 
         att = _AxisTickText(
             N.ravel(N.column_stack(pts)), N.ravel(N.column_stack(ptsalong)),
-            text, labelprops, {})
+            text, labelsprop, {})
         cont.addObject(att)
 
-    def addAxisTicks(self, tickprops, labelprops, tickvals, cont, dirn):
+    def addTickLabels2(self, cont, linecoords, labelsprop, tickfracs,
+                       tickvals):
+        """Make tick labels for axis."""
+
+        if labelsprop.hide:
+            return
+
+        # make strings for labels
+        fmt = labelsprop.format
+        if fmt.lower() == 'auto':
+            fmt = self.autoformat
+        scale = labelsprop.scale
+        labels = [ utils.formatNumber(v*scale, fmt, locale=self.document.locale)
+                   for v in tickvals ]
+
+        atl = _AxisTickLabels(
+            threed.Vec3(0,0,0), threed.Vec3(1,1,1),
+            threed.ValVector(tickfracs),
+            labels, labelsprop)
+        for startpos, endpos in linecoords:
+            atl.addAxisChoice(threed.Vec3(*startpos), threed.Vec3(*endpos))
+        cont.addObject(atl)
+
+    def addAxisTicks(self, cont, dirn, linecoords, tickprops, labelsprop,
+                     tickvals):
         """Add ticks for the vals and tick properties class given.
+        linecoords: coordinates of start and end points of lines
         labelprops: properties of label, or None
         cont: container to add ticks
         dirn: 'x', 'y', 'z' for axis
         """
-
-        if tickprops.hide:
-            return
 
         ticklen = tickprops.length * 1e-3
         tfracs = self.dataToLogicalCoords(tickvals)
@@ -539,16 +610,19 @@ class Axis3D(widget.Widget):
                 ptsoff2 = (op1pts, op2pts2, tfracs)
                 ptsalong = (op1pts, op2pts, tfracs+1e-3)
 
-            outstart += [N.ravel(N.column_stack(ptsonaxis)), N.ravel(N.column_stack(ptsonaxis))]
-            outend += [N.ravel(N.column_stack(ptsoff1)), N.ravel(N.column_stack(ptsoff2))]
+            outstart += [N.ravel(N.column_stack(ptsonaxis)),
+                         N.ravel(N.column_stack(ptsonaxis))]
+            outend += [N.ravel(N.column_stack(ptsoff1)),
+                       N.ravel(N.column_stack(ptsoff2))]
 
-        if labelprops is not None:
-            self.addTickLabels(cont, labelprops, ptsonaxis, ptsalong, tickvals)
+        if labelsprop is not None:
+            self.addTickLabels2(cont, linecoords, labelsprop, tfracs, tickvals)
 
-        startpts = threed.ValVector(N.concatenate(outstart))
-        endpts = threed.ValVector(N.concatenate(outend))
-        lineprop = tickprops.makeLineProp()
-        cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
+        if not tickprops.hide:
+            startpts = threed.ValVector(N.concatenate(outstart))
+            endpts = threed.ValVector(N.concatenate(outend))
+            lineprop = tickprops.makeLineProp()
+            cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
 
     def drawToObject(self):
 
@@ -557,9 +631,13 @@ class Axis3D(widget.Widget):
 
         cont = threed.ObjectContainer()
 
-        self.addAxisLine(cont, dirn)
-        self.addAxisTicks(s.MajorTicks, s.TickLabels, self.majortickscalc, cont, dirn)
-        self.addAxisTicks(s.MinorTicks, None, self.minortickscalc, cont, dirn)
+        linecoords = self.addAxisLine(cont, dirn)
+        self.addAxisTicks(
+            cont, dirn, linecoords, s.MajorTicks, s.TickLabels,
+            self.majortickscalc)
+        self.addAxisTicks(
+            cont, dirn, linecoords, s.MinorTicks, None,
+            self.minortickscalc)
 
         return cont
 

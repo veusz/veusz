@@ -398,6 +398,22 @@ public:
   Vec3 norm;
 };
 
+class AxisTickLabels : public Object
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+public:
+  AxisTickLabels(const Vec3& _box1, const Vec3& _box2,
+                 const ValVector& _tickfracs);
+
+  void addAxisChoice(const Vec3& start, const Vec3& end);
+
+  virtual void drawLabel(QPainter* painter, unsigned index,
+                         int alignhorz, int alignvert);
+};
+
+
 class ClipContainer : public ObjectContainer
 {
 %TypeHeaderCode

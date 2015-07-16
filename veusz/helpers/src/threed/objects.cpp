@@ -19,7 +19,9 @@
 #include <algorithm>
 #include <cstdio>
 #include <cmath>
+#include <limits>
 #include "objects.h"
+#include "twod.h"
 
 Object::~Object()
 {
@@ -607,4 +609,188 @@ void FacingContainer::getFragments(const Mat4& outerM, FragmentVector& v)
   // norm points towards +z
   if(tnorm(2) > origin(2))
     ObjectContainer::getFragments(outerM, v);
+}
+
+// AxisTickLabels
+
+AxisTickLabels::AxisTickLabels(const Vec3& _box1, const Vec3& _box2,
+                               const ValVector& _tickfracs)
+  : box1(_box1), box2(_box2),
+    tickfracs(_tickfracs)
+{
+  fragparams.tl = this;
+  fragparams.path = 0;
+  fragparams.scaleedges = 0;
+  fragparams.runcallback = 1;
+}
+
+void AxisTickLabels::addAxisChoice(const Vec3& _start, const Vec3& _end)
+{
+  starts.push_back(_start);
+  ends.push_back(_end);
+}
+
+void AxisTickLabels::PathParameters::callback(QPainter* painter, QPointF pt1,
+                                              QPointF pt2, unsigned index,
+                                              double scale, double linescale)
+{
+  painter->save();
+  painter->translate(pt1);
+  tl->drawLabel(painter, index, 0, 0);
+  painter->restore();
+}
+
+void AxisTickLabels::drawLabel(QPainter* painter, unsigned index,
+                               int alignhorz, int alignvert)
+{
+}
+
+// does the line overlap with the face in 2d?
+bool AxisTickLabels::faceOverlap(const Vec2 linepts[2],
+                                 const Vec2 facepts[4]) const
+{
+  for(unsigned edge=0; edge<4; ++edge)
+    {
+      if( twodLineIntersect(linepts[0], linepts[1],
+                            facepts[edge], facepts[(edge+1)%4]) ==
+          LINE_CROSS )
+        return 1;
+    }
+  return 0;
+}
+
+void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
+{
+  // algorithm:
+
+  // Take possible axis positions
+  // Find those which do not overlap on the screen with body of cube
+  //  - make cube faces
+  //  - look for endpoints which are somewhere on a face (not edge)
+  // Prefer those axes to bottom left
+  // Determine from faces, which side of the axis is inside and which outside
+  // Setup drawLabel for the right axis
+
+  unsigned numentries = std::min(starts.size(), ends.size());
+  if(numentries == 0)
+    return;
+
+  Vec3 boxpts[2];
+  boxpts[0] = box1; boxpts[1] = box2;
+
+  // compute corners of cube in scene coordinates
+  // (0,0,0),(0,0,1),(0,1,0),(0,1,1),(1,0,0),(1,0,1),(1,1,0),(1,1,1)
+  Vec3 scenecorners[8];
+  for(unsigned i0=0; i0<2; ++i0)
+    for(unsigned i1=0; i1<2; ++i1)
+      for(unsigned i2=0; i2<2; ++i2)
+        {
+          Vec3 pt(boxpts[i0](0), boxpts[i1](1), boxpts[i2](2));
+          scenecorners[i2+i1*2+i0*4] = vec4to3(outerM*vec3to4(pt));
+        }
+
+  // point indices for faces of cube
+  static const unsigned faces[6][4] = {
+    {0,1,3,2} /* x==0 */, {4,5,7,6} /* x==1 */,
+    {0,1,5,4} /* y==0 */, {2,3,7,6} /* y==1 */,
+    {0,4,6,2} /* z==0 */, {1,5,7,3} /* z==1 */
+  };
+
+  // scene coords of axis ends
+  std::vector<Vec3> pt_starts, pt_ends;
+  for(unsigned axis=0; axis!=numentries; ++axis)
+    {
+      pt_starts.push_back(vec4to3(outerM*vec3to4(starts[axis])));
+      pt_ends.push_back(vec4to3(outerM*vec3to4(ends[axis])));
+    }
+
+  // find axes which don't overlap with faces in 2D
+  std::vector<unsigned> axchoices;
+
+  for(unsigned axis=0; axis!=numentries; ++axis)
+    {
+      Vec2 linepts[2] = {
+        vec3to2(pt_starts[axis]), vec3to2(pt_ends[axis])
+      };
+
+      bool overlap=0;
+
+      // does this overlap with any faces?
+      for(unsigned face=0; face<6 && !overlap; ++face)
+        {
+          Vec2 facepts[4] = {
+            vec3to2(scenecorners[faces[face][0]]),
+            vec3to2(scenecorners[faces[face][1]]),
+            vec3to2(scenecorners[faces[face][2]]),
+            vec3to2(scenecorners[faces[face][3]]),
+          };
+          if(faceOverlap(linepts, facepts))
+            overlap=1;
+        }
+
+      if(!overlap)
+        axchoices.push_back(axis);
+    }
+
+  // if none are suitable, prefer all
+  if(axchoices.empty())
+    for(unsigned axis=0; axis!=numentries; ++axis)
+      axchoices.push_back(axis);
+
+  // get approx centre of cube by averaging corners
+  double centx, centy, centz;
+  centx = centy = centz = 0;
+  for(unsigned i=0; i<8; ++i)
+    {
+      centx += scenecorners[i](0);
+      centy += scenecorners[i](1);
+      centz += scenecorners[i](2);
+    }
+  centx *= (1./8); centy *= (1./8); centz *= (1./8);
+
+  // prefer axes which are left-most and bottom-most and front-most
+  int bestscore=-1;
+  unsigned bestaxis=0;
+
+  for(std::vector<unsigned>::const_iterator choice=axchoices.begin();
+      choice!=axchoices.end(); ++choice)
+    {
+      double avx = 0.5*(pt_starts[*choice](0)+pt_ends[*choice](0));
+      double avy = 0.5*(pt_starts[*choice](1)+pt_ends[*choice](1));
+      double avz = 0.5*(pt_starts[*choice](2)+pt_ends[*choice](2));
+
+      // score is weighted towards front, then bottom, then left
+      int score = ((avx <= centx)*10 +
+                   (avy >  centy)*11 +
+                   (avz >  centz)*12 );
+      if(score > bestscore)
+        {
+          bestscore = score;
+          bestaxis = *choice;
+        }
+    }
+
+  // ok, now we add the number fragments for the best choice of axis
+  Fragment fp;
+  fp.type = Fragment::FR_PATH;
+  fp.object = this;
+  fp.params = &fragparams;
+  fp.surfaceprop = 0;
+  fp.lineprop = 0;
+  fp.pathsize = 1;
+
+  Vec3 axstart = starts[bestaxis];
+  Vec3 delta = ends[bestaxis]-axstart;
+
+  for(unsigned i=0; i<tickfracs.size(); ++i)
+    {
+      fp.index = i;
+      Vec3 p1 = axstart + delta*(tickfracs[i]);
+      Vec3 p2 = axstart + delta*(tickfracs[i]+1e-3);
+
+      fp.points[0] = vec4to3(outerM*vec3to4(p1));
+      fp.points[1] = vec4to3(outerM*vec3to4(p2));
+
+      fragvec.push_back(fp);
+    }
 }
