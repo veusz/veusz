@@ -508,6 +508,8 @@ class AxisFunction(axis.Axis):
 
     def _linearInterpolWarning(self, vals, xcoords, ycoords):
         '''Linear interpolation, giving out of bounds warning.'''
+        if not vals.shape:
+            vals=N.array([vals])
         if any(vals < xcoords[0]) or any(vals > xcoords[-1]):
             self.document.log(
                 _('Warning: values exceed bounds in axis-function'))
