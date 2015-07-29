@@ -50,59 +50,113 @@ class _AxisTickLabels(threed.AxisTickLabels):
         self.labels = labels
         self.labelsprop = labelsprop
 
-    def drawLabel(self, painter, index, alignhorz, alignvert):
+    def drawLabel(self, painter, index, pt, ax1, ax2, quad, dirn):
         """Draw the label, as requested by the Scene."""
 
         painter.setPen(qt4.QPen())
 
         font = self.labelsprop.makeQFont(painter)
         painter.setFont(font)
-        r = utils.Renderer(
-            painter, font, 0, 0, self.labels[index],
-            alignhorz=alignhorz, alignvert=alignvert)
-        r.render()
 
-class _AxisTickText(threed.Text):
-    """For drawing text at 3D locations."""
-    def __init__(self, posns, posnsalong, textlist, labelprop, params):
-        threed.Text.__init__(
-            self, threed.ValVector(posns), threed.ValVector(posnsalong))
-        self.textlist = textlist
-        self.labelprop = labelprop
-        self.params = params
+        label = self.labels[index]
+        renderer = utils.Renderer(
+            painter, font, 0, 0, label, alignhorz=0, alignvert=0)
+        bounds = renderer.getBounds()
+        width, height = bounds[2]-bounds[0], bounds[3]-bounds[1]
 
-    def draw(self, painter, pt1, pt2, index, scale, linescale):
-        painter.save()
-        painter.setPen(qt4.QPen())
+        fm = qt4.QFontMetricsF(font, painter.device())
+        height += fm.ascent()
+        width += fm.ascent()*0.5
 
-        font = self.labelprop.makeQFont(painter)
-        fm = utils.FontMetrics(font, painter.device())
-        offset = self.labelprop.get('offset').convert(painter)
-        offset += fm.leading() + fm.descent()
+        # is the axis more horizontal than vertical?
+        dx, dy = ax2.x()-ax1.x(), ax2.y()-ax1.y()
+        horz = abs(dx) > abs(dy)
 
-        # convert offset into perp dirn from delpt
-        # normalise vector
+        if horz:
+            # t=tan theta
+            t = abs(dy/dx)
+            # these are shifts reqired so that text bounding box does
+            # not hit axis
+            hshift = t*(height*0.5+t*width *0.5)/(1+t*t)
+            vshift = t*(width *0.5-t*height*0.5)/(1+t*t)
 
-        delpt = (pt2.x()-pt1.x(), pt2.y()-pt1.y())
-        scale = offset / math.sqrt(delpt[0]**2+delpt[1]**2)
-        delpt = (delpt[0]*scale, delpt[1]*scale)
+            if quad == 0 or quad == 2:
+                # top horizontal axis: text at top
+                yoffset = -height*0.5-vshift
+                xoffset = hshift if dy/dx>=0 else -hshift
+            else:
+                # bottom horizontal axis: text at top
+                yoffset = height*0.5+vshift
+                xoffset = -hshift if dy/dx>=0 else hshift
 
-        ptrans = qt4.QPointF(pt1.x()-delpt[1], pt1.y()+delpt[0])
+        else:
+            t = abs(dx/dy)
+            vshift = t*(width *0.5+t*height*0.5)/(1+t*t)
+            hshift = t*(height*0.5-t*width *0.5)/(1+t*t)
 
-        painter.translate(ptrans)
+            if quad == 2 or quad == 3:
+                # left vertical axis: text at left
+                xoffset = -width*0.5-hshift
+                yoffset = vshift if dx/dy >= 0 else -vshift
+            else:
+                # right vertical axis: text at right
+                xoffset = width*0.5+hshift
+                yoffset = -vshift if dx/dy >= 0 else vshift
 
-        angle = math.atan2(delpt[1], delpt[0]) * 180/math.pi
-        # prevent text going upside down
-        alignvert = 1
-        #if angle < -90 or angle > 90:
-        #    angle = 180+angle
-        #    #alignvert = -alignvert
-        painter.rotate(angle)
-        r = utils.Renderer(
-            painter, font, 0, 0, self.textlist[index],
-            alignhorz=0, alignvert=alignvert)
-        r.render()
-        painter.restore()
+        # painter.setPen(qt4.QPen(qt4.QColor("red")))
+        # painter.drawEllipse(qt4.QRectF(
+        #     pt.x()-2, pt.y()-2, 4, 4))
+
+        # painter.setPen(qt4.QPen())
+        # painter.drawRect(qt4.QRectF(
+        #     qt4.QPointF(pt.x()+xoffset-width*0.5, pt.y()+yoffset-height*0.5),
+        #     qt4.QPointF(pt.x()+xoffset+width*0.5, pt.y()+yoffset+height*0.5)
+        # ))
+
+        painter.translate(pt.x()+xoffset, pt.y()+yoffset)
+        renderer.render()
+
+# class _AxisTickText(threed.Text):
+#     """For drawing text at 3D locations."""
+#     def __init__(self, posns, posnsalong, textlist, labelprop, params):
+#         threed.Text.__init__(
+#             self, threed.ValVector(posns), threed.ValVector(posnsalong))
+#         self.textlist = textlist
+#         self.labelprop = labelprop
+#         self.params = params
+
+#     def draw(self, painter, pt1, pt2, index, scale, linescale):
+#         painter.save()
+#         painter.setPen(qt4.QPen())
+
+#         font = self.labelprop.makeQFont(painter)
+#         fm = utils.FontMetrics(font, painter.device())
+#         offset = self.labelprop.get('offset').convert(painter)
+#         offset += fm.leading() + fm.descent()
+
+#         # convert offset into perp dirn from delpt
+#         # normalise vector
+
+#         delpt = (pt2.x()-pt1.x(), pt2.y()-pt1.y())
+#         scale = offset / math.sqrt(delpt[0]**2+delpt[1]**2)
+#         delpt = (delpt[0]*scale, delpt[1]*scale)
+
+#         ptrans = qt4.QPointF(pt1.x()-delpt[1], pt1.y()+delpt[0])
+
+#         painter.translate(ptrans)
+
+#         angle = math.atan2(delpt[1], delpt[0]) * 180/math.pi
+#         # prevent text going upside down
+#         alignvert = 1
+#         #if angle < -90 or angle > 90:
+#         #    angle = 180+angle
+#         #    #alignvert = -alignvert
+#         painter.rotate(angle)
+#         r = utils.Renderer(
+#             painter, font, 0, 0, self.textlist[index],
+#             alignhorz=0, alignvert=alignvert)
+#         r.render()
+#         painter.restore()
 
 class MajorTick(setting.Line3D):
     '''Major tick settings.'''
@@ -528,28 +582,8 @@ class Axis3D(widget.Widget):
 
         return list(zip(outstart, outend))
 
-    def addTickLabels(self, linecoords, cont, labelsprop, pts,
-                      ptsalong, tickvals):
-        """Make tick labels for axis."""
-
-        if labelsprop.hide:
-            return None
-
-        # make strings for labels
-        fmt = labelsprop.format
-        if fmt.lower() == 'auto':
-            fmt = self.autoformat
-        scale = labelsprop.scale
-        text = [ utils.formatNumber(v*scale, fmt, locale=self.document.locale)
-                 for v in tickvals ]
-
-        att = _AxisTickText(
-            N.ravel(N.column_stack(pts)), N.ravel(N.column_stack(ptsalong)),
-            text, labelsprop, {})
-        cont.addObject(att)
-
-    def addTickLabels2(self, cont, linecoords, labelsprop, tickfracs,
-                       tickvals):
+    def addTickLabels(self, cont, linecoords, labelsprop, tickfracs,
+                      tickvals):
         """Make tick labels for axis."""
 
         if labelsprop.hide:
@@ -616,7 +650,7 @@ class Axis3D(widget.Widget):
                        N.ravel(N.column_stack(ptsoff2))]
 
         if labelsprop is not None:
-            self.addTickLabels2(cont, linecoords, labelsprop, tfracs, tickvals)
+            self.addTickLabels(cont, linecoords, labelsprop, tfracs, tickvals)
 
         if not tickprops.hide:
             startpts = threed.ValVector(N.concatenate(outstart))

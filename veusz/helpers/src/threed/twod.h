@@ -36,4 +36,16 @@ enum ISect { LINE_NOOVERLAP, LINE_CROSS, LINE_OVERLAP };
 ISect twodLineIntersect(Vec2 p1, Vec2 p2, Vec2 q1, Vec2 q2,
                         Vec2* posn=0, Vec2* posn2=0);
 
+// clip 2D polygon by a 2nd polygon (must be clockwise polygons)
+Vec2Vector twodPolyEdgeClip(Vec2Vector inPoly, const Vec2Vector& clipPoly);
+
+// area of polygon (+ve -> clockwise)
+double twodPolyArea(const Vec2Vector& poly);
+
+// ensure polygon is clockwise
+void twodPolyMakeClockwise(Vec2Vector* poly);
+
+// does line cross polygon? (make sure poly is defined clockwise)
+bool twodLineIntersectPolygon(Vec2 p1, Vec2 p2, const Vec2Vector& poly);
+
 #endif

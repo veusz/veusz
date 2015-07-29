@@ -174,7 +174,8 @@ QPen Scene::surfaceProp2QPen(const Fragment& frag) const
 }
 
 void Scene::drawPath(QPainter* painter, const Fragment& frag,
-                     QPointF pt1, QPointF pt2, double linescale)
+                     QPointF pt1, QPointF pt2, QPointF pt3,
+                     double linescale)
 {
   FragmentPathParameters* pars =
     static_cast<FragmentPathParameters*>(frag.params);
@@ -183,7 +184,7 @@ void Scene::drawPath(QPainter* painter, const Fragment& frag,
   // hook into drawing routine
   if(pars->runcallback)
     {
-      pars->callback(painter, pt1, pt2, frag.index, scale, linescale);
+      pars->callback(painter, pt1, pt2, pt3, frag.index, scale, linescale);
       return;
     }
 
@@ -292,7 +293,8 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   lsurf = frag.surfaceprop;
                   painter->setBrush(surfaceProp2QBrush(frag));
                 }
-              drawPath(painter, frag, projpts[0], projpts[1], linescale);
+              drawPath(painter, frag, projpts[0], projpts[1], projpts[2],
+                       linescale);
             }
 	  break;
 

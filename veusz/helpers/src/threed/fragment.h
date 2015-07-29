@@ -48,7 +48,8 @@ struct FragmentPathParameters : public FragmentParameters
   bool scaleedges;
   bool runcallback;
   // optional callback function if runcallback is set
-  virtual void callback(QPainter* painter, QPointF pt1, QPointF pt2,
+  virtual void callback(QPainter* painter,
+                        QPointF pt1, QPointF pt2, QPointF pt3,
                         unsigned index,  double scale, double linescale);
 };
 
@@ -125,7 +126,7 @@ struct Fragment
       {
       case FR_TRIANGLE: return 3;
       case FR_LINESEG: return 2;
-      case FR_PATH: return 2;
+      case FR_PATH: return 3;
       default: return 0;
       }
   }

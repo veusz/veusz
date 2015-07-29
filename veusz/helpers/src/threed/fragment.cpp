@@ -22,7 +22,8 @@ FragmentParameters::~FragmentParameters()
 {
 }
 
-void FragmentPathParameters::callback(QPainter* painter, QPointF pt1, QPointF pt2,
+void FragmentPathParameters::callback(QPainter* painter,
+                                      QPointF pt1, QPointF pt2, QPointF pt3,
                                       unsigned index, double scale, double linescale)
 {
 }

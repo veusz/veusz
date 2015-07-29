@@ -210,14 +210,15 @@ public:
 
   void getFragments(const Mat4& outerM, FragmentVector& v);
 
-  virtual void draw(QPainter* painter, QPointF pt1, QPointF pt2,
+  virtual void draw(QPainter* painter,
+                    QPointF pt1, QPointF pt2, QPointF pt3,
                     unsigned index, double scale, double linescale);
 
 private:
   class TextPathParameters : public FragmentPathParameters
   {
   public:
-    void callback(QPainter* painter, QPointF pt1, QPointF pt2,
+    void callback(QPainter* painter, QPointF pt1, QPointF pt2, QPointF pt3,
                   unsigned index,  double scale, double linescale);
     Text* text;
   };
@@ -294,12 +295,10 @@ public:
   // override this: draw reqested label at origin, with alignment
   // given
   virtual void drawLabel(QPainter* painter, unsigned index,
-                         int alignhorz, int alignvert);
+                         QPointF pt, QPointF ax1, QPointF ax2,
+                         int quad, int dirn);
 
   void getFragments(const Mat4& outerM, FragmentVector& v);
-
-private:
-  bool faceOverlap(const Vec2 linepts[2], const Vec2 facepts[4]) const;
 
 private:
   Vec3 box1, box2;
@@ -307,12 +306,13 @@ private:
   std::vector<Vec3> starts, ends;
 
 private:
-  class PathParameters : public FragmentPathParameters
+  struct PathParameters : public FragmentPathParameters
   {
-  public:
-    void callback(QPainter* painter, QPointF pt1, QPointF pt2,
+    void callback(QPainter* painter, QPointF pt, QPointF ax1, QPointF ax2,
                   unsigned index,  double scale, double linescale);
     AxisTickLabels* tl;
+    int quad;
+    int dirn;
   };
 
   PathParameters fragparams;

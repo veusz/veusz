@@ -64,7 +64,8 @@ private:
   void doDrawing(QPainter* painter, const Mat3& screenM, double linescale);
 
   void drawPath(QPainter* painter, const Fragment& frag,
-                QPointF pt1, QPointF pt2, double linescale);
+                QPointF pt1, QPointF pt2, QPointF pt3,
+                double linescale);
 
   // different rendering modes
   void renderPainters(const Camera& cam);

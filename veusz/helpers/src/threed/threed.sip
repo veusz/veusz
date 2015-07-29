@@ -362,7 +362,8 @@ public:
   // pos1 and pos2 contain a list of x,y,z values
   Text(const ValVector& _pos1, const ValVector& _pos2);
 
-  virtual void draw(QPainter* painter, QPointF pt1, QPointF pt2,
+  virtual void draw(QPainter* painter,
+                    QPointF pt1, QPointF pt2, QPointF pt3,
                     unsigned index, double scale, double linescale);
 };
 
@@ -410,7 +411,8 @@ public:
   void addAxisChoice(const Vec3& start, const Vec3& end);
 
   virtual void drawLabel(QPainter* painter, unsigned index,
-                         int alignhorz, int alignvert);
+                         QPointF pt, QPointF ax1, QPointF ax2,
+                         int quad, int dirn);
 };
 
 

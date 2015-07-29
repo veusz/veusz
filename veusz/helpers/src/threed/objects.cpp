@@ -532,11 +532,12 @@ Text::Text(const ValVector& _pos1, const ValVector& _pos2)
   fragparams.runcallback = 1;
 }
 
-void Text::TextPathParameters::callback(QPainter* painter, QPointF pt1,
-                                        QPointF pt2, unsigned index,
+void Text::TextPathParameters::callback(QPainter* painter,
+                                        QPointF pt1, QPointF pt2, QPointF pt3,
+                                        unsigned index,
                                         double scale, double linescale)
 {
-  text->draw(painter, pt1, pt2, index, scale, linescale);
+  text->draw(painter, pt1, pt2, pt3, index, scale, linescale);
 }
 
 void Text::getFragments(const Mat4& outerM, FragmentVector& v)
@@ -562,7 +563,8 @@ void Text::getFragments(const Mat4& outerM, FragmentVector& v)
     }
 }
 
-void Text::draw(QPainter* painter, QPointF pt1, QPointF pt2,
+void Text::draw(QPainter* painter,
+                QPointF pt1, QPointF pt2, QPointF pt3,
                 unsigned index, double scale, double linescale)
 {
 }
@@ -618,10 +620,6 @@ AxisTickLabels::AxisTickLabels(const Vec3& _box1, const Vec3& _box2,
   : box1(_box1), box2(_box2),
     tickfracs(_tickfracs)
 {
-  fragparams.tl = this;
-  fragparams.path = 0;
-  fragparams.scaleedges = 0;
-  fragparams.runcallback = 1;
 }
 
 void AxisTickLabels::addAxisChoice(const Vec3& _start, const Vec3& _end)
@@ -630,33 +628,20 @@ void AxisTickLabels::addAxisChoice(const Vec3& _start, const Vec3& _end)
   ends.push_back(_end);
 }
 
-void AxisTickLabels::PathParameters::callback(QPainter* painter, QPointF pt1,
-                                              QPointF pt2, unsigned index,
+void AxisTickLabels::PathParameters::callback(QPainter* painter,
+                                              QPointF pt, QPointF ax1, QPointF ax2,
+                                              unsigned index,
                                               double scale, double linescale)
 {
   painter->save();
-  painter->translate(pt1);
-  tl->drawLabel(painter, index, 0, 0);
+  tl->drawLabel(painter, index, pt, ax1, ax2, quad, dirn);
   painter->restore();
 }
 
 void AxisTickLabels::drawLabel(QPainter* painter, unsigned index,
-                               int alignhorz, int alignvert)
+                               QPointF pt, QPointF ax1, QPointF ax2,
+                               int quad, int dirn)
 {
-}
-
-// does the line overlap with the face in 2d?
-bool AxisTickLabels::faceOverlap(const Vec2 linepts[2],
-                                 const Vec2 facepts[4]) const
-{
-  for(unsigned edge=0; edge<4; ++edge)
-    {
-      if( twodLineIntersect(linepts[0], linepts[1],
-                            facepts[edge], facepts[(edge+1)%4]) ==
-          LINE_CROSS )
-        return 1;
-    }
-  return 0;
 }
 
 void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
@@ -707,24 +692,23 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
   // find axes which don't overlap with faces in 2D
   std::vector<unsigned> axchoices;
 
+  std::vector<Vec2> facepts;
   for(unsigned axis=0; axis!=numentries; ++axis)
     {
-      Vec2 linepts[2] = {
-        vec3to2(pt_starts[axis]), vec3to2(pt_ends[axis])
-      };
+      Vec2 linept1 = vec3to2(pt_starts[axis]);
+      Vec2 linept2 = vec3to2(pt_ends[axis]);
 
       bool overlap=0;
 
       // does this overlap with any faces?
       for(unsigned face=0; face<6 && !overlap; ++face)
         {
-          Vec2 facepts[4] = {
-            vec3to2(scenecorners[faces[face][0]]),
-            vec3to2(scenecorners[faces[face][1]]),
-            vec3to2(scenecorners[faces[face][2]]),
-            vec3to2(scenecorners[faces[face][3]]),
-          };
-          if(faceOverlap(linepts, facepts))
+          facepts.resize(0);
+          for(unsigned i=0; i<4; ++i)
+            facepts.push_back(vec3to2(scenecorners[faces[face][i]]));
+          twodPolyMakeClockwise(&facepts);
+
+          if( twodLineIntersectPolygon(linept1, linept2, facepts) )
             overlap=1;
         }
 
@@ -734,8 +718,10 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
 
   // if none are suitable, prefer all
   if(axchoices.empty())
-    for(unsigned axis=0; axis!=numentries; ++axis)
-      axchoices.push_back(axis);
+    {
+      for(unsigned axis=0; axis!=numentries; ++axis)
+        axchoices.push_back(axis);
+    }
 
   // get approx centre of cube by averaging corners
   double centx, centy, centz;
@@ -748,9 +734,23 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
     }
   centx *= (1./8); centy *= (1./8); centz *= (1./8);
 
-  // prefer axes which are left-most and bottom-most and front-most
-  int bestscore=-1;
-  unsigned bestaxis=0;
+  // currently-prefered axis number
+  unsigned bestaxis = 0;
+  // axes are scored to prefer front, bottom, left axes
+  int bestscore = -1;
+
+  // quadrant of best axis: where axis is approx in space
+  // 0 == top right
+  // 1 == bottom right
+  // 2 == top left
+  // 3 == bottom left
+  int bestquad = -1;
+  // axis direction (dx>0=rightwards, dy>0=topwards)
+  // 0 == dx>=0 and dy>=0
+  // 1 == dx>=0 and dy<0
+  // 2 == dx<0  and dy>=0
+  // 3 == dx<0  and dy<0
+  int bestdirn = -1;
 
   for(std::vector<unsigned>::const_iterator choice=axchoices.begin();
       choice!=axchoices.end(); ++choice)
@@ -767,8 +767,24 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
         {
           bestscore = score;
           bestaxis = *choice;
+
+          // which quadrant is axis in
+          bestquad = (avx<=centx)*2 + (avy>centy);
+
+          // which direction is axis in?
+          double dx = pt_ends[*choice](0)-pt_starts[*choice](0);
+          double dy = pt_ends[*choice](1)-pt_starts[*choice](1);
+          bestdirn = (dx<0)*2 + (dy<0);
         }
     }
+
+  // initialise PathParameters with best axis
+  fragparams.tl = this;
+  fragparams.path = 0;
+  fragparams.scaleedges = 0;
+  fragparams.runcallback = 1;
+  fragparams.quad = bestquad;
+  fragparams.dirn = bestdirn;
 
   // ok, now we add the number fragments for the best choice of axis
   Fragment fp;
@@ -782,14 +798,18 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
   Vec3 axstart = starts[bestaxis];
   Vec3 delta = ends[bestaxis]-axstart;
 
+  // scene coordinates of axis ends
+  Vec3 axstart_scene = vec4to3(outerM*vec3to4(axstart));
+  Vec3 axend_scene = vec4to3(outerM*vec3to4(ends[bestaxis]));
+
   for(unsigned i=0; i<tickfracs.size(); ++i)
     {
       fp.index = i;
-      Vec3 p1 = axstart + delta*(tickfracs[i]);
-      Vec3 p2 = axstart + delta*(tickfracs[i]+1e-3);
+      Vec3 pt = axstart + delta*(tickfracs[i]);
 
-      fp.points[0] = vec4to3(outerM*vec3to4(p1));
-      fp.points[1] = vec4to3(outerM*vec3to4(p2));
+      fp.points[0] = vec4to3(outerM*vec3to4(pt));
+      fp.points[1] = axstart_scene;
+      fp.points[2] = axend_scene;
 
       fragvec.push_back(fp);
     }
