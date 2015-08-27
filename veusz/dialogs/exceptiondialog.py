@@ -15,7 +15,7 @@
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
- 
+
 '''Dialog to pop up if an exception occurs in Veusz.
 This allows the user to send a bug report in via email.'''
 
@@ -37,6 +37,8 @@ from .veuszdialog import VeuszDialog
 def _(text, disambiguation=None, context="ExceptionDialog"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+_emailUrl ='http://barmag.net/veusz-mail.php'
 
 _reportformat = \
 '''Veusz version: %s
@@ -63,25 +65,28 @@ What the user was doing before the crash
 %s
 '''
 
+def createReportText(exception):
+    return _reportformat % (
+                utils.version(),
+                sys.version,
+                sys.platform,
+                numpy.__version__,
+                qt4.qVersion(),
+                qt4.PYQT_VERSION_STR,
+                sip.SIP_VERSION_STR,
+                time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
+                exception
+            )
+
 class ExceptionSendDialog(VeuszDialog):
     """Dialog to send debugging report."""
-    
+
     def __init__(self, exception, parent):
 
         VeuszDialog.__init__(self, parent, 'exceptionsend.ui')
 
         # debugging report text
-        self.text = _reportformat % (
-            utils.version(),
-            sys.version,
-            sys.platform,
-            numpy.__version__,
-            qt4.qVersion(),
-            qt4.PYQT_VERSION_STR,
-            sip.SIP_VERSION_STR,
-            time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
-            exception
-            )
+        self.text = createReportText(exception)
         self.detailstosend.setPlainText(self.text)
 
     def accept(self):
@@ -98,7 +103,7 @@ class ExceptionSendDialog(VeuszDialog):
 
         try:
             # send the message
-            curlrequest.urlopen('http://barmag.net/veusz-mail.php',
+            curlrequest.urlopen(_emailUrl,
                                 'message=%s' % text)
 
         except:
@@ -170,7 +175,7 @@ def formatLocals(exception):
 
 class ExceptionDialog(VeuszDialog):
     """Choose an exception to send to developers."""
-    
+
     ignore_exceptions = set()
 
     def __init__(self, exception, parent):
@@ -189,8 +194,12 @@ class ExceptionDialog(VeuszDialog):
         self.erroriconlabel.setPixmap(icon.pixmap(32))
 
         self.ignoreSessionButton.clicked.connect(self.ignoreSessionSlot)
-       
+        self.saveButton.clicked.connect(self.saveButtonSlot)
+
         self.checkVeuszVersion()
+
+        if not _emailUrl:
+            self.okButton.hide()
 
     def checkVeuszVersion(self):
         """See whether there is a later version of veusz and inform the
@@ -225,11 +234,20 @@ class ExceptionDialog(VeuszDialog):
         d = ExceptionSendDialog(self.backtrace, self)
         if d.exec_() == qt4.QDialog.Accepted:
             VeuszDialog.accept(self)
-        
+
     def ignoreSessionSlot(self):
         """Ignore exception for session."""
         ExceptionDialog.ignore_exceptions.add(self.fmtexcept)
         self.reject()
+
+    def saveButtonSlot(self):
+        filename = qt4.QFileDialog.getSaveFileName(self, 'Save File')
+        if filename:
+            f = open(filename, 'w')
+            f.write(createReportText(self.backtrace))
+            f.close()
+
+            self.close()
 
     def exec_(self):
         """Exec dialog if exception is not ignored."""
