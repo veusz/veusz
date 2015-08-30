@@ -36,7 +36,11 @@ from .. import utils
 try:
     from ..helpers import threed
 except ImportError:
-    threed = None
+    # compatibility if threed is not compiled
+    class _dummy:
+        def __init__(self):
+            self.AxisTickLabels = object
+    threed = _dummy()
 
 def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""

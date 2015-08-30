@@ -39,12 +39,15 @@ def _(text, disambiguation=None, context='Graph3D'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+# non-reflective back of cube
 class BackSurface(setting.Surface3D):
     def __init__(self, name, **args):
         setting.Surface3D.__init__(self, name, **args)
         self.get('color').newDefault('white')
         self.get('reflectivity').newDefault(0)
+        self.get('hide').newDefault(True)
 
+# define 2nd and 3rd lighting classes
 class Lighting3D_2(setting.Lighting3D):
     def __init__(self, name, **args):
         setting.Lighting3D.__init__(self, name, **args)
@@ -110,7 +113,7 @@ class Graph3D(widget.Widget):
             usertext=_('X rotation') ))
         s.add( setting.FloatSlider(
             'yRotation',
-            0,
+            35.,
             minval=-180, maxval=180, step=15, tick=45,
             descr=_(u'Rotation around y axis (°)'),
             usertext=_('Y rotation') ))
@@ -155,25 +158,25 @@ class Graph3D(widget.Widget):
 
         s.add( setting.Distance(
                 'leftMargin',
-                '0.2cm',
+                '1cm',
                 descr=_('Distance from left of graph to edge'),
                 usertext=_('Left margin'),
                 formatting=True) )
         s.add( setting.Distance(
                 'rightMargin',
-                '0.2cm',
+                '1cm',
                 descr=_('Distance from right of graph to edge'),
                 usertext=_('Right margin'),
                 formatting=True) )
         s.add( setting.Distance(
                 'topMargin',
-                '0.2cm',
+                '1cm',
                 descr=_('Distance from top of graph to edge'),
                 usertext=_('Top margin'),
                 formatting=True) )
         s.add( setting.Distance(
                 'bottomMargin',
-                '0.2cm',
+                '1cm',
                 descr=_('Distance from bottom of graph to edge'),
                 usertext=_('Bottom margin'),
                 formatting=True) )
@@ -298,7 +301,9 @@ class Graph3D(widget.Widget):
         maxbounds = self.computeBounds(
             parentposn, painthelper, withmargin=False)
 
+        # threed is not compiled
         if threed is None:
+            sys.stderr.write('Cannot show 3D graph as support not compiled\n')
             return bounds
 
         s = self.settings
@@ -307,6 +312,7 @@ class Graph3D(widget.Widget):
         if s.hide:
             return bounds
 
+        # do axis min-max computation
         axestodraw = {}
         axesofwidget = painthelper.plotteraxismap
 
@@ -321,7 +327,7 @@ class Graph3D(widget.Widget):
         for axis in cvalues(axestodraw):
             axis.computePlottedRange()
 
-        # scale according to aspect ratio
+        # scale self+children according to aspect ratio
         maxaspect = max(s.xAspect,s.yAspect,s.zAspect)
         scaleM = threed.scaleM4(threed.Vec3(
             s.xAspect/maxaspect, s.yAspect/maxaspect, s.zAspect/maxaspect))
@@ -334,12 +340,15 @@ class Graph3D(widget.Widget):
             scaleM *
             threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
 
+        # build 3d scene from children
         for c in self.children:
            obj = c.drawToObject()
            if obj:
                root.addObject(obj)
 
+        # add graph box
         self.addBorder(root)
+        # add graph behind fill
         self.addBackSurface(root)
 
         camera = threed.Camera()
@@ -358,6 +367,7 @@ class Graph3D(widget.Widget):
         }[s.rendermode]
         scene = threed.Scene(mode)
 
+        # add lighting if enabled
         for light in s.Lighting1, s.Lighting2, s.Lighting3:
             if light.enable:
                 scene.addLight(
@@ -365,6 +375,7 @@ class Graph3D(widget.Widget):
                     light.get('color').color(),
                     light.intensity*0.01)
 
+        # finally render the scene
         painter = painthelper.painter(self, bounds)
         with painter:
             scene.render(
