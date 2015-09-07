@@ -1,6 +1,6 @@
 # plotwindow.py
 # the main window for showing plots
- 
+
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -527,7 +527,7 @@ class PlotWindow( qt4.QGraphicsView ):
             pt1.x(), pt1.y(), widgets.Graph)
         if widget is None:
             return
-        
+
         # convert points on plotter to points on axis for each axis
         # we also add a neighbouring pixel for the rounding calculation
         xpts = N.array( [pt1.x(), pt2.x(), pt1.x()+1, pt2.x()-1] )
@@ -535,7 +535,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # build up operation list to do zoom
         operations = []
-        
+
         axes = {}
         # iterate over children, to look for plotters
         for c in [i for i in widget.children if
@@ -853,7 +853,7 @@ class PlotWindow( qt4.QGraphicsView ):
     def locateClickWidget(self, x, y):
         """Work out which widget was clicked, and if necessary send
         a sigWidgetClicked(widget) signal."""
-        
+
         if self.document.getNumberPages() == 0:
             return
 
@@ -907,7 +907,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
             # print >>sys.stderr, "updating"
             self.pickeritem.hide()
-            
+
             self.pagenumber = min( self.document.getNumberPages() - 1,
                                    self.pagenumber )
             self.oldpagenumber = self.pagenumber
@@ -1077,10 +1077,10 @@ class PlotWindow( qt4.QGraphicsView ):
         if aspectwin > aspectplot:
             # take account of scroll bar
             width -= self.verticalScrollBar().width()
-            
+
         mult = width / r.width()
         self.setZoomFactor(self.zoomfactor * mult)
-        
+
     def slotViewZoomHeight(self):
         """Make the zoom factor so that the plot fills the whole width."""
 
@@ -1094,7 +1094,7 @@ class PlotWindow( qt4.QGraphicsView ):
         if aspectwin < aspectplot:
             # take account of scroll bar
             height -= self.horizontalScrollBar().height()
-            
+
         mult = height / r.height()
         self.setZoomFactor(self.zoomfactor * mult)
 
@@ -1115,7 +1115,7 @@ class PlotWindow( qt4.QGraphicsView ):
     def slotViewPreviousPage(self):
         """View the previous page."""
         self.setPageNumber( self.pagenumber - 1 )
- 
+
     def slotViewNextPage(self):
         """View the next page."""
         self.setPageNumber( self.pagenumber + 1 )
@@ -1135,7 +1135,7 @@ class PlotWindow( qt4.QGraphicsView ):
         modecnvt = { self.vzactions['view.select'] : 'select',
                      self.vzactions['view.pick'] : 'pick',
                      self.vzactions['view.zoomgraph'] : 'graphzoom' }
-        
+
         # close the current picker
         self.pickeritem.hide()
         self.sigPickerEnabled.emit(False)
@@ -1145,14 +1145,12 @@ class PlotWindow( qt4.QGraphicsView ):
 
         if self.clickmode == 'select':
             self.pixmapitem.unsetCursor()
-            #self.label.setCursor(qt4.Qt.ArrowCursor)
         elif self.clickmode == 'graphzoom':
-            self.pixmapitem.unsetCursor()
-            #self.label.setCursor(qt4.Qt.CrossCursor)
+            self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
         elif self.clickmode == 'pick':
             self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
             self.sigPickerEnabled.emit(True)
-        
+
     def getClick(self):
         """Return a click point from the graph."""
 
@@ -1173,7 +1171,7 @@ class PlotWindow( qt4.QGraphicsView ):
             pt.x(), pt.y(), widgets.Graph)
         if widget is None:
             return []
-        
+
         # convert points on plotter to points on axis for each axis
         xpts = N.array( [pt.x()] )
         ypts = N.array( [pt.y()] )
