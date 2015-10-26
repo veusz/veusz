@@ -1,4 +1,6 @@
 # -*- mode: python -*-
+import glob
+
 a = Analysis(['veusz\\veusz_main.py'],
              pathex=['C:\\src\\veusz-msvc\\veusz'],
              hiddenimports=[],
