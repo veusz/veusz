@@ -1,5 +1,6 @@
 Changes in <next release>:
  * Add data clipping dataset plugin
+ * Fix boxplot with manual settings
 
 Changes in 1.23.1:
  * Enable compression in exported files (Benjamin K. Stuhl)

@@ -405,7 +405,7 @@ class BoxPlot(GenericPlotter):
             datasets = [ s.get(x).getData(doc) for x in
                          ('whiskermin', 'whiskermax', 'boxmin',
                           'boxmax', 'mean', 'median') ]
-            if N.any((d is None for d in datasets)):
+            if any((d is None for d in datasets)):
                 return
 
         # get axes widgets
