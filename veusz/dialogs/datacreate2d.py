@@ -19,7 +19,7 @@
 """Dataset creation dialog for 2d data."""
 
 from __future__ import division
-from ..compat import crange, citems
+from ..compat import crange, citems, cstr
 from .. import qtall as qt4
 from .. import utils
 from .. import document
@@ -95,7 +95,7 @@ class DataCreate2DDialog(VeuszDialog):
             if ds.datatype == 'numeric':
                 datasets[ds.dimensions-1].append(name)
         datasets[0].sort()
-        datasets[1].sort()        
+        datasets[1].sort()
 
         # make sure names are escaped if they have funny characters
         self.escapeDatasets(datasets[0])
@@ -163,7 +163,7 @@ class DataCreate2DDialog(VeuszDialog):
         disable = False
         # need name and zexpr
         disable = disable or not text['name'] or not text['zexpr']
-        
+
         if self.mode == 'xyzexpr':
             # need x and yexpr
             disable = disable or not text['xexpr'] or not text['yexpr']
@@ -171,7 +171,7 @@ class DataCreate2DDialog(VeuszDialog):
         elif self.mode == '2dexpr':
             # nothing else
             pass
-                
+
         elif self.mode == 'xyfunc':
             # need x and yexpr in special step format min:max:step
             disable = disable or ( checkGetStep(text['xexpr']) is None or
@@ -179,7 +179,7 @@ class DataCreate2DDialog(VeuszDialog):
 
         # finally check button
         self.createbutton.setDisabled(disable)
-        
+
     def createButtonClickedSlot(self):
         """Create button pressed."""
 
@@ -188,29 +188,30 @@ class DataCreate2DDialog(VeuszDialog):
             text[name] = getattr(self, name+'combo').currentText().strip()
 
         link = self.linkcheckbox.checkState() == qt4.Qt.Checked
-        if self.mode == 'xyzexpr':
-            # build operation
-            op = document.OperationDataset2DCreateExpressionXYZ(
-                text['name'],
-                text['xexpr'], text['yexpr'], text['zexpr'],
-                link)
 
-        elif self.mode == '2dexpr': 
-            op = document.OperationDataset2DCreateExpression(
-                text['name'], text['zexpr'], link)
-
-        elif self.mode == 'xyfunc':
-            xstep = checkGetStep(text['xexpr'])
-            ystep = checkGetStep(text['yexpr'])
-
-            # build operation
-            op = document.OperationDataset2DXYFunc(
-                text['name'],
-                xstep, ystep,
-                text['zexpr'], link)
-
-        # apply operation, catching evaluation errors
+        # create and apply operation, catching evaluation errors
         try:
+            if self.mode == 'xyzexpr':
+                # build operation
+                op = document.OperationDataset2DCreateExpressionXYZ(
+                    text['name'],
+                    text['xexpr'], text['yexpr'], text['zexpr'],
+                    link)
+
+            elif self.mode == '2dexpr':
+                op = document.OperationDataset2DCreateExpression(
+                    text['name'], text['zexpr'], link)
+
+            elif self.mode == 'xyfunc':
+                xstep = checkGetStep(text['xexpr'])
+                ystep = checkGetStep(text['yexpr'])
+
+                # build operation
+                op = document.OperationDataset2DXYFunc(
+                    text['name'],
+                    xstep, ystep,
+                    text['zexpr'], link)
+
             # check expression is okay
             op.validateExpression(self.document)
 
@@ -218,15 +219,20 @@ class DataCreate2DDialog(VeuszDialog):
             self.document.applyOperation(op)
             # forces an evaluation
             self.document.data[text['name']].data
+
         except (document.CreateDatasetException,
-                document.DatasetException):
+                document.DatasetException) as e:
+
             msg = _("Failed to create dataset '%s'") % text['name']
+            s = cstr(e)
+            if s:
+                msg += ' (%s)' % s
         else:
             msg = _("Created dataset '%s'") % text['name']
 
         self.notifylabel.setText(msg)
         qt4.QTimer.singleShot(4000, self.notifylabel.clear)
-        
+
 def recreateDataset(mainwindow, document, dataset, datasetname):
     """Open dialog to recreate a DatasetExpression / DatasetRange."""
     dialog = DataCreate2DDialog(mainwindow, document)

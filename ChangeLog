@@ -2,6 +2,7 @@ Changes in <next release>:
  * Add data clipping dataset plugin
  * Fix boxplot with manual settings
  * Fix plugin normalize and divide by maximum for new numpy versions
+ * Avoid error in 2d data creation
 
 Changes in 1.23.1:
  * Enable compression in exported files (Benjamin K. Stuhl)

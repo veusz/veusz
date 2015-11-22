@@ -1692,14 +1692,19 @@ class Dataset2DXYFunc(Dataset2DBase):
 
         Dataset2DBase.__init__(self)
 
+        if xstep is None or ystep is None:
+            raise DatasetException('Steps are not set')
+
         self.xstep = xstep
         self.ystep = ystep
         self.expr = expr
 
-        self.xrange = (self.xstep[0] - self.xstep[2]*0.5,
-                       self.xstep[1] + self.xstep[2]*0.5)
-        self.yrange = (self.ystep[0] - self.ystep[2]*0.5,
-                       self.ystep[1] + self.ystep[2]*0.5)
+        self.xrange = (
+            self.xstep[0] - self.xstep[2]*0.5,
+            self.xstep[1] + self.xstep[2]*0.5)
+        self.yrange = (
+            self.ystep[0] - self.ystep[2]*0.5,
+            self.ystep[1] + self.ystep[2]*0.5)
         self.xedge = self.yedge = self.xcent = self.ycent = None
 
         self.cacheddata = None
