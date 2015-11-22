@@ -4,6 +4,7 @@ Changes in <next release>:
  * Fix plugin normalize and divide by maximum for new numpy versions
  * Avoid error in 2d data creation
  * Fix problems with unicode characters in plugins in Python 2.x
+ * Clip axis to sensible range -1e100->1e100
 
 Changes in 1.23.1:
  * Enable compression in exported files (Benjamin K. Stuhl)
