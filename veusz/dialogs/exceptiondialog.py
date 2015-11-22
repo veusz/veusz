@@ -29,7 +29,7 @@ import base64
 import numpy
 import sip
 
-from ..compat import citems, curlrequest
+from ..compat import citems, curlrequest, cexceptionuser
 from .. import qtall as qt4
 from .. import utils
 from .veuszdialog import VeuszDialog
@@ -75,7 +75,7 @@ def createReportText(exception):
                 qt4.PYQT_VERSION_STR,
                 sip.SIP_VERSION_STR,
                 time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
-                exception
+                cexceptionuser(exception),
             )
 
 class ExceptionSendDialog(VeuszDialog):
@@ -105,7 +105,6 @@ class ExceptionSendDialog(VeuszDialog):
             # send the message
             curlrequest.urlopen(_emailUrl,
                                 'message=%s' % text)
-
         except:
             # something went wrong...
             qt4.QMessageBox.critical(None, _("Veusz"),
