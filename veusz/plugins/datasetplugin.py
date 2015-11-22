@@ -1162,9 +1162,9 @@ class DivideMaxPlugin(_OneOutputDatasetPlugin):
         data = data / maxval
         # divide error bars
         serr = perr = nerr = None
-        if inds.serr: serr = inds.serr / maxval
-        if inds.perr: perr = inds.perr / maxval
-        if inds.nerr: nerr = inds.nerr / maxval
+        if inds.serr is not None: serr = inds.serr / maxval
+        if inds.perr is not None: perr = inds.perr / maxval
+        if inds.nerr is not None: nerr = inds.nerr / maxval
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
@@ -1198,9 +1198,9 @@ class DivideNormalizePlugin(_OneOutputDatasetPlugin):
         data = data / tot
         # divide error bars
         serr = perr = nerr = None
-        if inds.serr: serr = inds.serr / tot
-        if inds.perr: perr = inds.perr / tot
-        if inds.nerr: nerr = inds.nerr / tot
+        if inds.serr is not None: serr = inds.serr / tot
+        if inds.perr is not None: perr = inds.perr / tot
+        if inds.nerr is not None: nerr = inds.nerr / tot
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
