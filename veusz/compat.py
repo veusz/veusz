@@ -96,6 +96,10 @@ if cpy3:
             return 'u' + repr(v)
         return repr(v)
 
+    # convert exception to a user string
+    def cexceptionuser(ex):
+        return str(ex)
+
 else:
     # py2
 
@@ -165,12 +169,21 @@ else:
     # convert strerror exception to string
     def cstrerror(ex):
         if isinstance(ex.strerror, str):
-            deflocale = locale.getdefaultlocale()[1]
-            if deflocale is None:
-                deflocale = 'ascii'
+            deflocale = locale.getdefaultlocale()[1] or 'ascii'
             return ex.strerror.decode(deflocale)
         else:
             return ex.strerror
+
+    # sometimes exceptions come as unicode, sometimes as strings
+    # encoded in ascii, so we have to decode
+    def cexceptionuser(ex):
+        if hasattr(ex, 'strerror') and isinstance(ex.strerror, str):
+            # comes from operating system as encoded
+            deflocale = locale.getdefaultlocale()[1] or 'ascii'
+            return str(ex).decode(deflocale)
+        else:
+            # let's hope this works
+            return unicode(ex)
 
     # py2/3 repr
     crepr = repr
