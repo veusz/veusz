@@ -80,6 +80,12 @@ if cpy3:
     # exec function
     cexec = getattr(cbuiltins, 'exec')
 
+    # execfile
+    def cexecfile(filename, globaldict):
+        with open(filename) as f:
+            code = compile(f.read(), filename, 'exec')
+        cexec(code, globaldict)
+
     # convert strerror exception to string
     def cstrerror(ex):
         return ex.strerror
@@ -151,6 +157,10 @@ else:
         # this is done like this to avoid a compile-time error in py3
         code = 'exec text in globdict'
         exec(code)
+
+    # execfile
+    def cexecfile(filename, globaldict):
+        execfile(filename, globaldict)
 
     # convert strerror exception to string
     def cstrerror(ex):

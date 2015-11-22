@@ -36,7 +36,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO
+from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO, cexecfile
 from .. import qtall as qt4
 
 from . import widgetfactory
@@ -415,7 +415,7 @@ class Document( qt4.QObject ):
 
         for plugin in pluginlist:
             try:
-                cexec(compile(open(plugin).read(), plugin, 'exec'), dict())
+                cexecfile(plugin, {})
             except Exception:
                 err = _('Error loading plugin %s\n\n%s') % (
                     plugin, traceback.format_exc())
