@@ -1004,7 +1004,7 @@ class PartColor(Part):
     def __init__(self, children):
         try:
             self.colorname = children[0].text
-        except AttributeError:
+        except (AttributeError, IndexError):
             self.colorname = ''
         self.children = children[1:]
 

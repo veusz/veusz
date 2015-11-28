@@ -7,6 +7,7 @@ Changes in <next release>:
  * Clip axis to sensible range -1e100->1e100
  * Handle unicode errors from operating system in Veusz scripts
  * Handle unicode errors in error reports
+ * Fix crash in \color
 
 Changes in 1.23.1:
  * Enable compression in exported files (Benjamin K. Stuhl)
