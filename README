@@ -1,4 +1,4 @@
-Veusz 1.23.1
+Veusz 1.23.2
 ------------
 http://home.gna.org/veusz/
 
@@ -11,6 +11,17 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 1.23.2:
+ * Add data clipping dataset plugin
+ * Fix boxplot with manual settings
+ * Fix plugin normalize and divide by maximum for new numpy versions
+ * Avoid error in 2d data creation
+ * Fix problems with unicode characters in plugins in Python 2.x
+ * Clip axis to sensible range -1e100->1e100
+ * Handle unicode errors from operating system in Veusz scripts
+ * Handle unicode errors in error reports
+ * Fix crash in \color
 
 Changes in 1.23.1:
  * Enable compression in exported files (Benjamin K. Stuhl)

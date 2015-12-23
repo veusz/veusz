@@ -1,4 +1,4 @@
-Changes in <next release>:
+Changes in 1.23.2:
  * Add data clipping dataset plugin
  * Fix boxplot with manual settings
  * Fix plugin normalize and divide by maximum for new numpy versions
