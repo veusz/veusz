@@ -1,5 +1,5 @@
 # -*- mode: python -*-
-
+import glob
 # linux pyinstaller file
 
 a = Analysis(['veusz/veusz_main.py'],

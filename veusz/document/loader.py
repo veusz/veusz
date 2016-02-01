@@ -28,7 +28,7 @@ from .. import qtall as qt4
 from .. import setting
 from .. import utils
 
-from ..compat import cexec, cstr, cstrerror, cbytes
+from ..compat import cexec, cstr, cstrerror, cbytes, cexceptionuser
 from .commandinterface import CommandInterface
 from . import datasets
 
@@ -69,7 +69,7 @@ def executeScript(thedoc, filename, script, callbackunsafe=None):
     def genexception(exc):
         info = sys.exc_info()
         backtrace = ''.join(traceback.format_exception(*info))
-        return LoadError(cstr(exc), backtrace=backtrace)
+        return LoadError(cexceptionuser(exc), backtrace=backtrace)
 
     # compile script and check for security (if reqd)
     unsafe = [setting.transient_settings['unsafe_mode']]
