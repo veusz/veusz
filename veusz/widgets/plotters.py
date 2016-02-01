@@ -170,6 +170,10 @@ class GenericPlotter(widget.Widget):
         painter = painthelper.painter(self, posn, clip=cliprect)
         with painter:
             self.dataDraw(painter, axes, posn, cliprect)
+
+        for c in self.children:
+            c.draw(posn, painthelper, outerbounds)
+
         return posn
 
     def dataDraw(self, painter, axes, posn, cliprect):
@@ -257,7 +261,7 @@ class FreePlotter(widget.Widget):
                 return None, None
             if axes[0] is None or axes[1] is None:
                 return None, None
-            
+
             xpos = axes[0].plotterToDataCoords(posn, xplt)
             ypos = axes[1].plotterToDataCoords(posn, yplt)
         else:
