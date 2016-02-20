@@ -1,5 +1,6 @@
 Changes in <next release>:
  * Fix transparency with bar plot
+ * Add File->Reload menu option to reload from saved document
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin
