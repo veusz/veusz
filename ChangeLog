@@ -1,6 +1,7 @@
 Changes in <next release>:
  * Fix transparency with bar plot
  * Add File->Reload menu option to reload from saved document
+ * Add tooltip to items in FieldWidget showing widget path
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin

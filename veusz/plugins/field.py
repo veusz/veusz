@@ -142,8 +142,13 @@ class _WidgetCombo(qt4.QComboBox):
             except ValueError:
                 pass
 
+        # make combo match list of widgets
         utils.populateCombo(self, comboitems)
-    
+
+        # set tool tip for each entry which is the path
+        for i, path in enumerate(self.paths):
+            self.setItemData(i, path, qt4.Qt.ToolTipRole)
+
     def getWidgetPath(self):
         """Get path of selected widget."""
         return self.paths[self.currentIndex()]
