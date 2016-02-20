@@ -1,3 +1,6 @@
+Changes in <next release>:
+ * Fix transparency with bar plot
+
 Changes in 1.23.2:
  * Add data clipping dataset plugin
  * Fix boxplot with manual settings
