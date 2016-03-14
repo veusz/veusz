@@ -55,28 +55,27 @@ def handleIntSignal(signum, frame):
 
 def makeSplashLogo():
     '''Make a splash screen logo.'''
-    border = 16
     xw, yw = 520, 240
-    pix = qt4.QPixmap(xw, yw)
-    pix.fill()
-    p = qt4.QPainter(pix)
 
+    splash = qt4.QSplashScreen()
+    splash.setStyleSheet("background-color:white;")
+    splash.setFixedSize(xw,yw)
+    
     # draw logo on pixmap
-    logo = utils.getPixmap('logo.png')
-    p.drawPixmap( xw//2 - logo.width()//2, border, logo )
-
+    layout = qt4.QVBoxLayout(splash)
+    pm = utils.getPixmap('logo.png')
+    logo = qt4.QLabel()            
+    logo.setPixmap(pm)
+    logo.setAlignment(qt4.Qt.AlignCenter)
+    layout.addWidget(logo)
+    
     # add copyright text
-    doc = qt4.QTextDocument()
-    doc.setPageSize( qt4.QSizeF(xw, yw - 3*border - logo.height()) )
-    f = qt4.qApp.font()
-    f.setPointSize(14)
-    doc.setDefaultFont(f)
-    doc.setDefaultTextOption( qt4.QTextOption(qt4.Qt.AlignCenter) )
-    doc.setHtml(splashcopyr % utils.version())
-    p.translate(0, 2*border + logo.height())
-    doc.drawContents(p)
-    p.end()
-    return pix
+    message = qt4.QLabel()
+    message.setText(splashcopyr % utils.version())
+    message.setAlignment(qt4.Qt.AlignCenter)
+    layout.addWidget(message)
+    
+    return splash
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
     '''Show exception dialog if an exception occurs.'''
@@ -221,7 +220,7 @@ class VeuszApp(qt4.QApplication):
 
         if not (self.options.listen or self.options.export):
             # show the splash screen on normal start
-            self.splash = qt4.QSplashScreen(makeSplashLogo())
+            self.splash = makeSplashLogo()
             self.splash.show()
 
         # optionally load a translation
