@@ -15,9 +15,12 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
   - conda create -q -n test-environment python=2.7 nose numpy scipy pytables pycrypto pyqt pygments pil
-  - export VEUSZ_RESOURCE_DIR=$(pwd)
+
 script:
   - source activate test-environment
+  - ls -la
+  - export VEUSZ_RESOURCE_DIR=$(pwd)
+  - echo $PYTHONPATH
   - python tests/runselftest.py
 cache:
   - apt
