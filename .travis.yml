@@ -20,13 +20,10 @@ script:
   - source activate test-environment
   - ls -la
   - export VEUSZ_RESOURCE_DIR=$(pwd)
-  - echo $PYTHONPATH
+  - export PYTHONPATH=$(pwd)
+  - echo $PYTHONPATH $VEUSZ_RESOURCE_DIR
   - python tests/runselftest.py
 cache:
   - apt
   - directories:
     - $HOME/.cache/pip
-before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3
