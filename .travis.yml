@@ -15,7 +15,10 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
   - conda create -q -n test-environment python=2.7 nose numpy scipy pytables pycrypto pyqt pygments pil
-
+-before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3
 script:
   - source activate test-environment
   - ls -la
