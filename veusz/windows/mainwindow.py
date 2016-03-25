@@ -31,7 +31,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import cstr, cstrerror
+from ..compat import cstr, cstrerror, cgetcwd
 from .. import qtall as qt4
 
 from .. import document
@@ -189,7 +189,7 @@ class MainWindow(qt4.QMainWindow):
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt4.QDir.homePath())
         if setdb['dirname_usecwd']:
-            self.dirname = os.getcwd()
+            self.dirname = cgetcwd()
 
         # connect plot signals to main window
         self.plot.sigUpdatePage.connect(self.slotUpdatePage)

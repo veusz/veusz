@@ -24,7 +24,7 @@ from .. import qtall as qt4
 from .. import setting
 from .. import utils
 from .. import document
-from ..compat import citems, cstrerror, cstr
+from ..compat import citems, cstrerror, cstr, cgetcwd
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context='ExportDialog'):
@@ -104,7 +104,7 @@ class ExportDialog(VeuszDialog):
         if eloc == 'doc':
             self.dirname = os.path.dirname(os.path.abspath(docfilename))
         elif eloc == 'cwd':
-            self.dirname = os.getcwd()
+            self.dirname = cgetcwd()
         else: # 'prev'
             self.dirname = setdb.get('dirname_export', qt4.QDir.homePath())
 
