@@ -32,4 +32,4 @@ for x in QtHelp.framework QtNetwork.framework QtOpenGL.framework QtSql.framework
     rm -rf ${distdir}/Contents/Frameworks/${x}
 done
 
-rm ${distir}/Contents/Frameworks/libQtCLucene*
+rm ${distdir}/Contents/Frameworks/libQtCLucene*
