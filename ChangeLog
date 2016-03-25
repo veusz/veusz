@@ -4,6 +4,7 @@ Changes in <next release>:
  * Add tooltip to items in FieldWidget showing widget path
  * Use getcwdu() for python2 to avoid bugs combining paths
  * Handle inf/nan when converting to human readable form in plots
+ * Fix CreateHistogram on command line without binparams parameter
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin

@@ -42,7 +42,10 @@ class DatasetHistoGenerator(object):
         self.document = document
         self.inexpr = inexpr
         self.binmanual = binmanual
-        self.binparams = binparams
+        if binparams is None:
+            self.binparams = (10, 'Auto', 'Auto', False)
+        else:
+            self.binparams = binparams
         self.method = method
         self.cumulative = cumulative
         self.errors = errors
