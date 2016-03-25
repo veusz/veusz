@@ -19,6 +19,7 @@
 from __future__ import division
 import re
 import math
+import numpy as N
 
 from . import dates
 
@@ -93,6 +94,10 @@ def formatSciNotation(num, formatargs, locale=None):
 
     locale is a QLocale object
     """
+
+    # handle nan, inf, -inf
+    if not N.isfinite(num):
+        return str(num)
 
     # create an initial formatting string
     if formatargs:
