@@ -1084,18 +1084,21 @@ class PlotWindow( qt4.QGraphicsView ):
     def slotViewZoomHeight(self):
         """Make the zoom factor so that the plot fills the whole width."""
 
-        # need to take account of scroll bars when deciding size
         viewportsize = self.maximumViewportSize()
-        aspectwin = viewportsize.width() / viewportsize.height()
-        r = self.pixmapitem.boundingRect()
-        aspectplot = r.width() / r.height()
+        pixrect = self.pixmapitem.boundingRect()
+
+        try:
+            aspectwin = viewportsize.width() / viewportsize.height()
+            aspectplot = pixrect.width() / pixrect.height()
+        except ZeroDivisionError:
+            return
 
         height = viewportsize.height()
         if aspectwin < aspectplot:
             # take account of scroll bar
             height -= self.horizontalScrollBar().height()
 
-        mult = height / r.height()
+        mult = height / pixrect.height()
         self.setZoomFactor(self.zoomfactor * mult)
 
     def slotViewZoomPage(self):

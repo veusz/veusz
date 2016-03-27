@@ -9,6 +9,7 @@ Changes in <next release>:
  * Do not allow error bars on imported CSV non-numeric data
  * Handle missing argument in \size
  * For data edit dialog, allow 1D dataset to replace 2D dataset
+ * Crash if zoom to be height when height is zero
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin
