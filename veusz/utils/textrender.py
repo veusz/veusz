@@ -905,7 +905,7 @@ class PartSize(Part):
             else:
                 # is an absolute font size
                 self.size = float(size)
-        except (AttributeError, ValueError):
+        except (AttributeError, ValueError, IndexError):
             self.deltasize = 0.
 
         self.children = children[1:]

@@ -7,6 +7,7 @@ Changes in <next release>:
  * Fix CreateHistogram on command line without binparams parameter
  * Handle empty 2D dataset import with grid at edge enabled
  * Do not allow error bars on imported CSV non-numeric data
+ * Handle missing argument in \size
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin
