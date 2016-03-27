@@ -8,6 +8,7 @@ Changes in <next release>:
  * Handle empty 2D dataset import with grid at edge enabled
  * Do not allow error bars on imported CSV non-numeric data
  * Handle missing argument in \size
+ * For data edit dialog, allow 1D dataset to replace 2D dataset
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin
