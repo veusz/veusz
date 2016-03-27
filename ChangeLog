@@ -6,6 +6,7 @@ Changes in <next release>:
  * Handle inf/nan when converting to human readable form in plots
  * Fix CreateHistogram on command line without binparams parameter
  * Handle empty 2D dataset import with grid at edge enabled
+ * Do not allow error bars on imported CSV non-numeric data
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin
