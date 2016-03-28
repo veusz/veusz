@@ -247,7 +247,7 @@ class ReadCSV(object):
 
         # add back on blanks if necessary with correct format
         for i in crange(self.colblanks[colnum]):
-            d = (N.nan, '')[t == 'string']
+            d = (N.nan, '')[dtype == 'string']
             self.data[self.colnames[colnum]].append(d)
         self.colblanks[colnum] = 0
 
