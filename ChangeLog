@@ -11,6 +11,7 @@ Changes in <next release>:
  * For data edit dialog, allow 1D dataset to replace 2D dataset
  * Crash if zoom to be height when height is zero
  * Fix problem with 2D import if error message is in unicode
+ * With axis-function widget catch result if greater than 1 dimension
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin

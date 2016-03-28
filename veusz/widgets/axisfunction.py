@@ -71,7 +71,10 @@ def solveFunction(function, vals, mint=None, maxt=None):
         xvals = N.hstack(( xvals[xvals < maxt], maxt ))
 
     # yvalue in correct shape
-    yvals = function(xvals) + N.zeros(len(xvals))
+    try:
+        yvals = function(xvals) + N.zeros(len(xvals))
+    except Exception as e:
+        raise FunctionError(_('Error evaluating function: %s') % cstr(e))
 
     anynan = N.any( N.isnan(yvals) )
     if anynan:
