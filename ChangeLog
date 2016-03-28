@@ -1,4 +1,7 @@
 Changes in <next release>:
+ * Add fractions and percentages units to polar plot
+ * Allow number of spokes to be varied in polar plot
+
  * Fix transparency with bar plot
  * Add File->Reload menu option to reload from saved document
  * Add tooltip to items in FieldWidget showing widget path
