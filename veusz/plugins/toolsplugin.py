@@ -432,8 +432,13 @@ class WidgetsClone(ToolsPlugin):
             newname = None
             if fields['names']:
                 newname = widget.name
-                if ds1r: newname += ' ' + ds1r
-                if ds2r: newname += ' ' + ds2r
+                if ds1r:
+                    # / cannot be in dataset name
+                    flt1 = ds1r.replace('/', '_')
+                    newname += ' ' + flt1
+                if ds2r:
+                    flt2 = ds2r.replace('/', '_')
+                    newname += ' ' + flt2
 
             # make the new widget (and children)
             newwidget = widget.Clone(widget.parent, newname=newname)
