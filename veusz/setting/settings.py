@@ -37,7 +37,8 @@ class Settings(object):
         usertext: name for user of class
         pixmap: pixmap to show in tab (if appropriate)
         setnsmode: type of Settings class, one of
-              ('formatting', 'groupedsetting', 'widgetsettings', 'stylesheet')
+              ('formatting', 'groupedsetting', 'widgetsettings', 'stylesheet',
+               'hide')
         """
 
         self.__dict__['setdict'] = {}

@@ -66,37 +66,42 @@ def radianToAlign(a):
     else:
         return (-1, -1)
 
-class InternalLine(setting.Line):
+class OldLine(setting.Line):
     '''Polar tick settings.'''
+
+    def __init__(self, name):
+        setting.Line.__init__(self, name, setnsmode='hide')
+
+        self.add( setting.SettingBackwardCompat(
+            'number', '../RadiiLine/number', None))
+        self.add( setting.SettingBackwardCompat(
+            'hidespokes', '../SpokeLine/length', None))
+        self.add( setting.SettingBackwardCompat(
+            'hideannuli', '../SpokeAnnuli/length', None))
+
+class SpokeLine(setting.Line):
+    '''Spokes in polar plot.'''
 
     def __init__(self, name, **args):
         setting.Line.__init__(self, name, **args)
-        self.add( setting.DistancePt(
-            'length', '6pt',
-            descr = _('Length of radial ticks'),
-            usertext=_('Length') ) )
         self.add( setting.Int(
-            'number', 6,
-            descr = _('Number of radial ticks to aim for'),
-            usertext=_('Num. ticks')) )
-        self.add( setting.Int(
-            'numspokes', 12,
+            'number', 12,
+            minval=1,
             descr = _('Number of spokes to use'),
-            usertext=_('Num. spokes')) )
-        self.add( setting.Bool(
-            'hidespokes', False,
-            descr = _('Hide radial spokes'),
-            usertext = _('Hide spokes')) )
-        self.add( setting.Bool(
-            'hideannuli', False,
-            descr = _('Hide annuli'),
-            usertext = _('Hide annuli') ) )
+            usertext=_('Number')) )
         self.get('color').newDefault('grey')
 
-    def getLength(self, painter):
-        '''Return tick length in painter coordinates'''
+class RadiiLine(setting.Line):
+    '''Radii in polar plot.'''
 
-        return self.get('length').convert(painter)
+    def __init__(self, name, **args):
+        setting.Line.__init__(self, name, **args)
+        self.add( setting.Int(
+            'number', 6,
+            minval=1,
+            descr = _('Number of radial ticks to aim for'),
+            usertext=_('Number')) )
+        self.get('color').newDefault('grey')
 
 class TickLabel(axis.TickLabel):
     """For tick label."""
@@ -111,8 +116,8 @@ class TickLabel(axis.TickLabel):
             usertext=_('Hide radial') ) )
         self.add( setting.Bool(
             'hidetangential', False,
-            descr = _('Hide tangential labels'),
-            usertext=_('Hide tangent') ) )
+            descr = _('Hide spoke labels'),
+            usertext=_('Hide spokes') ) )
 
 class Polar(NonOrthGraph):
     '''Polar plotter.'''
@@ -168,11 +173,20 @@ class Polar(NonOrthGraph):
             descr = _('Radial tick labels'),
             usertext=_('Radial tick labels')),
                pixmap='settings_axisticklabels' )
-        s.add( InternalLine(
-            'Tick',
-            descr = _('Internal line'),
-            usertext=_('Internal line')),
+
+        s.add( OldLine('Tick') )
+
+        s.add( SpokeLine(
+            'SpokeLine',
+            descr = _('Spoke line'),
+            usertext=_('Spoke line')),
                pixmap='settings_axismajorticks' )
+
+        s.add( RadiiLine(
+            'RadiiLine',
+            descr = _('Radii line'),
+            usertext=_('Radii line')),
+               pixmap='settings_contourline' )
 
         s.get('leftMargin').newDefault('1cm')
         s.get('rightMargin').newDefault('1cm')
@@ -312,13 +326,15 @@ class Polar(NonOrthGraph):
         '''Plot axes.'''
 
         s = self.settings
-        t = s.Tick
+
+        spokesL = s.SpokeLine
+        radiiL = s.RadiiLine
 
         # handle reversed axes using min and max below
         r = [self._minradius, self._maxradius]
         atick = AxisTicks(
             min(r), max(r),
-            t.number, t.number*4,
+            radiiL.number, radiiL.number*4,
             extendmin=False, extendmax=False,
             logaxis=s.log)
         atick.getTicks()
@@ -328,41 +344,45 @@ class Polar(NonOrthGraph):
         if self._minradius == 0. and not s.log:
             majtick = majtick[1:]
 
-        # draw ticks as circles
-        if not t.hideannuli:
-            painter.setPen( s.Tick.makeQPenWHide(painter) )
-            painter.setBrush( qt4.QBrush() )
+        # pen for radii circles and axis
+        painter.setPen( radiiL.makeQPenWHide(painter) )
+        painter.setBrush( qt4.QBrush() )
 
+        # draw ticks as circles
+        if not radiiL.hide:
             for tick in majtick:
                 radius = self.toPlotRadius(tick)
                 if radius > 0:
                     rect = qt4.QRectF(
-                        qt4.QPointF( self._xc - radius*self._xscale,
-                                     self._yc - radius*self._yscale ),
-                        qt4.QPointF( self._xc + radius*self._xscale,
-                                     self._yc + radius*self._yscale ) )
+                        qt4.QPointF(
+                            self._xc - radius*self._xscale,
+                            self._yc - radius*self._yscale ),
+                        qt4.QPointF(
+                            self._xc + radius*self._xscale,
+                            self._yc + radius*self._yscale ) )
                     painter.drawEllipse(rect)
 
         # setup axes plot
         tl = s.TickLabels
-        scale, format = tl.scale, tl.format
-        if format == 'Auto':
-            format = atick.autoformat
+        scale, fmt = tl.scale, tl.format
+        if fmt == 'Auto':
+            fmt = atick.autoformat
         painter.setPen( tl.makeQPen() )
         font = tl.makeQFont(painter)
 
-        # draw radial axis
+        # draw ticks
         if not s.TickLabels.hideradial:
             for tick in majtick:
-                num = utils.formatNumber(tick*scale, format,
-                                         locale=self.document.locale)
+                num = utils.formatNumber(
+                    tick*scale, fmt,locale=self.document.locale)
                 x = self.toPlotRadius(tick) * self._xscale + self._xc
-                r = utils.Renderer(painter, font, x, self._yc, num,
-                                   alignhorz=-1,
-                                   alignvert=-1, usefullheight=True)
+                r = utils.Renderer(
+                    painter, font, x, self._yc, num,
+                    alignhorz=-1,
+                    alignvert=-1, usefullheight=True)
                 r.render()
 
-        numspokes = s.Tick.numspokes
+        numspokes = spokesL.number
         if s.units == 'degrees':
             vals = N.linspace(0., 360., numspokes+1)[:-1]
             labels = [u'%g°' % x for x in vals]
@@ -383,12 +403,9 @@ class Polar(NonOrthGraph):
         elif s.units == 'fractions':
             labels = []
             for i in crange(numspokes):
-                f = fractions.Fraction(i, numspokes)
-                if i == 0:
-                    txt = '0'
-                else:
-                    txt = '%i/%i' % (f.numerator, f.denominator)
-                labels.append(txt)
+                val = i/numspokes
+                label = ('%.2f' % val).rstrip('0').rstrip('.')
+                labels.append(label)
         elif s.units == 'percentages':
             labels = []
             for i in crange(numspokes):
@@ -427,8 +444,8 @@ class Polar(NonOrthGraph):
                 r.render()
 
         # draw spokes
-        if not t.hidespokes:
-            painter.setPen( s.Tick.makeQPenWHide(painter) )
+        if not spokesL.hide:
+            painter.setPen( spokesL.makeQPenWHide(painter) )
             painter.setBrush( qt4.QBrush() )
             angle = 2 * math.pi / numspokes
             lines = []
