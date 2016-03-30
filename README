@@ -141,3 +141,5 @@ https://gna.org/mail/?group=veusz
 to discuss new features or if you'd like to contribute code. The
 latest code can always be found in the Git repository
 at https://github.com/jeremysanders/veusz.git.
+
+[![Build Status](https://travis-ci.org/tainstr/veusz.svg?branch=master)](https://travis-ci.org/tainstr/veusz)
