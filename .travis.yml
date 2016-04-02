@@ -25,6 +25,7 @@ script:
   - export VEUSZ_RESOURCE_DIR=$(pwd)
   - export PYTHONPATH=$(pwd)
   - echo $PYTHONPATH $VEUSZ_RESOURCE_DIR
+  - python setup.py build_ext --inplace
   - python tests/runselftest.py
 cache:
   - apt
