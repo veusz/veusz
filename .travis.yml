@@ -5,8 +5,9 @@ branches:
     - master
 python:
   - "2.7"
-install:
+before_install:
   - sudo apt-get -y build-dep veusz
+install:
   - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
