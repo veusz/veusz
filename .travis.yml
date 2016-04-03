@@ -5,8 +5,24 @@ branches:
     - master
 python:
   - "2.7"
-before_install:
-  - sudo apt-get -y build-dep veusz
+apt:
+  packages:
+    - debhelper 
+    - docbook-utils 
+    - docbook-xml 
+    - graphicsmagick 
+    - libqt4-dev perl 
+    - python-all-dbg 
+    - python-all-dev 
+    - python-numpy 
+    - python-numpy-dbg 
+    - python-qt4-dbg 
+    - python-qt4-dev 
+    - python-sip-dbg 
+    - python-sip-dev 
+    - xauth 
+    - xfonts-base
+    - xvfb
 install:
   - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
   - bash miniconda.sh -b -p $HOME/miniconda
@@ -23,7 +39,6 @@ before_script:
   - sleep 3
 script:
   - source activate test-environment
-  - ls -la
   - export VEUSZ_RESOURCE_DIR=$(pwd)
   - export PYTHONPATH=$(pwd)
   - echo $PYTHONPATH $VEUSZ_RESOURCE_DIR
