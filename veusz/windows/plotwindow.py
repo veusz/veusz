@@ -425,6 +425,10 @@ class PlotWindow( qt4.QGraphicsView ):
                     a(self, _('Zoom into graph'), _('Zoom graph'),
                       None,
                       icon='veusz-zoom-graph'),
+                'view.zoomgraphreset':
+                    a(self, _('Reset graph axes'), _('Reset axes'),
+                      self.slotResetAxes,
+                      icon='veusz-reset-axes'),
                 'view.fullscreen':
                     a(self, _('View plot full screen'), _('Full screen'),
                       self.slotFullScreen,
@@ -442,7 +446,8 @@ class PlotWindow( qt4.QGraphicsView ):
                         'view.prevpage', 'view.nextpage',
                         'view.fullscreen',
                         '',
-                        'view.select', 'view.pick', 'view.zoomgraph',
+                        'view.select', 'view.pick', 'view.zoomgraph', 
+                        'view.zoomgraphreset',
                         ]),
                 ]
             utils.constructMenus(menu, {'view': menu}, menuitems,
@@ -468,7 +473,7 @@ class PlotWindow( qt4.QGraphicsView ):
                                 ('view.prevpage', 'view.nextpage',
                                  'view.fullscreen',
                                  'view.select', 'view.pick',
-                                 'view.zoomgraph', 'view.zoommenu'))
+                                 'view.zoomgraph', 'view.zoomgraphreset', 'view.zoommenu'))
 
         # define action group for various different selection models
         grp = self.selectactiongrp = qt4.QActionGroup(self)
@@ -1009,6 +1014,23 @@ class PlotWindow( qt4.QGraphicsView ):
         """Force an update for the graph."""
         self.docchangeset = -100
         self.checkPlotUpdate()
+        
+    def slotResetAxes(self):
+        """Reset the axes limits to auto."""
+        # get current graph
+        # reset limits to auto for each axis in graph
+        
+        def checkWidgets(w):
+            if isinstance(w, widgets.axis.Axis):
+                w.settings.min = 'Auto'
+                w.settings.max = 'Auto'
+                self.document.setModified(True)
+            else:
+                for c in w.children:
+                    checkWidgets(c)
+        
+        for w in self.lastwidgetsselected:
+            checkWidgets(w)
 
     def slotFullScreen(self):
         """Show window full screen or not."""
