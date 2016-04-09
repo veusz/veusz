@@ -369,8 +369,10 @@ class Key(widget.Widget):
         if s.title != '':
             titlefont = qt4.QFont(font)
             titlefont.setPointSize(max(font.pointSize() * 1.2, font.pointSize() + 2))
-            titlewidth, titleheight = utils.Renderer(painter, titlefont,
-                                            0, 0, s.title).getDimensions()
+            titlewidth, titleheight = utils.Renderer(
+                painter, titlefont,
+                0, 0, s.title,
+                doc=self.document).getDimensions()
             titleheight += 0.5*margin
 
         # maximum width of text required
@@ -388,8 +390,10 @@ class Key(widget.Widget):
                 for i in crange(num):
                     lines = 1
                     if showtext:
-                        w, h = utils.Renderer(painter, font, 0, 0,
-                                              c.getKeyText(i)).getDimensions()
+                        w, h = utils.Renderer(
+                            painter, font, 0, 0,
+                            c.getKeyText(i),
+                            doc=self.document).getDimensions()
                         maxwidth = max(maxwidth, w)
                         lines = max(1, math.ceil(h/height))
 
@@ -452,7 +456,9 @@ class Key(widget.Widget):
         # center and draw the title
         if s.title:
             xpos = x + (totalwidth-titlewidth)/2
-            utils.Renderer(painter, titlefont, xpos, y, s.title, alignvert=1).render()
+            utils.Renderer(
+                painter, titlefont, xpos, y, s.title,
+                alignvert=1, doc=self.document).render()
             y += titleheight
 
         # centres key below title
@@ -492,10 +498,12 @@ class Key(widget.Widget):
                     lx = xpos + height + symbolwidth
                     alignx = -1
 
-                utils.Renderer(painter, font,
-                               lx, ypos,
-                               plotter.getKeyText(num),
-                               alignx, 1).render()
+                utils.Renderer(
+                    painter, font,
+                    lx, ypos,
+                    plotter.getKeyText(num),
+                    alignx, 1,
+                    doc=self.document).render()
 
         phelper.setControlGraph(
             self, [ControlKey(self, parentposn, boxposn, boxdims, height)] )

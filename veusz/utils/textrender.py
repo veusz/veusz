@@ -1160,9 +1160,11 @@ def makePartTree(partlist):
 class _Renderer:
     """Different renderer types based on this."""
 
-    def __init__(self, painter, font, x, y, text,
-                 alignhorz = -1, alignvert = -1, angle = 0,
-                 usefullheight = False):
+    def __init__(
+            self, painter, font, x, y, text,
+            alignhorz = -1, alignvert = -1, angle = 0,
+            usefullheight = False,
+            doc = None):
 
         self.painter = painter
         self.font = font
@@ -1170,6 +1172,7 @@ class _Renderer:
         self.alignvert = alignvert
         self.angle = angle
         self.usefullheight = usefullheight
+        self.doc = doc
 
         # x and y are the original coordinates
         # xi and yi are adjusted for alignment
@@ -1307,10 +1310,34 @@ class _Renderer:
 class _StdRenderer(_Renderer):
     """Standard rendering class."""
 
+    # expresions in triple brackets {{{ }}} are evaluated
+    exprexpansion = re.compile(r'\{\{\{(.+?)\}\}\}')
+
     def _initText(self, text):
+
+        # expand any expressions in the text
+        delta = 0
+        for m in self.exprexpansion.finditer(text):
+            expanded = self._expandExpr(m.group(1))
+            text = text[:delta+m.start()] + expanded + text[delta+m.end():]
+            delta += len(expanded) - (m.end()-m.start())
+
         # make internal tree
         partlist = makePartList(text)
         self.parttree = makePartTree(partlist)
+
+    def _expandExpr(self, expr):
+        """Expand expression."""
+        if self.doc is None:
+            try:
+                return cstr(eval(expr))
+            except Exception as e:
+                return cstr(e)
+        else:
+            try:
+                return cstr(eval(expr, self.doc.eval_context))
+            except Exception as e:
+                return cstr(e)
 
     def _getWidthHeight(self):
         """Get size of box around text."""
@@ -1321,9 +1348,11 @@ class _StdRenderer(_Renderer):
         # work out height of box, and
         # make the bounding box a bit bigger if we want to include descents
 
-        state = RenderState(self.font, self.painter, 0, 0,
-                            self.alignhorz,
-                            actually_render = False)
+        state = RenderState(
+            self.font, self.painter, 0, 0,
+            self.alignhorz,
+            actually_render = False)
+
         fm = state.fontMetrics()
 
         if self.usefullheight:
@@ -1354,9 +1383,10 @@ class _StdRenderer(_Renderer):
         if self.calcbounds is None:
             self.getBounds()
 
-        state = RenderState(self.font, self.painter,
-                            self.xi, self.yi,
-                            self.alignhorz)
+        state = RenderState(
+            self.font, self.painter,
+            self.xi, self.yi,
+            self.alignhorz)
 
         # if the text is rotated, change the coordinate frame
         if self.angle != 0:
@@ -1472,8 +1502,10 @@ class _MmlRenderer(_Renderer):
 mml_re = re.compile(r'^\s*<math.*</math\s*>\s*$', re.DOTALL)
 
 def Renderer(painter, font, x, y, text,
-                alignhorz = -1, alignvert = -1, angle = 0,
-                usefullheight = False):
+             alignhorz = -1, alignvert = -1, angle = 0,
+             usefullheight = False,
+             doc = None):
+
     """Return an appropriate Renderer object depending on the text.
     This looks like a class name, because it was a class originally.
 
@@ -1485,6 +1517,7 @@ def Renderer(painter, font, x, y, text,
     angle is the angle to draw the text at
     usefullheight means include descenders in calculation of height
     of text
+    doc is a Document for evaluating any expressions
 
     alignment is in the painter frame, not the text frame
     """
@@ -1497,5 +1530,6 @@ def Renderer(painter, font, x, y, text,
     return r(
         painter, font, x, y, text,
         alignhorz=alignhorz, alignvert=alignvert,
-        angle=angle, usefullheight=usefullheight
+        angle=angle, usefullheight=usefullheight,
+        doc=doc
         )

@@ -835,8 +835,11 @@ class Axis(widget.Widget):
             else:
                 x, y = parlposn, perpposn
 
-            r = utils.Renderer(painter, font, x, y, text, alignhorz=ax,
-                               alignvert=ay, angle=angle)
+            r = utils.Renderer(
+                painter, font, x, y, text, alignhorz=ax,
+                alignvert=ay, angle=angle,
+                doc=self.document)
+
             if outerbounds is not None:
                 # make sure ticks are within plot
                 if vertical:
@@ -940,9 +943,11 @@ class Axis(widget.Widget):
                     x = outerbounds[2]
                     ax = -ax
 
-        r = utils.Renderer(painter, font, x, y, text,
-                           ax, ay, angle,
-                           usefullheight = True)
+        r = utils.Renderer(
+            painter, font, x, y, text,
+            ax, ay, angle,
+            usefullheight=True,
+            doc=self.document)
 
         # make sure text is in plot rectangle
         if outerbounds is not None:

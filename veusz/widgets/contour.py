@@ -57,13 +57,14 @@ def finitePoly(poly):
     return out
 
 class ContourLineLabeller(LineLabeller):
-    def __init__(self, clip, rot, painter, font):
+    def __init__(self, clip, rot, painter, font, doc):
         LineLabeller.__init__(self, clip, rot)
         self.clippath = qt4.QPainterPath()
         self.clippath.addRect(clip)
         self.labels = []
         self.painter = painter
         self.font = font
+        self.document = doc
 
     def drawAt(self, idx, rect):
         """Called to draw the label with the index given."""
@@ -79,7 +80,9 @@ class ContourLineLabeller(LineLabeller):
             self.painter, self.font,
             rect.cx, rect.cy, text,
             alignhorz=0, alignvert=0,
-            angle=angle)
+            angle=angle,
+            doc=self.document)
+
         rend.render()
         if rect.xw > 0:
             p = qt4.QPainterPath()
@@ -526,7 +529,8 @@ class Contour(plotters.GenericPlotter):
         descent = qt4.QFontMetricsF(font).descent()
 
         # linelabeller does clipping and labelling of contours
-        linelabeller = ContourLineLabeller(clip, cl.rotate, painter, font)
+        linelabeller = ContourLineLabeller(
+            clip, cl.rotate, painter, font, self.document)
         levels = []
 
         # iterate over each level, and list of lines
@@ -534,10 +538,12 @@ class Contour(plotters.GenericPlotter):
 
             if showlabels:
                 number = s.levelsOut[num]
-                text = utils.formatNumber(number * cl.scale, cl.format,
-                                          locale=self.document.locale)
-                rend = utils.Renderer(painter, font, 0, 0, text, alignhorz=0,
-                                      alignvert=0, angle=0)
+                text = utils.formatNumber(
+                    number * cl.scale, cl.format,
+                    locale=self.document.locale)
+                rend = utils.Renderer(
+                    painter, font, 0, 0, text, alignhorz=0,
+                    alignvert=0, angle=0, doc=self.document)
                 textdims = qt4.QSizeF(*rend.getDimensions())
                 textdims += qt4.QSizeF(descent*2, descent*2)
             else:

@@ -956,6 +956,7 @@ class Document( qt4.QObject ):
         c['os_path_join'] = os.path.join
         c['os_path_dirname'] = os.path.dirname
         c['veusz_markercodes'] = tuple(utils.MarkerCodes)
+        c['environ'] = os.environ
 
         # custom definitions
         for ctype, name, val in self.customs:

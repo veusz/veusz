@@ -449,15 +449,15 @@ class Ternary(NonOrthGraph):
             # draw tick labels in each direction
             hlabbot = wlableft = wlabright = 0
             for l, x, y in czip(tbotlabels, tickbotline[2], tickbotline[3]+off):
-                r = utils.Renderer(painter, font, x, y, l, 0, 1, 0)
+                r = utils.Renderer(painter, font, x, y, l, 0, 1, 0, doc=self.document)
                 bounds = r.render()
                 hlabbot = max(hlabbot, bounds[3]-bounds[1])
             for l, x, y in czip(tleftlabels, tickleftline[2]-off-sp, tickleftline[3]):
-                r = utils.Renderer(painter, font, x, y, l, 1, 0, 0)
+                r = utils.Renderer(painter, font, x, y, l, 1, 0, 0, doc=self.document)
                 bounds = r.render()
                 wlableft = max(wlableft, bounds[2]-bounds[0])
             for l, x, y in czip(trightlabels,tickrightline[2]+off+sp, tickrightline[3]):
-                r = utils.Renderer(painter, font, x, y, l, -1, 0, 0)
+                r = utils.Renderer(painter, font, x, y, l, -1, 0, 0, doc=self.document)
                 bounds = r.render()
                 wlabright = max(wlabright, bounds[2]-bounds[0])
 
@@ -483,9 +483,11 @@ class Ternary(NonOrthGraph):
                        'at-maximum': self._width/2}[labelSetn.position]
 
             # bottom label
-            r = utils.Renderer(painter, font, 0, 0,
-                               self.settings.labelbottom,
-                               align, 1)
+            r = utils.Renderer(
+                painter, font, 0, 0,
+                self.settings.labelbottom,
+                align, 1,
+                doc=self.document)
             painter.save()
             painter.translate(self._box[0]+self._width/2,
                               self._box[3] + bdelta + off)
@@ -495,9 +497,12 @@ class Ternary(NonOrthGraph):
 
             # left label - rotate frame before drawing so we can get
             # the bounds correct
-            r = utils.Renderer(painter, font, 0, -sp,
-                               self.settings.labelleft,
-                               -align, -1)
+            r = utils.Renderer(
+                painter, font, 0, -sp,
+                self.settings.labelleft,
+                -align, -1,
+                doc=self.document)
+
             painter.save()
             painter.translate(self._box[0]+self._width*0.25,
                               0.5*(self._box[1]+self._box[3]))
@@ -507,9 +512,12 @@ class Ternary(NonOrthGraph):
             painter.restore()
 
             # right label
-            r = utils.Renderer(painter, font, 0, -sp,
-                               self.settings.labelright,
-                               -align, -1)
+            r = utils.Renderer(
+                painter, font, 0, -sp,
+                self.settings.labelright,
+                -align, -1,
+                doc=self.document)
+
             painter.save()
             painter.translate(self._box[0]+self._width*0.75 ,
                               0.5*(self._box[1]+self._box[3]) )

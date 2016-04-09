@@ -379,7 +379,8 @@ class Polar(NonOrthGraph):
                 r = utils.Renderer(
                     painter, font, x, self._yc, num,
                     alignhorz=-1,
-                    alignvert=-1, usefullheight=True)
+                    alignvert=-1, usefullheight=True,
+                    doc=self.document)
                 r.render()
 
         numspokes = spokesL.number
