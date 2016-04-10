@@ -1415,6 +1415,17 @@ SetData('y', y)
       symmetric errors bars of 0.1. Asymmetric bars are given as
       <command>(a,a*0.1,-a*0.1)</command>.</para>
 
+      <para>Other useful functions in evaluation include those already
+      mentioned in the LaTeX expansion
+      description. <command>DATA(name, [part])</command> returns the
+      dataset with name given. The optional part, which can be 'data',
+      'serr', 'perr' or 'nerr', allows error bars to be returned for
+      numerical data. <command>SETTING(path)</command> returns the
+      value of the Veusz setting, which can include, for example, the
+      best fitting parameters of a fit. <command>ENVIRON</command> is
+      the Python environment variable dictionary, allowing values to
+      be passed from the environment,
+      e.g. <command>float(ENVIRON['myvar'])</command>.</para>
       </section>
 
       <section>
