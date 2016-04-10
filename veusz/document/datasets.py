@@ -76,10 +76,13 @@ def _copyOrNone(a):
     elif isinstance(a, list):
         return list(a)
 
-def generateValidDatasetParts(*datasets):
+def generateValidDatasetParts(datasets, breakds=True):
     """Generator to return array of valid parts of datasets.
 
-    Yields new datasets between rows which are invalid
+    if breakds is True:
+      Yields new datasets between rows which are invalid
+    else:
+      Yields single, filtered dataset
     """
 
     # find NaNs and INFs in input dataset
@@ -91,29 +94,50 @@ def generateValidDatasetParts(*datasets):
             minlen = min(nextinvalid.shape[0], minlen)
             invalid = N.logical_or(invalid[:minlen], nextinvalid[:minlen])
 
-    # get indexes of invalid points
-    indexes = invalid.nonzero()[0].tolist()
+    if breakds:
+        # return multiple datasets, breaking at invalid values
 
-    # no bad points: optimisation
-    if not indexes:
-        yield datasets
-        return
+        # get indexes of invalid points
+        indexes = invalid.nonzero()[0].tolist()
 
-    # add on shortest length of datasets
-    indexes.append( minlen )
+        # no bad points: optimisation
+        if not indexes:
+            yield datasets
+            return
 
-    lastindex = 0
-    for index in indexes:
-        if index != lastindex:
-            retn = []
-            for ds in datasets:
-                if ds is not None and (not isinstance(ds, DatasetBase) or
-                                       not ds.empty()):
-                    retn.append( ds[lastindex:index] )
-                else:
-                    retn.append( None )
-            yield retn
-        lastindex = index+1
+        # add on shortest length of datasets
+        indexes.append(minlen)
+
+        lastindex = 0
+        for index in indexes:
+            if index != lastindex:
+                retn = []
+                for ds in datasets:
+                    if ds is not None and (
+                            not isinstance(ds, DatasetBase) or
+                            not ds.empty()):
+                        retn.append(ds[lastindex:index])
+                    else:
+                        retn.append(None)
+                yield retn
+            lastindex = index+1
+
+    else:
+        # in this mode we return single datasets where the invalid
+        # values are masked out
+
+        if not N.any(invalid):
+            yield datasets
+            return
+
+        valid = N.logical_not(invalid)
+        retn = []
+        for ds in datasets:
+            if ds is None:
+                retn.append(None)
+            else:
+                retn.append(ds[valid])
+        yield retn
 
 def datasetNameToDescriptorName(name):
     """Return descriptor name for dataset."""

@@ -819,7 +819,7 @@ class PointPlotter(GenericPlotter):
         # loop over chopped up values
         for xvals, yvals, tvals, ptvals, cvals in (
             document.generateValidDatasetParts(
-                xv, yv, text, scalepoints, colorpoints)):
+                [xv, yv, text, scalepoints, colorpoints])):
 
             #print "Calculating coordinates"
             # calc plotter coords of x and y points
