@@ -969,16 +969,15 @@ class Document( qt4.QObject ):
 
     def _evalfilename(self):
         """FILENAME() eval: returns filename."""
-        return self._evalescape(self.filename)
+        return utils.latexEscape(self.filename)
 
     def _evalbasename(self):
         """BASENAME() eval: returns base filename."""
-        return self._evalescape(os.path.basename(self.filename))
+        return utils.latexEscape(os.path.basename(self.filename))
 
-    @staticmethod
-    def _evalescape(text):
-        """ESCAPE() eval: escape special latex characters."""
-        return re.sub(r'([_\^\[\]\{\}\\])', r'\\\1', text)
+    def _evalsetting(self, path):
+        """SETTING() eval: return setting given full path."""
+        return self.resolveFullSettingPath(path).get()
 
     def updateEvalContext(self):
         """To be called after custom constants or functions are changed.
@@ -1007,7 +1006,8 @@ class Document( qt4.QObject ):
         c['DATA'] = self._evaldata
         c['FILENAME'] = self._evalfilename
         c['BASENAME'] = self._evalbasename
-        c['ESCAPE'] = self._evalescape
+        c['ESCAPE'] = utils.latexEscape
+        c['SETTING'] = self._evalsetting
 
         # custom definitions
         for ctype, name, val in self.customs:

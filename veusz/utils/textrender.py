@@ -1055,6 +1055,10 @@ _                   # subscript
 )
 ''', re.VERBOSE)
 
+def latexEscape(text):
+    """Escape any special characters in LaTex-like code."""
+    return re.sub(r'([_\^\[\]\{\}\\])', r'\\\1', text)
+
 def makePartList(text):
     """Make list of parts from text"""
     parts = []
@@ -1336,7 +1340,7 @@ class _StdRenderer(_Renderer):
                 comp = self.doc.compileCheckedExpression(expr)
                 return cstr(eval(comp, self.doc.eval_context))
             except Exception as e:
-                return cstr(e)
+                return latexEscape(cstr(e))
 
     def _getWidthHeight(self):
         """Get size of box around text."""

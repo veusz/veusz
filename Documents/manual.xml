@@ -529,6 +529,14 @@
              </para>
            </listitem>
 
+           <listitem>
+             <para>
+               <command>SETTING(path)</command> - return the value of
+               the Veusz setting given by the full path,
+               e.g. <command>%{{SETTING('/page1/width')}}%</command>.
+             </para>
+           </listitem>
+
          </orderedlist>
 
       </section>
