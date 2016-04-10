@@ -155,6 +155,7 @@ class Document( qt4.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
+        self.filename = ""
         self.sigWiped.emit()
 
     def clearHistory(self):
@@ -619,6 +620,8 @@ class Document( qt4.QObject ):
         else:
             raise RuntimeError('Invalid save mode')
 
+        self.filename = filename
+
     def load(self, filename, mode='vsz', callbackunsafe=None):
         """Load document from file.
 
@@ -627,6 +630,8 @@ class Document( qt4.QObject ):
         from . import loader
         loader.loadDocument(self, filename, mode=mode,
                             callbackunsafe=callbackunsafe)
+
+        self.filename = filename
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""
@@ -937,11 +942,49 @@ class Document( qt4.QObject ):
             self.exprcompiled[expr] = checked
             return checked
 
+    @staticmethod
+    def _evalformatdate(fmt=None):
+        """DATE() eval: return date with optional format."""
+        d = datetime.date.today()
+        return d.isoformat() if fmt is None else d.strftime(fmt)
+
+    @staticmethod
+    def _evalformattime(fmt=None):
+        """TIME() eval: return time with optional format."""
+        t = datetime.datetime.now()
+        return t.isoformat() if fmt is None else t.strftime(fmt)
+
+    def _evaldata(self, name, part='data'):
+        """DATA(name, [part]) eval: return dataset as array."""
+        if part not in ('data', 'perr', 'serr', 'nerr'):
+            raise RuntimeError("Invalid dataset part '%s'" % part)
+        if name not in self.data:
+            raise RuntimeError("Dataset '%s' does not exist" % name)
+        data = getattr(self.data[name], part)
+        if isinstance(data, N.ndarray):
+            return N.array(data)
+        elif isinstance(data, list):
+            return list(data)
+        return data
+
+    def _evalfilename(self):
+        """FILENAME() eval: returns filename."""
+        return self._evalescape(self.filename)
+
+    def _evalbasename(self):
+        """BASENAME() eval: returns base filename."""
+        return self._evalescape(os.path.basename(self.filename))
+
+    @staticmethod
+    def _evalescape(text):
+        """ESCAPE() eval: escape special latex characters."""
+        return re.sub(r'([_\^\[\]\{\}\\])', r'\\\1', text)
+
     def updateEvalContext(self):
         """To be called after custom constants or functions are changed.
         This sets up a safe environment where things can be evaluated
         """
-        
+
         self.eval_context = c = {}
 
         # add numpy things
@@ -951,12 +994,20 @@ class Document( qt4.QObject ):
                  name not in __builtins__ and
                  name[:1] != '_' and name[-1:] != '_' ):
                 c[name] = val
-        
+
         # safe functions
         c['os_path_join'] = os.path.join
         c['os_path_dirname'] = os.path.dirname
         c['veusz_markercodes'] = tuple(utils.MarkerCodes)
-        c['environ'] = os.environ
+
+        # helpful functions for expansion
+        c['ENVIRON'] = os.environ
+        c['DATE'] = self._evalformatdate
+        c['TIME'] = self._evalformattime
+        c['DATA'] = self._evaldata
+        c['FILENAME'] = self._evalfilename
+        c['BASENAME'] = self._evalbasename
+        c['ESCAPE'] = self._evalescape
 
         # custom definitions
         for ctype, name, val in self.customs:

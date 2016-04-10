@@ -447,6 +447,90 @@
 	pasting from a character map application. If your current font
 	does not contain these symbols then you may get a box
 	character.</para>
+
+        <para>Veusz also supports the evaluation of a Python
+        expression when text is written to the page. Python code is
+        written inside the brackets <command>%{{ }}%</command>. Note
+        that the Python evaluation happens before the LaTeX expansion
+        is done. The return value of the expression is converted to
+        text using the Python <command>str()</command> function. For
+        example, the expression <command>%{{2+2}}%</command> would
+        write <command>4</command>. Custom functions and constants are
+        supported when evaluation, in addition to the usual numpy
+        functions. In addition, Veusz defines the following useful
+        functions and values.</para>
+
+	 <orderedlist>
+	   <listitem>
+	     <para>
+	       <command>ENVIRON</command> is the
+	       <command>os.environ</command> dict of environment
+	       variables. <command>%{{ENVIRON['USER']}}%</command>
+	       would show the current user in unix.
+	     </para>
+	   </listitem>
+
+	   <listitem>
+	     <para>
+	       <command>DATE([fmt])</command> returns the current
+	       date, by default in ISO format. fmt is an optional
+	       format specifier using
+	       <command>datetime.date.strftime</command> format
+	       specifiers.
+	     </para>
+	   </listitem>
+
+	   <listitem>
+	     <para>
+	       <command>TIME([fmt])</command> returns the current
+	       date/time, by default in ISO format. fmt is an optional
+	       format specifier using
+	       <command>datetime.datetime.strftime</command> format
+	       specifiers.
+	     </para>
+	   </listitem>
+
+	   <listitem>
+	     <para>
+	       <command>DATA(name[, part])</command> returns the Veusz
+	       dataset with given name. For numeric datasets this is a
+	       numpy array. For numeric datasets with errors, part
+	       specifies the dataset part to return, i.e. 'data',
+	       'serr', 'perr', 'nerr'. For example, the mean value of
+	       a dataset could be shown using
+	       <command>%{{mean(DATA('x'))}}%</command>.
+	     </para>
+	   </listitem>
+
+           <listitem>
+             <para>
+               <command>FILENAME()</command> - returns the current
+               document filename. This can include the
+               directory/folder of the file. Note that the filename is
+               escaped with ESCAPE() so that LaTeX symbols are not
+               expanded when shown.
+             </para>
+           </listitem>
+
+           <listitem>
+             <para>
+               <command>BASENAME()</command> - returns the current
+               document filename, removing the directory or folder
+               name Note that the filename is escaped with ESCAPE() so
+               that LaTeX symbols are not expanded when shown.
+             </para>
+           </listitem>
+
+           <listitem>
+             <para>
+               <command>ESCAPE(x)</command> - escapes any LaTeX
+               symbols in x so that they are not interpreted as
+               LaTeX.
+             </para>
+           </listitem>
+
+         </orderedlist>
+
       </section>
 
       <section>

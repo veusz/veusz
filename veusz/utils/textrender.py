@@ -1310,8 +1310,8 @@ class _Renderer:
 class _StdRenderer(_Renderer):
     """Standard rendering class."""
 
-    # expresions in triple brackets {{{ }}} are evaluated
-    exprexpansion = re.compile(r'\{\{\{(.+?)\}\}\}')
+    # expresions in brackets %{{ }}% are evaluated
+    exprexpansion = re.compile(r'%\{\{(.+?)\}\}%')
 
     def _initText(self, text):
 
@@ -1329,13 +1329,12 @@ class _StdRenderer(_Renderer):
     def _expandExpr(self, expr):
         """Expand expression."""
         if self.doc is None:
-            try:
-                return cstr(eval(expr))
-            except Exception as e:
-                return cstr(e)
+            return "*not supported here*"
         else:
+            expr = expr.strip()
             try:
-                return cstr(eval(expr, self.doc.eval_context))
+                comp = self.doc.compileCheckedExpression(expr)
+                return cstr(eval(comp, self.doc.eval_context))
             except Exception as e:
                 return cstr(e)
 

@@ -1,4 +1,5 @@
 Changes in <next release>:
+ * Text labels can now include Python expressions
  * Add fractions and percentages units to polar plot
  * Allow number of spokes to be varied in polar plot
 
