@@ -218,7 +218,7 @@ class PlotWindow( qt4.QGraphicsView ):
     # axis values update from moving mouse
     sigAxisValuesFromMouse = qt4.pyqtSignal(dict)
     # gives widget clicked
-    sigWidgetClicked = qt4.pyqtSignal(object)
+    sigWidgetClicked = qt4.pyqtSignal(object, str)
 
     # how often the document can update
     updateintervals = (
@@ -738,7 +738,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
     def mouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
-        clicked on a widget, and emit a sigWidgetClicked(widget)."""
+        clicked on a widget, and emit a sigWidgetClicked(widget,mode)."""
 
         qt4.QGraphicsView.mouseReleaseEvent(self, event)
 
@@ -748,7 +748,7 @@ class PlotWindow( qt4.QGraphicsView ):
             if self.currentclickmode == 'select':
                 # work out where the mouse clicked and choose widget
                 pos = self.mapToScene(event.pos())
-                self.locateClickWidget(pos.x(), pos.y())
+                self.identifyAndClickWidget(pos.x(), pos.y(), event.modifiers())
             elif self.currentclickmode == 'scroll':
                 # return the cursor to normal after scrolling
                 self.clickmode = 'select'
@@ -850,7 +850,7 @@ class PlotWindow( qt4.QGraphicsView ):
         else:
             qt4.QGraphicsView.wheelEvent(self, event)
 
-    def locateClickWidget(self, x, y):
+    def identifyAndClickWidget(self, x, y, modifier):
         """Work out which widget was clicked, and if necessary send
         a sigWidgetClicked(widget) signal."""
 
@@ -865,7 +865,14 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # tell connected objects that widget was clicked
         if widget is not None:
-            self.sigWidgetClicked.emit(widget)
+            if modifier & qt4.Qt.ControlModifier:
+                mode = 'toggle'
+            elif modifier & qt4.Qt.ShiftModifier:
+                mode = 'add'
+            else:
+                mode = 'new'
+
+            self.sigWidgetClicked.emit(widget, mode)
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""

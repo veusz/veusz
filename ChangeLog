@@ -1,7 +1,19 @@
 Changes in <next release>:
- * Text labels can now include Python expressions
+ * Text labels can now include Python expressions inside %{{ }}%
+ * Added built-in functions DATE([fmt]), TIME([fmt]), FILENAME() and BASENAME()
+   when evaluating expressions, which are useful when used in labels
+ * Added Python dictionary ENVIRON when evaluating expressions, to obtain
+   values from environment variables
+ * Added DATA(name, [part]) function to expression environment for accessing
+   values from datasets, useful for function evaluation or labels
+ * Added SETTING(path) function for expression evaluation to obtain values
+   of settings
+ * Added ESCAPE(text) function to environment, which allows LaTeX special
+   characters to be displayed in labels
  * Add fractions and percentages units to polar plot
  * Allow number of spokes to be varied in polar plot
+ * Widgets can be clicked holding down shift or ctrl, to add or toggle their
+   selection
 
  * Fix transparency with bar plot
  * Add File->Reload menu option to reload from saved document
