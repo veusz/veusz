@@ -119,6 +119,8 @@ _defaultmaps = {
         (0,   255, 255, 255),
         (255, 255, 255, 255),
         ),
+
+    # from http://www.kennethmoreland.com/color-maps/
     'cool-warm': (
         (59, 76, 192, 255), 
         (68, 90, 204, 255), 
