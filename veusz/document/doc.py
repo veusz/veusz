@@ -1000,7 +1000,7 @@ class Document( qt4.QObject ):
         c['veusz_markercodes'] = tuple(utils.MarkerCodes)
 
         # helpful functions for expansion
-        c['ENVIRON'] = os.environ
+        c['ENVIRON'] = dict(os.environ)
         c['DATE'] = self._evalformatdate
         c['TIME'] = self._evalformattime
         c['DATA'] = self._evaldata
