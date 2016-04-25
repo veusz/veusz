@@ -15,6 +15,8 @@ Changes in <next release>:
  * Widgets can be clicked holding down shift or ctrl, to add or toggle their
    selection
  * Add K. Moreland's cool-warm colormap (thanks to S. Richardson)
+ * Added further green-map, blue-darkred, blue-darkorange, brown-blue and
+   blue-orange colormaps from Oregon geography dept.
 
  * Fix transparency with bar plot
  * Add File->Reload menu option to reload from saved document
