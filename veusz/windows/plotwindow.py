@@ -68,6 +68,10 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
 class RenderControl(qt4.QObject):
     """Object for rendering plots in a separate thread."""
 
+    # emitted when new item on plot queue
+    sigQueueChange = qt4.pyqtSignal(int)
+
+    # when a rendering job is finished
     signalRenderFinished = qt4.pyqtSignal(
         int, qt4.QImage, document.PaintHelper)
 
@@ -148,13 +152,13 @@ class RenderControl(qt4.QObject):
             self.mutex.unlock()
 
         # tell any listeners that a job has been processed
-        self.plotwindow.sigQueueChange.emit(-1)
+        self.sigQueueChange.emit(-1)
 
     def addJob(self, helper):
         """Process drawing job in PaintHelper given."""
 
         # indicate that there is a new item to be processed to listeners
-        self.plotwindow.sigQueueChange.emit(1)
+        self.sigQueueChange.emit(1)
 
         # add the job to the queue
         self.mutex.lock()
@@ -296,6 +300,8 @@ class PlotWindow( qt4.QGraphicsView ):
         self.rendercontrol = RenderControl(self)
         self.rendercontrol.signalRenderFinished.connect(
             self.slotRenderFinished)
+        self.rendercontrol.sigQueueChange.connect(
+            self.sigQueueChange)
 
         # mode for clicking
         self.clickmode = 'select'

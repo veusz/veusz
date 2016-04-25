@@ -30,6 +30,7 @@ Changes in <next release>:
  * Fix problem with 2D import if error message is in unicode
  * With axis-function widget catch result if greater than 1 dimension
  * Fix cloning for datasets with / in name
+ * Fix crash in embedding if plot window closed while rendering in progress
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin
