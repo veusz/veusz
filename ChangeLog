@@ -18,6 +18,7 @@ Changes in <next release>:
  * Added further green-map, blue-darkred, blue-darkorange, brown-blue and
    blue-orange colormaps from Oregon geography dept.
  * Add logarithm and exponential dataset plugins
+ * Add Wipe() command to embedding interface to clear document
 
  * Fix transparency with bar plot
  * Add File->Reload menu option to reload from saved document
