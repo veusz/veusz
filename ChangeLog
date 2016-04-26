@@ -17,6 +17,7 @@ Changes in <next release>:
  * Add K. Moreland's cool-warm colormap (thanks to S. Richardson)
  * Added further green-map, blue-darkred, blue-darkorange, brown-blue and
    blue-orange colormaps from Oregon geography dept.
+ * Add logarithm and exponential dataset plugins
 
  * Fix transparency with bar plot
  * Add File->Reload menu option to reload from saved document

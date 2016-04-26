@@ -1935,6 +1935,90 @@ class ClipPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
+class LogPlugin(_OneOutputDatasetPlugin):
+    """Compute logarithm of data."""
+
+    menu = (_('Compute'), _('Log'),)
+    name = 'Logarithm'
+    description_short = _('Compute log of data')
+    description_full = _('Compute logarithm of data with arbitrary base')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldFloat('base', _('Base'), default=10., minval=1e-10),
+            field.FieldDataset('ds_out', _('Output dataset')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do shifting of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        data = N.array(ds_in.data)
+        perr = getattr(ds_in, 'perr')
+        nerr = getattr(ds_in, 'nerr')
+        serr = getattr(ds_in, 'serr')
+
+        uppers = lowers = None
+        if perr is not None:
+            uppers = data + perr
+        elif serr is not None:
+            uppers = data + serr
+        if nerr is not None:
+            lowers = data + nerr
+        elif serr is not None:
+            lowers = data - serr
+
+        # convert base e to base given
+        invlogbase = 1. / N.log(fields['base'])
+
+        logdata = N.log(data) * invlogbase
+        logperr = None if uppers is None else N.log(uppers)*invlogbase - logdata
+        lognerr = None if lowers is None else N.log(lowers)*invlogbase - logdata
+
+        self.dsout.update(data=logdata, perr=logperr, nerr=lognerr)
+
+class ExpPlugin(_OneOutputDatasetPlugin):
+    """Compute exponential of data."""
+
+    menu = (_('Compute'), _('Exponential'),)
+    name = 'Exponential'
+    description_short = _('Compute exponential of data')
+    description_full = _('Compute exponential of data')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldFloat('base', _('Base'), default=10., minval=1e-10),
+            field.FieldDataset('ds_out', _('Output dataset')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do shifting of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        data = N.array(ds_in.data)
+        perr = getattr(ds_in, 'perr')
+        nerr = getattr(ds_in, 'nerr')
+        serr = getattr(ds_in, 'serr')
+
+        uppers = lowers = None
+        if perr is not None:
+            uppers = data + perr
+        elif serr is not None:
+            uppers = data + serr
+        if nerr is not None:
+            lowers = data + nerr
+        elif serr is not None:
+            lowers = data - serr
+
+        base = fields['base']
+        expdata = base**data
+        expperr = None if uppers is None else base**uppers - expdata
+        expnerr = None if lowers is None else base**lowers - expdata
+
+        self.dsout.update(data=expdata, perr=expperr, nerr=expnerr)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -1950,6 +2034,8 @@ datasetpluginregistry += [
     ExtremesDatasetPlugin,
     CumulativePlugin,
     ClipPlugin,
+    LogPlugin,
+    ExpPlugin,
 
     ConcatenateDatasetPlugin,
     InterleaveDatasetPlugin,
