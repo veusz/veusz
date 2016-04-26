@@ -1440,7 +1440,7 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Do filtering of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
         filt = helper.evaluateExpression(fields['filter'])
 
@@ -1495,7 +1495,7 @@ class MovingAveragePlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Compute moving average of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
         weights = None
         if fields['weighterrors']:
@@ -1529,7 +1529,7 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Compute linear interpolation of dataset."""
         ds_x = helper.getDataset(fields['ds_x']).data
         ds_y = helper.getDataset(fields['ds_y']).data
         ds_xprime = helper.getDataset(fields['ds_xprime']).data
@@ -1894,7 +1894,7 @@ class ClipPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Do clipping of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
         data = N.array(ds_in.data)
         perr = getattr(ds_in, 'perr')
@@ -1952,7 +1952,7 @@ class LogPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Compute log of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
         data = N.array(ds_in.data)
         perr = getattr(ds_in, 'perr')
@@ -1995,7 +1995,7 @@ class ExpPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Compute exponential of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
         data = N.array(ds_in.data)
         perr = getattr(ds_in, 'perr')
