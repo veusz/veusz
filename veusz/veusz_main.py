@@ -55,11 +55,9 @@ def handleIntSignal(signum, frame):
 
 def makeSplashLogo():
     '''Make a splash screen logo.'''
-    xw, yw = 520, 240
 
     splash = qt4.QSplashScreen()
     splash.setStyleSheet("background-color:white;")
-    splash.setFixedSize(xw,yw)
     
     # draw logo on pixmap
     layout = qt4.QVBoxLayout(splash)
@@ -73,8 +71,14 @@ def makeSplashLogo():
     message = qt4.QLabel()
     message.setText(splashcopyr % utils.version())
     message.setAlignment(qt4.Qt.AlignCenter)
+    # increase size of font
+    font = message.font()
+    font.setPointSize(font.pointSize()*1.5)
+    message.setFont(font)
     layout.addWidget(message)
-    
+    h = qt4.QFontMetrics(font).height()
+    layout.setContentsMargins(h,h,h,h)
+
     return splash
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
