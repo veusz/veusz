@@ -1,4 +1,4 @@
-Changes in <next release>:
+Changes in 1.24:
  * Text labels can now include Python expressions inside %{{ }}%
  * Added built-in functions DATE([fmt]), TIME([fmt]), FILENAME() and BASENAME()
    when evaluating expressions, which are useful when used in labels
@@ -20,6 +20,7 @@ Changes in <next release>:
  * Add logarithm and exponential dataset plugins
  * Add Wipe() command to embedding interface to clear document
 
+Bux fixes:
  * Fix transparency with bar plot
  * Add File->Reload menu option to reload from saved document
  * Add tooltip to items in FieldWidget showing widget path
