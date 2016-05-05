@@ -19,11 +19,11 @@ Changes in 1.24:
    blue-orange colormaps from Oregon geography dept.
  * Add logarithm and exponential dataset plugins
  * Add Wipe() command to embedding interface to clear document
+ * Add File->Reload menu option to reload from saved document
+ * Add tooltip to items in FieldWidget showing widget path
 
 Bux fixes:
  * Fix transparency with bar plot
- * Add File->Reload menu option to reload from saved document
- * Add tooltip to items in FieldWidget showing widget path
  * Use getcwdu() for python2 to avoid bugs combining paths
  * Handle inf/nan when converting to human readable form in plots
  * Fix CreateHistogram on command line without binparams parameter
