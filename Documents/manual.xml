@@ -81,7 +81,7 @@
 	<para>As an aside, using the scripting interface, widgets are
 	specified with a "path", like a file in Unix or Windows. These
 	can be relative to the current widget (do not start with a
-	slash), or absolute (do not start with a slash). Examples of
+	slash), or absolute (start with a slash). Examples of
 	paths include, "/page1/graph1/x", "x" and ".".</para>
 
 	<para>The widget types include</para>
