@@ -20,6 +20,8 @@ from __future__ import division
 import re
 import numpy as N
 
+from .. import qtall as qt4
+
 # use fast or slow helpers
 slowfuncs = False
 try:
@@ -510,10 +512,8 @@ def applyColorMap(cmap, scaling, datain, minval, maxval,
     return img
 
 def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
-                      direction='horz'):
+                      direction='horizontal', barsize=128):
     """Make a colorbar for the scaling given."""
-
-    barsize = 128
 
     if scaling in ('linear', 'sqrt', 'squared'):
         # do a linear color scaling
@@ -542,3 +542,24 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
                         minval, maxval, transparency)
 
     return img
+
+def getColormapArray(cmap, nvals):
+    """Get [R,G,B,alpha] array of nvals for colormap array given.
+
+    number of values to return is given by nvals
+    """
+
+    img = makeColorbarImage(0, 1, 'linear', cmap, 0, barsize=nvals)
+
+    # ensure data are stored in the correct order
+    fmt = qt4.QImage.Format_ARGB32
+    if img.format() != fmt:
+        img = img.convertToFormat(fmt)
+
+    # convert image pointer to numpy array (assumes nvals*4 bytes)
+    cv = N.array(img.constScanLine(0).asarray(nvals*4)).reshape((nvals,4))
+
+    # swap into RGBA
+    cv = N.column_stack(( cv[:,2], cv[:,1], cv[:,0], cv[:,3] ))
+
+    return cv

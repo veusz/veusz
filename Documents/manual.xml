@@ -1816,6 +1816,18 @@ SetData('y', y)
       </section>
 
       <section>
+        <title>GetColormap</title>
+
+        <anchor id="Command.GetColormap" />
+
+        <para><command>GetColormap(name, invert=False, nvals=256)</command></para>
+        <para>Returns a colormap as a numpy array of red, green, blue,
+        alpha values (ranging from 0 to 255) with the number of steps
+        given.
+        </para>
+      </section>
+
+      <section>
 	<title>GetData</title>
 	<anchor id="Command.GetData" />
 

@@ -422,3 +422,12 @@ class FieldFilename(_FieldSetting):
         _FieldSetting.__init__(self, setting.Filename, name,
                                descr=descr, default=default)
 
+
+class FieldColormap(_FieldSetting):
+    """Return the name of a colormap."""
+
+    def __init__(self, name, descr=None, default=''):
+        _FieldSetting.__init__(
+            self, setting.Colormap, name,
+            descr=descr, default=default)
+

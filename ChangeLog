@@ -1,3 +1,7 @@
+Changes in <next version>:
+ * Add GetColormap command to return RGBA values
+ * Add Colormap sequence plugin for choosing colors of widgets
+
 Changes in 1.24:
  * Text labels can now include Python expressions inside %{{ }}%
  * Added built-in functions DATE([fmt]), TIME([fmt]), FILENAME() and BASENAME()
