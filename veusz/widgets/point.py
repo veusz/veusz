@@ -16,7 +16,22 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-"""For plotting xy points."""
+"""For plotting xy points.
+
+Future expansion:
+
+Plots set of datasets
+ Sets: defined by
+   expression: data_*
+   tags
+   list of datasets in a dataset
+   gui chooser
+ Single:
+   real dataset
+   data expression
+   filters
+
+"""
 
 from __future__ import division
 import numpy as N
@@ -527,7 +542,7 @@ class PointPlotter(GenericPlotter):
                 axrange[0] = min(axrange[0], 1)
                 axrange[1] = max(axrange[1], length)
 
-    def _getLinePoints( self, xvals, yvals, posn, xdata, ydata ):
+    def _getLinePoints( self, axes, xvals, yvals, posn, xdata, ydata ):
         """Get the points corresponding to the line connecting the points."""
 
         pts = qt4.QPolygonF()
@@ -559,8 +574,6 @@ class PointPlotter(GenericPlotter):
         # this is complex as we can't use the mean of the plotter coords,
         #  as the axis could be log
         elif steps[:6] == 'centre':
-            axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
             if xdata.hasErrors():
                 # Special case if error bars on x points:
                 # here we use the error bars to define the steps
@@ -586,8 +599,6 @@ class PointPlotter(GenericPlotter):
                     pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
 
         elif steps[:7] == 'vcentre':
-            axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
-
             if ydata.hasErrors():
                 # Special case if error bars on y points:
                 # here we use the error bars to define the steps
@@ -637,11 +648,11 @@ class PointPlotter(GenericPlotter):
                 qtloops.addCubicsToPainterPath(path, npts);
         return path
 
-    def _drawBezierLine( self, painter, xvals, yvals, posn,
+    def _drawBezierLine( self, painter, axes, xvals, yvals, posn,
                          xdata, ydata, cliprect ):
         """Handle bezier lines and fills."""
 
-        pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
+        pts = self._getLinePoints(axes, xvals, yvals, posn, xdata, ydata)
         if len(pts) < 2:
             return
         path = self._getBezierLine(pts, cliprect)
@@ -665,11 +676,12 @@ class PointPlotter(GenericPlotter):
         if not s.PlotLine.hide:
             painter.strokePath(path, s.PlotLine.makeQPen(painter))
 
-    def _drawPlotLine( self, painter, xvals, yvals, posn, xdata, ydata,
-                       cliprect ):
+    def _drawPlotLine(
+            self, painter, axes, xvals, yvals, posn, xdata,
+            ydata, cliprect):
         """Draw the line connecting the points."""
 
-        pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
+        pts = self._getLinePoints(axes, xvals, yvals, posn, xdata, ydata)
         if len(pts) < 2:
             return
         s = self.settings
@@ -818,6 +830,148 @@ class PointPlotter(GenericPlotter):
         return (c.min, c.max, c.scaling, s.MarkerFill.colorMap, 0,
                 s.MarkerFill.colorMapInvert)
 
+    def drawDatasetSection(
+            self, painter, axes, posn, cliprect,
+            xvals, yvals, tvals, ptvals, cvals):
+
+        s = self.settings
+
+        #print "Calculating coordinates"
+        # calc plotter coords of x and y points
+        xplotter = axes[0].dataToPlotterCoords(posn, xvals.data)
+        yplotter = axes[1].dataToPlotterCoords(posn, yvals.data)
+
+        # points are plotted offset in shift-points modes
+        if s.PlotLine.steps != 'off':
+            xpltpoint = N.array(xplotter)
+            if s.PlotLine.steps == 'right-shift-points':
+                xpltpoint[1:] = 0.5*(xplotter[:-1] + xplotter[1:])
+            elif s.PlotLine.steps == 'left-shift-points':
+                xpltpoint[:-1] = 0.5*(xplotter[:-1] + xplotter[1:])
+        else:
+            xpltpoint = xplotter
+        ypltpoint = yplotter
+
+        # plot filled error bars
+        if s.errorStyle in ('fillvert', 'fillhorz'):
+            # filled region errors are painted first
+            self._plotErrors(
+                posn, painter, xpltpoint, ypltpoint,
+                axes, xvals, yvals, cliprect)
+
+        #print "Painting plot line"
+        # plot data line (and/or filling above or below)
+        if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
+            if s.PlotLine.bezierJoin and hasqtloops:
+                self._drawBezierLine(
+                    painter, axes, xplotter, yplotter, posn,
+                    xvals, yvals, cliprect )
+            else:
+                self._drawPlotLine(
+                    painter, axes, xplotter, yplotter, posn,
+                    xvals, yvals, cliprect )
+
+        #print "Painting error bars"
+        # plot normal errors bars
+        if s.errorStyle not in ('fillvert', 'fillhorz'):
+            # normally the error bar is painted after the line
+            self._plotErrors(posn, painter, xpltpoint, ypltpoint,
+                             axes, xvals, yvals, cliprect)
+
+        # plot the points (we do this last so they are on top)
+        markersize = s.get('markerSize').convert(painter)
+        if not s.MarkerLine.hide or not s.MarkerFill.hide:
+
+            #print "Painting marker fill"
+            if not s.MarkerFill.hide:
+                # filling for markers
+                painter.setBrush( s.MarkerFill.makeQBrush() )
+            else:
+                # no-filling brush
+                painter.setBrush( qt4.QBrush() )
+
+            #print "Painting marker lines"
+            if not s.MarkerLine.hide:
+                # edges of markers
+                painter.setPen( s.MarkerLine.makeQPen(painter) )
+            else:
+                # invisible pen
+                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+
+            # thin datapoints as required
+            if s.thinfactor <= 1:
+                xplt, yplt = xpltpoint, ypltpoint
+            else:
+                xplt, yplt = (
+                    xpltpoint[::s.thinfactor],
+                    ypltpoint[::s.thinfactor])
+
+            # whether to scale markers
+            scaling = colorvals = cmap = None
+            if ptvals:
+                scaling = ptvals.data
+                if s.thinfactor > 1:
+                    scaling = scaling[::s.thinfactor]
+
+            # color point individually
+            if cvals and not s.MarkerFill.hide:
+                colorvals = utils.applyScaling(
+                    cvals.data, s.Color.scaling,
+                    s.Color.min, s.Color.max)
+                if s.thinfactor > 1:
+                    colorvals = colorvals[::s.thinfactor]
+                cmap = self.document.getColormap(
+                    s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
+
+            # actually plot datapoints
+            utils.plotMarkers(
+                painter, xplt, yplt, s.marker, markersize,
+                scaling=scaling, clip=cliprect,
+                cmap=cmap, colorvals=colorvals,
+                scaleline=s.MarkerLine.scaleLine)
+
+        # finally plot any labels
+        if tvals and not s.Label.hide:
+            self.drawLabels(
+                painter, xpltpoint, ypltpoint,
+                tvals, markersize)
+
+    def drawDataset(
+            self, painter, axes, posn, cliprect,
+            xds=None, yds=None, text=None,
+            scaleds=None, colords=None):
+
+        s = self.settings
+
+        # if a missing dataset, make a fake dataset for the second one
+        # based on a row number
+        if xds and not yds and s.get('yData').isEmpty():
+            # use index for y data
+            length = xds.data.shape[0]
+            yds = document.DatasetRange(length, (1,length))
+        elif yds and not xds and s.get('xData').isEmpty():
+            # use index for x data
+            length = yds.data.shape[0]
+            xds = document.DatasetRange(length, (1,length))
+        if not xds or not yds:
+            # no valid dataset, so exit
+            return
+
+        # if text entered, then multiply up to get same number of values
+        # as datapoints
+        if text:
+            length = min( len(xds.data), len(yds.data) )
+            text = text*(length // len(text)) + text[:length % len(text)]
+
+        # loop over chopped up values
+        for parts in (
+            document.generateValidDatasetParts(
+                [xds, yds, text, scaleds, colords])):
+
+            self.drawDatasetSection(
+                painter, axes, posn, cliprect,
+                *parts)
+
     def dataDraw(self, painter, axes, posn, cliprect):
         """Plot the data on a plotter."""
 
@@ -830,130 +984,10 @@ class PointPlotter(GenericPlotter):
         scalepoints = s.get('scalePoints').getData(doc)
         colorpoints = s.Color.get('points').getData(doc)
 
-        # if a missing dataset, make a fake dataset for the second one
-        # based on a row number
-        if xv and not yv and s.get('yData').isEmpty():
-            # use index for y data
-            length = xv.data.shape[0]
-            yv = document.DatasetRange(length, (1,length))
-        elif yv and not xv and s.get('xData').isEmpty():
-            # use index for x data
-            length = yv.data.shape[0]
-            xv = document.DatasetRange(length, (1,length))
-        if not xv or not yv:
-            # no valid dataset, so exit
-            return
-
-        # if text entered, then multiply up to get same number of values
-        # as datapoints
-        if text:
-            length = min( len(xv.data), len(yv.data) )
-            text = text*(length // len(text)) + text[:length % len(text)]
-
-        # loop over chopped up values
-        for xvals, yvals, tvals, ptvals, cvals in (
-            document.generateValidDatasetParts(
-                [xv, yv, text, scalepoints, colorpoints])):
-
-            #print "Calculating coordinates"
-            # calc plotter coords of x and y points
-            xplotter = axes[0].dataToPlotterCoords(posn, xvals.data)
-            yplotter = axes[1].dataToPlotterCoords(posn, yvals.data)
-
-            # points are plotted offset in shift-points modes
-            if s.PlotLine.steps != 'off':
-                xpltpoint = N.array(xplotter)
-                if s.PlotLine.steps == 'right-shift-points':
-                    xpltpoint[1:] = 0.5*(xplotter[:-1] + xplotter[1:])
-                elif s.PlotLine.steps == 'left-shift-points':
-                    xpltpoint[:-1] = 0.5*(xplotter[:-1] + xplotter[1:])
-            else:
-                xpltpoint = xplotter
-            ypltpoint = yplotter
-
-            # plot filled error bars
-            if s.errorStyle in ('fillvert', 'fillhorz'):
-                # filled region errors are painted first
-                self._plotErrors(
-                    posn, painter, xpltpoint, ypltpoint,
-                    axes, xvals, yvals, cliprect)
-
-            #print "Painting plot line"
-            # plot data line (and/or filling above or below)
-            if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                if s.PlotLine.bezierJoin and hasqtloops:
-                    self._drawBezierLine(
-                        painter, xplotter, yplotter, posn,
-                        xvals, yvals, cliprect )
-                else:
-                    self._drawPlotLine(
-                        painter, xplotter, yplotter, posn,
-                        xvals, yvals, cliprect )
-
-            #print "Painting error bars"
-            # plot normal errors bars
-            if s.errorStyle not in ('fillvert', 'fillhorz'):
-                # normally the error bar is painted after the line
-                self._plotErrors(posn, painter, xpltpoint, ypltpoint,
-                                 axes, xvals, yvals, cliprect)
-
-            # plot the points (we do this last so they are on top)
-            markersize = s.get('markerSize').convert(painter)
-            if not s.MarkerLine.hide or not s.MarkerFill.hide:
-
-                #print "Painting marker fill"
-                if not s.MarkerFill.hide:
-                    # filling for markers
-                    painter.setBrush( s.MarkerFill.makeQBrush() )
-                else:
-                    # no-filling brush
-                    painter.setBrush( qt4.QBrush() )
-
-                #print "Painting marker lines"
-                if not s.MarkerLine.hide:
-                    # edges of markers
-                    painter.setPen( s.MarkerLine.makeQPen(painter) )
-                else:
-                    # invisible pen
-                    painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
-
-                # thin datapoints as required
-                if s.thinfactor <= 1:
-                    xplt, yplt = xpltpoint, ypltpoint
-                else:
-                    xplt, yplt = (
-                        xpltpoint[::s.thinfactor],
-                        ypltpoint[::s.thinfactor])
-
-                # whether to scale markers
-                scaling = colorvals = cmap = None
-                if ptvals:
-                    scaling = ptvals.data
-                    if s.thinfactor > 1:
-                        scaling = scaling[::s.thinfactor]
-
-                # color point individually
-                if cvals and not s.MarkerFill.hide:
-                    colorvals = utils.applyScaling(
-                        cvals.data, s.Color.scaling,
-                        s.Color.min, s.Color.max)
-                    if s.thinfactor > 1:
-                        colorvals = colorvals[::s.thinfactor]
-                    cmap = self.document.getColormap(
-                        s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
-
-                # actually plot datapoints
-                utils.plotMarkers(
-                    painter, xplt, yplt, s.marker, markersize,
-                    scaling=scaling, clip=cliprect,
-                    cmap=cmap, colorvals=colorvals,
-                    scaleline=s.MarkerLine.scaleLine)
-
-            # finally plot any labels
-            if tvals and not s.Label.hide:
-                self.drawLabels(
-                    painter, xpltpoint, ypltpoint,
-                    tvals, markersize)
+        self.drawDataset(
+            painter, axes, posn, cliprect,
+            xds=xv, yds=yv, text=text,
+            scaleds=scalepoints, colords=colorpoints)
 
 # allow the factory to instantiate an x,y plotter
-document.thefactory.register( PointPlotter )
+document.thefactory.register(PointPlotter)

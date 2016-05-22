@@ -1144,14 +1144,16 @@ class Dataset(Str):
 
     def copy(self):
         """Make a setting which has its values copied from this one."""
-        return self._copyHelper((), (),
-                                {'dimensions': self.dimensions,
-                                 'datatype': self.datatype})
+        return self._copyHelper(
+            (), (),
+            {'dimensions': self.dimensions,
+             'datatype': self.datatype})
 
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        return controls.Dataset(self, self.getDocument(), self.dimensions,
-                                self.datatype, *args)
+        return controls.Dataset(
+            self, self.getDocument(), self.dimensions,
+            self.datatype, *args)
 
     def getData(self, doc):
         """Return a list of datasets entered."""
