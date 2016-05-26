@@ -998,8 +998,8 @@ class PointPlotter(GenericPlotter):
                 painter,axes, posn, cliprect,
                 parts[0], parts[1], self.document, s,
                 labeldata=parts[2],
-                colordata=parts[3],
-                sizedata=parts[4])
+                sizedata=parts[3],
+                colordata=parts[4])
             dd.plot()
 
     def dataDraw(self, painter, axes, posn, cliprect):
