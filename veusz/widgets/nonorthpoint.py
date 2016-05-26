@@ -175,8 +175,10 @@ class NonOrthPoint(Widget):
         # iterate over each point and plot each label
         for x, y, t in czip(xplotter+deltax, yplotter+deltay,
                             textvals):
-            utils.Renderer( painter, font, x, y, t,
-                            alignhorz, alignvert, angle ).render()
+            utils.Renderer(
+                painter, font, x, y, t,
+                alignhorz, alignvert, angle,
+                doc=self.document).render()
 
     def getColorbarParameters(self):
         """Return parameters for colorbar."""
@@ -212,7 +214,7 @@ class NonOrthPoint(Widget):
 
             # split parts separated by NaNs
             for v1, v2, scalings, cvals, textitems in document.generateValidDatasetParts(
-                d1, d2, dscale, colorpoints, text):
+                [d1, d2, dscale, colorpoints, text]):
                 # convert data (chopping down length)
                 v1d, v2d = v1.data, v2.data
                 minlen = min(v1d.shape[0], v2d.shape[0])

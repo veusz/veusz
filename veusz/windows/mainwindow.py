@@ -31,7 +31,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import cstr, cstrerror
+from ..compat import cstr, cstrerror, cgetcwd
 from .. import qtall as qt4
 
 from .. import document
@@ -44,8 +44,6 @@ from . import consolewindow
 from . import plotwindow
 from . import treeeditwindow
 from .datanavigator import DataNavigatorWindow
-
-from ..dialogs.plugin import handlePlugin
 
 def _(text, disambiguation=None, context='MainWindow'):
     """Translate text."""
@@ -191,7 +189,7 @@ class MainWindow(qt4.QMainWindow):
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt4.QDir.homePath())
         if setdb['dirname_usecwd']:
-            self.dirname = os.getcwd()
+            self.dirname = cgetcwd()
 
         # connect plot signals to main window
         self.plot.sigUpdatePage.connect(self.slotUpdatePage)
@@ -365,12 +363,14 @@ class MainWindow(qt4.QMainWindow):
         menuname: string giving prefix for new menu entries (inside actions)
         """
 
+        def getLoadDialog(pluginkls):
+            def _loadPlugin():
+                from ..dialogs.plugin import handlePlugin
+                handlePlugin(self, self.document, pluginkls)
+            return _loadPlugin
+
         menu = []
         for pluginkls in pluginlist:
-            def loaddialog(pluginkls=pluginkls):
-                """Load plugin dialog"""
-                handlePlugin(self, self.document, pluginkls)
-
             actname = menuname + '.' + '.'.join(pluginkls.menu)
             text = pluginkls.menu[-1]
             if pluginkls.has_parameters:
@@ -379,7 +379,7 @@ class MainWindow(qt4.QMainWindow):
                 self,
                 pluginkls.description_short,
                 text,
-                loaddialog)
+                getLoadDialog(pluginkls))
 
             # build up menu from tuple of names
             menulook = menu
@@ -414,12 +414,15 @@ class MainWindow(qt4.QMainWindow):
                 a(self, _('Open a document'), _('&Open...'),
                   self.slotFileOpen,
                   icon='kde-document-open', key='Ctrl+O'),
+            'file.reload':
+                a(self, _('Reload document from saved version'),
+                  _('Reload...'), self.slotFileReload),
             'file.save':
                 a(self, _('Save the document'), _('&Save'),
                   self.slotFileSave,
                   icon='kde-document-save', key='Ctrl+S'),
             'file.saveas':
-                a(self, _('Save the current graph under a new name'),
+                a(self, _('Save the current document under a new name'),
                   _('Save &As...'), self.slotFileSaveAs,
                   icon='kde-document-save-as'),
             'file.print':
@@ -500,7 +503,7 @@ class MainWindow(qt4.QMainWindow):
                   self.slotDataImport, icon='kde-vzdata-import'),
             'data.edit':
                 a(self, _('Edit and enter new datasets'), _('&Editor...'),
-                  self.slotDataEdit, icon='kde-edit-veuszedit'),
+                  lambda: self.slotDataEdit(), icon='kde-edit-veuszedit'),
             'data.create':
                 a(self, _('Create new datasets using ranges, parametrically or as functions of existing datasets'), _('&Create...'),
                   self.slotDataCreate, icon='kde-dataset-new-veuszedit'),
@@ -562,6 +565,7 @@ class MainWindow(qt4.QMainWindow):
         filemenu = [
             'file.new', 'file.open',
             ['file.filerecent', _('Open &Recent'), []],
+            'file.reload',
             '',
             'file.save', 'file.saveas',
             '',
@@ -1135,32 +1139,54 @@ class MainWindow(qt4.QMainWindow):
         """Populate the recently opened files menu with a list of
         recently opened files"""
 
+        def opener(path):
+            def _fileOpener():
+                self.openFile(path)
+            return _fileOpener
+
         menu = self.menus["file.filerecent"]
         menu.clear()
 
-        newMenuItems = []
         if setdb['main_recentfiles']:
             files = [f for f in setdb['main_recentfiles']
                      if os.path.isfile(f)]
-            self._openRecentFunctions = []
 
             # add each recent file to menu
+            newmenuitems = []
             for i, path in enumerate(files):
-
-                def fileOpener(filename=path):
-                    self.openFile(filename)
-
-                self._openRecentFunctions.append(fileOpener)
-                newMenuItems.append(('filerecent%i' % i, _('Open File %s') % path,
-                                     os.path.basename(path),
-                                     'file.filerecent', fileOpener,
-                                     '', False, ''))
+                newmenuitems.append(
+                    ('filerecent%i' % i,_('Open File %s') % path,
+                     os.path.basename(path),
+                     'file.filerecent', opener(path),
+                     '', False, ''))
 
             menu.setEnabled(True)
             self.recentFileActions = utils.populateMenuToolbars(
-                newMenuItems, self.maintoolbar, self.menus)
+                newmenuitems, self.maintoolbar, self.menus)
         else:
             menu.setEnabled(False)
+
+    def slotFileReload(self):
+        """Reload document from saved version."""
+
+        mb = qt4.QMessageBox(
+            _("Reload file"),
+            _("Reload document from file, losing any changes?"),
+            qt4.QMessageBox.Warning,
+            qt4.QMessageBox.Cancel,
+            qt4.QMessageBox.Yes,
+            qt4.QMessageBox.NoButton,
+            self)
+        mb.setButtonText(qt4.QMessageBox.Yes, _("&Reload"))
+        mb.setDefaultButton(qt4.QMessageBox.Cancel)
+        if mb.exec_() == qt4.QMessageBox.Yes:
+            if not os.path.exists(self.filename):
+                qt4.QMessageBox.critical(
+                    self,
+                    _("Reload file"),
+                    _("File %s no longer exists") % self.filename)
+            else:
+                self.openFileInWindow(self.filename)
 
     def slotFileExport(self):
         """Export the graph."""
@@ -1178,6 +1204,10 @@ class MainWindow(qt4.QMainWindow):
 
         # enable/disable file, save menu item
         self.vzactions['file.save'].setEnabled(ismodified)
+
+        # enable/disable reloading from saved document
+        self.vzactions['file.reload'].setEnabled(
+            bool(self.filename) and ismodified)
 
     def slotFileClose(self):
         """File close window chosen."""

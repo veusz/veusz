@@ -228,7 +228,7 @@ class DiscretePickable(GenericPickable):
         # map all the valid data
         x, y = N.array([]), N.array([])
         xs, ys = N.array([]), N.array([])
-        for xvals, yvals in document.generateValidDatasetParts(xdata, ydata):
+        for xvals, yvals in document.generateValidDatasetParts([xdata, ydata]):
             chunklen = min(len(xvals.data), len(yvals.data))
 
             x = N.append(x, xvals.data[:chunklen])

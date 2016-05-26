@@ -378,7 +378,7 @@ class TSWriter(object):
         # write tree back to file
         tree.write(self.filename, encoding='utf-8', pretty_print=True)
 
-def python_find_strings(filename, retn, verbose=True):
+def python_find_strings(filename, retn, verbose=True, gcontext={}, gargs={}):
     '''Update output in retn with strings in filename.'''
 
     if verbose:
@@ -389,6 +389,8 @@ def python_find_strings(filename, retn, verbose=True):
     tree = ast.parse(source, filename)
 
     v = PythonMessageVisitor(filename, retn, verbose=verbose)
+    v.fn2context = gcontext.copy()
+    v.fnargs = gargs.copy()
     v.visit(tree)
 
 def ui_find_strings(filename, retn, verbose=True):
@@ -435,7 +437,22 @@ def main():
     parser.add_argument('--output', metavar='FILE',
                         default='output.ts',
                         help='output ts file')
+    parser.add_argument('--defn', metavar='FNAME:CTX',nargs='+',default=[],
+						help='force global function name:context')
     args = parser.parse_args()
+
+    # Prepare forced global translation functions
+    gcontext={}
+    gargs={}
+    for n in args.defn:
+    	if ':' in n: 
+    		n,ctx = n.split(':')
+    	else:
+    	   # Default context is 'global'
+    	   ctx = 'global'
+    	gcontext[n]=ctx
+    	# Always use default argids for forced functions
+    	gargs[n] = ['text','disambiguation','context']
 
     retn = {}
     for infile in args.files:
@@ -445,7 +462,7 @@ def main():
 
         ext = os.path.splitext(infile)[1]
         if ext == '.py':
-            python_find_strings(infile, retn, verbose=args.verbose)
+            python_find_strings(infile, retn, verbose=args.verbose,gcontext=gcontext,gargs=gargs)
         elif ext == '.ui':
             ui_find_strings(infile, retn, verbose=args.verbose)
         else:

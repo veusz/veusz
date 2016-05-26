@@ -20,7 +20,7 @@
 
 """Plugins for creating datasets."""
 
-from __future__ import division
+from __future__ import division, print_function
 import numpy as N
 from . import field
 
@@ -212,7 +212,7 @@ class Function(object):
 # class to pass to plugin to give parameters
 class DatasetPluginHelper(object):
     """Helpers to get existing datasets for plugins."""
-    
+
     def __init__(self, doc):
         """Construct helper object to pass to DatasetPlugins."""
         self._doc = doc
@@ -287,7 +287,7 @@ class DatasetPluginHelper(object):
         if isinstance(ds, document.DatasetDateTime):
             return DatasetDateTime(name, data=ds.data)
         elif ds.dimensions == 1:
-            return Dataset1D(name, data=ds.data, serr=ds.serr, 
+            return Dataset1D(name, data=ds.data, serr=ds.serr,
                              perr=ds.perr, nerr=ds.nerr)
         elif ds.dimensions == 2:
             return Dataset2D(name, ds.data,
@@ -327,7 +327,7 @@ class DatasetPluginManager(object):
         doc - document instance
         fields - fields to pass to plugin
         """
-        
+
         self.plugin = plugin
         self.document = doc
         self.helper = DatasetPluginHelper(doc)
@@ -487,7 +487,7 @@ def combineAddedErrors(inds, length):
         f = N.isfinite(d.data)
 
         if errortype == 'symmetric' and d.serr is not None:
-            serr[f] += d.serr[f]**2 
+            serr[f] += d.serr[f]**2
         elif errortype == 'asymmetric':
             if d.serr is not None:
                 v = (d.serr[f])**2
@@ -521,7 +521,7 @@ def combineMultipliedErrors(inds, length, data):
             f = f[:length]
 
         if errortype == 'symmetric' and d.serr is not None:
-            serr[f] += (d.serr[f]/d.data[f])**2 
+            serr[f] += (d.serr[f]/d.data[f])**2
         elif errortype == 'asymmetric':
             if d.serr is not None:
                 v = (d.serr[f]/d.data[f])**2
@@ -548,7 +548,7 @@ class MultiplyDatasetPlugin(_OneOutputDatasetPlugin):
     description_short = _('Multiply dataset by a constant')
     description_full = _('Multiply a dataset by a factor. '
                          'Error bars are also scaled.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -579,7 +579,7 @@ class AddDatasetPlugin(_OneOutputDatasetPlugin):
     description_short = _('Add a constant to a dataset')
     description_full = _('Add a dataset by adding a value. '
                          'Error bars remain the same.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -948,7 +948,7 @@ class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
     description_short = _('Subtract two datasets')
     description_full = _('Subtract two datasets. '
                          'Combined error bars are also calculated.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1043,17 +1043,17 @@ class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do scaling of dataset."""
+        """Do subtraction of dataset."""
 
         dsin = helper.getDataset(fields['ds_in'])
 
-        vals = dsin.data
-        if len(vals) > 0:
-            minval = vals[N.isfinite(vals)].min()
-            vals = vals - minval
+        data = dsin.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) != 0:
+            data = data - filtered.min()
 
         self.dsout.update(
-            data=vals, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
+            data=data, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
 
 class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to multiply two or more datasets."""
@@ -1063,7 +1063,7 @@ class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     description_short = _('Multiply two or more datasets')
     description_full = _('Multiply two or more datasets. '
                          'Combined error bars are also calculated.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1103,7 +1103,7 @@ class DivideDatasetsPlugin(_OneOutputDatasetPlugin):
                           ' between two datasets')
     description_full = _('Divide or compute fractional difference'
                          ' between two datasets')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1150,15 +1150,21 @@ class DivideMaxPlugin(_OneOutputDatasetPlugin):
     def updateDatasets(self, fields, helper):
 
         inds = helper.getDataset( fields['ds_in'] )
-        maxval = N.nanmax( inds.data )
+
+        data = inds.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) == 0:
+            maxval = N.nan
+        else:
+            maxval = filtered.max()
 
         # divide data
-        data = inds.data / maxval
+        data = data / maxval
         # divide error bars
         serr = perr = nerr = None
-        if inds.serr: serr = inds.serr / maxval
-        if inds.perr: perr = inds.perr / maxval
-        if inds.nerr: nerr = inds.nerr / maxval
+        if inds.serr is not None: serr = inds.serr / maxval
+        if inds.perr is not None: perr = inds.perr / maxval
+        if inds.nerr is not None: nerr = inds.nerr / maxval
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
@@ -1180,15 +1186,21 @@ class DivideNormalizePlugin(_OneOutputDatasetPlugin):
     def updateDatasets(self, fields, helper):
 
         inds = helper.getDataset( fields['ds_in'] )
-        tot = N.nansum( inds.data )
+
+        data = inds.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) == 0:
+            tot = 0
+        else:
+            tot = N.sum(filtered)
 
         # divide data
-        data = inds.data / tot
+        data = data / tot
         # divide error bars
         serr = perr = nerr = None
-        if inds.serr: serr = inds.serr / tot
-        if inds.perr: perr = inds.perr / tot
-        if inds.nerr: nerr = inds.nerr / tot
+        if inds.serr is not None: serr = inds.serr / tot
+        if inds.perr is not None: perr = inds.perr / tot
+        if inds.nerr is not None: nerr = inds.nerr / tot
 
         self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
 
@@ -1415,7 +1427,7 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
     description_short = _('Filter a dataset using an expression')
     description_full = _('Filter a dataset using an expression, '
                          'e.g. "x>10" or "(x>1) & (y<2)"')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1428,11 +1440,14 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Do filtering of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
         filt = helper.evaluateExpression(fields['filter'])
 
-        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+        data = ds_in.data
+        serr = getattr(ds_in, 'serr', None)
+        perr = getattr(ds_in, 'perr', None)
+        nerr = getattr(ds_in, 'nerr', None)
 
         if filt is None:
             # select nothing
@@ -1467,7 +1482,7 @@ class MovingAveragePlugin(_OneOutputDatasetPlugin):
     description_full = _('Compute moving average for regularly spaced data.'
                          'Average is computed either\nside of each data point '
                          'by number of points given.')
-    
+
     def __init__(self):
         """Define fields."""
         self.fields = [
@@ -1478,9 +1493,9 @@ class MovingAveragePlugin(_OneOutputDatasetPlugin):
                             default=True),
             field.FieldDataset('ds_out', _('Output dataset')),
             ]
-    
+
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Compute moving average of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
         weights = None
         if fields['weighterrors']:
@@ -1514,7 +1529,7 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Do shifting of dataset."""
+        """Compute linear interpolation of dataset."""
         ds_x = helper.getDataset(fields['ds_x']).data
         ds_y = helper.getDataset(fields['ds_y']).data
         ds_xprime = helper.getDataset(fields['ds_xprime']).data
@@ -1858,6 +1873,152 @@ class ConvertNumbersToText(DatasetPlugin):
 
         self.dsout.update(data=data)
 
+class ClipPlugin(_OneOutputDatasetPlugin):
+    """Compute moving average for dataset."""
+
+    menu = (_('Compute'), _('Clipped dataset'),)
+    name = 'Clip'
+    description_short = _('Clip data between a minimum and maximum')
+    description_full = _('Clip data points to minimum and/or maximum values')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldFloat('minimum', _('Minimum'), default=0.),
+            field.FieldBool('disablemin', _('Disable minimum')),
+            field.FieldFloat('maximum', _('Maximum'), default=1.),
+            field.FieldBool('disablemax', _('Disable maximum')),
+            field.FieldBool('cliperrs', _('Clip error bars'), default=True),
+            field.FieldDataset('ds_out', _('Output dataset')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do clipping of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        data = N.array(ds_in.data)
+        perr = getattr(ds_in, 'perr')
+        nerr = getattr(ds_in, 'nerr')
+        serr = getattr(ds_in, 'serr')
+
+        cliperrs = fields['cliperrs']
+        # force asymmetric errors if clipping error bars
+        if cliperrs and serr is not None and (nerr is None or perr is None):
+            perr = serr
+            nerr = -serr
+            serr = None
+
+        # we have to clip the ranges, so calculate these first
+        upper = (data+perr) if (cliperrs and perr is not None) else None
+        lower = (data+nerr) if (cliperrs and nerr is not None) else None
+
+        # note: this preserves nan values
+        if not fields['disablemin']:
+            minv = fields['minimum']
+            data[data<minv] = minv
+            if upper is not None:
+                upper[upper<minv] = minv
+            if lower is not None:
+                lower[lower<minv] = minv
+        if not fields['disablemax']:
+            maxv = fields['maximum']
+            data[data>maxv] = maxv
+            if upper is not None:
+                upper[upper>maxv] = maxv
+            if lower is not None:
+                lower[lower>maxv] = maxv
+
+        if upper is not None:
+            perr = upper-data
+        if lower is not None:
+            nerr = lower-data
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
+class LogPlugin(_OneOutputDatasetPlugin):
+    """Compute logarithm of data."""
+
+    menu = (_('Compute'), _('Log'),)
+    name = 'Logarithm'
+    description_short = _('Compute log of data')
+    description_full = _('Compute logarithm of data with arbitrary base')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldFloat('base', _('Base'), default=10., minval=1e-10),
+            field.FieldDataset('ds_out', _('Output dataset')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Compute log of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        data = N.array(ds_in.data)
+        perr = getattr(ds_in, 'perr')
+        nerr = getattr(ds_in, 'nerr')
+        serr = getattr(ds_in, 'serr')
+
+        uppers = lowers = None
+        if perr is not None:
+            uppers = data + perr
+        elif serr is not None:
+            uppers = data + serr
+        if nerr is not None:
+            lowers = data + nerr
+        elif serr is not None:
+            lowers = data - serr
+
+        # convert base e to base given
+        invlogbase = 1. / N.log(fields['base'])
+
+        logdata = N.log(data) * invlogbase
+        logperr = None if uppers is None else N.log(uppers)*invlogbase - logdata
+        lognerr = None if lowers is None else N.log(lowers)*invlogbase - logdata
+
+        self.dsout.update(data=logdata, perr=logperr, nerr=lognerr)
+
+class ExpPlugin(_OneOutputDatasetPlugin):
+    """Compute exponential of data."""
+
+    menu = (_('Compute'), _('Exponential'),)
+    name = 'Exponential'
+    description_short = _('Compute exponential of data')
+    description_full = _('Compute exponential of data')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldFloat('base', _('Base'), default=10., minval=1e-10),
+            field.FieldDataset('ds_out', _('Output dataset')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Compute exponential of dataset."""
+        ds_in = helper.getDataset(fields['ds_in'])
+        data = N.array(ds_in.data)
+        perr = getattr(ds_in, 'perr')
+        nerr = getattr(ds_in, 'nerr')
+        serr = getattr(ds_in, 'serr')
+
+        uppers = lowers = None
+        if perr is not None:
+            uppers = data + perr
+        elif serr is not None:
+            uppers = data + serr
+        if nerr is not None:
+            lowers = data + nerr
+        elif serr is not None:
+            lowers = data - serr
+
+        base = fields['base']
+        expdata = base**data
+        expperr = None if uppers is None else base**uppers - expdata
+        expnerr = None if lowers is None else base**lowers - expdata
+
+        self.dsout.update(data=expdata, perr=expperr, nerr=expnerr)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -1872,6 +2033,9 @@ datasetpluginregistry += [
     MeanDatasetPlugin,
     ExtremesDatasetPlugin,
     CumulativePlugin,
+    ClipPlugin,
+    LogPlugin,
+    ExpPlugin,
 
     ConcatenateDatasetPlugin,
     InterleaveDatasetPlugin,

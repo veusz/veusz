@@ -36,7 +36,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO
+from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO, cexecfile
 from .. import qtall as qt4
 
 from . import widgetfactory
@@ -155,6 +155,7 @@ class Document( qt4.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
+        self.filename = ""
         self.sigWiped.emit()
 
     def clearHistory(self):
@@ -415,7 +416,7 @@ class Document( qt4.QObject ):
 
         for plugin in pluginlist:
             try:
-                cexec(compile(open(plugin).read(), plugin, 'exec'), dict())
+                cexecfile(plugin, {})
             except Exception:
                 err = _('Error loading plugin %s\n\n%s') % (
                     plugin, traceback.format_exc())
@@ -433,22 +434,23 @@ class Document( qt4.QObject ):
             painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
    
         sizes = []
-        with painter:
-            # This all assumes that only pages can go into the root widget
-            for count, page in enumerate(pages):
-                painter.save()
-                size = self.pageSize(page, dpi=dpi)
-                sizes.append(size)
-                painter.setClipRect(qt4.QRectF(
-                    qt4.QPointF(0,0), qt4.QPointF(*size)))
-                helper = painthelper.PaintHelper(
-                    size, dpi=dpi, directpaint=painter)
-                self.paintTo(helper, page)
-                painter.restore()
 
-                # start new pages between each page
-                if count < len(pages)-1:
-                    printer.newPage()
+        # This all assumes that only pages can go into the root widget
+        for count, page in enumerate(pages):
+            painter.save()
+            size = self.pageSize(page, dpi=dpi)
+            sizes.append(size)
+            painter.setClipRect(qt4.QRectF(
+                qt4.QPointF(0,0), qt4.QPointF(*size)))
+            helper = painthelper.PaintHelper(
+                size, dpi=dpi, directpaint=painter)
+            self.paintTo(helper, page)
+            painter.restore()
+
+            # start new pages between each page
+            if count < len(pages)-1:
+                printer.newPage()
+        painter.end()
 
         return sizes
 
@@ -618,6 +620,8 @@ class Document( qt4.QObject ):
         else:
             raise RuntimeError('Invalid save mode')
 
+        self.filename = filename
+
     def load(self, filename, mode='vsz', callbackunsafe=None):
         """Load document from file.
 
@@ -626,6 +630,8 @@ class Document( qt4.QObject ):
         from . import loader
         loader.loadDocument(self, filename, mode=mode,
                             callbackunsafe=callbackunsafe)
+
+        self.filename = filename
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""
@@ -936,11 +942,48 @@ class Document( qt4.QObject ):
             self.exprcompiled[expr] = checked
             return checked
 
+    @staticmethod
+    def _evalformatdate(fmt=None):
+        """DATE() eval: return date with optional format."""
+        d = datetime.date.today()
+        return d.isoformat() if fmt is None else d.strftime(fmt)
+
+    @staticmethod
+    def _evalformattime(fmt=None):
+        """TIME() eval: return time with optional format."""
+        t = datetime.datetime.now()
+        return t.isoformat() if fmt is None else t.strftime(fmt)
+
+    def _evaldata(self, name, part='data'):
+        """DATA(name, [part]) eval: return dataset as array."""
+        if part not in ('data', 'perr', 'serr', 'nerr'):
+            raise RuntimeError("Invalid dataset part '%s'" % part)
+        if name not in self.data:
+            raise RuntimeError("Dataset '%s' does not exist" % name)
+        data = getattr(self.data[name], part)
+        if isinstance(data, N.ndarray):
+            return N.array(data)
+        elif isinstance(data, list):
+            return list(data)
+        return data
+
+    def _evalfilename(self):
+        """FILENAME() eval: returns filename."""
+        return utils.latexEscape(self.filename)
+
+    def _evalbasename(self):
+        """BASENAME() eval: returns base filename."""
+        return utils.latexEscape(os.path.basename(self.filename))
+
+    def _evalsetting(self, path):
+        """SETTING() eval: return setting given full path."""
+        return self.resolveFullSettingPath(path).get()
+
     def updateEvalContext(self):
         """To be called after custom constants or functions are changed.
         This sets up a safe environment where things can be evaluated
         """
-        
+
         self.eval_context = c = {}
 
         # add numpy things
@@ -950,11 +993,21 @@ class Document( qt4.QObject ):
                  name not in __builtins__ and
                  name[:1] != '_' and name[-1:] != '_' ):
                 c[name] = val
-        
+
         # safe functions
         c['os_path_join'] = os.path.join
         c['os_path_dirname'] = os.path.dirname
         c['veusz_markercodes'] = tuple(utils.MarkerCodes)
+
+        # helpful functions for expansion
+        c['ENVIRON'] = dict(os.environ)
+        c['DATE'] = self._evalformatdate
+        c['TIME'] = self._evalformattime
+        c['DATA'] = self._evaldata
+        c['FILENAME'] = self._evalfilename
+        c['BASENAME'] = self._evalbasename
+        c['ESCAPE'] = utils.latexEscape
+        c['SETTING'] = self._evalsetting
 
         # custom definitions
         for ctype, name, val in self.customs:

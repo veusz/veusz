@@ -346,7 +346,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         """Get coordinates at edge of grid."""
         self.xedge = self.yedge = self.xcent = self.ycent = []
         ds = self.document.data.get(self.dsname)
-        if ds:
+        if ds and ds.dimensions==2:
             self.xcent, self.ycent = ds.getPixelCentres()
             self.xedge, self.yedge = ds.getPixelEdges()
 
@@ -357,7 +357,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             data = self.document.data[self.dsname].data
         except KeyError:
             return 0
-        if data is not None:
+        if data is not None and data.ndim==2:
             return data.shape[0]
         else:
             return 0
@@ -369,7 +369,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             data = self.document.data[self.dsname].data
         except KeyError:
             return 0
-        if data is not None:
+        if data is not None and data.ndim==2:
             return data.shape[1]
         else:
             return 0
@@ -381,7 +381,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
                 data = self.document.data[self.dsname].data
             except KeyError:
                 return None
-            if data is not None:
+            if data is not None and data.ndim==2:
                 try:
                     num = data[data.shape[0]-index.row()-1, index.column()]
                     return float(num)
@@ -394,6 +394,9 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         """Return headers at top."""
 
         ds = self.document.data.get(self.dsname)
+        if ds.dimensions != 2:
+            return None
+
         xaxis = orientation == qt4.Qt.Horizontal
 
         # note: y coordinates are upside down (high y is at top)

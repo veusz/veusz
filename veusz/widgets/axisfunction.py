@@ -71,7 +71,10 @@ def solveFunction(function, vals, mint=None, maxt=None):
         xvals = N.hstack(( xvals[xvals < maxt], maxt ))
 
     # yvalue in correct shape
-    yvals = function(xvals) + N.zeros(len(xvals))
+    try:
+        yvals = function(xvals) + N.zeros(len(xvals))
+    except Exception as e:
+        raise FunctionError(_('Error evaluating function: %s') % cstr(e))
 
     anynan = N.any( N.isnan(yvals) )
     if anynan:
@@ -508,7 +511,7 @@ class AxisFunction(axis.Axis):
 
     def _linearInterpolWarning(self, vals, xcoords, ycoords):
         '''Linear interpolation, giving out of bounds warning.'''
-        if any(vals < xcoords[0]) or any(vals > xcoords[-1]):
+        if N.any(vals < xcoords[0]) or N.any(vals > xcoords[-1]):
             self.document.log(
                 _('Warning: values exceed bounds in axis-function'))
 

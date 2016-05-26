@@ -20,6 +20,7 @@ from __future__ import division
 import numpy as N
 from .datasets import Dataset1DBase, evalDatasetExpression, _
 from .. import qtall as qt4
+from ..compat import citems
 
 class DatasetHistoGenerator(object):
     def __init__(self, document, inexpr,
@@ -41,7 +42,10 @@ class DatasetHistoGenerator(object):
         self.document = document
         self.inexpr = inexpr
         self.binmanual = binmanual
-        self.binparams = binparams
+        if binparams is None:
+            self.binparams = (10, 'Auto', 'Auto', False)
+        else:
+            self.binparams = binparams
         self.method = method
         self.cumulative = cumulative
         self.errors = errors
@@ -174,19 +178,19 @@ class DatasetHistoGenerator(object):
 
     def saveToFile(self, fileobj):
         """Save two datasets to file."""
-        try:
-            binname = self.bindataset.name()
-        except (ValueError, AttributeError):
-            binname = ''
-        try:
-            valname = self.valuedataset.name()
-        except (ValueError, AttributeError):
-            valname = ''
+
+        # lookup names of datasets in document
+        bindsname = valuedsname = ''
+        for name, ds in citems(self.document.data):
+            if ds is self.bindataset:
+                bindsname = name
+            elif ds is self.valuedataset:
+                valuedsname = name
 
         fileobj.write( ("CreateHistogram(%s, %s, %s, binparams=%s, "
                         "binmanual=%s, method=%s, "
                         "cumulative=%s, errors=%s)\n") %
-                       (repr(self.inexpr), repr(binname), repr(valname),
+                       (repr(self.inexpr), repr(bindsname), repr(valuedsname),
                         repr(self.binparams), repr(self.binmanual),
                         repr(self.method), repr(self.cumulative),
                         repr(self.errors)) )

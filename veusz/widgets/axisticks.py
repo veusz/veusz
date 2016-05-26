@@ -54,8 +54,11 @@ class AxisTicksBase(object):
          is tuple as returned in self.interval after calling getTicks()
         """
 
-        self.minval = minval
-        self.maxval = maxval
+        # clip to sensible range
+        self.minval = max(min(minval, 1e100), -1e100)
+        self.maxval = max(min(maxval, 1e100), -1e100)
+
+        # tick parameters
         self.numticks = numticks
         self.numminorticks = numminorticks
         self.logaxis = logaxis

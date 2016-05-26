@@ -1,6 +1,6 @@
 # plotwindow.py
 # the main window for showing plots
- 
+
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -68,6 +68,10 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
 class RenderControl(qt4.QObject):
     """Object for rendering plots in a separate thread."""
 
+    # emitted when new item on plot queue
+    sigQueueChange = qt4.pyqtSignal(int)
+
+    # when a rendering job is finished
     signalRenderFinished = qt4.pyqtSignal(
         int, qt4.QImage, document.PaintHelper)
 
@@ -148,13 +152,13 @@ class RenderControl(qt4.QObject):
             self.mutex.unlock()
 
         # tell any listeners that a job has been processed
-        self.plotwindow.sigQueueChange.emit(-1)
+        self.sigQueueChange.emit(-1)
 
     def addJob(self, helper):
         """Process drawing job in PaintHelper given."""
 
         # indicate that there is a new item to be processed to listeners
-        self.plotwindow.sigQueueChange.emit(1)
+        self.sigQueueChange.emit(1)
 
         # add the job to the queue
         self.mutex.lock()
@@ -218,7 +222,7 @@ class PlotWindow( qt4.QGraphicsView ):
     # axis values update from moving mouse
     sigAxisValuesFromMouse = qt4.pyqtSignal(dict)
     # gives widget clicked
-    sigWidgetClicked = qt4.pyqtSignal(object)
+    sigWidgetClicked = qt4.pyqtSignal(object, str)
 
     # how often the document can update
     updateintervals = (
@@ -296,6 +300,8 @@ class PlotWindow( qt4.QGraphicsView ):
         self.rendercontrol = RenderControl(self)
         self.rendercontrol.signalRenderFinished.connect(
             self.slotRenderFinished)
+        self.rendercontrol.sigQueueChange.connect(
+            self.sigQueueChange)
 
         # mode for clicking
         self.clickmode = 'select'
@@ -527,7 +533,7 @@ class PlotWindow( qt4.QGraphicsView ):
             pt1.x(), pt1.y(), widgets.Graph)
         if widget is None:
             return
-        
+
         # convert points on plotter to points on axis for each axis
         # we also add a neighbouring pixel for the rounding calculation
         xpts = N.array( [pt1.x(), pt2.x(), pt1.x()+1, pt2.x()-1] )
@@ -535,7 +541,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # build up operation list to do zoom
         operations = []
-        
+
         axes = {}
         # iterate over children, to look for plotters
         for c in [i for i in widget.children if
@@ -738,7 +744,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
     def mouseReleaseEvent(self, event):
         """If the mouse button is released, check whether the mouse
-        clicked on a widget, and emit a sigWidgetClicked(widget)."""
+        clicked on a widget, and emit a sigWidgetClicked(widget,mode)."""
 
         qt4.QGraphicsView.mouseReleaseEvent(self, event)
 
@@ -748,7 +754,7 @@ class PlotWindow( qt4.QGraphicsView ):
             if self.currentclickmode == 'select':
                 # work out where the mouse clicked and choose widget
                 pos = self.mapToScene(event.pos())
-                self.locateClickWidget(pos.x(), pos.y())
+                self.identifyAndClickWidget(pos.x(), pos.y(), event.modifiers())
             elif self.currentclickmode == 'scroll':
                 # return the cursor to normal after scrolling
                 self.clickmode = 'select'
@@ -847,10 +853,10 @@ class PlotWindow( qt4.QGraphicsView ):
         else:
             qt4.QGraphicsView.wheelEvent(self, event)
 
-    def locateClickWidget(self, x, y):
+    def identifyAndClickWidget(self, x, y, modifier):
         """Work out which widget was clicked, and if necessary send
         a sigWidgetClicked(widget) signal."""
-        
+
         if self.document.getNumberPages() == 0:
             return
 
@@ -862,7 +868,14 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # tell connected objects that widget was clicked
         if widget is not None:
-            self.sigWidgetClicked.emit(widget)
+            if modifier & qt4.Qt.ControlModifier:
+                mode = 'toggle'
+            elif modifier & qt4.Qt.ShiftModifier:
+                mode = 'add'
+            else:
+                mode = 'new'
+
+            self.sigWidgetClicked.emit(widget, mode)
 
     def setPageNumber(self, pageno):
         """Move the the selected page."""
@@ -904,7 +917,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
             # print >>sys.stderr, "updating"
             self.pickeritem.hide()
-            
+
             self.pagenumber = min( self.document.getNumberPages() - 1,
                                    self.pagenumber )
             self.oldpagenumber = self.pagenumber
@@ -1074,25 +1087,28 @@ class PlotWindow( qt4.QGraphicsView ):
         if aspectwin > aspectplot:
             # take account of scroll bar
             width -= self.verticalScrollBar().width()
-            
+
         mult = width / r.width()
         self.setZoomFactor(self.zoomfactor * mult)
-        
+
     def slotViewZoomHeight(self):
         """Make the zoom factor so that the plot fills the whole width."""
 
-        # need to take account of scroll bars when deciding size
         viewportsize = self.maximumViewportSize()
-        aspectwin = viewportsize.width() / viewportsize.height()
-        r = self.pixmapitem.boundingRect()
-        aspectplot = r.width() / r.height()
+        pixrect = self.pixmapitem.boundingRect()
+
+        try:
+            aspectwin = viewportsize.width() / viewportsize.height()
+            aspectplot = pixrect.width() / pixrect.height()
+        except ZeroDivisionError:
+            return
 
         height = viewportsize.height()
         if aspectwin < aspectplot:
             # take account of scroll bar
             height -= self.horizontalScrollBar().height()
-            
-        mult = height / r.height()
+
+        mult = height / pixrect.height()
         self.setZoomFactor(self.zoomfactor * mult)
 
     def slotViewZoomPage(self):
@@ -1112,7 +1128,7 @@ class PlotWindow( qt4.QGraphicsView ):
     def slotViewPreviousPage(self):
         """View the previous page."""
         self.setPageNumber( self.pagenumber - 1 )
- 
+
     def slotViewNextPage(self):
         """View the next page."""
         self.setPageNumber( self.pagenumber + 1 )
@@ -1132,7 +1148,7 @@ class PlotWindow( qt4.QGraphicsView ):
         modecnvt = { self.vzactions['view.select'] : 'select',
                      self.vzactions['view.pick'] : 'pick',
                      self.vzactions['view.zoomgraph'] : 'graphzoom' }
-        
+
         # close the current picker
         self.pickeritem.hide()
         self.sigPickerEnabled.emit(False)
@@ -1142,14 +1158,12 @@ class PlotWindow( qt4.QGraphicsView ):
 
         if self.clickmode == 'select':
             self.pixmapitem.unsetCursor()
-            #self.label.setCursor(qt4.Qt.ArrowCursor)
         elif self.clickmode == 'graphzoom':
-            self.pixmapitem.unsetCursor()
-            #self.label.setCursor(qt4.Qt.CrossCursor)
+            self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
         elif self.clickmode == 'pick':
             self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
             self.sigPickerEnabled.emit(True)
-        
+
     def getClick(self):
         """Return a click point from the graph."""
 
@@ -1170,7 +1184,7 @@ class PlotWindow( qt4.QGraphicsView ):
             pt.x(), pt.y(), widgets.Graph)
         if widget is None:
             return []
-        
+
         # convert points on plotter to points on axis for each axis
         xpts = N.array( [pt.x()] )
         ypts = N.array( [pt.y()] )

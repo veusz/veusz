@@ -66,6 +66,7 @@ class CommandInterface(qt4.QObject):
         'FilterDatasets',
         'Get',
         'GetChildren',
+        'GetColormap',
         'GetData',
         'GetDataType',
         'GetDatasets',
@@ -341,8 +342,19 @@ class CommandInterface(qt4.QObject):
     def GetChildren(self, where='.'):
         """Return a list of widgets which are children of the widget of the
         path given."""
-        return list( self.document.resolve(self.currentwidget,
-                                           where).childnames )
+        return list(
+            self.document.resolve(self.currentwidget, where).childnames )
+
+    def GetColormap(self, name, invert=False, nvals=256):
+        """Return an array of [red,green,blue,alpha] values
+        representing the colormap with the name given.
+
+        Each return value is between 0 and 255.
+
+        The number of values to return is given by nvals
+        """
+        cmap = self.document.getColormap(name, invert)
+        return utils.getColormapArray(cmap, nvals)
 
     def GetDatasets(self):
         """Return a list of names of datasets."""

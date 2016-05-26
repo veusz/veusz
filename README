@@ -1,4 +1,4 @@
-Veusz 1.23
+Veusz 1.24
 ----------
 http://home.gna.org/veusz/
 
@@ -12,38 +12,44 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.23:
- * Add new export dialog box which can export multiple pages and
-   modify the export options
- * Add new dataset filtering dialog
- * Add cubehelix() functional colormap
- * Add -stepN suffix for colormaps to make arbitrary numbers of steps
- * Fix incorrect colors in log images and log color scales
- * Fix unsafe commands not being run
+Changes in 1.24:
+ * Text labels can now include Python expressions inside %{{ }}%
+ * Added built-in functions DATE([fmt]), TIME([fmt]), FILENAME() and BASENAME()
+   when evaluating expressions, which are useful when used in labels
+ * Added Python dictionary ENVIRON when evaluating expressions, to obtain
+   values from environment variables
+ * Added DATA(name, [part]) function to expression environment for accessing
+   values from datasets, useful for function evaluation or labels
+ * Added SETTING(path) function for expression evaluation to obtain values
+   of settings
+ * Added ESCAPE(text) function to environment, which allows LaTeX special
+   characters to be displayed in labels
+ * Add fractions and percentages units to polar plot
+ * Allow number of spokes to be varied in polar plot
+ * Widgets can be clicked holding down shift or ctrl, to add or toggle their
+   selection
+ * Add K. Moreland's cool-warm colormap (thanks to S. Richardson)
+ * Added further green-map, blue-darkred, blue-darkorange, brown-blue and
+   blue-orange colormaps from Oregon geography dept.
+ * Add logarithm and exponential dataset plugins
+ * Add Wipe() command to embedding interface to clear document
+ * Add File->Reload menu option to reload from saved document
+ * Add tooltip to items in FieldWidget showing widget path
 
-Minor changes
- * Fix incorrect use of None in (x,...) pattern
- * Catch crash if plotting nan/inf value in log space
- * Fix getData in dataset plugin for dimensions=2
- * Catch error in too large float to date time conversion
- * Catch disappeared file during import
- * Index error fixed in pickable
- * Catch error in data edit dialog if 2d dataset size changes
- * If root widget is selected with others, do not error on hide
- * Fix undo for dataset histogram with a single output dataset
- * Fix error resizing ellipse with a tuple width, height or position setting
- * Only use finite values in histogram
- * Rewrite Line/FillSet setting controls for internal consistency and to fix
-   new style extended fills
- * Do not crash with log date-time axes
- * Also ignore non-finite values when fitting with minuit
- * Avoid syntax error with invalid colormap
- * Updates to setup.py and desktop files
- * Recreate dataset now works if dialog hasn't been opened already
- * Restore dock layout when using Python3
- * Fix undo after loading stylesheet/custom definitions
- * Support unicode example filenames
- * Clip bezier lines to avoid problems with log axes
+Bux fixes:
+ * Fix transparency with bar plot
+ * Use getcwdu() for python2 to avoid bugs combining paths
+ * Handle inf/nan when converting to human readable form in plots
+ * Fix CreateHistogram on command line without binparams parameter
+ * Handle empty 2D dataset import with grid at edge enabled
+ * Do not allow error bars on imported CSV non-numeric data
+ * Handle missing argument in \size
+ * For data edit dialog, allow 1D dataset to replace 2D dataset
+ * Crash if zoom to be height when height is zero
+ * Fix problem with 2D import if error message is in unicode
+ * With axis-function widget catch result if greater than 1 dimension
+ * Fix cloning for datasets with / in name
+ * Fix crash in embedding if plot window closed while rendering in progress
 
 Features of package:
  Plotting features:

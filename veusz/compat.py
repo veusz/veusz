@@ -23,9 +23,10 @@ Rolled own, because I can control the naming better (everying starts
 with a 'c')
 """
 
-import sys
 import itertools
 import locale
+import os
+import sys
 
 cpy3 = sys.version_info[0] == 3
 
@@ -80,6 +81,12 @@ if cpy3:
     # exec function
     cexec = getattr(cbuiltins, 'exec')
 
+    # execfile
+    def cexecfile(filename, globaldict):
+        with open(filename) as f:
+            code = compile(f.read(), filename, 'exec')
+        cexec(code, globaldict)
+
     # convert strerror exception to string
     def cstrerror(ex):
         return ex.strerror
@@ -89,6 +96,13 @@ if cpy3:
         if isinstance(v, str):
             return 'u' + repr(v)
         return repr(v)
+
+    # convert exception to a user string
+    def cexceptionuser(ex):
+        return str(ex)
+
+    # get current directory (as unicode)
+    cgetcwd = os.getcwd
 
 else:
     # py2
@@ -152,15 +166,31 @@ else:
         code = 'exec text in globdict'
         exec(code)
 
+    # execfile
+    def cexecfile(filename, globaldict):
+        execfile(filename, globaldict)
+
     # convert strerror exception to string
     def cstrerror(ex):
         if isinstance(ex.strerror, str):
-            deflocale = locale.getdefaultlocale()[1]
-            if deflocale is None:
-                deflocale = 'ascii'
+            deflocale = locale.getdefaultlocale()[1] or 'ascii'
             return ex.strerror.decode(deflocale)
         else:
             return ex.strerror
 
+    # sometimes exceptions come as unicode, sometimes as strings
+    # encoded in ascii, so we have to decode
+    def cexceptionuser(ex):
+        if hasattr(ex, 'strerror') and isinstance(ex.strerror, str):
+            # comes from operating system as encoded
+            deflocale = locale.getdefaultlocale()[1] or 'ascii'
+            return str(ex).decode(deflocale)
+        else:
+            # let's hope this works
+            return unicode(ex)
+
     # py2/3 repr
     crepr = repr
+
+    # unicode getcwd
+    cgetcwd = os.getcwdu

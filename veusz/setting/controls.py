@@ -1385,7 +1385,7 @@ class _FillBox(qt4.QScrollArea):
         # get value of brush and get data for row
         e = self.extbrush
         rowdata = [e.style, e.color, e.hide]
-        if e.style != 'solid':
+        if e.style != 'solid' or e.transparency > 0:
             rowdata += [
                 e.transparency, e.linewidth, e.linestyle,
                 e.patternspacing, e.backcolor,

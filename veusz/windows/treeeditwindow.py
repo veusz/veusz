@@ -832,6 +832,9 @@ class TreeEditDock(qt4.QDockWidget):
     def _constructToolbarMenu(self):
         """Add items to edit/add graph toolbar and menu."""
 
+        def slotklass(klass):
+            return lambda: self.slotMakeWidgetButton(klass)
+
         iconsize = setting.settingdb['toolbar_size']
         self.addtoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
         self.edittoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
@@ -848,9 +851,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'nonorthpoint', 'nonorthfunc'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
-            def slotfn(klass=wc):
-                return lambda: self.slotMakeWidgetButton(klass)
-            slot = slotfn(wc)
+            slot = slotklass(wc)
             self.addslots[wc] = slot
 
             actionname = 'add.' + widgettype
@@ -1098,18 +1099,30 @@ class TreeEditDock(qt4.QDockWidget):
         if len(selected) != 0:
             self.treeview.edit(selected[0])
 
-    def selectWidget(self, widget):
+    def selectWidget(self, widget, mode='new'):
         """Select the associated listviewitem for the widget w in the
-        listview."""
+        listview.
+
+        mode:
+         'new': new selection
+         'add': add to selection
+         'toggle': toggle selection
+        """
 
         index = self.treemodel.getWidgetIndex(widget)
+
         if index is not None:
             self.treeview.scrollTo(index)
-            self.treeview.selectionModel().select(
-                index, qt4.QItemSelectionModel.Clear |
-                qt4.QItemSelectionModel.Current |
-                qt4.QItemSelectionModel.Rows |
-                qt4.QItemSelectionModel.Select )
+
+            flags = qt4.QItemSelectionModel.Rows | {
+                'new':  (
+                    qt4.QItemSelectionModel.ClearAndSelect |
+                    qt4.QItemSelectionModel.Current),
+                'add': qt4.QItemSelectionModel.Select,
+                'toggle': qt4.QItemSelectionModel.Toggle,
+            }[mode]
+
+            self.treeview.selectionModel().select(index, flags)
 
     def slotWidgetMove(self, direction):
         """Move the selected widget up/down in the hierarchy.

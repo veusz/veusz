@@ -15,7 +15,7 @@
     </author>
 
     <copyright>
-      <year>2015</year>
+      <year>2016</year>
     </copyright>
 
     <legalnotice>
@@ -81,7 +81,7 @@
 	<para>As an aside, using the scripting interface, widgets are
 	specified with a "path", like a file in Unix or Windows. These
 	can be relative to the current widget (do not start with a
-	slash), or absolute (do not start with a slash). Examples of
+	slash), or absolute (start with a slash). Examples of
 	paths include, "/page1/graph1/x", "x" and ".".</para>
 
 	<para>The widget types include</para>
@@ -447,6 +447,98 @@
 	pasting from a character map application. If your current font
 	does not contain these symbols then you may get a box
 	character.</para>
+
+        <para>Veusz also supports the evaluation of a Python
+        expression when text is written to the page. Python code is
+        written inside the brackets <command>%{{ }}%</command>. Note
+        that the Python evaluation happens before the LaTeX expansion
+        is done. The return value of the expression is converted to
+        text using the Python <command>str()</command> function. For
+        example, the expression <command>%{{2+2}}%</command> would
+        write <command>4</command>. Custom functions and constants are
+        supported when evaluation, in addition to the usual numpy
+        functions. In addition, Veusz defines the following useful
+        functions and values.</para>
+
+	 <orderedlist>
+	   <listitem>
+	     <para>
+	       <command>ENVIRON</command> is the
+	       <command>os.environ</command> dict of environment
+	       variables. <command>%{{ENVIRON['USER']}}%</command>
+	       would show the current user in unix.
+	     </para>
+	   </listitem>
+
+	   <listitem>
+	     <para>
+	       <command>DATE([fmt])</command> returns the current
+	       date, by default in ISO format. fmt is an optional
+	       format specifier using
+	       <command>datetime.date.strftime</command> format
+	       specifiers.
+	     </para>
+	   </listitem>
+
+	   <listitem>
+	     <para>
+	       <command>TIME([fmt])</command> returns the current
+	       date/time, by default in ISO format. fmt is an optional
+	       format specifier using
+	       <command>datetime.datetime.strftime</command> format
+	       specifiers.
+	     </para>
+	   </listitem>
+
+	   <listitem>
+	     <para>
+	       <command>DATA(name[, part])</command> returns the Veusz
+	       dataset with given name. For numeric datasets this is a
+	       numpy array. For numeric datasets with errors, part
+	       specifies the dataset part to return, i.e. 'data',
+	       'serr', 'perr', 'nerr'. For example, the mean value of
+	       a dataset could be shown using
+	       <command>%{{mean(DATA('x'))}}%</command>.
+	     </para>
+	   </listitem>
+
+           <listitem>
+             <para>
+               <command>FILENAME()</command> - returns the current
+               document filename. This can include the
+               directory/folder of the file. Note that the filename is
+               escaped with ESCAPE() so that LaTeX symbols are not
+               expanded when shown.
+             </para>
+           </listitem>
+
+           <listitem>
+             <para>
+               <command>BASENAME()</command> - returns the current
+               document filename, removing the directory or folder
+               name Note that the filename is escaped with ESCAPE() so
+               that LaTeX symbols are not expanded when shown.
+             </para>
+           </listitem>
+
+           <listitem>
+             <para>
+               <command>ESCAPE(x)</command> - escapes any LaTeX
+               symbols in x so that they are not interpreted as
+               LaTeX.
+             </para>
+           </listitem>
+
+           <listitem>
+             <para>
+               <command>SETTING(path)</command> - return the value of
+               the Veusz setting given by the full path,
+               e.g. <command>%{{SETTING('/page1/width')}}%</command>.
+             </para>
+           </listitem>
+
+         </orderedlist>
+
       </section>
 
       <section>
@@ -1323,6 +1415,17 @@ SetData('y', y)
       symmetric errors bars of 0.1. Asymmetric bars are given as
       <command>(a,a*0.1,-a*0.1)</command>.</para>
 
+      <para>Other useful functions in evaluation include those already
+      mentioned in the LaTeX expansion
+      description. <command>DATA(name, [part])</command> returns the
+      dataset with name given. The optional part, which can be 'data',
+      'serr', 'perr' or 'nerr', allows error bars to be returned for
+      numerical data. <command>SETTING(path)</command> returns the
+      value of the Veusz setting, which can include, for example, the
+      best fitting parameters of a fit. <command>ENVIRON</command> is
+      the Python environment variable dictionary, allowing values to
+      be passed from the environment,
+      e.g. <command>float(ENVIRON['myvar'])</command>.</para>
       </section>
 
       <section>
@@ -1710,6 +1813,18 @@ SetData('y', y)
 	<para>Returns: A list containing tuples of the form (axispath,
 	val) for each axis for which the click was in range. The value
 	is the value on the axis for the click.</para>
+      </section>
+
+      <section>
+        <title>GetColormap</title>
+
+        <anchor id="Command.GetColormap" />
+
+        <para><command>GetColormap(name, invert=False, nvals=256)</command></para>
+        <para>Returns a colormap as a numpy array of red, green, blue,
+        alpha values (ranging from 0 to 255) with the number of steps
+        given.
+        </para>
       </section>
 
       <section>
@@ -2622,6 +2737,10 @@ g.Close()
 	    <literal>Embedded</literal> object. Returns a new
 	    <literal>Embedded</literal> object.</para>
 	  </listitem>
+          <listitem>
+            <para><literal>Wipe()</literal> - wipe the document of all
+            widgets and datasets.</para>
+          </listitem>
 	</itemizedlist>
       </section>
 

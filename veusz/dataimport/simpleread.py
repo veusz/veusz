@@ -766,7 +766,10 @@ class SimpleRead2D(object):
                 raise Read2DError(
                     "x|y grid|cent are incompatible with gridatedge")
 
-            self.xcent = N.array(rows[-1])
+            if len(rows) > 0:
+                self.xcent = N.array(rows[-1])
+            else:
+                self.xcent = N.array([])
             self.ycent = N.array([r[0] for r in rows[:-1]])
 
             # chop out grid

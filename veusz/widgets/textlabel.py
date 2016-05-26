@@ -162,10 +162,12 @@ class TextLabel(plotters.FreePlotter):
                     dx = -TextLabel.cnvtalignhorz[s.alignHorz]*margin
                     dy =  TextLabel.cnvtalignvert[s.alignVert]*margin
 
-                r = utils.Renderer( painter, font, x+dx, y+dy, t,
-                                    TextLabel.cnvtalignhorz[s.alignHorz],
-                                    TextLabel.cnvtalignvert[s.alignVert],
-                                    s.angle )
+                r = utils.Renderer(
+                    painter, font, x+dx, y+dy, t,
+                    TextLabel.cnvtalignhorz[s.alignHorz],
+                    TextLabel.cnvtalignvert[s.alignVert],
+                    s.angle,
+                    doc=d)
 
                 tbounds = r.getBounds()
                 if borderorfill:

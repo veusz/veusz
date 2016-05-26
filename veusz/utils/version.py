@@ -29,21 +29,22 @@ import sys
 
 from . import utilfuncs
 
-def version():
-    """Return the version number as a string."""
-
-    try:
-        f = open( os.path.join(utilfuncs.resourceDirectory, 'VERSION') )
-    except EnvironmentError:
-        sys.stderr.write('''
-Failed to find VERSION file.
+_errmsg = """Failed to find VERSION file.
 
 This is probably because the resource files are not installed in the
 python module directory. You may need to set the environment variable
 VEUSZ_RESOURCE_DIR or add a "resources" symlink in the main veusz
 module directory pointing to the directory where resources are
 located. See INSTALL for details.
-'''.lstrip())
-        sys.exit(1)
+"""
 
-    return f.readline().strip()
+def version():
+    """Return the version number as a string."""
+
+    filename = os.path.join(utilfuncs.resourceDirectory, "VERSION")
+    try:
+        with open(filename) as f:
+            return f.readline().strip()
+    except EnvironmentError:
+        sys.stderr.write(_errmsg)
+        sys.exit(1)
