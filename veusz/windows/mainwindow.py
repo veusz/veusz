@@ -843,7 +843,7 @@ class MainWindow(qt4.QMainWindow):
             if v == qt4.QMessageBox.Cancel:
                 event.ignore()
                 return
-            elif v == qt4.QMessageBox.Yes:
+            elif v == qt4.QMessageBox.Save:
                 self.slotFileSave()
 
         # store working directory
