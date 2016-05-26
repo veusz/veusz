@@ -592,3 +592,7 @@ class SVGPaintDevice(qt4.QPaintDevice):
             return int(dpi)
         elif m == qt4.QPaintDevice.PdmDevicePixelRatio:
             return 1
+
+        # Qt >= 5.6
+        elif m == getattr(qt4.QPaintDevice, 'PdmDevicePixelRatioScaled', -1):
+            return 1
