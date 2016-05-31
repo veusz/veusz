@@ -1018,7 +1018,7 @@ dataexpr_split_re = re.compile(r'(`.*?`|[\.+\-*/\(\)\[\],<>=!|%^~& ])')
 dataexpr_quote_re = re.compile(r'^`.*`$')
 dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True}
 
-def _substituteDatasets(datasets, expression, thispart):
+def substituteDatasets(datasets, expression, thispart):
     """Substitute the names of datasets with calls to a function which will
     evaluate them.
 
@@ -1169,7 +1169,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
         return None
 
     # replace dataset names by calls to _DS_(name,part)
-    expr, subdatasets = _substituteDatasets(doc.data, origexpr, part)
+    expr, subdatasets = substituteDatasets(doc.data, origexpr, part)
 
     comp = doc.compileCheckedExpression(expr, origexpr=origexpr)
     if comp is None:
@@ -1185,7 +1185,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
     try:
         evalout = eval(comp, env)
     except Exception as ex:
-        doc.log("Error evaluating '%s': '%s'" % (origexpr, cstr(ex)))
+        doc.log(_("Error evaluating '%s': '%s'" % (origexpr, cstr(ex))))
         return None
 
     # return correct dataset for data type
@@ -1240,7 +1240,7 @@ class DatasetExpression(Dataset1DBase):
         Returns True if succeeded
         """
         # replace dataset names with calls
-        newexpr = _substituteDatasets(self.document.data, expr, part)[0]
+        newexpr = substituteDatasets(self.document.data, expr, part)[0]
 
         comp = self.document.compileCheckedExpression(newexpr, origexpr=expr)
         if comp is None:
@@ -1547,8 +1547,7 @@ class Dataset2DXYZExpression(Dataset2DBase):
         # evaluate the x, y and z expressions
         for name in ('exprx', 'expry', 'exprz'):
             origexpr = getattr(self, name)
-            expr = _substituteDatasets(self.document.data, origexpr,
-                                       'data')[0]
+            expr = substituteDatasets(self.document.data, origexpr, 'data')[0]
 
             comp = self.document.compileCheckedExpression(
                 expr, origexpr=origexpr)

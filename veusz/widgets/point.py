@@ -722,12 +722,18 @@ class PointPlotter(GenericPlotter):
         s.add( setting.DatasetOrStr(
             'labels', '',
             descr=_('Dataset or string to label points'),
-            usertext=_('Labels')), 5 )
+            usertext=_('Labels')), 4 )
         s.add( setting.DatasetExtended(
             'scalePoints', '',
             descr = _('Scale size of markers given by dataset, expression'
                       ' or list of values'),
-            usertext=_('Scale markers')), 6 )
+            usertext=_('Scale markers')), 5 )
+        s.add( setting.MarkerColor('Color'), 6 )
+
+        s.add( setting.Str(
+            'pipe', '',
+            descr=_('Pipes to manipulate plotted data'),
+            usertext=_('Pipe')), 7)
 
         # formatting
         s.add( setting.Int(
@@ -759,7 +765,6 @@ class PointPlotter(GenericPlotter):
             'circle',
             descr = _('Type of marker to plot'),
             usertext=_('Marker'), formatting=True), 0 )
-        s.add( setting.MarkerColor('Color') )
 
         s.add( setting.ErrorStyle(
             'errorStyle',
@@ -988,6 +993,13 @@ class PointPlotter(GenericPlotter):
         if text:
             length = min( len(xds.data), len(yds.data) )
             text = text*(length // len(text)) + text[:length % len(text)]
+
+        # manipulate datasets
+        if s.pipe:
+            retn = self.document.pipe.evalExpr(
+                s.pipe, xds, yds, text, colords, scaleds)
+            if retn is not None:
+                xds, yds, text, colords, scaleds = retn
 
         # loop over chopped up values
         for parts in (

@@ -51,6 +51,16 @@ def numpyCopyOrNone(data):
         return None
     return N.array(data, dtype=N.float64)
 
+def minlen(data, serr, perr, nerr):
+    l = len(data)
+    if serr is not None:
+        l = min(l, len(serr))
+    if perr is not None:
+        l = min(l, len(perr))
+    if nerr is not None:
+        l = min(l, len(nerr))
+    return l
+
 # these classes are returned from dataset plugins
 class Dataset1D(object):
     """1D dataset for ImportPlugin or DatasetPlugin."""
@@ -75,6 +85,12 @@ class Dataset1D(object):
         self.serr = numpyCopyOrNone(serr)
         self.perr = numpyCopyOrNone(perr)
         self.nerr = numpyCopyOrNone(nerr)
+
+    def hasErrors(self):
+        """Does dataset have error bars?"""
+        return (
+            self.serr is not None or self.perr is not None or
+            self.nerr is not None )
 
     def _null(self):
         """Empty data contents."""

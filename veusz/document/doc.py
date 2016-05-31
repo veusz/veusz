@@ -42,6 +42,7 @@ from .. import qtall as qt4
 from . import widgetfactory
 from . import datasets
 from . import painthelper
+from . import pipe
 
 from .. import utils
 from .. import setting
@@ -137,6 +138,9 @@ class Document( qt4.QObject ):
         # we use this format to preserve evaluation order
         self.customs = []
         self.updateEvalContext()
+
+        # for pipe function evaluation
+        self.pipe = pipe.Pipe(self)
 
         # copy default colormaps
         self.colormaps = utils.ColorMaps()
