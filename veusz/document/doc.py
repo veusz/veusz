@@ -42,7 +42,7 @@ from .. import qtall as qt4
 from . import widgetfactory
 from . import datasets
 from . import painthelper
-from . import pipe
+from . import transform
 
 from .. import utils
 from .. import setting
@@ -139,8 +139,8 @@ class Document( qt4.QObject ):
         self.customs = []
         self.updateEvalContext()
 
-        # for pipe function evaluation
-        self.pipe = pipe.Pipe(self)
+        # for transform function evaluation
+        self.transform = transform.Transform(self)
 
         # copy default colormaps
         self.colormaps = utils.ColorMaps()

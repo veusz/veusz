@@ -22,17 +22,17 @@ import numpy as N
 from .. import qtall as qt4
 from .datasetplugin import Dataset1D
 
-def _(text, disambiguation=None, context='PipePlugin'):
+def _(text, disambiguation=None, context='TransformPlugin'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-pipepluginregistry = {}
+transformpluginregistry = {}
 
-def registerPipePlugin(
+def registerTransformPlugin(
         name, username, category='Base', description=None):
 
     def decorator(f):
-        pipepluginregistry[name] = (
+        transformpluginregistry[name] = (
             f, username, category, description)
         return f
 
@@ -93,10 +93,10 @@ def _addSubDataset(d1, d2, sub=False):
         d1.serr = N.sqrt(d1err2[:minlen] + d2err2[:minlen])
         d1.perr = d1.nerr = None
 
-@registerPipePlugin(
+@registerTransformPlugin(
     'AddX', _('Add to X'), category=_('Maths'),
     description=_('Add value or dataset to X dataset'))
-def pipeAddX(dss):
+def transformAddX(dss):
     def AddX(val):
         if isDataset1D(val):
             _addSubDataset(dss[0], val, sub=False)
@@ -104,10 +104,10 @@ def pipeAddX(dss):
             dss[0].data += val
     return AddX
 
-@registerPipePlugin(
+@registerTransformPlugin(
     'AddY', _('Add to Y'), category=_('Maths'),
     description=_('Add value or dataset to Y dataset'))
-def pipeAddY(dss):
+def transformAddY(dss):
     def AddY(val):
         if isDataset1D(val):
             _addSubDataset(dss[1], val, sub=False)
@@ -115,10 +115,10 @@ def pipeAddY(dss):
             dss[1].data += val
     return AddY
 
-@registerPipePlugin(
+@registerTransformPlugin(
     'Add', _('Add to dataset'), category=_('Maths'),
     description=_('Add value or dataset to dataset'))
-def pipeAdd(dss):
+def transformAdd(dss):
     def Add(ds, val):
         idx = dsCodeToIdx(ds)
         if isDataset1D(val):
@@ -127,10 +127,10 @@ def pipeAdd(dss):
             dss[idx].data += val
     return Add
 
-@registerPipePlugin(
+@registerTransformPlugin(
     'SubX', _('Subtract from X'), category=_('Maths'),
     description=_('Subtract value or dataset from X dataset'))
-def pipeSubX(dss):
+def transformSubX(dss):
     def SubX(val):
         if isDataset1D(val):
             _addSubDataset(dss[0], val, sub=True)
@@ -138,10 +138,10 @@ def pipeSubX(dss):
             dss[0].data -= val
     return SubX
 
-@registerPipePlugin(
+@registerTransformPlugin(
     'SubY', _('Subtract from Y'), category=_('Maths'),
     description=_('Subtract value or dataset from Y dataset'))
-def pipeSubY(dss):
+def transformSubY(dss):
     def SubY(val):
         if isDataset1D(val):
             _addSubDataset(dss[1], val, sub=True)
@@ -203,10 +203,10 @@ def _multiplyDatasetDataset(d1, d2):
     # multiply data points
     d1.data = d1.data[:minlen] * d2.data[:minlen]
 
-@registerPipePlugin(
+@registerTransformPlugin(
     'MulX', _('Multiply X'), category=_('Maths'),
     description=_('Multiply X dataset by value or dataset'))
-def pipeMulX(dss):
+def transformMulX(dss):
     def MulX(val):
         if isDataset1D(val):
             _multiplyDatasetDataset(dss[0], val)
@@ -214,10 +214,10 @@ def pipeMulX(dss):
             _multiplyDatasetScalar(dss[0], val)
     return MulX
 
-@registerPipePlugin(
+@registerTransformPlugin(
     'MulY', _('Multiply Y'), category=_('Maths'),
     description=_('Multiply Y dataset by value or dataset'))
-def pipeMulY(dss):
+def transformMulY(dss):
     def MulY(val):
         if isDataset1D(val):
             _multiplyDatasetDataset(dss[1], val)

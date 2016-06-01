@@ -20,7 +20,7 @@ from .field import *
 from .datasetplugin import *
 from .importplugin import *
 from .toolsplugin import *
-from .pipeplugin import *
+from .transformplugin import *
 from .votable import *
 
 # backward compatibility

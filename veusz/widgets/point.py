@@ -731,9 +731,9 @@ class PointPlotter(GenericPlotter):
         s.add( setting.MarkerColor('Color'), 6 )
 
         s.add( setting.Str(
-            'pipe', '',
-            descr=_('Pipes to manipulate plotted data'),
-            usertext=_('Pipe')), 7)
+            'transform', '',
+            descr=_('Transforms plotted data'),
+            usertext=_('Transform')), 7)
 
         # formatting
         s.add( setting.Int(
@@ -995,9 +995,9 @@ class PointPlotter(GenericPlotter):
             text = text*(length // len(text)) + text[:length % len(text)]
 
         # manipulate datasets
-        if s.pipe:
-            retn = self.document.pipe.evalExpr(
-                s.pipe, xds, yds, text, colords, scaleds)
+        if s.transform:
+            retn = self.document.transform.evalExpr(
+                s.transform, xds, yds, text, colords, scaleds)
             if retn is not None:
                 xds, yds, text, colords, scaleds = retn
 

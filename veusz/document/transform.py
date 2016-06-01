@@ -24,7 +24,7 @@ from ..compat import cstr, citems
 from .. import plugins
 from . import datasets
 
-def _(text, disambiguation=None, context='pipe'):
+def _(text, disambiguation=None, context='transform'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
@@ -62,28 +62,28 @@ def convertFromPluginDataset(ds):
     else:
         raise RuntimeError("Unknown plugin dataset type")
 
-class Pipe:
+class Transform:
     def __init__(self, document):
         self.document = document
         self.datasets = []
 
         # link the function to the input datasets
-        self.pipeenv = {}
-        for name, info in citems(plugins.pipepluginregistry):
+        self.transformenv = {}
+        for name, info in citems(plugins.transformpluginregistry):
             fn = info[0]
-            self.pipeenv[name] = fn(self.datasets)
-        self.pipeenv['_DS_'] = self._evalDataset
+            self.transformenv[name] = fn(self.datasets)
+        self.transformenv['_DS_'] = self._evalDataset
 
     def _evalDataset(self, name, part):
         try:
-            ds = document.data[name]
+            ds = self.document.data[name]
         except KeyError:
             raise datasets.DatasetExpception(
                 'Dataset %s does not exist' % name)
         return convertToPluginDataset(ds)
 
     def evalExpr(self, expr, dsx, dsy, dslabel, dscolor, dssize):
-        """Execute pipe
+        """Execute transform
 
         expr: expression
         dsx,dsy,dslabel,dscolor,dssize: input datasets or None
@@ -100,7 +100,7 @@ class Pipe:
         if comp is None:
             return
 
-        # these are the datasets passed to the pipe functions,
+        # these are the datasets passed to the transform functions,
         # converted to the simplified plugin format
         self.datasets[:] = [
             convertToPluginDataset(dsx),
@@ -111,7 +111,7 @@ class Pipe:
         ]
 
         env = dict(self.document.eval_context)
-        env.update(self.pipeenv)
+        env.update(self.transformenv)
 
         # run the plugin
         try:
