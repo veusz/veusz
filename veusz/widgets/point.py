@@ -334,25 +334,23 @@ class MarkerFillBrush(setting.Brush):
 class DatasetPartPlot:
     """Encapsulate drawing of dataset as a class."""
 
-    def __init__(
-            self, painter, axes, posn, cliprect, xdata, ydata,
-            document, settings,
-            labeldata=None, colordata=None, sizedata=None):
-
+    def __init__(self, painter, axes, posn, cliprect, document, settings, datasets):
         self.painter = painter
         self.axes = axes
         self.posn = posn
         self.cliprect = cliprect
-        self.xdata = xdata
-        self.ydata = ydata
         self.document = document
         s = self.settings = settings
-        self.labeldata = labeldata
-        self.colordata = colordata
-        self.sizedata = sizedata
+        self.xdata = datasets[0]
+        self.ydata = datasets[1]
+        self.labeldata = datasets[2]
+        self.scaledata = datasets[3]
+        self.colordata = datasets[4]
 
-        xplotter = self.xplotter = axes[0].dataToPlotterCoords(posn, xdata.data)
-        yplotter = self.yplotter = axes[1].dataToPlotterCoords(posn, ydata.data)
+        xplotter = self.xplotter = axes[0].dataToPlotterCoords(
+            posn, self.xdata.data)
+        yplotter = self.yplotter = axes[1].dataToPlotterCoords(
+            posn, self.ydata.data)
 
         self.markersize = s.get('markerSize').convert(painter)
 
@@ -478,8 +476,8 @@ class DatasetPartPlot:
         scaling = colorvals = cmap = None
 
         # whether to scale markers
-        if self.sizedata:
-            scaling = self.sizedata.data
+        if self.scaledata:
+            scaling = self.scaledata.data
             if s.thinfactor > 1:
                 scaling = scaling[::s.thinfactor]
 
@@ -705,6 +703,10 @@ class PointPlotter(GenericPlotter):
         if type(self) == PointPlotter:
             self.readDefaults()
 
+        # datasets are cached for speed
+        self._cachechangeset = -1
+        self._cache_ds = None
+
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
@@ -821,6 +823,53 @@ class PointPlotter(GenericPlotter):
         return "x='%s', y='%s', marker='%s'" % (
             s.xData, s.yData, s.marker)
 
+    def _updateDatasetCache(self):
+        """Check whether datasets needs updating due to doc change.
+
+        This applies transforms, etc, so the calculations don't need
+        repeating.
+        """
+
+        if self._cachechangeset == self.document.changeset:
+            return
+        self._cachechangeset = self.document.changeset
+
+        s = self.settings
+        doc = self.document
+        xds = s.get('xData').getData(doc)
+        yds = s.get('yData').getData(doc)
+        text = s.get('labels').getData(doc, checknull=True)
+        scaleds = s.get('scalePoints').getData(doc)
+        colords = s.Color.get('points').getData(doc)
+
+        # automatic indexing of dataset is the other is blank
+        if xds and not yds and s.get('yData').isEmpty():
+            # use index for y data
+            length = xds.data.shape[0]
+            yds = document.DatasetRange(length, (1,length))
+        elif yds and not xds and s.get('xData').isEmpty():
+            # use index for x data
+            length = yds.data.shape[0]
+            xds = document.DatasetRange(length, (1,length))
+
+        # handle repeating labels
+        if text:
+            length = min( len(xds.data), len(yds.data) )
+            text = text*(length // len(text)) + text[:length % len(text)]
+
+        # cache contains tuples of datasets
+        self._cache_ds = []
+        if xds is not None and yds is not None:
+            self._cache_ds.append((xds, yds, text, scaleds, colords))
+
+        # transform datasets into new datasets
+        if s.transform:
+            transds = []
+            for ds in self._cache_ds:
+                retn = self.document.transform.evalExpr(s.transform, ds)
+                transds.append(ds if retn is None else retn)
+            self._cache_ds = transds
+
     def affectsAxisRange(self):
         """This widget provides range information about these axes."""
         s = self.settings
@@ -828,39 +877,33 @@ class PointPlotter(GenericPlotter):
 
     def getRange(self, axis, depname, axrange):
         """Compute the effect of data on the axis range."""
-        dataname = {'sx': 'xData', 'sy': 'yData'}[depname]
-        dsetn = self.settings.get(dataname)
-        data = dsetn.getData(self.document)
 
-        if axis.settings.log:
-            def updateRange(v):
-                with N.errstate(invalid='ignore'):
-                    chopzero = v[(v>0) & N.isfinite(v)]
-                if len(chopzero) > 0:
-                    axrange[0] = min(axrange[0], chopzero.min())
-                    axrange[1] = max(axrange[1], chopzero.max())
-        else:
-            def updateRange(v):
-                fvals = v[N.isfinite(v)]
-                if len(fvals) > 0:
-                    axrange[0] = min(axrange[0], fvals.min())
-                    axrange[1] = max(axrange[1], fvals.max())
+        islog = axis.settings.log
+        def updateRange(v):
+            """Update range based on data."""
+            filt = N.isfinite(v)
+            if islog:
+                filt &= v>0
+            fvals = v[filt]
+            if len(fvals) > 0:
+                axrange[0] = min(axrange[0], fvals.min())
+                axrange[1] = max(axrange[1], fvals.max())
 
-        if data:
-            data.rangeVisit(updateRange)
-        elif dsetn.isEmpty():
-            # no valid dataset.
-            # check if there a valid dataset for the other axis.
-            # if there is, treat this as a row number
-            dataname = {'sy': 'xData', 'sx': 'yData'}[depname]
-            data = self.settings.get(dataname).getData(self.document)
-            if data:
-                length = data.data.shape[0]
-                axrange[0] = min(axrange[0], 1)
-                axrange[1] = max(axrange[1], length)
+        # this is the index into the cached returned datasets
+        idx = {'sx': 0, 'sy': 1}[depname]
+
+        # update range using each entry in cache
+        self._updateDatasetCache()
+        for datasets in self._cache_ds:
+            datasets[idx].rangeVisit(updateRange)
 
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
+
+        self._updateDatasetCache()
+
+        # FIXME: needs to handle multiple datasets
+
         painter.save()
         cliprect = qt4.QRectF(qt4.QPointF(x,y), qt4.QPointF(x+width,y+height))
         painter.setClipRect(cliprect)
@@ -920,29 +963,33 @@ class PointPlotter(GenericPlotter):
     def getAxisLabels(self, direction):
         """Get labels for axis if using a label axis."""
 
-        s = self.settings
-        doc = self.document
-        text = s.get('labels').getData(doc, checknull=True)
-        xv = s.get('xData').getData(doc)
-        yv = s.get('yData').getData(doc)
+        self._updateDatasetCache()
 
-        # handle missing dataset
-        if yv and not xv and s.get('xData').isEmpty():
-            length = yv.data.shape[0]
-            xv = document.DatasetRange(length, (1,length))
-        elif xv and not yv and s.get('yData').isEmpty():
-            length = xv.data.shape[0]
-            yv = document.DatasetRange(length, (1,length))
+        # use x or y dataset as appropriate
+        dsidx = 0 if direction=='horizontal' else 1
 
-        if text is None or xv is None or yv is None:
+        # build up text and positions for each dataset
+        text = []
+        posns = []
+        for datasets in self._cache_ds:
+            if datasets[2]: # label
+                posns.append(datasets[dsidx].data)
+                # merge text
+                text += datasets[2]
+
+        # nothing to plot
+        if not text or not posns:
             return (None, None)
-        if direction == 'horizontal':
-            return (text, xv.data)
-        else:
-            return (text, yv.data)
+
+        # merge positions into single list
+        posns = N.hstack(posns)
+
+        return (text, posns)
 
     def _pickable(self, bounds):
         axes = self.fetchAxes()
+
+        # FIXME: for multiple datasets
 
         if axes is None:
             map_fn = None
@@ -967,69 +1014,17 @@ class PointPlotter(GenericPlotter):
             c.min, c.max, c.scaling, s.MarkerFill.colorMap, 0,
             s.MarkerFill.colorMapInvert)
 
-    def drawDataset(
-            self, painter, axes, posn, cliprect,
-            xds=None, yds=None, text=None,
-            scaleds=None, colords=None):
-
-        s = self.settings
-
-        # if a missing dataset, make a fake dataset for the second one
-        # based on a row number
-        if xds and not yds and s.get('yData').isEmpty():
-            # use index for y data
-            length = xds.data.shape[0]
-            yds = document.DatasetRange(length, (1,length))
-        elif yds and not xds and s.get('xData').isEmpty():
-            # use index for x data
-            length = yds.data.shape[0]
-            xds = document.DatasetRange(length, (1,length))
-        if not xds or not yds:
-            # no valid dataset, so exit
-            return
-
-        # if text entered, then multiply up to get same number of values
-        # as datapoints
-        if text:
-            length = min( len(xds.data), len(yds.data) )
-            text = text*(length // len(text)) + text[:length % len(text)]
-
-        # manipulate datasets
-        if s.transform:
-            retn = self.document.transform.evalExpr(
-                s.transform, xds, yds, text, colords, scaleds)
-            if retn is not None:
-                xds, yds, text, colords, scaleds = retn
-
-        # loop over chopped up values
-        for parts in (
-            document.generateValidDatasetParts(
-                [xds, yds, text, scaleds, colords])):
-
-            dd = DatasetPartPlot(
-                painter,axes, posn, cliprect,
-                parts[0], parts[1], self.document, s,
-                labeldata=parts[2],
-                sizedata=parts[3],
-                colordata=parts[4])
-            dd.plot()
-
     def dataDraw(self, painter, axes, posn, cliprect):
         """Plot the data on a plotter."""
 
-        # get data
-        s = self.settings
-        doc = self.document
-        xv = s.get('xData').getData(doc)
-        yv = s.get('yData').getData(doc)
-        text = s.get('labels').getData(doc, checknull=True)
-        scalepoints = s.get('scalePoints').getData(doc)
-        colorpoints = s.Color.get('points').getData(doc)
+        self._updateDatasetCache()
 
-        self.drawDataset(
-            painter, axes, posn, cliprect,
-            xds=xv, yds=yv, text=text,
-            scaleds=scalepoints, colords=colorpoints)
+        for datasets in self._cache_ds:
+            for dsparts in document.generateValidDatasetParts(datasets):
+                dd = DatasetPartPlot(
+                    painter,axes, posn, cliprect,
+                    self.document, self.settings, dsparts)
+                dd.plot()
 
 # allow the factory to instantiate an x,y plotter
 document.thefactory.register(PointPlotter)

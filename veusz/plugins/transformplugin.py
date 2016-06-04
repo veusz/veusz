@@ -48,10 +48,10 @@ def dsCodeToIdx(code):
             'y': 1,
             'l': 2,
             'label': 2,
-            'c': 3,
-            'color': 3,
-            's': 4,
-            'size': 4
+            's': 3,
+            'size': 3,
+            'c': 4,
+            'color': 4,
         }[code.lower()]
     except KeyError:
         raise ValueError('Unknown dataset code %s' % code)

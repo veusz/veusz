@@ -31,7 +31,7 @@ def _(text, disambiguation=None, context='transform'):
 def convertToPluginDataset(ds):
     """Convert Veusz standard datasets to datasets to pass to a plugin."""
 
-    name = 'xxx'
+    name = 'N/A'
 
     if ds is None:
         return None
@@ -82,12 +82,11 @@ class Transform:
                 'Dataset %s does not exist' % name)
         return convertToPluginDataset(ds)
 
-    def evalExpr(self, expr, dsx, dsy, dslabel, dscolor, dssize):
+    def evalExpr(self, expr, dsin):
         """Execute transform
 
         expr: expression
-        dsx,dsy,dslabel,dscolor,dssize: input datasets or None
-
+        dsin: (dsx,dsy,dslabel,dsscale,dscolor): input datasets or None
         returns: tuple of output datasets.
         """
 
@@ -102,13 +101,7 @@ class Transform:
 
         # these are the datasets passed to the transform functions,
         # converted to the simplified plugin format
-        self.datasets[:] = [
-            convertToPluginDataset(dsx),
-            convertToPluginDataset(dsy),
-            convertToPluginDataset(dslabel),
-            convertToPluginDataset(dscolor),
-            convertToPluginDataset(dssize),
-        ]
+        self.datasets[:] = [convertToPluginDataset(d) for d in dsin]
 
         env = dict(self.document.eval_context)
         env.update(self.transformenv)

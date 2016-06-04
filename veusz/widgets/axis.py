@@ -757,7 +757,7 @@ class Axis(widget.Widget):
         for plotter in plotters:
             # get label and label coordinates from plotter (if any)
             labels, coords = plotter.getAxisLabels(dir)
-            if None not in (labels, coords):
+            if labels is not None and coords is not None:
                 # convert coordinates to plotter coordinates
                 pcoords = self._graphToPlotter(coords)
                 for coord, pcoord, lab in czip(coords, pcoords, labels):
@@ -812,8 +812,8 @@ class Axis(widget.Widget):
 
             # generate positions and labels
             for posn, tickval in czip(coordticks, tickvals):
-                text = utils.formatNumber(tickval*scale, format,
-                                          locale=self.document.locale)
+                text = utils.formatNumber(
+                    tickval*scale, format, locale=self.document.locale)
                 yield posn, text
 
         # position of label perpendicular to axis
