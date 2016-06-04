@@ -17,7 +17,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-"""Handle piping data."""
+"""Handle transforming data inside widget."""
 
 from .. import qtall as qt4
 from ..compat import cstr, citems
@@ -75,12 +75,19 @@ class Transform:
         self.transformenv['_DS_'] = self._evalDataset
 
     def _evalDataset(self, name, part):
+        """Either return full dataset, or part of it."""
         try:
             ds = self.document.data[name]
         except KeyError:
             raise datasets.DatasetExpception(
                 'Dataset %s does not exist' % name)
-        return convertToPluginDataset(ds)
+
+        if part is None:
+            return convertToPluginDataset(ds)
+        elif part in set(('data', 'serr', 'perr', 'nerr')):
+            return getattr(ds, part)
+        else:
+            raise RuntimeError('Invalid dataset part')
 
     def evalExpr(self, expr, dsin):
         """Execute transform
