@@ -347,6 +347,51 @@ def mathsDiv(dss):
     return Div
 
 ###############################################################################
+## Clip
+
+def _clip_dataset(d, minv, maxv):
+    """Internal dataset clip range."""
+    data = d.data
+    if d.serr is not None:
+        prange = d.data+d.serr
+        nrange = d.data-d.serr
+    else:
+        prange = d.perr+d.data if d.perr is not None else None
+        nrange = d.nerr+d.data if d.nerr is not None else None
+
+    d.data = N.clip(data, minv, maxv)
+    if prange is not None:
+        d.perr = N.clip(prange, minv, maxv) - d.data
+    if nrange is not None:
+        d.nerr = N.clip(nrange, minv, maxv) - d.data
+    d.serr = None
+
+@registerTransformPlugin(
+    'Clip', _('Clip dataset'), category=_('Maths'),
+    description=_('Clip dataset values to lie within range'))
+def mathsClip(dss):
+    def Clip(ds, minv=-N.inf, maxv=N.inf):
+        idx = dsCodeToIdx(ds)
+        _clip_dataset(dss[idx], minv, maxv)
+    return Clip
+
+@registerTransformPlugin(
+    'ClipX', _('Clip X dataset'), category=_('Maths'),
+    description=_('Clip X dataset values to lie within range'))
+def mathsClip(dss):
+    def ClipX(minv=-N.inf, maxv=N.inf):
+        _clip_dataset(dss[0], minv, maxv)
+    return ClipX
+
+@registerTransformPlugin(
+    'ClipY', _('Clip Y dataset'), category=_('Maths'),
+    description=_('Clip Y dataset values to lie within range'))
+def mathsClip(dss):
+    def ClipY(minv=-N.inf, maxv=N.inf):
+        _clip_dataset(dss[1], minv, maxv)
+    return ClipY
+
+###############################################################################
 # Geometry
 
 @registerTransformPlugin(
