@@ -732,7 +732,7 @@ class PointPlotter(GenericPlotter):
             usertext=_('Scale markers')), 5 )
         s.add( setting.MarkerColor('Color'), 6 )
 
-        s.add( setting.Str(
+        s.add( setting.Transform(
             'transform', '',
             descr=_('Transforms plotted data'),
             usertext=_('Transform')), 7)

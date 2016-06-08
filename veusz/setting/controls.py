@@ -47,11 +47,12 @@ def styleError(widget):
     widget.setStyleSheet("background-color: " +
                          settingdb.color('error').name() )
 
-class DotDotButton(qt4.QPushButton):
+class SmallButton(qt4.QPushButton):
     """A button for opening up more complex editor."""
-    def __init__(self, tooltip=None, checkable=True):
-        qt4.QPushButton.__init__(self, "..", flat=True, checkable=checkable,
-                                 maximumWidth=16, maximumHeight=16)
+    def __init__(self, tooltip=None, checkable=True, label=".."):
+        qt4.QPushButton.__init__(
+            self, label, flat=True, checkable=checkable,
+            maximumWidth=16, maximumHeight=16)
         if tooltip:
             self.setToolTip(tooltip)
         self.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
@@ -175,7 +176,7 @@ class String(qt4.QWidget):
         self.edit = qt4.QLineEdit()
         layout.addWidget(self.edit)
 
-        b = self.button = DotDotButton(tooltip="Edit text")
+        b = self.button = SmallButton(tooltip="Edit text")
         layout.addWidget(b)
 
         # set the text of the widget to the 
@@ -626,7 +627,7 @@ class Dataset(qt4.QWidget):
         self.choice = Choice(setting, True, [], None)
         self.choice.sigSettingChanged.connect(self.sigSettingChanged)
 
-        b = self.button = DotDotButton(tooltip=_("Select using dataset browser"))
+        b = self.button = SmallButton(tooltip=_("Select using dataset browser"))
         b.toggled.connect(self.slotButtonToggled)
 
         self.document = document
@@ -692,7 +693,7 @@ class DatasetOrString(Dataset):
     def __init__(self, setting, document, parent):
         Dataset.__init__(self, setting, document, 1, 'all', parent)
 
-        b = self.textbutton = DotDotButton()
+        b = self.textbutton = SmallButton()
         self.layout().addWidget(b)
         b.toggled.connect(self.textButtonToggled)
 
@@ -1450,7 +1451,7 @@ class FillSet(ListSet):
         whide = self.addToggleButton(_("Hide fill"))
 
         # extended options
-        wmore = DotDotButton(tooltip=_("More options"))
+        wmore = SmallButton(tooltip=_("More options"))
         wmore.toggled.connect(lambda on, row=row: self.editMore(on, row))
 
         # return widgets
@@ -1712,8 +1713,8 @@ class Filename(qt4.QWidget):
         self.edit.setText( setting.toText() )
         layout.addWidget(self.edit)
         
-        b = self.button = DotDotButton(checkable=False,
-                                       tooltip=_("Browse for file"))
+        b = self.button = SmallButton(
+            checkable=False, tooltip=_("Browse for file"))
         layout.addWidget(b)
 
         # connect up signals
@@ -1895,3 +1896,26 @@ class AxisBound(Choice):
 
         if self.currentText().lower() != 'auto':
             self.setEditText( self.setting.toText() )
+
+class Transform(String):
+    """Represents a transformation done to the data."""
+
+    def __init__(self, setn, doc, parent):
+        String.__init__(self, setn, parent)
+        self.doc = doc
+        plusbutton = SmallButton(tooltip=_("Add transform"), label="+")
+        plusbutton.clicked.connect(self.onAddClicked)
+        self.layout().addWidget(plusbutton)
+
+    def onAddClicked(self):
+        from ..dialogs.transformchooser import TransformChooser
+        d = TransformChooser(self, self.doc)
+        if d.exec_() and d.retn:
+            # ok clicked and something to return
+            if not self.setting.val:
+                # empty, so replace
+                newval = d.retn
+            else:
+                # add entry
+                newval = "%s, %s" % (self.setting.val, d.retn)
+            self.sigSettingChanged.emit(self, self.setting, newval)

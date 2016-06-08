@@ -1988,3 +1988,9 @@ class AxisBound(FloatOrAuto):
             return v
         else:
             return FloatOrAuto.fromText(self, txt)
+
+class Transform(Str):
+    """A sequence of transformations to apply to the data."""
+
+    def makeControl(self, *args):
+        return controls.Transform(self, self.getDocument(), *args)

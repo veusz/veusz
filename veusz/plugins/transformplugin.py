@@ -26,6 +26,14 @@ def _(text, disambiguation=None, context='TransformPlugin'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+# TODO
+# log, exp
+# cumulative
+# normalise
+# filter
+# moving average
+# rebin
+
 transformpluginregistry = {}
 
 def registerTransformPlugin(
@@ -60,6 +68,8 @@ def dsCodeToIdx(code):
 
 ###############################################################################
 # Add
+
+catarith=_('Arithmetic')
 
 def _addSubDataset(d1, d2, sub=False):
     minlen = min(len(d1.data), len(d2.data))
@@ -99,8 +109,8 @@ def _addSubDataset(d1, d2, sub=False):
         d1.perr = d1.nerr = None
 
 @registerTransformPlugin(
-    'AddX', _('Add to X'), category=_('Maths'),
-    description=_('Add value or dataset to X dataset'))
+    'AddX', _('Add to X'), category=catarith,
+    description=_('Add value or dataset [val] to X dataset'))
 def mathsAddX(dss):
     def AddX(val):
         if isDataset1D(val):
@@ -110,8 +120,8 @@ def mathsAddX(dss):
     return AddX
 
 @registerTransformPlugin(
-    'AddY', _('Add to Y'), category=_('Maths'),
-    description=_('Add value or dataset to Y dataset'))
+    'AddY', _('Add to Y'), category=catarith,
+    description=_('Add value or dataset [val] to Y dataset'))
 def mathsAddY(dss):
     def AddY(val):
         if isDataset1D(val):
@@ -121,11 +131,11 @@ def mathsAddY(dss):
     return AddY
 
 @registerTransformPlugin(
-    'Add', _('Add to dataset'), category=_('Maths'),
-    description=_('Add value or dataset to dataset'))
+    'Add', _('Add to dataset'), category=catarith,
+    description=_('Add value or dataset [val] to specified output dataset [outds]'))
 def mathsAdd(dss):
-    def Add(ds, val):
-        idx = dsCodeToIdx(ds)
+    def Add(outds, val):
+        idx = dsCodeToIdx(outds)
         if isDataset1D(val):
             _addSubDataset(dss[idx], val, sub=False)
         else:
@@ -136,8 +146,8 @@ def mathsAdd(dss):
 # Subtract
 
 @registerTransformPlugin(
-    'SubX', _('Subtract from X'), category=_('Maths'),
-    description=_('Subtract value or dataset from X dataset'))
+    'SubX', _('Subtract from X'), category=catarith,
+    description=_('Subtract value or dataset [val] from X dataset'))
 def mathsSubX(dss):
     def SubX(val):
         if isDataset1D(val):
@@ -147,8 +157,8 @@ def mathsSubX(dss):
     return SubX
 
 @registerTransformPlugin(
-    'SubY', _('Subtract from Y'), category=_('Maths'),
-    description=_('Subtract value or dataset from Y dataset'))
+    'SubY', _('Subtract from Y'), category=catarith,
+    description=_('Subtract value or dataset [val] from Y dataset'))
 def mathsSubY(dss):
     def SubY(val):
         if isDataset1D(val):
@@ -158,11 +168,11 @@ def mathsSubY(dss):
     return SubY
 
 @registerTransformPlugin(
-    'Sub', _('Subtract from dataset'), category=_('Maths'),
-    description=_('Subtract value or dataset from dataset'))
+    'Sub', _('Subtract from dataset'), category=catarith,
+    description=_('Subtract value or dataset [val] from specified output dataset [outds]'))
 def mathsSub(dss):
-    def Sub(ds, val):
-        idx = dsCodeToIdx(ds)
+    def Sub(outds, val):
+        idx = dsCodeToIdx(outds)
         if isDataset1D(val):
             _addSubDataset(dss[idx], val, sub=True)
         else:
@@ -227,8 +237,8 @@ def _multiplyDatasetDataset(d1, d2):
     d1.data = d1.data[:minlen] * d2.data[:minlen]
 
 @registerTransformPlugin(
-    'MulX', _('Multiply X'), category=_('Maths'),
-    description=_('Multiply X dataset by value or dataset'))
+    'MulX', _('Multiply X'), category=catarith,
+    description=_('Multiply X dataset by value or dataset [val]'))
 def mathsMulX(dss):
     def MulX(val):
         if isDataset1D(val):
@@ -238,8 +248,8 @@ def mathsMulX(dss):
     return MulX
 
 @registerTransformPlugin(
-    'MulY', _('Multiply Y'), category=_('Maths'),
-    description=_('Multiply Y dataset by value or dataset'))
+    'MulY', _('Multiply Y'), category=catarith,
+    description=_('Multiply Y dataset by value or dataset [val]'))
 def mathsMulY(dss):
     def MulY(val):
         if isDataset1D(val):
@@ -249,11 +259,11 @@ def mathsMulY(dss):
     return MulY
 
 @registerTransformPlugin(
-    'Mul', _('Multiply dataset'), category=_('Maths'),
-    description=_('Multiply dataset by value or dataset'))
+    'Mul', _('Multiply dataset'), category=catarith,
+    description=_('Multiply output dataset [outds] by value or dataset [val]'))
 def mathsMul(dss):
-    def Mul(ds, val):
-        idx = dsCodeToIdx(ds)
+    def Mul(outds, val):
+        idx = dsCodeToIdx(outds)
         if isDataset1D(val):
             _multiplyDatasetDataset(dss[idx], val)
         else:
@@ -313,8 +323,8 @@ def _divideDatasetDataset(d1, d2):
     d1.data = ratio
 
 @registerTransformPlugin(
-    'DivX', _('Divide X'), category=_('Maths'),
-    description=_('Divide X dataset by value or dataset'))
+    'DivX', _('Divide X'), category=catarith,
+    description=_('Divide X dataset by value or dataset [val]'))
 def mathsDivX(dss):
     def DivX(val):
         if isDataset1D(val):
@@ -324,8 +334,8 @@ def mathsDivX(dss):
     return DivX
 
 @registerTransformPlugin(
-    'DivY', _('Divide Y'), category=_('Maths'),
-    description=_('Divide Y dataset by value or dataset'))
+    'DivY', _('Divide Y'), category=catarith,
+    description=_('Divide Y dataset by value or dataset [val]'))
 def mathsDivY(dss):
     def DivY(val):
         if isDataset1D(val):
@@ -335,16 +345,158 @@ def mathsDivY(dss):
     return DivY
 
 @registerTransformPlugin(
-    'Div', _('Divide dataset'), category=_('Maths'),
-    description=_('Divide dataset by value or dataset'))
+    'Div', _('Divide dataset'), category=catarith,
+    description=_('Divide output dataset [outds] by value or dataset [val]'))
 def mathsDiv(dss):
-    def Div(ds, val):
-        idx = dsCodeToIdx(ds)
+    def Div(outds, val):
+        idx = dsCodeToIdx(outds)
         if isDataset1D(val):
             _divideDatasetDataset(dss[idx], val)
         else:
             _multiplyDatasetScalar(dss[idx], 1./val)
     return Div
+
+###############################################################################
+## Log10, Log, Exp, Pow
+
+def _applyFn(ds, fun):
+    prange = nrange = None
+    if ds.serr is not None:
+        prange = ds.data+ds.serr
+        nrange = ds.data-ds.serr
+    if ds.nerr is not None:
+        nrange = ds.data+ds.nerr
+    if ds.perr is not None:
+        prange = ds.data+ds.perr
+
+    ds.data = fun(ds.data)
+    if prange is not None:
+        ds.perr = fun(prange) - ds.data
+    if nrange is not None:
+        ds.nerr = fun(nrange) - ds.data
+    ds.serr = None
+
+catlog=_('Exponential / Log')
+
+@registerTransformPlugin(
+    'Log10X', _('Log10 of X'), category=catlog,
+    description=_('Set X dataset to be log10 of input X'))
+def mathsLog10X(dss):
+    def Log10X():
+        _applyFn(dss[0], N.log10)
+    return Log10X
+
+@registerTransformPlugin(
+    'Log10Y', _('Log10 of Y'), category=catlog,
+    description=_('Set Y dataset to be log10 of input Y'))
+def mathsLog10Y(dss):
+    def Log10Y():
+        _applyFn(dss[1], N.log10)
+    return Log10Y
+
+@registerTransformPlugin(
+    'Log10', _('Log10 of dataset'), category=catlog,
+    description=_('Set output dataset [outds] to be log10 of input'))
+def mathsLog10(dss):
+    def Log10(outds):
+        _applyFn(dss[dsCodeToIdx(outds)], N.log10)
+    return Log10
+
+@registerTransformPlugin(
+    'LogX', _('Natural log of X'), category=catlog,
+    description=_('Set X dataset to be natural log of input X'))
+def mathsLogX(dss):
+    def LogX():
+        _applyFn(dss[0], N.log)
+    return LogX
+
+@registerTransformPlugin(
+    'LogY', _('Natural log of Y'), category=catlog,
+    description=_('Set Y dataset to be natural log of input Y'))
+def mathsLogY(dss):
+    def LogY():
+        _applyFn(dss[1], N.log)
+    return LogY
+
+@registerTransformPlugin(
+    'Log', _('Natural log of dataset'), category=catlog,
+    description=_('Set output dataset [outds] to be natural log of input'))
+def mathsLog(dss):
+    def Log(outds):
+        _applyFn(dss[dsCodeToIdx(outds)], N.log)
+    return Log
+
+@registerTransformPlugin(
+    'ExpX', _('Calculate exponential of X'), category=catlog,
+    description=_('Set X dataset to be e^X'))
+def mathsExpX(dss):
+    def ExpX():
+        _applyFn(dss[0], N.exp)
+    return ExpX
+
+@registerTransformPlugin(
+    'ExpY', _('Calculate exponential of Y'), category=catlog,
+    description=_('Set Y dataset to be e^Y'))
+def mathsExpY(dss):
+    def ExpY():
+        _applyFn(dss[1], N.exp)
+    return ExpY
+
+@registerTransformPlugin(
+    'Exp', _('Calculate exponential of dataset'), category=catlog,
+    description=_('Calculate exponential of output dataset [outds]'))
+def mathsExp(dss):
+    def Exp(outds):
+        _applyFn(dss[dsCodeToIdx(outds)], N.exp)
+    return Exp
+
+@registerTransformPlugin(
+    'Exp10X', _('Raise 10 to the power of X'), category=catlog,
+    description=_('Set X dataset to be 10^X'))
+def mathsExp10X(dss):
+    def Exp10X():
+        _applyFn(dss[0], lambda x: 10**x)
+    return Exp10X
+
+@registerTransformPlugin(
+    'Exp10Y', _('Raise 10 to the power of Y'), category=catlog,
+    description=_('Set Y dataset to be 10^Y'))
+def mathsExp10Y(dss):
+    def Exp10Y():
+        _applyFn(dss[1], lambda x: 10**x)
+    return Exp10Y
+
+@registerTransformPlugin(
+    'Exp10', _('Raise 10 to the power of dataset'), category=catlog,
+    description=_('Raise 10 to the power of output dataset [outds]'))
+def mathsExp10(dss):
+    def Exp10(outds):
+        _applyFn(dss[dsCodeToIdx(outds)], lambda x: 10**x)
+    return Exp10
+
+@registerTransformPlugin(
+    'ExpVX', _('Raise value to the power of X dataset'), category=catlog,
+    description=_('Raise value [val] to the power of X dataset'))
+def mathsExpVX(dss):
+    def ExpVX(val):
+        _applyFn(dss[0], lambda x: val**x)
+    return ExpVX
+
+@registerTransformPlugin(
+    'ExpVY', _('Raise value to the power of Y dataset'), category=catlog,
+    description=_('Raise value [val] to the power of Y dataset'))
+def mathsExpVY(dss):
+    def ExpVY(val):
+        _applyFn(dss[1], lambda x: val**x)
+    return ExpVY
+
+@registerTransformPlugin(
+    'ExpV', _('Raise value to the power of dataset'), category=catlog,
+    description=_('Raise value [val] to the power of output dataset [outds]'))
+def mathsExpV(dss):
+    def ExpV(val, outds):
+        _applyFn(dss[dsCodeToIdx(outds)], lambda x: val**x)
+    return ExpV
 
 ###############################################################################
 ## Clip
@@ -368,16 +520,16 @@ def _clip_dataset(d, minv, maxv):
 
 @registerTransformPlugin(
     'Clip', _('Clip dataset'), category=_('Maths'),
-    description=_('Clip dataset values to lie within range'))
+    description=_('Clip output dataset [outds] to lie within range [minv to maxv]'))
 def mathsClip(dss):
-    def Clip(ds, minv=-N.inf, maxv=N.inf):
-        idx = dsCodeToIdx(ds)
+    def Clip(outds, minv=-N.inf, maxv=N.inf):
+        idx = dsCodeToIdx(outds)
         _clip_dataset(dss[idx], minv, maxv)
     return Clip
 
 @registerTransformPlugin(
     'ClipX', _('Clip X dataset'), category=_('Maths'),
-    description=_('Clip X dataset values to lie within range'))
+    description=_('Clip X dataset values to lie within range [minv to maxv]'))
 def mathsClip(dss):
     def ClipX(minv=-N.inf, maxv=N.inf):
         _clip_dataset(dss[0], minv, maxv)
@@ -385,7 +537,7 @@ def mathsClip(dss):
 
 @registerTransformPlugin(
     'ClipY', _('Clip Y dataset'), category=_('Maths'),
-    description=_('Clip Y dataset values to lie within range'))
+    description=_('Clip Y dataset values to lie within range [minv to maxv]'))
 def mathsClip(dss):
     def ClipY(minv=-N.inf, maxv=N.inf):
         _clip_dataset(dss[1], minv, maxv)
@@ -396,7 +548,8 @@ def mathsClip(dss):
 
 @registerTransformPlugin(
     'Rotate', _('Rotate coordinates'), category=_('Geometry'),
-    description=_('Rotate coordinates by angle in radians, with optional centre'))
+    description=_('Rotate coordinates by angle in radians [angle_rad], with '
+                  'optional centre [cx,cy]'))
 def geometryRotate(dss):
     def Rotate(angle_rad, cx=0, cy=0):
         xvals = dss[0].data - cx
@@ -413,7 +566,7 @@ def geometryRotate(dss):
 
 @registerTransformPlugin(
     'Translate', _('Translate coordinates'), category=_('Geometry'),
-    description=_('Translate coordinates'))
+    description=_('Translate coordinates by given shifts [dx,dy]'))
 def geometryTranslate(dss):
     def Translate(dx, dy):
         dss[0].data += dx
@@ -425,22 +578,23 @@ def geometryTranslate(dss):
 
 @registerTransformPlugin(
     'Thin', _('Thin values'), category=_('Filtering'),
-    description=_('Thin values by step and optional starting index (from 0)'))
+    description=_('Thin values by step [step] and optional starting index ([start] from 0)'))
 def filteringThin(dss):
-    def Thin(num, start=0):
+    def Thin(step, start=0):
         for ds in dss:
             if ds is None:
                 continue
             for attr in 'data', 'serr', 'perr', 'nerr':
                 if getattr(ds, attr, None) is not None:
-                    setattr(ds, attr, getattr(ds, attr)[start::num])
+                    setattr(ds, attr, getattr(ds, attr)[start::step])
     return Thin
 
 @registerTransformPlugin(
     'Range', _('Select range'), category=_('Filtering'),
     description=_(
-        'Select values from start, with optional end index and step '
-        '(Python-style indexing from 0)'))
+        'Select values between index ranges from start [start], '
+        'with optional end index [end] and step '
+        '[step] (Python-style indexing from 0)'))
 def filteringRange(dss):
     def Range(start, end=None, step=None):
         for ds in dss:
