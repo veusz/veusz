@@ -65,11 +65,17 @@ def dsCodeToIdx(code):
     except (KeyError, AttributeError):
         raise ValueError('Unknown dataset code %s' % code)
 
+###############################################################################
+
+## categories
+catarith = _('Arithmetic')
+catlog = _('Exponential / Log')
+catmaths = _('Maths')
+catgeom = _('Geometry')
+catfilt = _('Filtering')
 
 ###############################################################################
 # Add
-
-catarith=_('Arithmetic')
 
 def _addSubDataset(d1, d2, sub=False):
     minlen = min(len(d1.data), len(d2.data))
@@ -376,8 +382,6 @@ def _applyFn(ds, fun):
         ds.nerr = fun(nrange) - ds.data
     ds.serr = None
 
-catlog=_('Exponential / Log')
-
 @registerTransformPlugin(
     'Log10X', _('Log10 of X'), category=catlog,
     description=_('Set X dataset to be log10 of input X'))
@@ -519,7 +523,7 @@ def _clip_dataset(d, minv, maxv):
     d.serr = None
 
 @registerTransformPlugin(
-    'Clip', _('Clip dataset'), category=_('Maths'),
+    'Clip', _('Clip dataset'), category=catmaths,
     description=_('Clip output dataset [outds] to lie within range [minv to maxv]'))
 def mathsClip(dss):
     def Clip(outds, minv=-N.inf, maxv=N.inf):
@@ -528,7 +532,7 @@ def mathsClip(dss):
     return Clip
 
 @registerTransformPlugin(
-    'ClipX', _('Clip X dataset'), category=_('Maths'),
+    'ClipX', _('Clip X dataset'), category=catmaths,
     description=_('Clip X dataset values to lie within range [minv to maxv]'))
 def mathsClip(dss):
     def ClipX(minv=-N.inf, maxv=N.inf):
@@ -536,7 +540,7 @@ def mathsClip(dss):
     return ClipX
 
 @registerTransformPlugin(
-    'ClipY', _('Clip Y dataset'), category=_('Maths'),
+    'ClipY', _('Clip Y dataset'), category=catmaths,
     description=_('Clip Y dataset values to lie within range [minv to maxv]'))
 def mathsClip(dss):
     def ClipY(minv=-N.inf, maxv=N.inf):
@@ -547,7 +551,7 @@ def mathsClip(dss):
 # Geometry
 
 @registerTransformPlugin(
-    'Rotate', _('Rotate coordinates'), category=_('Geometry'),
+    'Rotate', _('Rotate coordinates'), category=catgeom,
     description=_('Rotate coordinates by angle in radians [angle_rad], with '
                   'optional centre [cx,cy]'))
 def geometryRotate(dss):
@@ -565,7 +569,7 @@ def geometryRotate(dss):
     return Rotate
 
 @registerTransformPlugin(
-    'Translate', _('Translate coordinates'), category=_('Geometry'),
+    'Translate', _('Translate coordinates'), category=catgeom,
     description=_('Translate coordinates by given shifts [dx,dy]'))
 def geometryTranslate(dss):
     def Translate(dx, dy):
@@ -577,7 +581,7 @@ def geometryTranslate(dss):
 # Filter
 
 @registerTransformPlugin(
-    'Thin', _('Thin values'), category=_('Filtering'),
+    'Thin', _('Thin values'), category=catfilt,
     description=_('Thin values by step [step] and optional starting index ([start] from 0)'))
 def filteringThin(dss):
     def Thin(step, start=0):
@@ -590,7 +594,7 @@ def filteringThin(dss):
     return Thin
 
 @registerTransformPlugin(
-    'Range', _('Select range'), category=_('Filtering'),
+    'Range', _('Select index range'), category=catfilt,
     description=_(
         'Select values between index ranges from start [start], '
         'with optional end index [end] and step '
