@@ -49,8 +49,16 @@ def convertNumpy(a, dims=1):
         # convert to numpy array
         a = N.array(a, dtype=N.float64)
 
-    if len(a.shape) != dims:
-        raise ValueError("Only %i-dimensional arrays or lists allowed" % dims)
+    if a.ndim != dims:
+        if a.ndim == 0:
+            if dims == 1:
+                a = a.reshape((1,))
+            elif dims == 2:
+                a = a.reshape((1,1))
+            else:
+                raise RuntimeError()
+        else:
+            raise ValueError("Only %i-dimensional arrays or lists allowed" % dims)
     return a
 
 def convertNumpyAbs(a):

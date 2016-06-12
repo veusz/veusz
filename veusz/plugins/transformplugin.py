@@ -66,12 +66,16 @@ def dsCodeToIdx(code):
 ###############################################################################
 
 ## categories
-catarith = _('Arithmetic')
+catadd = _('Add')
+catsub = _('Sub')
+catmul = _('Multiply')
+catdiv = _('Divide')
+catrange = _('Range')
 catlog = _('Exponential / Log')
-catmaths = _('Maths')
 catgeom = _('Geometry')
 catfilt = _('Filtering')
 catnorm = _('Normalisation')
+catapply = _('Apply')
 
 ###############################################################################
 # Add
@@ -114,9 +118,9 @@ def _addSubDataset(d1, d2, sub=False):
         d1.perr = d1.nerr = None
 
 @registerTransformPlugin(
-    'Add', _('Add to dataset'), category=catarith,
+    'Add', _('Add to dataset'), category=catadd,
     description=_('Add value or dataset [val] to specified output dataset [outds]'))
-def arithAdd(dss):
+def addAdd(dss):
     def Add(outds, val):
         idx = dsCodeToIdx(outds)
         if isDataset1D(val):
@@ -126,24 +130,24 @@ def arithAdd(dss):
     return Add
 
 @registerTransformPlugin(
-    'AddX', _('Add to X'), category=catarith,
+    'AddX', _('Add to X'), category=catadd,
     description=_('Add value or dataset [val] to X dataset'))
-def arithAddX(dss):
-    return lambda val: arithAdd(dss)('x', val)
+def addAddX(dss):
+    return lambda val: addAdd(dss)('x', val)
 
 @registerTransformPlugin(
-    'AddY', _('Add to Y'), category=catarith,
+    'AddY', _('Add to Y'), category=catadd,
     description=_('Add value or dataset [val] to Y dataset'))
-def arithAddY(dss):
-    return lambda val: arithAdd(dss)('y', val)
+def addAddY(dss):
+    return lambda val: addAdd(dss)('y', val)
 
 ###############################################################################
 # Subtract
 
 @registerTransformPlugin(
-    'Sub', _('Subtract from dataset'), category=catarith,
+    'Sub', _('Subtract from dataset'), category=catsub,
     description=_('Subtract value or dataset [val] from specified output dataset [outds]'))
-def arithSub(dss):
+def subSub(dss):
     def Sub(outds, val):
         idx = dsCodeToIdx(outds)
         if isDataset1D(val):
@@ -153,40 +157,82 @@ def arithSub(dss):
     return Sub
 
 @registerTransformPlugin(
-    'SubX', _('Subtract from X'), category=catarith,
+    'SubX', _('Subtract from X'), category=catsub,
     description=_('Subtract value or dataset [val] from X dataset'))
-def arithSubX(dss):
-    return lambda val: arithSub(dss)('x', val)
+def subSubX(dss):
+    return lambda val: subSub(dss)('x', val)
 
 @registerTransformPlugin(
-    'SubY', _('Subtract from Y'), category=catarith,
+    'SubY', _('Subtract from Y'), category=catsub,
     description=_('Subtract value or dataset [val] from Y dataset'))
-def arithSubY(dss):
-    return lambda val: arithSub(dss)('y', val)
+def subSubY(dss):
+    return lambda val: subSub(dss)('y', val)
+
+def _subfn(ds, fn):
+    data = ds.data
+    findata = data[N.isfinite(data)]
+    if len(findata) > 0:
+        ds.data -= fn(findata)
+
+## SubMin
 
 @registerTransformPlugin(
-    'SubMin', _('Subtract minimum value from dataset'), category=catarith,
+    'SubMin', _('Subtract minimum value from dataset'), category=catsub,
     description=_('Subtract minimum value from [outds]'))
-def arithSubMin(dss):
-    def SubMin(outds):
-        idx = dsCodeToIdx(outds)
-        data = dss[idx].data
-        findata = data[N.isfinite(data)]
-        if len(findata) > 0:
-            dss[idx].data -= N.min(findata)
-    return SubMin
+def subSubMin(dss):
+    return lambda outds: _subfn(dss[dsCodeToIdx(outds)], N.min)
 
 @registerTransformPlugin(
-    'SubMinX', _('Normalise dataset X to be between 0 and 1'), category=catarith,
-    description=_('Normalise dataset X to be between 0 and 1'))
-def normSubMinX(dss):
-    return lambda: arithSubMin(dss)('x')
+    'SubMinX', _('Subtract minimum value from X'), category=catsub,
+    description=_('Subtract minimum value from dataset X'))
+def subSubMinX(dss):
+    return lambda: _subfn(dss[0], N.min)
 
 @registerTransformPlugin(
-    'SubMinY', _('Normalise dataset Y to be between 0 and 1'), category=catarith,
-    description=_('Normalise dataset Y to be between 0 and 1'))
-def arithSubMinY(dss):
-    return lambda: arithSubMin(dss)('y')
+    'SubMinY', _('Subtract minimum value from Y'), category=catsub,
+    description=_('Subtract minimum value from dataset Y'))
+def subSubMinY(dss):
+    return lambda: _subfn(dss[1], N.min)
+
+## SubMax
+
+@registerTransformPlugin(
+    'SubMax', _('Subtract maximum value from dataset'), category=catsub,
+    description=_('Subtract maximum value from [outds]'))
+def subSubMax(dss):
+    return lambda outds: _subfn(dss[dsCodeToIdx(outds)], N.max)
+
+@registerTransformPlugin(
+    'SubMaxX', _('Subtract maximum value from X'), category=catsub,
+    description=_('Subtract maximum value from dataset X'))
+def subSubMaxX(dss):
+    return lambda: _subfn(dss[0], N.max)
+
+@registerTransformPlugin(
+    'SubMaxY', _('Subtract maximum value from Y'), category=catsub,
+    description=_('Subtract maximum value from dataset Y'))
+def subSubMaxY(dss):
+    return lambda: _subfn(dss[1], N.max)
+
+## SubMean
+
+@registerTransformPlugin(
+    'SubMean', _('Subtract mean value from dataset'), category=catsub,
+    description=_('Subtract mean value from [outds]'))
+def subSubMean(dss):
+    return lambda outds: _subfn(dss[dsCodeToIdx(outds)], N.mean)
+
+@registerTransformPlugin(
+    'SubMeanX', _('Subtract mean value from X'), category=catsub,
+    description=_('Subtract mean value from dataset X'))
+def subSubMeanX(dss):
+    return lambda: _subfn(dss[0], N.mean)
+
+@registerTransformPlugin(
+    'SubMeanY', _('Subtract mean value from Y'), category=catsub,
+    description=_('Subtract mean value from dataset Y'))
+def subSubMeanY(dss):
+    return lambda: _subfn(dss[1], N.mean)
 
 ###############################################################################
 # Multiply
@@ -246,7 +292,7 @@ def _multiplyDatasetDataset(d1, d2):
     d1.data = d1.data[:minlen] * d2.data[:minlen]
 
 @registerTransformPlugin(
-    'Mul', _('Multiply dataset'), category=catarith,
+    'Mul', _('Multiply dataset'), category=catmul,
     description=_('Multiply output dataset [outds] by value or dataset [val]'))
 def arithMul(dss):
     def Mul(outds, val):
@@ -258,13 +304,13 @@ def arithMul(dss):
     return Mul
 
 @registerTransformPlugin(
-    'MulX', _('Multiply X'), category=catarith,
+    'MulX', _('Multiply X'), category=catmul,
     description=_('Multiply X dataset by value or dataset [val]'))
 def arithMulX(dss):
     return lambda val: arithMul(dss)('x', val)
 
 @registerTransformPlugin(
-    'MulY', _('Multiply Y'), category=catarith,
+    'MulY', _('Multiply Y'), category=catmul,
     description=_('Multiply Y dataset by value or dataset [val]'))
 def arithMulY(dss):
     return lambda val: arithMul(dss)('y', val)
@@ -322,9 +368,9 @@ def _divideDatasetDataset(d1, d2):
     d1.data = ratio
 
 @registerTransformPlugin(
-    'Div', _('Divide dataset'), category=catarith,
+    'Div', _('Divide dataset'), category=catdiv,
     description=_('Divide output dataset [outds] by value or dataset [val]'))
-def arithDiv(dss):
+def divDiv(dss):
     def Div(outds, val):
         idx = dsCodeToIdx(outds)
         if isDataset1D(val):
@@ -334,48 +380,119 @@ def arithDiv(dss):
     return Div
 
 @registerTransformPlugin(
-    'DivX', _('Divide X'), category=catarith,
+    'DivX', _('Divide X'), category=catdiv,
     description=_('Divide X dataset by value or dataset [val]'))
-def arithDivX(dss):
-    return lambda val: arithDiv(dss)('x', val)
+def divDivX(dss):
+    return lambda val: divDiv(dss)('x', val)
 
 @registerTransformPlugin(
-    'DivY', _('Divide Y'), category=catarith,
+    'DivY', _('Divide Y'), category=catdiv,
     description=_('Divide Y dataset by value or dataset [val]'))
-def arithDivY(dss):
-    return lambda val: arithDiv(dss)('y', val)
+def divDivY(dss):
+    return lambda val: divDiv(dss)('y', val)
+
+# helper function for dividing by function of dataset
+def _divfn(ds, fn):
+    data = ds.data
+    findata = data[N.isfinite(data)]
+    f = 1./fn(findata) if len(findata)>0 else 1
+    ds.data *= f
+    if ds.serr is not None:
+        ds.serr *= f
+    if ds.perr is not None:
+        ds.perr *= f
+    if ds.nerr is not None:
+        ds.nerr *= f
+
+## DivMax
+
+@registerTransformPlugin(
+    'DivMax', _('Divide dataset by maximum value'), category=catdiv,
+    description=_('Divide output dataset [outds] by its maximum value'))
+def divDivMax(dss):
+    return lambda outds: _divfn(dss[dsCodeToIdx(outds)], N.max)
+
+@registerTransformPlugin(
+    'DivMaxX', _('Divide X by maximum value'), category=catdiv,
+    description=_('Divide dataset X by its maximum value'))
+def divDivMaxX(dss):
+    return lambda: _divfn(dss[0], N.max)
+
+@registerTransformPlugin(
+    'DivMaxY', _('Divide Y by maximum value'), category=catdiv,
+    description=_('Divide datset Y by its maximum value'))
+def divDivMaxY(dss):
+    return lambda: _divfn(dss[1], N.max)
+
+## DivMean
+
+@registerTransformPlugin(
+    'DivMean', _('Divide dataset by mean value'), category=catdiv,
+    description=_('Divide output dataset [outds] by its mean value'))
+def divDivMean(dss):
+    return lambda outds: _divfn(dss[dsCodeToIdx(outds)], N.mean)
+
+@registerTransformPlugin(
+    'DivMeanX', _('Divide X by mean value'), category=catdiv,
+    description=_('Divide dataset X by its mean value'))
+def divDivMeanX(dss):
+    return lambda: _divfn(dss[0], N.mean)
+
+@registerTransformPlugin(
+    'DivMeanY', _('Divide Y by mean value'), category=catdiv,
+    description=_('Divide dataset Y by its mean value'))
+def divDivMeanY(dss):
+    return lambda: _divfn(dss[1], N.mean)
+
+## DivStd
+
+@registerTransformPlugin(
+    'DivStd', _('Divide dataset by standard deviation'), category=catdiv,
+    description=_('Divide dataset [outds] by its standard deviation'))
+def divDivStd(dss):
+    return lambda outds: _divfn(dss[dsCodeToIdx(outds)], N.std)
+
+@registerTransformPlugin(
+    'DivStdX', _('Divide X by standard deviation'), category=catdiv,
+    description=_('Divide dataset X by its standard deviation'))
+def divDivStdX(dss):
+    return lambda: _divfn(dss[0], N.std)
+
+@registerTransformPlugin(
+    'DivStdY', _('Divide Y by standard deviation'), category=catdiv,
+    description=_('Divide dataset Y by its standard deviation'))
+def divDivStdY(dss):
+    return lambda: _divfn(dss[1], N.std)
+
+
+## DivSum
+
+@registerTransformPlugin(
+    'DivSum', _('Divide dataset by sum'), category=catdiv,
+    description=_('Divide dataset [outds] by its sum'))
+def divDivSum(dss):
+    return lambda outds: _divfn(dss[dsCodeToIdx(outds)], N.sum)
+
+@registerTransformPlugin(
+    'DivSumX', _('Divide X by sum'), category=catdiv,
+    description=_('Divide dataset X by its sum'))
+def divDivSumX(dss):
+    return lambda: _divfn(dss[0], N.sum)
+
+@registerTransformPlugin(
+    'DivSumY', _('Divide Y by sum'), category=catdiv,
+    description=_('Divide dataset Y by its sum'))
+def divDivSumY(dss):
+    return lambda: _divfn(dss[1], N.sum)
+
 
 ###############################################################################
 ## Normalise
 
 @registerTransformPlugin(
-    'Norm', _('Normalise output dataset'), category=catnorm,
-    description=_('Divide by maximum value in dataset [outds] to make maximum 1.0'))
-def normNorm(dss):
-    def Norm(outds):
-        idx = dsCodeToIdx(outds)
-        data = dss[idx].data
-        findata = data[N.isfinite(data)]
-        if len(findata) > 0:
-            dss[idx].data *= 1./N.max(findata)
-    return Norm
-
-@registerTransformPlugin(
-    'NormX', _('Normalise output dataset X'), category=catnorm,
-    description=_('Divide by maximum value in dataset X to make maximum 1.0'))
-def normNormX(dss):
-    return lambda: normNorm(dss)('x')
-
-@registerTransformPlugin(
-    'NormY', _('Normalise output dataset Y'), category=catnorm,
-    description=_('Divide by maximum value in dataset Y to make maximum 1.0'))
-def normNormY(dss):
-    return lambda: normNorm(dss)('y')
-
-@registerTransformPlugin(
-    'NormRange', _('Normalise output dataset to be between 0 and 1'), category=catnorm,
+    'NormRange', _('Normalise output dataset to be between 0 and 1'), category=catrange,
     description=_('Normalise dataset [outds] to be between 0 and 1'))
-def normNormRange(dss):
+def rangeNormRange(dss):
     def NormRange(outds):
         idx = dsCodeToIdx(outds)
         data = dss[idx].data
@@ -387,16 +504,16 @@ def normNormRange(dss):
     return NormRange
 
 @registerTransformPlugin(
-    'NormRangeX', _('Normalise dataset X to be between 0 and 1'), category=catnorm,
+    'NormRangeX', _('Normalise dataset X to be between 0 and 1'), category=catrange,
     description=_('Normalise dataset X to be between 0 and 1'))
-def normNormX(dss):
-    return lambda: normNormRange(dss)('x')
+def rangeNormX(dss):
+    return lambda: rangeNormRange(dss)('x')
 
 @registerTransformPlugin(
-    'NormRangeY', _('Normalise dataset Y to be between 0 and 1'), category=catnorm,
+    'NormRangeY', _('Normalise dataset Y to be between 0 and 1'), category=catrange,
     description=_('Normalise dataset Y to be between 0 and 1'))
-def normNormY(dss):
-    return lambda: normNormRange(dss)('y')
+def rangeNormY(dss):
+    return lambda: rangeNormRange(dss)('y')
 
 ###############################################################################
 ## Log10, Log, Exp, Pow
@@ -418,10 +535,12 @@ def _applyFn(ds, fun):
         ds.nerr = fun(nrange) - ds.data
     ds.serr = None
 
+## Log10
+
 @registerTransformPlugin(
     'Log10X', _('Log10 of X'), category=catlog,
     description=_('Set X dataset to be log10 of input X'))
-def mathsLog10X(dss):
+def logLog10X(dss):
     def Log10X():
         _applyFn(dss[0], N.log10)
     return Log10X
@@ -429,7 +548,7 @@ def mathsLog10X(dss):
 @registerTransformPlugin(
     'Log10Y', _('Log10 of Y'), category=catlog,
     description=_('Set Y dataset to be log10 of input Y'))
-def mathsLog10Y(dss):
+def logLog10Y(dss):
     def Log10Y():
         _applyFn(dss[1], N.log10)
     return Log10Y
@@ -437,15 +556,17 @@ def mathsLog10Y(dss):
 @registerTransformPlugin(
     'Log10', _('Log10 of dataset'), category=catlog,
     description=_('Set output dataset [outds] to be log10 of input'))
-def mathsLog10(dss):
+def logLog10(dss):
     def Log10(outds):
         _applyFn(dss[dsCodeToIdx(outds)], N.log10)
     return Log10
 
+## Log
+
 @registerTransformPlugin(
     'LogX', _('Natural log of X'), category=catlog,
     description=_('Set X dataset to be natural log of input X'))
-def mathsLogX(dss):
+def logLogX(dss):
     def LogX():
         _applyFn(dss[0], N.log)
     return LogX
@@ -453,7 +574,7 @@ def mathsLogX(dss):
 @registerTransformPlugin(
     'LogY', _('Natural log of Y'), category=catlog,
     description=_('Set Y dataset to be natural log of input Y'))
-def mathsLogY(dss):
+def logLogY(dss):
     def LogY():
         _applyFn(dss[1], N.log)
     return LogY
@@ -461,15 +582,17 @@ def mathsLogY(dss):
 @registerTransformPlugin(
     'Log', _('Natural log of dataset'), category=catlog,
     description=_('Set output dataset [outds] to be natural log of input'))
-def mathsLog(dss):
+def logLog(dss):
     def Log(outds):
         _applyFn(dss[dsCodeToIdx(outds)], N.log)
     return Log
 
+## Exp
+
 @registerTransformPlugin(
     'ExpX', _('Calculate exponential of X'), category=catlog,
     description=_('Set X dataset to be e^X'))
-def mathsExpX(dss):
+def logExpX(dss):
     def ExpX():
         _applyFn(dss[0], N.exp)
     return ExpX
@@ -477,7 +600,7 @@ def mathsExpX(dss):
 @registerTransformPlugin(
     'ExpY', _('Calculate exponential of Y'), category=catlog,
     description=_('Set Y dataset to be e^Y'))
-def mathsExpY(dss):
+def logExpY(dss):
     def ExpY():
         _applyFn(dss[1], N.exp)
     return ExpY
@@ -485,15 +608,17 @@ def mathsExpY(dss):
 @registerTransformPlugin(
     'Exp', _('Calculate exponential of dataset'), category=catlog,
     description=_('Calculate exponential of output dataset [outds]'))
-def mathsExp(dss):
+def logExp(dss):
     def Exp(outds):
         _applyFn(dss[dsCodeToIdx(outds)], N.exp)
     return Exp
 
+## Exp10
+
 @registerTransformPlugin(
     'Exp10X', _('Raise 10 to the power of X'), category=catlog,
     description=_('Set X dataset to be 10^X'))
-def mathsExp10X(dss):
+def logExp10X(dss):
     def Exp10X():
         _applyFn(dss[0], lambda x: 10**x)
     return Exp10X
@@ -501,7 +626,7 @@ def mathsExp10X(dss):
 @registerTransformPlugin(
     'Exp10Y', _('Raise 10 to the power of Y'), category=catlog,
     description=_('Set Y dataset to be 10^Y'))
-def mathsExp10Y(dss):
+def logExp10Y(dss):
     def Exp10Y():
         _applyFn(dss[1], lambda x: 10**x)
     return Exp10Y
@@ -509,15 +634,17 @@ def mathsExp10Y(dss):
 @registerTransformPlugin(
     'Exp10', _('Raise 10 to the power of dataset'), category=catlog,
     description=_('Raise 10 to the power of output dataset [outds]'))
-def mathsExp10(dss):
+def logExp10(dss):
     def Exp10(outds):
         _applyFn(dss[dsCodeToIdx(outds)], lambda x: 10**x)
     return Exp10
 
+## ExpV
+
 @registerTransformPlugin(
     'ExpVX', _('Raise value to the power of X dataset'), category=catlog,
     description=_('Raise value [val] to the power of X dataset'))
-def mathsExpVX(dss):
+def logExpVX(dss):
     def ExpVX(val):
         _applyFn(dss[0], lambda x: val**x)
     return ExpVX
@@ -525,7 +652,7 @@ def mathsExpVX(dss):
 @registerTransformPlugin(
     'ExpVY', _('Raise value to the power of Y dataset'), category=catlog,
     description=_('Raise value [val] to the power of Y dataset'))
-def mathsExpVY(dss):
+def logExpVY(dss):
     def ExpVY(val):
         _applyFn(dss[1], lambda x: val**x)
     return ExpVY
@@ -533,10 +660,63 @@ def mathsExpVY(dss):
 @registerTransformPlugin(
     'ExpV', _('Raise value to the power of dataset'), category=catlog,
     description=_('Raise value [val] to the power of output dataset [outds]'))
-def mathsExpV(dss):
+def logExpV(dss):
     def ExpV(val, outds):
         _applyFn(dss[dsCodeToIdx(outds)], lambda x: val**x)
     return ExpV
+
+## Pow
+
+@registerTransformPlugin(
+    'PowX', _('Raise X dataset to power'), category=catmul,
+    description=_('Raise X dataset to power [val]'))
+def mulPowX(dss):
+    def PowX(val):
+        _applyFn(dss[0], lambda x: x**val)
+    return PowX
+
+@registerTransformPlugin(
+    'PowY', _('Raise Y dataset to power'), category=catmul,
+    description=_('Raise Y dataset to power [val]'))
+def mulPowY(dss):
+    def PowY(val):
+        _applyFn(dss[1], lambda x: x**val)
+    return PowY
+
+@registerTransformPlugin(
+    'Pow', _('Raise dataset to power'), category=catmul,
+    description=_('Raise dataset [outds] to power [val]'))
+def mulPowX(dss):
+    def Pow(outds, val):
+        _applyFn(dss[dsCodeToIdx(outds)], lambda x: x**val)
+    return Pow
+
+## Apply
+
+@registerTransformPlugin(
+    'ApplyX', _('Apply function to X dataset'), category=catapply,
+    description=_('Apply function [fn] to X dataset'))
+def applyApplyX(dss):
+    def ApplyX(fn):
+        _applyFn(dss[0], fn)
+    return ApplyX
+
+@registerTransformPlugin(
+    'ApplyY', _('Apply function to Y dataset'), category=catapply,
+    description=_('Apply function [fn] to Y dataset'))
+def applyApplyY(dss):
+    def ApplyY(fn):
+        _applyFn(dss[1], fn)
+    return ApplyY
+
+@registerTransformPlugin(
+    'Apply', _('Apply function to dataset'), category=catapply,
+    description=_('Apply function [fn] to output dataset [outds]'))
+def applyApply(dss):
+    def Apply(outds, fn):
+        _applyFn(dss[dsCodeToIdx(outds)], fn)
+    return Apply
+
 
 ###############################################################################
 ## Clip
@@ -559,26 +739,26 @@ def _clip_dataset(d, minv, maxv):
     d.serr = None
 
 @registerTransformPlugin(
-    'Clip', _('Clip dataset'), category=catmaths,
+    'Clip', _('Clip dataset'), category=catrange,
     description=_('Clip output dataset [outds] to lie within range [minv to maxv]'))
-def mathsClip(dss):
+def rangeClip(dss):
     def Clip(outds, minv=-N.inf, maxv=N.inf):
         idx = dsCodeToIdx(outds)
         _clip_dataset(dss[idx], minv, maxv)
     return Clip
 
 @registerTransformPlugin(
-    'ClipX', _('Clip X dataset'), category=catmaths,
+    'ClipX', _('Clip X dataset'), category=catrange,
     description=_('Clip X dataset values to lie within range [minv to maxv]'))
-def mathsClip(dss):
+def rangeClip(dss):
     def ClipX(minv=-N.inf, maxv=N.inf):
         _clip_dataset(dss[0], minv, maxv)
     return ClipX
 
 @registerTransformPlugin(
-    'ClipY', _('Clip Y dataset'), category=catmaths,
+    'ClipY', _('Clip Y dataset'), category=catrange,
     description=_('Clip Y dataset values to lie within range [minv to maxv]'))
-def mathsClip(dss):
+def rangeClip(dss):
     def ClipY(minv=-N.inf, maxv=N.inf):
         _clip_dataset(dss[1], minv, maxv)
     return ClipY
