@@ -27,9 +27,7 @@ def _(text, disambiguation=None, context='TransformPlugin'):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # TODO
-# log, exp
 # cumulative
-# normalise
 # filter
 # moving average
 # rebin
@@ -73,6 +71,7 @@ catlog = _('Exponential / Log')
 catmaths = _('Maths')
 catgeom = _('Geometry')
 catfilt = _('Filtering')
+catnorm = _('Normalisation')
 
 ###############################################################################
 # Add
@@ -115,31 +114,9 @@ def _addSubDataset(d1, d2, sub=False):
         d1.perr = d1.nerr = None
 
 @registerTransformPlugin(
-    'AddX', _('Add to X'), category=catarith,
-    description=_('Add value or dataset [val] to X dataset'))
-def mathsAddX(dss):
-    def AddX(val):
-        if isDataset1D(val):
-            _addSubDataset(dss[0], val, sub=False)
-        else:
-            dss[0].data += val
-    return AddX
-
-@registerTransformPlugin(
-    'AddY', _('Add to Y'), category=catarith,
-    description=_('Add value or dataset [val] to Y dataset'))
-def mathsAddY(dss):
-    def AddY(val):
-        if isDataset1D(val):
-            _addSubDataset(dss[1], val, sub=False)
-        else:
-            dss[1].data += val
-    return AddY
-
-@registerTransformPlugin(
     'Add', _('Add to dataset'), category=catarith,
     description=_('Add value or dataset [val] to specified output dataset [outds]'))
-def mathsAdd(dss):
+def arithAdd(dss):
     def Add(outds, val):
         idx = dsCodeToIdx(outds)
         if isDataset1D(val):
@@ -148,35 +125,25 @@ def mathsAdd(dss):
             dss[idx].data += val
     return Add
 
+@registerTransformPlugin(
+    'AddX', _('Add to X'), category=catarith,
+    description=_('Add value or dataset [val] to X dataset'))
+def arithAddX(dss):
+    return lambda val: arithAdd(dss)('x', val)
+
+@registerTransformPlugin(
+    'AddY', _('Add to Y'), category=catarith,
+    description=_('Add value or dataset [val] to Y dataset'))
+def arithAddY(dss):
+    return lambda val: arithAdd(dss)('y', val)
+
 ###############################################################################
 # Subtract
 
 @registerTransformPlugin(
-    'SubX', _('Subtract from X'), category=catarith,
-    description=_('Subtract value or dataset [val] from X dataset'))
-def mathsSubX(dss):
-    def SubX(val):
-        if isDataset1D(val):
-            _addSubDataset(dss[0], val, sub=True)
-        else:
-            dss[0].data -= val
-    return SubX
-
-@registerTransformPlugin(
-    'SubY', _('Subtract from Y'), category=catarith,
-    description=_('Subtract value or dataset [val] from Y dataset'))
-def mathsSubY(dss):
-    def SubY(val):
-        if isDataset1D(val):
-            _addSubDataset(dss[1], val, sub=True)
-        else:
-            dss[1].data -= val
-    return SubY
-
-@registerTransformPlugin(
     'Sub', _('Subtract from dataset'), category=catarith,
     description=_('Subtract value or dataset [val] from specified output dataset [outds]'))
-def mathsSub(dss):
+def arithSub(dss):
     def Sub(outds, val):
         idx = dsCodeToIdx(outds)
         if isDataset1D(val):
@@ -184,6 +151,42 @@ def mathsSub(dss):
         else:
             dss[idx].data -= val
     return Sub
+
+@registerTransformPlugin(
+    'SubX', _('Subtract from X'), category=catarith,
+    description=_('Subtract value or dataset [val] from X dataset'))
+def arithSubX(dss):
+    return lambda val: arithSub(dss)('x', val)
+
+@registerTransformPlugin(
+    'SubY', _('Subtract from Y'), category=catarith,
+    description=_('Subtract value or dataset [val] from Y dataset'))
+def arithSubY(dss):
+    return lambda val: arithSub(dss)('y', val)
+
+@registerTransformPlugin(
+    'SubMin', _('Subtract minimum value from dataset'), category=catarith,
+    description=_('Subtract minimum value from [outds]'))
+def arithSubMin(dss):
+    def SubMin(outds):
+        idx = dsCodeToIdx(outds)
+        data = dss[idx].data
+        findata = data[N.isfinite(data)]
+        if len(findata) > 0:
+            dss[idx].data -= N.min(findata)
+    return SubMin
+
+@registerTransformPlugin(
+    'SubMinX', _('Normalise dataset X to be between 0 and 1'), category=catarith,
+    description=_('Normalise dataset X to be between 0 and 1'))
+def normSubMinX(dss):
+    return lambda: arithSubMin(dss)('x')
+
+@registerTransformPlugin(
+    'SubMinY', _('Normalise dataset Y to be between 0 and 1'), category=catarith,
+    description=_('Normalise dataset Y to be between 0 and 1'))
+def arithSubMinY(dss):
+    return lambda: arithSubMin(dss)('y')
 
 ###############################################################################
 # Multiply
@@ -243,31 +246,9 @@ def _multiplyDatasetDataset(d1, d2):
     d1.data = d1.data[:minlen] * d2.data[:minlen]
 
 @registerTransformPlugin(
-    'MulX', _('Multiply X'), category=catarith,
-    description=_('Multiply X dataset by value or dataset [val]'))
-def mathsMulX(dss):
-    def MulX(val):
-        if isDataset1D(val):
-            _multiplyDatasetDataset(dss[0], val)
-        else:
-            _multiplyDatasetScalar(dss[0], val)
-    return MulX
-
-@registerTransformPlugin(
-    'MulY', _('Multiply Y'), category=catarith,
-    description=_('Multiply Y dataset by value or dataset [val]'))
-def mathsMulY(dss):
-    def MulY(val):
-        if isDataset1D(val):
-            _multiplyDatasetDataset(dss[1], val)
-        else:
-            _multiplyDatasetScalar(dss[1], val)
-    return MulY
-
-@registerTransformPlugin(
     'Mul', _('Multiply dataset'), category=catarith,
     description=_('Multiply output dataset [outds] by value or dataset [val]'))
-def mathsMul(dss):
+def arithMul(dss):
     def Mul(outds, val):
         idx = dsCodeToIdx(outds)
         if isDataset1D(val):
@@ -275,6 +256,18 @@ def mathsMul(dss):
         else:
             _multiplyDatasetScalar(dss[idx], val)
     return Mul
+
+@registerTransformPlugin(
+    'MulX', _('Multiply X'), category=catarith,
+    description=_('Multiply X dataset by value or dataset [val]'))
+def arithMulX(dss):
+    return lambda val: arithMul(dss)('x', val)
+
+@registerTransformPlugin(
+    'MulY', _('Multiply Y'), category=catarith,
+    description=_('Multiply Y dataset by value or dataset [val]'))
+def arithMulY(dss):
+    return lambda val: arithMul(dss)('y', val)
 
 ###############################################################################
 # Divide
@@ -329,31 +322,9 @@ def _divideDatasetDataset(d1, d2):
     d1.data = ratio
 
 @registerTransformPlugin(
-    'DivX', _('Divide X'), category=catarith,
-    description=_('Divide X dataset by value or dataset [val]'))
-def mathsDivX(dss):
-    def DivX(val):
-        if isDataset1D(val):
-            _divideDatasetDataset(dss[0], val)
-        else:
-            _multiplyDatasetScalar(dss[0], 1./val)
-    return DivX
-
-@registerTransformPlugin(
-    'DivY', _('Divide Y'), category=catarith,
-    description=_('Divide Y dataset by value or dataset [val]'))
-def mathsDivY(dss):
-    def DivY(val):
-        if isDataset1D(val):
-            _divideDatasetDataset(dss[1], val)
-        else:
-            _multiplyDatasetScalar(dss[1], 1./val)
-    return DivY
-
-@registerTransformPlugin(
     'Div', _('Divide dataset'), category=catarith,
     description=_('Divide output dataset [outds] by value or dataset [val]'))
-def mathsDiv(dss):
+def arithDiv(dss):
     def Div(outds, val):
         idx = dsCodeToIdx(outds)
         if isDataset1D(val):
@@ -361,6 +332,71 @@ def mathsDiv(dss):
         else:
             _multiplyDatasetScalar(dss[idx], 1./val)
     return Div
+
+@registerTransformPlugin(
+    'DivX', _('Divide X'), category=catarith,
+    description=_('Divide X dataset by value or dataset [val]'))
+def arithDivX(dss):
+    return lambda val: arithDiv(dss)('x', val)
+
+@registerTransformPlugin(
+    'DivY', _('Divide Y'), category=catarith,
+    description=_('Divide Y dataset by value or dataset [val]'))
+def arithDivY(dss):
+    return lambda val: arithDiv(dss)('y', val)
+
+###############################################################################
+## Normalise
+
+@registerTransformPlugin(
+    'Norm', _('Normalise output dataset'), category=catnorm,
+    description=_('Divide by maximum value in dataset [outds] to make maximum 1.0'))
+def normNorm(dss):
+    def Norm(outds):
+        idx = dsCodeToIdx(outds)
+        data = dss[idx].data
+        findata = data[N.isfinite(data)]
+        if len(findata) > 0:
+            dss[idx].data *= 1./N.max(findata)
+    return Norm
+
+@registerTransformPlugin(
+    'NormX', _('Normalise output dataset X'), category=catnorm,
+    description=_('Divide by maximum value in dataset X to make maximum 1.0'))
+def normNormX(dss):
+    return lambda: normNorm(dss)('x')
+
+@registerTransformPlugin(
+    'NormY', _('Normalise output dataset Y'), category=catnorm,
+    description=_('Divide by maximum value in dataset Y to make maximum 1.0'))
+def normNormY(dss):
+    return lambda: normNorm(dss)('y')
+
+@registerTransformPlugin(
+    'NormRange', _('Normalise output dataset to be between 0 and 1'), category=catnorm,
+    description=_('Normalise dataset [outds] to be between 0 and 1'))
+def normNormRange(dss):
+    def NormRange(outds):
+        idx = dsCodeToIdx(outds)
+        data = dss[idx].data
+        findata = data[N.isfinite(data)]
+        if len(findata) > 0:
+            minv = N.min(findata)
+            maxv = N.max(findata)
+            dss[idx].data[:] = (data-minv) * (1./(maxv-minv))
+    return NormRange
+
+@registerTransformPlugin(
+    'NormRangeX', _('Normalise dataset X to be between 0 and 1'), category=catnorm,
+    description=_('Normalise dataset X to be between 0 and 1'))
+def normNormX(dss):
+    return lambda: normNormRange(dss)('x')
+
+@registerTransformPlugin(
+    'NormRangeY', _('Normalise dataset Y to be between 0 and 1'), category=catnorm,
+    description=_('Normalise dataset Y to be between 0 and 1'))
+def normNormY(dss):
+    return lambda: normNormRange(dss)('y')
 
 ###############################################################################
 ## Log10, Log, Exp, Pow
@@ -594,17 +630,17 @@ def filteringThin(dss):
     return Thin
 
 @registerTransformPlugin(
-    'Range', _('Select index range'), category=catfilt,
+    'IndexRange', _('Select index range'), category=catfilt,
     description=_(
         'Select values between index ranges from start [start], '
         'with optional end index [end] and step '
         '[step] (Python-style indexing from 0)'))
 def filteringRange(dss):
-    def Range(start, end=None, step=None):
+    def IndexRange(start, end=None, step=None):
         for ds in dss:
             if ds is None:
                 continue
             for attr in 'data', 'serr', 'perr', 'nerr':
                 if getattr(ds, attr, None) is not None:
                     setattr(ds, attr, getattr(ds, attr)[start:end:step])
-    return Range
+    return IndexRange

@@ -63,6 +63,8 @@ def convertFromPluginDataset(ds):
         raise RuntimeError("Unknown plugin dataset type")
 
 class Transform:
+    """Call to evaluate expressions transforming input datasets."""
+
     def __init__(self, document):
         self.document = document
         self.datasets = []
@@ -75,7 +77,7 @@ class Transform:
         self.transformenv['_DS_'] = self._evalDataset
 
     def _evalDataset(self, name, part):
-        """Either return full dataset, or part of it."""
+        """Called to return dataset during evaluation."""
         try:
             ds = self.document.data[name]
         except KeyError:
