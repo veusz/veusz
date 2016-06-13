@@ -27,7 +27,6 @@ def _(text, disambiguation=None, context='TransformPlugin'):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 # TODO
-# cumulative
 # filter
 # moving average
 # rebin
@@ -140,6 +139,54 @@ def addAddX(dss):
     description=_('Add value or dataset [val] to Y dataset'))
 def addAddY(dss):
     return lambda val: addAdd(dss)('y', val)
+
+## CumSum
+
+def _cumsum(dataset, reverse=False):
+    def calccum(v):
+        v = N.array(v)
+        if reverse:
+            v = v[::-1]
+        v[~N.isfinite(v)] = 0.
+        c = N.cumsum(v)
+        if reverse:
+            c = c[::-1]
+        return c
+
+    dataset.data[:] = calccum(dataset.data)
+    if dataset.serr is not None:
+        dataset.serr[:] = N.sqrt(calccum(dataset.serr**2))
+    if dataset.perr is not None:
+        dataset.perr[:] = N.sqrt(calccum(dataset.perr**2))
+    if dataset.nerr is not None:
+        dataset.nerr[:] = -N.sqrt(calccum(dataset.nerr**2))
+
+@registerTransformPlugin(
+    'CumSumX', _('Cumulative sum of X dataset'), category=catadd,
+    description=_('Calculate cumulative sum of X dataset. Sum is from '
+                  'reverse end if [reverse] set'))
+def addCumSumX(dss):
+    def CumSumX(reverse=False):
+        _cumsum(dss[0], reverse=reverse)
+    return CumSumX
+
+@registerTransformPlugin(
+    'CumSumY', _('Cumulative sum of Y dataset'), category=catadd,
+    description=_('Calculate cumulative sum of Y dataset. Sum is from '
+                  'reverse end if [reverse] set'))
+def addCumSumY(dss):
+    def CumSumY(reverse=False):
+        _cumsum(dss[1], reverse=reverse)
+    return CumSumY
+
+@registerTransformPlugin(
+    'CumSum', _('Cumulative sum of output dataset'), category=catadd,
+    description=_('Calculate cumulative sum of [outds] dataset. Sum is from '
+                  'reverse end if [reverse] set'))
+def addCumSum(dss):
+    def CumSum(outds, reverse=False):
+        _cumsum(dss[dsCodeToIdx(outds)], reverse=reverse)
+    return CumSum
 
 ###############################################################################
 # Subtract
