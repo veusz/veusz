@@ -30,6 +30,7 @@ def _(text, disambiguation=None, context='TransformPlugin'):
 # filter
 # moving average
 # rebin
+# divfrom, inv
 
 transformpluginregistry = {}
 
@@ -280,6 +281,38 @@ def subSubMeanX(dss):
     description=_('Subtract mean value from dataset Y'))
 def subSubMeanY(dss):
     return lambda: _subfn(dss[1], N.mean)
+
+## SubFrom
+
+def _subfrom(ds, val):
+    if isDataset1D(val):
+        _addSubDataset(val, ds, sub=True)
+    else:
+        ds.data[:] = val - ds.data
+
+@registerTransformPlugin(
+    'SubFrom', _('Subtract output dataset from value or dataset'), category=catsub,
+    description=_('Subtract output dataset [outds] from value or dataset [val]'))
+def subSubFrom(dss):
+    def SubFrom(outds, val):
+        _subfrom(dss[dsCodeToIdx(outds)], val)
+    return SubFrom
+
+@registerTransformPlugin(
+    'SubFromX', _('Subtract X dataset from value or dataset'), category=catsub,
+    description=_('Subtract X dataset from value or dataset [val]'))
+def subSubFromX(dss):
+    def SubFromX(val):
+        _subfrom(dss[0], val)
+    return SubFromX
+
+@registerTransformPlugin(
+    'SubFromY', _('Subtract Y dataset from value or dataset'), category=catsub,
+    description=_('Subtract Y dataset from value or dataset [val]'))
+def subSubFromY(dss):
+    def SubFromY(val):
+        _subfrom(dss[1], val)
+    return SubFromY
 
 ###############################################################################
 # Multiply
