@@ -101,8 +101,7 @@ def fitLM(func, params, xvals, yvals, errors,
         alpha *= 1. + N.identity(len(params), dtype='float64')*Lambda
 
         # now work out deltas on parameters to get better fit
-        epsilon = NLA.inv( alpha )
-        deltas = N.dot(beta, epsilon)
+        deltas = NLA.solve(alpha, beta)
 
         # new solution
         new_params = params+deltas

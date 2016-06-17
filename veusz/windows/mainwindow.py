@@ -827,20 +827,12 @@ class MainWindow(qt4.QMainWindow):
         if self.filename:
             filetext = " '%s'" % os.path.basename(self.filename)
 
-        # show message box
-        mb = qt4.QMessageBox(
+        return qt4.QMessageBox.warning(
+            self,
             _("Save file?"),
             _("Document%s was modified. Save first?") % filetext,
-            qt4.QMessageBox.Warning,
-            qt4.QMessageBox.Yes,
-            qt4.QMessageBox.No,
-            qt4.QMessageBox.Cancel,
-            self)
-        mb.setButtonText(qt4.QMessageBox.Yes, _("&Save"))
-        mb.setButtonText(qt4.QMessageBox.No, _("&Discard"))
-        mb.setButtonText(qt4.QMessageBox.Cancel, _("&Cancel"))
-        mb.setDefaultButton(qt4.QMessageBox.Yes)
-        return mb.exec_()
+            qt4.QMessageBox.Save | qt4.QMessageBox.Discard |
+            qt4.QMessageBox.Cancel)
 
     def closeEvent(self, event):
         """Before closing, check whether we need to save first."""
@@ -851,7 +843,7 @@ class MainWindow(qt4.QMainWindow):
             if v == qt4.QMessageBox.Cancel:
                 event.ignore()
                 return
-            elif v == qt4.QMessageBox.Yes:
+            elif v == qt4.QMessageBox.Save:
                 self.slotFileSave()
 
         # store working directory
