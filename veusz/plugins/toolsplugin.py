@@ -106,7 +106,7 @@ class ColorsRandomize(ToolsPlugin):
             if a > b:
                 return random.randint(b, a)
             return random.randint(a, b)
-            
+
         col = qt4.QColor.fromHsv(rand(H1, H2), rand(S1, S2), rand(V1, V2))
         return str(col.name())
 
@@ -133,7 +133,9 @@ class ColorsSequenceCMap(ToolsPlugin):
     menu = (_('Colors'), _('Colormap Sequence'))
     name = 'Create color sequence using color map'
     description_short = _('Make widgets use sequence of colors in a colormap')
-    description_full = _('Give new colors to each widget in a sequence using a colormap.')
+    description_full = _(
+        'Give new colors to each widget in a sequence using a colormap. '
+        'Match can be set to match names of widgets (e.g. "xy*").')
 
     def __init__(self):
         """Construct plugin."""
@@ -144,6 +146,8 @@ class ColorsSequenceCMap(ToolsPlugin):
                 "colorxy", descr=_("Color xy plotters"), default=True),
             field.FieldBool(
                 "colorfunc", descr=_("Color function plotters"), default=True),
+            field.FieldText(
+                "match", descr=_("Match")),
             field.FieldBool(
                 "invert", descr=_("Invert colormap"), default=False),
             field.FieldBool(
@@ -156,42 +160,40 @@ class ColorsSequenceCMap(ToolsPlugin):
         """Do the randomizing."""
 
         fromwidget = ifc.Root.fromPath(fields['widget'])
+        match = fields['match'].strip()
 
-        # add up total number of widgets
-        numwidgets = (
-            len( list(fromwidget.WalkWidgets(widgettype='xy')) ) +
-            len( list(fromwidget.WalkWidgets(widgettype='function')) ) )
+        widgets = []
+        for w in fromwidget.WalkWidgets():
+            if match and not fnmatch.fnmatch(w.name, match):
+                continue
+            if ( (w.widgettype=='xy' and fields['colorxy']) or
+                 (w.widgettype=='function' and fields['colorfunc']) ):
+                widgets.append(w)
 
         # get list of RGBA values
         cvals = ifc.GetColormap(
             fields["colormap"], invert=fields["invert"],
-            nvals=max(1, numwidgets))
+            nvals=max(1, len(widgets)))
 
         if fields["randomize"]:
             N.random.shuffle(cvals)
 
-        def getcoloridx(i):
+        # convert colors to #XXXX format
+        for idx, widget in enumerate(widgets):
             if cvals[idx,3] == 255:
                 # opaque
-                return "#%02x%02x%02x" % (
+                col = "#%02x%02x%02x" % (
                     cvals[idx,0], cvals[idx,1], cvals[idx,2])
             else:
                 # with transparency
-                return "#%02x%02x%02x%02x" % (
+                col = "#%02x%02x%02x%02x" % (
                     cvals[idx,0], cvals[idx,1], cvals[idx,2], cvals[idx,3])
 
-        idx = 0
-        for node in fromwidget.WalkWidgets():
-            t = node.widgettype
-            if fields['colorxy'] and t == 'xy':
-                col = getcoloridx(idx)
-                node.color.val = col
-                idx += 1
-
-            if fields['colorfunc'] and t == 'function':
-                col = getcoloridx(idx)
-                node.Line.color.val = col
-                idx += 1
+            t = widget.widgettype
+            if t == 'xy':
+                widget.color.val = col
+            elif t == 'function':
+                widget.Line.color.val = col
 
 class ColorsSequence(ToolsPlugin):
     """Color plotters in sequence."""
