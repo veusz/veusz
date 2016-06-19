@@ -841,14 +841,16 @@ class TreeEditDock(qt4.QDockWidget):
 
         self.addslots = {}
         self.vzactions = actions = self.parentwin.vzactions
-        for widgettype in ('page', 'grid', 'graph', 'axis',
-                           'axis-broken', 'axis-function',
-                           'xy', 'bar', 'fit', 'function', 'boxplot',
-                           'image', 'contour', 'vectorfield',
-                           'key', 'label', 'colorbar',
-                           'rect', 'ellipse', 'imagefile',
-                           'line', 'polygon', 'polar', 'ternary',
-                           'nonorthpoint', 'nonorthfunc'):
+        for widgettype in (
+                'page', 'grid', 'graph', 'axis',
+                'axis-broken', 'axis-function',
+                'xy', 'bar', 'fit', 'function', 'boxplot',
+                'image', 'contour', 'vectorfield',
+                'key', 'label', 'colorbar',
+                'rect', 'ellipse', 'imagefile',
+                'line', 'polygon', 'polar', 'ternary',
+                'nonorthpoint', 'nonorthfunc',
+                'covariance'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = slotklass(wc)
@@ -925,6 +927,7 @@ class TreeEditDock(qt4.QDockWidget):
             'add.colorbar',
             'add.polar',
             'add.ternary',
+            'add.covariance',
             'add.shapemenu',
             )
 
