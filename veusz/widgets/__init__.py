@@ -46,3 +46,4 @@ from .polar import Polar
 from .ternary import Ternary
 from .nonorthpoint import NonOrthPoint
 from .nonorthfunction import NonOrthFunction
+from .covariance import Covariance
