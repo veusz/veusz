@@ -101,18 +101,27 @@ class GenericPickable:
         if len(self.xscreen) <= 1:
             # we only have one element, so it doesn't matter anyways
             return 1
-        
-        if i == 0:
+
+        # go backwards to get previous finite point
+        mi = i-1
+        while mi >= 0 and not N.isfinite(self.xscreen[mi]+self.yscreen[mi]):
+            mi -= 1
+        if mi < 0:
             m = None
         else:
-            m = self.xscreen[i-1], self.yscreen[i-1]
+            m = self.xscreen[mi], self.yscreen[mi]
 
+        # point in centre
         c = self.xscreen[i], self.yscreen[i]
 
-        if i+1 == len(self.xscreen):
+        # find next finite point
+        pi = i+1
+        while pi < len(self.xscreen) and not N.isfinite(self.xscreen[pi]+self.yscreen[pi]):
+            pi += 1
+        if pi == len(self.xscreen):
             p = None
         else:
-            p = self.xscreen[i+1], self.yscreen[i+1]
+            p = self.xscreen[pi], self.yscreen[pi]
 
         return _chooseOrderingSign(m, c, p)
 
@@ -143,10 +152,13 @@ class GenericPickable:
                     distance_direction == 'vertical' or
                     distance_direction == 'horizontal')
 
-        # ignore points which are offscreen
-        outofbounds = ( (self.xscreen < bounds[0]) | (self.xscreen > bounds[2]) |
-                        (self.yscreen < bounds[1]) | (self.yscreen > bounds[3]) )
-        dist[outofbounds] = float('inf')
+        # ignore points which are offscreen or not finite
+        with N.errstate(invalid='ignore'):
+            outofbounds = (
+                (self.xscreen < bounds[0]) | (self.xscreen > bounds[2]) |
+                (self.yscreen < bounds[1]) | (self.yscreen > bounds[3]) |
+                ~N.isfinite(self.xscreen) | ~N.isfinite(self.yscreen) )
+        dist[outofbounds] = N.inf
 
         m = N.min(dist)
         # if there are multiple equidistant points, arbitrarily take
@@ -196,10 +208,12 @@ class GenericPickable:
 
         i += incr
 
-        # skip points that are outside of the bounds
-        while ( i >= 0 and i < len(self.xscreen) and
-            (self.xscreen[i] < bounds[0] or self.xscreen[i] > bounds[2] or
-             self.yscreen[i] < bounds[1] or self.yscreen[i] > bounds[3]) ):
+        # skip points that are outside of the bounds or are not finite
+        while (i >= 0 and i < len(self.xscreen) and
+                ( not N.isfinite(self.xscreen[i]) or
+                  not N.isfinite(self.yscreen[i]) or
+                  (self.xscreen[i] < bounds[0] or self.xscreen[i] > bounds[2] or
+                   self.yscreen[i] < bounds[1] or self.yscreen[i] > bounds[3]) )):
             i += incr
 
         if i < 0 or i >= len(self.xscreen):
@@ -225,15 +239,10 @@ class DiscretePickable(GenericPickable):
             GenericPickable.__init__( self, widget, labels, (None, None), (None, None) )
             return
 
-        # map all the valid data
-        x, y = N.array([]), N.array([])
-        xs, ys = N.array([]), N.array([])
-        for xvals, yvals in document.generateValidDatasetParts([xdata, ydata]):
-            chunklen = min(len(xvals.data), len(yvals.data))
-
-            x = N.append(x, xvals.data[:chunklen])
-            y = N.append(y, yvals.data[:chunklen])
-
+        # take data, ensure same size and map it
+        x, y = xdata.data, ydata.data
+        minlen = min(len(x), len(y))
+        x, y = x[:minlen], y[:minlen]
         xs, ys = mapdata_fn(x, y)
 
         # and set us up with the mapped data
