@@ -76,6 +76,18 @@ class Transform:
             self.transformenv[name] = fn(self.datasets)
         self.transformenv['_DS_'] = self._evalDataset
 
+        self.transformenv['GetX'] = lambda: self._getDataset(0)
+        self.transformenv['GetY'] = lambda: self._getDataset(1)
+        self.transformenv['DropErrors'] = self._dropErrors
+
+    def _getDataset(self, idx):
+        """Return dataset with index given."""
+        return self.datasets[idx]
+
+    def _dropErrors(self, ds):
+        """Return dataset without error bars."""
+        return plugins.Dataset1D(ds.name, data=ds.data)
+
     def _evalDataset(self, name, part):
         """Called to return dataset during evaluation."""
         try:

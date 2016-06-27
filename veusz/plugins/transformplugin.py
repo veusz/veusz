@@ -344,11 +344,11 @@ def _multiplyDatasetDataset(d1, d2):
             d1.nerr = d2.nerr[:minlen]*d1av
     elif d1err and not d2err:
         d2av = N.abs(d2.data[:minlen])
-        if d2.serr is not None:
+        if d1.serr is not None:
             d1.serr = d1.serr[:minlen]*d2av
-        if d2.perr is not None:
+        if d1.perr is not None:
             d1.perr = d1.perr[:minlen]*d2av
-        if d2.nerr is not None:
+        if d1.nerr is not None:
             d1.nerr = d1.nerr[:minlen]*d2av
     elif d1err and d2err:
         # combine errors square fractional errors, add, sqrt
@@ -420,11 +420,11 @@ def _divideDatasetDataset(d1, d2):
 
     elif d1err and not d2err:
         # divide error by scalar
-        if d2.serr is not None:
+        if d1.serr is not None:
             d1.serr = d1.serr[:minlen] / N.abs(d2.data[:minlen])
-        if d2.perr is not None:
+        if d1.perr is not None:
             d1.perr = d1.perr[:minlen] / N.abs(d2.data[:minlen])
-        if d2.nerr is not None:
+        if d1.nerr is not None:
             d1.nerr = d1.nerr[:minlen] / N.abs(d2.data[:minlen])
 
     elif d1err and d2err:
