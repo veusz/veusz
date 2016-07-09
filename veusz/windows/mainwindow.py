@@ -256,7 +256,7 @@ class MainWindow(qt4.QMainWindow):
             return []
         else:
             # get list of vsz files dropped
-            urls = [u.path() for u in mime.urls()]
+            urls = [u.toLocalFile() for u in mime.urls()]
             urls = [u for u in urls if os.path.splitext(u)[1] == '.vsz']
             return urls
 
