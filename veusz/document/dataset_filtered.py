@@ -215,8 +215,10 @@ class DatasetFiltered(DatasetBase):
 
     # these have to be overridden manually
     def __getitem__(self, key):
+        self._checkUpdate()
         return self._internalds[key]
     def __len__(self):
+        self._checkUpdate()
         return len(self._internalds)
 
 class OperationDatasetsFilter(object):
