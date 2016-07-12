@@ -265,9 +265,8 @@ class Fit(FunctionPlotter):
                 print("Warning: Symmeterising positive and negative errors")
                 yserr = N.sqrt( 0.5*(ydata.perr**2 + ydata.nerr**2) )
             else:
-                print("Warning: No errors on y values. Assuming 5% errors.")
-                yserr = yvals*0.05
-                yserr[yserr < 1e-8] = 1e-8
+                print("Warning: No errors on y values.")
+                yserr = N.ones(yvals.size)
 
         # if the fitRange parameter is on, we chop out data outside the
         # range of the axis
