@@ -31,12 +31,25 @@ Plots set of datasets
    data expression
    filters
 
+
+Current dataset formats:
+expr, expr, expr
+expr, ...
+(expr, ...)
+datasetname
+`dataset name`
+
+future formats:
+: y*
+:y1:y2:y3
+
+
 """
 
 from __future__ import division
 import numpy as N
 
-from ..compat import czip
+from ..compat import czip, crange
 from .. import qtall as qt4
 from .. import document
 from .. import setting
@@ -367,6 +380,8 @@ class DatasetPartPlot:
         self.ypltpoint = yplotter
 
     def plot(self):
+        """Do all the steps of plotting."""
+
         s = self.settings
 
         # plot filled error bars
@@ -518,6 +533,7 @@ class DatasetPartPlot:
             utils.plotClippedPolyline(self.painter, self.cliprect, pts)
 
     def getLinePoints(self):
+        """Return points of line as a QPolygonF."""
 
         pts = qt4.QPolygonF()
 
@@ -687,6 +703,18 @@ class DatasetPartPlot:
                 alignhorz, alignvert, angle,
                 doc=self.document).render()
 
+def cycledatasets(*datasets):
+    """Cycle datasets, repeating if necessary."""
+    maxlen = max([len(d) for d in datasets])
+    for i in crange(maxlen):
+        out = []
+        for d in datasets:
+            if len(d) == 0:
+                out.append(None)
+            else:
+                out.append(d[i % len(d)])
+        yield tuple(out)
+
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
 
@@ -713,11 +741,11 @@ class PointPlotter(GenericPlotter):
         GenericPlotter.addSettings(s)
 
         # non-formatting
-        s.add( setting.DatasetExtended(
+        s.add( setting.DatasetExtendedMulti(
             'yData', 'y',
             descr=_('Y values, given by dataset, expression or list of values'),
             usertext=_('Y data')), 0 )
-        s.add( setting.DatasetExtended(
+        s.add( setting.DatasetExtendedMulti(
             'xData', 'x',
             descr=_('X values, given by dataset, expression or list of values'),
             usertext=_('X data')), 0 )
@@ -725,7 +753,7 @@ class PointPlotter(GenericPlotter):
             'labels', '',
             descr=_('Dataset or string to label points'),
             usertext=_('Labels')), 4 )
-        s.add( setting.DatasetExtended(
+        s.add( setting.DatasetExtendedMulti(
             'scalePoints', '',
             descr = _('Scale size of markers given by dataset, expression'
                       ' or list of values'),
@@ -836,21 +864,25 @@ class PointPlotter(GenericPlotter):
 
         s = self.settings
         doc = self.document
-        xds = s.get('xData').getData(doc)
-        yds = s.get('yData').getData(doc)
+        xds = s.get('xData').getDatasets(doc)
+        yds = s.get('yData').getDatasets(doc)
         text = s.get('labels').getData(doc, checknull=True)
-        scaleds = s.get('scalePoints').getData(doc)
+        text = [] if text is None else [text]
+        scaleds = s.get('scalePoints').getDatasets(doc)
         colords = s.Color.get('points').getData(doc)
+        colords = [] if colords is None else [colords]
 
         # automatic indexing of dataset is the other is blank
         if xds and not yds and s.get('yData').isEmpty():
-            # use index for y data
-            length = xds.data.shape[0]
-            yds = document.DatasetRange(length, (1,length))
+            yds = []
+            for ds in xds:
+                length = ds.data.shape[0]
+                yds.append(document.DatasetRange(length, (1,length)))
         elif yds and not xds and s.get('xData').isEmpty():
-            # use index for x data
-            length = yds.data.shape[0]
-            xds = document.DatasetRange(length, (1,length))
+            xds = []
+            for ds in yds:
+                length = ds.data.shape[0]
+                xds.append(document.DatasetRange(length, (1,length)))
 
         # handle repeating labels
         if text:
@@ -859,8 +891,9 @@ class PointPlotter(GenericPlotter):
 
         # cache contains tuples of datasets
         self._cache_ds = []
-        if xds is not None and yds is not None:
-            self._cache_ds.append((xds, yds, text, scaleds, colords))
+        if xds and yds:
+            for dsset in cycledatasets(xds, yds, text, scaleds, colords):
+                self._cache_ds.append(dsset)
 
         # transform datasets into new datasets
         if s.transform:

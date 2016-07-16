@@ -29,6 +29,7 @@ s.fromText('42')
 from __future__ import division
 import re
 import sys
+import fnmatch
 
 import numpy as N
 
@@ -1245,11 +1246,8 @@ class Datasets(Setting):
                 out.append(d)
         return out
 
-class DatasetExtended(Dataset):
-    """Choose a dataset, give an expression or specify a list of float
-    values."""
-
-    typename = 'dataset-extended'
+class _DatasetExtendedConversion(object):
+    """Helper for dataset conversion."""
 
     def convertTo(self, val):
         """Check is a string (dataset name or expression) or a list of
@@ -1303,6 +1301,12 @@ class DatasetExtended(Dataset):
                     return text
         return out
 
+class DatasetExtended(_DatasetExtendedConversion, Dataset):
+    """Choose a dataset, give an expression or specify a list of float
+    values."""
+
+    typename = 'dataset-extended'
+
     def getFloatArray(self, doc):
         """Get a numpy of values or None."""
         if isinstance(self.val, cbasestr):
@@ -1333,6 +1337,89 @@ class DatasetExtended(Dataset):
         else:
             return doc.valsToDataset(
                 self.val, self.datatype, self.dimensions)
+
+class DatasetExtendedMulti(_DatasetExtendedConversion, Str):
+    """An extended dataset allowing multiple datasets."""
+
+    typename = 'dataset-extended-multi'
+
+    # for splitting on colons, except when quoted with ``
+    _multisplit = re.compile(r'((?:`.*?`|[^:])+)')
+    # check for any shell expansion
+    _globbing = re.compile(r'\*|\?|\[.+\]')
+
+    def __init__(self, name, val, dimensions=1, datatype='numeric',
+                 **args):
+        self.dimensions = dimensions
+        self.datatype = datatype
+        Setting.__init__(self, name, val, **args)
+
+    def copy(self):
+        return self._copyHelper(
+            (), (), {'dimensions': self.dimensions, 'datatype': self.datatype})
+
+    def isEmpty(self):
+        """Is this unset?"""
+        return self.val == [] or self.val == ''
+
+    def _interpretMulti(self, val, doc):
+        """Interpret multi dataset string."""
+
+        # split into colon-separated parts, allowing for : to be
+        # enclosed in `` quotes
+
+        datasets = []
+        for p in re.finditer(self._multisplit, val):
+            p = p.group().strip()
+            if p == '' or p == ':':
+                continue
+
+            quoted = len(p)>=2 and p[0]=='`' and p[-1]=='`' and p.count('`') == 2
+            if quoted:
+                # remove any complete single quoting
+                p = p[1:-1]
+            elif self._globbing.search(p):
+                # p looks like a glob, so see whether it matches anything
+                # we don't try globbing
+                matches = fnmatch.filter(list(doc.data.keys()), p)
+                if matches:
+                    datasets += [doc.data[d] for d in sorted(matches)]
+                    continue
+
+            ds = doc.data.get(p)
+            if ( ds is not None and ds.dimensions == self.dimensions and
+                 ds.datatype == self.datatype ):
+                # exact match
+                datasets.append(ds)
+            elif not quoted:
+                # evaluate expression
+                ds = doc.evalDatasetExpression(
+                    p, datatype=self.datatype, dimensions=self.dimensions)
+                if ds is not None:
+                    datasets.append(ds)
+
+        return datasets
+
+    def getDatasets(self, doc):
+        """Return list of datasets objects."""
+
+        if isinstance(self.val, cbasestr):
+            # string expression
+            val = self.val.strip()
+            if not val:
+                return []
+            if val[:1] == ':':
+                # multiple colon-separated expression
+                return self._interpretMulti(val, doc)
+            else:
+                # single dataset or dataset expression
+                ds = doc.evalDatasetExpression(
+                    self.val, datatype=self.datatype, dimensions=self.dimensions)
+        else:
+            # list of values
+            ds = doc.valsToDataset(self.val, self.datatype, self.dimensions)
+
+        return [ds] if ds is not None else []
 
 class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string.
