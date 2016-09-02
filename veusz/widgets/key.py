@@ -266,6 +266,13 @@ class Key(widget.Widget):
             descr=_('Put key symbol on right and text on left'),
             usertext=_('Swap symbol'),
             formatting=True) )
+        
+        s.add( setting.Bool(
+            'orderswap',
+            False,
+            descr=_('Reverse order of entries'),
+            usertext=_('Reverse order'),
+            formatting=True) )
 
     @classmethod
     def allowedParentTypes(klass):
@@ -501,6 +508,15 @@ class Key(widget.Widget):
         x += (totalwidth-keyswidth)/2
 
         swap = s.symbolswap
+
+        if s.orderswap:
+            new_layout = []
+            i = 0
+            l = len(layout)
+            for (plotter, num, xp, yp, lines) in layout:
+               new_layout.append( (plotter, num, xp, layout[l - i - 1][3], lines) )
+               i = i + 1
+            layout = new_layout
 
         # plot dataset entries
         for (plotter, num, xp, yp, lines) in layout:
