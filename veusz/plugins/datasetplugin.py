@@ -651,6 +651,34 @@ class AddDatasetPlugin(_OneOutputDatasetPlugin):
         self.dsout.update(data = ds_in.data + fields['value'],
                           serr=ds_in.serr, perr=ds_in.perr, nerr=ds_in.nerr)
 
+class ReverseDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to reverse datasets."""
+
+    menu = (_('Other'), _('Reverse'),)
+    name = 'Reverse'
+    description_short = _('Reverse dataset')
+    description_full = description_short 
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset')),
+            field.FieldDataset('ds_out', _('Output dataset name')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do reverse of dataset."""
+
+        ds_in = helper.getDataset(fields['ds_in'])
+
+        data, serr, perr, nerr = ds_in.data, ds_in.serr, ds_in.perr, ds_in.nerr
+        data = data[::-1]
+        if serr is not None: serr = serr[::-1]
+        if perr is not None: perr = perr[::-1]
+        if nerr is not None: nerr = nerr[::-1]
+
+        self.dsout.update(data=data, serr=serr, perr=perr, nerr=nerr)
+
 class ConcatenateDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to concatenate datasets."""
 
@@ -2142,6 +2170,7 @@ datasetpluginregistry += [
     LogPlugin,
     ExpPlugin,
 
+    ReverseDatasetPlugin,
     ConcatenateDatasetPlugin,
     InterleaveDatasetPlugin,
 
