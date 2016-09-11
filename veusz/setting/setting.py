@@ -23,7 +23,7 @@ e.g.
 s = Int('foo', 5)
 s.get()
 s.set(42)
-s.fromText('42')
+s.fromTextUI('42')
 """
 
 from __future__ import division
@@ -33,7 +33,7 @@ import fnmatch
 
 import numpy as N
 
-from ..compat import cbasestr, cstr, crepr
+from ..compat import cbasestr, cstr, crepr, cstrerror
 from .. import qtall as qt4
 from . import controls
 from .settingdb import settingdb, uilocale, ui_floattostring, ui_stringtofloat
@@ -44,6 +44,10 @@ from .. import utils
 class OnModified(qt4.QObject):
     """onmodified is emitted from an object contained in each setting."""
     onModified = qt4.pyqtSignal()
+
+def _(text, disambiguation=None, context="Setting"):
+    """Translate text."""
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
 
 class Setting(object):
     """A class to store a value with a particular type."""
@@ -183,12 +187,12 @@ class Setting(object):
     path = property(_path, None, None,
                     'Return the full path of the setting')
 
-    def toText(self):
-        """Convert the type to text for saving."""
+    def toTextUI(self):
+        """Convert the type to text for editing in UI."""
         return ""
 
-    def fromText(self, text):
-        """Convert text to type suitable for setting.
+    def fromTextUI(self, text):
+        """Convert text from UI into type for saving.
 
         Raises utils.InvalidType if cannot convert."""
         return None
@@ -211,7 +215,7 @@ class Setting(object):
             pass
 
         if deftext is not None:
-            self.val = self.fromText(deftext)
+            self.val = self.fromTextUI(deftext)
             self.default = self.val
 
     def removeDefault(self):
@@ -252,7 +256,7 @@ class Setting(object):
             path = '%s_NAME:%s' % (item.name, path)
 
         # set the default
-        settingdb[path] = self.toText()
+        settingdb[path] = self.toTextUI()
 
     def saveText(self, saveall, rootname = ''):
         """Return text to restore the value of this setting."""
@@ -380,11 +384,11 @@ class SettingBackwardCompat(Setting):
         if self.parent is not None:
             return self.getForward().convertTo(val)
 
-    def toText(self):
-        return self.getForward().toText()
+    def toTextUI(self):
+        return self.getForward().toTextUI()
 
-    def fromText(self, val):
-        return self.getForward().fromText(val)
+    def fromTextUI(self, val):
+        return self.getForward().fromTextUI(val)
 
     def set(self, val):
         if self.parent is not None and not isinstance(val, ReferenceBase):
@@ -423,10 +427,10 @@ class Str(Setting):
             return val
         raise utils.InvalidType
 
-    def toText(self):
+    def toTextUI(self):
         return self.val
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         return text
 
     def makeControl(self, *args):
@@ -451,13 +455,13 @@ class Bool(Setting):
             return bool(val)
         raise utils.InvalidType
 
-    def toText(self):
+    def toTextUI(self):
         if self.val:
             return 'True'
         else:
             return 'False'
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         t = text.strip().lower()
         if t in ('true', '1', 't', 'y', 'yes'):
             return True
@@ -503,10 +507,10 @@ class Int(Setting):
                 raise utils.InvalidType('Out of range allowed')
         raise utils.InvalidType
 
-    def toText(self):
+    def toTextUI(self):
         return uilocale.toString(self.val)
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         i, ok = uilocale.toLongLong(text)
         if not ok:
             raise ValueError
@@ -560,10 +564,10 @@ class Float(Setting):
                                      minval=self.minval, maxval=self.maxval)
         raise utils.InvalidType
 
-    def toText(self):
+    def toTextUI(self):
         return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         try:
             f = ui_stringtofloat(text)
         except ValueError:
@@ -593,18 +597,18 @@ class FloatOrAuto(Float):
         else:
             return Float.convertFrom(self, val)
 
-    def toText(self):
+    def toTextUI(self):
         if self.val is None or (isinstance(self.val, cbasestr) and
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
             return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
-            return Float.fromText(self, text)
+            return Float.fromTextUI(self, text)
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
@@ -628,14 +632,14 @@ class IntOrAuto(Setting):
         else:
             return val
 
-    def toText(self):
+    def toTextUI(self):
         if self.val is None or (isinstance(self.val, cbasestr) and
                                 self.val.lower() == 'auto'):
             return 'Auto'
         else:
             return uilocale.toString(self.val)
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
@@ -763,11 +767,11 @@ class Distance(Setting):
         else:
             raise utils.InvalidType
 
-    def toText(self):
+    def toTextUI(self):
         # convert decimal point to display locale
         return self.val.replace('.', uilocale.decimalPoint())
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         # convert decimal point from display locale
         text = text.replace(uilocale.decimalPoint(), '.')
 
@@ -888,10 +892,10 @@ class Choice(Setting):
         else:
             raise utils.InvalidType
 
-    def toText(self):
+    def toTextUI(self):
         return self.val
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         if text in self.vallist:
             return text
         else:
@@ -928,10 +932,10 @@ class ChoiceOrMore(Setting):
     def convertTo(self, val):
         return val
 
-    def toText(self):
+    def toTextUI(self):
         return self.val
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         return text
 
     def makeControl(self, *args):
@@ -948,10 +952,10 @@ class FloatChoice(ChoiceOrMore):
             return _finiteRangeFloat(val)
         raise utils.InvalidType
 
-    def toText(self):
+    def toTextUI(self):
         return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         try:
             f = ui_stringtofloat(text)
         except ValueError:
@@ -980,12 +984,12 @@ class FloatDict(Setting):
         # return copy
         return dict(val)
 
-    def toText(self):
+    def toTextUI(self):
         text = ['%s = %s' % (k, ui_floattostring(self.val[k]))
                 for k in sorted(self.val)]
         return '\n'.join(text)
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         """Do conversion from list of a=X\n values."""
 
         out = {}
@@ -1030,7 +1034,7 @@ class FloatList(Setting):
                 out.append( float(i) )
         return out
 
-    def toText(self):
+    def toTextUI(self):
         """Make a string a, b, c."""
         # can't use the comma for splitting if used as a decimal point
 
@@ -1039,7 +1043,7 @@ class FloatList(Setting):
             join = '; '
         return join.join( [ui_floattostring(x) for x in self.val] )
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         """Convert from a, b, c or a b c."""
 
         # don't use commas if it is the decimal separator
@@ -1246,8 +1250,11 @@ class Datasets(Setting):
                 out.append(d)
         return out
 
-class _DatasetExtendedConversion(object):
-    """Helper for dataset conversion."""
+class DatasetExtended(Dataset):
+    """Choose a dataset, give an expression or specify a list of float
+    values."""
+
+    typename = 'dataset-extended'
 
     def convertTo(self, val):
         """Check is a string (dataset name or expression) or a list of
@@ -1267,7 +1274,7 @@ class _DatasetExtendedConversion(object):
                     pass
         raise utils.InvalidType
 
-    def toText(self):
+    def toTextUI(self):
         if isinstance(self.val, cbasestr):
             return self.val
         else:
@@ -1278,7 +1285,7 @@ class _DatasetExtendedConversion(object):
             return join.join( [ ui_floattostring(x)
                                 for x in self.val ] )
 
-    def fromText(self, text):
+    def fromTextUI(self, text):
         """Convert from text."""
 
         text = text.strip()
@@ -1300,12 +1307,6 @@ class _DatasetExtendedConversion(object):
                     # fail conversion, so exit with text
                     return text
         return out
-
-class DatasetExtended(_DatasetExtendedConversion, Dataset):
-    """Choose a dataset, give an expression or specify a list of float
-    values."""
-
-    typename = 'dataset-extended'
 
     def getFloatArray(self, doc):
         """Get a numpy of values or None."""
@@ -1331,6 +1332,9 @@ class DatasetExtended(_DatasetExtendedConversion, Dataset):
 
     def getData(self, doc):
         """Return veusz dataset"""
+        if self.isEmpty():
+            return None
+
         if isinstance(self.val, cbasestr):
             return doc.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
@@ -1338,15 +1342,10 @@ class DatasetExtended(_DatasetExtendedConversion, Dataset):
             return doc.valsToDataset(
                 self.val, self.datatype, self.dimensions)
 
-class DatasetExtendedMulti(_DatasetExtendedConversion, Str):
+class DatasetExtendedMulti(Str):
     """An extended dataset allowing multiple datasets."""
 
     typename = 'dataset-extended-multi'
-
-    # for splitting on colons, except when quoted with ``
-    _multisplit = re.compile(r'((?:`.*?`|[^:])+)')
-    # check for any shell expansion
-    _globbing = re.compile(r'\*|\?|\[.+\]')
 
     def __init__(self, name, val, dimensions=1, datatype='numeric',
                  **args):
@@ -1358,68 +1357,108 @@ class DatasetExtendedMulti(_DatasetExtendedConversion, Str):
         return self._copyHelper(
             (), (), {'dimensions': self.dimensions, 'datatype': self.datatype})
 
+    def convertTo(self, val):
+        """Check is a string (dataset name or expression) or a list of
+        floats (numbers).
+        """
+
+        if isinstance(val, cbasestr):
+            return [val]
+        elif isinstance(val, list) or isinstance(val, tuple):
+            if len(val) == 0:
+                return []
+
+            # old fashioned single numeric list
+            if utils.isnumeric(val[0]):
+                val = [val]
+
+            vout = []
+            for v in val:
+                if isinstance(v, cbasestr):
+                    vout.append(v)
+                elif self.dimensions == 1 and self.datatype == 'numeric':
+                    temp = N.array(v)
+                    if temp.dtype.kind in 'iuf' and temp.ndim == 1:
+                        vout.append(temp.astype(N.float64))
+                    else:
+                        raise utils.InvalidType
+                else:
+                    raise utils.InvalidType
+
+            return vout
+
+    def makeControl(self, *args):
+        """Allow user to choose between the datasets."""
+        return controls.Datasets(
+            self, self.getDocument(), self.dimensions,
+            self.datatype, *args)
+
     def isEmpty(self):
         """Is this unset?"""
-        return self.val == [] or self.val == ''
+        return len(self.val) == 0 or (
+            len(self.val) == 1 and self.val[0] == '')
 
-    def _interpretMulti(self, val, doc):
-        """Interpret multi dataset string."""
+    def filteredDatasets(self, doc, names):
+        """Return datasets which match criteria."""
+        out = []
+        for n in names:
+            ds = doc.data[n]
+            if ds.dimensions==self.dimensions and ds.datatype==self.datatype:
+                out.append(ds)
+        return out
 
-        # split into colon-separated parts, allowing for : to be
-        # enclosed in `` quotes
+    def retnGlobbing(self, doc, val):
+        """Return list of globbed datasets."""
+        matches = fnmatch.filter(list(doc.data.keys()), val)
+        matches.sort(key=utils.numericPartsKey)
+        return self.filteredDatasets(doc, matches)
 
-        datasets = []
-        for p in re.finditer(self._multisplit, val):
-            p = p.group().strip()
-            if p == '' or p == ':':
-                continue
+    def retnRegExp(self, doc, val):
+        """Return datasets matching regexp."""
 
-            quoted = len(p)>=2 and p[0]=='`' and p[-1]=='`' and p.count('`') == 2
-            if quoted:
-                # remove any complete single quoting
-                p = p[1:-1]
-            elif self._globbing.search(p):
-                # p looks like a glob, so see whether it matches anything
-                # we don't try globbing
-                matches = fnmatch.filter(list(doc.data.keys()), p)
-                if matches:
-                    datasets += [doc.data[d] for d in sorted(matches)]
-                    continue
+        try:
+            regexp = re.compile(val)
+        except re.error as e:
+            doc.log(_('Error compiling regular expression: "%s"') % cstr(e))
+            return []
 
-            ds = doc.data.get(p)
-            if ( ds is not None and ds.dimensions == self.dimensions and
-                 ds.datatype == self.datatype ):
-                # exact match
-                datasets.append(ds)
-            elif not quoted:
-                # evaluate expression
-                ds = doc.evalDatasetExpression(
-                    p, datatype=self.datatype, dimensions=self.dimensions)
-                if ds is not None:
-                    datasets.append(ds)
-
-        return datasets
+        matches = [v for v in doc.data if regexp.match(v)]
+        matches.sort(key=utils.numericPartsKey)
+        return self.filteredDatasets(doc, matches)
 
     def getDatasets(self, doc):
         """Return list of datasets objects."""
 
-        if isinstance(self.val, cbasestr):
-            # string expression
-            val = self.val.strip()
-            if not val:
-                return []
-            if val[:1] == ':':
-                # multiple colon-separated expression
-                return self._interpretMulti(val, doc)
-            else:
-                # single dataset or dataset expression
-                ds = doc.evalDatasetExpression(
-                    self.val, datatype=self.datatype, dimensions=self.dimensions)
-        else:
-            # list of values
-            ds = doc.valsToDataset(self.val, self.datatype, self.dimensions)
+        out = []
+        for v in self.val:
+            if isinstance(v, cbasestr):
+                # string expression
+                v = v.strip()
 
-        return [ds] if ds is not None else []
+                if v[:2] == ':^':
+                    # egular expression matching
+                    out += self.retnRegExp(doc, v[2:].strip())
+                elif v[:2] == '::':
+                    # glob-style matching
+                    out += self.retnGlobbing(doc, v[2:].strip())
+                elif v:
+                    ds = doc.data.get(v)
+                    if (ds is not None and ds.dimensions==self.dimensions and
+                        ds.datatype==self.datatype):
+                        # immediate lookup of dataset
+                        out.append(ds)
+                    else:
+                        # single dataset or dataset expression
+                        ds = doc.evalDatasetExpression(
+                            v, datatype=self.datatype, dimensions=self.dimensions)
+                        if ds is not None:
+                            out.append(ds)
+            else:
+                # list of values
+                ds = doc.valsToDataset(v, self.datatype, self.dimensions)
+                out.append(ds)
+
+        return out
 
 class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string.
@@ -1452,6 +1491,19 @@ class DatasetOrStr(Dataset):
     def copy(self):
         """Make a setting which has its values copied from this one."""
         return self._copyHelper((), (), {})
+
+class DatasetOrStrMulti(Str):
+    """Enter multiple strings or names of datasets."""
+
+    typename = 'dataset-or-str-multi'
+
+    def __init__(self, name, val, **args):
+        if isinstance(val, cbasestr):
+            val = [val]
+        Str.__init__(self, name, val, **args)
+
+    def getData(self, doc):
+        pass
 
 class Color(ChoiceOrMore):
     """A color setting."""
@@ -2050,7 +2102,7 @@ class AxisBound(FloatOrAuto):
     def makeControl(self, *args):
         return controls.AxisBound(self, *args)
 
-    def toText(self):
+    def toTextUI(self):
         """Convert to text, taking into account mode of Axis.
         Displays datetimes in date format if used
         """
@@ -2065,16 +2117,16 @@ class AxisBound(FloatOrAuto):
              mode == 'datetime' ):
             return utils.dateFloatToString(v)
 
-        return FloatOrAuto.toText(self)
+        return FloatOrAuto.toTextUI(self)
 
-    def fromText(self, txt):
+    def fromTextUI(self, txt):
         """Convert from text, allowing datetimes."""
 
         v = utils.dateStringToDate(txt)
         if N.isfinite(v):
             return v
         else:
-            return FloatOrAuto.fromText(self, txt)
+            return FloatOrAuto.fromTextUI(self, txt)
 
 class Transform(Str):
     """A sequence of transformations to apply to the data."""

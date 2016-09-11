@@ -68,7 +68,7 @@ class Edit(qt4.QLineEdit):
         qt4.QLineEdit.__init__(self, parent)
         self.setting = setting
 
-        self.setText( setting.toText() )
+        self.setText( setting.toTextUI() )
         self.editingFinished.connect(self.validateAndSet)
         self.setting.setOnModified(self.onModified)
 
@@ -80,7 +80,7 @@ class Edit(qt4.QLineEdit):
 
         text = self.text()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromTextUI(text)
             styleClear(self)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -90,7 +90,7 @@ class Edit(qt4.QLineEdit):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.setText( self.setting.toText() )
+        self.setText( self.setting.toTextUI() )
 
 class _EditBox(qt4.QTextEdit):
     """A popup edit box to support editing long text sections.
@@ -180,7 +180,7 @@ class String(qt4.QWidget):
         layout.addWidget(b)
 
         # set the text of the widget to the 
-        self.edit.setText( setting.toText() )
+        self.edit.setText( setting.toTextUI() )
 
         self.edit.editingFinished.connect(self.validateAndSet)
         b.toggled.connect(self.buttonToggled)
@@ -219,7 +219,7 @@ class String(qt4.QWidget):
 
         text = self.edit.text()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromTextUI(text)
             styleClear(self.edit)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -229,7 +229,7 @@ class String(qt4.QWidget):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.edit.setText( self.setting.toText() )
+        self.edit.setText( self.setting.toTextUI() )
 
 class Int(qt4.QSpinBox):
     """A control for changing an integer."""
@@ -354,13 +354,13 @@ class Choice(qt4.QComboBox):
 
         # choose the correct setting
         try:
-            index = list(vallist).index(setting.toText())
+            index = list(vallist).index(setting.toTextUI())
             self.setCurrentIndex(index)
         except ValueError:
             # for cases when this is editable
             # set the text of the widget to the setting
             assert iseditable
-            self.setEditText( setting.toText() )
+            self.setEditText( setting.toTextUI() )
 
         # if a different item is selected
         self.activated[str].connect(self.slotActivated)
@@ -384,7 +384,7 @@ class Choice(qt4.QComboBox):
 
         text = self.currentText()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromTextUI(text)
             styleClear(self)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -394,7 +394,7 @@ class Choice(qt4.QComboBox):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        text = self.setting.toText()
+        text = self.setting.toTextUI()
         index = self.findText(text)
         if index >= 0:
             self.setCurrentIndex(index)
@@ -481,7 +481,7 @@ class MultiLine(qt4.QTextEdit):
         self.setTabChangesFocus(True)
         
         # set the text of the widget to the 
-        self.setPlainText( setting.toText() )
+        self.setPlainText( setting.toTextUI() )
 
         self.setting.setOnModified(self.onModified)
 
@@ -512,7 +512,7 @@ class MultiLine(qt4.QTextEdit):
 
         text = self.toPlainText()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromTextUI(text)
             styleClear(self)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -522,7 +522,7 @@ class MultiLine(qt4.QTextEdit):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.setPlainText( self.setting.toText() )
+        self.setPlainText( self.setting.toTextUI() )
 
 class Notes(MultiLine):
     """For editing notes."""
@@ -670,11 +670,12 @@ class Dataset(qt4.QWidget):
         """Bring up list of datasets."""
         if on:
             from ..qtwidgets.datasetbrowser import DatasetBrowserPopup
-            d = DatasetBrowserPopup(self.document,
-                                    self.choice.currentText(),
-                                    self.button,
-                                    filterdims=set((self.dimensions,)),
-                                    filterdtype=set((self.datatype,)) )
+            d = DatasetBrowserPopup(
+                self.document,
+                self.choice.currentText(),
+                self.button,
+                filterdims=set((self.dimensions,)),
+                filterdtype=set((self.datatype,)) )
             d.closing.connect(self.boxClosing)
             d.newdataset.connect(self.newDataset)
             d.show()
@@ -924,7 +925,7 @@ class Color(qt4.QWidget):
         layout.addWidget(c)
         layout.addWidget(b)
 
-        self.setColor( setting.toText() )
+        self.setColor( setting.toTextUI() )
         self.setLayout(layout)
         self.setting.setOnModified(self.onModified)
 
@@ -968,7 +969,7 @@ class Color(qt4.QWidget):
         """A different value is selected."""
         
         text = self.combo.currentText()
-        val = self.setting.fromText(text)
+        val = self.setting.fromTextUI(text)
         self.sigSettingChanged.emit(self, self.setting, val)
 
     def setColor(self, color):
@@ -989,7 +990,7 @@ class Color(qt4.QWidget):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.setColor( self.setting.toText() )
+        self.setColor( self.setting.toTextUI() )
 
 class WidgetSelector(Choice):
     """For choosing from a list of widgets."""
@@ -1507,30 +1508,27 @@ class MultiSettingWidget(qt4.QWidget):
         row = len(self.controls)
         cntrl = self.makeControl(row)
         cntrl.installEventFilter(self)
-        addbutton = qt4.QPushButton('+')
-        addbutton.setFixedWidth(24)
-        addbutton.setFlat(True)
-        addbutton.setToolTip('Add another item')
-        subbutton = qt4.QPushButton('-')
-        subbutton.setToolTip('Remove item')
-        subbutton.setFixedWidth(24)
-        subbutton.setFlat(True)
 
-        self.controls.append((cntrl, addbutton, subbutton))
+        addbutton = qt4.QPushButton('+')
+        addbutton.setFixedWidth(16)
+        addbutton.setFlat(True)
+        addbutton.setToolTip(_('Add entry'))
+        addbutton.clicked.connect(lambda: self.addPressed(row))
+
+        subbutton = qt4.QPushButton('-')
+        subbutton.setToolTip(_('Remove entry'))
+        subbutton.setFixedWidth(16)
+        subbutton.setFlat(True)
+        subbutton.clicked.connect(lambda: self.subPressed(row))
+
+        if len(self.setting.val) <= 1:
+            subbutton.hide()
 
         self.grid.addWidget(cntrl, row, 0)
         self.grid.addWidget(addbutton, row, 1)
         self.grid.addWidget(subbutton, row, 2)
 
-        addbutton.clicked.connect(lambda: self.addPressed(row))
-        subbutton.clicked.connect(lambda: self.subPressed(row))
-
-        if len(self.controls) == 2:
-            # enable first subtraction button
-            self.controls[0][2].setEnabled(True)
-        elif len(self.controls) == 1:
-            # or disable
-            self.controls[0][2].setEnabled(False)
+        self.controls.append((cntrl, addbutton, subbutton))
 
     def eventFilter(self, obj, event):
         """Capture loss of focus by controls."""
@@ -1548,15 +1546,19 @@ class MultiSettingWidget(qt4.QWidget):
             w.deleteLater()
         self.controls.pop(-1)
 
-        # disable first subtraction button
-        if len(self.controls) == 1:
-            self.controls[0][2].setEnabled(False)
+        show1st = len(self.setting.val) > 1
+        if len(self.controls) > 0:
+            self.controls[0][2].setVisible(len(self.setting.val)>1)
 
     def addPressed(self, row):
         """User adds a new row."""
         val = list(self.setting.val)
-        val.insert(row+1, '')
+        val.insert(row+1, val[row])
         self.sigSettingChanged.emit(self, self.setting, tuple(val))
+
+        show1st = len(self.setting.val) > 1
+        if len(self.controls) > 0:
+            self.controls[0][2].setVisible(len(self.setting.val)>1)
 
     def subPressed(self, row):
         """User deletes a row."""
@@ -1710,7 +1712,7 @@ class Filename(qt4.QWidget):
 
         # the actual edit control
         self.edit = qt4.QLineEdit()
-        self.edit.setText( setting.toText() )
+        self.edit.setText( setting.toTextUI() )
         layout.addWidget(self.edit)
         
         b = self.button = SmallButton(
@@ -1754,7 +1756,7 @@ class Filename(qt4.QWidget):
 
         text = self.edit.text()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromTextUI(text)
             styleClear(self.edit)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -1764,7 +1766,7 @@ class Filename(qt4.QWidget):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.edit.setText( self.setting.toText() )
+        self.edit.setText( self.setting.toTextUI() )
 
 class FontFamily(qt4.QFontComboBox):
     """List the font families, showing each font."""
@@ -1803,7 +1805,7 @@ class FontFamily(qt4.QFontComboBox):
     @qt4.pyqtSlot()
     def onModified(self):
         """Make control reflect chosen setting."""
-        self.setCurrentFont( qt4.QFont(self.setting.toText()) )
+        self.setCurrentFont( qt4.QFont(self.setting.toTextUI()) )
 
 class ErrorStyle(Choice):
     """Choose different error bar styles."""
@@ -1895,7 +1897,7 @@ class AxisBound(Choice):
         Re-set text as float or date."""
 
         if self.currentText().lower() != 'auto':
-            self.setEditText( self.setting.toText() )
+            self.setEditText( self.setting.toTextUI() )
 
 class Transform(String):
     """Represents a transformation done to the data."""

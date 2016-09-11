@@ -217,6 +217,13 @@ def pythonise(text):
 
     return out
 
+def isnumeric(v):
+    try:
+        v+1.2
+    except TypeError:
+        return False
+    return True
+
 def validLinePoints(x, y):
     """Take x and y points and split into sets of points which
     don't have invalid points.
@@ -606,3 +613,14 @@ def unescapeHDFDataName(name):
     name = name.replace('`SL', '/')
     name = name.replace('`BT', '`')
     return name
+
+_numre = re.compile('([0-9]+)|([^0-9]+)')
+def numericPartsKey(val):
+    """Create a key for sorting numerical parts of dataset names."""
+
+    key = [
+        (txt, 0) if txt else ('', int(num))
+        for num, txt in _numre.findall(val)
+    ]
+
+    return tuple(key)

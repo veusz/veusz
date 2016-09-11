@@ -930,12 +930,20 @@ class PointPlotter(GenericPlotter):
         for datasets in self._cache_ds:
             datasets[idx].rangeVisit(updateRange)
 
+    def getNumberKeys(self):
+        """Return number of key entries."""
+        self._updateDatasetCache()
+
+        if self.settings.key:
+            return len(self._cache_ds)
+        else:
+            return 0
+
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
 
         self._updateDatasetCache()
-
-        # FIXME: needs to handle multiple datasets
+        xdata, ydata, labeldata, scaledata, colordata = self._cache_ds[number]
 
         painter.save()
         cliprect = qt4.QRectF(qt4.QPointF(x,y), qt4.QPointF(x+width,y+height))
@@ -947,8 +955,6 @@ class PointPlotter(GenericPlotter):
         style = s.errorStyle
 
         # make some fake error bar data to plot
-        xv = s.get('xData').getData(self.document)
-        yv = s.get('yData').getData(self.document)
         yp = y + height/2
         xpts = N.array([x-width, x+width/2, x+2*width])
         ypts = N.array([yp, yp, yp])
@@ -957,12 +963,12 @@ class PointPlotter(GenericPlotter):
         errorsize = height*0.4
 
         # make points for error bars (if any)
-        if xv and xv.hasErrors():
+        if xdata and xdata.hasErrors():
             xneg = N.array([x-width, x+width/2-errorsize, x+2*width])
             xpos = N.array([x-width, x+width/2+errorsize, x+2*width])
         else:
             xneg = xpos = xpts
-        if yv and yv.hasErrors():
+        if ydata and ydata.hasErrors():
             yneg = N.array([yp-errorsize, yp-errorsize, yp-errorsize])
             ypos = N.array([yp+errorsize, yp+errorsize, yp+errorsize])
         else:
