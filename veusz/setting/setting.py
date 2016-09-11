@@ -49,6 +49,17 @@ def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+def safeTextEvalToFloat(setting, text):
+    """Evaluate an expression, catching naughtiness."""
+    doc = setting.getDocument()
+    try:
+        comp = doc.compileCheckedExpression(text)
+        if comp is None:
+            raise utils.InvalidType
+        return float(eval(comp, doc.eval_context))
+    except Exception:
+        raise utils.InvalidType
+
 class Setting(object):
     """A class to store a value with a particular type."""
 
@@ -285,17 +296,6 @@ class Setting(object):
             w = w.parent
         return w
 
-    def safeEvalHelper(self, text):
-        """Evaluate an expression, catching naughtiness."""
-        try:
-            comp = self.getDocument().compileCheckedExpression(
-                text)
-            if comp is None:
-                raise utils.InvalidType
-            return float( eval(comp, self.getDocument().eval_context) )
-        except:
-            raise utils.InvalidType
-
 # forward setting to another setting
 class SettingBackwardCompat(Setting):
     """Forward setting requests to another setting.
@@ -511,7 +511,7 @@ class Float(Setting):
             f = ui_stringtofloat(text)
         except ValueError:
             # try to evaluate
-            f = self.safeEvalHelper(text)
+            f = safeTextEvalToFloat(self, text)
         return self.convertTo(f)
 
     def makeControl(self, *args):
@@ -899,7 +899,7 @@ class FloatChoice(ChoiceOrMore):
             f = ui_stringtofloat(text)
         except ValueError:
             # try to evaluate
-            f = self.safeEvalHelper(text)
+            f = safeTextEvalToFloat(self, text)
         return self.convertTo(f)
 
     def makeControl(self, *args):
@@ -996,7 +996,7 @@ class FloatList(Setting):
                 try:
                     out.append( ui_stringtofloat(x) )
                 except ValueError:
-                    out.append( self.safeEvalHelper(x) )
+                    out.append( safeTextEvalToFloat(self, x) )
         return out
 
     def makeControl(self, *args):
