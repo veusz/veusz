@@ -218,19 +218,6 @@ class Settings(object):
                          for name in self.setnames] )
         return text
 
-    def readDefaults(self, root, widgetname):
-        """Return default values from saved text.
-
-        root is the path of the setting in the db, built up by settings
-        above this one
-
-        widgetname is the name of the widget this setting belongs to
-        """
-
-        root = '%s/%s' % (root, self.name)
-        for s in list(self.setdict.values()):
-            s.readDefaults(root, widgetname)
-
     def linkToStylesheet(self, _root=None):
         """Link the settings within this Settings to a stylesheet.
         

@@ -197,67 +197,6 @@ class Setting(object):
         Raises utils.InvalidType if cannot convert."""
         return None
 
-    def readDefaults(self, root, widgetname):
-        """Check whether the user has a default for this setting."""
-
-        deftext = None
-        unnamedpath = '%s/%s' % (root, self.name)
-        try:
-            deftext = settingdb[unnamedpath]
-        except KeyError:
-            pass
-
-        # named defaults supersedes normal defaults
-        namedpath = '%s_NAME:%s' % (widgetname, unnamedpath)
-        try:
-            deftext = settingdb[namedpath]
-        except KeyError:
-            pass
-
-        if deftext is not None:
-            self.val = self.fromTextUI(deftext)
-            self.default = self.val
-
-    def removeDefault(self):
-        """Remove the default setting for this setting."""
-
-        # build up setting path
-        path = ''
-        item = self
-        while not item.isWidget():
-            path = '/%s%s' % (item.name, path)
-            item = item.parent
-
-        # remove the settings (ignore if they are not set)
-        if path in settingdb:
-            del settingdb[path]
-
-        # specific setting to this widgetname
-        namedpath = '%s_NAME:%s' % (item.name, path)
-
-        if namedpath in settingdb:
-            del settingdb[namedpath]
-
-    def setAsDefault(self, withwidgetname = False):
-        """Set the current value of this setting as the default value
-
-        If withwidthname is True, then it is only the default for widgets
-        of the particular name this setting is contained within."""
-
-        # build up setting path
-        path = ''
-        item = self
-        while not item.isWidget():
-            path = '/%s%s' % (item.name, path)
-            item = item.parent
-
-        # if the setting is only for widgets with a certain name
-        if withwidgetname:
-            path = '%s_NAME:%s' % (item.name, path)
-
-        # set the default
-        settingdb[path] = self.toTextUI()
-
     def saveText(self, saveall, rootname = ''):
         """Return text to restore the value of this setting."""
 
