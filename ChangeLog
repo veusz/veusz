@@ -4,6 +4,8 @@ Changes in <next version>:
  * Add Covariance widget for plotting covariance ellipses
  * Fix pick indices if non-finite values in data
  * Fix drag and drop of files into Veusz on Windows
+ * Add lineup, linedown, lineleft and lineright markers
+ * Add lineup, linedown and lineextend arrows
 
 Changes in 1.24:
  * Text labels can now include Python expressions inside %{{ }}%
