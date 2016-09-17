@@ -18,7 +18,9 @@
 
 from .settingdb import *
 from .reference import Reference, ReferenceMultiple
+from .settingbase import *
 from .setting import *
+from .distance import *
 from .settings import *
 from .collections import *
 from .stylesheet import *

@@ -22,6 +22,7 @@ from __future__ import division
 from .. import qtall as qt4
 
 from . import setting
+from . import distance
 from .settings import Settings
 from .reference import Reference
 
@@ -35,26 +36,31 @@ class Line(Settings):
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
 
-        self.add( setting.Color('color',
-                                setting.Reference('/StyleSheet/Line/color'),
-                                descr = _('Color of line'),
-                                usertext=_('Color')) )
-        self.add( setting.DistancePt('width',
-                                     setting.Reference('/StyleSheet/Line/width'),
-                                     descr = _('Width of line'),
-                                     usertext=_('Width')) )
-        self.add( setting.LineStyle('style', 'solid',
-                                    descr = _('Line style'),
-                                    usertext=_('Style')) )
-        self.add( setting.Int( 'transparency', 0,
-                               descr = _('Transparency percentage'),
-                               usertext = _('Transparency'),
-                               minval = 0,
-                               maxval = 100 ) )
-        self.add( setting.Bool('hide', False,
-                               descr = _('Hide the line'),
-                               usertext=_('Hide')) )
-        
+        self.add( setting.Color(
+            'color',
+            setting.Reference('/StyleSheet/Line/color'),
+            descr = _('Color of line'),
+            usertext=_('Color')) )
+        self.add( distance.DistancePt(
+            'width',
+            setting.Reference('/StyleSheet/Line/width'),
+            descr = _('Width of line'),
+            usertext=_('Width')) )
+        self.add( setting.LineStyle(
+            'style', 'solid',
+            descr = _('Line style'),
+            usertext=_('Style')) )
+        self.add( setting.Int(
+            'transparency', 0,
+            descr = _('Transparency percentage'),
+            usertext = _('Transparency'),
+            minval = 0,
+            maxval = 100 ) )
+        self.add( setting.Bool(
+            'hide', False,
+            descr = _('Hide the line'),
+            usertext=_('Hide')) )
+
     def makeQPen(self, painthelper):
         '''Make a QPen from the description.
         This currently ignores the hide attribute
@@ -77,25 +83,27 @@ class Line(Settings):
             return qt4.QPen(qt4.Qt.NoPen)
         else:
             return self.makeQPen(painthelper)
-        
+
 class XYPlotLine(Line):
     '''A plot line for plotting data, allowing histogram-steps
     to be plotted.'''
-    
+
     def __init__(self, name, **args):
         Line.__init__(self, name, **args)
 
-        self.add( setting.Choice('steps',
-                                 ['off', 'left', 'centre', 'right',
-                                  'left-shift-points', 'right-shift-points',
-                                  'vcentre'],
-                                 'off',
-                                 descr=_('Plot horizontal steps '
-                                         'instead of a line'),
-                                 usertext=_('Steps')), 0 )
-        self.add( setting.Bool('bezierJoin', False,
-                               descr=_('Connect points with a cubic Bezier curve'),
-                               usertext=_('Bezier join')), 1 )
+        self.add( setting.Choice(
+            'steps',
+            ['off', 'left', 'centre', 'right',
+             'left-shift-points', 'right-shift-points',
+             'vcentre'],
+            'off',
+            descr=_('Plot horizontal steps '
+                    'instead of a line'),
+            usertext=_('Steps')), 0 )
+        self.add( setting.Bool(
+            'bezierJoin', False,
+            descr=_('Connect points with a cubic Bezier curve'),
+            usertext=_('Bezier join')), 1 )
         self.get('color').newDefault( Reference('../color') )
 
 class MarkerLine(Line):
@@ -104,10 +112,11 @@ class MarkerLine(Line):
     def __init__(self, name, **args):
         Line.__init__(self, name, **args)
 
-        self.add( setting.Bool('scaleLine', True,
-                               descr=_('Scale line width with marker if scaling'
-                                       ' enabled'),
-                               usertext=_('Scale')), 4 )
+        self.add( setting.Bool(
+            'scaleLine', True,
+            descr=_('Scale line width with marker if scaling'
+                    ' enabled'),
+            usertext=_('Scale')), 4 )
 
 class ErrorBarLine(Line):
     '''A line style for error bar plotting.'''
@@ -115,16 +124,19 @@ class ErrorBarLine(Line):
     def __init__(self, name, **args):
         Line.__init__(self, name, **args)
 
-        self.add( setting.Float('endsize', 1.0,
-                                minval = 0.,
-                                descr=_('Scale ends of error bars by this factor'),
-                                usertext = _('End size')) )
-        self.add( setting.Bool('hideHorz', False,
-                               descr = _('Hide horizontal errors'),
-                               usertext=_('Hide horz.')) )
-        self.add( setting.Bool('hideVert', False,
-                               descr = _('Hide vertical errors'),
-                               usertext=_('Hide vert.')) )
+        self.add( setting.Float(
+            'endsize', 1.0,
+            minval = 0.,
+            descr=_('Scale ends of error bars by this factor'),
+            usertext = _('End size')) )
+        self.add( setting.Bool(
+            'hideHorz', False,
+            descr = _('Hide horizontal errors'),
+            usertext=_('Hide horz.')) )
+        self.add( setting.Bool(
+            'hideVert', False,
+            descr = _('Hide vertical errors'),
+            usertext=_('Hide vert.')) )
 
 class Brush(Settings):
     '''Settings of a fill.'''
@@ -132,28 +144,32 @@ class Brush(Settings):
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
 
-        self.add( setting.Color( 'color', 'black',
-                                 descr = _('Fill colour'),
-                                 usertext=_('Color')) )
-        self.add( setting.FillStyle( 'style', 'solid',
-                                     descr = _('Fill style'),
-                                     usertext=_('Style')) )
-        self.add( setting.Int( 'transparency', 0,
-                               descr = _('Transparency percentage'),
-                               usertext = _('Transparency'),
-                               minval = 0,
-                               maxval = 100 ) )
-        self.add( setting.Bool( 'hide', False,
-                                descr = _('Hide the fill'),
-                                usertext=_('Hide')) )
-        
+        self.add( setting.Color(
+            'color', 'black',
+            descr = _('Fill colour'),
+            usertext=_('Color')) )
+        self.add( setting.FillStyle(
+            'style', 'solid',
+            descr = _('Fill style'),
+            usertext=_('Style')) )
+        self.add( setting.Int(
+            'transparency', 0,
+            descr = _('Transparency percentage'),
+            usertext = _('Transparency'),
+            minval = 0,
+            maxval = 100 ) )
+        self.add( setting.Bool(
+            'hide', False,
+            descr = _('Hide the fill'),
+            usertext=_('Hide')) )
+
     def makeQBrush(self):
         '''Make a qbrush from the settings.'''
 
         color = qt4.QColor(self.color)
         color.setAlphaF( (100-self.transparency) / 100.)
         return qt4.QBrush( color, self.get('style').qtStyle() )
-    
+
     def makeQBrushWHide(self):
         """Make a brush, taking account of hide attribute."""
         if self.hide:
@@ -187,7 +203,7 @@ class BrushExtended(Settings):
                 usertext = _('Transparency'),
                 minval = 0,
                 maxval = 100 ) )
-        self.add( setting.DistancePt(
+        self.add( distance.DistancePt(
                 'linewidth', '0.5pt',
                 descr = _('Width of hatch or pattern line'),
                 usertext=_('Line width')) )
@@ -195,7 +211,7 @@ class BrushExtended(Settings):
                 'linestyle', 'solid',
                 descr = _('Hatch or pattern line style'),
                 usertext=_('Line style')) )
-        self.add( setting.DistancePt(
+        self.add( distance.DistancePt(
                 'patternspacing', '5pt',
                 descr = _('Hatch or pattern spacing'),
                 usertext = _('Spacing')) )
@@ -261,7 +277,7 @@ class PointFill(BrushExtended):
         self.get('color').newDefault('grey')
 
         self.add( setting.Choice(
-            'fillto', 
+            'fillto',
             ['top', 'bottom', 'left', 'right'],
             'top',
             descr=_('Edge to fill towards'),
@@ -285,10 +301,10 @@ class ArrowFill(Brush):
     """Brush for filling arrow heads"""
     def __init__(self, name, **args):
         Brush.__init__(self, name, **args)
-        
+
         self.get('color').newDefault( setting.Reference(
                 '../Line/color') )
-    
+
 class Text(Settings):
     '''Text settings.'''
 
@@ -300,24 +316,31 @@ class Text(Settings):
     def __init__(self, name, **args):
         Settings.__init__(self, name, **args)
 
-        self.add( setting.FontFamily('font',
-                                     setting.Reference('/StyleSheet/Font/font'),
-                                     descr = _('Font name'),
-                                     usertext=_('Font')) )
-        self.add( setting.DistancePt('size',
-                                     setting.Reference('/StyleSheet/Font/size'),
-                                     descr = _('Font size'), usertext=_('Size') ) )
-        self.add( setting.Color( 'color',
-                                 setting.Reference('/StyleSheet/Font/color'),
-                                 descr = _('Font color'), usertext=_('Color') ) )
-        self.add( setting.Bool( 'italic', False,
-                                descr = _('Italic font'), usertext=_('Italic') ) )
-        self.add( setting.Bool( 'bold', False,
-                                descr = _('Bold font'), usertext=_('Bold') ) )
-        self.add( setting.Bool( 'underline', False,
-                                descr = _('Underline font'), usertext=_('Underline') ) )
-        self.add( setting.Bool( 'hide', False,
-                                descr = _('Hide the text'), usertext=_('Hide')) )
+        self.add( setting.FontFamily(
+            'font',
+            setting.Reference('/StyleSheet/Font/font'),
+            descr = _('Font name'),
+            usertext=_('Font')) )
+        self.add( distance.DistancePt(
+            'size',
+            setting.Reference('/StyleSheet/Font/size'),
+            descr = _('Font size'), usertext=_('Size') ) )
+        self.add( setting.Color(
+            'color',
+            setting.Reference('/StyleSheet/Font/color'),
+            descr = _('Font color'), usertext=_('Color') ) )
+        self.add( setting.Bool(
+            'italic', False,
+            descr = _('Italic font'), usertext=_('Italic') ) )
+        self.add( setting.Bool(
+            'bold', False,
+            descr = _('Bold font'), usertext=_('Bold') ) )
+        self.add( setting.Bool(
+            'underline', False,
+            descr = _('Underline font'), usertext=_('Underline') ) )
+        self.add( setting.Bool(
+            'hide', False,
+            descr = _('Hide the text'), usertext=_('Hide')) )
 
     def copy(self):
         """Make copy of settings."""
@@ -328,7 +351,7 @@ class Text(Settings):
 
     def makeQFont(self, painthelper):
         '''Return a qt4.QFont object corresponding to the settings.'''
-        
+
         size = self.get('size').convertPts(painthelper)
         weight = qt4.QFont.Normal
         if self.bold:
@@ -344,27 +367,30 @@ class Text(Settings):
     def makeQPen(self):
         """ Return a qt4.QPen object for the font pen """
         return qt4.QPen(qt4.QColor(self.color))
-        
+
 class PointLabel(Text):
     """For labelling points on plots."""
 
     def __init__(self, name, **args):
         Text.__init__(self, name, **args)
-        
-        self.add( setting.Float('angle', 0.,
-                                descr=_('Angle of the labels in degrees'),
-                                usertext=_('Angle'),
-                                formatting=True), 0 )
-        self.add( setting.AlignVert('posnVert',
-                                    'centre',
-                                    descr=_('Vertical position of label'),
-                                    usertext=_('Vert position'),
-                                    formatting=True), 0 )
-        self.add( setting.AlignHorz('posnHorz',
-                                    'right',
-                                    descr=_('Horizontal position of label'),
-                                    usertext=_('Horz position'),
-                                    formatting=True), 0 )
+
+        self.add( setting.Float(
+            'angle', 0.,
+            descr=_('Angle of the labels in degrees'),
+            usertext=_('Angle'),
+            formatting=True), 0 )
+        self.add( setting.AlignVert(
+            'posnVert',
+            'centre',
+            descr=_('Vertical position of label'),
+            usertext=_('Vert position'),
+            formatting=True), 0 )
+        self.add( setting.AlignHorz(
+            'posnHorz',
+            'right',
+            descr=_('Horizontal position of label'),
+            usertext=_('Horz position'),
+            formatting=True), 0 )
 
 class MarkerColor(Settings):
     """Settings for a coloring points using data values."""

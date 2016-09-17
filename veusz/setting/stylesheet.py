@@ -21,6 +21,7 @@ import sys
 
 from .settings import Settings
 from . import setting
+from . import distance
 from . import collections
 
 from .. import qtall as qt4
@@ -57,17 +58,20 @@ class StyleSheet(Settings):
 class StylesheetLine(Settings):
     """Hold the properties of the default line."""
     def __init__(self):
-        Settings.__init__(self, 'Line', pixmap='settings_plotline',
-                          descr=_('Default line style for document'),
-                          usertext=_('Line'))
-        self.add( setting.DistancePt('width', '0.5pt',
-                                     descr=_('Default line width'),
-                                     usertext=_('Width'),
-                                     formatting=True) )
-        self.add( setting.Color('color', 'black',
-                                descr=_('Default line color'),
-                                usertext=_('Color'),
-                                formatting=True) )
+        Settings.__init__(
+            self, 'Line', pixmap='settings_plotline',
+            descr=_('Default line style for document'),
+            usertext=_('Line'))
+        self.add( distance.DistancePt(
+            'width', '0.5pt',
+            descr=_('Default line width'),
+            usertext=_('Width'),
+            formatting=True) )
+        self.add( setting.Color(
+            'color', 'black',
+            descr=_('Default line color'),
+            usertext=_('Color'),
+            formatting=True) )
 # register these properties with the stylesheet
 StyleSheet.register(StylesheetLine)
 
@@ -106,15 +110,18 @@ class StylesheetText(Settings):
         if StylesheetText.defaultfamily is None:
             _registerFontStyleSheet()
 
-        self.add( setting.FontFamily('font', StylesheetText.defaultfamily,
-                                     descr=_('Font name'), usertext=_('Font'),
-                                     formatting=True))
-        self.add( setting.DistancePt('size', '14pt',
-                                     descr=_('Default font size'),
-                                     usertext=_('Size'),
-                                     formatting=True))
-        self.add( setting.Color('color', 'black',
-                                descr=_('Default font color'),
-                                usertext=_('Color'),
-                                formatting=True))
+        self.add( setting.FontFamily(
+            'font', StylesheetText.defaultfamily,
+            descr=_('Font name'), usertext=_('Font'),
+            formatting=True))
+        self.add( distance.DistancePt(
+            'size', '14pt',
+            descr=_('Default font size'),
+            usertext=_('Size'),
+            formatting=True))
+        self.add( setting.Color(
+            'color', 'black',
+            descr=_('Default font color'),
+            usertext=_('Color'),
+            formatting=True))
 StyleSheet.register(StylesheetText)
