@@ -624,3 +624,7 @@ def numericPartsKey(val):
     ]
 
     return tuple(key)
+
+def allNotNone(*items):
+    """Are all the items not None."""
+    return not any((x is None for x in items))
