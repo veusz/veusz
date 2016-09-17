@@ -79,14 +79,14 @@ def _errorBarsEnds(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 def _errorBarsBox(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                   s, painter, clip):
     """Draw box around error region."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         painter.setBrush( qt4.QBrush() )
         utils.plotBoxesToPainter(painter, xmin, ymin, xmax, ymax, clip)
 
 def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                         s, painter, clip):
     """Draw box filled region inside error bars."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         # filled region below
         if not s.FillBelow.hideerror:
             path = qt4.QPainterPath()
@@ -108,7 +108,7 @@ def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                       s, painter, clip):
     """Draw diamond around error region."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
 
         # expand clip by pen width (urgh)
         pw = painter.pen().widthF()*2
@@ -127,7 +127,7 @@ def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                             s, painter, clip):
     """Draw diamond filled region inside error bars."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         if not s.FillBelow.hideerror:
             path = qt4.QPainterPath()
             utils.addNumpyPolygonToPath(
@@ -147,7 +147,7 @@ def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                     s, painter, clip):
     """Draw curve around error region."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         # non-filling brush
         painter.setBrush( qt4.QBrush() )
 
@@ -174,7 +174,7 @@ def _errorBarsCurveFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                           s, painter, clip):
     """Fill area around error region."""
 
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         for xp, yp, xmn, ymn, xmx, ymx in czip(
             xplotter, yplotter, xmin, ymin, xmax, ymax):
 
