@@ -481,7 +481,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
                   for i in idxs if i.column() == 0 ]
 
         # unique list of types of nodes
-        types = utils.unique([ type(n) for n in nodes ])
+        types = set([ type(n) for n in nodes ])
 
         menu = qt4.QMenu()
         # put contexts onto submenus if multiple types selected
