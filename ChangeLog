@@ -6,6 +6,7 @@ Changes in <next version>:
  * Fix drag and drop of files into Veusz on Windows
  * Add lineup, linedown, lineleft and lineright markers
  * Add lineup, linedown and lineextend arrows
+ * Raise exception if functions in console request input, avoiding hang
 
 Changes in 1.24:
  * Text labels can now include Python expressions inside %{{ }}%
