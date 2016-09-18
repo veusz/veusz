@@ -537,7 +537,7 @@ class PlotWindow( qt4.QGraphicsView ):
         # convert points on plotter to points on axis for each axis
         # we also add a neighbouring pixel for the rounding calculation
         xpts = N.array( [pt1.x(), pt2.x(), pt1.x()+1, pt2.x()-1] )
-        ypts = N.array( [pt1.y(), pt2.y(), pt2.y()+1, pt2.y()-1] )
+        ypts = N.array( [pt1.y(), pt2.y(), pt1.y()+1, pt2.y()-1] )
 
         # build up operation list to do zoom
         operations = []
