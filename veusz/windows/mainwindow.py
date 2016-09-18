@@ -231,13 +231,13 @@ class MainWindow(qt4.QMainWindow):
 
     def dragEnterEvent(self, event):
         """Check whether event is valid to be dropped."""
-        if (event.mimeData().hasUrls() and
+        if (event.provides("text/uri-list") and
             self._getVeuszDropFiles(event)):
             event.acceptProposedAction()
 
     def dropEvent(self, event):
         """Respond to a drop event on the current window"""
-        if event.mimeData().hasUrls():
+        if event.provides("text/uri-list"):
             files = self._getVeuszDropFiles(event)
             if files:
                 if self.document.isBlank():

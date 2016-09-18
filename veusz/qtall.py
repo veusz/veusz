@@ -25,9 +25,17 @@ import os
 if sys.platform != 'win32' and sys.platform != 'darwin':
     os.environ['QT_PLATFORM_PLUGIN'] = 'none'
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtSvg import *
-from PyQt5.QtPrintSupport import *
-from PyQt5.uic import loadUi
+import sip
+sip.setapi('QDate', 2)
+sip.setapi('QDateTime', 2)
+sip.setapi('QString', 2)
+sip.setapi('QTextStream', 2)
+sip.setapi('QTime', 2)
+sip.setapi('QUrl', 2)
+sip.setapi('QVariant', 2)
+isdeleted = sip.isdeleted
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4.QtSvg import *
+from PyQt4.uic import loadUi

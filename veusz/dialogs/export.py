@@ -232,7 +232,7 @@ class ExportDialog(VeuszDialog):
 
         if fd.exec_() == qt4.QDialog.Accepted:
             # convert filter to extension
-            filterused = str(fd.selectedNameFilter())
+            filterused = str(fd.selectedFilter())
             chosenext = filtertoext[filterused][0]
 
             filename = fd.selectedFiles()[0]

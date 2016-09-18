@@ -434,7 +434,7 @@ def printDialog(parentwindow, document, filename=None):
             pages = list(crange(maxval, minval-1, -1))
 
         # if more copies are requested
-        pages *= prnt.copyCount()
+        pages *= prnt.numCopies()
 
         # do the printing
         document.printTo(prnt, pages)

@@ -10,29 +10,32 @@ from distutils.dep_util import newer, newer_group
 import os
 import sys
 
+import sip
+sip.setapi('QString', 2)
+
 import sipconfig
-import PyQt5.QtCore
+import PyQt4.QtCore
 
 ##################################################################
 # try to get various useful things we need in order to build
 # this is likely to break, I'm sure
 
-QT_LIB_DIR = PyQt5.QtCore.QLibraryInfo.location(
-    PyQt5.QtCore.QLibraryInfo.LibrariesPath)
-QT_INC_DIR = PyQt5.QtCore.QLibraryInfo.location(
-    PyQt5.QtCore.QLibraryInfo.HeadersPath)
+QT_LIB_DIR = PyQt4.QtCore.QLibraryInfo.location(
+    PyQt4.QtCore.QLibraryInfo.LibrariesPath)
+QT_INC_DIR = PyQt4.QtCore.QLibraryInfo.location(
+    PyQt4.QtCore.QLibraryInfo.HeadersPath)
 QT_IS_FRAMEWORK = os.path.exists(
     os.path.join(QT_LIB_DIR, 'QtCore.framework') )
 
 try:
     # >= 4.10
-    SIP_FLAGS = PyQt5.QtCore.PYQT_CONFIGURATION['sip_flags']
+    SIP_FLAGS = PyQt4.QtCore.PYQT_CONFIGURATION['sip_flags']
 except:
-    import PyQt5.pyqtconfig
-    SIP_FLAGS = PyQt5.pyqtconfig.Configuration().pyqt_sip_flags
+    import PyQt4.pyqtconfig
+    SIP_FLAGS = PyQt4.pyqtconfig.Configuration().pyqt_sip_flags
 
 PYQT_SIP_DIR = os.path.join(
-    sipconfig.Configuration().default_sip_dir, 'PyQt5')
+    sipconfig.Configuration().default_sip_dir, 'PyQt4')
 
 SIP_BIN = sipconfig.Configuration().sip_bin
 SIP_INC_DIR = sipconfig.Configuration().sip_inc_dir
@@ -65,7 +68,7 @@ class build_ext (distutils.command.build_ext.build_ext):
     def get_includes(self):
 
         incdirs = []
-        for mod in ('QtCore', 'QtGui', 'QtWidgets', 'QtXml'):
+        for mod in ('QtCore', 'QtGui', 'QtXml'):
             if QT_IS_FRAMEWORK:
                 incdirs.append(
                     os.path.join(QT_LIB_DIR, mod + '.framework', 'Headers') )
@@ -92,13 +95,12 @@ class build_ext (distutils.command.build_ext.build_ext):
                 '-F', os.path.join(QT_LIB_DIR),
                 '-framework', 'QtGui',
                 '-framework', 'QtCore',
-                '-framework', 'QtXml',
-                '-framework', 'QtWidgets',
+                '-framework', 'QtXml'
                 ]
         elif sys.platform == 'win32':
-            extension.libraries = ['QtGui5', 'QtCore5', 'QtXml5', 'QtWidgets5']
+            extension.libraries = ['QtGui4', 'QtCore4', 'QtXml4']
         else:
-            extension.libraries = ['Qt5Gui', 'Qt5Core', 'Qt5Xml', 'Qt5Widgets']
+            extension.libraries = ['QtGui', 'QtCore', 'QtXml']
         extension.library_dirs = [QT_LIB_DIR]
 
         depends = extension.depends
