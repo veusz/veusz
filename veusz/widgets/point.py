@@ -884,16 +884,15 @@ class PointPlotter(GenericPlotter):
                 length = ds.data.shape[0]
                 xds.append(document.DatasetRange(length, (1,length)))
 
-        # handle repeating labels
-        if text:
-            length = min( len(xds.data), len(yds.data) )
-            text = text*(length // len(text)) + text[:length % len(text)]
-
         # cache contains tuples of datasets
         self._cache_ds = []
         if xds and yds:
-            for dsset in cycledatasets(xds, yds, text, scaleds, colords):
-                self._cache_ds.append(dsset)
+            for xd, yd, td, sd, cd in cycledatasets(xds, yds, text, scaleds, colords):
+                # handle repeating labels
+                if td is not None:
+                    mlen = min(len(xd), len(yd))
+                    td = td*(mlen // len(td)) + td[:mlen % len(td)]
+                self._cache_ds.append((xd,yd,td,sd,cd))
 
         # transform datasets into new datasets
         if s.transform:
