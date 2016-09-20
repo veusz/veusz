@@ -1601,8 +1601,11 @@ class MultiSettingWidget(qt4.QWidget):
     def dataChanged(self, row):
         """Update row of setitng with new data"""
         val = list(self.setting.val)
-        val[row] = self.readControl( self.controls[row][0] )
-        self.sigSettingChanged.emit(self, self.setting, tuple(val))
+
+        newval = self.readControl( self.controls[row][0] )
+        if newval != val[row]:
+            val[row] = newval
+            self.sigSettingChanged.emit(self, self.setting, tuple(val))
 
 class Datasets(MultiSettingWidget):
     """A control for editing a list of datasets."""

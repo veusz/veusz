@@ -55,7 +55,7 @@ class OperationSettingSet(object):
         """Set the setting to value.
         Setting may be a widget path
         """
-        
+
         if isinstance(setting, cbasestr):
             self.settingpath = setting
         else:
@@ -64,6 +64,8 @@ class OperationSettingSet(object):
         
     def do(self, document):
         """Apply setting variable."""
+
+        #print('do', self.settingpath, self.value)
         setting = document.resolveFullSettingPath(self.settingpath)
         if setting.isReference():
             self.oldvalue = setting.getReference()
@@ -73,6 +75,8 @@ class OperationSettingSet(object):
         
     def undo(self, document):
         """Return old value back..."""
+
+        #print('undo', self.settingpath, self.value)
         setting = document.resolveFullSettingPath(self.settingpath)
         setting.set(self.oldvalue)
 
