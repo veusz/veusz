@@ -80,7 +80,6 @@ def makeSplashLogo():
     layout.setContentsMargins(h,h,h,h)
 
     # Center the spash screen
-    splash.setGeometry(5, 5, 100, 100)
     screen = qt4.QDesktopWidget().screenGeometry()
     splash.move((screen.width()-layout.sizeHint().width())/2, 
         (screen.height()-layout.sizeHint().height())/2)
