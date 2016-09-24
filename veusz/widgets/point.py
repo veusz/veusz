@@ -52,6 +52,7 @@ import numpy as N
 from ..compat import czip, crange
 from .. import qtall as qt4
 from .. import document
+from .. import datasets
 from .. import setting
 from .. import utils
 
@@ -700,12 +701,10 @@ def cycledatasets(*datasets):
     """Cycle datasets, repeating if necessary."""
     maxlen = max([len(d) for d in datasets])
     for i in crange(maxlen):
-        out = []
-        for d in datasets:
-            if len(d) == 0:
-                out.append(None)
-            else:
-                out.append(d[i % len(d)])
+        out = [
+            None if len(d) == 0 else d[i % len(d)]
+            for d in datasets
+        ]
         yield tuple(out)
 
 class PointPlotter(GenericPlotter):
@@ -870,12 +869,12 @@ class PointPlotter(GenericPlotter):
             yds = []
             for ds in xds:
                 length = ds.data.shape[0]
-                yds.append(document.DatasetRange(length, (1,length)))
+                yds.append(datasets.DatasetRange(length, (1,length)))
         elif yds and not xds and s.get('xData').isEmpty():
             xds = []
             for ds in yds:
                 length = ds.data.shape[0]
-                xds.append(document.DatasetRange(length, (1,length)))
+                xds.append(datasets.DatasetRange(length, (1,length)))
 
         # cache contains tuples of datasets
         self._cache_ds = []
@@ -1050,8 +1049,8 @@ class PointPlotter(GenericPlotter):
 
         self._updateDatasetCache()
 
-        for datasets in self._cache_ds:
-            for dsparts in document.generateValidDatasetParts(datasets):
+        for dss in self._cache_ds:
+            for dsparts in datasets.generateValidDatasetParts(dss):
                 dd = DatasetPartPlot(
                     painter,axes, posn, cliprect,
                     self.document, self.settings, dsparts)

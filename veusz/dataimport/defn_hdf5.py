@@ -25,6 +25,7 @@ import numpy as N
 from .. import qtall as qt4
 from ..compat import citems, cvalues, cbytes, cunicode, cpy3
 from .. import document
+from .. import datasets
 from .. import utils
 from . import base
 
@@ -407,7 +408,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
                 if mode == 'unix':
                     data = utils.floatUnixToVeusz(data)
-                ds = document.DatasetDateTime(data)
+                ds = datasets.DatasetDateTime(data)
 
             else:
                 # Standard 1D Import
@@ -424,7 +425,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     if args[a] is not None and len(args[a]) > minlen:
                         args[a] = args[a][:minlen]
 
-                ds = document.Dataset(**args)
+                ds = datasets.Dataset(**args)
 
         elif len(data.shape) == 2:
             # 2D dataset
@@ -434,9 +435,9 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                  data.shape[1] in (2,3) ):
                 # actually a 1D dataset in disguise
                 if data.shape[1] == 2:
-                    ds = document.Dataset(data=data[:,0], serr=data[:,1])
+                    ds = datasets.Dataset(data=data[:,0], serr=data[:,1])
                 else:
-                    ds = document.Dataset(
+                    ds = datasets.Dataset(
                         data=data[:,0], perr=data[:,1], nerr=data[:,2])
             else:
                 # this really is a 2D dataset
@@ -459,7 +460,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     attrs["yrange"] = (r[1], r[3])
 
                 # create the object
-                ds = document.Dataset2D(data, **attrs)
+                ds = datasets.Dataset2D(data, **attrs)
 
         return ds
 
@@ -496,14 +497,14 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     val = N.nan
                 dout[i] = val
 
-            ds = document.DatasetDateTime(dout)
+            ds = datasets.DatasetDateTime(dout)
 
         else:
             # unfortunately byte strings are returned in py3
             tdata = [bconv(d) for d in dread.data]
 
             # standard text dataset
-            ds = document.DatasetText(tdata)
+            ds = datasets.DatasetText(tdata)
 
         return ds
 

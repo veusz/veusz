@@ -1,6 +1,4 @@
-# document __init__.py
-
-#    Copyright (C) 2004 Jeremy S. Sanders
+#    Copyright (C) 2016 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -16,15 +14,8 @@
 #    You should have received a copy of the GNU General Public License along
 #    with this program; if not, write to the Free Software Foundation, Inc.,
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-##############################################################################
+###############################################################################
 
-from .widgetfactory import *
-from .doc import *
-from .commandinterface import *
-from .commandinterpreter import *
-from .operations import *
-from .mime import *
-from .painthelper import *
-from .export import Export, printDialog
-from .dbusinterface import *
-from .loader import loadDocument, executeScript, LoadError
+from .datasets import *
+from .filtered import *
+from .histo import *

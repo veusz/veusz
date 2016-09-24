@@ -120,7 +120,7 @@ class DataCreateDialog(VeuszDialog):
         """Given a dataset name, allow it to be edited again
         (if it is editable)."""
 
-        if isinstance(ds, document.DatasetExpression): 
+        if isinstance(ds, datasets.DatasetExpression): 
             # change selected method
             if ds.parametric is None:
                 # standard expression
@@ -142,7 +142,7 @@ class DataCreateDialog(VeuszDialog):
                     text = ''
                 self.dsedits[part].setText(text)
 
-        elif isinstance(ds, document.DatasetRange):
+        elif isinstance(ds, datasets.DatasetRange):
             # change selected method
             self.valueradio.click()
             # make sure name is set
@@ -227,8 +227,8 @@ class DataCreateDialog(VeuszDialog):
                 status = _("Created dataset '%s'") % dsname
             self.statuslabel.setText(status)
 
-        except (document.CreateDatasetException,
-                document.DatasetException, _DSException) as e:
+        except (datasets.CreateDatasetException,
+                datasets.DatasetException, _DSException) as e:
 
             # all bad roads lead here - take exception string and tell user
             if dsexists:
@@ -279,7 +279,7 @@ class DataCreateDialog(VeuszDialog):
             vals[key] = (minval, maxval)
             
         linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
-        return document.OperationDatasetCreateRange(name, numsteps, vals,
+        return datasets.OperationDatasetCreateRange(name, numsteps, vals,
                                                     linked=linked)
 
     def createParametric(self, name):
@@ -299,7 +299,7 @@ class DataCreateDialog(VeuszDialog):
                 vals[key] = text
 
         linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
-        return document.OperationDatasetCreateParameteric(name,
+        return datasets.OperationDatasetCreateParameteric(name,
                                                           t0, t1, numsteps,
                                                           vals, linked=linked)
 
@@ -314,7 +314,7 @@ class DataCreateDialog(VeuszDialog):
                 vals[key] = text
 
         link = self.linkcheckbox.checkState() == qt4.Qt.Checked
-        op = document.OperationDatasetCreateExpression(name, vals, link)
+        op = datasets.OperationDatasetCreateExpression(name, vals, link)
         if not op.validateExpression(self.document):
             raise _DSException()
         return op

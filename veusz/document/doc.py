@@ -40,10 +40,10 @@ from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO, cexecfile
 from .. import qtall as qt4
 
 from . import widgetfactory
-from . import datasets
 from . import painthelper
 from . import transform
 
+from .. import datasets
 from .. import utils
 from .. import setting
 
@@ -90,7 +90,7 @@ class DocSuspend(object):
     def __exit__(self, type, value, traceback):
         self.doc.enableUpdates()
 
-class Document( qt4.QObject ):
+class Document(qt4.QObject):
     """Document class for holding the graph data.
     """
 
@@ -167,7 +167,7 @@ class Document( qt4.QObject ):
         self.historybatch = []
         self.historyundo = []
         self.historyredo = []
-        
+
     def suspendUpdates(self):
         """Holds sending update messages.
         This speeds up modification of the document and prevents the document
@@ -200,7 +200,7 @@ class Document( qt4.QObject ):
 
     def applyOperation(self, operation):
         """Apply operation to the document.
-        
+
         Operations represent atomic actions which can be done to the document
         and undone.
 
@@ -228,19 +228,19 @@ class Document( qt4.QObject ):
 
     def batchHistory(self, batch):
         """Enable/disable batch history mode.
-        
+
         In this mode further operations are added to the OperationMultiple specified,
         until batchHistory is called with None.
-        
+
         The objects are pushed into a list and popped off
-        
+
         This allows multiple operations to be batched up for simple undo.
         """
         if batch:
             self.historybatch.append(batch)
         else:
             self.historybatch.pop()
-        
+
     def undoOperation(self):
         """Undo the previous operation."""
 
@@ -254,7 +254,7 @@ class Document( qt4.QObject ):
             raise
         self.enableUpdates()
         self.historyredo.append(operation)
-        
+
     def canUndo(self):
         """Returns True if previous operation can be removed."""
         return len(self.historyundo) != 0
@@ -267,10 +267,10 @@ class Document( qt4.QObject ):
     def canRedo(self):
         """Returns True if previous operation can be redone."""
         return len(self.historyredo) != 0
-        
+
     def resolveFullWidgetPath(self, path):
         """Translate the widget path given into the widget."""
-        
+
         widget = self.basewidget
         for p in [i for i in path.split('/') if i != '']:
             for child in widget.children:
@@ -281,7 +281,7 @@ class Document( qt4.QObject ):
                 # break wasn't called
                 assert False
         return widget
-        
+
     def resolveFullSettingPath(self, path):
         """Translate setting path into setting object."""
 
@@ -297,13 +297,13 @@ class Document( qt4.QObject ):
             else:
                 # no child with name
                 break
-            
+
         # get Setting object
         s = widget.settings
         while isinstance(s, setting.Settings) and parts[0] in s.setdict:
             s = s.get(parts[0])
             del parts[0]
-            
+
         assert isinstance(s, setting.Setting)
         return s
 
@@ -315,10 +315,11 @@ class Document( qt4.QObject ):
         """Set data to val, with symmetric or negative and positive errors."""
         self.data[name] = dataset
         dataset.document = self
-        
+        dataset.username = name
+
         # update the change tracking
         self.setModified()
-    
+
     def deleteData(self, name):
         """Remove a dataset"""
         if name in self.data:
@@ -374,26 +375,18 @@ class Document( qt4.QObject ):
                 return name
         raise ValueError("Cannot find dataset")
 
-    def deleteDataset(self, name):
-        """Remove the selected dataset."""
-        del self.data[name]
-        self.setModified()
-
     def renameDataset(self, oldname, newname):
         """Rename the dataset."""
         d = self.data[oldname]
         del self.data[oldname]
         self.data[newname] = d
+        d.username = newname
 
         self.setModified()
 
     def getData(self, name):
         """Get data with name"""
         return self.data[name]
-
-    def hasData(self, name):
-        """Whether dataset is defined."""
-        return name in self.data
 
     def setModified(self, ismodified=True):
         """Set the modified flag on the data, and inform views."""
@@ -436,7 +429,7 @@ class Document( qt4.QObject ):
         if antialias:
             painter.setRenderHint(qt4.QPainter.Antialiasing, True)
             painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
-   
+
         sizes = []
 
         # This all assumes that only pages can go into the root widget
@@ -524,7 +517,7 @@ class Document( qt4.QObject ):
         """
 
         self._writeFileHeader(fileobj, 'saved document')
-        
+
         # add file directory to import path if we know it
         reldirname = None
         if getattr(fileobj, 'name', False):
@@ -550,7 +543,7 @@ class Document( qt4.QObject ):
 
         # save the actual tree structure
         fileobj.write(self.basewidget.getSaveText())
-        
+
         self.setModified(False)
 
     def saveToHDF5File(self, fileobj):
@@ -656,7 +649,7 @@ class Document( qt4.QObject ):
         if integer:
             return int(w), int(h)
         else:
-            return w, h        
+            return w, h
 
     def pageSize(self, pagenum, dpi=None, scaling=1., integer=True):
         """Get the size of a particular page in pixels.

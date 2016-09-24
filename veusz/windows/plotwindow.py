@@ -634,18 +634,20 @@ class PlotWindow( qt4.QGraphicsView ):
 
         for w, bounds in self.painthelper.widgetBoundsIterator():
             try:
-                # ask the widget for its (visually) closest point to the cursor
-                info = w.pickPoint(pos.x(), pos.y(), bounds)
-
-                # this is a pickable widget, so remember it for future key navigation
-                self.pickerwidgets.append(w)
-
-                if info.distance < pickinfo.distance:
-                    # and remember the overall closest
-                    pickinfo = info
+                pick = w.pickPoint
             except AttributeError:
-                # ignore widgets that don't support axes or picking
+                # widget isn't pickable
                 continue
+
+            # ask the widget for its (visually) closest point to the cursor
+            info = pick(pos.x(), pos.y(), bounds)
+
+            # this is a pickable widget, so remember it for future key navigation
+            self.pickerwidgets.append(w)
+
+            if info.distance < pickinfo.distance:
+                # and remember the overall closest
+                pickinfo = info
 
         if not pickinfo:
             self.pickeritem.hide()

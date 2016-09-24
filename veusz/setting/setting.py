@@ -835,20 +835,20 @@ class DatasetExtendedMulti(Str):
     def filteredDatasets(self, doc, names):
         """Return datasets which match criteria."""
         out = []
-        for n in names:
-            ds = doc.data[n]
+        for name in names:
+            ds = doc.data[name]
             if ds.dimensions==self.dimensions and ds.datatype==self.datatype:
                 out.append(ds)
         return out
 
     def retnGlobbing(self, doc, val):
-        """Return list of globbed datasets."""
+        """Return list of names and globbed datasets."""
         matches = fnmatch.filter(list(doc.data.keys()), val)
         matches.sort(key=utils.numericPartsKey)
         return self.filteredDatasets(doc, matches)
 
     def retnRegExp(self, doc, val):
-        """Return datasets matching regexp."""
+        """Return names and datasets matching regexp."""
 
         try:
             regexp = re.compile(val)
@@ -861,38 +861,41 @@ class DatasetExtendedMulti(Str):
         return self.filteredDatasets(doc, matches)
 
     def getDatasets(self, doc):
-        """Return list of datasets objects."""
+        """Return list of names and datasets given.
 
-        out = []
-        for v in self.val:
-            if isinstance(v, cbasestr):
+        Expands out globs and regular expressions if given.
+        """
+
+        datasets = []
+        for entry in self.val:
+            if isinstance(entry, cbasestr):
                 # string expression
-                v = v.strip()
+                entry = entry.strip()
 
-                if v[:2] == ':^':
-                    # egular expression matching
-                    out += self.retnRegExp(doc, v[2:].strip())
-                elif v[:2] == '::':
+                if entry[:2] == ':^':
+                    # regular expression matching
+                    datasets += self.retnRegExp(doc, entry[2:].strip())
+                elif entry[:2] == '::':
                     # glob-style matching
-                    out += self.retnGlobbing(doc, v[2:].strip())
-                elif v:
-                    ds = doc.data.get(v)
+                    datasets += self.retnGlobbing(doc, entry[2:].strip())
+                elif entry:
+                    ds = doc.data.get(entry)
                     if (ds is not None and ds.dimensions==self.dimensions and
                         ds.datatype==self.datatype):
                         # immediate lookup of dataset
-                        out.append(ds)
+                        datasets.append(ds)
                     else:
                         # single dataset or dataset expression
                         ds = doc.evalDatasetExpression(
-                            v, datatype=self.datatype, dimensions=self.dimensions)
+                            entry, datatype=self.datatype, dimensions=self.dimensions)
                         if ds is not None:
-                            out.append(ds)
+                            datasets.append(ds)
             else:
                 # list of values
-                ds = doc.valsToDataset(v, self.datatype, self.dimensions)
-                out.append(ds)
+                ds = doc.valsToDataset(entry, self.datatype, self.dimensions)
+                datasets.append(ds)
 
-        return out
+        return datasets
 
 class DatasetOrStr(Dataset):
     """Choose a dataset or enter a string.

@@ -22,7 +22,7 @@
 from .. import qtall as qt4
 from ..compat import cstr, citems
 from .. import plugins
-from . import datasets
+from .. import datasets
 
 def _(text, disambiguation=None, context='transform'):
     """Translate text."""

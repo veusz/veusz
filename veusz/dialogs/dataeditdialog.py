@@ -25,6 +25,7 @@ from __future__ import division
 from ..compat import cstr
 from .. import qtall as qt4
 from .. import document
+from .. import datasets
 from .. import setting
 from ..qtwidgets.datasetbrowser import DatasetBrowser
 from .veuszdialog import VeuszDialog, recreate_register
@@ -691,15 +692,15 @@ class DataEditDialog(VeuszDialog):
 
     def slotNewNumericalDataset(self):
         """Add new value dataset."""
-        self.newDataset( document.Dataset(data=[0.]) )
+        self.newDataset( datasets.Dataset(data=[0.]) )
 
     def slotNewTextDataset(self):
         """Add new text dataset."""
-        self.newDataset( document.DatasetText(data=['']) )
+        self.newDataset( datasets.DatasetText(data=['']) )
 
     def slotNewDateDataset(self):
         """Add new date dataset."""
-        self.newDataset( document.DatasetDateTime(data=[]) )
+        self.newDataset( datasets.DatasetDateTime(data=[]) )
 
     def newDataset(self, ds):
         """Add new dataset to document."""

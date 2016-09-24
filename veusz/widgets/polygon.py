@@ -18,6 +18,7 @@
 
 from __future__ import division
 from .. import document
+from .. import datasets
 from .. import setting
 from .. import qtall as qt4
 from .. import utils
@@ -79,8 +80,8 @@ class Polygon(plotters.FreePlotter):
 
             # this is a hack as we generate temporary fake datasets
             path = qt4.QPainterPath()
-            for xvals, yvals in document.generateValidDatasetParts(
-                [document.Dataset(xp), document.Dataset(yp)]):
+            for xvals, yvals in datasets.generateValidDatasetParts(
+                [datasets.Dataset(xp), datasets.Dataset(yp)]):
 
                 poly = qt4.QPolygonF()
                 utils.addNumpyToPolygonF(poly, xvals.data, yvals.data)

@@ -161,7 +161,7 @@ class HistoDataDialog(VeuszDialog):
 
         def getGenerator(self, doc):
             """Return dataset generator."""
-            return document.DatasetHistoGenerator(
+            return datasets.DatasetHistoGenerator(
                 doc, self.expr, binparams = self.binparams,
                 binmanual = self.manualbins, method = self.method,
                 cumulative = self.cumulative, errors = self.errors)
