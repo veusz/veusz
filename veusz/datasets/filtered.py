@@ -20,8 +20,12 @@ from __future__ import division, print_function
 import numpy as N
 
 from ..compat import citems, czip, crepr
-from .. import qtall as qt4
-from .datasets import Dataset, DatasetBase, evalDatasetExpression, _
+
+from .functions import _
+from .functions import *
+from .datasetbase import DatasetBase
+from .oned import Dataset
+from .expression import evalDatasetExpression
 
 class DatasetFilterGenerator(object):
     """This object is shared by all DatasetFiltered datasets, to calculate
@@ -220,4 +224,3 @@ class DatasetFiltered(DatasetBase):
     def __len__(self):
         self._checkUpdate()
         return len(self._internalds)
-

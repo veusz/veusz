@@ -18,9 +18,13 @@
 
 from __future__ import division
 import numpy as N
-from .datasets import Dataset1DBase, evalDatasetExpression, _
-from .. import qtall as qt4
+
 from ..compat import citems
+
+from .functions import _
+from .functions import *
+from .oned import Dataset1DBase
+from .expression import evalDatasetExpression
 
 class DatasetHistoGenerator(object):
     def __init__(self, document, inexpr,
