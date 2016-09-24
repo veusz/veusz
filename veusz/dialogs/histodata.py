@@ -21,6 +21,7 @@ from __future__ import division
 from ..compat import crange, citems, cstr
 from .. import qtall as qt4
 from .. import utils
+from .. import datasets
 from .. import document
 
 from .veuszdialog import VeuszDialog
@@ -114,7 +115,7 @@ class HistoDataDialog(VeuszDialog):
     def datasetExprChanged(self):
         """Validate expression."""
         text = self.indataset.text()
-        document.evalDatasetExpression(self.document, text)
+        datasets.evalDatasetExpression(self.document, text)
 
     class Params(object):
         """Parameters to creation of histogram."""
@@ -274,7 +275,7 @@ class HistoDataDialog(VeuszDialog):
             self.statuslabel.setText(_("Invalid parameters: %s") % cstr(ex))
             return
 
-        exprresult = document.evalDatasetExpression(self.document, p.expr)
+        exprresult = datasets.evalDatasetExpression(self.document, p.expr)
         if exprresult is None:
             self.statuslabel.setText(_("Invalid expression"))
             return

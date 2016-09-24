@@ -251,7 +251,7 @@ class CommandInterface(qt4.QObject):
           'none', 'smalltolarge' or 'largetosmall'
         errors is to calculate Poisson error bars
         """
-        op = datasets.OperationDatasetHistogram(
+        op = operations.OperationDatasetHistogram(
             inexpr, outbinsds, outvalsds, binparams=binparams,
             binmanual=binmanual, method=method,
             cumulative=cumulative, errors=errors)

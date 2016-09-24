@@ -22,6 +22,7 @@ from ..compat import cstr
 from .. import qtall as qt4
 from .. import utils
 from .. import document
+from .. import datasets
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="DataCreateDialog"):
@@ -227,7 +228,7 @@ class DataCreateDialog(VeuszDialog):
                 status = _("Created dataset '%s'") % dsname
             self.statuslabel.setText(status)
 
-        except (datasets.CreateDatasetException,
+        except (document.CreateDatasetException,
                 datasets.DatasetException, _DSException) as e:
 
             # all bad roads lead here - take exception string and tell user
@@ -279,8 +280,8 @@ class DataCreateDialog(VeuszDialog):
             vals[key] = (minval, maxval)
             
         linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
-        return datasets.OperationDatasetCreateRange(name, numsteps, vals,
-                                                    linked=linked)
+        return document.OperationDatasetCreateRange(
+            name, numsteps, vals, linked=linked)
 
     def createParametric(self, name):
         """Use a parametric form to create the dataset.
@@ -299,9 +300,8 @@ class DataCreateDialog(VeuszDialog):
                 vals[key] = text
 
         linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
-        return datasets.OperationDatasetCreateParameteric(name,
-                                                          t0, t1, numsteps,
-                                                          vals, linked=linked)
+        return document.OperationDatasetCreateParameteric(
+            name, t0, t1, numsteps, vals, linked=linked)
 
     def createFromExpression(self, name):
         """Create a dataset based on the expressions given."""
@@ -314,7 +314,7 @@ class DataCreateDialog(VeuszDialog):
                 vals[key] = text
 
         link = self.linkcheckbox.checkState() == qt4.Qt.Checked
-        op = datasets.OperationDatasetCreateExpression(name, vals, link)
+        op = document.OperationDatasetCreateExpression(name, vals, link)
         if not op.validateExpression(self.document):
             raise _DSException()
         return op
