@@ -48,7 +48,7 @@ import numpy as N
 
 from ..compat import crange, cnext, CStringIO
 from .. import utils
-from .. import document
+from .. import datasets
 from .. import qtall as qt4
 from .import base
 
@@ -330,14 +330,14 @@ class DescriptorPart(object):
 
                 # create the dataset
                 if self.datatype == 'float':
-                    ds = document.Dataset( data = vals, serr = sym,
+                    ds = datasets.Dataset( data = vals, serr = sym,
                                            nerr = neg, perr = pos,
                                            linked = linkedfile )
                 elif self.datatype == 'date':
-                    ds = document.DatasetDateTime( data=vals,
+                    ds = datasets.DatasetDateTime( data=vals,
                                                    linked=linkedfile )
                 elif self.datatype == 'string':
-                    ds = document.DatasetText( data=vals,
+                    ds = datasets.DatasetText( data=vals,
                                                linked = linkedfile )
                 else:
                     raise RuntimeError("Invalid data type")
@@ -831,7 +831,7 @@ class SimpleRead2D(object):
         """Set the data in the output dict out
         """
 
-        ds = document.Dataset2D(self.data,
+        ds = datasets.Dataset2D(self.data,
                                 xrange=self.params.xrange,
                                 yrange=self.params.yrange,
                                 xedge=self.xedge, yedge=self.yedge,

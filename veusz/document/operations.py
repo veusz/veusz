@@ -33,9 +33,9 @@ import io
 import numpy as N
 
 from ..compat import czip, crange, citems, cbasestr
-from . import datasets
 from . import widgetfactory
 
+from .. import datasets
 from .. import plugins
 from .. import qtall as qt4
 
@@ -415,43 +415,40 @@ class OperationWidgetAdd(object):
     
 class OperationDatasetSet(object):
     """Set a dataset to that specified."""
-    
+
     descr = _('set dataset')
-    
+
     def __init__(self, datasetname, dataset):
         self.datasetname = datasetname
         self.dataset = dataset
-        
+
     def do(self, document):
         """Set dataset, backing up existing one."""
-    
-        if self.datasetname in document.data:
-            self.olddata = document.data[self.datasetname]
-        else:
-            self.olddata = None
-            
+
+        self.olddata = document.data.get(self.datasetname)
         document.setData(self.datasetname, self.dataset)
 
     def undo(self, document):
         """Undo the data setting."""
-        
-        document.deleteData(self.datasetname)
-        if self.olddata is not None:
+
+        if self.olddata is None:
+            document.deleteData(self.datasetname)
+        else:
             document.setData(self.datasetname, self.olddata)
-    
+
 class OperationDatasetDelete(object):
     """Delete a dateset."""
-    
+
     descr = _('delete dataset')
-    
+
     def __init__(self, datasetname):
         self.datasetname = datasetname
-    
+
     def do(self, document):
         """Remove dataset from document, but preserve for undo."""
         self.olddata = document.data[self.datasetname]
         document.deleteData(self.datasetname)
-        
+
     def undo(self, document):
         """Put dataset back"""
         document.setData(self.datasetname, self.olddata)
@@ -506,24 +503,24 @@ class OperationDatasetRename(object):
 
 class OperationDatasetDuplicate(object):
     """Duplicate a dataset.
-    
+
     Assumes duplicate name doesn't already exist
     """
-    
+
     descr = _('duplicate dataset')
-    
+
     def __init__(self, origname, duplname):
         self.origname = origname
         self.duplname = duplname
-        
+
     def do(self, document):
         """Make the duplicate"""
-        self.olddata = document.data.get(self.duplname, None)
+        self.olddata = document.data.get(self.duplname)
 
         dataset = document.data[self.origname]
         duplicate = dataset.returnCopy()
         document.setData(self.duplname, duplicate)
-        
+
     def undo(self, document):
         """Delete the duplicate"""
         
@@ -568,29 +565,29 @@ class OperationDatasetUnlinkRelation(object):
         
 class OperationDatasetCreate(object):
     """Create dataset base class."""
-    
+
     def __init__(self, datasetname):
         self.datasetname = datasetname
         self.parts = {}
-        
+
     def setPart(self, part, val):
         self.parts[part] = val
-        
+
     def do(self, document):
         """Record old dataset if it exists."""
-        self.olddataset = document.data.get(self.datasetname, None)
-        
+        self.olddataset = document.data.get(self.datasetname)
+
     def undo(self, document):
         """Delete the created dataset."""
         document.deleteData(self.datasetname)
         if self.olddataset is not None:
             document.setData(self.datasetname, self.olddataset)
-        
+
 class OperationDatasetCreateRange(OperationDatasetCreate):
     """Create a dataset in a specfied range."""
-    
+
     descr = _('create dataset from range')
-    
+
     def __init__(self, datasetname, numsteps, parts, linked=False):
         """Create a dataset with numsteps values.
         
@@ -604,13 +601,13 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
         
     def do(self, document):
         """Create dataset using range."""
-        
+
         OperationDatasetCreate.do(self, document)
         data = self.parts['data']
         serr = self.parts.get('serr', None)
         perr = self.parts.get('perr', None)
         nerr = self.parts.get('nerr', None)
-        
+
         ds = datasets.DatasetRange(self.numsteps, data, serr=serr,
                                    perr=perr, nerr=nerr)
         if not self.linked:
@@ -620,23 +617,23 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
 
         document.setData(self.datasetname, ds)
         return ds
-        
+
 class CreateDatasetException(Exception):
     """Thrown by dataset creation routines."""
     pass
-        
+
 class OperationDatasetCreateParameteric(OperationDatasetCreate):
     """Create a dataset using expressions dependent on t."""
-    
+
     descr = _('create parametric dataset')
-    
+
     def __init__(self, datasetname, t0, t1, numsteps, parts, linked=False):
         """Create a parametric dataset.
         
         Variable t goes from t0 to t1 in numsteps.
         parts is a dict with keys 'data', 'serr', 'perr' and/or 'nerr'
         The values are expressions for evaluating."""
-        
+
         OperationDatasetCreate.__init__(self, datasetname)
         self.numsteps = numsteps
         self.t0 = t0
@@ -657,10 +654,10 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
             # copy these values if we don't want to link
             ds = datasets.Dataset(data=ds.data, serr=ds.serr,
                                   perr=ds.perr, nerr=ds.nerr)
-        
+
         document.setData(self.datasetname, ds)
         return ds
-        
+
 class OperationDatasetCreateExpression(OperationDatasetCreate):
     descr = _('create dataset from expression')
 
@@ -709,6 +706,68 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         
         document.setData(self.datasetname, ds)
         return ds
+
+class OperationDatasetsFilter(object):
+    """Operation to filter datasets."""
+
+    descr = _("filter datasets")
+
+    def __init__(self, inexpr, indatasets,
+                 prefix="", suffix="",
+                 invert=False, replaceblanks=False):
+        """Initialise operation:
+        inexpr: input expression
+        indatasets: list of dataset names
+        prefix, suffix: output prefix/suffix
+        invert: invert filter expression
+        replaceblanks: replace output with blank/nan values.
+        """
+
+        if not prefix and not suffix:
+            raise ValueError("Prefix and/or suffix must be given")
+        self.inexpr = inexpr
+        self.indatasets = indatasets
+        self.prefix = prefix
+        self.suffix = suffix
+        self.invert = invert
+        self.replaceblanks = replaceblanks
+
+    def makeGen(self):
+        """Return generator object."""
+        return datasets.DatasetFilterGenerator(
+            self.inexpr, self.indatasets,
+            prefix=self.prefix, suffix=self.suffix,
+            invert=self.invert, replaceblanks=self.replaceblanks)
+
+    def check(self, doc):
+        """Check the filter is ok.
+
+        Return (ok, [list of errors])
+        """
+
+        log = self.makeGen().evaluateFilter(doc)
+        if log:
+            return (False, log)
+        return (True, [])
+
+    def do(self, doc):
+        """Do the operation."""
+
+        gen = self.makeGen()
+        self.olddatasets = {}
+        for name in self.indatasets:
+            outname = self.prefix + name + self.suffix
+            self.olddatasets[outname] = doc.data.get(outname)
+            doc.setData(outname, datasets.DatasetFiltered(gen, name, doc))
+
+    def undo(self, doc):
+        """Undo operation."""
+
+        for name, val in citems(self.olddatasets):
+            if val is None:
+                doc.deleteData(name)
+            else:
+                doc.setData(name, val)
 
 class OperationDataset2DBase(object):
     """Operation as base for 2D dataset creation operations."""
@@ -1181,3 +1240,67 @@ class OperationDatasetPlugin(object):
         # put back old datasets
         for name, ds in citems(self.olddata):
             document.setData(name, ds)
+
+class OperationDatasetHistogram(object):
+    """Operation to make histogram from data."""
+
+    descr = _("make histogram")
+
+    def __init__(self, expr, outposns, outvalues,
+                 binparams=None, binmanual=None, method='counts',
+                 cumulative = 'none',
+                 errors=False):
+        """
+        inexpr = input dataset expression
+        outposns = name of dataset for bin positions
+        outvalues = name of dataset for bin values
+        binparams = None / (num, minval, maxval, islog)
+        binmanual = None / [1,2,3,4,5]
+        method = ('counts', 'density', or 'fractions')
+        cumulative = ('none', 'smalltolarge', 'largetosmall')
+        errors = True/False
+        """
+
+        self.expr = expr
+        self.outposns = outposns
+        self.outvalues = outvalues
+        self.binparams = binparams
+        self.binmanual = binmanual
+        self.method = method
+        self.cumulative = cumulative
+        self.errors = errors
+
+    def do(self, document):
+        """Create histogram datasets."""
+
+        gen = datasets.DatasetHistoGenerator(
+            document, self.expr, binparams=self.binparams,
+            binmanual=self.binmanual,
+            method=self.method,
+            cumulative=self.cumulative,
+            errors=self.errors)
+
+        self.oldposnsds = self.oldvaluesds = None
+
+        if self.outvalues != '':
+            self.oldvaluesds = document.data.get(self.outvalues, None)
+            document.setData(self.outvalues, gen.generateValueDataset())
+
+        if self.outposns != '':
+            self.oldposnsds = document.data.get(self.outposns, None)
+            document.setData(self.outposns, gen.generateBinDataset())
+
+    def undo(self, document):
+        """Undo creation of datasets."""
+
+        if self.oldposnsds is not None:
+            if self.outposns != '':
+                document.setData(self.outposns, self.oldposnsds)
+        else:
+            document.deleteData(self.outposns)
+
+        if self.oldvaluesds is not None:
+            if self.outvalues != '':
+                document.setData(self.outvalues, self.oldvaluesds)
+        else:
+            document.deleteData(self.outvalues)

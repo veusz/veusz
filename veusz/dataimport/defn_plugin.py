@@ -20,6 +20,7 @@ from __future__ import division, print_function
 import traceback
 
 from .. import document
+from .. import datasets
 from .. import plugins
 from .. import qtall as qt4
 from . import base
@@ -111,17 +112,17 @@ class OperationDataImportPlugin(base.OperationDataImportBase):
         # convert results to real datasets
         for d in results:
             if isinstance(d, plugins.Dataset1D):
-                ds = document.Dataset(data=d.data, serr=d.serr, perr=d.perr,
+                ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
                                       nerr=d.nerr)
             elif isinstance(d, plugins.Dataset2D):
-                ds = document.Dataset2D(data=d.data,
+                ds = datasets.Dataset2D(data=d.data,
                                         xrange=d.rangex, yrange=d.rangey,
                                         xedge=d.xedge, yedge=d.yedge,
                                         xcent=d.xcent, ycent=d.ycent)
             elif isinstance(d, plugins.DatasetText):
-                ds = document.DatasetText(data=d.data)
+                ds = datasets.DatasetText(data=d.data)
             elif isinstance(d, plugins.DatasetDateTime):
-                ds = document.DatasetDateTime(data=d.data)
+                ds = datasets.DatasetDateTime(data=d.data)
             elif isinstance(d, plugins.Constant):
                 self.outcustoms.append( ['constant', d.name, d.val] )
                 continue
