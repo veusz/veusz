@@ -687,29 +687,6 @@ class Document(qt4.QObject):
         # return widget
         return obj
 
-    def valsToDataset(self, vals, datatype, dimensions):
-        """Return a dataset given a numpy array of values."""
-
-        if datatype == 'numeric':
-            try:
-                nvals = N.array(vals, dtype=N.float64)
-
-                if nvals.ndim == dimensions:
-                    if nvals.ndim == 1:
-                        return datasets.Dataset(data=nvals)
-                    elif nvals.ndim == 2:
-                        return datasets.Dataset2D(nvals)
-            except ValueError:
-                pass
-
-        elif datatype == 'text':
-            try:
-                return datasets.DatasetText([cstr(x) for x in vals])
-            except ValueError:
-                pass
-
-        raise RuntimeError('Invalid array')
-
     def walkNodes(self, tocall, root=None,
                   nodetypes=('widget', 'setting', 'settings'),
                   _path=None):

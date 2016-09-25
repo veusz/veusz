@@ -39,6 +39,7 @@ from .settingdb import settingdb, uilocale, ui_floattostring, ui_stringtofloat
 from .reference import ReferenceBase, Reference
 
 from .. import utils
+from .. import datasets
 
 class OnModified(qt4.QObject):
     """onmodified is emitted from an object contained in each setting."""
@@ -1325,11 +1326,12 @@ class DatasetExtended(Dataset):
 
     def getData(self, doc):
         """Return veusz dataset"""
+        from .. import datasets
         if isinstance(self.val, cbasestr):
             return doc.evaluate.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
         else:
-            return doc.valsToDataset(
+            return datasets.valsToDataset(
                 self.val, self.datatype, self.dimensions)
 
 class DatasetOrStr(Dataset):
