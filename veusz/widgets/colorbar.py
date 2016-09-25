@@ -197,7 +197,7 @@ class ColorBar(axis.Axis):
             minval, maxval, axisscale, cmapname, trans, invert = \
                 imgwidget.getColorbarParameters()
 
-            cmap = self.document.getColormap(cmapname, invert)
+            cmap = self.document.evaluate.getColormap(cmapname, invert)
 
             img = utils.makeColorbarImage(
                 minval, maxval, axisscale, cmap, trans,

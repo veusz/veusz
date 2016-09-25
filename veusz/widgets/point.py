@@ -940,7 +940,7 @@ class PointPlotter(GenericPlotter):
                         s.Color.min, s.Color.max)
                     if s.thinfactor > 1:
                         colorvals = colorvals[::s.thinfactor]
-                    cmap = self.document.getColormap(
+                    cmap = self.document.evaluate.getColormap(
                         s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
                 # actually plot datapoints

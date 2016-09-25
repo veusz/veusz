@@ -335,7 +335,7 @@ class Dataset2DXYFunc(Dataset2DBase):
         if self.document.changeset == self.lastchangeset:
             return self.cacheddata
 
-        env = self.document.eval_context.copy()
+        env = self.document.evaluate.context.copy()
 
         xarange = N.arange(self.xstep[0], self.xstep[1]+self.xstep[2],
                            self.xstep[2])

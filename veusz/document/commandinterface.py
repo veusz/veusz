@@ -115,6 +115,7 @@ class CommandInterface(qt4.QObject):
 
         self.Root = embed.WidgetNode(self, 'widget', '/')
 
+    @qt4.pyqtSlot()
     def slotWipedDoc(self):
         """When the document is wiped, we change to the root widget."""
         self.To('/')
@@ -185,7 +186,7 @@ class CommandInterface(qt4.QObject):
         """
 
         if ctype == 'colormap':
-            self.document.validateProcessColormap(val)
+            self.document.evaluate.validateProcessColormap(val)
         else:
             if not isinstance(val, cbasestr):
                 raise RuntimeError('Value should be string')
@@ -195,7 +196,7 @@ class CommandInterface(qt4.QObject):
         if ctype not in ('constant', 'import', 'function', 'colormap'):
             raise RuntimeError('Invalid type')
 
-        vals = list( self.document.customs )
+        vals = list(self.document.evaluate.customs)
         item = [ctype, name, val]
         if mode == 'appendalways':
             vals.append(item)
@@ -297,7 +298,7 @@ class CommandInterface(qt4.QObject):
 
     def RemoveCustom(self, name):
         """Removes a custom-defined constant, function or import."""
-        vals = list( self.document.customs )
+        vals = list( self.document.evaluate.customs )
         for i, (t, n, v) in enumerate(vals):
             if n == name:
                 del vals[i]
@@ -351,7 +352,7 @@ class CommandInterface(qt4.QObject):
 
         The number of values to return is given by nvals
         """
-        cmap = self.document.getColormap(name, invert)
+        cmap = self.document.evaluate.getColormap(name, invert)
         return utils.getColormapArray(cmap, nvals)
 
     def GetDatasets(self):

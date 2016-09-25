@@ -250,7 +250,7 @@ class NonOrthPoint(Widget):
                         colorvals = utils.applyScaling(
                             cvals.data, s.Color.scaling,
                             s.Color.min, s.Color.max)
-                        cmap = self.document.getColormap(
+                        cmap = self.document.evaluate.getColormap(
                             s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
                     painter.setBrush(s.MarkerFill.makeQBrushWHide())

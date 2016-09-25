@@ -1088,14 +1088,14 @@ class OperationSetCustom(object):
 
     def do(self, document):
         """Set the custom object."""
-        self.oldval = list(document.customs)
-        document.customs = self.customvals
-        document.updateEvalContext()
+        self.oldval = list(document.evaluate.customs)
+        document.evaluate.customs = self.customvals
+        document.evaluate.update()
         
     def undo(self, document):
         """Restore custom object."""
-        document.customs = self.oldval
-        document.updateEvalContext()
+        document.evaluate.customs = self.oldval
+        document.evaluate.update()
 
 ###############################################################################
 # Misc operations

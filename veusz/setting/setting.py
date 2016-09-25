@@ -344,11 +344,11 @@ class Setting(object):
     def safeEvalHelper(self, text):
         """Evaluate an expression, catching naughtiness."""
         try:
-            comp = self.getDocument().compileCheckedExpression(
+            comp = self.getDocument().evaluate.compileCheckedExpression(
                 text)
             if comp is None:
                 raise utils.InvalidType
-            return float( eval(comp, self.getDocument().eval_context) )
+            return float( eval(comp, self.getDocument().evaluate.context) )
         except:
             raise utils.InvalidType
 
@@ -1304,7 +1304,7 @@ class DatasetExtended(Dataset):
     def getFloatArray(self, doc):
         """Get a numpy of values or None."""
         if isinstance(self.val, cbasestr):
-            ds = doc.evalDatasetExpression(
+            ds = doc.evaluate.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
             if ds:
                 # get numpy array of values
@@ -1326,7 +1326,7 @@ class DatasetExtended(Dataset):
     def getData(self, doc):
         """Return veusz dataset"""
         if isinstance(self.val, cbasestr):
-            return doc.evalDatasetExpression(
+            return doc.evaluate.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
         else:
             return doc.valsToDataset(

@@ -20,6 +20,7 @@
 
 from .widgetfactory import *
 from .doc import *
+from .evaluate import *
 from .commandinterface import *
 from .commandinterpreter import *
 from .operations import *
