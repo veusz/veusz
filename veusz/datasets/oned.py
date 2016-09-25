@@ -16,6 +16,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+"""One dimensional datasets."""
+
 import numpy as N
 
 from .commonfn import _

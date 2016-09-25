@@ -16,11 +16,12 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+"""Base class for all Datasets."""
+
 from __future__ import division
 
 import numpy as N
 
-from .. import setting
 from ..compat import cbasestr
 from .commonfn import _
 
@@ -130,6 +131,7 @@ class DatasetConcreteBase(DatasetBase):
         """Return a value cast to this dataset data type.
         We assume here it is a float, so override if not
         """
+        from .. import setting
         if isinstance(val, cbasestr):
             val, ok = setting.uilocale.toDouble(val)
             if ok: return val
@@ -198,68 +200,3 @@ class DatasetConcreteBase(DatasetBase):
     def datasetAsText(self, fmt='%g', join='\t'):
         """Return dataset as text (for use by user)."""
         return ''
-
-
-
-def generateValidDatasetParts(datasets, breakds=True):
-    """Generator to return array of valid parts of datasets.
-
-    if breakds is True:
-      Yields new datasets between rows which are invalid
-    else:
-      Yields single, filtered dataset
-    """
-
-    # find NaNs and INFs in input dataset
-    invalid = datasets[0].invalidDataPoints()
-    minlen = invalid.shape[0]
-    for ds in datasets[1:]:
-        if isinstance(ds, DatasetBase) and not ds.empty():
-            nextinvalid = ds.invalidDataPoints()
-            minlen = min(nextinvalid.shape[0], minlen)
-            invalid = N.logical_or(invalid[:minlen], nextinvalid[:minlen])
-
-    if breakds:
-        # return multiple datasets, breaking at invalid values
-
-        # get indexes of invalid points
-        indexes = invalid.nonzero()[0].tolist()
-
-        # no bad points: optimisation
-        if not indexes:
-            yield datasets
-            return
-
-        # add on shortest length of datasets
-        indexes.append(minlen)
-
-        lastindex = 0
-        for index in indexes:
-            if index != lastindex:
-                retn = []
-                for ds in datasets:
-                    if ds is not None and (
-                            not isinstance(ds, DatasetBase) or
-                            not ds.empty()):
-                        retn.append(ds[lastindex:index])
-                    else:
-                        retn.append(None)
-                yield retn
-            lastindex = index+1
-
-    else:
-        # in this mode we return single datasets where the invalid
-        # values are masked out
-
-        if not N.any(invalid):
-            yield datasets
-            return
-
-        valid = N.logical_not(invalid)
-        retn = []
-        for ds in datasets:
-            if ds is None:
-                retn.append(None)
-            else:
-                retn.append(ds[valid])
-        yield retn

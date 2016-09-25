@@ -16,6 +16,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+"""Date time datasets."""
+
 from __future__ import division
 
 import numpy as N

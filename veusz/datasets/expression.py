@@ -16,6 +16,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
+"""For evaluating dataset expressions and dataset classes using expressions."""
+
 from __future__ import division
 import re
 import numpy as N
