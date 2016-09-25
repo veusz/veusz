@@ -189,12 +189,12 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
     # replace dataset names by calls to _DS_(name,part)
     expr, subdatasets = substituteDatasets(doc.data, origexpr, part)
 
-    comp = doc.compileCheckedExpression(expr, origexpr=origexpr)
+    comp = doc.evaluate.compileCheckedExpression(expr, origexpr=origexpr)
     if comp is None:
         return
 
     # set up environment for evaluation
-    env = doc.eval_context.copy()
+    env = doc.evaluate.context.copy()
     def doeval(dsname, dspart):
         return _evaluateDataset(doc.data, dsname, dspart)
     env['_DS_'] = doeval
@@ -260,12 +260,13 @@ class DatasetExpression(Dataset1DBase):
         # replace dataset names with calls
         newexpr = substituteDatasets(self.document.data, expr, part)[0]
 
-        comp = self.document.compileCheckedExpression(newexpr, origexpr=expr)
+        comp = self.document.evaluate.compileCheckedExpression(
+            newexpr, origexpr=expr)
         if comp is None:
             return False
 
         # set up environment to evaluate expressions in
-        environment = self.document.eval_context.copy()
+        environment = self.document.evaluate.context.copy()
 
         # create dataset using parametric expression
         if self.parametric:
@@ -487,7 +488,7 @@ class Dataset2DXYZExpression(Dataset2DBase):
 
         evaluated = {}
 
-        environment = self.document.eval_context.copy()
+        environment = self.document.evaulate.context.copy()
         environment['_DS_'] = self.evaluateDataset
 
         # evaluate the x, y and z expressions
@@ -495,7 +496,7 @@ class Dataset2DXYZExpression(Dataset2DBase):
             origexpr = getattr(self, name)
             expr = substituteDatasets(self.document.data, origexpr, 'data')[0]
 
-            comp = self.document.compileCheckedExpression(
+            comp = self.document.evaluate.compileCheckedExpression(
                 expr, origexpr=origexpr)
             if comp is None:
                 return None

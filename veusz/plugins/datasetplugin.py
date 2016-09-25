@@ -250,10 +250,7 @@ class DatasetPluginHelper(object):
         Returns None if expression could not be evaluated.
         """
         ds = self._doc.evalDatasetExpression(expr, part=part)
-        if ds is not None:
-            return ds.data
-        else:
-            return None
+        return None if ds is None else ds.data
 
     def getDataset(self, name, dimensions=1):
         """Return numerical dataset object for name given.
