@@ -23,6 +23,7 @@ import numpy as N
 
 from ..compat import czip
 from .. import qtall as qt4
+from .. import datasets
 from .. import document
 from .. import setting
 from .. import utils
@@ -781,10 +782,10 @@ class PointPlotter(GenericPlotter):
         # handle missing dataset
         if yv and not xv and s.get('xData').isEmpty():
             length = yv.data.shape[0]
-            xv = document.DatasetRange(length, (1,length))
+            xv = datasets.DatasetRange(length, (1,length))
         elif xv and not yv and s.get('yData').isEmpty():
             length = xv.data.shape[0]
-            yv = document.DatasetRange(length, (1,length))
+            yv = datasets.DatasetRange(length, (1,length))
 
         if text is None or xv is None or yv is None:
             return (None, None)
@@ -835,11 +836,11 @@ class PointPlotter(GenericPlotter):
         if xv and not yv and s.get('yData').isEmpty():
             # use index for y data
             length = xv.data.shape[0]
-            yv = document.DatasetRange(length, (1,length))
+            yv = datasets.DatasetRange(length, (1,length))
         elif yv and not xv and s.get('xData').isEmpty():
             # use index for x data
             length = yv.data.shape[0]
-            xv = document.DatasetRange(length, (1,length))
+            xv = datasets.DatasetRange(length, (1,length))
         if not xv or not yv:
             # no valid dataset, so exit
             return
@@ -852,7 +853,7 @@ class PointPlotter(GenericPlotter):
 
         # loop over chopped up values
         for xvals, yvals, tvals, ptvals, cvals in (
-            document.generateValidDatasetParts(
+            datasets.generateValidDatasetParts(
                 [xv, yv, text, scalepoints, colorpoints])):
 
             #print "Calculating coordinates"

@@ -34,11 +34,9 @@ from .. import setting
 from .. import embed
 from .. import plugins
 from .. import utils
+from .. import datasets
 
-from . import datasets
 from . import operations
-from . import dataset_histo
-from . import dataset_filtered
 from . import mime
 from . import export
 
@@ -253,7 +251,7 @@ class CommandInterface(qt4.QObject):
           'none', 'smalltolarge' or 'largetosmall'
         errors is to calculate Poisson error bars
         """
-        op = dataset_histo.OperationDatasetHistogram(
+        op = operations.OperationDatasetHistogram(
             inexpr, outbinsds, outvalsds, binparams=binparams,
             binmanual=binmanual, method=method,
             cumulative=cumulative, errors=errors)
@@ -808,19 +806,19 @@ class CommandInterface(qt4.QObject):
             print(_("Applied tag %s to datasets %s") % (
                 tag, ' '.join(datasets)))
 
-    def FilterDatasets(self, filterexpr, datasets,
+    def FilterDatasets(self, filterexpr, dataset_list,
                        prefix="", suffix="",
                        invert=False, replaceblanks=False):
         """Apply filter expression to list of datasets.
 
         filterexpr: input filter expression
-        datasets: list of input dataset names
+        dataset_list: list of input dataset names
         prefix, suffix: output prefix/suffix to add to names (one must be set)
         invert: invert results of filter expression
         replaceblanks: replace filtered values with nan/blank in output.
         """
-        op = dataset_filtered.OperationDatasetsFilter(
-            filterexpr, datasets,
+        op = operations.OperationDatasetsFilter(
+            filterexpr, dataset_list,
             prefix=prefix, suffix=suffix,
             invert=invert, replaceblanks=replaceblanks)
         self.document.applyOperation(op)
@@ -829,5 +827,5 @@ class CommandInterface(qt4.QObject):
             print(
                 _('Filtered datasets %s using expression %s. '
                   'Output prefix=%s, suffix=%s') % (
-                      datasets, filterexpr, prefix, suffix)
+                      dataset_list, filterexpr, prefix, suffix)
             )

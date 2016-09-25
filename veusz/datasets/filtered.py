@@ -20,8 +20,12 @@ from __future__ import division, print_function
 import numpy as N
 
 from ..compat import citems, czip, crepr
-from .. import qtall as qt4
-from .datasets import Dataset, DatasetBase, evalDatasetExpression, _
+
+from .commonfn import _
+from .commonfn import *
+from .base import DatasetBase
+from .oned import Dataset
+from .expression import evalDatasetExpression
 
 class DatasetFilterGenerator(object):
     """This object is shared by all DatasetFiltered datasets, to calculate
@@ -215,68 +219,8 @@ class DatasetFiltered(DatasetBase):
 
     # these have to be overridden manually
     def __getitem__(self, key):
+        self._checkUpdate()
         return self._internalds[key]
     def __len__(self):
+        self._checkUpdate()
         return len(self._internalds)
-
-class OperationDatasetsFilter(object):
-    """Operation to filter datasets."""
-
-    descr = _("filter datasets")
-
-    def __init__(self, inexpr, indatasets,
-                 prefix="", suffix="",
-                 invert=False, replaceblanks=False):
-        """Initialise operation:
-        inexpr: input expression
-        indatasets: list of dataset names
-        prefix, suffix: output prefix/suffix
-        invert: invert filter expression
-        replaceblanks: replace output with blank/nan values.
-        """
-
-        if not prefix and not suffix:
-            raise ValueError("Prefix and/or suffix must be given")
-        self.inexpr = inexpr
-        self.indatasets = indatasets
-        self.prefix = prefix
-        self.suffix = suffix
-        self.invert = invert
-        self.replaceblanks = replaceblanks
-
-    def makeGen(self):
-        """Return generator object."""
-        return DatasetFilterGenerator(
-            self.inexpr, self.indatasets,
-            prefix=self.prefix, suffix=self.suffix,
-            invert=self.invert, replaceblanks=self.replaceblanks)
-
-    def check(self, doc):
-        """Check the filter is ok.
-
-        Return (ok, [list of errors])
-        """
-
-        log = self.makeGen().evaluateFilter(doc)
-        if log:
-            return (False, log)
-        return (True, [])
-
-    def do(self, doc):
-        """Do the operation."""
-
-        gen = self.makeGen()
-        self.olddatasets = {}
-        for name in self.indatasets:
-            outname = self.prefix + name + self.suffix
-            self.olddatasets[outname] = doc.data.get(outname)
-            doc.setData(outname, DatasetFiltered(gen, name, doc))
-
-    def undo(self, doc):
-        """Undo operation."""
-
-        for name, val in citems(self.olddatasets):
-            if val is None:
-                doc.deleteData(name)
-            else:
-                doc.setData(name, val)

@@ -26,6 +26,7 @@ from . import field
 
 from ..compat import czip, citems, cstr
 from .. import utils
+from .. import datasets
 try:
     from ..helpers import qtloops
 except ImportError:
@@ -83,9 +84,7 @@ class Dataset1D(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        # need to do the import here as otherwise we get a loop
-        from .. import document
-        return document.Dataset1DPlugin(manager, self)
+        return datasets.Dataset1DPlugin(manager, self)
 
 class Dataset2D(object):
     """2D dataset for ImportPlugin or DatasetPlugin."""
@@ -126,8 +125,7 @@ class Dataset2D(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        from .. import document
-        return document.Dataset2DPlugin(manager, self)
+        return datasets.Dataset2DPlugin(manager, self)
 
 class DatasetDateTime(object):
     """Date-time dataset for ImportPlugin or DatasetPlugin."""
@@ -164,8 +162,7 @@ class DatasetDateTime(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        from .. import document
-        return document.DatasetDateTimePlugin(manager, self)
+        return datasets.DatasetDateTimePlugin(manager, self)
 
 class DatasetText(object):
     """Text dataset for ImportPlugin or DatasetPlugin."""
@@ -186,8 +183,7 @@ class DatasetText(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        from .. import document
-        return document.DatasetTextPlugin(manager, self)
+        return datasets.DatasetTextPlugin(manager, self)
 
 class Constant(object):
     """Dataset to return to set a Veusz constant after import.
@@ -238,9 +234,8 @@ class DatasetPluginHelper(object):
     @property
     def datasetsdatetime(self):
         """Return list of existing date-time datesets"""
-        from .. import document
         return [name for name, ds in citems(self._doc.data) if
-                isinstance(ds, document.DatasetDateTime)]
+                isinstance(ds, datasets.DatasetDateTime)]
 
     @property
     def locale(self):
@@ -270,7 +265,6 @@ class DatasetPluginHelper(object):
         name not found: raise a DatasetPluginException
         dimensions not right: raise a DatasetPluginException
         """
-        from .. import document
         try:
             ds = self._doc.data[name]
         except KeyError:
@@ -284,7 +278,7 @@ class DatasetPluginHelper(object):
             raise DatasetPluginException(
                 _("Dataset '%s' is not a numerical dataset") % name)
 
-        if isinstance(ds, document.DatasetDateTime):
+        if isinstance(ds, datasets.DatasetDateTime):
             return DatasetDateTime(name, data=ds.data)
         elif ds.dimensions == 1:
             return Dataset1D(name, data=ds.data, serr=ds.serr,
