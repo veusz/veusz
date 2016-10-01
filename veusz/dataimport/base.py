@@ -171,18 +171,11 @@ class LinkedFileBase(object):
         read = []
         for name, ds in list(tempdoc.data.items()):
             if name not in document.data:
-                read.append(name)
-
-                # rename any renamed datasets
-                outname = name
-                if self.params.renames and name in self.params.renames:
-                    outname = self.params.renames[name]
-
                 ds.linked = self
                 if name in tags:
                     ds.tags = tags[name]
-
-                document.setData(outname, ds)
+                document.setData(name, ds)
+                read.append(name)
         return read
 
     def reloadLinks(self, document):
