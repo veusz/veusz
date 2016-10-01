@@ -8,6 +8,7 @@ Changes in <next version>:
  * Add lineup, linedown and lineextend arrows
  * Raise exception if functions in console request input, avoiding hang
  * Initialise unsafe_mode, in case Veusz used in PyQt embedding
+ * Fix crash if setting default setting in default setting window
 
 Changes in 1.24:
  * Text labels can now include Python expressions inside %{{ }}%
