@@ -249,7 +249,7 @@ class DatasetPluginHelper(object):
 
         Returns None if expression could not be evaluated.
         """
-        ds = self._doc.evalDatasetExpression(expr, part=part)
+        ds = datasets.evalDatasetExpression(self._doc, expr, part=part)
         return None if ds is None else ds.data
 
     def getDataset(self, name, dimensions=1):
