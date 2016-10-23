@@ -841,3 +841,119 @@ class SimpleRead2D(object):
 
         fullname = self.params.prefix + self.name + self.params.suffix
         out[fullname] = ds
+
+
+
+#####################################################################
+# n-dimensional data reading
+
+class ReadNDError(base.ImportingError):
+    pass
+
+class SimpleReadND(object):
+    def __init__(self, name, params):
+        """Read dataset with name given.
+        params is a ImportParamsND object
+        """
+        self.name = name
+        self.params = params.copy()
+
+    ####################################################################
+
+    def _paramTranspose(self, cols):
+        self.params.transpose = True
+
+    ####################################################################
+
+    def readData(self, stream):
+        """Read data from stream given
+
+        stream consists of:
+        optional:
+         transpose    - swap rows and columns
+        then:
+         Matrix of columns and rows, separated by line endings.
+         Higher orders are given by using increasing numbers of
+         separating newlines
+        """
+
+        settings = {
+            'transpose': self._paramTranspose,
+            }
+
+        vals = []
+
+        # keep track of where we are in terms of index
+        dimstack = []
+        dimidx = 0
+
+        # loop over lines
+        while stream.newLine():
+            cols = stream.allColumns()
+
+            # check to see whether parameter is set
+            if len(cols) > 0:
+                c = cols[0].lower()
+                if c in settings:
+                    settings[c](cols)
+                    stream.flushLine()
+                    continue
+
+            # read columns
+            line = []
+            while True:
+                v = stream.nextColumn()
+                if v is None:
+                    break
+                try:
+                    line.append(float(v))
+                except ValueError:
+                    raise ReadNDError("Could not interpret number '%s'" % v)
+
+            if len(line) > 0:
+                # previous blank lines
+                if dimidx != len(dimstack):
+                    # insert new dimensions, if required
+                    while dimidx < 0:
+                        dimstack.insert(0, 0)
+                        dimidx += 1
+                        vals = [vals]
+
+                    # move to next value at current level
+                    dimstack[dimidx] += 1
+                    for i in crange(dimidx+1, len(dimstack)):
+                        dimstack[i] = 0
+                    dimidx = len(dimstack)
+
+                # lookup correct place in hierarchy and append
+                v = vals
+                for s in dimstack:
+                    while s >= len(v):
+                        v.append([])
+                    v = v[s]
+                v.append(N.array(line, dtype=N.float64))
+            else:
+                if len(vals) > 0:
+                    dimidx -= 1
+
+        try:
+            self.data = N.array(vals, dtype=N.float64)
+        except ValueError:
+            raise ReadNDError("Could not convert data to n-D matrix")
+
+        # obvious check
+        if self.data.ndim < 1:
+            raise ReadNDError("Needs at least a 1D dataset")
+
+        # transpose matrix if requested
+        if self.params.transpose:
+            self.data = N.transpose(self.data).copy()
+
+    def setOutput(self, out, linkedfile=None):
+        """Set the data in the output dict out
+        """
+
+        ds = datasets.DatasetND(self.data)
+        ds.linked = linkedfile
+        fullname = self.params.prefix + self.name + self.params.suffix
+        out[fullname] = ds
