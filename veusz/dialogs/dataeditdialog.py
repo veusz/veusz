@@ -22,6 +22,8 @@
 
 from __future__ import division
 
+import numpy as N
+
 from ..compat import cstr
 from .. import qtall as qt4
 from .. import document
@@ -454,6 +456,69 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         self.document.applyOperation(op)
         return True
 
+class DatasetTableModelND(qt4.QAbstractTableModel):
+    """An ND dataset model."""
+
+    def __init__(self, parent, document, datasetname):
+        qt4.QAbstractTableModel.__init__(self, parent)
+
+        self.document = document
+        self.dsname = datasetname
+        document.signalModified.connect(self.slotDocumentModified)
+
+    def rowCount(self, parent):
+        if parent.isValid():
+            return 0
+        try:
+            data = self.document.data[self.dsname].data
+        except KeyError:
+            return 0
+        return 0 if data is None else data.size
+
+    def columnCount(self, parent):
+        if parent.isValid():
+            return 0
+        try:
+            data = self.document.data[self.dsname].data
+        except KeyError:
+            return 0
+        return 1 if data is not None else 0
+
+    def data(self, index, role):
+        """Items in array."""
+        if role == qt4.Qt.DisplayRole:
+            try:
+                data = self.document.data[self.dsname].data
+            except KeyError:
+                return None
+            if data is not None:
+                try:
+                    num = N.ravel(data)[index.row()]
+                    return float(num)
+                except IndexError:
+                    pass
+        return None
+
+    def headerData(self, section, orientation, role):
+        """Return headers at top."""
+
+        ds = self.document.data.get(self.dsname)
+        if ds is None:
+            return None
+
+        if ds is not None and role == qt4.Qt.DisplayRole:
+            if orientation == qt4.Qt.Horizontal:
+                return _('Value')
+            else:
+                idx = N.unravel_index(section, ds.data.shape)
+                txt = ','.join( [str(v+1) for v in idx] )
+                return txt
+        return None
+
+    def slotDocumentModified(self):
+        """Called when document modified."""
+        self.layoutChanged.emit()
+
 class ViewDelegate(qt4.QStyledItemDelegate):
     """Delegate for fixing double editing.
     Normal editing uses double spin box, which is inappropriate
@@ -554,6 +619,8 @@ class DataEditDialog(VeuszDialog):
                 model = DatasetTableModel1D(self, self.document, names[0])
             elif ds.dimensions == 2:
                 model = DatasetTableModel2D(self, self.document, names[0])
+            elif ds.dimensions == 999:
+                model = DatasetTableModelND(self, self.document, names[0])
         elif len(names) > 1:
             model = DatasetTableModelMulti(self, self.document, names)
 
