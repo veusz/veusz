@@ -619,7 +619,7 @@ class DataEditDialog(VeuszDialog):
                 model = DatasetTableModel1D(self, self.document, names[0])
             elif ds.dimensions == 2:
                 model = DatasetTableModel2D(self, self.document, names[0])
-            elif ds.dimensions == 999:
+            elif ds.dimensions == -1:
                 model = DatasetTableModelND(self, self.document, names[0])
         elif len(names) > 1:
             model = DatasetTableModelMulti(self, self.document, names)

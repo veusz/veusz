@@ -284,6 +284,7 @@ class Evaluate:
         if name not in self.data:
             raise RuntimeError("Dataset '%s' does not exist" % name)
         data = getattr(self.data[name], part)
+
         if isinstance(data, N.ndarray):
             return N.array(data)
         elif isinstance(data, list):

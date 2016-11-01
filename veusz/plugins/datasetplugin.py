@@ -52,8 +52,20 @@ def numpyCopyOrNone(data):
         return None
     return N.array(data, dtype=N.float64)
 
+class _DatasetBase(object):
+    """Base class for dataset objects to be returned from plugins."""
+
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset
+        (or None if not a real dataset."""
+        return None
+
+    def _customs(self):
+        """Return list of custom definitions to add to document."""
+        return []
+
 # these classes are returned from dataset plugins
-class Dataset1D(object):
+class Dataset1D(_DatasetBase):
     """1D dataset for ImportPlugin or DatasetPlugin."""
     def __init__(self, name, data=[], serr=None, perr=None, nerr=None):
         """1D dataset
@@ -86,7 +98,12 @@ class Dataset1D(object):
         """Make a Veusz dataset from the plugin dataset."""
         return datasets.Dataset1DPlugin(manager, self)
 
-class Dataset2D(object):
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.Dataset(
+            data=self.data, serr=self.serr, perr=self.perr, nerr=self.nerr)
+
+class Dataset2D(_DatasetBase):
     """2D dataset for ImportPlugin or DatasetPlugin."""
     def __init__(self, name, data=[[]], rangex=None, rangey=None,
                  xedge=None, yedge=None,
@@ -127,13 +144,46 @@ class Dataset2D(object):
         """Make a Veusz dataset from the plugin dataset."""
         return datasets.Dataset2DPlugin(manager, self)
 
-class DatasetDateTime(object):
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.Dataset2D(
+            data=self.data,
+            xrange=self.rangex, yrange=self.rangey,
+            xedge=self.xedge, yedge=self.yedge,
+            xcent=self.xcent, ycent=self.ycent)
+
+class DatasetND(_DatasetBase):
+    """ND dataset for ImportPlugin or DatasetPlugin."""
+    def __init__(self, name, data=[]):
+        """N-dimensional dataset.
+        name: name of dataset
+        data: ND numpy array of values (or lists to convert)
+        """
+        self.name = name
+        self.update(data=data)
+
+    def update(self, data=[]):
+        self.data = N.array(data, dtype=N.float64)
+
+    def _null(self):
+        """Empty data contents."""
+        self.data = N.array([])
+
+    def _makeVeuszDataset(self, manager):
+        """Make a Veusz dataset from the plugin dataset."""
+        return datasets.DatasetNDPlugin(manager, self)
+
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.DatasetND(data=self.data)
+
+class DatasetDateTime(_DatasetBase):
     """Date-time dataset for ImportPlugin or DatasetPlugin."""
 
     def __init__(self, name, data=[]):
         """A date dataset
         name: name of dataset
-        data: list of datetime objects
+        data: list of datetime datasets
         """
         self.name = name
         self.update(data=data)
@@ -164,7 +214,11 @@ class DatasetDateTime(object):
         """Make a Veusz dataset from the plugin dataset."""
         return datasets.DatasetDateTimePlugin(manager, self)
 
-class DatasetText(object):
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.DatasetDateTime(data=self.data)
+
+class DatasetText(_DatasetBase):
     """Text dataset for ImportPlugin or DatasetPlugin."""
     def __init__(self, name, data=[]):
         """A text dataset
@@ -185,7 +239,11 @@ class DatasetText(object):
         """Make a Veusz dataset from the plugin dataset."""
         return datasets.DatasetTextPlugin(manager, self)
 
-class Constant(object):
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.DatasetText(data=self.data)
+
+class Constant(_DatasetBase):
     """Dataset to return to set a Veusz constant after import.
     This is only useful in an ImportPlugin, not a DatasetPlugin
     """
@@ -195,7 +253,10 @@ class Constant(object):
         self.name = name
         self.val = val
 
-class Function(object):
+    def _customs(self):
+        return [['constant', self.name, self.val]]
+
+class Function(_DatasetBase):
     """Dataset to return to set a Veusz function after import."""
     def __init__(self, name, val):
         """Map string value val to name.
@@ -204,6 +265,9 @@ class Function(object):
         """
         self.name = name
         self.val = val
+
+    def _customs(self):
+        return [['function', self.name, self.val]]
 
 # class to pass to plugin to give parameters
 class DatasetPluginHelper(object):

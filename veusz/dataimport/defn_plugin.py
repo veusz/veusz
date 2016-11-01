@@ -110,37 +110,22 @@ class OperationDataImportPlugin(base.OperationDataImportBase):
             LF = LinkedFilePlugin(p)
 
         # convert results to real datasets
-        for d in results:
-            if isinstance(d, plugins.Dataset1D):
-                ds = datasets.Dataset(data=d.data, serr=d.serr, perr=d.perr,
-                                      nerr=d.nerr)
-            elif isinstance(d, plugins.Dataset2D):
-                ds = datasets.Dataset2D(data=d.data,
-                                        xrange=d.rangex, yrange=d.rangey,
-                                        xedge=d.xedge, yedge=d.yedge,
-                                        xcent=d.xcent, ycent=d.ycent)
-            elif isinstance(d, plugins.DatasetText):
-                ds = datasets.DatasetText(data=d.data)
-            elif isinstance(d, plugins.DatasetDateTime):
-                ds = datasets.DatasetDateTime(data=d.data)
-            elif isinstance(d, plugins.Constant):
-                self.outcustoms.append( ['constant', d.name, d.val] )
-                continue
-            elif isinstance(d, plugins.Function):
-                self.outcustoms.append( ['function', d.name, d.val] )
-                continue
-            else:
-                raise RuntimeError("Invalid data set in plugin results")
+        for pluginds in results:
 
-            # set any linking
-            if p.linked:
-                ds.linked = LF
+            # get list of custom definitions to add to results
+            self.outcustoms += pluginds._customs()
 
-            # construct name
-            name = p.prefix + d.name + p.suffix
+            # convert plugin dataset to real one
+            ds = pluginds._unlinkedVeuszDataset()
+            if ds is not None:
+                if p.linked:
+                    ds.linked = LF
 
-            # actually make dataset
-            self.outdatasets[name] = ds
+                # construct name
+                name = p.prefix + pluginds.name + p.suffix
+
+                # actually make dataset
+                self.outdatasets[name] = ds
 
 def ImportFilePlugin(comm, plugin, filename, **args):
     """Import file using a plugin.
