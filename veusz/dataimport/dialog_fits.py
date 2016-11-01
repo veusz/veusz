@@ -129,10 +129,7 @@ class ImportTabFITS(importdialog.ImportTab):
             except AttributeError:
                 # this is an image
                 naxis = header['NAXIS']
-                if naxis == 1 or naxis == 2:
-                    data = ['image']
-                else:
-                    data = ['invalidimage']
+                data = ['image']
                 dims = [ str(header['NAXIS%i' % (i+1)])
                          for i in crange(naxis) ]
                 dims = '*'.join(dims)
