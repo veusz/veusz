@@ -863,6 +863,10 @@ class SimpleReadND(object):
     def _paramTranspose(self, cols):
         self.params.transpose = True
 
+    def _paramShape(self, cols):
+        sizes = [int(x) for x in cols[1:]]
+        self.params.shape = tuple(sizes)
+
     ####################################################################
 
     def readData(self, stream):
@@ -871,14 +875,17 @@ class SimpleReadND(object):
         stream consists of:
         optional:
          transpose    - swap rows and columns
+         shape size1 size2 ... - give dimensions of dataset
         then:
          Matrix of columns and rows, separated by line endings.
+         A single line is a single dimension
          Higher orders are given by using increasing numbers of
          separating newlines
         """
 
         settings = {
             'transpose': self._paramTranspose,
+            'shape': self._paramShape,
             }
 
         vals = []
@@ -948,6 +955,14 @@ class SimpleReadND(object):
         # transpose matrix if requested
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
+
+        # for 1d data, an extra dimension is sometimes added
+        if self.data.ndim == 2 and self.data.shape[0] == 1:
+            self.data = self.data.reshape(self.data.shape[-1])
+
+        # reshape if requested
+        if self.params.shape is not None:
+            self.data = self.data.reshape(self.params.shape)
 
     def setOutput(self, out, linkedfile=None):
         """Set the data in the output dict out

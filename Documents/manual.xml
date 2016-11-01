@@ -1925,8 +1925,8 @@ SetData('x', data[0]*0.1, *data[1:])
 	<anchor id="Command.ImportFile2D" />
 
 	<para><command>ImportFile2D('filename', datasets,
-xrange=(a,b), yrange=(c,d), invertrows=True/False,
-invertcols=True/False, transpose=True/False,
+xrange=None, yrange=None, invertrows=False,
+invertcols=False, transpose=False,
 prefix='', suffix='', linked=False,
 encoding='utf8', renames={})</command></para>
 
@@ -2081,6 +2081,41 @@ encoding='utf8', renames={})</command></para>
       </section>
 
       <section>
+	<title>ImportFileND</title>
+	<anchor id="Command.ImportFileND" />
+        <para><command>
+def ImportFileND(comm, filename, dataset, shape=None, transpose=False, mode='text', csvdelimiter=',', csvtextdelimiter='"', csvlocale='en_US', prefix="", suffix="", encoding='utf_8', linked=False)
+      </command></para>
+
+      <para>
+        Import an n-dimensional dataset from a file. The file should
+        either be in CSV format (mode='csv') or whitespace-separated
+        text (mode='text').  A one-dimensional dataset is given as a
+        list of numbers on a single line/row.  A two-dimensional
+        dataset is given by a set of rows.  A three-dimensional
+        dataset is given by a set of two-dimensional datasets, with
+        blank lines between them. a four-dimensional dataset is given
+        by a set of three-dimensional datasets with two blank lines
+        between each. Each additional dataset increases the separating
+        number of blank lines by one.  Alternatively, the numbers can
+        be given in most symmetric forms (rows, columns or equal
+        numbers on each columns), and "shape" is included to reshape
+        the data into the desired shape.
+      </para>
+
+      <para>
+        In the file, or included as parameters above, the command
+        "shape num1 num2..." can be included to reshape the output
+        dataset to the shape given by the numbers in the row after
+        "shape" (these should be in separate columns in CSV
+        format). If one of these numbers is -1, then this dimension is
+        inferred from the number of values and the other
+        dimensions. Also supported is the "transpose" command or
+        optional argument which reverses the order of the dimensions.
+      </para>
+      </section>
+
+      <section>
 	<title>ImportFilePlugin</title>
 	<anchor id="Command.ImportFilePlugin" />
 
@@ -2170,17 +2205,33 @@ ImportString('x y', '''
 	<title>ImportString2D</title>
 	<anchor id="Command.ImportString2D" />
 
-	<para><command>ImportString2D(datasets,	string)</command></para>
+	<para><command>ImportString2D(datasets, string, xrange=None,
+	yrange=None, invertrows=None, invertcols=None,
+	transpose=None)</command></para>
 
 	<para>Imports a two-dimensional dataset from the string
 	given. This is similar to the <link
 	linkend="Command.ImportFile2D">ImportFile2D</link> command,
-	with the same dataset format within the string. This command,
-	however, does not currently take any optional parameters. The
-	various controlling parameters can be set within the
-	string. See the <link
+	with the same dataset format within the string. The optional
+	values are also listed there. The various controlling
+	parameters can be set within the string. See the <link
 	linkend="Command.ImportFile2D">ImportFile2D</link> section for
 	details.</para>
+      </section>
+
+      <section>
+	<title>ImportStringND</title>
+	<anchor id="Command.ImportStringND" />
+
+	<para><command>ImportStringND(dataset, string, shape=None,
+	transpose=False)</command></para>
+
+	<para>Imports a n-dimensional dataset from the string
+	given. This is similar to the <link
+	linkend="Command.ImportFileND">ImportFileND</link>
+	command. Please look there for more detail and the description
+	of the optional parameters and in-stream allowed
+	parameters.</para>
       </section>
 
       <section>
@@ -2359,6 +2410,17 @@ Set('page1/graph1/x/min', -10.)
 	numitems). <command>t</command> in the expression will iterate
 	from minval to maxval in numitems values.</para>
 
+      </section>
+
+      <section>
+        <title>SetDataND</title>
+        <anchor id="Command.SetDataND" />
+
+	<para><command>SetDataRange(name, val)</command></para>
+
+        <para>Set a n-dimensional dataset to be the values given by
+        val. val should be an n-dimensional numpy array of values, or
+        a list of lists.</para>
       </section>
 
       <section>

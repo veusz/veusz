@@ -39,6 +39,7 @@ class ImportParamsND(base.ImportParamsBase):
     defaults = {
         'dataset': None,
         'datastr': None,
+        'shape': None,
         'transpose': False,
         'mode': 'text',
         'csvdelimiter': ',',
@@ -97,6 +98,7 @@ class OperationDataImportND(base.OperationDataImportBase):
 
 def ImportFileND(
         comm, filename, dataset,
+        shape=None,
         transpose=False,
         mode='text', csvdelimiter=',', csvtextdelimiter='"',
         csvlocale='en_US',
@@ -107,6 +109,7 @@ def ImportFileND(
     filename is the name of the file to read
     dataset is the dataset to read
 
+    if shape is set, the dataset is reshaped to these dimensions after loading
     if transpose=True, then rows and columns, etc, are swapped
 
     mode is either 'text' or 'csv'
@@ -143,10 +146,11 @@ def ImportFileND(
         print("Imported datasets %s" % ', '.join(op.outnames))
     return op.outnames
 
-def ImportStringND(comm, dataset, dstring, transpose=False):
+def ImportStringND(comm, dataset, dstring, shape=None, transpose=False):
     """Read n-dimensional data from the string specified.
     dataset is a dataset to read from the string
 
+    if shape is set, then the array is reshaped to these dimensions
     if transpose=True, then rows and columns, etc, are swapped
 
     Returns: list of imported datasets
@@ -155,6 +159,7 @@ def ImportStringND(comm, dataset, dstring, transpose=False):
     params = ImportParamsND(
         dataset=dataset,
         datastr=dstring,
+        shape=shape,
         transpose=transpose)
     op = OperationDataImportND(params)
     comm.document.applyOperation(op)
