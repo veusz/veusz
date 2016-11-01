@@ -27,24 +27,12 @@ from .commonfn import _
 from .commonfn import *
 from .base import DatasetConcreteBase, DatasetException
 
-class DatasetND(DatasetConcreteBase):
+class DatasetNDBase(DatasetConcreteBase):
     """N-dimensional datasets."""
 
-    dimensions = 999
+    dimensions = -1
     dstype = _('nD')
     editable = False
-
-    def __init__(self, data=None):
-        """data is a numpy array of N dimensions."""
-
-        DatasetConcreteBase.__init__(self)
-
-        if isinstance(data, N.ndarray):
-            self.data = data.astype(N.float64)
-        elif isinstance(data, list) or isinstance(data, tuple):
-            self.data = N.array(dtype=N.float64)
-        else:
-            raise ValueError("Could not convert data to nD numpy array.")
 
     def userSize(self):
         return u'×'.join(str(x) for x in self.data.shape)
@@ -88,6 +76,19 @@ class DatasetND(DatasetConcreteBase):
                 return '\n'.join(out)
 
         return fmtrecurse(self.data)
+
+class DatasetND(DatasetNDBase):
+    def __init__(self, data=None):
+        """data is a numpy array of N dimensions."""
+
+        DatasetNDBase.__init__(self)
+
+        if isinstance(data, N.ndarray):
+            self.data = data.astype(N.float64)
+        elif isinstance(data, list) or isinstance(data, tuple):
+            self.data = N.array(dtype=N.float64)
+        else:
+            raise ValueError("Could not convert data to nD numpy array.")
 
     def saveDataDumpToText(self, fileobj, name):
         """Save data to vsz in form of text."""
