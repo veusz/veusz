@@ -59,15 +59,8 @@ class DatasetNDBase(DatasetConcreteBase):
             if arr.ndim == 0:
                 return fmt % arr + '\n'
             elif arr.ndim == 1:
-                out = [fmt % v for v in arr] + ['']
-                return '\n'.join(out)
-            elif arr.ndim == 2:
-                out = []
-                for row in arr:
-                    txt = [fmt % v for v in row]
-                    out.append(join.join(txt))
-                out.append('')
-                return '\n'.join(out)
+                out = [fmt % v for v in arr]
+                return join.join(out)
             else:
                 out = []
                 for v in arr:
@@ -94,6 +87,11 @@ class DatasetND(DatasetNDBase):
         """Save data to vsz in form of text."""
 
         fileobj.write("ImportStringND(%s, '''\n" % crepr(name))
+        if self.data.shape[0] == 1:
+            # unfortunately it's hard to decode a single dimension
+            # here so we record this unambiguously
+            shape = ' '.join((str(d) for d in self.data.shape))
+            fileobj.write("shape %s\n" % shape)
         fileobj.write(self.datasetAsText(fmt='%e', join=' '))
         fileobj.write("''')\n")
 
