@@ -194,8 +194,8 @@ def convertDatasetToObject(data, slices):
 
     elif kind in ('S', 'a') or (
         kind == 'O' and h5py.check_dtype(vlen=data.dtype)):
-        if data.ndim == 1:
-            raise _ConvertError(_("HDF5 dataset has more than 1 dimension"))
+        if data.ndim != 1:
+            raise _ConvertError(_("HDF5 text datasets must have 1 dimension"))
 
         strcnv = list(data)
         return strcnv
