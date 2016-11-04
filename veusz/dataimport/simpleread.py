@@ -842,8 +842,6 @@ class SimpleRead2D(object):
         fullname = self.params.prefix + self.name + self.params.suffix
         out[fullname] = ds
 
-
-
 #####################################################################
 # n-dimensional data reading
 
@@ -943,6 +941,19 @@ class SimpleReadND(object):
                 if len(vals) > 0:
                     dimidx -= 1
 
+        if self.params.shape is not None:
+            # flatten so we can reshape properly later (this is to
+            # allow free form input with the shape option)
+            fdata = []
+            def flatten(d):
+                for x in d:
+                    if isinstance(x, list):
+                        flatten(x)
+                    else:
+                        fdata.append(x)
+            flatten(vals)
+            vals = N.hstack((fdata))
+
         try:
             self.data = N.array(vals, dtype=N.float64)
         except ValueError:
@@ -952,10 +963,6 @@ class SimpleReadND(object):
         if self.data.ndim < 1:
             raise ReadNDError("Needs at least a 1D dataset")
 
-        # transpose matrix if requested
-        if self.params.transpose:
-            self.data = N.transpose(self.data).copy()
-
         # for 1d data, an extra dimension is sometimes added
         if self.data.ndim == 2 and self.data.shape[0] == 1:
             self.data = self.data.reshape(self.data.shape[-1])
@@ -963,6 +970,10 @@ class SimpleReadND(object):
         # reshape if requested
         if self.params.shape is not None:
             self.data = self.data.reshape(self.params.shape)
+
+        # transpose matrix if requested
+        if self.params.transpose:
+            self.data = N.transpose(self.data).copy()
 
     def setOutput(self, out, linkedfile=None):
         """Set the data in the output dict out
