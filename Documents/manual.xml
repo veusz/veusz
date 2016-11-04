@@ -2098,9 +2098,9 @@ def ImportFileND(comm, filename, dataset, shape=None, transpose=False, mode='tex
         by a set of three-dimensional datasets with two blank lines
         between each. Each additional dataset increases the separating
         number of blank lines by one.  Alternatively, the numbers can
-        be given in most symmetric forms (rows, columns or equal
-        numbers on each columns), and "shape" is included to reshape
-        the data into the desired shape.
+        be given in any form (number of numbers on each row) and
+        "shape" is included to reshape the data into the desired
+        shape.
       </para>
 
       <para>
