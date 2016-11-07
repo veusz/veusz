@@ -121,6 +121,7 @@ class Document(qt4.QObject):
         self.basewidget.document = self
         self.setModified(False)
         self.filename = ""
+        self.evaluate.wipe()
         self.sigWiped.emit()
 
     def clearHistory(self):

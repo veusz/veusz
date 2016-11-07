@@ -61,6 +61,11 @@ class Evaluate:
         # directories to examine when importing
         self.importpath = []
 
+        self.wipe()
+
+    def wipe(self):
+        """Clear current customs."""
+
         # store custom functions and constants
         # consists of tuples of (name, type, value)
         # type is constant or function
