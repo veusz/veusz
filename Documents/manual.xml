@@ -394,6 +394,48 @@
       </section>
 
       <section>
+        <title>Datasets</title>
+
+        <para>
+          Data are imported into Veusz as a dataset. A dataset is
+          imported from a file, entered manually, set via the command
+          line, or linked to other datasets via an expression or
+          dataset plugin. Each dataset has a unique name in the
+          document. They can be seen in the dataset browser panel, or
+          in the Data, Edit dialog box.  To choose the data to be
+          plotted, the user usually selects the dataset in the
+          appropriate setting of a widget.
+        </para>
+
+        <para>
+          Veusz supports one-dimensional (1D) datasets, which are a
+          list of values with optional error bars. Error bars can
+          either be symmetric or asymmetric. Veusz also supports
+          two-dimensional (2D) data. A 2D dataset is a grid of values,
+          with either a fixed spacing in coordinates, or with
+          arbitrary pixel sizes. An n-dimensional (nD) dataset is an
+          arbitrary matrix of values. These cannot be plotted
+          directly, but subsets can be plotted using python slice
+          syntax to convert to 1D or 2D datasets.
+        </para>
+
+        <para>
+          In addition to simple numeric datasets, Veusz also supports
+          date-time datasets. For details see the sections on reading
+          data. Also supported are text datasets, which are lists of
+          text strings.
+        </para>
+
+        <para>
+          Datasets can either be plain lists of values which are
+          stored within the document, or they can be linked to a file,
+          so that the values update if the file is reloaded, or they
+          can be linked to other datasets via expressions or dataset
+          plugins.
+        </para>
+      </section>
+
+      <section>
 	<title><anchor id="TextFonts" />Text</title>
 
 	<para>Veusz understands a limited set of LaTeX-like formatting
@@ -1069,10 +1111,10 @@ descriptor alpha beta gamma
       <para>
 	HDF5 is a flexible data format. Datasets and tables can be
 	stored in a hierarchical arrangements of groups within a
-	file. Veusz supports reading 1D numeric, text, date-time or 2D
-	numeric data from HDF files. The <command>h5py</command>
-	Python module must be installed to use HDF5 files (included in
-	binary releases).
+	file. Veusz supports reading 1D numeric, text, date-time, 2D
+	numeric or n-dimensional numeric data from HDF files. The
+	<command>h5py</command> Python module must be installed to use
+	HDF5 files (included in binary releases).
       </para>
 
       <para>
@@ -1113,7 +1155,7 @@ descriptor alpha beta gamma
       <section>
 	<title>Slices</title>
 	<para>
-	  As Veusz only supports 1D and 2D datasets, you may wish to
+	  You may wish to
 	  reduce the dimensions of a dataset before importing by
 	  slicing. You can also give a slice to import a subset of a
 	  dataset. When importing, in the slice column you can give a
@@ -1277,10 +1319,11 @@ descriptor alpha beta gamma
     <section>
       <title>FITS files</title>
       <para>
-	1D or 2D data can be read from FITS files. 1D data, with
-	optional errors bars, can be read from table extensions, and
-	2D data from image or primary extensions.  Note that pyfits or
-	astropy must be installed to get FITS support.
+	1D, 2D or n-dimensional data can be read from FITS files. 1D
+	data, with optional errors bars, can be read from table
+	extensions, and 2D data from image or primary extensions.
+	Note that pyfits or astropy must be installed to get FITS
+	support.
       </para>
 
       <para>
@@ -1291,18 +1334,18 @@ descriptor alpha beta gamma
       </para>
 
       <para>
-	For 2D data, choose an image HDU. Enter the name of the
-	dataset. The data are imported with pixel coordinates by
-	default (i.e. the pixels are numbered with integers). Other
-	modes can be selected under <guilabel>Image WCS
-	mode</guilabel>. These include fractional, where the pixels
-	are numbered between 0 and 1. <guilabel>Pixel (WCS)</guilabel>
-	assigns the pixel coordinate calculated relative to the
-	<varname>CRPIX1/2</varname> header keywords. <guilabel>Linear
-	(WCS)</guilabel> uses linear coordinates where the Pixel (WCS)
-	coordinates are multiplied by the respective
-	<varname>CDELT1/2</varname> values and added to the
-	<varname>CRVAL1/2</varname> values.
+	For 2D or n-dimensioanl data, choose an image HDU. Enter the
+	name of the dataset. For 2D data, the data are imported with
+	pixel coordinates by default (i.e. the pixels are numbered
+	with integers). Other modes can be selected under
+	<guilabel>Image WCS mode</guilabel>. These include fractional,
+	where the pixels are numbered between 0 and 1. <guilabel>Pixel
+	(WCS)</guilabel> assigns the pixel coordinate calculated
+	relative to the <varname>CRPIX1/2</varname> header
+	keywords. <guilabel>Linear (WCS)</guilabel> uses linear
+	coordinates where the Pixel (WCS) coordinates are multiplied
+	by the respective <varname>CDELT1/2</varname> values and added
+	to the <varname>CRVAL1/2</varname> values.
       </para>
     </section>
 
