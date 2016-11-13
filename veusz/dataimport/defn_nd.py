@@ -90,7 +90,7 @@ class OperationDataImportND(base.OperationDataImportBase):
         LF = None
         if p.linked:
             assert p.filename
-            LF = LinkedFile2D(p)
+            LF = LinkedFileND(p)
 
         sr = simpleread.SimpleReadND(p.dataset, p)
         sr.readData(stream)
