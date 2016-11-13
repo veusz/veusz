@@ -51,6 +51,8 @@ for kls, fn in (
         (datasets.DatasetFiltered, _lazy_recreate_filtered),
         (datasets.Dataset1DPlugin, _lazy_recreate_plugin),
         (datasets.Dataset2DPlugin, _lazy_recreate_plugin),
+        (datasets.DatasetNDPlugin, _lazy_recreate_plugin),
         (datasets.DatasetTextPlugin, _lazy_recreate_plugin),
+        (datasets.DatasetDateTimePlugin, _lazy_recreate_plugin),
         ):
     recreate_register[kls] = fn

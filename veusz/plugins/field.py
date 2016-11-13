@@ -340,8 +340,8 @@ class FieldDataset(_FieldSetting):
         """name: name of field
         descr: description to show to user
         default: default value (ignored currently)
-        dims: dimensions of dataset to show
-        datatype: type of data: numeric or text
+        dims: dimensions of dataset to show (or 'all')
+        datatype: type of data: numeric, text or all
         """
         _FieldSetting.__init__(self, setting.Dataset,
                                name, descr=descr, default=default,
