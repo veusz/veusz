@@ -21,6 +21,7 @@
 """Plugins for creating datasets."""
 
 from __future__ import division, print_function
+import re
 import numpy as N
 from . import field
 
@@ -331,9 +332,9 @@ class DatasetPluginHelper(object):
         except KeyError:
             raise DatasetPluginException(_("Unknown dataset '%s'") % name)
 
-        if ds.dimensions != dimensions:
+        if ds.dimensions != dimensions and dimensions != 'all':
             raise DatasetPluginException(
-                _("Dataset '%s' does not have %i dimensions") % (
+                _("Dataset '%s' does not have %s dimensions") % (
                     name, dimensions))
         if ds.datatype != 'numeric':
             raise DatasetPluginException(
@@ -482,8 +483,8 @@ class DatasetPlugin(object):
 
     def getDatasets(self, fields):
         """Override this to return a list of (empty) Dataset1D,
-        Dataset2D and DatasetText objects to provide the initial names
-        and type of datasets.
+        Dataset2D, DatasetText, DatasetDateTime and DatasetND
+        objects to provide the initial names and type of datasets.
 
         These should be saved for updating in updateDatasets.
 
@@ -2074,6 +2075,54 @@ class ExpPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=expdata, perr=expperr, nerr=expnerr)
 
+class ReshapeDatasetPlugin(DatasetPlugin):
+    """Reshape a dataset to an n-dimensional dataset."""
+
+    menu = (_('Convert'), _('Reshape'))
+    name = 'Reshape'
+    description_short = _('Reshape to an aribtrary n-dimensional dataset')
+    description_full = _(
+        'Take a dataset with aribtrary shape and reshape into an '
+        'n-dimensional dataset with a shape given. '
+        'shape should be a space or comma-separated list of dimensions, '
+        'where -1 automatically calculates the length.')
+
+    def __init__(self):
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset'), dims='all'),
+            field.FieldText('shape', _('Shape')),
+            field.FieldBool('transpose', _('Transpose')),
+            field.FieldDataset('ds_out', _('Output dataset'), dims='all'),
+            ]
+
+    def getDatasets(self, fields):
+        if fields['ds_out'] == '':
+            raise DatasetPluginException(_('Invalid output dataset name'))
+        self.dsout = DatasetND(fields['ds_out'])
+        return [self.dsout]
+
+    def updateDatasets(self, fields, helper):
+        ds_in = helper.getDataset(fields['ds_in'], dimensions='all')
+
+        shapetxt = fields['shape']
+        shapesplit = re.split("[,;x* ]+", shapetxt)
+
+        try:
+            shape = tuple([int(x) for x in shapesplit])
+        except ValueError:
+            raise DatasetPluginException(
+                'Could not interpret shape text')
+        try:
+            data = ds_in.data.reshape(shape)
+        except ValueError:
+            raise DatasetPluginException(
+                'Cannot reshape: wrong number of dimensions')
+
+        if fields['transpose']:
+            data = N.transpose(data)
+
+        self.dsout.update(data)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -2102,6 +2151,7 @@ datasetpluginregistry += [
 
     PolarToCartesianPlugin,
     ConvertNumbersToText,
+    ReshapeDatasetPlugin,
 
     FilterDatasetPlugin,
 
