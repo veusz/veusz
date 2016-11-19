@@ -144,6 +144,17 @@ class OperationDataImportFITS(base.OperationDataImportBase):
 
         return datasets.Dataset2D(data, xrange=rangex, yrange=rangey)
 
+    def _importnd(self, hdu):
+        """Import 2d image data from hdu."""
+
+        p = self.params
+        if ( p.datacol is not None or p.symerrcol is not None
+             or p.poserrcol is not None
+             or p.negerrcol is not None ):
+            print("Warning: ignoring columns as import nD dataset")
+
+        return datasets.DatasetND(hdu.data)
+
     def doImport(self):
         """Do the import."""
 
@@ -175,8 +186,7 @@ class OperationDataImportFITS(base.OperationDataImportBase):
                 elif naxis == 2:
                     ds = self._import2dimage(hdu)
                 else:
-                    raise base.ImportingError(
-                        "Cannot import images with %i dimensions" % naxis)
+                    ds = self._importnd(hdu)
 
         if p.linked:
             ds.linked = LinkedFileFITS(p)

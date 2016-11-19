@@ -649,10 +649,12 @@ class Dataset(qt4.QWidget):
         # get datasets of the correct dimension
         datasets = []
         for name, ds in citems(self.document.data):
-            if ds.dimensions == self.dimensions and (
-                ds.datatype == self.datatype or
-                self.datatype == 'all' or
-                ds.datatype in self.datatype ):
+            if ( (ds.dimensions == self.dimensions or
+                  self.dimensions == 'all') and (
+                      ds.datatype == self.datatype or
+                      self.datatype == 'all' or
+                      ds.datatype in self.datatype)
+            ):
                 datasets.append(name)
         datasets.sort()
 

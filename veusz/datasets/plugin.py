@@ -20,6 +20,7 @@ from ..compat import cstr, citems
 
 from .oned import Dataset1DBase, Dataset
 from .twod import Dataset2DBase, Dataset2D
+from .nd import DatasetNDBase, DatasetND
 from .text import DatasetText
 from .date import DatasetDateTimeBase, DatasetDateTime
 
@@ -142,6 +143,19 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2DBase):
                        lambda self, val: None )
     ycent  = property( lambda self: self.getPluginData('ycent'),
                        lambda self, val: None )
+
+class DatasetNDPlugin(_DatasetPlugin, DatasetNDBase):
+    """Return N-dimensional dataset from plugin."""
+
+    def __init__(self, manager, ds):
+        _DatasetPlugin.__init__(self, manager, ds)
+        DatasetNDBase.__init__(self)
+
+    def __getitem__(self, key):
+        return DatasetND(self.data[key])
+
+    data = property( lambda self: self.getPluginData('data'),
+                     lambda self, val: None )
 
 class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     """Return text dataset from a plugin."""

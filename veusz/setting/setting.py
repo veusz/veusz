@@ -1159,7 +1159,7 @@ class Dataset(Str):
         d = doc.data.get(self.val)
         if ( d is not None and
              d.datatype == self.datatype and
-             d.dimensions == self.dimensions ):
+             (d.dimensions == self.dimensions or self.dimensions == 'all') ):
                  return d
 
 class Strings(Setting):

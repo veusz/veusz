@@ -172,20 +172,28 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
     Returns None if error
     """
 
+    if not origexpr:
+        # ignore blank names
+        return None
+
     d = doc.data.get(origexpr)
+
     if ( d is not None and
          d.datatype == datatype and
          d.dimensions == dimensions ):
         return d
 
+    # support nD datasets by converting to requested shape
+    if d is not None and d.dimensions == -1 and d.data.ndim == dimensions:
+        if dimensions == 1:
+            return Dataset(d.data)
+        elif dimensions == 2:
+            return Dataset2D(d.data)
+
     if utils.id_re.match(origexpr):
         # if name is a python identifier, then it has to be a dataset
         # name. As it wasn't there, just return with nothing rather
-        # than print error message
-        return None
-
-    if not origexpr:
-        # ignore blank names
+        # than print error message.
         return None
 
     # replace dataset names by calls to _DS_(name,part)

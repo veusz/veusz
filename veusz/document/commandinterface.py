@@ -86,6 +86,7 @@ class CommandInterface(qt4.QObject):
         'SetData2DXYFunc',
         'SetDataDateTime',
         'SetDataExpression',
+        'SetDataND',
         'SetDataRange',
         'SetDataText',
         'SettingType',
@@ -403,7 +404,7 @@ class CommandInterface(qt4.QObject):
             print( _( "Set setting '%s' to %s") % (var, repr(pref.get())) )
 
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
-        """Set dataset with name with values (and optionally errors)."""
+        """Create/set dataset name with values (and optionally errors)."""
 
         data = datasets.Dataset(val, symerr, negerr, poserr)
         op = operations.OperationDatasetSet(name, data)
@@ -473,6 +474,20 @@ class CommandInterface(qt4.QObject):
             if parametric:
                 print(_(" Where t goes form %g:%g in %i steps") % parametric)
             print(_(" linked to expression = %s") % repr(linked))
+
+    def SetDataND(self, name, val):
+        """Set n-dimensional dataset name with values."""
+
+        data = datasets.DatasetND(val)
+        op = operations.OperationDatasetSet(name, data)
+        self.document.applyOperation(op)
+
+        if self.verbose:
+            print(
+                _("Set dataset (nD) '%s':\n"
+                  " Values = %s\n") % (
+                      name, str(data.data))
+            )
 
     def SetDataRange(self, name, numsteps, val, symerr=None, negerr=None,
                      poserr=None, linked=False):
@@ -636,6 +651,7 @@ class CommandInterface(qt4.QObject):
             (data, serr, nerr, perr)
         For a 2D dataset, returns
             (data, xrange, yrange)
+        For an nD dataset returns data array
         For a text dataset, return a list of text
         For a date dataset, return a list of python datetime objects
 
@@ -649,6 +665,8 @@ class CommandInterface(qt4.QObject):
             return [utils.floatToDateTime(x) for x in d.data]
         elif d.dimensions == 2:
             return (d.data.copy(), d.xrange, d.yrange)
+        elif d.dimensions == -1:
+            return d.data.copy()
         else:
             data = serr = nerr = perr = None
             if d.data is not None:

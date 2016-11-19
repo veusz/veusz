@@ -266,7 +266,7 @@ class HDFDataNode(HDFNode):
         """Are dimensions ok to import?
         Need to count dimensions where slice is not fixed
         """
-        return self.getDims() in (1, 2)
+        return self.getDims() >= 1
 
     def data(self, column, role):
         """Return data for column"""

@@ -77,7 +77,7 @@ class LinkedFile2D(base.LinkedFileBase):
 class OperationDataImport2D(base.OperationDataImportBase):
     """Import a 2D matrix from a file."""
     
-    descr = _('import 2d data')
+    descr = _('import 2D data')
 
     def doImport(self):
         """Import data."""
@@ -95,7 +95,7 @@ class OperationDataImport2D(base.OperationDataImportBase):
         elif p.datastr is not None:
             stream = simpleread.StringStream(p.datastr)
         else:
-            raise RuntimeError("Invalid combination of paramters")
+            raise RuntimeError("Invalid combination of parameters")
 
         # linked file
         LF = None
