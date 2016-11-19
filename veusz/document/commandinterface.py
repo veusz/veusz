@@ -651,6 +651,7 @@ class CommandInterface(qt4.QObject):
             (data, serr, nerr, perr)
         For a 2D dataset, returns
             (data, xrange, yrange)
+        For an nD dataset returns data array
         For a text dataset, return a list of text
         For a date dataset, return a list of python datetime objects
 
@@ -664,6 +665,8 @@ class CommandInterface(qt4.QObject):
             return [utils.floatToDateTime(x) for x in d.data]
         elif d.dimensions == 2:
             return (d.data.copy(), d.xrange, d.yrange)
+        elif d.dimensions == -1:
+            return d.data.copy()
         else:
             data = serr = nerr = perr = None
             if d.data is not None:
