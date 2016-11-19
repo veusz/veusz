@@ -1,4 +1,5 @@
 Changes in <next version>:
+ * Add n-dimensional dataset support
  * Add GetColormap command to return RGBA values
  * Add Colormap sequence plugin for choosing colors of widgets
  * Add Covariance widget for plotting covariance ellipses
