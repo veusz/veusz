@@ -1,5 +1,5 @@
 # Veusz saved document (version 1.24)
-# Saved at 2016-11-19T13:44:33.655963
+# Saved at 2016-11-20T10:15:49.326108
 
 ImportFileND(u'nd-1.csv', u'ndim', csvlocale=u'en_GB', linked=True, mode='csv')
 Set('StyleSheet/Font/font', u'DejaVu Sans')
@@ -53,13 +53,11 @@ Set('Background/color', u'#ffe9ff')
 Add('axis', name='x', autoadd=False)
 To('x')
 Set('autoRange', u'+5%')
-Set('TickLabels/underline', True)
 To('..')
 Add('axis', name='y', autoadd=False)
 To('y')
 Set('autoRange', u'+5%')
 Set('direction', 'vertical')
-Set('TickLabels/underline', True)
 To('..')
 Add('xy', name='xy1', autoadd=False)
 To('xy1')
