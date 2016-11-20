@@ -1,5 +1,5 @@
 # Veusz saved document (version 1.24)
-# Saved at 2016-11-06T17:36:48.494127
+# Saved at 2016-11-20T10:17:54.552211
 
 ImportFileHDF5(u'hdftest.hdf5', [u'/nd'], linked=True)
 Add('page', name='page1', autoadd=False)
@@ -41,6 +41,8 @@ To('..')
 Add('image', name='image1', autoadd=False)
 To('image1')
 Set('data', u'nd[:,:,0]')
+Set('min', 0.0)
+Set('max', 70.0)
 To('..')
 To('..')
 To('..')
