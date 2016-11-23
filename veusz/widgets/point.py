@@ -706,6 +706,18 @@ class PointPlotter(GenericPlotter):
         # size of error bars in key
         errorsize = height*0.4
 
+        # draw fill setting
+        if not s.FillBelow.hide:
+            path = qt4.QPainterPath()
+            path.addRect(qt4.QRectF(
+                    qt4.QPointF(x, yp), qt4.QPointF(x+width, yp+height*0.45)))
+            utils.brushExtFillPath(painter, s.FillBelow, path)
+        if not s.FillAbove.hide:
+            path = qt4.QPainterPath()
+            path.addRect(qt4.QRectF(
+                    qt4.QPointF(x, yp), qt4.QPointF(x+width, yp-height*0.45)))
+            utils.brushExtFillPath(painter, s.FillAbove, path)
+
         # make points for error bars (if any)
         if xv and xv.hasErrors():
             xneg = N.array([x-width, x+width/2-errorsize, x+2*width])

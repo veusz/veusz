@@ -16,6 +16,7 @@ Changes in 1.25:
  * Add n-dimensional dataset support
  * Add GetColormap command to return RGBA values
  * Add Colormap sequence plugin for choosing colors of widgets
+ * Fill above/below setting shown in key for xy widget
  * Add Covariance widget for plotting covariance ellipses
  * Add lineup, linedown, lineleft and lineright markers
  * Add lineup, linedown and lineextend arrows
