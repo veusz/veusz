@@ -48,7 +48,7 @@ import numpy as N
 
 from ..compat import crange, cnext, CStringIO
 from .. import utils
-from .. import document
+from .. import datasets
 from .. import qtall as qt4
 from .import base
 
@@ -330,14 +330,14 @@ class DescriptorPart(object):
 
                 # create the dataset
                 if self.datatype == 'float':
-                    ds = document.Dataset( data = vals, serr = sym,
+                    ds = datasets.Dataset( data = vals, serr = sym,
                                            nerr = neg, perr = pos,
                                            linked = linkedfile )
                 elif self.datatype == 'date':
-                    ds = document.DatasetDateTime( data=vals,
+                    ds = datasets.DatasetDateTime( data=vals,
                                                    linked=linkedfile )
                 elif self.datatype == 'string':
-                    ds = document.DatasetText( data=vals,
+                    ds = datasets.DatasetText( data=vals,
                                                linked = linkedfile )
                 else:
                     raise RuntimeError("Invalid data type")
@@ -831,7 +831,7 @@ class SimpleRead2D(object):
         """Set the data in the output dict out
         """
 
-        ds = document.Dataset2D(self.data,
+        ds = datasets.Dataset2D(self.data,
                                 xrange=self.params.xrange,
                                 yrange=self.params.yrange,
                                 xedge=self.xedge, yedge=self.yedge,
@@ -839,5 +839,147 @@ class SimpleRead2D(object):
 
         ds.linked = linkedfile
 
+        fullname = self.params.prefix + self.name + self.params.suffix
+        out[fullname] = ds
+
+#####################################################################
+# n-dimensional data reading
+
+class ReadNDError(base.ImportingError):
+    pass
+
+class SimpleReadND(object):
+    def __init__(self, name, params):
+        """Read dataset with name given.
+        params is a ImportParamsND object
+        """
+        self.name = name
+        self.params = params.copy()
+
+    ####################################################################
+
+    def _paramTranspose(self, cols):
+        self.params.transpose = True
+
+    def _paramShape(self, cols):
+        sizes = [int(x) for x in cols[1:]]
+        self.params.shape = tuple(sizes)
+
+    ####################################################################
+
+    def readData(self, stream):
+        """Read data from stream given
+
+        stream consists of:
+        optional:
+         transpose    - swap rows and columns
+         shape size1 size2 ... - give dimensions of dataset
+        then:
+         Matrix of columns and rows, separated by line endings.
+         A single line is a single dimension
+         Higher orders are given by using increasing numbers of
+         separating newlines
+        """
+
+        settings = {
+            'transpose': self._paramTranspose,
+            'shape': self._paramShape,
+            }
+
+        vals = []
+
+        # keep track of where we are in terms of index
+        dimstack = []
+        dimidx = 0
+
+        # loop over lines
+        while stream.newLine():
+            cols = stream.allColumns()
+
+            # check to see whether parameter is set
+            if len(cols) > 0:
+                c = cols[0].lower()
+                if c in settings:
+                    settings[c](cols)
+                    stream.flushLine()
+                    continue
+
+            # read columns
+            line = []
+            while True:
+                v = stream.nextColumn()
+                if v is None:
+                    break
+                try:
+                    line.append(float(v))
+                except ValueError:
+                    raise ReadNDError("Could not interpret number '%s'" % v)
+
+            if len(line) > 0:
+                # previous blank lines
+                if dimidx != len(dimstack):
+                    # insert new dimensions, if required
+                    while dimidx < 0:
+                        dimstack.insert(0, 0)
+                        dimidx += 1
+                        vals = [vals]
+
+                    # move to next value at current level
+                    dimstack[dimidx] += 1
+                    for i in crange(dimidx+1, len(dimstack)):
+                        dimstack[i] = 0
+                    dimidx = len(dimstack)
+
+                # lookup correct place in hierarchy and append
+                v = vals
+                for s in dimstack:
+                    while s >= len(v):
+                        v.append([])
+                    v = v[s]
+                v.append(N.array(line, dtype=N.float64))
+            else:
+                if len(vals) > 0:
+                    dimidx -= 1
+
+        if self.params.shape is not None:
+            # flatten so we can reshape properly later (this is to
+            # allow free form input with the shape option)
+            fdata = []
+            def flatten(d):
+                for x in d:
+                    if isinstance(x, list):
+                        flatten(x)
+                    else:
+                        fdata.append(x)
+            flatten(vals)
+            vals = N.hstack((fdata))
+
+        try:
+            self.data = N.array(vals, dtype=N.float64)
+        except ValueError:
+            raise ReadNDError("Could not convert data to n-D matrix")
+
+        # obvious check
+        if self.data.ndim < 1:
+            raise ReadNDError("Needs at least a 1D dataset")
+
+        # for 1d data, an extra dimension is sometimes added
+        if self.data.ndim == 2 and self.data.shape[0] == 1:
+            self.data = self.data.reshape(self.data.shape[-1])
+
+        # reshape if requested
+        if self.params.shape is not None:
+            self.data = self.data.reshape(self.params.shape)
+
+        # transpose matrix if requested
+        if self.params.transpose:
+            self.data = N.transpose(self.data).copy()
+
+    def setOutput(self, out, linkedfile=None):
+        """Set the data in the output dict out
+        """
+
+        ds = datasets.DatasetND(self.data)
+        ds.linked = linkedfile
         fullname = self.params.prefix + self.name + self.params.suffix
         out[fullname] = ds

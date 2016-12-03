@@ -24,6 +24,7 @@ import numpy as N
 from ..compat import czip
 from .. import qtall as qt4
 from .. import document
+from .. import datasets
 from .. import setting
 from .. import utils
 
@@ -213,7 +214,7 @@ class NonOrthPoint(Widget):
             self.parent.setClip(painter, posn)
 
             # split parts separated by NaNs
-            for v1, v2, scalings, cvals, textitems in document.generateValidDatasetParts(
+            for v1, v2, scalings, cvals, textitems in datasets.generateValidDatasetParts(
                 [d1, d2, dscale, colorpoints, text]):
                 # convert data (chopping down length)
                 v1d, v2d = v1.data, v2.data
@@ -249,7 +250,7 @@ class NonOrthPoint(Widget):
                         colorvals = utils.applyScaling(
                             cvals.data, s.Color.scaling,
                             s.Color.min, s.Color.max)
-                        cmap = self.document.getColormap(
+                        cmap = self.document.evaluate.getColormap(
                             s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
                     painter.setBrush(s.MarkerFill.makeQBrushWHide())

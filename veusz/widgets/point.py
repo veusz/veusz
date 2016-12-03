@@ -23,6 +23,7 @@ import numpy as N
 
 from ..compat import czip
 from .. import qtall as qt4
+from .. import datasets
 from .. import document
 from .. import setting
 from .. import utils
@@ -705,6 +706,18 @@ class PointPlotter(GenericPlotter):
         # size of error bars in key
         errorsize = height*0.4
 
+        # draw fill setting
+        if not s.FillBelow.hide:
+            path = qt4.QPainterPath()
+            path.addRect(qt4.QRectF(
+                    qt4.QPointF(x, yp), qt4.QPointF(x+width, yp+height*0.45)))
+            utils.brushExtFillPath(painter, s.FillBelow, path)
+        if not s.FillAbove.hide:
+            path = qt4.QPainterPath()
+            path.addRect(qt4.QRectF(
+                    qt4.QPointF(x, yp), qt4.QPointF(x+width, yp-height*0.45)))
+            utils.brushExtFillPath(painter, s.FillAbove, path)
+
         # make points for error bars (if any)
         if xv and xv.hasErrors():
             xneg = N.array([x-width, x+width/2-errorsize, x+2*width])
@@ -781,10 +794,10 @@ class PointPlotter(GenericPlotter):
         # handle missing dataset
         if yv and not xv and s.get('xData').isEmpty():
             length = yv.data.shape[0]
-            xv = document.DatasetRange(length, (1,length))
+            xv = datasets.DatasetRange(length, (1,length))
         elif xv and not yv and s.get('yData').isEmpty():
             length = xv.data.shape[0]
-            yv = document.DatasetRange(length, (1,length))
+            yv = datasets.DatasetRange(length, (1,length))
 
         if text is None or xv is None or yv is None:
             return (None, None)
@@ -835,11 +848,11 @@ class PointPlotter(GenericPlotter):
         if xv and not yv and s.get('yData').isEmpty():
             # use index for y data
             length = xv.data.shape[0]
-            yv = document.DatasetRange(length, (1,length))
+            yv = datasets.DatasetRange(length, (1,length))
         elif yv and not xv and s.get('xData').isEmpty():
             # use index for x data
             length = yv.data.shape[0]
-            xv = document.DatasetRange(length, (1,length))
+            xv = datasets.DatasetRange(length, (1,length))
         if not xv or not yv:
             # no valid dataset, so exit
             return
@@ -852,7 +865,7 @@ class PointPlotter(GenericPlotter):
 
         # loop over chopped up values
         for xvals, yvals, tvals, ptvals, cvals in (
-            document.generateValidDatasetParts(
+            datasets.generateValidDatasetParts(
                 [xv, yv, text, scalepoints, colorpoints])):
 
             #print "Calculating coordinates"
@@ -939,7 +952,7 @@ class PointPlotter(GenericPlotter):
                         s.Color.min, s.Color.max)
                     if s.thinfactor > 1:
                         colorvals = colorvals[::s.thinfactor]
-                    cmap = self.document.getColormap(
+                    cmap = self.document.evaluate.getColormap(
                         s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
                 # actually plot datapoints

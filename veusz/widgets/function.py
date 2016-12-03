@@ -132,7 +132,7 @@ class FunctionPlotter(GenericPlotter):
             return
 
         # ignore if function isn't sensible
-        compiled = self.document.compileCheckedExpression(s.function)
+        compiled = self.document.evaluate.compileCheckedExpression(s.function)
         if compiled is None:
             return
 
@@ -279,7 +279,7 @@ class FunctionPlotter(GenericPlotter):
 
     def initEnviron(self):
         """Set up function environment."""
-        return self.document.eval_context.copy()
+        return self.document.evaluate.context.copy()
 
     def getIndependentPoints(self, axes, posn):
         """Calculate the real and screen points to plot for the independent axis"""
@@ -328,7 +328,7 @@ class FunctionPlotter(GenericPlotter):
         if axispts is None:
             return None, None
 
-        compiled = self.document.compileCheckedExpression(s.function)
+        compiled = self.document.evaluate.compileCheckedExpression(s.function)
         if not compiled:
             return None, None
 

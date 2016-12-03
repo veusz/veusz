@@ -537,7 +537,7 @@ class PlotWindow( qt4.QGraphicsView ):
         # convert points on plotter to points on axis for each axis
         # we also add a neighbouring pixel for the rounding calculation
         xpts = N.array( [pt1.x(), pt2.x(), pt1.x()+1, pt2.x()-1] )
-        ypts = N.array( [pt1.y(), pt2.y(), pt2.y()+1, pt2.y()-1] )
+        ypts = N.array( [pt1.y(), pt2.y(), pt1.y()+1, pt2.y()-1] )
 
         # build up operation list to do zoom
         operations = []
@@ -634,18 +634,20 @@ class PlotWindow( qt4.QGraphicsView ):
 
         for w, bounds in self.painthelper.widgetBoundsIterator():
             try:
-                # ask the widget for its (visually) closest point to the cursor
-                info = w.pickPoint(pos.x(), pos.y(), bounds)
-
-                # this is a pickable widget, so remember it for future key navigation
-                self.pickerwidgets.append(w)
-
-                if info.distance < pickinfo.distance:
-                    # and remember the overall closest
-                    pickinfo = info
+                pick = w.pickPoint
             except AttributeError:
-                # ignore widgets that don't support axes or picking
+                # widget isn't pickable
                 continue
+
+            # ask the widget for its (visually) closest point to the cursor
+            info = pick(pos.x(), pos.y(), bounds)
+
+            # this is a pickable widget, so remember it for future key navigation
+            self.pickerwidgets.append(w)
+
+            if info.distance < pickinfo.distance:
+                # and remember the overall closest
+                pickinfo = info
 
         if not pickinfo:
             self.pickeritem.hide()

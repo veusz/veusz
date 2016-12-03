@@ -394,6 +394,48 @@
       </section>
 
       <section>
+        <title>Datasets</title>
+
+        <para>
+          Data are imported into Veusz as a dataset. A dataset is
+          imported from a file, entered manually, set via the command
+          line, or linked to other datasets via an expression or
+          dataset plugin. Each dataset has a unique name in the
+          document. They can be seen in the dataset browser panel, or
+          in the Data, Edit dialog box.  To choose the data to be
+          plotted, the user usually selects the dataset in the
+          appropriate setting of a widget.
+        </para>
+
+        <para>
+          Veusz supports one-dimensional (1D) datasets, which are a
+          list of values with optional error bars. Error bars can
+          either be symmetric or asymmetric. Veusz also supports
+          two-dimensional (2D) data. A 2D dataset is a grid of values,
+          with either a fixed spacing in coordinates, or with
+          arbitrary pixel sizes. An n-dimensional (nD) dataset is an
+          arbitrary matrix of values. These cannot be plotted
+          directly, but subsets can be plotted using python slice
+          syntax to convert to 1D or 2D datasets.
+        </para>
+
+        <para>
+          In addition to simple numeric datasets, Veusz also supports
+          date-time datasets. For details see the sections on reading
+          data. Also supported are text datasets, which are lists of
+          text strings.
+        </para>
+
+        <para>
+          Datasets can either be plain lists of values which are
+          stored within the document, or they can be linked to a file,
+          so that the values update if the file is reloaded, or they
+          can be linked to other datasets via expressions or dataset
+          plugins.
+        </para>
+      </section>
+
+      <section>
 	<title><anchor id="TextFonts" />Text</title>
 
 	<para>Veusz understands a limited set of LaTeX-like formatting
@@ -1069,10 +1111,10 @@ descriptor alpha beta gamma
       <para>
 	HDF5 is a flexible data format. Datasets and tables can be
 	stored in a hierarchical arrangements of groups within a
-	file. Veusz supports reading 1D numeric, text, date-time or 2D
-	numeric data from HDF files. The <command>h5py</command>
-	Python module must be installed to use HDF5 files (included in
-	binary releases).
+	file. Veusz supports reading 1D numeric, text, date-time, 2D
+	numeric or n-dimensional numeric data from HDF files. The
+	<command>h5py</command> Python module must be installed to use
+	HDF5 files (included in binary releases).
       </para>
 
       <para>
@@ -1113,7 +1155,7 @@ descriptor alpha beta gamma
       <section>
 	<title>Slices</title>
 	<para>
-	  As Veusz only supports 1D and 2D datasets, you may wish to
+	  You may wish to
 	  reduce the dimensions of a dataset before importing by
 	  slicing. You can also give a slice to import a subset of a
 	  dataset. When importing, in the slice column you can give a
@@ -1277,10 +1319,11 @@ descriptor alpha beta gamma
     <section>
       <title>FITS files</title>
       <para>
-	1D or 2D data can be read from FITS files. 1D data, with
-	optional errors bars, can be read from table extensions, and
-	2D data from image or primary extensions.  Note that pyfits or
-	astropy must be installed to get FITS support.
+	1D, 2D or n-dimensional data can be read from FITS files. 1D
+	data, with optional errors bars, can be read from table
+	extensions, and 2D data from image or primary extensions.
+	Note that pyfits or astropy must be installed to get FITS
+	support.
       </para>
 
       <para>
@@ -1291,18 +1334,18 @@ descriptor alpha beta gamma
       </para>
 
       <para>
-	For 2D data, choose an image HDU. Enter the name of the
-	dataset. The data are imported with pixel coordinates by
-	default (i.e. the pixels are numbered with integers). Other
-	modes can be selected under <guilabel>Image WCS
-	mode</guilabel>. These include fractional, where the pixels
-	are numbered between 0 and 1. <guilabel>Pixel (WCS)</guilabel>
-	assigns the pixel coordinate calculated relative to the
-	<varname>CRPIX1/2</varname> header keywords. <guilabel>Linear
-	(WCS)</guilabel> uses linear coordinates where the Pixel (WCS)
-	coordinates are multiplied by the respective
-	<varname>CDELT1/2</varname> values and added to the
-	<varname>CRVAL1/2</varname> values.
+	For 2D or n-dimensioanl data, choose an image HDU. Enter the
+	name of the dataset. For 2D data, the data are imported with
+	pixel coordinates by default (i.e. the pixels are numbered
+	with integers). Other modes can be selected under
+	<guilabel>Image WCS mode</guilabel>. These include fractional,
+	where the pixels are numbered between 0 and 1. <guilabel>Pixel
+	(WCS)</guilabel> assigns the pixel coordinate calculated
+	relative to the <varname>CRPIX1/2</varname> header
+	keywords. <guilabel>Linear (WCS)</guilabel> uses linear
+	coordinates where the Pixel (WCS) coordinates are multiplied
+	by the respective <varname>CDELT1/2</varname> values and added
+	to the <varname>CRVAL1/2</varname> values.
       </para>
     </section>
 
@@ -1844,7 +1887,8 @@ SetData('y', y)
 	dataset is a 2D dataset return the tuple (data, rangex,
 	rangey), where data is a 2D numpy array and rangex/y are
 	tuples giving the range of the x and y coordinates of the
-	data.</para>
+	data. If it is an ND dataset, return an n-dimensional
+	array.</para>
 
 	<informalexample>
 	  <programlisting>
@@ -1925,8 +1969,8 @@ SetData('x', data[0]*0.1, *data[1:])
 	<anchor id="Command.ImportFile2D" />
 
 	<para><command>ImportFile2D('filename', datasets,
-xrange=(a,b), yrange=(c,d), invertrows=True/False,
-invertcols=True/False, transpose=True/False,
+xrange=None, yrange=None, invertrows=False,
+invertcols=False, transpose=False,
 prefix='', suffix='', linked=False,
 encoding='utf8', renames={})</command></para>
 
@@ -2081,6 +2125,41 @@ encoding='utf8', renames={})</command></para>
       </section>
 
       <section>
+	<title>ImportFileND</title>
+	<anchor id="Command.ImportFileND" />
+        <para><command>
+def ImportFileND(comm, filename, dataset, shape=None, transpose=False, mode='text', csvdelimiter=',', csvtextdelimiter='"', csvlocale='en_US', prefix="", suffix="", encoding='utf_8', linked=False)
+      </command></para>
+
+      <para>
+        Import an n-dimensional dataset from a file. The file should
+        either be in CSV format (mode='csv') or whitespace-separated
+        text (mode='text').  A one-dimensional dataset is given as a
+        list of numbers on a single line/row.  A two-dimensional
+        dataset is given by a set of rows.  A three-dimensional
+        dataset is given by a set of two-dimensional datasets, with
+        blank lines between them. a four-dimensional dataset is given
+        by a set of three-dimensional datasets with two blank lines
+        between each. Each additional dataset increases the separating
+        number of blank lines by one.  Alternatively, the numbers can
+        be given in any form (number of numbers on each row) and
+        "shape" is included to reshape the data into the desired
+        shape.
+      </para>
+
+      <para>
+        In the file, or included as parameters above, the command
+        "shape num1 num2..." can be included to reshape the output
+        dataset to the shape given by the numbers in the row after
+        "shape" (these should be in separate columns in CSV
+        format). If one of these numbers is -1, then this dimension is
+        inferred from the number of values and the other
+        dimensions. Also supported is the "transpose" command or
+        optional argument which reverses the order of the dimensions.
+      </para>
+      </section>
+
+      <section>
 	<title>ImportFilePlugin</title>
 	<anchor id="Command.ImportFilePlugin" />
 
@@ -2170,17 +2249,33 @@ ImportString('x y', '''
 	<title>ImportString2D</title>
 	<anchor id="Command.ImportString2D" />
 
-	<para><command>ImportString2D(datasets,	string)</command></para>
+	<para><command>ImportString2D(datasets, string, xrange=None,
+	yrange=None, invertrows=None, invertcols=None,
+	transpose=None)</command></para>
 
 	<para>Imports a two-dimensional dataset from the string
 	given. This is similar to the <link
 	linkend="Command.ImportFile2D">ImportFile2D</link> command,
-	with the same dataset format within the string. This command,
-	however, does not currently take any optional parameters. The
-	various controlling parameters can be set within the
-	string. See the <link
+	with the same dataset format within the string. The optional
+	values are also listed there. The various controlling
+	parameters can be set within the string. See the <link
 	linkend="Command.ImportFile2D">ImportFile2D</link> section for
 	details.</para>
+      </section>
+
+      <section>
+	<title>ImportStringND</title>
+	<anchor id="Command.ImportStringND" />
+
+	<para><command>ImportStringND(dataset, string, shape=None,
+	transpose=False)</command></para>
+
+	<para>Imports a n-dimensional dataset from the string
+	given. This is similar to the <link
+	linkend="Command.ImportFileND">ImportFileND</link>
+	command. Please look there for more detail and the description
+	of the optional parameters and in-stream allowed
+	parameters.</para>
       </section>
 
       <section>
@@ -2359,6 +2454,17 @@ Set('page1/graph1/x/min', -10.)
 	numitems). <command>t</command> in the expression will iterate
 	from minval to maxval in numitems values.</para>
 
+      </section>
+
+      <section>
+        <title>SetDataND</title>
+        <anchor id="Command.SetDataND" />
+
+	<para><command>SetDataRange(name, val)</command></para>
+
+        <para>Set a n-dimensional dataset to be the values given by
+        val. val should be an n-dimensional numpy array of values, or
+        a list of lists.</para>
       </section>
 
       <section>

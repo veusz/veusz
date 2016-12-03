@@ -242,7 +242,7 @@ class AxisFunction(axis.Axis):
             return self.cachedfuncobj
         self.funcchangeset = self.document.changeset
 
-        compiled = self.document.compileCheckedExpression(
+        compiled = self.document.evaluate.compileCheckedExpression(
             self.settings.function.strip())
 
         if compiled is None:
@@ -250,7 +250,7 @@ class AxisFunction(axis.Axis):
         else:
             # a python function for doing the evaluation and handling
             # errors
-            env = self.document.eval_context.copy()
+            env = self.document.evaluate.context.copy()
 
             def function(t):
                 env['t'] = t

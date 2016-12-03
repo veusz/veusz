@@ -34,11 +34,9 @@ from .. import setting
 from .. import embed
 from .. import plugins
 from .. import utils
+from .. import datasets
 
-from . import datasets
 from . import operations
-from . import dataset_histo
-from . import dataset_filtered
 from . import mime
 from . import export
 
@@ -88,6 +86,7 @@ class CommandInterface(qt4.QObject):
         'SetData2DXYFunc',
         'SetDataDateTime',
         'SetDataExpression',
+        'SetDataND',
         'SetDataRange',
         'SetDataText',
         'SettingType',
@@ -117,6 +116,7 @@ class CommandInterface(qt4.QObject):
 
         self.Root = embed.WidgetNode(self, 'widget', '/')
 
+    @qt4.pyqtSlot()
     def slotWipedDoc(self):
         """When the document is wiped, we change to the root widget."""
         self.To('/')
@@ -187,7 +187,7 @@ class CommandInterface(qt4.QObject):
         """
 
         if ctype == 'colormap':
-            self.document.validateProcessColormap(val)
+            self.document.evaluate.validateProcessColormap(val)
         else:
             if not isinstance(val, cbasestr):
                 raise RuntimeError('Value should be string')
@@ -197,7 +197,7 @@ class CommandInterface(qt4.QObject):
         if ctype not in ('constant', 'import', 'function', 'colormap'):
             raise RuntimeError('Invalid type')
 
-        vals = list( self.document.customs )
+        vals = list(self.document.evaluate.customs)
         item = [ctype, name, val]
         if mode == 'appendalways':
             vals.append(item)
@@ -253,7 +253,7 @@ class CommandInterface(qt4.QObject):
           'none', 'smalltolarge' or 'largetosmall'
         errors is to calculate Poisson error bars
         """
-        op = dataset_histo.OperationDatasetHistogram(
+        op = operations.OperationDatasetHistogram(
             inexpr, outbinsds, outvalsds, binparams=binparams,
             binmanual=binmanual, method=method,
             cumulative=cumulative, errors=errors)
@@ -299,7 +299,7 @@ class CommandInterface(qt4.QObject):
 
     def RemoveCustom(self, name):
         """Removes a custom-defined constant, function or import."""
-        vals = list( self.document.customs )
+        vals = list( self.document.evaluate.customs )
         for i, (t, n, v) in enumerate(vals):
             if n == name:
                 del vals[i]
@@ -353,7 +353,7 @@ class CommandInterface(qt4.QObject):
 
         The number of values to return is given by nvals
         """
-        cmap = self.document.getColormap(name, invert)
+        cmap = self.document.evaluate.getColormap(name, invert)
         return utils.getColormapArray(cmap, nvals)
 
     def GetDatasets(self):
@@ -404,7 +404,7 @@ class CommandInterface(qt4.QObject):
             print( _( "Set setting '%s' to %s") % (var, repr(pref.get())) )
 
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
-        """Set dataset with name with values (and optionally errors)."""
+        """Create/set dataset name with values (and optionally errors)."""
 
         data = datasets.Dataset(val, symerr, negerr, poserr)
         op = operations.OperationDatasetSet(name, data)
@@ -474,6 +474,20 @@ class CommandInterface(qt4.QObject):
             if parametric:
                 print(_(" Where t goes form %g:%g in %i steps") % parametric)
             print(_(" linked to expression = %s") % repr(linked))
+
+    def SetDataND(self, name, val):
+        """Set n-dimensional dataset name with values."""
+
+        data = datasets.DatasetND(val)
+        op = operations.OperationDatasetSet(name, data)
+        self.document.applyOperation(op)
+
+        if self.verbose:
+            print(
+                _("Set dataset (nD) '%s':\n"
+                  " Values = %s\n") % (
+                      name, str(data.data))
+            )
 
     def SetDataRange(self, name, numsteps, val, symerr=None, negerr=None,
                      poserr=None, linked=False):
@@ -637,6 +651,7 @@ class CommandInterface(qt4.QObject):
             (data, serr, nerr, perr)
         For a 2D dataset, returns
             (data, xrange, yrange)
+        For an nD dataset returns data array
         For a text dataset, return a list of text
         For a date dataset, return a list of python datetime objects
 
@@ -650,6 +665,8 @@ class CommandInterface(qt4.QObject):
             return [utils.floatToDateTime(x) for x in d.data]
         elif d.dimensions == 2:
             return (d.data.copy(), d.xrange, d.yrange)
+        elif d.dimensions == -1:
+            return d.data.copy()
         else:
             data = serr = nerr = perr = None
             if d.data is not None:
@@ -808,19 +825,19 @@ class CommandInterface(qt4.QObject):
             print(_("Applied tag %s to datasets %s") % (
                 tag, ' '.join(datasets)))
 
-    def FilterDatasets(self, filterexpr, datasets,
+    def FilterDatasets(self, filterexpr, dataset_list,
                        prefix="", suffix="",
                        invert=False, replaceblanks=False):
         """Apply filter expression to list of datasets.
 
         filterexpr: input filter expression
-        datasets: list of input dataset names
+        dataset_list: list of input dataset names
         prefix, suffix: output prefix/suffix to add to names (one must be set)
         invert: invert results of filter expression
         replaceblanks: replace filtered values with nan/blank in output.
         """
-        op = dataset_filtered.OperationDatasetsFilter(
-            filterexpr, datasets,
+        op = operations.OperationDatasetsFilter(
+            filterexpr, dataset_list,
             prefix=prefix, suffix=suffix,
             invert=invert, replaceblanks=replaceblanks)
         self.document.applyOperation(op)
@@ -829,5 +846,5 @@ class CommandInterface(qt4.QObject):
             print(
                 _('Filtered datasets %s using expression %s. '
                   'Output prefix=%s, suffix=%s') % (
-                      datasets, filterexpr, prefix, suffix)
+                      dataset_list, filterexpr, prefix, suffix)
             )

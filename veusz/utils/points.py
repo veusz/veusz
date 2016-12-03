@@ -110,6 +110,11 @@ linesymbols = {
                              ((2, 0), (0, 0), (0, -2)),
                              ((1, -0.8), (2, 0), (1, 0.8)) ),
 
+    'lineup': ( ((0, 0), (0, -1)), ),
+    'linedown': ( ((0, 0), (0, 1)), ),
+    'lineleft': ( ((0, 0), (-1, 0)), ),
+    'lineright': ( ((0, 0), (1, 0)), ),
+
     # for arrows
     '_linearrow': ( ((-1.8, -1), (0, 0), (-1.8, 1)), ),
     '_linearrowreverse': ( ((1.8, -1), (0, 0), (1.8, 1)), ),
@@ -400,6 +405,7 @@ MarkerCodes = (
     'limitleftaway2', 'limitrightaway2',
     'arrowupperleftaway', 'arrowupperrightaway',
     'arrowlowerrightaway', 'arrowlowerleftaway',
+    'lineup', 'linedown', 'lineleft', 'lineright',
     )
 
 def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
@@ -469,6 +475,9 @@ arrow_translate = {
     'circle': 'circle',
     'square': 'square',
     'diamond': 'diamond',
+    'lineup': 'lineup',
+    'linedown': 'linedown',
+    'lineextend': 'lineright',
 }
 
 # codes of allowable arrows
@@ -479,6 +488,8 @@ ArrowCodes = ( 'none', 'arrow', 'arrownarrow',
                'bar', 'linecross',
                'asterisk',
                'circle', 'square', 'diamond',
+               'lineup', 'linedown',
+               'lineextend',
                )
 
 def plotLineArrow(painter, xpos, ypos, length, angle,

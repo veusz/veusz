@@ -68,6 +68,7 @@ class CommandInterpreter(object):
         # save the stdout & stderr
         self.write_stdout = sys.stdout
         self.write_stderr = sys.stderr
+        self.read_stdin = sys.stdin
 
         # import numpy into the environment
         cexec("from numpy import *", self.globals)
@@ -94,10 +95,11 @@ class CommandInterpreter(object):
         self.cmds[name] = command
         self.globals[name] = command
 
-    def setOutputs(self, stdout, stderr):
-        """ Assign the environment output files."""
+    def setFiles(self, stdout, stderr, stdin):
+        """Assign the environment input/output files."""
         self.write_stdout = stdout
         self.write_stderr = stderr
+        self.read_stdin = stdin
 
     def _pythonise(self, text):
         """Internal routine to convert commands in the form Cmd a b c into Cmd(a,b,c)."""
@@ -133,10 +135,9 @@ class CommandInterpreter(object):
             return
 
         # preserve output streams
-        temp_stdout = sys.stdout
-        temp_stderr = sys.stderr
-        sys.stdout = self.write_stdout
-        sys.stderr = self.write_stderr
+        saved = sys.stdout, sys.stderr, sys.stdin
+        sys.stdout, sys.stderr, sys.stdin = (
+            self.write_stdout, self.write_stderr, self.read_stdin)
 
         # count number of newlines in expression
         # If it's 2, then execute as a single statement (print out result)
@@ -172,8 +173,7 @@ class CommandInterpreter(object):
             self.document.enableUpdates()
 
         # return output streams
-        sys.stdout = temp_stdout
-        sys.stderr = temp_stderr
+        sys.stdout, sys.stderr, sys.stdin = saved
 
     def Load(self, filename):
         """Replace the document with a new one from the filename."""

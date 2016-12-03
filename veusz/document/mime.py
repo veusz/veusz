@@ -245,9 +245,9 @@ class OperationWidgetClone(OperationWidgetPaste):
 
     def __init__(self, widget, newparent, newname):
         mime = generateWidgetsMime([widget])
-        mime = str(mime.data(widgetmime))
-        OperationWidgetPaste.__init__(self, newparent, mime,
-                                      newnames=[newname])
+        mimedec = mime.data(widgetmime).data().decode('utf-8')
+        OperationWidgetPaste.__init__(
+            self, newparent, mimedec, newnames=[newname])
 
     def do(self, document):
         """Do the import."""

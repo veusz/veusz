@@ -1337,8 +1337,8 @@ class _StdRenderer(_Renderer):
         else:
             expr = expr.strip()
             try:
-                comp = self.doc.compileCheckedExpression(expr)
-                return cstr(eval(comp, self.doc.eval_context))
+                comp = self.doc.evaluate.compileCheckedExpression(expr)
+                return cstr(eval(comp, self.doc.evaluate.context))
             except Exception as e:
                 return latexEscape(cstr(e))
 

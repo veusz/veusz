@@ -21,6 +21,7 @@ from __future__ import division, print_function
 from .. import qtall as qt4
 from ..compat import cbasestr, cbytes
 from .. import document
+from .. import datasets
 from . import base
 
 def _(text, disambiguation=None, context="Import_FITS"):
@@ -91,17 +92,17 @@ class OperationDataImportFITS(base.OperationDataImportBase):
 
         if len(datav) > 1 and isinstance(datav[0], cbasestr):
             # text dataset
-            return document.DatasetText(list(datav))
+            return datasets.DatasetText(list(datav))
         elif len(datav) > 1 and isinstance(datav[0], cbytes):
-            return document.DatasetText(
+            return datasets.DatasetText(
                 [x.decode('ascii') for x in datav])
 
         # numeric dataset
-        return document.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
+        return datasets.Dataset(data=datav, serr=symv, perr=posv, nerr=negv)
 
     def _import1dimage(self, hdu):
         """Import 1d image data form hdu."""
-        return document.Dataset(data=hdu.data)
+        return datasets.Dataset(data=hdu.data)
 
     def _import2dimage(self, hdu):
         """Import 2d image data from hdu."""
@@ -141,7 +142,18 @@ class OperationDataImportFITS(base.OperationDataImportBase):
             # no / broken wcs
             rangex = rangey = None
 
-        return document.Dataset2D(data, xrange=rangex, yrange=rangey)
+        return datasets.Dataset2D(data, xrange=rangex, yrange=rangey)
+
+    def _importnd(self, hdu):
+        """Import 2d image data from hdu."""
+
+        p = self.params
+        if ( p.datacol is not None or p.symerrcol is not None
+             or p.poserrcol is not None
+             or p.negerrcol is not None ):
+            print("Warning: ignoring columns as import nD dataset")
+
+        return datasets.DatasetND(hdu.data)
 
     def doImport(self):
         """Do the import."""
@@ -174,8 +186,7 @@ class OperationDataImportFITS(base.OperationDataImportBase):
                 elif naxis == 2:
                     ds = self._import2dimage(hdu)
                 else:
-                    raise base.ImportingError(
-                        "Cannot import images with %i dimensions" % naxis)
+                    ds = self._importnd(hdu)
 
         if p.linked:
             ds.linked = LinkedFileFITS(p)

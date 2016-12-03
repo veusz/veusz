@@ -18,9 +18,13 @@
 
 from __future__ import division
 import numpy as N
-from .datasets import Dataset1DBase, evalDatasetExpression, _
-from .. import qtall as qt4
+
 from ..compat import citems
+
+from .commonfn import _
+from .commonfn import *
+from .oned import Dataset1DBase
+from .expression import evalDatasetExpression
 
 class DatasetHistoGenerator(object):
     def __init__(self, document, inexpr,
@@ -280,67 +284,3 @@ class DatasetHistoValues(Dataset1DBase):
     nerr = property(lambda self: self.getData()[1])
     perr = property(lambda self: self.getData()[2])
     serr = None
-
-class OperationDatasetHistogram(object):
-    """Operation to make histogram from data."""
-
-    descr = _("make histogram")
-
-    def __init__(self, expr, outposns, outvalues,
-                 binparams=None, binmanual=None, method='counts',
-                 cumulative = 'none',
-                 errors=False):
-        """
-        inexpr = input dataset expression
-        outposns = name of dataset for bin positions
-        outvalues = name of dataset for bin values
-        binparams = None / (num, minval, maxval, islog)
-        binmanual = None / [1,2,3,4,5]
-        method = ('counts', 'density', or 'fractions')
-        cumulative = ('none', 'smalltolarge', 'largetosmall')
-        errors = True/False
-        """
-
-        self.expr = expr
-        self.outposns = outposns
-        self.outvalues = outvalues
-        self.binparams = binparams
-        self.binmanual = binmanual
-        self.method = method
-        self.cumulative = cumulative
-        self.errors = errors
-
-    def do(self, document):
-        """Create histogram datasets."""
-
-        gen = DatasetHistoGenerator(
-            document, self.expr, binparams=self.binparams,
-            binmanual=self.binmanual,
-            method=self.method,
-            cumulative=self.cumulative,
-            errors=self.errors)
-
-        self.oldposnsds = self.oldvaluesds = None
-
-        if self.outvalues != '':
-            self.oldvaluesds = document.data.get(self.outvalues, None)
-            document.setData(self.outvalues, gen.generateValueDataset())
-
-        if self.outposns != '':
-            self.oldposnsds = document.data.get(self.outposns, None)
-            document.setData(self.outposns, gen.generateBinDataset())
-
-    def undo(self, document):
-        """Undo creation of datasets."""
-
-        if self.oldposnsds is not None:
-            if self.outposns != '':
-                document.setData(self.outposns, self.oldposnsds)
-        else:
-            document.deleteData(self.outposns)
-
-        if self.oldvaluesds is not None:
-            if self.outvalues != '':
-                document.setData(self.outvalues, self.oldvaluesds)
-        else:
-            document.deleteData(self.outvalues)

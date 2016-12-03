@@ -649,10 +649,12 @@ class Dataset(qt4.QWidget):
         # get datasets of the correct dimension
         datasets = []
         for name, ds in citems(self.document.data):
-            if ds.dimensions == self.dimensions and (
-                ds.datatype == self.datatype or
-                self.datatype == 'all' or
-                ds.datatype in self.datatype ):
+            if ( (ds.dimensions == self.dimensions or
+                  self.dimensions == 'all') and (
+                      ds.datatype == self.datatype or
+                      self.datatype == 'all' or
+                      ds.datatype in self.datatype)
+            ):
                 datasets.append(name)
         datasets.sort()
 
@@ -1836,7 +1838,7 @@ class Colormap(Choice):
     size = (32, 12)
 
     def __init__(self, setn, document, parent):
-        names = sorted(document.colormaps)
+        names = sorted(document.evaluate.colormaps)
 
         icons = Colormap._generateIcons(document, names)
         Choice.__init__(self, setn, True,
@@ -1857,7 +1859,7 @@ class Colormap(Choice):
 
         # iterate over colour maps
         for name in names:
-            val = document.colormaps.get(name, None)
+            val = document.evaluate.colormaps.get(name, None)
             if name in kls._icons:
                 icon = kls._icons[name]
             else:

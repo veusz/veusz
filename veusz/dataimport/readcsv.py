@@ -24,7 +24,7 @@ import re
 import numpy as N
 
 from ..compat import crange, cnext, CIterator
-from .. import document
+from .. import datasets
 from .. import utils
 from .. import qtall as qt4
 
@@ -387,11 +387,11 @@ class ReadCSV(object):
             # create dataset
             dstype = self.nametypes[name]
             if dstype == 'string':
-                ds = document.DatasetText(data=data[0], linked=linkedfile)
+                ds = datasets.DatasetText(data=data[0], linked=linkedfile)
             elif dstype == 'date':
-                ds = document.DatasetDateTime(data=data[0], linked=linkedfile)
+                ds = datasets.DatasetDateTime(data=data[0], linked=linkedfile)
             else:
-                ds = document.Dataset(
+                ds = datasets.Dataset(
                     data=data[0], serr=data[1], perr=data[2], nerr=data[3],
                     linked=linkedfile)
 

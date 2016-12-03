@@ -39,6 +39,7 @@ from .settingdb import settingdb, uilocale, ui_floattostring, ui_stringtofloat
 from .reference import ReferenceBase, Reference
 
 from .. import utils
+from .. import datasets
 
 class OnModified(qt4.QObject):
     """onmodified is emitted from an object contained in each setting."""
@@ -344,11 +345,11 @@ class Setting(object):
     def safeEvalHelper(self, text):
         """Evaluate an expression, catching naughtiness."""
         try:
-            comp = self.getDocument().compileCheckedExpression(
+            comp = self.getDocument().evaluate.compileCheckedExpression(
                 text)
             if comp is None:
                 raise utils.InvalidType
-            return float( eval(comp, self.getDocument().eval_context) )
+            return float( eval(comp, self.getDocument().evaluate.context) )
         except:
             raise utils.InvalidType
 
@@ -1158,7 +1159,7 @@ class Dataset(Str):
         d = doc.data.get(self.val)
         if ( d is not None and
              d.datatype == self.datatype and
-             d.dimensions == self.dimensions ):
+             (d.dimensions == self.dimensions or self.dimensions == 'all') ):
                  return d
 
 class Strings(Setting):
@@ -1304,7 +1305,7 @@ class DatasetExtended(Dataset):
     def getFloatArray(self, doc):
         """Get a numpy of values or None."""
         if isinstance(self.val, cbasestr):
-            ds = doc.evalDatasetExpression(
+            ds = doc.evaluate.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
             if ds:
                 # get numpy array of values
@@ -1325,11 +1326,12 @@ class DatasetExtended(Dataset):
 
     def getData(self, doc):
         """Return veusz dataset"""
+        from .. import datasets
         if isinstance(self.val, cbasestr):
-            return doc.evalDatasetExpression(
+            return doc.evaluate.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
         else:
-            return doc.valsToDataset(
+            return datasets.valsToDataset(
                 self.val, self.datatype, self.dimensions)
 
 class DatasetOrStr(Dataset):

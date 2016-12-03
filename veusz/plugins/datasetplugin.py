@@ -21,11 +21,13 @@
 """Plugins for creating datasets."""
 
 from __future__ import division, print_function
+import re
 import numpy as N
 from . import field
 
 from ..compat import czip, citems, cstr
 from .. import utils
+from .. import datasets
 try:
     from ..helpers import qtloops
 except ImportError:
@@ -51,8 +53,20 @@ def numpyCopyOrNone(data):
         return None
     return N.array(data, dtype=N.float64)
 
+class _DatasetBase(object):
+    """Base class for dataset objects to be returned from plugins."""
+
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset
+        (or None if not a real dataset."""
+        return None
+
+    def _customs(self):
+        """Return list of custom definitions to add to document."""
+        return []
+
 # these classes are returned from dataset plugins
-class Dataset1D(object):
+class Dataset1D(_DatasetBase):
     """1D dataset for ImportPlugin or DatasetPlugin."""
     def __init__(self, name, data=[], serr=None, perr=None, nerr=None):
         """1D dataset
@@ -83,11 +97,14 @@ class Dataset1D(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        # need to do the import here as otherwise we get a loop
-        from .. import document
-        return document.Dataset1DPlugin(manager, self)
+        return datasets.Dataset1DPlugin(manager, self)
 
-class Dataset2D(object):
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.Dataset(
+            data=self.data, serr=self.serr, perr=self.perr, nerr=self.nerr)
+
+class Dataset2D(_DatasetBase):
     """2D dataset for ImportPlugin or DatasetPlugin."""
     def __init__(self, name, data=[[]], rangex=None, rangey=None,
                  xedge=None, yedge=None,
@@ -126,16 +143,48 @@ class Dataset2D(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        from .. import document
-        return document.Dataset2DPlugin(manager, self)
+        return datasets.Dataset2DPlugin(manager, self)
 
-class DatasetDateTime(object):
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.Dataset2D(
+            data=self.data,
+            xrange=self.rangex, yrange=self.rangey,
+            xedge=self.xedge, yedge=self.yedge,
+            xcent=self.xcent, ycent=self.ycent)
+
+class DatasetND(_DatasetBase):
+    """ND dataset for ImportPlugin or DatasetPlugin."""
+    def __init__(self, name, data=[]):
+        """N-dimensional dataset.
+        name: name of dataset
+        data: ND numpy array of values (or lists to convert)
+        """
+        self.name = name
+        self.update(data=data)
+
+    def update(self, data=[]):
+        self.data = N.array(data, dtype=N.float64)
+
+    def _null(self):
+        """Empty data contents."""
+        self.data = N.array([])
+
+    def _makeVeuszDataset(self, manager):
+        """Make a Veusz dataset from the plugin dataset."""
+        return datasets.DatasetNDPlugin(manager, self)
+
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.DatasetND(data=self.data)
+
+class DatasetDateTime(_DatasetBase):
     """Date-time dataset for ImportPlugin or DatasetPlugin."""
 
     def __init__(self, name, data=[]):
         """A date dataset
         name: name of dataset
-        data: list of datetime objects
+        data: list of datetime datasets
         """
         self.name = name
         self.update(data=data)
@@ -164,10 +213,13 @@ class DatasetDateTime(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        from .. import document
-        return document.DatasetDateTimePlugin(manager, self)
+        return datasets.DatasetDateTimePlugin(manager, self)
 
-class DatasetText(object):
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.DatasetDateTime(data=self.data)
+
+class DatasetText(_DatasetBase):
     """Text dataset for ImportPlugin or DatasetPlugin."""
     def __init__(self, name, data=[]):
         """A text dataset
@@ -186,10 +238,13 @@ class DatasetText(object):
 
     def _makeVeuszDataset(self, manager):
         """Make a Veusz dataset from the plugin dataset."""
-        from .. import document
-        return document.DatasetTextPlugin(manager, self)
+        return datasets.DatasetTextPlugin(manager, self)
 
-class Constant(object):
+    def _unlinkedVeuszDataset(self):
+        """Convert this to an equivalent (unlinked) Veusz dataset."""
+        return datasets.DatasetText(data=self.data)
+
+class Constant(_DatasetBase):
     """Dataset to return to set a Veusz constant after import.
     This is only useful in an ImportPlugin, not a DatasetPlugin
     """
@@ -199,7 +254,10 @@ class Constant(object):
         self.name = name
         self.val = val
 
-class Function(object):
+    def _customs(self):
+        return [['constant', self.name, self.val]]
+
+class Function(_DatasetBase):
     """Dataset to return to set a Veusz function after import."""
     def __init__(self, name, val):
         """Map string value val to name.
@@ -208,6 +266,9 @@ class Function(object):
         """
         self.name = name
         self.val = val
+
+    def _customs(self):
+        return [['function', self.name, self.val]]
 
 # class to pass to plugin to give parameters
 class DatasetPluginHelper(object):
@@ -238,9 +299,8 @@ class DatasetPluginHelper(object):
     @property
     def datasetsdatetime(self):
         """Return list of existing date-time datesets"""
-        from .. import document
         return [name for name, ds in citems(self._doc.data) if
-                isinstance(ds, document.DatasetDateTime)]
+                isinstance(ds, datasets.DatasetDateTime)]
 
     @property
     def locale(self):
@@ -254,11 +314,8 @@ class DatasetPluginHelper(object):
 
         Returns None if expression could not be evaluated.
         """
-        ds = self._doc.evalDatasetExpression(expr, part=part)
-        if ds is not None:
-            return ds.data
-        else:
-            return None
+        ds = datasets.evalDatasetExpression(self._doc, expr, part=part)
+        return None if ds is None else ds.data
 
     def getDataset(self, name, dimensions=1):
         """Return numerical dataset object for name given.
@@ -270,21 +327,20 @@ class DatasetPluginHelper(object):
         name not found: raise a DatasetPluginException
         dimensions not right: raise a DatasetPluginException
         """
-        from .. import document
         try:
             ds = self._doc.data[name]
         except KeyError:
             raise DatasetPluginException(_("Unknown dataset '%s'") % name)
 
-        if ds.dimensions != dimensions:
+        if ds.dimensions != dimensions and dimensions != 'all':
             raise DatasetPluginException(
-                _("Dataset '%s' does not have %i dimensions") % (
+                _("Dataset '%s' does not have %s dimensions") % (
                     name, dimensions))
         if ds.datatype != 'numeric':
             raise DatasetPluginException(
                 _("Dataset '%s' is not a numerical dataset") % name)
 
-        if isinstance(ds, document.DatasetDateTime):
+        if isinstance(ds, datasets.DatasetDateTime):
             return DatasetDateTime(name, data=ds.data)
         elif ds.dimensions == 1:
             return Dataset1D(name, data=ds.data, serr=ds.serr,
@@ -427,8 +483,8 @@ class DatasetPlugin(object):
 
     def getDatasets(self, fields):
         """Override this to return a list of (empty) Dataset1D,
-        Dataset2D and DatasetText objects to provide the initial names
-        and type of datasets.
+        Dataset2D, DatasetText, DatasetDateTime and DatasetND
+        objects to provide the initial names and type of datasets.
 
         These should be saved for updating in updateDatasets.
 
@@ -2019,6 +2075,54 @@ class ExpPlugin(_OneOutputDatasetPlugin):
 
         self.dsout.update(data=expdata, perr=expperr, nerr=expnerr)
 
+class ReshapeDatasetPlugin(DatasetPlugin):
+    """Reshape a dataset to an n-dimensional dataset."""
+
+    menu = (_('Convert'), _('Reshape'))
+    name = 'Reshape'
+    description_short = _('Reshape to an aribtrary n-dimensional dataset')
+    description_full = _(
+        'Take a dataset with aribtrary shape and reshape into an '
+        'n-dimensional dataset with a shape given. '
+        'shape should be a space or comma-separated list of dimensions, '
+        'where -1 automatically calculates the length.')
+
+    def __init__(self):
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset'), dims='all'),
+            field.FieldText('shape', _('Shape')),
+            field.FieldBool('transpose', _('Transpose')),
+            field.FieldDataset('ds_out', _('Output dataset'), dims='all'),
+            ]
+
+    def getDatasets(self, fields):
+        if fields['ds_out'] == '':
+            raise DatasetPluginException(_('Invalid output dataset name'))
+        self.dsout = DatasetND(fields['ds_out'])
+        return [self.dsout]
+
+    def updateDatasets(self, fields, helper):
+        ds_in = helper.getDataset(fields['ds_in'], dimensions='all')
+
+        shapetxt = fields['shape']
+        shapesplit = re.split("[,;x* ]+", shapetxt)
+
+        try:
+            shape = tuple([int(x) for x in shapesplit])
+        except ValueError:
+            raise DatasetPluginException(
+                'Could not interpret shape text')
+        try:
+            data = ds_in.data.reshape(shape)
+        except ValueError:
+            raise DatasetPluginException(
+                'Cannot reshape: wrong number of dimensions')
+
+        if fields['transpose']:
+            data = N.transpose(data)
+
+        self.dsout.update(data)
+
 datasetpluginregistry += [
     AddDatasetPlugin,
     AddDatasetsPlugin,
@@ -2047,6 +2151,7 @@ datasetpluginregistry += [
 
     PolarToCartesianPlugin,
     ConvertNumbersToText,
+    ReshapeDatasetPlugin,
 
     FilterDatasetPlugin,
 
