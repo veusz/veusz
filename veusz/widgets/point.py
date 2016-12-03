@@ -23,6 +23,7 @@ import numpy as N
 
 from ..compat import czip
 from .. import qtall as qt4
+from .. import datasets
 from .. import document
 from .. import setting
 from .. import utils
@@ -61,83 +62,93 @@ def _errorBarsEnds(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
              s.ErrorBarLine.endsize )
 
     if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
-        utils.plotLinesToPainter(painter, xplotter-size, ymin,
-                                 xplotter+size, ymin, clip)
-        utils.plotLinesToPainter(painter, xplotter-size, ymax,
-                                 xplotter+size, ymax, clip)
+        utils.plotLinesToPainter(
+            painter, xplotter-size, ymin,
+            xplotter+size, ymin, clip)
+        utils.plotLinesToPainter(
+            painter, xplotter-size, ymax,
+            xplotter+size, ymax, clip)
 
     if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
-        utils.plotLinesToPainter(painter, xmin, yplotter-size,
-                                 xmin, yplotter+size, clip)
-        utils.plotLinesToPainter(painter, xmax, yplotter-size,
-                                 xmax, yplotter+size, clip)
+        utils.plotLinesToPainter(
+            painter, xmin, yplotter-size,
+            xmin, yplotter+size, clip)
+        utils.plotLinesToPainter(
+            painter, xmax, yplotter-size,
+            xmax, yplotter+size, clip)
 
 def _errorBarsBox(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                   s, painter, clip):
     """Draw box around error region."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         painter.setBrush( qt4.QBrush() )
         utils.plotBoxesToPainter(painter, xmin, ymin, xmax, ymax, clip)
 
 def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                         s, painter, clip):
     """Draw box filled region inside error bars."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         # filled region below
         if not s.FillBelow.hideerror:
             path = qt4.QPainterPath()
-            utils.addNumpyPolygonToPath(path, clip,
-                                        xmin, ymin, xmin, yplotter,
-                                        xmax, yplotter, xmax, ymin)
+            utils.addNumpyPolygonToPath(
+                path, clip,
+                xmin, ymin, xmin, yplotter,
+                xmax, yplotter, xmax, ymin)
             utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
 
         # filled region above
         if not s.FillAbove.hideerror:
             path = qt4.QPainterPath()
-            utils.addNumpyPolygonToPath(path, clip,
-                                        xmin, yplotter, xmax, yplotter,
-                                        xmax, ymax, xmin, ymax)
+            utils.addNumpyPolygonToPath(
+                path, clip,
+                xmin, yplotter, xmax, yplotter,
+                xmax, ymax, xmin, ymax)
             utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
 
 def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                       s, painter, clip):
     """Draw diamond around error region."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
 
         # expand clip by pen width (urgh)
         pw = painter.pen().widthF()*2
-        clip = qt4.QRectF(qt4.QPointF(clip.left()-pw,clip.top()-pw),
-                          qt4.QPointF(clip.right()+pw,clip.bottom()+pw))
+        clip = qt4.QRectF(
+            qt4.QPointF(clip.left()-pw,clip.top()-pw),
+            qt4.QPointF(clip.right()+pw,clip.bottom()+pw))
 
         path = qt4.QPainterPath()
-        utils.addNumpyPolygonToPath(path, clip,
-                                    xmin, yplotter, xplotter, ymax,
-                                    xmax, yplotter, xplotter, ymin)
+        utils.addNumpyPolygonToPath(
+            path, clip,
+            xmin, yplotter, xplotter, ymax,
+            xmax, yplotter, xplotter, ymin)
         painter.setBrush( qt4.QBrush() )
         painter.drawPath(path)
 
 def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                             s, painter, clip):
     """Draw diamond filled region inside error bars."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         if not s.FillBelow.hideerror:
             path = qt4.QPainterPath()
-            utils.addNumpyPolygonToPath(path, clip,
-                                        xmin, yplotter, xplotter, ymin,
-                                        xmax, yplotter)
+            utils.addNumpyPolygonToPath(
+                path, clip,
+                xmin, yplotter, xplotter, ymin,
+                xmax, yplotter)
             utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
 
         if not s.FillAbove.hideerror:
             path = qt4.QPainterPath()
-            utils.addNumpyPolygonToPath(path, clip,
-                                        xmin, yplotter, xplotter, ymax,
-                                        xmax, yplotter)
+            utils.addNumpyPolygonToPath(
+                path, clip,
+                xmin, yplotter, xplotter, ymax,
+                xmax, yplotter)
             utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
 
 def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                     s, painter, clip):
     """Draw curve around error region."""
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         # non-filling brush
         painter.setBrush( qt4.QBrush() )
 
@@ -146,40 +157,48 @@ def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 
             p = qt4.QPainterPath()
             p.moveTo(xp + (xmx-xp), yp)
-            p.arcTo(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
-                               (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
-            p.arcTo(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
-                               (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
-            p.arcTo(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
-                               (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
-            p.arcTo(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
-                               (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
+            p.arcTo(qt4.QRectF(
+                xp - (xmx-xp), yp - (yp-ymx),
+                (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
+            p.arcTo(qt4.QRectF(
+                xp - (xp-xmn), yp - (yp-ymx),
+                (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
+            p.arcTo(qt4.QRectF(
+                xp - (xp-xmn), yp - (ymn-yp),
+                (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
+            p.arcTo(qt4.QRectF(
+                xp - (xmx-xp), yp - (ymn-yp),
+                (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
             painter.drawPath(p)
 
 def _errorBarsCurveFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                           s, painter, clip):
     """Fill area around error region."""
 
-    if None not in (xmin, xmax, ymin, ymax):
+    if utils.allNotNone(xmin, xmax, ymin, ymax):
         for xp, yp, xmn, ymn, xmx, ymx in czip(
             xplotter, yplotter, xmin, ymin, xmax, ymax):
 
             if not s.FillAbove.hideerror:
                 p = qt4.QPainterPath()
                 p.moveTo(xp + (xmx-xp), yp)
-                p.arcTo(qt4.QRectF(xp - (xmx-xp), yp - (yp-ymx),
-                                   (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
-                p.arcTo(qt4.QRectF(xp - (xp-xmn), yp - (yp-ymx),
-                                   (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
+                p.arcTo(qt4.QRectF(
+                    xp - (xmx-xp), yp - (yp-ymx),
+                    (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
+                p.arcTo(qt4.QRectF(
+                    xp - (xp-xmn), yp - (yp-ymx),
+                    (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
                 utils.brushExtFillPath(painter, s.FillAbove, p, ignorehide=True)
 
             if not s.FillBelow.hideerror:
                 p = qt4.QPainterPath()
                 p.moveTo(xp + (xp-xmn), yp)
-                p.arcTo(qt4.QRectF(xp - (xp-xmn), yp - (ymn-yp),
-                                   (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
-                p.arcTo(qt4.QRectF(xp - (xmx-xp), yp - (ymn-yp),
-                                   (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
+                p.arcTo(qt4.QRectF(
+                    xp - (xp-xmn), yp - (ymn-yp),
+                    (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
+                p.arcTo(qt4.QRectF(
+                    xp - (xmx-xp), yp - (ymn-yp),
+                    (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
                 utils.brushExtFillPath(painter, s.FillBelow, p, ignorehide=True)
 
 def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
@@ -216,11 +235,13 @@ def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
         # polygons consist of lines joining the points and continuing
         # back along the plot line (retnpts)
         if not s.FillBelow.hideerror:
-            utils.brushExtFillPolygon(painter, s.FillBelow, clip,
-                                      ptsbelow+retnpts, ignorehide=True)
+            utils.brushExtFillPolygon(
+                painter, s.FillBelow, clip,
+                ptsbelow+retnpts, ignorehide=True)
         if not s.FillAbove.hideerror:
-            utils.brushExtFillPolygon(painter, s.FillAbove, clip,
-                                      ptsabove+retnpts, ignorehide=True)
+            utils.brushExtFillPolygon(
+                painter, s.FillAbove, clip,
+                ptsabove+retnpts, ignorehide=True)
 
     # draw optional line (on top of fill)
     utils.plotClippedPolyline(painter, clip, ptsabove)
@@ -279,16 +300,16 @@ class MarkerFillBrush(setting.Brush):
         self.get('color').newDefault( setting.Reference('../color') )
 
         self.add( setting.Colormap(
-                'colorMap', 'grey',
-                descr = _('If color markers dataset is given, use this colormap '
-                          'instead of the fill color'),
-                usertext=_('Color map'),
-                formatting=True) )
+            'colorMap', 'grey',
+            descr = _('If color markers dataset is given, use this colormap '
+                      'instead of the fill color'),
+            usertext=_('Color map'),
+            formatting=True) )
         self.add( setting.Bool(
-                'colorMapInvert', False,
-                descr = _('Invert color map'),
-                usertext = _('Invert map'),
-                formatting=True) )
+            'colorMapInvert', False,
+            descr = _('Invert color map'),
+            usertext = _('Invert map'),
+            formatting=True) )
 
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
@@ -313,13 +334,13 @@ class PointPlotter(GenericPlotter):
 
         # non-formatting
         s.add( setting.DatasetExtended(
-                'yData', 'y',
-                descr=_('Y values, given by dataset, expression or list of values'),
-                usertext=_('Y data')), 0 )
+            'yData', 'y',
+            descr=_('Y values, given by dataset, expression or list of values'),
+            usertext=_('Y data')), 0 )
         s.add( setting.DatasetExtended(
-                'xData', 'x',
-                descr=_('X values, given by dataset, expression or list of values'),
-                usertext=_('X data')), 0 )
+            'xData', 'x',
+            descr=_('X values, given by dataset, expression or list of values'),
+            usertext=_('X data')), 0 )
         s.add( setting.DatasetOrStr(
             'labels', '',
             descr=_('Dataset or string to label points'),
@@ -331,69 +352,82 @@ class PointPlotter(GenericPlotter):
             usertext=_('Scale markers')), 6 )
 
         # formatting
-        s.add( setting.Int('errorthin', 1,
-                           minval=1,
-                           descr=_('Thin number of error bars plotted by this factor'),
-                           usertext=_('Thin errors'),
-                           formatting=True), 0 )
-        s.add( setting.Int('thinfactor', 1,
-                           minval=1,
-                           descr=_('Thin number of markers plotted'
-                                   ' for each datapoint by this factor'),
-                           usertext=_('Thin markers'),
-                           formatting=True), 0 )
-        s.add( setting.Color('color',
-                             'black',
-                             descr = _('Master color'),
-                             usertext = _('Color'),
-                             formatting=True), 0 )
-        s.add( setting.DistancePt('markerSize',
-                                  '3pt',
-                                  descr = _('Size of marker to plot'),
-                                  usertext=_('Marker size'), formatting=True), 0 )
-        s.add( setting.Marker('marker',
-                              'circle',
-                              descr = _('Type of marker to plot'),
-                              usertext=_('Marker'), formatting=True), 0 )
+        s.add( setting.Int(
+            'errorthin', 1,
+            minval=1,
+            descr=_('Thin number of error bars plotted by this factor'),
+            usertext=_('Thin errors'),
+            formatting=True), 0 )
+        s.add( setting.Int(
+            'thinfactor', 1,
+            minval=1,
+            descr=_('Thin number of markers plotted'
+                    ' for each datapoint by this factor'),
+            usertext=_('Thin markers'),
+            formatting=True), 0 )
+        s.add( setting.Color(
+            'color',
+            'black',
+            descr = _('Master color'),
+            usertext = _('Color'),
+            formatting=True), 0 )
+        s.add( setting.DistancePt(
+            'markerSize',
+            '3pt',
+            descr = _('Size of marker to plot'),
+            usertext=_('Marker size'), formatting=True), 0 )
+        s.add( setting.Marker(
+            'marker',
+            'circle',
+            descr = _('Type of marker to plot'),
+            usertext=_('Marker'), formatting=True), 0 )
         s.add( setting.DataColor('Color') )
 
-        s.add( setting.ErrorStyle('errorStyle',
-                                  'bar',
-                                  descr=_('Style of error bars to plot'),
-                                  usertext=_('Error style'), formatting=True) )
+        s.add( setting.ErrorStyle(
+            'errorStyle',
+            'bar',
+            descr=_('Style of error bars to plot'),
+            usertext=_('Error style'), formatting=True) )
 
-        s.add( setting.XYPlotLine('PlotLine',
-                                  descr = _('Plot line settings'),
-                                  usertext = _('Plot line')),
+        s.add( setting.XYPlotLine(
+            'PlotLine',
+            descr = _('Plot line settings'),
+            usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
 
-        s.add( setting.MarkerLine('MarkerLine',
-                                  descr = _('Line around the marker settings'),
-                                  usertext = _('Marker border')),
+        s.add( setting.MarkerLine(
+            'MarkerLine',
+            descr = _('Line around the marker settings'),
+            usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
-        s.add( MarkerFillBrush('MarkerFill',
-                               descr = _('Marker fill settings'),
-                               usertext = _('Marker fill')),
+        s.add( MarkerFillBrush(
+            'MarkerFill',
+            descr = _('Marker fill settings'),
+            usertext = _('Marker fill')),
                pixmap = 'settings_plotmarkerfill' )
 
-        s.add( setting.ErrorBarLine('ErrorBarLine',
-                                    descr = _('Error bar line settings'),
-                                    usertext = _('Error bar line')),
+        s.add( setting.ErrorBarLine(
+            'ErrorBarLine',
+            descr = _('Error bar line settings'),
+            usertext = _('Error bar line')),
                pixmap = 'settings_ploterrorline' )
         s.ErrorBarLine.get('color').newDefault( setting.Reference('../color') )
 
-        s.add( setting.PointFill('FillBelow',
-                                 descr = _('Fill mode 1'),
-                                 usertext = _('Fill 1')),
+        s.add( setting.PointFill(
+            'FillBelow',
+            descr = _('Fill mode 1'),
+            usertext = _('Fill 1')),
                pixmap = 'settings_plotfillbelow' )
         s.FillBelow.get('fillto').newDefault('bottom')
-        s.add( setting.PointFill('FillAbove',
-                                 descr = _('Fill mode 2'),
-                                 usertext = _('Fill 2')),
+        s.add( setting.PointFill(
+            'FillAbove',
+            descr = _('Fill mode 2'),
+            usertext = _('Fill 2')),
                pixmap = 'settings_plotfillabove' )
-        s.add( setting.PointLabel('Label',
-                                  descr = _('Label settings'),
-                                  usertext=_('Label')),
+        s.add( setting.PointLabel(
+            'Label',
+            descr = _('Label settings'),
+            usertext=_('Label')),
                pixmap = 'settings_axislabel' )
 
     @property
@@ -401,8 +435,8 @@ class PointPlotter(GenericPlotter):
         """User-friendly description."""
 
         s = self.settings
-        return "x='%s', y='%s', marker='%s'" % (s.xData, s.yData,
-                                                s.marker)
+        return "x='%s', y='%s', marker='%s'" % (
+            s.xData, s.yData, s.marker)
 
     def _plotErrors(self, posn, painter, xplotter, yplotter,
                     axes, xdata, ydata, cliprect):
@@ -672,6 +706,18 @@ class PointPlotter(GenericPlotter):
         # size of error bars in key
         errorsize = height*0.4
 
+        # draw fill setting
+        if not s.FillBelow.hide:
+            path = qt4.QPainterPath()
+            path.addRect(qt4.QRectF(
+                    qt4.QPointF(x, yp), qt4.QPointF(x+width, yp+height*0.45)))
+            utils.brushExtFillPath(painter, s.FillBelow, path)
+        if not s.FillAbove.hide:
+            path = qt4.QPainterPath()
+            path.addRect(qt4.QRectF(
+                    qt4.QPointF(x, yp), qt4.QPointF(x+width, yp-height*0.45)))
+            utils.brushExtFillPath(painter, s.FillAbove, path)
+
         # make points for error bars (if any)
         if xv and xv.hasErrors():
             xneg = N.array([x-width, x+width/2-errorsize, x+2*width])
@@ -731,8 +777,10 @@ class PointPlotter(GenericPlotter):
         # iterate over each point and plot each label
         for x, y, t in czip(xplotter+deltax, yplotter+deltay,
                             textvals):
-            utils.Renderer( painter, font, x, y, t,
-                            alignhorz, alignvert, angle ).render()
+            utils.Renderer(
+                painter, font, x, y, t,
+                alignhorz, alignvert, angle,
+                doc=self.document).render()
 
     def getAxisLabels(self, direction):
         """Get labels for axis if using a label axis."""
@@ -746,10 +794,10 @@ class PointPlotter(GenericPlotter):
         # handle missing dataset
         if yv and not xv and s.get('xData').isEmpty():
             length = yv.data.shape[0]
-            xv = document.DatasetRange(length, (1,length))
+            xv = datasets.DatasetRange(length, (1,length))
         elif xv and not yv and s.get('yData').isEmpty():
             length = xv.data.shape[0]
-            yv = document.DatasetRange(length, (1,length))
+            yv = datasets.DatasetRange(length, (1,length))
 
         if text is None or xv is None or yv is None:
             return (None, None)
@@ -764,8 +812,9 @@ class PointPlotter(GenericPlotter):
         if axes is None:
             map_fn = None
         else:
-            map_fn = lambda x, y: ( axes[0].dataToPlotterCoords(bounds, x),
-                                    axes[1].dataToPlotterCoords(bounds, y) )
+            map_fn = lambda x, y: (
+                axes[0].dataToPlotterCoords(bounds, x),
+                axes[1].dataToPlotterCoords(bounds, y) )
 
         return pickable.DiscretePickable(self, 'xData', 'yData', map_fn)
 
@@ -799,11 +848,11 @@ class PointPlotter(GenericPlotter):
         if xv and not yv and s.get('yData').isEmpty():
             # use index for y data
             length = xv.data.shape[0]
-            yv = document.DatasetRange(length, (1,length))
+            yv = datasets.DatasetRange(length, (1,length))
         elif yv and not xv and s.get('xData').isEmpty():
             # use index for x data
             length = yv.data.shape[0]
-            xv = document.DatasetRange(length, (1,length))
+            xv = datasets.DatasetRange(length, (1,length))
         if not xv or not yv:
             # no valid dataset, so exit
             return
@@ -816,8 +865,8 @@ class PointPlotter(GenericPlotter):
 
         # loop over chopped up values
         for xvals, yvals, tvals, ptvals, cvals in (
-            document.generateValidDatasetParts(
-                xv, yv, text, scalepoints, colorpoints)):
+            datasets.generateValidDatasetParts(
+                [xv, yv, text, scalepoints, colorpoints])):
 
             #print "Calculating coordinates"
             # calc plotter coords of x and y points
@@ -838,18 +887,21 @@ class PointPlotter(GenericPlotter):
             # plot filled error bars
             if s.errorStyle in ('fillvert', 'fillhorz'):
                 # filled region errors are painted first
-                self._plotErrors(posn, painter, xpltpoint, ypltpoint,
-                                 axes, xvals, yvals, cliprect)
+                self._plotErrors(
+                    posn, painter, xpltpoint, ypltpoint,
+                    axes, xvals, yvals, cliprect)
 
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
                 if s.PlotLine.bezierJoin and hasqtloops:
-                    self._drawBezierLine( painter, xplotter, yplotter, posn,
-                                          xvals, yvals, cliprect )
+                    self._drawBezierLine(
+                        painter, xplotter, yplotter, posn,
+                        xvals, yvals, cliprect )
                 else:
-                    self._drawPlotLine( painter, xplotter, yplotter, posn,
-                                        xvals, yvals, cliprect )
+                    self._drawPlotLine(
+                        painter, xplotter, yplotter, posn,
+                        xvals, yvals, cliprect )
 
             #print "Painting error bars"
             # plot normal errors bars
@@ -882,8 +934,9 @@ class PointPlotter(GenericPlotter):
                 if s.thinfactor <= 1:
                     xplt, yplt = xpltpoint, ypltpoint
                 else:
-                    xplt, yplt = (xpltpoint[::s.thinfactor],
-                                  ypltpoint[::s.thinfactor])
+                    xplt, yplt = (
+                        xpltpoint[::s.thinfactor],
+                        ypltpoint[::s.thinfactor])
 
                 # whether to scale markers
                 scaling = colorvals = cmap = None
@@ -899,19 +952,21 @@ class PointPlotter(GenericPlotter):
                         s.Color.min, s.Color.max)
                     if s.thinfactor > 1:
                         colorvals = colorvals[::s.thinfactor]
-                    cmap = self.document.getColormap(
+                    cmap = self.document.evaluate.getColormap(
                         s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
                 # actually plot datapoints
-                utils.plotMarkers(painter, xplt, yplt, s.marker, markersize,
-                                  scaling=scaling, clip=cliprect,
-                                  cmap=cmap, colorvals=colorvals,
-                                  scaleline=s.MarkerLine.scaleLine)
+                utils.plotMarkers(
+                    painter, xplt, yplt, s.marker, markersize,
+                    scaling=scaling, clip=cliprect,
+                    cmap=cmap, colorvals=colorvals,
+                    scaleline=s.MarkerLine.scaleLine)
 
             # finally plot any labels
             if tvals and not s.Label.hide:
-                self.drawLabels(painter, xpltpoint, ypltpoint,
-                                tvals, markersize)
+                self.drawLabels(
+                    painter, xpltpoint, ypltpoint,
+                    tvals, markersize)
 
 # allow the factory to instantiate an x,y plotter
 document.thefactory.register( PointPlotter )

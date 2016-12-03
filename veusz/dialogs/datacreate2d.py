@@ -23,6 +23,7 @@ from ..compat import crange, citems, cstr
 from .. import qtall as qt4
 from .. import utils
 from .. import document
+from .. import datasets
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="DataCreate2D"):
@@ -131,19 +132,19 @@ class DataCreate2DDialog(VeuszDialog):
         self.namecombo.setEditText(dsname)
         self.linkcheckbox.setChecked(True)
 
-        if isinstance(ds, document.Dataset2DXYZExpression):
+        if isinstance(ds, datasets.Dataset2DXYZExpression):
             self.fromxyzexpr.click()
             self.xexprcombo.setEditText(ds.exprx)
             self.yexprcombo.setEditText(ds.expry)
             self.zexprcombo.setEditText(ds.exprz)
 
-        elif isinstance(ds, document.Dataset2DExpression):
+        elif isinstance(ds, datasets.Dataset2DExpression):
             self.from2dexpr.click()
             self.xexprcombo.clearEditText()
             self.yexprcombo.clearEditText()
             self.zexprcombo.setEditText(ds.expr)
 
-        elif isinstance(ds, document.Dataset2DXYFunc):
+        elif isinstance(ds, datasets.Dataset2DXYFunc):
             self.fromxyfunc.click()
             self.xexprcombo.setEditText('%g:%g:%g' % tuple(ds.xstep))
             self.yexprcombo.setEditText('%g:%g:%g' % tuple(ds.ystep))
@@ -221,7 +222,7 @@ class DataCreate2DDialog(VeuszDialog):
             self.document.data[text['name']].data
 
         except (document.CreateDatasetException,
-                document.DatasetException) as e:
+                datasets.DatasetException) as e:
 
             msg = _("Failed to create dataset '%s'") % text['name']
             s = cstr(e)

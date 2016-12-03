@@ -24,7 +24,7 @@ import re
 import numpy as N
 
 from ..compat import crange, cnext, CIterator
-from .. import document
+from .. import datasets
 from .. import utils
 from .. import qtall as qt4
 
@@ -124,14 +124,15 @@ class ReadCSV(object):
         else:
             prefix = 'col'
 
-        name = '%s%s%i%s' % (self.params.prefix, prefix,
-                             column+1, self.params.suffix)
+        name = '%s%s%i%s' % (
+            self.params.prefix, prefix, column+1, self.params.suffix)
         return name
 
     def _getNameAndColType(self, colnum, colval):
         """Get column name and type."""
 
         name = colval.strip()
+
         if name in ('+', '-', '+-'):
             # loop to find previous valid column
             prevcol = colnum - 1
@@ -143,7 +144,17 @@ class ReadCSV(object):
                     # we add a \0 here so that there's no chance of the user
                     # using this as a column name
                     name = n + '\0' + name
-                    return self.coltypes[prevcol], name
+
+                    if self.coltypes[prevcol] == 'unknown':
+                        # force previous column to float if this
+                        # column is an error bar
+                        self.coltypes[prevcol] = 'float'
+                    elif self.coltypes[prevcol] != 'float':
+                        # we can't treat this as an error bar if the
+                        # previous column is not numeric
+                        break
+
+                    return 'float', name
                 prevcol -= 1
 
             # did not find anything
@@ -151,13 +162,13 @@ class ReadCSV(object):
 
         # examine whether object type is at end of name
         # convert, and remove, if is
-        type = 'unknown'
+        dtype = 'unknown'
         for codename, codetype in typecodes:
             if name[-len(codename):] == codename:
-                type = codetype
+                dtype = codetype
                 name = name[:-len(codename)].strip()
                 break
-        return type, self.params.prefix + name + self.params.suffix
+        return dtype, self.params.prefix + name + self.params.suffix
 
     def _setNameAndType(self, colnum, colname, coltype):
         """Set a name for column number given column name and type."""
@@ -202,8 +213,8 @@ class ReadCSV(object):
         elif self.params.headermode == 'none':
             # no header, so just start a new data set
             dtype = self._guessType(col)
-            self._setNameAndType(colnum, self._generateName(colnum),
-                                 dtype)
+            self._setNameAndType(
+                colnum, self._generateName(colnum), dtype)
         else:
             # see whether it looks like data, not a header
             dtype = self._guessType(col)
@@ -214,8 +225,8 @@ class ReadCSV(object):
                 raise _NextValue()
             else:
                 # use guessed data type and generated name
-                self._setNameAndType(colnum, self._generateName(colnum),
-                                     dtype)
+                self._setNameAndType(
+                    colnum, self._generateName(colnum), dtype)
 
     def _newUnknownDataValue(self, colnum, col):
         """Process data value if data type is unknown.
@@ -230,13 +241,13 @@ class ReadCSV(object):
             raise _NextValue()
 
         # guess type from data value
-        t = self._guessType(col)
-        self.nametypes[self.colnames[colnum]] = t
-        self.coltypes[colnum] = t
+        dtype = self._guessType(col)
+        self.nametypes[self.colnames[colnum]] = dtype
+        self.coltypes[colnum] = dtype
 
         # add back on blanks if necessary with correct format
         for i in crange(self.colblanks[colnum]):
-            d = (N.nan, '')[t == 'string']
+            d = (N.nan, '')[dtype == 'string']
             self.data[self.colnames[colnum]].append(d)
         self.colblanks[colnum] = 0
 
@@ -376,13 +387,13 @@ class ReadCSV(object):
             # create dataset
             dstype = self.nametypes[name]
             if dstype == 'string':
-                ds = document.DatasetText(data=data[0], linked=linkedfile)
+                ds = datasets.DatasetText(data=data[0], linked=linkedfile)
             elif dstype == 'date':
-                ds = document.DatasetDateTime(data=data[0], linked=linkedfile)
+                ds = datasets.DatasetDateTime(data=data[0], linked=linkedfile)
             else:
-                ds = document.Dataset(data=data[0], serr=data[1],
-                                      perr=data[2], nerr=data[3],
-                                      linked=linkedfile)
+                ds = datasets.Dataset(
+                    data=data[0], serr=data[1], perr=data[2], nerr=data[3],
+                    linked=linkedfile)
 
             outmap[name] = ds
 

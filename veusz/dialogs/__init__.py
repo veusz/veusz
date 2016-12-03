@@ -20,7 +20,7 @@
 
 # load custom widgets
 from .. import qtwidgets
-from .. import document
+from .. import datasets
 from .veuszdialog import recreate_register
 
 # lazy loading recreation routines
@@ -41,16 +41,18 @@ def _lazy_recreate_plugin(*args):
     recreateDataset(*args)
 
 for kls, fn in (
-        (document.DatasetExpression, _lazy_recreate_1d),
-        (document.DatasetRange, _lazy_recreate_1d),
-        (document.Dataset2DXYZExpression, _lazy_recreate_2d),
-        (document.Dataset2DExpression, _lazy_recreate_2d),
-        (document.Dataset2DXYFunc, _lazy_recreate_2d),
-        (document.DatasetHistoValues, _lazy_recreate_histo),
-        (document.DatasetHistoBins, _lazy_recreate_histo),
-        (document.DatasetFiltered, _lazy_recreate_filtered),
-        (document.Dataset1DPlugin, _lazy_recreate_plugin),
-        (document.Dataset2DPlugin, _lazy_recreate_plugin),
-        (document.DatasetTextPlugin, _lazy_recreate_plugin),
+        (datasets.DatasetExpression, _lazy_recreate_1d),
+        (datasets.DatasetRange, _lazy_recreate_1d),
+        (datasets.Dataset2DXYZExpression, _lazy_recreate_2d),
+        (datasets.Dataset2DExpression, _lazy_recreate_2d),
+        (datasets.Dataset2DXYFunc, _lazy_recreate_2d),
+        (datasets.DatasetHistoValues, _lazy_recreate_histo),
+        (datasets.DatasetHistoBins, _lazy_recreate_histo),
+        (datasets.DatasetFiltered, _lazy_recreate_filtered),
+        (datasets.Dataset1DPlugin, _lazy_recreate_plugin),
+        (datasets.Dataset2DPlugin, _lazy_recreate_plugin),
+        (datasets.DatasetNDPlugin, _lazy_recreate_plugin),
+        (datasets.DatasetTextPlugin, _lazy_recreate_plugin),
+        (datasets.DatasetDateTimePlugin, _lazy_recreate_plugin),
         ):
     recreate_register[kls] = fn

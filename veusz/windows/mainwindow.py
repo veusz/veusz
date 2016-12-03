@@ -31,7 +31,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import cstr, cstrerror
+from ..compat import cstr, cstrerror, cgetcwd
 from .. import qtall as qt4
 
 from .. import document
@@ -189,7 +189,7 @@ class MainWindow(qt4.QMainWindow):
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt4.QDir.homePath())
         if setdb['dirname_usecwd']:
-            self.dirname = os.getcwd()
+            self.dirname = cgetcwd()
 
         # connect plot signals to main window
         self.plot.sigUpdatePage.connect(self.slotUpdatePage)
@@ -256,7 +256,7 @@ class MainWindow(qt4.QMainWindow):
             return []
         else:
             # get list of vsz files dropped
-            urls = [u.path() for u in mime.urls()]
+            urls = [u.toLocalFile() for u in mime.urls()]
             urls = [u for u in urls if os.path.splitext(u)[1] == '.vsz']
             return urls
 
@@ -414,12 +414,15 @@ class MainWindow(qt4.QMainWindow):
                 a(self, _('Open a document'), _('&Open...'),
                   self.slotFileOpen,
                   icon='kde-document-open', key='Ctrl+O'),
+            'file.reload':
+                a(self, _('Reload document from saved version'),
+                  _('Reload...'), self.slotFileReload),
             'file.save':
                 a(self, _('Save the document'), _('&Save'),
                   self.slotFileSave,
                   icon='kde-document-save', key='Ctrl+S'),
             'file.saveas':
-                a(self, _('Save the current graph under a new name'),
+                a(self, _('Save the current document under a new name'),
                   _('Save &As...'), self.slotFileSaveAs,
                   icon='kde-document-save-as'),
             'file.print':
@@ -562,6 +565,7 @@ class MainWindow(qt4.QMainWindow):
         filemenu = [
             'file.new', 'file.open',
             ['file.filerecent', _('Open &Recent'), []],
+            'file.reload',
             '',
             'file.save', 'file.saveas',
             '',
@@ -823,18 +827,12 @@ class MainWindow(qt4.QMainWindow):
         if self.filename:
             filetext = " '%s'" % os.path.basename(self.filename)
 
-        # show message box
-        mb = qt4.QMessageBox(_("Save file?"),
-                             _("Document%s was modified. Save first?") % filetext,
-                             qt4.QMessageBox.Warning,
-                             qt4.QMessageBox.Yes | qt4.QMessageBox.Default,
-                             qt4.QMessageBox.No,
-                             qt4.QMessageBox.Cancel | qt4.QMessageBox.Escape,
-                             self)
-        mb.setButtonText(qt4.QMessageBox.Yes, _("&Save"))
-        mb.setButtonText(qt4.QMessageBox.No, _("&Discard"))
-        mb.setButtonText(qt4.QMessageBox.Cancel, _("&Cancel"))
-        return mb.exec_()
+        return qt4.QMessageBox.warning(
+            self,
+            _("Save file?"),
+            _("Document%s was modified. Save first?") % filetext,
+            qt4.QMessageBox.Save | qt4.QMessageBox.Discard |
+            qt4.QMessageBox.Cancel)
 
     def closeEvent(self, event):
         """Before closing, check whether we need to save first."""
@@ -845,7 +843,7 @@ class MainWindow(qt4.QMainWindow):
             if v == qt4.QMessageBox.Cancel:
                 event.ignore()
                 return
-            elif v == qt4.QMessageBox.Yes:
+            elif v == qt4.QMessageBox.Save:
                 self.slotFileSave()
 
         # store working directory
@@ -1168,6 +1166,28 @@ class MainWindow(qt4.QMainWindow):
         else:
             menu.setEnabled(False)
 
+    def slotFileReload(self):
+        """Reload document from saved version."""
+
+        mb = qt4.QMessageBox(
+            _("Reload file"),
+            _("Reload document from file, losing any changes?"),
+            qt4.QMessageBox.Warning,
+            qt4.QMessageBox.Cancel,
+            qt4.QMessageBox.Yes,
+            qt4.QMessageBox.NoButton,
+            self)
+        mb.setButtonText(qt4.QMessageBox.Yes, _("&Reload"))
+        mb.setDefaultButton(qt4.QMessageBox.Cancel)
+        if mb.exec_() == qt4.QMessageBox.Yes:
+            if not os.path.exists(self.filename):
+                qt4.QMessageBox.critical(
+                    self,
+                    _("Reload file"),
+                    _("File %s no longer exists") % self.filename)
+            else:
+                self.openFileInWindow(self.filename)
+
     def slotFileExport(self):
         """Export the graph."""
         from ..dialogs.export import ExportDialog
@@ -1184,6 +1204,10 @@ class MainWindow(qt4.QMainWindow):
 
         # enable/disable file, save menu item
         self.vzactions['file.save'].setEnabled(ismodified)
+
+        # enable/disable reloading from saved document
+        self.vzactions['file.reload'].setEnabled(
+            bool(self.filename) and ismodified)
 
     def slotFileClose(self):
         """File close window chosen."""

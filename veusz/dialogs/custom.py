@@ -43,7 +43,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
             # qt docs say we have to return zero here, and we get a
             # crash if we don't (pressing right arrow)
             return 0
-        return len(self.document.customs)
+        return len(self.document.evaluate.customs)
 
     def columnCount(self, parent):
         if parent.isValid():
@@ -51,9 +51,9 @@ class CustomItemModel(qt4.QAbstractTableModel):
         return 3
 
     def data(self, index, role):
-        """Lookup data in document customs list."""
+        """Lookup data in document.evaluate.customs list."""
         if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
-            cust = self.document.customs[index.row()]
+            cust = self.document.evaluate.customs[index.row()]
             if cust[0] == 'colormap' and index.column() == 2:
                 # values are not a string
                 return repr(cust[2])
@@ -92,21 +92,21 @@ class CustomItemModel(qt4.QAbstractTableModel):
 
     def addNewEntry(self):
         """Add a new row to the list of custom items."""
-        newcustom = list(self.document.customs)
+        newcustom = list(self.document.evaluate.customs)
         newcustom.append( ['constant', 'name', 'None'] )
         self.document.applyOperation( document.OperationSetCustom(newcustom) )
 
     def deleteEntry(self, num):
         """Delete row num."""
-        newcustom = list(self.document.customs)
+        newcustom = list(self.document.evaluate.customs)
         del newcustom[num]
         self.document.applyOperation( document.OperationSetCustom(newcustom) )
 
     def moveUpEntry(self, num):
         """Move up entry."""
-        if num == 0 or len(self.document.customs) == 0:
+        if num == 0 or len(self.document.evaluate.customs) == 0:
             return
-        newcustom = list(self.document.customs)
+        newcustom = list(self.document.evaluate.customs)
         row = newcustom[num]
         del newcustom[num]
         newcustom.insert(num-1, row)
@@ -114,9 +114,9 @@ class CustomItemModel(qt4.QAbstractTableModel):
 
     def moveDownEntry(self, num):
         """Move down entry."""
-        if num >= len(self.document.customs)-1:
+        if num >= len(self.document.evaluate.customs)-1:
             return
-        newcustom = list(self.document.customs)
+        newcustom = list(self.document.evaluate.customs)
         row = newcustom[num]
         del newcustom[num]
         newcustom.insert(num+1, row)
@@ -131,7 +131,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
             if col == 0:
                 ok = value in ('constant', 'function', 'import', 'colormap')
             elif col == 1:
-                dtype = self.document.customs[row][0]
+                dtype = self.document.evaluate.customs[row][0]
                 if dtype == 'constant':
                     ok = document.identifier_re.match(value) is not None
                 elif dtype == 'function':
@@ -141,7 +141,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
                 elif dtype == 'colormap':
                     ok = value.strip() != ''
             elif col == 2:
-                dtype = self.document.customs[row][0]
+                dtype = self.document.evaluate.customs[row][0]
                 if dtype == 'colormap':
                     try:
                         value = ast.literal_eval(value)
@@ -154,7 +154,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
             if not ok:
                 return False
 
-            newcustom = list(self.document.customs)
+            newcustom = list(self.document.evaluate.customs)
             newcustom[row][col] = value
             self.document.applyOperation(
                 document.OperationSetCustom(newcustom) )
@@ -249,7 +249,7 @@ class CustomDialog(VeuszDialog):
         if filename:
             try:
                 f = open(filename, 'w')
-                self.document.saveCustomFile(f)
+                self.document.evaluate.saveCustomFile(f)
                 f.close()
                 self.recentButton.addFile(filename)
             except EnvironmentError as e:

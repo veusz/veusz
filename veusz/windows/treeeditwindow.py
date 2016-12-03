@@ -857,6 +857,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'rect', 'ellipse', 'imagefile',
                            'line', 'polygon', 'polar', 'ternary',
                            'nonorthpoint', 'nonorthfunc',
+                           'covariance',
                            'graph3d', 'function3d', 'point3d', 'axis3d',
                            'surface3d'):
 
@@ -940,6 +941,7 @@ class TreeEditDock(qt4.QDockWidget):
             'add.polar',
             'add.ternary',
             'add.graph3d',
+            'add.covariance',
             'add.shapemenu',
             )
 
@@ -1114,18 +1116,30 @@ class TreeEditDock(qt4.QDockWidget):
         if len(selected) != 0:
             self.treeview.edit(selected[0])
 
-    def selectWidget(self, widget):
+    def selectWidget(self, widget, mode='new'):
         """Select the associated listviewitem for the widget w in the
-        listview."""
+        listview.
+
+        mode:
+         'new': new selection
+         'add': add to selection
+         'toggle': toggle selection
+        """
 
         index = self.treemodel.getWidgetIndex(widget)
+
         if index is not None:
             self.treeview.scrollTo(index)
-            self.treeview.selectionModel().select(
-                index, qt4.QItemSelectionModel.Clear |
-                qt4.QItemSelectionModel.Current |
-                qt4.QItemSelectionModel.Rows |
-                qt4.QItemSelectionModel.Select )
+
+            flags = qt4.QItemSelectionModel.Rows | {
+                'new':  (
+                    qt4.QItemSelectionModel.ClearAndSelect |
+                    qt4.QItemSelectionModel.Current),
+                'add': qt4.QItemSelectionModel.Select,
+                'toggle': qt4.QItemSelectionModel.Toggle,
+            }[mode]
+
+            self.treeview.selectionModel().select(index, flags)
 
     def slotWidgetMove(self, direction):
         """Move the selected widget up/down in the hierarchy.
@@ -1403,26 +1417,36 @@ class SettingLabel(qt4.QWidget):
         name = widget.name
 
         popup = qt4.QMenu(self)
-        popup.addAction(_('Reset to default'),
-                        self.actionResetDefault)
+        popup.addAction(
+            _('Reset to default'),
+            self.actionResetDefault)
 
-        copyto = popup.addMenu(_('Copy to'))
-        copyto.addAction(_("all '%s' widgets") % wtype,
-                         self.actionCopyTypedWidgets)
-        copyto.addAction(_("'%s' siblings") % wtype,
-                         self.actionCopyTypedSiblings)
-        copyto.addAction(_("'%s' widgets called '%s'") % (wtype, name),
-                         self.actionCopyTypedNamedWidgets)
-        copyto.addSeparator()
-        self.addCopyToWidgets(copyto)
+        if self.setting.path[:12] != '/StyleSheet/':
+            # settings not relevant for style sheet items
 
-        popup.addAction(_('Use as default style'),
-                        self.actionSetStyleSheet)
+            copyto = popup.addMenu(_('Copy to'))
+            copyto.addAction(
+                _("all '%s' widgets") % wtype,
+                self.actionCopyTypedWidgets)
+            copyto.addAction(
+                _("'%s' siblings") % wtype,
+                self.actionCopyTypedSiblings)
+            copyto.addAction(
+                _("'%s' widgets called '%s'") % (wtype, name),
+                self.actionCopyTypedNamedWidgets)
+            copyto.addSeparator()
+            self.addCopyToWidgets(copyto)
+
+            popup.addAction(
+                _('Use as default style'),
+                self.actionSetStyleSheet)
 
         # special actions for references
         if self.setting.isReference():
             popup.addSeparator()
-            popup.addAction(_('Unlink setting'), self.actionUnlinkSetting)
+            popup.addAction(
+                _('Unlink setting'),
+                self.actionUnlinkSetting)
 
         self.inmenu = True
         self.updateHighlight()

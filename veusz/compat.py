@@ -23,9 +23,10 @@ Rolled own, because I can control the naming better (everying starts
 with a 'c')
 """
 
-import sys
 import itertools
 import locale
+import os
+import sys
 
 cpy3 = sys.version_info[0] == 3
 
@@ -99,6 +100,9 @@ if cpy3:
     # convert exception to a user string
     def cexceptionuser(ex):
         return str(ex)
+
+    # get current directory (as unicode)
+    cgetcwd = os.getcwd
 
 else:
     # py2
@@ -187,3 +191,6 @@ else:
 
     # py2/3 repr
     crepr = repr
+
+    # unicode getcwd
+    cgetcwd = os.getcwdu

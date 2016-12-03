@@ -204,7 +204,7 @@ class Fit(FunctionPlotter):
 
     def initEnviron(self):
         """Copy data into environment."""
-        env = self.document.eval_context.copy()
+        env = self.document.evaluate.context.copy()
         env.update( self.settings.values )
         return env
 
@@ -237,7 +237,7 @@ class Fit(FunctionPlotter):
         s = self.settings
 
         # check and get compiled for of function
-        compiled = self.document.compileCheckedExpression(s.function)
+        compiled = self.document.evaluate.compileCheckedExpression(s.function)
         if compiled is None:
             return
 

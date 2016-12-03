@@ -1,5 +1,59 @@
-Changes in *next version*:
- * Draw separate polygons with the polygon widget if missing values
+Changes in 1.25:
+ * Add n-dimensional dataset support
+ * Add GetColormap command to return RGBA values
+ * Add Colormap sequence plugin for choosing colors of widgets
+ * Fill above/below setting shown in key for xy widget
+ * Add Covariance widget for plotting covariance ellipses
+ * Add lineup, linedown, lineleft and lineright markers
+ * Add lineup, linedown and lineextend arrows
+
+Bug fixes:
+ * Fix pick indices if non-finite values in data
+ * Fix drag and drop of files into Veusz on Windows
+ * Raise exception if functions in console request input, avoiding hang
+ * Initialise unsafe_mode, in case Veusz used in PyQt embedding
+ * Fix crash if setting default setting in default setting window
+ * Fix crash in Clone() command on python3
+
+Changes in 1.24:
+ * Text labels can now include Python expressions inside %{{ }}%
+ * Added built-in functions DATE([fmt]), TIME([fmt]), FILENAME() and BASENAME()
+   when evaluating expressions, which are useful when used in labels
+ * Added Python dictionary ENVIRON when evaluating expressions, to obtain
+   values from environment variables
+ * Added DATA(name, [part]) function to expression environment for accessing
+   values from datasets, useful for function evaluation or labels
+ * Added SETTING(path) function for expression evaluation to obtain values
+   of settings
+ * Added ESCAPE(text) function to environment, which allows LaTeX special
+   characters to be displayed in labels
+ * Add fractions and percentages units to polar plot
+ * Allow number of spokes to be varied in polar plot
+ * Widgets can be clicked holding down shift or ctrl, to add or toggle their
+   selection
+ * Add K. Moreland's cool-warm colormap (thanks to S. Richardson)
+ * Added further green-map, blue-darkred, blue-darkorange, brown-blue and
+   blue-orange colormaps from Oregon geography dept.
+ * Add logarithm and exponential dataset plugins
+ * Add Wipe() command to embedding interface to clear document
+ * Add File->Reload menu option to reload from saved document
+ * Add tooltip to items in FieldWidget showing widget path
+
+Bux fixes:
+ * Fix transparency with bar plot
+ * Use getcwdu() for python2 to avoid bugs combining paths
+ * Handle inf/nan when converting to human readable form in plots
+ * Fix CreateHistogram on command line without binparams parameter
+ * Handle empty 2D dataset import with grid at edge enabled
+ * Do not allow error bars on imported CSV non-numeric data
+ * Handle missing argument in \size
+ * For data edit dialog, allow 1D dataset to replace 2D dataset
+ * Crash if zoom to be height when height is zero
+ * Fix problem with 2D import if error message is in unicode
+ * With axis-function widget catch result if greater than 1 dimension
+ * Fix cloning for datasets with / in name
+ * Fix crash in embedding if plot window closed while rendering in progress
+>>>>>>> master
 
 Changes in 1.23.2:
  * Add data clipping dataset plugin

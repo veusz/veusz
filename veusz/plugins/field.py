@@ -142,8 +142,13 @@ class _WidgetCombo(qt4.QComboBox):
             except ValueError:
                 pass
 
+        # make combo match list of widgets
         utils.populateCombo(self, comboitems)
-    
+
+        # set tool tip for each entry which is the path
+        for i, path in enumerate(self.paths):
+            self.setItemData(i, path, qt4.Qt.ToolTipRole)
+
     def getWidgetPath(self):
         """Get path of selected widget."""
         return self.paths[self.currentIndex()]
@@ -335,8 +340,8 @@ class FieldDataset(_FieldSetting):
         """name: name of field
         descr: description to show to user
         default: default value (ignored currently)
-        dims: dimensions of dataset to show
-        datatype: type of data: numeric or text
+        dims: dimensions of dataset to show (or 'all')
+        datatype: type of data: numeric, text or all
         """
         _FieldSetting.__init__(self, setting.Dataset,
                                name, descr=descr, default=default,
@@ -416,4 +421,13 @@ class FieldFilename(_FieldSetting):
     def __init__(self, name, descr=None, default=''):
         _FieldSetting.__init__(self, setting.Filename, name,
                                descr=descr, default=default)
+
+
+class FieldColormap(_FieldSetting):
+    """Return the name of a colormap."""
+
+    def __init__(self, name, descr=None, default=''):
+        _FieldSetting.__init__(
+            self, setting.Colormap, name,
+            descr=descr, default=default)
 

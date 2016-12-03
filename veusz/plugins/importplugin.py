@@ -471,7 +471,7 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
         else:
             return datasetplugin.Dataset2D(name, val)
     else:
-        raise ImportPluginException(_("Unsupported dataset shape"))
+        return datasetplugin.DatasetND(name, val)
 
 class ImportPluginNpy(ImportPlugin):
     """For reading single datasets from NPY numpy saved files."""

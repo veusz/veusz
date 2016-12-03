@@ -19,7 +19,7 @@
 ###############################################################################
 
 from .version import version
-from .textrender import Renderer, FontMetrics
+from .textrender import Renderer, FontMetrics, latexEscape
 from .safe_eval import compileChecked, SafeEvalException
 from .fitlm import fitLM
 

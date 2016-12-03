@@ -171,18 +171,11 @@ class LinkedFileBase(object):
         read = []
         for name, ds in list(tempdoc.data.items()):
             if name not in document.data:
-                read.append(name)
-
-                # rename any renamed datasets
-                outname = name
-                if self.params.renames and name in self.params.renames:
-                    outname = self.params.renames[name]
-
                 ds.linked = self
                 if name in tags:
                     ds.tags = tags[name]
-
-                document.setData(outname, ds)
+                document.setData(name, ds)
+                read.append(name)
         return read
 
     def reloadLinks(self, document):
@@ -231,15 +224,16 @@ class OperationDataImportBase(object):
         """Optionally, add the customs return by plugins to document."""
 
         if len(customs) > 0:
-            self.oldconst = list(document.customs)
-            cd = document.customDict()
+            doceval = document.evaluate
+            self.oldconst = list(doceval.customs)
+            cd = doceval.customDict()
             for item in customs:
                 if item[1] in cd:
                     idx, ctype, val = cd[item[1]]
-                    document.customs[idx] = item
+                    doceval.customs[idx] = item
                 else:
-                    document.customs.append(item)
-            document.updateEvalContext()
+                    doceval.customs.append(item)
+            doceval.update()
 
     def do(self, document):
         """Do import."""
@@ -296,5 +290,5 @@ class OperationDataImportBase(object):
 
         # for custom definitions
         if self.oldconst is not None:
-            document.customs = self.oldconst
-            document.updateEvalContext()
+            document.evaluate.customs = self.oldconst
+            document.evaluate.update()

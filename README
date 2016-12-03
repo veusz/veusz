@@ -1,5 +1,5 @@
-Veusz 1.23.2
-------------
+Veusz 1.25
+----------
 http://home.gna.org/veusz/
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -12,66 +12,22 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.23.2:
- * Add data clipping dataset plugin
- * Fix boxplot with manual settings
- * Fix plugin normalize and divide by maximum for new numpy versions
- * Avoid error in 2d data creation
- * Fix problems with unicode characters in plugins in Python 2.x
- * Clip axis to sensible range -1e100->1e100
- * Handle unicode errors from operating system in Veusz scripts
- * Handle unicode errors in error reports
- * Fix crash in \color
+Changes in 1.25:
+ * Add n-dimensional dataset support
+ * Add GetColormap command to return RGBA values
+ * Add Colormap sequence plugin for choosing colors of widgets
+ * Fill above/below setting shown in key for xy widget
+ * Add Covariance widget for plotting covariance ellipses
+ * Add lineup, linedown, lineleft and lineright markers
+ * Add lineup, linedown and lineextend arrows
 
-Changes in 1.23.1:
- * Enable compression in exported files (Benjamin K. Stuhl)
- * Fix saving histogram datasets
- * Add option to "thin" error bars plotted
- * Fix label colour in contour labelling
- * Remove use of deprecated Qt functions
- * Fix clone widget tools plugin
- * Fix EPS/PDF crash with broken axis widget
- * Do not crash filter plugin if using date datatype
- * Avoid crashes in normalise, subtract minimum and divide maximum plugins
- * Avoid crash in image widget
- * Avoid issue in identifying spacing in 1D->2D conversion
- * Add Gnuplot 2D data import plugin (Joerg Meyer)
- * When loading data from import plugins, provide default values
- * Remove some deprecated Qt uses
- * Fix issue when plotting non-plain datasets with nan values
-
-Changes in 1.23:
- * Add new export dialog box which can export multiple pages and
-   modify the export options
- * Add new dataset filtering dialog
- * Add cubehelix() functional colormap
- * Add -stepN suffix for colormaps to make arbitrary numbers of steps
- * Fix incorrect colors in log images and log color scales
- * Fix unsafe commands not being run
-
-Minor changes
- * Fix incorrect use of None in (x,...) pattern
- * Catch crash if plotting nan/inf value in log space
- * Fix getData in dataset plugin for dimensions=2
- * Catch error in too large float to date time conversion
- * Catch disappeared file during import
- * Index error fixed in pickable
- * Catch error in data edit dialog if 2d dataset size changes
- * If root widget is selected with others, do not error on hide
- * Fix undo for dataset histogram with a single output dataset
- * Fix error resizing ellipse with a tuple width, height or position setting
- * Only use finite values in histogram
- * Rewrite Line/FillSet setting controls for internal consistency and to fix
-   new style extended fills
- * Do not crash with log date-time axes
- * Also ignore non-finite values when fitting with minuit
- * Avoid syntax error with invalid colormap
- * Updates to setup.py and desktop files
- * Recreate dataset now works if dialog hasn't been opened already
- * Restore dock layout when using Python3
- * Fix undo after loading stylesheet/custom definitions
- * Support unicode example filenames
- * Clip bezier lines to avoid problems with log axes
+Bug fixes:
+ * Fix pick indices if non-finite values in data
+ * Fix drag and drop of files into Veusz on Windows
+ * Raise exception if functions in console request input, avoiding hang
+ * Initialise unsafe_mode, in case Veusz used in PyQt embedding
+ * Fix crash if setting default setting in default setting window
+ * Fix crash in Clone() command on python3
 
 Features of package:
  Plotting features:

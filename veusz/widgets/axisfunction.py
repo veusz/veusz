@@ -71,7 +71,10 @@ def solveFunction(function, vals, mint=None, maxt=None):
         xvals = N.hstack(( xvals[xvals < maxt], maxt ))
 
     # yvalue in correct shape
-    yvals = function(xvals) + N.zeros(len(xvals))
+    try:
+        yvals = function(xvals) + N.zeros(len(xvals))
+    except Exception as e:
+        raise FunctionError(_('Error evaluating function: %s') % cstr(e))
 
     anynan = N.any( N.isnan(yvals) )
     if anynan:
@@ -239,7 +242,7 @@ class AxisFunction(axis.Axis):
             return self.cachedfuncobj
         self.funcchangeset = self.document.changeset
 
-        compiled = self.document.compileCheckedExpression(
+        compiled = self.document.evaluate.compileCheckedExpression(
             self.settings.function.strip())
 
         if compiled is None:
@@ -247,7 +250,7 @@ class AxisFunction(axis.Axis):
         else:
             # a python function for doing the evaluation and handling
             # errors
-            env = self.document.eval_context.copy()
+            env = self.document.evaluate.context.copy()
 
             def function(t):
                 env['t'] = t

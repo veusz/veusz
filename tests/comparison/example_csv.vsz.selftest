@@ -49,6 +49,9 @@
 </g>
 </g>
 <g clip-path="url(#c2)">
+<g fill="#808080" stroke="none" stroke-width="1">
+<path d="m374.2,445l35.4,0l0,7.8l-35.4,0l0,-7.8"/>
+</g>
 <g fill="none" stroke="#ff0000" stroke-width="0.6">
 <path d="M391.9,438l0,14"/>
 <path d="M391.9,445l0,0"/>

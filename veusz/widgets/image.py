@@ -306,7 +306,7 @@ class Image(plotters.GenericPlotter):
             return
 
         # make QImage from data
-        cmap = d.getColormap(s.colorMap, s.colorInvert)
+        cmap = d.evaluate.getColormap(s.colorMap, s.colorInvert)
         datavaluerange = self.getDataValueRange(data)
         image = utils.applyColorMap(
             cmap, s.colorScaling, data.data,

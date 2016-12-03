@@ -40,7 +40,7 @@ class FunctionPlotter(GenericPlotter):
     typename='function'
     allowusercreation=True
     description=_('Plot a function')
-    
+
     def __init__(self, parent, name=None):
         """Initialise plotter."""
 
@@ -54,40 +54,48 @@ class FunctionPlotter(GenericPlotter):
         """Construct list of settings."""
         GenericPlotter.addSettings(s)
 
-        s.add( setting.Int('steps',
-                           50,
-                           minval = 3,
-                           descr = _('Number of steps to evaluate the function'
-                                     ' over'),
-                           usertext=_('Steps'), formatting=True), 0 )
-        s.add( setting.Choice('variable', ['x', 'y'], 'x',
-                              descr=_('Variable the function is a function of'),
-                              usertext=_('Variable')),
+        s.add( setting.Int(
+            'steps',
+            50,
+            minval = 3,
+            descr = _('Number of steps to evaluate the function'
+                      ' over'),
+            usertext=_('Steps'), formatting=True), 0 )
+        s.add( setting.Choice(
+            'variable', ['x', 'y'], 'x',
+            descr=_('Variable the function is a function of'),
+            usertext=_('Variable')),
                0 )
-        s.add( setting.Str('function', 'x',
-                           descr=_('Function expression'),
-                           usertext=_('Function')), 0 )
+        s.add( setting.Str(
+            'function', 'x',
+            descr=_('Function expression'),
+            usertext=_('Function')), 0 )
 
-        s.add(setting.FloatOrAuto('min', 'Auto',
-                                  descr=_('Minimum value at which to plot function'),
-                                  usertext=_('Min')))
-        
-        s.add(setting.FloatOrAuto('max', 'Auto',
-                                  descr=_('Maximum value at which to plot function'),
-                                  usertext=_('Max')))
+        s.add(setting.FloatOrAuto(
+            'min', 'Auto',
+            descr=_('Minimum value at which to plot function'),
+            usertext=_('Min')))
 
-        s.add( setting.Line('Line',
-                            descr = _('Function line settings'),
-                            usertext = _('Plot line')),
+        s.add(setting.FloatOrAuto(
+            'max', 'Auto',
+            descr=_('Maximum value at which to plot function'),
+            usertext=_('Max')))
+
+        s.add( setting.Line(
+            'Line',
+            descr = _('Function line settings'),
+            usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
 
-        s.add( setting.PlotterFill('FillBelow',
-                                   descr = _('Fill below/left function'),
-                                   usertext = _('Fill below')),
+        s.add( setting.PlotterFill(
+            'FillBelow',
+            descr = _('Fill below/left function'),
+            usertext = _('Fill below')),
                pixmap = 'settings_plotfillbelow' )
-        s.add( setting.PlotterFill('FillAbove',
-                                   descr = _('Fill mode above/right function'),
-                                   usertext = _('Fill above')),
+        s.add( setting.PlotterFill(
+            'FillAbove',
+            descr = _('Fill mode above/right function'),
+            usertext = _('Fill above')),
                pixmap = 'settings_plotfillabove' )
 
     @property
@@ -124,7 +132,7 @@ class FunctionPlotter(GenericPlotter):
             return
 
         # ignore if function isn't sensible
-        compiled = self.document.compileCheckedExpression(s.function)
+        compiled = self.document.evaluate.compileCheckedExpression(s.function)
         if compiled is None:
             return
 
@@ -147,7 +155,7 @@ class FunctionPlotter(GenericPlotter):
         # work out function in steps
         try:
             if varaxis.settings.log:
-                # log spaced steps 
+                # log spaced steps
                 l1, l2 = N.log(varaxrange[1]), N.log(varaxrange[0])
                 delta = (l2-l1)/20.
                 points = N.exp(N.arange(l1, l2+delta, delta))
@@ -271,7 +279,7 @@ class FunctionPlotter(GenericPlotter):
 
     def initEnviron(self):
         """Set up function environment."""
-        return self.document.eval_context.copy()
+        return self.document.evaluate.context.copy()
 
     def getIndependentPoints(self, axes, posn):
         """Calculate the real and screen points to plot for the independent axis"""
@@ -320,7 +328,7 @@ class FunctionPlotter(GenericPlotter):
         if axispts is None:
             return None, None
 
-        compiled = self.document.compileCheckedExpression(s.function)
+        compiled = self.document.evaluate.compileCheckedExpression(s.function)
         if not compiled:
             return None, None
 
@@ -342,7 +350,7 @@ class FunctionPlotter(GenericPlotter):
     def calcFunctionPoints(self, axes, posn):
         ipts, pipts = self.getIndependentPoints(axes, posn)
         dpts, pdpts = self.calcDependentPoints(ipts, axes, posn)
-        
+
         if self.settings.variable == 'x':
             return (ipts, dpts), (pipts, pdpts)
         else:
@@ -360,7 +368,7 @@ class FunctionPlotter(GenericPlotter):
             axisnames[0] = axisnames[0] + '(' + axisnames[1] + ')'
 
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
-        
+
         return pickable.GenericPickable(
                     self, axisnames, (xpts, ypts), (pxpts, pypts) )
 
@@ -408,4 +416,3 @@ class FunctionPlotter(GenericPlotter):
 
 # allow the factory to instantiate an function plotter
 document.thefactory.register( FunctionPlotter )
-

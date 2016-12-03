@@ -23,6 +23,8 @@ import random
 import re
 import fnmatch
 
+import numpy as N
+
 from ..compat import cbasestr
 from .. import qtall as qt4
 from .. import utils
@@ -104,7 +106,7 @@ class ColorsRandomize(ToolsPlugin):
             if a > b:
                 return random.randint(b, a)
             return random.randint(a, b)
-            
+
         col = qt4.QColor.fromHsv(rand(H1, H2), rand(S1, S2), rand(V1, V2))
         return str(col.name())
 
@@ -119,13 +121,79 @@ class ColorsRandomize(ToolsPlugin):
         if fields['randxy']:
             for node in fromwidget.WalkWidgets(widgettype='xy'):
                 col = self.getRandomColor(col1, col2)
-                node.PlotLine.color.val = col
-                node.MarkerFill.color.val = col
-                node.ErrorBarLine.color.val = col
+                node.PlotLine.color = col
 
         if fields['randfunc']:
             for node in fromwidget.WalkWidgets(widgettype='function'):
                 node.Line.color.val = self.getRandomColor(col1, col2)
+
+class ColorsSequenceCMap(ToolsPlugin):
+    """Color sequence using colormap."""
+
+    menu = (_('Colors'), _('Colormap Sequence'))
+    name = 'Create color sequence using color map'
+    description_short = _('Make widgets use sequence of colors in a colormap')
+    description_full = _(
+        'Give new colors to each widget in a sequence using a colormap. '
+        'Match can be set to match names of widgets (e.g. "xy*").')
+
+    def __init__(self):
+        """Construct plugin."""
+        self.fields = [
+            field.FieldWidget(
+                "widget", descr=_("Start from widget"), default="/"),
+            field.FieldBool(
+                "colorxy", descr=_("Color xy plotters"), default=True),
+            field.FieldBool(
+                "colorfunc", descr=_("Color function plotters"), default=True),
+            field.FieldText(
+                "match", descr=_("Match")),
+            field.FieldBool(
+                "invert", descr=_("Invert colormap"), default=False),
+            field.FieldBool(
+                "randomize", descr=_("Randomize order"), default=False),
+            field.FieldColormap(
+                "colormap", descr=_("Colormap"), default="grey"),
+            ]
+
+    def apply(self, ifc, fields):
+        """Do the randomizing."""
+
+        fromwidget = ifc.Root.fromPath(fields['widget'])
+        match = fields['match'].strip()
+
+        widgets = []
+        for w in fromwidget.WalkWidgets():
+            if match and not fnmatch.fnmatch(w.name, match):
+                continue
+            if ( (w.widgettype=='xy' and fields['colorxy']) or
+                 (w.widgettype=='function' and fields['colorfunc']) ):
+                widgets.append(w)
+
+        # get list of RGBA values
+        cvals = ifc.GetColormap(
+            fields["colormap"], invert=fields["invert"],
+            nvals=max(1, len(widgets)))
+
+        if fields["randomize"]:
+            N.random.shuffle(cvals)
+
+        # convert colors to #XXXX format
+        for idx, widget in enumerate(widgets):
+            if cvals[idx,3] == 255:
+                # opaque
+                col = "#%02x%02x%02x" % (
+                    cvals[idx,0], cvals[idx,1], cvals[idx,2])
+            else:
+                # with transparency
+                col = "#%02x%02x%02x%02x" % (
+                    cvals[idx,0], cvals[idx,1], cvals[idx,2], cvals[idx,3])
+
+            t = widget.widgettype
+            if t == 'xy':
+                widget.color.val = col
+            elif t == 'function':
+                widget.Line.color.val = col
 
 class ColorsSequence(ToolsPlugin):
     """Color plotters in sequence."""
@@ -151,7 +219,7 @@ class ColorsSequence(ToolsPlugin):
             ]
 
     def apply(self, ifc, fields):
-        """Do the randomizing."""
+        """Do the sequence."""
 
         fromwidget = ifc.Root.fromPath(fields['widget'])
 
@@ -162,8 +230,9 @@ class ColorsSequence(ToolsPlugin):
         V1, V2 = col1.value(), col2.value()
 
         # add up total number of widgets
-        numwidgets = ( len( list(fromwidget.WalkWidgets(widgettype='xy')) ) +
-                       len( list(fromwidget.WalkWidgets(widgettype='function')) ) )
+        numwidgets = (
+            len( list(fromwidget.WalkWidgets(widgettype='xy')) ) +
+            len( list(fromwidget.WalkWidgets(widgettype='function')) ) )
 
         def colatidx(i):
             """Get color in range 0...numwidgets-1."""
@@ -180,9 +249,7 @@ class ColorsSequence(ToolsPlugin):
             if fields['randxy'] and t == 'xy':
                 col = colatidx(idx)
                 idx += 1
-                node.PlotLine.color.val = col
-                node.MarkerFill.color.val = col
-                node.ErrorBarLine.color.val = col
+                node.PlotLine.color = col
 
             if fields['randfunc'] and t == 'function':
                 node.Line.color.val = colatidx(idx)
@@ -432,8 +499,13 @@ class WidgetsClone(ToolsPlugin):
             newname = None
             if fields['names']:
                 newname = widget.name
-                if ds1r: newname += ' ' + ds1r
-                if ds2r: newname += ' ' + ds2r
+                if ds1r:
+                    # / cannot be in dataset name
+                    flt1 = ds1r.replace('/', '_')
+                    newname += ' ' + flt1
+                if ds2r:
+                    flt2 = ds2r.replace('/', '_')
+                    newname += ' ' + flt2
 
             # make the new widget (and children)
             newwidget = widget.Clone(widget.parent, newname=newname)
@@ -524,6 +596,7 @@ class FontSizeDecrease(FontSize):
 toolspluginregistry += [
     ColorsRandomize,
     ColorsSequence,
+    ColorsSequenceCMap,
     ColorsReplace,
     ColorsSwap,
     TextReplace,

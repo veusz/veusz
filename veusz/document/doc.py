@@ -24,7 +24,6 @@
 from __future__ import division
 import codecs
 import os.path
-import re
 import traceback
 import datetime
 from collections import defaultdict
@@ -36,37 +35,20 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import crange, citems, cvalues, cstr, cexec, CStringIO, cexecfile
+from ..compat import citems, cvalues, cstr, CStringIO, cexecfile
 from .. import qtall as qt4
 
 from . import widgetfactory
-from . import datasets
 from . import painthelper
+from . import evaluate
 
+from .. import datasets
 from .. import utils
 from .. import setting
 
 def _(text, disambiguation=None, context="Document"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
-
-# python identifier
-identifier_re = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
-# for splitting
-identifier_split_re = re.compile(r'[A-Za-z_][A-Za-z0-9_]*')
-
-# python module
-module_re = re.compile(r'^[A-Za-z_\.]+$')
-
-# function(arg1, arg2...) for custom functions
-# not quite correct as doesn't check for commas in correct places
-function_re = re.compile(r'''
-^([A-Za-z_][A-Za-z0-9_]*)[ ]*  # identifier
-\((                            # begin args
-(?: [ ]* ,? [ ]* [A-Za-z_][A-Za-z0-9_]* )*     # named args
-(?: [ ]* ,? [ ]* \*[A-Za-z_][A-Za-z0-9_]* )?   # *args
-(?: [ ]* ,? [ ]* \*\*[A-Za-z_][A-Za-z0-9_]* )? # **kwargs
-)\)$                           # endargs''', re.VERBOSE)
 
 def getSuitableParent(widgettype, initialwidget):
     """Find the nearest relevant parent for the widgettype given."""
@@ -89,7 +71,7 @@ class DocSuspend(object):
     def __exit__(self, type, value, traceback):
         self.doc.enableUpdates()
 
-class Document( qt4.QObject ):
+class Document(qt4.QObject):
     """Document class for holding the graph data.
     """
 
@@ -125,28 +107,11 @@ class Document( qt4.QObject ):
         # default document locale
         self.locale = qt4.QLocale()
 
+        # evaluation context
+        self.evaluate = evaluate.Evaluate(self)
+
         self.clearHistory()
         self.wipe()
-
-        # directories to examine when importing
-        self.importpath = []
-
-        # store custom functions and constants
-        # consists of tuples of (name, type, value)
-        # type is constant or function
-        # we use this format to preserve evaluation order
-        self.customs = []
-        self.updateEvalContext()
-
-        # copy default colormaps
-        self.colormaps = utils.ColorMaps()
-
-        # copies of validated compiled expressions
-        self.exprcompiled = {}
-        self.exprfailed = set()
-        self.exprfailedchangeset = -1
-        self.evalexprcache = {}
-        self.evalexprcachechangeset = None
 
     def wipe(self):
         """Wipe out any stored data."""
@@ -155,6 +120,8 @@ class Document( qt4.QObject ):
             'document', None, None)
         self.basewidget.document = self
         self.setModified(False)
+        self.filename = ""
+        self.evaluate.wipe()
         self.sigWiped.emit()
 
     def clearHistory(self):
@@ -162,7 +129,7 @@ class Document( qt4.QObject ):
         self.historybatch = []
         self.historyundo = []
         self.historyredo = []
-        
+
     def suspendUpdates(self):
         """Holds sending update messages.
         This speeds up modification of the document and prevents the document
@@ -172,7 +139,7 @@ class Document( qt4.QObject ):
     def enableUpdates(self):
         """Reenables document updates."""
         changeset = self.suspendupdates.pop()
-        if len(self.suspendupdates) == 0 and changeset != self.changeset:
+        if not self.suspendupdates and changeset != self.changeset:
             # bump this up as some watchers might ignore this otherwise
             self.changeset += 1
             self.setModified()
@@ -195,21 +162,16 @@ class Document( qt4.QObject ):
 
     def applyOperation(self, operation):
         """Apply operation to the document.
-        
+
         Operations represent atomic actions which can be done to the document
         and undone.
 
         Updates are suspended during the operation.
         """
 
-        self.suspendUpdates()
-        try:
+        with DocSuspend(self):
             retn = operation.do(self)
             self.changeset += 1
-        except:
-            self.enableUpdates()
-            raise
-        self.enableUpdates()
 
         if self.historybatch:
             # in batch mode, create an OperationMultiple for all changes
@@ -223,33 +185,28 @@ class Document( qt4.QObject ):
 
     def batchHistory(self, batch):
         """Enable/disable batch history mode.
-        
+
         In this mode further operations are added to the OperationMultiple specified,
         until batchHistory is called with None.
-        
+
         The objects are pushed into a list and popped off
-        
+
         This allows multiple operations to be batched up for simple undo.
         """
         if batch:
             self.historybatch.append(batch)
         else:
             self.historybatch.pop()
-        
+
     def undoOperation(self):
         """Undo the previous operation."""
 
         operation = self.historyundo.pop()
-        self.suspendUpdates()
-        try:
+        with DocSuspend(self):
             operation.undo(self)
             self.changeset += 1
-        except:
-            self.enableUpdates()
-            raise
-        self.enableUpdates()
         self.historyredo.append(operation)
-        
+
     def canUndo(self):
         """Returns True if previous operation can be removed."""
         return len(self.historyundo) != 0
@@ -262,10 +219,10 @@ class Document( qt4.QObject ):
     def canRedo(self):
         """Returns True if previous operation can be redone."""
         return len(self.historyredo) != 0
-        
+
     def resolveFullWidgetPath(self, path):
         """Translate the widget path given into the widget."""
-        
+
         widget = self.basewidget
         for p in [i for i in path.split('/') if i != '']:
             for child in widget.children:
@@ -276,7 +233,7 @@ class Document( qt4.QObject ):
                 # break wasn't called
                 assert False
         return widget
-        
+
     def resolveFullSettingPath(self, path):
         """Translate setting path into setting object."""
 
@@ -292,13 +249,13 @@ class Document( qt4.QObject ):
             else:
                 # no child with name
                 break
-            
+
         # get Setting object
         s = widget.settings
         while isinstance(s, setting.Settings) and parts[0] in s.setdict:
             s = s.get(parts[0])
             del parts[0]
-            
+
         assert isinstance(s, setting.Setting)
         return s
 
@@ -310,10 +267,11 @@ class Document( qt4.QObject ):
         """Set data to val, with symmetric or negative and positive errors."""
         self.data[name] = dataset
         dataset.document = self
-        
+        dataset.username = name
+
         # update the change tracking
         self.setModified()
-    
+
     def deleteData(self, name):
         """Remove a dataset"""
         if name in self.data:
@@ -369,26 +327,18 @@ class Document( qt4.QObject ):
                 return name
         raise ValueError("Cannot find dataset")
 
-    def deleteDataset(self, name):
-        """Remove the selected dataset."""
-        del self.data[name]
-        self.setModified()
-
     def renameDataset(self, oldname, newname):
         """Rename the dataset."""
         d = self.data[oldname]
         del self.data[oldname]
         self.data[newname] = d
+        d.username = newname
 
         self.setModified()
 
     def getData(self, name):
         """Get data with name"""
         return self.data[name]
-
-    def hasData(self, name):
-        """Whether dataset is defined."""
-        return name in self.data
 
     def setModified(self, ismodified=True):
         """Set the modified flag on the data, and inform views."""
@@ -431,7 +381,7 @@ class Document( qt4.QObject ):
         if antialias:
             painter.setRenderHint(qt4.QPainter.Antialiasing, True)
             painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
-   
+
         sizes = []
 
         # This all assumes that only pages can go into the root widget
@@ -479,13 +429,6 @@ class Document( qt4.QObject ):
         fileobj.write('# Saved at %s\n\n' %
                       datetime.datetime.utcnow().isoformat())
 
-    def saveCustomDefinitions(self, fileobj):
-        """Save custom constants and functions."""
-
-        for vals in self.customs:
-            fileobj.write('AddCustom(%s, %s, %s)\n' %
-                          tuple([repr(x) for x in vals]))
-
     def saveDatasetTags(self, fileobj):
         """Write dataset tags to output file"""
 
@@ -500,12 +443,6 @@ class Document( qt4.QObject ):
             fileobj.write('TagDatasets(%s, %s)\n' %
                           (repr(tag), repr(val)))
 
-    def saveCustomFile(self, fileobj):
-        """Export the custom settings to a file."""
-
-        self._writeFileHeader(fileobj, 'custom definitions')
-        self.saveCustomDefinitions(fileobj)
-
     def saveToFile(self, fileobj):
         """Save the text representing a document to a file.
 
@@ -519,7 +456,7 @@ class Document( qt4.QObject ):
         """
 
         self._writeFileHeader(fileobj, 'saved document')
-        
+
         # add file directory to import path if we know it
         reldirname = None
         if getattr(fileobj, 'name', False):
@@ -527,7 +464,7 @@ class Document( qt4.QObject ):
             fileobj.write('AddImportPath(%s)\n' % repr(reldirname))
 
         # add custom definitions
-        self.saveCustomDefinitions(fileobj)
+        self.evaluate.saveCustomDefinitions(fileobj)
 
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
@@ -545,7 +482,7 @@ class Document( qt4.QObject ):
 
         # save the actual tree structure
         fileobj.write(self.basewidget.getSaveText())
-        
+
         self.setModified(False)
 
     def saveToHDF5File(self, fileobj):
@@ -570,7 +507,7 @@ class Document( qt4.QObject ):
             textstream.write('AddImportPath(%s)\n' % repr(reldirname))
 
         # add custom definitions
-        self.saveCustomDefinitions(textstream)
+        self.evaluate.saveCustomDefinitions(textstream)
 
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
@@ -619,6 +556,8 @@ class Document( qt4.QObject ):
         else:
             raise RuntimeError('Invalid save mode')
 
+        self.filename = filename
+
     def load(self, filename, mode='vsz', callbackunsafe=None):
         """Load document from file.
 
@@ -627,6 +566,8 @@ class Document( qt4.QObject ):
         from . import loader
         loader.loadDocument(self, filename, mode=mode,
                             callbackunsafe=callbackunsafe)
+
+        self.filename = filename
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""
@@ -647,7 +588,7 @@ class Document( qt4.QObject ):
         if integer:
             return int(w), int(h)
         else:
-            return w, h        
+            return w, h
 
     def pageSize(self, pagenum, dpi=None, scaling=1., integer=True):
         """Get the size of a particular page in pixels.
@@ -747,278 +688,6 @@ class Document( qt4.QObject ):
         # return widget
         return obj
 
-    def _processSafeImports(self, module, symbols):
-        """Check what symbols are safe to import."""
-
-        # empty list
-        if not symbols:
-            return symbols
-
-        # do import anyway
-        if setting.transient_settings['unsafe_mode']:
-            return symbols
-
-        # two-pass to ask user whether they want to import symbol
-        for thepass in crange(2):
-            # remembered during session
-            a = 'import_allowed'
-            if a not in setting.transient_settings:
-                setting.transient_settings[a] = defaultdict(set)
-            allowed = setting.transient_settings[a][module]
-
-            # not allowed during session
-            a = 'import_notallowed'
-            if a not in setting.transient_settings:
-                setting.transient_settings[a] = defaultdict(set)
-            notallowed = setting.transient_settings[a][module]
-
-            # remembered in setting file
-            a = 'import_allowed'
-            if a not in setting.settingdb:
-                setting.settingdb[a] = {}
-            if module not in setting.settingdb[a]:
-                setting.settingdb[a][module] = {}
-            allowed_always = setting.settingdb[a][module]
-
-            # collect up
-            toimport = []
-            possibleimport = []
-            for symbol in symbols:
-                if symbol in allowed or symbol in allowed_always:
-                    toimport.append(symbol)
-                elif symbol not in notallowed:
-                    possibleimport.append(symbol)
-
-            # nothing to do, so leave
-            if not possibleimport:
-                break
-
-            # only ask the user the first time
-            if thepass == 0:
-                self.sigAllowedImports.emit(module, possibleimport)
-
-        return toimport
-
-    def _updateEvalContextImport(self, module, val):
-        """Add an import statement to the eval function context."""
-        if module_re.match(module):
-            # work out what is safe to import
-            symbols = identifier_split_re.findall(val)
-            toimport = self._processSafeImports(module, symbols)
-            if toimport:
-                defn = 'from %s import %s' % (module,
-                                              ', '.join(toimport))
-                try:
-                    cexec(defn, self.eval_context)
-                except Exception:
-                    self.log(_("Failed to import '%s' from "
-                               "module '%s'") % (', '.join(toimport),
-                                                 module))
-                    return
-
-            delta = set(symbols)-set(toimport)
-            if delta:
-                self.log(_("Did not import '%s' from module '%s'") %
-                         (', '.join(list(delta)), module))
-
-        else:
-            self.log( _("Invalid module name '%s'") % module )
-
-    def validateProcessColormap(self, colormap):
-        """Validate and process a colormap value.
-
-        Returns a list of B,G,R,alpha tuples or raises ValueError if a problem."""
-
-        try:
-            if len(colormap) < 2:
-                raise ValueError( _("Need at least two entries in colormap") )
-        except TypeError:
-            raise ValueError( _("Invalid type for colormap") )
-
-        out = []
-        for entry in colormap:
-            for v in entry:
-                try:
-                    v - 0
-                except TypeError:
-                    raise ValueError(
-                        _("Colormap entries should be numerical") )
-                if v < 0 or v > 255:
-                    raise ValueError(
-                        _("Colormap entries should be between 0 and 255") )
-
-            if len(entry) == 3:
-                out.append( (int(entry[2]), int(entry[1]), int(entry[0]),
-                             255) )
-            elif len(entry) == 4:
-                out.append( (int(entry[2]), int(entry[1]), int(entry[0]),
-                             int(entry[3])) )
-            else:
-                raise ValueError( _("Each colormap entry consists of R,G,B "
-                                    "and optionally alpha values") )
-
-        return tuple(out)
-
-    def _updateEvalContextColormap(self, name, val):
-        """Add a colormap entry."""
-
-        try:
-            cmap = self.validateProcessColormap(val)
-        except ValueError as e:
-            self.log( cstr(e) )
-        else:
-            self.colormaps[ cstr(name) ] = cmap
-
-    def _updateEvalContextFuncOrConst(self, ctype, name, val):
-        """Update a function or constant in eval function context."""
-
-        if ctype == 'constant':
-            if not identifier_re.match(name):
-                self.log( _("Invalid constant name '%s'") % name )
-                return
-            defn = val
-        elif ctype == 'function':
-            m = function_re.match(name)
-            if not m:
-                self.log( _("Invalid function specification '%s'") % name )
-                return
-            name = m.group(1)
-            args = m.group(2)
-            defn = 'lambda %s: %s' % (args, val)
-
-        # evaluate, but we ignore any unsafe commands or exceptions
-        comp = self.compileCheckedExpression(defn)
-        if comp is None:
-            return
-        try:
-            self.eval_context[name] = eval(comp, self.eval_context)
-        except Exception as e:
-            self.log( _("Error evaluating '%s': '%s'") %
-                      (name, cstr(e)) )
-
-    def compileCheckedExpression(self, expr, origexpr=None, log=True):
-        """Compile expression and check for errors.
-
-        origexpr is an expression to show in error messages. This is
-        used if replacements have been done, etc.
-        """
-
-        try:
-            return self.exprcompiled[expr]
-        except KeyError:
-            pass
-
-        # track failed compilations, so we only print them once
-        if self.exprfailedchangeset != self.changeset:
-            self.exprfailedchangeset = self.changeset
-            self.exprfailed.clear()
-        elif expr in self.exprfailed:
-            return None
-
-        if origexpr is None:
-            origexpr = expr
-
-        try:
-            checked = utils.compileChecked(
-                expr,
-                ignoresecurity=setting.transient_settings['unsafe_mode'])
-        except utils.SafeEvalException as e:
-            if log:
-                self.log(
-                    _("Unsafe expression '%s': %s") % (origexpr, cstr(e)))
-            self.exprfailed.add(expr)
-            return None
-        except Exception as e:
-            if log:
-                self.log(
-                    _("Error in expression '%s': %s") % (origexpr, cstr(e)))
-            return None
-        else:
-            self.exprcompiled[expr] = checked
-            return checked
-
-    def updateEvalContext(self):
-        """To be called after custom constants or functions are changed.
-        This sets up a safe environment where things can be evaluated
-        """
-        
-        self.eval_context = c = {}
-
-        # add numpy things
-        # we try to avoid various bits and pieces for safety
-        for name, val in citems(N.__dict__):
-            if ( (callable(val) or type(val)==float) and
-                 name not in __builtins__ and
-                 name[:1] != '_' and name[-1:] != '_' ):
-                c[name] = val
-        
-        # safe functions
-        c['os_path_join'] = os.path.join
-        c['os_path_dirname'] = os.path.dirname
-        c['veusz_markercodes'] = tuple(utils.MarkerCodes)
-
-        # custom definitions
-        for ctype, name, val in self.customs:
-            name = name.strip()
-            if ctype == 'constant' or ctype == 'function':
-                self._updateEvalContextFuncOrConst(ctype, name, val.strip())
-            elif ctype == 'import':
-                self._updateEvalContextImport(name, val)
-            elif ctype == 'colormap':
-                self._updateEvalContextColormap(name, val)
-            else:
-                raise ValueError('Invalid custom type')
-
-    def customDict(self):
-        """Return a dictionary mapping custom names to (idx, type, value)."""
-        retn = {}
-        for i, (ctype, name, val) in enumerate(self.customs):
-            retn[name] = (i, ctype, val)
-        return retn
-
-    def evalDatasetExpression(self, expr, part='data', datatype='numeric',
-                              dimensions=1):
-        """Return dataset after evaluating a dataset expression.
-        part is 'data', 'serr', 'perr' or 'nerr' - these are the
-        dataset parts which are evaluated by the expression
-
-        None is returned on error
-        """
-
-        key = (expr, part, datatype, dimensions)
-        if self.evalexprcachechangeset != self.changeset:
-            self.evalexprcachechangeset = self.changeset
-            self.evalexprcache.clear()
-        elif key in self.evalexprcache:
-            return self.evalexprcache[key]
-
-        self.evalexprcache[key] = ds = datasets.evalDatasetExpression(
-            self, expr, part=part, datatype=datatype, dimensions=dimensions)
-        return ds
-
-    def valsToDataset(self, vals, datatype, dimensions):
-        """Return a dataset given a numpy array of values."""
-
-        if datatype == 'numeric':
-            try:
-                nvals = N.array(vals, dtype=N.float64)
-
-                if nvals.ndim == dimensions:
-                    if nvals.ndim == 1:
-                        return datasets.Dataset(data=nvals)
-                    elif nvals.ndim == 2:
-                        return datasets.Dataset2D(nvals)
-            except ValueError:
-                pass
-
-        elif datatype == 'text':
-            try:
-                return datasets.DatasetText([cstr(x) for x in vals])
-            except ValueError:
-                pass
-
-        raise RuntimeError('Invalid array')
-
     def walkNodes(self, tocall, root=None,
                   nodetypes=('widget', 'setting', 'settings'),
                   _path=None):
@@ -1053,17 +722,6 @@ class Document( qt4.QObject ):
                 self.walkNodes(tocall, root=s, nodetypes=nodetypes,
                                _path = _path + '/' + s.name)
         # elif root.nodetype == 'setting': pass
-
-    def getColormap(self, name, invert):
-        """Get colormap with name given (returning grey if does not exist)."""
-        cmap = self.colormaps.get(name, self.colormaps['grey'])
-        if invert:
-            if cmap[0][0] >= 0:
-                return cmap[::-1]
-            else:
-                # ignore marker at beginning for stepped maps
-                return tuple([cmap[0]] + list(cmap[-1:0:-1]))
-        return cmap
 
     def formatValsWithDatatypeToText(self, vals, displaydatatype):
         """Given a set of values, datatype, return a list of strings

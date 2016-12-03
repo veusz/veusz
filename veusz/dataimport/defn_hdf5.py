@@ -25,6 +25,7 @@ import numpy as N
 from .. import qtall as qt4
 from ..compat import citems, cvalues, cbytes, cunicode, cpy3
 from .. import document
+from .. import datasets
 from .. import utils
 from . import base
 
@@ -187,14 +188,14 @@ def convertDatasetToObject(data, slices):
 
     if kind in ('b', 'i', 'u', 'f'):
         data = N.array(data, dtype=N.float64)
-        if len(data.shape) > 2:
-            raise _ConvertError(_("HDF5 dataset has more than 2 dimensions"))
+        if data.ndim == 0:
+            raise _ConvertError(_("HDF5 dataset has no dimensions"))
         return data
 
     elif kind in ('S', 'a') or (
         kind == 'O' and h5py.check_dtype(vlen=data.dtype)):
-        if len(data.shape) != 1:
-            raise _ConvertError(_("HDF5 dataset has more than 1 dimension"))
+        if hasattr(data, 'ndim') and data.ndim != 1:
+            raise _ConvertError(_("HDF5 text datasets must have 1 dimension"))
 
         strcnv = list(data)
         return strcnv
@@ -253,7 +254,7 @@ class _DataRead:
         self.options = options
 
 class OperationDataImportHDF5(base.OperationDataImportBase):
-    """Import 1d or 2d data from a fits file."""
+    """Import 1d, 2d, text or nd data from a fits file."""
 
     descr = _("import HDF5 file")
 
@@ -395,7 +396,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         data = dread.data
 
         ds = None
-        if len(data.shape) == 1:
+        if data.ndim == 1:
             if ( (self.params.convert_datetime and
                   dread.origname in self.params.convert_datetime) or
                  "vsz_convert_datetime" in dread.options ):
@@ -407,7 +408,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
                 if mode == 'unix':
                     data = utils.floatUnixToVeusz(data)
-                ds = document.DatasetDateTime(data)
+                ds = datasets.DatasetDateTime(data)
 
             else:
                 # Standard 1D Import
@@ -424,9 +425,9 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     if args[a] is not None and len(args[a]) > minlen:
                         args[a] = args[a][:minlen]
 
-                ds = document.Dataset(**args)
+                ds = datasets.Dataset(**args)
 
-        elif len(data.shape) == 2:
+        elif data.ndim == 2:
             # 2D dataset
             if ( ((self.params.twod_as_oned and
                    dread.origname in self.params.twod_as_oned) or
@@ -434,9 +435,9 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                  data.shape[1] in (2,3) ):
                 # actually a 1D dataset in disguise
                 if data.shape[1] == 2:
-                    ds = document.Dataset(data=data[:,0], serr=data[:,1])
+                    ds = datasets.Dataset(data=data[:,0], serr=data[:,1])
                 else:
-                    ds = document.Dataset(
+                    ds = datasets.Dataset(
                         data=data[:,0], perr=data[:,1], nerr=data[:,2])
             else:
                 # this really is a 2D dataset
@@ -459,7 +460,11 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     attrs["yrange"] = (r[1], r[3])
 
                 # create the object
-                ds = document.Dataset2D(data, **attrs)
+                ds = datasets.Dataset2D(data, **attrs)
+
+        else:
+            # N-dimensional dataset
+            ds = datasets.DatasetND(data)
 
         return ds
 
@@ -496,14 +501,14 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     val = N.nan
                 dout[i] = val
 
-            ds = document.DatasetDateTime(dout)
+            ds = datasets.DatasetDateTime(dout)
 
         else:
             # unfortunately byte strings are returned in py3
             tdata = [bconv(d) for d in dread.data]
 
             # standard text dataset
-            ds = document.DatasetText(tdata)
+            ds = datasets.DatasetText(tdata)
 
         return ds
 

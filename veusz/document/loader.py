@@ -87,7 +87,7 @@ def executeScript(thedoc, filename, script, callbackunsafe=None):
         except Exception as e:
             raise genexception(e)
 
-    env = thedoc.eval_context.copy()
+    env = thedoc.evaluate.context.copy()
     interface = CommandInterface(thedoc)
 
     # allow safe commands as-is

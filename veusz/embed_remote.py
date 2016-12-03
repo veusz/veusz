@@ -56,6 +56,7 @@ class EmbeddedClient(object):
         self.ci.addCommand('MoveToPage', self.cmdMoveToPage)
         self.ci.addCommand('IsClosed', self.cmdIsClosed)
         self.ci.addCommand('SetAntiAliasing', self.cmdSetAntiAliasing)
+        self.ci.addCommand('Wipe', self.cmdWipe)
         self.ci.addCommand('_apiVersion', self.cmd_apiVersion)
 
         setting.transient_settings['unsafe_mode'] = True
@@ -158,6 +159,10 @@ class EmbeddedClient(object):
         Tell window to show specified pagenumber (starting from 1).
         """
         self.plot.setPageNumber(pagenum-1)
+
+    def cmdWipe(self):
+        """Wipe the current document."""
+        self.document.wipe()
 
 class EmbedApplication(qt4.QApplication):
     """Application to run remote end of embed connection.

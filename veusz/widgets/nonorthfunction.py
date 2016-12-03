@@ -96,8 +96,8 @@ class NonOrthFunction(Widget):
 
     def initEnviron(self):
         '''Set up function environment.'''
-        return self.document.eval_context.copy()
-       
+        return self.document.evaluate.context.copy()
+
     def logEvalError(self, ex):
         '''Write error message to document log for exception ex.'''
         self.document.log(
@@ -124,7 +124,7 @@ class NonOrthFunction(Widget):
         # do evaluation
         env = self.initEnviron()
         env[s.variable] = invals
-        comp = self.document.compileCheckedExpression(s.function)
+        comp = self.document.evaluate.compileCheckedExpression(s.function)
         if comp is None:
             return N.array([]), N.array([])
         try:

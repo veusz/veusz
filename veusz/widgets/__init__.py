@@ -52,3 +52,4 @@ from .plotters3d import GenericPlotter3D
 from .function3d import Function3D
 from .point3d import Point3D
 from .surface3d import Surface3D
+from .covariance import Covariance

@@ -20,13 +20,11 @@
 
 from .widgetfactory import *
 from .doc import *
-from .datasets import *
+from .evaluate import *
 from .commandinterface import *
 from .commandinterpreter import *
 from .operations import *
 from .mime import *
-from .dataset_histo import *
-from .dataset_filtered import DatasetFiltered, OperationDatasetsFilter
 from .painthelper import *
 from .export import Export, printDialog
 from .dbusinterface import *
