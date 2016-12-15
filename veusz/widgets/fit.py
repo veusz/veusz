@@ -149,6 +149,17 @@ class Fit(FunctionPlotter):
                 descr = _('Y data to fit (dataset name, list of values '
                           'or expression)'),
                 usertext=_('Y data')), 3 )
+
+        s.add(setting.FloatOrAuto(
+            'fit_min', 'Auto',
+            descr=_('Minimum value at which to fit function'),
+            usertext=_('Min. fit range')))
+
+        s.add(setting.FloatOrAuto(
+            'fit_max', 'Auto',
+            descr=_('Maximum value at which to fit function'),
+            usertext=_('Max. fit range')))
+ 
         s.add( setting.Bool(
                 'fitRange', False,
                 descr = _('Fit only the data between the '
@@ -183,10 +194,6 @@ class Fit(FunctionPlotter):
         f = s.get('function')
         f.newDefault('a + b*x')
         f.descr = _('Function to fit')
-
-        # modify description
-        s.get('min').usertext=_('Min. fit range')
-        s.get('max').usertext=_('Max. fit range')
 
     def affectsAxisRange(self):
         """This widget provides range information about these axes."""
@@ -295,23 +302,23 @@ class Fit(FunctionPlotter):
                 return N.nan
 
         # minimum set for fitting
-        if s.min != 'Auto':
+        if s.fit_min != 'Auto':
             if s.variable == 'x':
-                mask = xvals >= s.min
+                mask = xvals >= s.fit_min
             else:
-                mask = yvals >= s.min
+                mask = yvals >= s.fit_min
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
 
         # maximum set for fitting
-        if s.max != 'Auto':
+        if s.fit_max != 'Auto':
             if s.variable == 'x':
-                mask = xvals <= s.max
+                mask = xvals <= s.fit_max
             else:
-                mask = yvals <= s.max
+                mask = yvals <= s.fit_max
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
 
-        if s.min != 'Auto' or s.max != 'Auto':
-            print("Fitting %s between %s and %s" % (s.variable, s.min, s.max))
+        if s.fit_min != 'Auto' or s.fit_max != 'Auto':
+            print("Fitting %s between %s and %s" % (s.variable, s.fit_min, s.fit_max))
 
         # various error checks
         if len(xvals) != len(yvals) or len(xvals) != len(yserr):
