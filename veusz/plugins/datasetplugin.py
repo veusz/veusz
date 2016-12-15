@@ -1140,6 +1140,34 @@ class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
         self.dsout.update(
             data=data, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
 
+class SubtractMaximumDatasetPlugin(_OneOutputDatasetPlugin):
+    """Dataset plugin to subtract minimum from dataset."""
+
+    menu = (_('Subtract'), _('Maximum'),)
+    name = 'Subtract Maximum'
+    description_short = _('Subtract maximum from dataset')
+    description_full = _('Subtract the maximum value from a dataset')
+
+    def __init__(self):
+        """Define fields."""
+        self.fields = [
+            field.FieldDataset('ds_in', _('Input dataset 1')),
+            field.FieldDataset('ds_out', _('Output dataset name')),
+            ]
+
+    def updateDatasets(self, fields, helper):
+        """Do subtraction of dataset."""
+
+        dsin = helper.getDataset(fields['ds_in'])
+
+        data = dsin.data
+        filtered = data[N.isfinite(data)]
+        if len(filtered) != 0:
+            data = data - filtered.max()
+
+        self.dsout.update(
+            data=data, serr=dsin.serr, perr=dsin.perr, nerr=dsin.nerr)
+
 class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to multiply two or more datasets."""
 
@@ -2158,6 +2186,7 @@ datasetpluginregistry += [
     SubtractDatasetPlugin,
     SubtractMeanDatasetPlugin,
     SubtractMinimumDatasetPlugin,
+    SubtractMaximumDatasetPlugin,
     MultiplyDatasetPlugin,
     MultiplyDatasetsPlugin,
     DivideDatasetsPlugin,
