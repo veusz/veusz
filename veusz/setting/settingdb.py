@@ -80,6 +80,9 @@ defaultValues = {
     'export_template_single': '%DOCNAME%',
     'export_template_multi': '%DOCNAME%_%PAGE00%',
 
+    # add import paths
+    'docfile_addimportpaths': True,
+
     # ask tutorial before?
     'ask_tutorial': False,
 

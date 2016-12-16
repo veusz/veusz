@@ -172,6 +172,13 @@ Set to 0 to disable threads.</string>
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="docFileAddImportPaths">
+            <property name="text">
+             <string>Add import paths</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

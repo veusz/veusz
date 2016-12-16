@@ -75,6 +75,9 @@ class PreferencesDialog(VeuszDialog):
         # use cwd for file dialogs
         (self.dirDocCWDRadio if setdb['dirname_usecwd'] else self.dirDocPrevRadio).click()
 
+        # add import paths
+        self.docFileAddImportPaths.setChecked( setdb['docfile_addimportpaths'] )
+
         # exporting documents
         {
             'doc': self.dirExportDocRadio,
@@ -203,6 +206,9 @@ class PreferencesDialog(VeuszDialog):
 
         # use cwd
         setdb['dirname_usecwd'] = self.dirDocCWDRadio.isChecked()
+        
+        # add import paths
+        setdb['docfile_addimportpaths'] = self.docFileAddImportPaths.isChecked()
 
         for radio, val in (
                 (self.dirExportDocRadio, 'doc'),

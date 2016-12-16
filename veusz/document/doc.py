@@ -405,7 +405,8 @@ class Document(qt.QObject):
         reldirname = None
         if getattr(fileobj, 'name', False):
             reldirname = os.path.dirname( os.path.abspath(fileobj.name) )
-            fileobj.write('AddImportPath(%s)\n' % utils.rrepr(reldirname))
+            if setting.settingdb['docfile_addimportpaths']:
+                fileobj.write('AddImportPath(%s)\n' % utils.rrepr(reldirname))
 
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
