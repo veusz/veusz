@@ -639,7 +639,7 @@ class Dataset2DExpression(Dataset2DBase):
 
     def evalDataset(self):
         """Do actual evaluation."""
-        return self.document.evalDatasetExpression(self.expr, dimensions=2)
+        return evalDatasetExpression(self.document, self.expr, dimensions=2)
 
     def saveDataRelationToText(self, fileobj, name):
         '''Save expression to file.'''
