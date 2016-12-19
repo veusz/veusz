@@ -498,7 +498,7 @@ class Dataset2DXYZExpression(Dataset2DBase):
 
         evaluated = {}
 
-        environment = self.document.evaulate.context.copy()
+        environment = self.document.evaluate.context.copy()
         environment['_DS_'] = self.evaluateDataset
 
         # evaluate the x, y and z expressions
