@@ -1326,7 +1326,6 @@ class DatasetExtended(Dataset):
 
     def getData(self, doc):
         """Return veusz dataset"""
-        from .. import datasets
         if isinstance(self.val, cbasestr):
             return doc.evaluate.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)

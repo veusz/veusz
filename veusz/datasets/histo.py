@@ -22,7 +22,6 @@ import numpy as N
 from ..compat import citems
 
 from .commonfn import _
-from .commonfn import *
 from .oned import Dataset1DBase
 from .expression import evalDatasetExpression
 

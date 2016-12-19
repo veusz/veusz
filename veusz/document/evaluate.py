@@ -24,7 +24,7 @@ import datetime
 
 import numpy as N
 
-from ..compat import citems, cstr, cexec, CStringIO, cexecfile
+from ..compat import citems, cstr, cexec
 from .. import setting
 from .. import utils
 from .. import datasets
