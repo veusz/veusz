@@ -1,0 +1,74 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="531.4px" height="531.4px" version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+<desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
+</clipPath>
+<clipPath id="c1">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</clipPath>
+</defs>
+<g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</g>
+</g>
+<g clip-path="url(#c1)">
+<g fill="none" stroke-width="0.6">
+<polyline fill="none" points="60.2,471.2 214.9,316.5 369.6,161.8 524.4,7"/>
+</g>
+<g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(60.2,471.2)">
+<path d="m3.7,0c0,2,-1.6,3.7,-3.7,3.7c-2,0,-3.7,-1.6,-3.7,-3.7c0,-2,1.6,-3.7,3.7,-3.7c2,0,3.7,1.6,3.7,3.7" id="p0"/>
+</g>
+<use xlink:href="#p0" x="214.9" y="316.5"/>
+<use xlink:href="#p0" x="369.6" y="161.8"/>
+<use xlink:href="#p0" x="524.4" y="7"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l0,-464.1"/>
+<path d="M60.2,471.2l3.7,0M60.2,432.5l3.7,0M60.2,393.8l3.7,0M60.2,355.2l3.7,0M60.2,316.5l3.7,0M60.2,277.8l3.7,0M60.2,239.1l3.7,0M60.2,200.4l3.7,0M60.2,161.8l3.7,0M60.2,123.1l3.7,0M60.2,84.4l3.7,0M60.2,45.7l3.7,0M60.2,7l3.7,0"/>
+<path d="M60.2,471.2l7.5,0M60.2,393.8l7.5,0M60.2,316.5l7.5,0M60.2,239.1l7.5,0M60.2,161.8l7.5,0M60.2,84.4l7.5,0M60.2,7l7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="47.9" y="480" font-size="14pt" fill="#000000">0</text>
+<text x="30.4" y="402.6" font-size="14pt" fill="#000000">0.5</text>
+<text x="47.9" y="325.2" font-size="14pt" fill="#000000">1</text>
+<text x="30.4" y="247.9" font-size="14pt" fill="#000000">1.5</text>
+<text x="47.9" y="170.5" font-size="14pt" fill="#000000">2</text>
+<text x="30.4" y="93.1" font-size="14pt" fill="#000000">2.5</text>
+<text x="47.9" y="21" font-size="14pt" fill="#000000">3</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l464.1,0"/>
+<path d="M60.2,471.2l0,-3.7M98.9,471.2l0,-3.7M137.5,471.2l0,-3.7M176.2,471.2l0,-3.7M214.9,471.2l0,-3.7M253.6,471.2l0,-3.7M292.3,471.2l0,-3.7M331,471.2l0,-3.7M369.6,471.2l0,-3.7M408.3,471.2l0,-3.7M447,471.2l0,-3.7M485.7,471.2l0,-3.7M524.4,471.2l0,-3.7"/>
+<path d="M60.2,471.2l0,-7.5M137.5,471.2l0,-7.5M214.9,471.2l0,-7.5M292.3,471.2l0,-7.5M369.6,471.2l0,-7.5M447,471.2l0,-7.5M524.4,471.2l0,-7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="55.8" y="476.5" font-size="14pt" fill="#000000">1</text>
+<text x="124.4" y="476.5" font-size="14pt" fill="#000000">1.5</text>
+<text x="210.5" y="476.5" font-size="14pt" fill="#000000">2</text>
+<text x="279.1" y="476.5" font-size="14pt" fill="#000000">2.5</text>
+<text x="365.2" y="476.5" font-size="14pt" fill="#000000">3</text>
+<text x="433.9" y="476.5" font-size="14pt" fill="#000000">3.5</text>
+<text x="520" y="476.5" font-size="14pt" fill="#000000">4</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M524.4,471.2l0,-464.1"/>
+<path d="M524.4,471.2l-3.7,0M524.4,432.5l-3.7,0M524.4,393.8l-3.7,0M524.4,355.2l-3.7,0M524.4,316.5l-3.7,0M524.4,277.8l-3.7,0M524.4,239.1l-3.7,0M524.4,200.4l-3.7,0M524.4,161.8l-3.7,0M524.4,123.1l-3.7,0M524.4,84.4l-3.7,0M524.4,45.7l-3.7,0M524.4,7l-3.7,0"/>
+<path d="M524.4,471.2l-7.5,0M524.4,393.8l-7.5,0M524.4,316.5l-7.5,0M524.4,239.1l-7.5,0M524.4,161.8l-7.5,0M524.4,84.4l-7.5,0M524.4,7l-7.5,0"/>
+<path d="M60.2,7l464.1,0"/>
+<path d="M60.2,7l0,3.7M98.9,7l0,3.7M137.5,7l0,3.7M176.2,7l0,3.7M214.9,7l0,3.7M253.6,7l0,3.7M292.3,7l0,3.7M331,7l0,3.7M369.6,7l0,3.7M408.3,7l0,3.7M447,7l0,3.7M485.7,7l0,3.7M524.4,7l0,3.7"/>
+<path d="M60.2,7l0,7.5M137.5,7l0,7.5M214.9,7l0,7.5M292.3,7l0,7.5M369.6,7l0,7.5M447,7l0,7.5M524.4,7l0,7.5"/>
+</g>
+</g>
+</g>
+</svg>
