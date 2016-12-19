@@ -22,10 +22,10 @@
 import numpy as N
 
 from ..compat import crepr
+from .. import utils
 
-from .commonfn import _
-from .commonfn import *
-from .base import DatasetConcreteBase, DatasetException
+from .commonfn import _, dsPreviewHelper
+from .base import DatasetConcreteBase
 
 class DatasetNDBase(DatasetConcreteBase):
     """N-dimensional datasets."""

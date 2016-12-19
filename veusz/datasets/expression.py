@@ -23,7 +23,6 @@ import re
 import numpy as N
 
 from .commonfn import _
-from .commonfn import *
 from .base import DatasetExpressionException
 from .oned import Dataset1DBase, Dataset
 from .twod import Dataset2DBase, Dataset2D

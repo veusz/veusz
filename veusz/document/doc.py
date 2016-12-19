@@ -28,8 +28,6 @@ import traceback
 import datetime
 from collections import defaultdict
 
-import numpy as N
-
 try:
     import h5py
 except ImportError:

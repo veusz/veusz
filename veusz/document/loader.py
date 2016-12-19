@@ -28,7 +28,7 @@ from .. import qtall as qt4
 from .. import setting
 from .. import utils
 
-from ..compat import cexec, cstr, cstrerror, cbytes, cexceptionuser
+from ..compat import cexec, cstrerror, cbytes, cexceptionuser
 from .commandinterface import CommandInterface
 from . import datasets
 
