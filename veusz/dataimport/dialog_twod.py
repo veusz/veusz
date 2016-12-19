@@ -150,6 +150,11 @@ class ImportTab2D(importdialog.ImportTab):
         csvlocale = dialog_csv.csvLocaleIndexToLocale(
             self.twod_csvlocale.currentIndex())
 
+        if len(csvdelimiter) != 1 or len(csvtextdelimiter) != 1:
+            self.twod_previewedit.setPlainText(
+                _('Delimiters must be single characters'))
+            return
+
         # loop over datasets and read...
         params = defn_twod.ImportParams2D(
             datasetnames=datasets,
