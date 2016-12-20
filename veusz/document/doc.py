@@ -565,8 +565,6 @@ class Document(qt4.QObject):
         loader.loadDocument(self, filename, mode=mode,
                             callbackunsafe=callbackunsafe)
 
-        self.filename = filename
-
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""
 

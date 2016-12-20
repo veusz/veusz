@@ -286,9 +286,9 @@ class Evaluate:
         """DATA(name, [part]) eval: return dataset as array."""
         if part not in ('data', 'perr', 'serr', 'nerr'):
             raise RuntimeError("Invalid dataset part '%s'" % part)
-        if name not in self.data:
+        if name not in self.doc.data:
             raise RuntimeError("Dataset '%s' does not exist" % name)
-        data = getattr(self.data[name], part)
+        data = getattr(self.doc.data[name], part)
 
         if isinstance(data, N.ndarray):
             return N.array(data)
@@ -298,15 +298,16 @@ class Evaluate:
 
     def _evalfilename(self):
         """FILENAME() eval: returns filename."""
-        return utils.latexEscape(self.filename)
+        print(self.doc.filename)
+        return utils.latexEscape(self.doc.filename)
 
     def _evalbasename(self):
         """BASENAME() eval: returns base filename."""
-        return utils.latexEscape(os.path.basename(self.filename))
+        return utils.latexEscape(os.path.basename(self.doc.filename))
 
     def _evalsetting(self, path):
         """SETTING() eval: return setting given full path."""
-        return self.resolveFullSettingPath(path).get()
+        return self.doc.resolveFullSettingPath(path).get()
 
     def evalDatasetExpression(self, expr, part='data', datatype='numeric',
                               dimensions=1):
