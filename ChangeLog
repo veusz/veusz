@@ -1,6 +1,6 @@
-Changes in 1.25.1:
- * Fix crash with 2D dataset expression
- * Fix bug with 2D X,Y,Z dataset expression
+Bug fixes in 1.25.1:
+ * Fix 2D dataset expressions
+ * Fix 2D X,Y,Z dataset expressions
  * Better error checking in Gnuplot import plugin
  * Catch non-single character delimiters for 2D CSV import
 
