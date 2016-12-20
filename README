@@ -17,6 +17,8 @@ Bug fixes in 1.25.1:
  * Fix 2D X,Y,Z dataset expressions
  * Better error checking in Gnuplot import plugin
  * Catch non-single character delimiters for 2D CSV import
+ * Fix SETTING(), BASENAME(), FILENAME() and DATA() in function evaluation
+ * More self tests
 
 Changes in 1.25:
  * Add n-dimensional dataset support
