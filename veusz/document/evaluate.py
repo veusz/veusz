@@ -298,7 +298,6 @@ class Evaluate:
 
     def _evalfilename(self):
         """FILENAME() eval: returns filename."""
-        print(self.doc.filename)
         return utils.latexEscape(self.doc.filename)
 
     def _evalbasename(self):

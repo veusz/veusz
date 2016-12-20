@@ -1062,7 +1062,8 @@ _                   # subscript
 def latexEscape(text):
     """Escape any special characters in LaTex-like code."""
     # \\ is converted a unicode-special character and replaced again
-    # with the latex code below, to avoid being replaced
+    # with the latex code later, to avoid its parts being replaced in
+    # the next step
     text = text.replace('\\', u'\ue000')
     # replace _, ^, {, }, [ and ] with escaped versions
     text = re.sub(r'([_\^\[\]\{\}])', r'\\\1', text)
