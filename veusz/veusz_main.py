@@ -187,6 +187,7 @@ class VeuszApp(qt4.QApplication):
         self.openeventfiles = []
         self.startupdone = False
         self.splash = None
+        self.trans = None
 
     def openMainWindow(self, args):
         """Open the main window with any loaded files."""
@@ -235,9 +236,9 @@ class VeuszApp(qt4.QApplication):
 
         # optionally load a translation
         if self.options.translation:
-            trans = qt4.QTranslator()
-            trans.load(self.options.translation)
-            self.installTranslator(trans)
+            self.trans = qt4.QTranslator()
+            self.trans.load(self.options.translation)
+            self.installTranslator(self.trans)
 
         self.thread = ImportThread()
         self.thread.finished.connect(self.slotStartApplication)
