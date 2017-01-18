@@ -29,3 +29,4 @@ from .painthelper import *
 from .export import Export, printDialog
 from .dbusinterface import *
 from .loader import loadDocument, executeScript, LoadError
+
