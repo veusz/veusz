@@ -32,9 +32,109 @@ from .. import setting
 from ..qtwidgets.datasetbrowser import DatasetBrowser
 from .veuszdialog import VeuszDialog, recreate_register
 
+
 def _(text, disambiguation=None, context="DataEditDialog"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
+
+
+class AttrsTableModel(qt4.QAbstractTableModel):
+    """Provides read/write access to attributes defined for the datasets"""
+
+    def __init__(self, parent, document, datasetname):
+        qt4.QAbstractTableModel.__init__(self, parent)
+
+        self.document = document
+        self.dsname = datasetname
+
+        document.signalModified.connect(self.slotDocumentModified)
+
+    def slotDocumentModified(self):
+        """Called when document modified."""
+        self.layoutChanged.emit()
+
+    def rowCount(self, parent):
+        if parent.isValid():
+            return 0
+        try:
+            return len(self.document.data[self.dsname].attr)
+        except (KeyError, AttributeError):
+            return 0
+
+    def columnCount(self, parent):
+        """Return number of columns."""
+        if parent.isValid():
+            return 0
+        return 2
+
+    def _data(self, index):
+        # convert data to data
+        ds = self.document.data.get(self.dsname, None)
+        if ds is None:
+            return None
+        name = ds.attr.keys()[index.row()]
+        if index.column() == 0:
+            return name
+        d = ds.attr[name]
+        return d
+
+    def data(self, index, role):
+        """Return data for index."""
+        # get dataset
+        d = self._data(index)
+        if d is not None and role in (
+                qt4.Qt.DisplayRole, qt4.Qt.EditRole):
+            # convert data to data
+            if not (isinstance(d, float) or isinstance(d, int) or isinstance(d, basestring)):
+                d = repr(d)
+            return d
+
+        # empty entry
+        return None
+
+    def headerData(self, section, orientation, role):
+        """Return row numbers or column names."""
+        if role == qt4.Qt.DisplayRole:
+            if orientation == qt4.Qt.Horizontal:
+                # column names
+                return ['Name', 'Value'][section]
+        return None
+
+    def flags(self, index):
+        """Update flags to say that items are editable."""
+        if not index.isValid():
+            return qt4.Qt.ItemIsEnabled
+        f = qt4.QAbstractTableModel.flags(self, index)
+        ds = self.document.data.get(self.dsname)
+        d = self._data(index)
+        editable = isinstance(d, basestring) or isinstance(
+            d, float) or isinstance(d, int)
+        print self.dsname, ds.editable, editable, d
+        if ds is not None and editable:
+            f |= qt4.Qt.ItemIsEditable
+        return f
+
+    def setData(self, index, value, role):
+        """Called to set the data."""
+
+        if not index.isValid() or role != qt4.Qt.EditRole:
+            return False
+
+        row = index.row()
+        column = index.column()
+        ds = self.document.data[self.dsname]
+        name = ds.attr.keys()[row]
+        oldval = ds.attr.get(name, value)
+        if column == 0:
+            if ds.attr.has_key(name):
+                ds.attr.pop(name)
+        if isinstance(oldval, float):
+            value = float(value)
+        elif isinstance(oldval, int):
+            value = int(value)
+        ds.attr[name] = value
+        return True
+
 
 class DatasetTableModel1D(qt4.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""
@@ -54,7 +154,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             return 0
 
         try:
-            return len(self.document.data[self.dsname].data)+1
+            return len(self.document.data[self.dsname].data) + 1
         except (KeyError, AttributeError):
             return 0
 
@@ -71,7 +171,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             ds = self.document.data[self.dsname]
         except KeyError:
             return 0
-        return len( ds.column_descriptions )
+        return len(ds.column_descriptions)
 
     def data(self, index, role):
         """Return data for index."""
@@ -81,7 +181,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             # select correct part of dataset
             data = getattr(ds, ds.columns[index.column()])
         if ds is not None and data is not None and role in (
-            qt4.Qt.DisplayRole, qt4.Qt.EditRole):
+                qt4.Qt.DisplayRole, qt4.Qt.EditRole):
             # blank row at end of data
             if index.row() == len(data):
                 return None
@@ -109,7 +209,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
                 if section == len(ds.data):
                     return "+"
                 # return row numbers
-                return section+1
+                return section + 1
 
         return None
 
@@ -172,6 +272,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             return False
         return True
 
+
 class DatasetTableModelMulti(qt4.QAbstractTableModel):
     """Edit multiple datasets simultaneously with a spreadsheet-like style."""
 
@@ -200,11 +301,11 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
                 continue
             dataset = self.document.data[name]
             if (not hasattr(dataset, 'data') or
-                not hasattr(dataset, 'columns') or
-                dataset.dimensions != 1):
+                    not hasattr(dataset, 'columns') or
+                    dataset.dimensions != 1):
                 continue
 
-            r = len(dataset.data)+1
+            r = len(dataset.data) + 1
             rowcounts.append(r)
             rows = max(rows, r)
 
@@ -212,8 +313,8 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
             for colidx, col in enumerate(dataset.columns):
                 data = getattr(dataset, col)
                 if data is not None:
-                    attr.append( (name, col, dsidx, colidx) )
-            colcounts.append( len(attr) )
+                    attr.append((name, col, dsidx, colidx))
+            colcounts.append(len(attr))
             colattrs += attr
 
         self.rows = rows
@@ -244,7 +345,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
         data = getattr(ds, colname)
 
         if role == qt4.Qt.DisplayRole:
-            if index.row() < self.rowcounts[dsidx]-1:
+            if index.row() < self.rowcounts[dsidx] - 1:
                 # convert data to Data
                 d = data[index.row()]
                 return ds.uiDataItemToData(d)
@@ -265,9 +366,9 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
                 return header
             else:
                 # return row numbers
-                if section == self.rows-1:
+                if section == self.rows - 1:
                     return "+"
-                return section+1
+                return section + 1
 
         return None
 
@@ -294,12 +395,12 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
         ds = self.document.data[dsname]
 
         ops = document.OperationMultiple([], descr=_('set value'))
-        if row >= self.rowcounts[dsidx]-1:
+        if row >= self.rowcounts[dsidx] - 1:
             # add number of rows required to add new value below
             ops.addOperation(
                 document.OperationDatasetInsertRow(
-                    dsname, self.rowcounts[dsidx]-1,
-                    row+1-self.rowcounts[dsidx]+1))
+                    dsname, self.rowcounts[dsidx] - 1,
+                    row + 1 - self.rowcounts[dsidx] + 1))
 
         # convert text to value
         try:
@@ -319,7 +420,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
     def insertRows(self, row, count):
         ops = []
         for i, name in enumerate(self.dsnames):
-            if self.rowcounts[i]-1 >= row:
+            if self.rowcounts[i] - 1 >= row:
                 ops.append(
                     document.OperationDatasetInsertRow(name, row, count))
         self.document.applyOperation(
@@ -328,11 +429,12 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
     def removeRows(self, row, count):
         ops = []
         for i, name in enumerate(self.dsnames):
-            if self.rowcounts[i]-1 >= row:
+            if self.rowcounts[i] - 1 >= row:
                 ops.append(
                     document.OperationDatasetDeleteRow(name, row, count))
         self.document.applyOperation(
             document.OperationMultiple(ops, _('delete row(s)')))
+
 
 class DatasetTableModel2D(qt4.QAbstractTableModel):
     """A 2D dataset model."""
@@ -349,7 +451,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         """Get coordinates at edge of grid."""
         self.xedge = self.yedge = self.xcent = self.ycent = []
         ds = self.document.data.get(self.dsname)
-        if ds and ds.dimensions==2:
+        if ds and ds.dimensions == 2:
             self.xcent, self.ycent = ds.getPixelCentres()
             self.xedge, self.yedge = ds.getPixelEdges()
 
@@ -360,7 +462,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             data = self.document.data[self.dsname].data
         except KeyError:
             return 0
-        if data is not None and data.ndim==2:
+        if data is not None and data.ndim == 2:
             return data.shape[0]
         else:
             return 0
@@ -372,7 +474,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             data = self.document.data[self.dsname].data
         except KeyError:
             return 0
-        if data is not None and data.ndim==2:
+        if data is not None and data.ndim == 2:
             return data.shape[1]
         else:
             return 0
@@ -384,9 +486,9 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
                 data = self.document.data[self.dsname].data
             except KeyError:
                 return None
-            if data is not None and data.ndim==2:
+            if data is not None and data.ndim == 2:
                 try:
-                    num = data[data.shape[0]-index.row()-1, index.column()]
+                    num = data[data.shape[0] - index.row() - 1, index.column()]
                     return float(num)
                 except IndexError:
                     pass
@@ -405,15 +507,15 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         # note: y coordinates are upside down (high y is at top)
         if ds is not None and role == qt4.Qt.DisplayRole:
             v = self.xcent[section] if xaxis else self.ycent[
-                len(self.ycent)-section-1]
+                len(self.ycent) - section - 1]
             return '%i (%s)' % (
-                len(self.ycent)-section, setting.ui_floattostring(v, maxdp=4))
+                len(self.ycent) - section, setting.ui_floattostring(v, maxdp=4))
 
         elif ds is not None and role == qt4.Qt.ToolTipRole:
             v1 = self.xedge[section] if xaxis else self.yedge[
-                len(self.yedge)-section-2]
-            v2 = self.xedge[section+1] if xaxis else self.yedge[
-                len(self.yedge)-section-1]
+                len(self.yedge) - section - 2]
+            v2 = self.xedge[section + 1] if xaxis else self.yedge[
+                len(self.yedge) - section - 1]
             return u'%s\u2013%s' % (setting.ui_floattostring(v1),
                                     setting.ui_floattostring(v2))
 
@@ -442,7 +544,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             return False
 
         ds = self.document.data[self.dsname]
-        row = ds.data.shape[0]-index.row()-1
+        row = ds.data.shape[0] - index.row() - 1
         col = index.column()
 
         # update if conversion okay
@@ -455,6 +557,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             self.dsname, row, col, val)
         self.document.applyOperation(op)
         return True
+
 
 class DatasetTableModelND(qt4.QAbstractTableModel):
     """An ND dataset model."""
@@ -511,13 +614,14 @@ class DatasetTableModelND(qt4.QAbstractTableModel):
                 return _('Value')
             else:
                 idx = N.unravel_index(section, ds.data.shape)
-                txt = ','.join( [str(v+1) for v in idx] )
+                txt = ','.join([str(v + 1) for v in idx])
                 return txt
         return None
 
     def slotDocumentModified(self):
         """Called when document modified."""
         self.layoutChanged.emit()
+
 
 class ViewDelegate(qt4.QStyledItemDelegate):
     """Delegate for fixing double editing.
@@ -539,9 +643,10 @@ class ViewDelegate(qt4.QStyledItemDelegate):
         else:
             qt4.QStyledItemDelegate.setEditorData(self, editor, index)
 
+
 class DataEditDialog(VeuszDialog):
     """Dialog for editing and rearranging data sets."""
-    
+
     def __init__(self, parent, document):
         VeuszDialog.__init__(self, parent, 'dataedit.ui')
         self.document = document
@@ -560,11 +665,11 @@ class DataEditDialog(VeuszDialog):
             (_('Copy'), self.slotCopy),
             (_('Delete row'), self.slotDeleteRow),
             (_('Insert row'), self.slotInsertRow),
-            ):
+        ):
             act = qt4.QAction(text, self)
             act.triggered.connect(slot)
             self.datatableview.addAction(act)
-        self.datatableview.setContextMenuPolicy( qt4.Qt.ActionsContextMenu )
+        self.datatableview.setContextMenuPolicy(qt4.Qt.ActionsContextMenu)
 
         # layout edit dialog improvement
         self.splitter.setStretchFactor(0, 3)
@@ -579,7 +684,7 @@ class DataEditDialog(VeuszDialog):
 
         # select first item, if any or initialise if none
         if len(self.document.data) > 0:
-            self.selectDataset( sorted(self.document.data)[0] )
+            self.selectDataset(sorted(self.document.data)[0])
         else:
             self.slotDatasetsSelected([])
 
@@ -587,20 +692,20 @@ class DataEditDialog(VeuszDialog):
             self.slotDatasetsSelected)
 
         # connect buttons
-        for btn, slot in ( (self.deletebutton, self.slotDatasetDelete),
-                           (self.unlinkbutton, self.slotDatasetUnlink),
-                           (self.duplicatebutton, self.slotDatasetDuplicate),
-                           (self.importbutton, self.slotDatasetImport),
-                           (self.createbutton, self.slotDatasetCreate),
-                           (self.editbutton, self.slotDatasetEdit),
-                           ):
+        for btn, slot in ((self.deletebutton, self.slotDatasetDelete),
+                          (self.unlinkbutton, self.slotDatasetUnlink),
+                          (self.duplicatebutton, self.slotDatasetDuplicate),
+                          (self.importbutton, self.slotDatasetImport),
+                          (self.createbutton, self.slotDatasetCreate),
+                          (self.editbutton, self.slotDatasetEdit),
+                          ):
             btn.clicked.connect(slot)
 
         # menu for new button
         self.newmenu = qt4.QMenu()
-        for text, slot in ( (_('Numerical dataset'), self.slotNewNumericalDataset),
-                            (_('Text dataset'), self.slotNewTextDataset),
-                            (_('Date/time dataset'), self.slotNewDateDataset) ):
+        for text, slot in ((_('Numerical dataset'), self.slotNewNumericalDataset),
+                           (_('Text dataset'), self.slotNewTextDataset),
+                           (_('Date/time dataset'), self.slotNewDateDataset)):
             a = self.newmenu.addAction(text)
             a.triggered.connect(slot)
         self.newbutton.setMenu(self.newmenu)
@@ -628,7 +733,9 @@ class DataEditDialog(VeuszDialog):
         for a in self.datatableview.actions():
             a.setEnabled(model is not None)
 
-        self.datatableview.setModel(model)    
+        self.datatableview.setModel(model)
+        attrsmodel = AttrsTableModel(self, self.document, names[0])
+        self.attrstableview.setModel(attrsmodel)
         self.setUnlinkState()
 
     def setUnlinkState(self):
@@ -723,7 +830,7 @@ class DataEditDialog(VeuszDialog):
         model = self.datatableview.model()
         indices = []
         for index in selmodel.selectedIndexes():
-            indices.append( (index.row(), index.column()) )
+            indices.append((index.row(), index.column()))
         indices.sort()
 
         # build up text stream for copying to clipboard
@@ -734,13 +841,13 @@ class DataEditDialog(VeuszDialog):
             if row != lastrow:
                 if rowitems:
                     # items are tab separated
-                    lines.append( '\t'.join(rowitems) )
+                    lines.append('\t'.join(rowitems))
                     rowitems = []
                 lastrow = row
             rowitems.append(
-                cstr(model.createIndex(row, column).data()) )
+                cstr(model.createIndex(row, column).data()))
         if rowitems:
-            lines.append( '\t'.join(rowitems) )
+            lines.append('\t'.join(rowitems))
         lines.append('')  # blank line at end
         lines = '\n'.join(lines)
 
@@ -759,15 +866,15 @@ class DataEditDialog(VeuszDialog):
 
     def slotNewNumericalDataset(self):
         """Add new value dataset."""
-        self.newDataset( datasets.Dataset(data=[0.]) )
+        self.newDataset(datasets.Dataset(data=[0.]))
 
     def slotNewTextDataset(self):
         """Add new text dataset."""
-        self.newDataset( datasets.DatasetText(data=['']) )
+        self.newDataset(datasets.DatasetText(data=['']))
 
     def slotNewDateDataset(self):
         """Add new date dataset."""
-        self.newDataset( datasets.DatasetDateTime(data=[]) )
+        self.newDataset(datasets.DatasetDateTime(data=[]))
 
     def newDataset(self, ds):
         """Add new dataset to document."""
