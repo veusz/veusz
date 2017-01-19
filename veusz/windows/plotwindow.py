@@ -32,6 +32,8 @@ from ..dialogs import exceptiondialog
 from .. import document
 from .. import utils
 from .. import widgets
+from .. import plugins
+from veusz.document.operations import OperationToolsPlugin
 
 def _(text, disambiguation=None, context='PlotWindow'):
     """Translate text."""
@@ -431,6 +433,14 @@ class PlotWindow( qt4.QGraphicsView ):
                     a(self, _('Zoom into graph'), _('Zoom graph'),
                       None,
                       icon='veusz-zoom-graph'),
+                'view.autoaxes':
+                    a(self, _('Restore auto axes ranges'), _('Auto axes'),
+                      self.slotAutoAxes,
+                      icon='veusz-zoom-graph-out'),
+                'view.undo':
+                    a(self, _('Undo'), _('Undo'),
+                      self.slotUndo,
+                      icon='kde-edit-undo'),
                 'view.fullscreen':
                     a(self, _('View plot full screen'), _('Full screen'),
                       self.slotFullScreen,
@@ -474,7 +484,7 @@ class PlotWindow( qt4.QGraphicsView ):
                                 ('view.prevpage', 'view.nextpage',
                                  'view.fullscreen',
                                  'view.select', 'view.pick',
-                                 'view.zoomgraph', 'view.zoommenu'))
+                                 'view.zoomgraph', 'view.autoaxes', 'view.undo', 'view.zoommenu'))
 
         # define action group for various different selection models
         grp = self.selectactiongrp = qt4.QActionGroup(self)
@@ -1137,6 +1147,17 @@ class PlotWindow( qt4.QGraphicsView ):
     def slotViewNextPage(self):
         """View the next page."""
         self.setPageNumber( self.pagenumber + 1 )
+        
+    def slotAutoAxes(self):
+        """Restore auto axes ranges on current page"""
+        page_path = self.document.basewidget.children[self.pagenumber].path
+        op = OperationToolsPlugin(plugins.ZoomAxesPlugin(), {'zoom': 0, 'x': True, 
+                                'currentwidget': page_path})
+        self.document.applyOperation(op)
+    
+    def slotUndo(self):
+        """Undo last operation"""
+        self.document.undoOperation()
 
     def updatePageToolbar(self):
         """Update page number when the plot window says so."""
