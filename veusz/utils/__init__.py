@@ -41,3 +41,5 @@ except ImportError:
         plotLinesToPainter, plotClippedPolyline, polygonClip, \
         plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath, \
         resampleLinearImage, RotatedRectangle, RectangleOverlapTester
+
+from .search import searchFirstOccurrence, iter_widgets
