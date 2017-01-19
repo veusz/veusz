@@ -21,8 +21,8 @@ from .datasetplugin import *
 from .importplugin import *
 from .toolsplugin import *
 from .votable import *
-from ZoomAxesPlugin import ZoomAxesPlugin
-from operation_wrapper import OperationWrapper
+from .zoomaxes import ZoomAxesPlugin
+from .operation_wrapper import OperationWrapper
 
 # backward compatibility
 ImportDataset1D = Dataset1D

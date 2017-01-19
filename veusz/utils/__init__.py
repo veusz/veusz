@@ -42,4 +42,4 @@ except ImportError:
         plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath, \
         resampleLinearImage, RotatedRectangle, RectangleOverlapTester
 
-from search import searchFirstOccurrence, iter_widgets
+from .search import searchFirstOccurrence, iter_widgets
