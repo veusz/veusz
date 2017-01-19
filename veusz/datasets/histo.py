@@ -184,6 +184,7 @@ class DatasetHistoGenerator(object):
 
         # lookup names of datasets in document
         bindsname = valuedsname = ''
+
         dss = []
         for name, ds in citems(self.document.data):
             if ds is self.bindataset:
@@ -203,7 +204,6 @@ class DatasetHistoGenerator(object):
         
         for ds, name in dss:
             ds.saveDataAttr(fileobj, name)
-        
 
     def linkedInformation(self):
         """Informating about linking."""

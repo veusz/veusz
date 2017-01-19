@@ -101,6 +101,7 @@ class DatasetConcreteBase(DatasetBase):
         """Save dataset to file."""
         self.saveDataRelationToText(fileobj, name)
         self.saveDataAttr(fileobj, name)
+        
         if self.linked is None:
             if mode == 'text':
                 self.saveDataDumpToText(fileobj, name)

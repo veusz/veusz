@@ -70,8 +70,6 @@ class _DatasetBase(object):
         return []
 
 # these classes are returned from dataset plugins
-
-
 class Dataset1D(_DatasetBase):
     """1D dataset for ImportPlugin or DatasetPlugin."""
 
@@ -110,7 +108,6 @@ class Dataset1D(_DatasetBase):
         """Convert this to an equivalent (unlinked) Veusz dataset."""
         return datasets.Dataset(
             data=self.data, serr=self.serr, perr=self.perr, nerr=self.nerr)
-
 
 class Dataset2D(_DatasetBase):
     """2D dataset for ImportPlugin or DatasetPlugin."""
@@ -231,7 +228,7 @@ class DatasetDateTime(_DatasetBase):
         """Convert this to an equivalent (unlinked) Veusz dataset."""
         return datasets.DatasetDateTime(data=self.data)
 
-
+      
 class DatasetText(_DatasetBase):
     """Text dataset for ImportPlugin or DatasetPlugin."""
 
