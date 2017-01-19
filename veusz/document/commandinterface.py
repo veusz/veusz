@@ -68,6 +68,8 @@ class CommandInterface(qt4.QObject):
         'GetData',
         'GetDataType',
         'GetDatasets',
+        'GetDataAttr',
+        'DataAttrs',
         'ImportFITSFile',
         'List',
         'NodeChildren',
@@ -89,6 +91,7 @@ class CommandInterface(qt4.QObject):
         'SetDataND',
         'SetDataRange',
         'SetDataText',
+        'SetDataAttr',
         'SettingType',
         'SetVerbose',
         'TagDatasets',
@@ -138,6 +141,10 @@ class CommandInterface(qt4.QObject):
     def SetVerbose(self, v=True):
         """Specify whether we want verbose output after operations."""
         self.verbose = v
+        
+    def vprint(self, *a):
+        if self.verbose:
+            print(*a) 
 
     def Add(self, widgettype, **args_opt):
         """Add a widget to the widget with the type given.
@@ -643,6 +650,34 @@ class CommandInterface(qt4.QObject):
                   "Values = %s") % (
                       name, repr(data.data))
             )
+            
+    def SetDataAttr(self, dsname, attrname, val):
+        """Set dataset attribute `attrname` to `val`"""
+        self.vprint(_('setting attr'), dsname, attrname, val)
+        ds = self.document.data.get(dsname, False)
+        if ds is False:
+            raise RuntimeError(_('Dataset not found') + dsname)
+        ds.attr[attrname] = val
+        op = operations.OperationDatasetSet(dsname, ds)
+        self.document.applyOperation(op)
+        
+    def GetDataAttr(self, dsname, attrname):
+        """Retrieve a user/plugin defined attribute `attrname`"""
+        ds = self.document.data.get(dsname, False)
+        if ds is False:
+            raise RuntimeError(_('GetDataAttr: dataset not found! ') + dsname)
+            return  
+        if not ds.attr.has_key(attrname):
+            raise RuntimeError(_('No attribute named ')+ attrname)
+        return ds.attr[attrname]
+    
+    def DataAttrs(self, dsname):
+        """Return all dataset attributes"""
+        ds = self.document.data.get(dsname, False)
+        if ds is False:
+            raise RuntimeError(_('AllDataAttr: dataset not found! ') + dsname)
+            return   
+        return ds.attr
 
     def GetData(self, name):
         """Return the data with the name.
