@@ -326,6 +326,10 @@ class PointPlotter(GenericPlotter):
         GenericPlotter.__init__(self, parent, name=name)
         if type(self) == PointPlotter:
             self.readDefaults()
+        ys = self.settings.get('yData')
+        ys.setOnModified(self.auto_key)
+        
+            
 
     @classmethod
     def addSettings(klass, s):
@@ -437,6 +441,20 @@ class PointPlotter(GenericPlotter):
         s = self.settings
         return "x='%s', y='%s', marker='%s'" % (
             s.xData, s.yData, s.marker)
+        
+    def auto_key(self):
+        """Automatically define plot key based on dataset label"""
+        # Key already set or yData not set
+        if bool(self.settings.key) or not self.settings.yData:
+            return False
+        ds = self.document.data.get(self.settings.yData, False)
+        if ds is False:
+            return False
+        label = ds.attr.get('label', '')
+        if not label:
+            return False
+        self.settings.key = label
+        return label
 
     def _plotErrors(self, posn, painter, xplotter, yplotter,
                     axes, xdata, ydata, cliprect):
