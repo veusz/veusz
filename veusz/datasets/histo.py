@@ -71,7 +71,7 @@ class DatasetHistoGenerator(object):
 
     def binLocations(self):
         """Compute locations of bins edges, giving N+1 items."""
-        if self.binmanual:
+        if self.binmanual is not None:
             return N.array(self.binmanual)
         else:
             numbins, minval, maxval, islog = self.binparams
@@ -151,9 +151,9 @@ class DatasetHistoGenerator(object):
         if data is None:
             return (N.array([]), None, None)
 
-        normed = self.method == 'density'
+        density = self.method == 'density'
         binlocs = self.binLocations()
-        hist, edges = N.histogram(data, bins=binlocs, normed=normed)
+        hist, edges = N.histogram(data, bins=binlocs, density=density)
         hist = hist.astype(N.float64)  # integers can break plots (github#49)
         
         if self.method == 'fractions':
