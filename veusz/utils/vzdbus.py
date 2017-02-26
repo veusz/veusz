@@ -19,6 +19,8 @@
 """Wrapper for D-Bus module it."""
 
 from __future__ import division
+import sys
+import os
 
 # interface name veusz interfaces appear on
 sessionbus = busname = None
@@ -27,19 +29,24 @@ try:
     import dbus
     from dbus.service import method, Object
     from dbus.mainloop.qt import DBusQtMainLoop
-    import os
 
     def setup():
         """Initialise dbus."""
 
-        DBusQtMainLoop(set_as_default=True)
-
         global sessionbus
         global busname
 
-        sessionbus = dbus.SessionBus()
-        busname = dbus.service.BusName(
-            'org.veusz.pid%i' % os.getpid(), sessionbus)
+        try:
+            DBusQtMainLoop(set_as_default=True)
+
+            sessionbus = dbus.SessionBus()
+            busname = dbus.service.BusName(
+                'org.veusz.pid%i' % os.getpid(), sessionbus)
+
+        except dbus.exceptions.DBusException:
+            sys.stderr.write('Exception when connecting to DBus')
+            sessionbus = None
+            busname = None
 
 except ImportError:
     # no DBus, so we try to make the interface do nothing

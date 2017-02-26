@@ -59,7 +59,9 @@ class DBusWinInterface(vzdbus.Object):
 
     def __init__(self, actions, index):
         prefix = '/Windows/%i/Actions' % index
-        vzdbus.Object.__init__(self, vzdbus.sessionbus, prefix)
+        # possible exception in dbus means we have to check sessionbus
+        if vzdbus.sessionbus is not None:
+            vzdbus.Object.__init__(self, vzdbus.sessionbus, prefix)
         self.actions = actions
 
     @vzdbus.method(dbus_interface=interface, out_signature='as')
