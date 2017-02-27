@@ -201,7 +201,7 @@ class DatasetHistoGenerator(object):
     def linkedInformation(self):
         """Informating about linking."""
 
-        if self.binmanual:
+        if self.binmanual is not None:
             bins = _('manual bins')
         else:
             bins = _('%i bins from %s to %s') % (self.binparams[0],
