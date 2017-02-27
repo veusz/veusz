@@ -1,5 +1,6 @@
 Changes in <next release>:
  * Fix loading translator via command line
+ * Show horizontal error lines/fills in key
 
 Bug fixes in 1.25.1:
  * Fix 2D dataset expressions

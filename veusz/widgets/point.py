@@ -694,11 +694,22 @@ class PointPlotter(GenericPlotter):
         # draw sample error bar
         s = self.settings
         size = s.get('markerSize').convert(painter)
-        style = s.errorStyle
 
-        # make some fake error bar data to plot
+        # does data have errors bars?
         xv = s.get('xData').getData(self.document)
         yv = s.get('yData').getData(self.document)
+        hasxerrs = xv.hasErrors()
+        hasyerrs = yv.hasErrors()
+
+        # style to plot
+        style = s.errorStyle
+
+        # convert horizontal errors to vertical ones
+        if style in ('linehorz', 'fillhorz', 'likehorzbar'):
+            style = style.replace('horz', 'vert')
+            hasxerrs, hasyerrs = hasyerrs, hasxerrs
+
+        # make some fake error bar data to plot
         yp = y + height/2
         xpts = N.array([x-width, x+width/2, x+2*width])
         ypts = N.array([yp, yp, yp])
@@ -719,12 +730,12 @@ class PointPlotter(GenericPlotter):
             utils.brushExtFillPath(painter, s.FillAbove, path)
 
         # make points for error bars (if any)
-        if xv and xv.hasErrors():
+        if xv and hasxerrs:
             xneg = N.array([x-width, x+width/2-errorsize, x+2*width])
             xpos = N.array([x-width, x+width/2+errorsize, x+2*width])
         else:
             xneg = xpos = xpts
-        if yv and yv.hasErrors():
+        if yv and hasyerrs:
             yneg = N.array([yp-errorsize, yp-errorsize, yp-errorsize])
             ypos = N.array([yp+errorsize, yp+errorsize, yp+errorsize])
         else:
