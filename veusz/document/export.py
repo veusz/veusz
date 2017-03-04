@@ -206,7 +206,7 @@ class Export(object):
         """Render page using paint helper to painter.
         This first renders to the helper, then to the painter
         """
-        helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
+        helper = painthelper.PaintHelper(self.doc, size, dpi=dpi, directpaint=painter)
         painter.setClipRect( qt4.QRectF(
                 qt4.QPointF(0,0), qt4.QPointF(*size)) )
         painter.save()

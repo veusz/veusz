@@ -82,8 +82,8 @@ class PaintHelper(object):
     Holds the scaling, dpi and size of the page.
     """
 
-    def __init__(self, pagesize, scaling=1., dpi=(100, 100),
-                 directpaint=None):
+    def __init__(self, document, pagesize,
+                 scaling=1., dpi=(100, 100), directpaint=None):
         """Initialise using page size (tuple of pixelw, pixelh).
 
         If directpaint is set to a painter, use this directly rather
@@ -93,6 +93,7 @@ class PaintHelper(object):
         the painter.
         """
 
+        self.document = document
         self.dpi = dpi
         self.scaling = scaling
         self.pixperpt = self.dpi[1] / 72.

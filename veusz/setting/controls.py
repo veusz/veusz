@@ -855,11 +855,12 @@ class LineStyle(Choice):
         setn.get('color').set('black')
         setn.get('width').set('1pt')
         
+        doc = document.Document()
         for lstyle in cls._lines:
             pix = qt4.QPixmap(*size)
             pix.fill()
 
-            ph = document.PaintHelper( (1, 1) )
+            ph = document.PaintHelper(doc, (1, 1))
 
             painter = qt4.QPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
