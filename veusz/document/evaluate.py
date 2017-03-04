@@ -24,6 +24,8 @@ import datetime
 
 import numpy as N
 
+from . import colors
+
 from ..compat import citems, cstr, cexec
 from .. import setting
 from .. import utils
@@ -78,6 +80,7 @@ class Evaluate:
 
         # copy default colormaps
         self.colormaps = utils.ColorMaps()
+        self.colors = colors.Colors()
 
         # copies of validated compiled expressions
         self.compiled = {}

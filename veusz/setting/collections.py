@@ -54,15 +54,16 @@ class Line(Settings):
         self.add( setting.Bool('hide', False,
                                descr = _('Hide the line'),
                                usertext=_('Hide')) )
-        
-    def makeQPen(self, painthelper):
+
+    def makeQPen(self, painter):
         '''Make a QPen from the description.
         This currently ignores the hide attribute
         '''
 
-        color = qt4.QColor(self.color)
-        color.setAlphaF( (100-self.transparency) / 100.)
-        width = self.get('width').convert(painthelper)
+        color = painter.docColor(self.color)
+        if self.transparency > 0:
+            color.setAlphaF( (100-self.transparency) / 100.)
+        width = self.get('width').convert(painter)
         style, dashpattern = setting.LineStyle._linecnvt[self.style]
         pen = qt4.QPen( color, width, style )
 
@@ -71,13 +72,13 @@ class Line(Settings):
 
         return pen
 
-    def makeQPenWHide(self, painthelper):
+    def makeQPenWHide(self, painter):
         """Make a pen, taking account of hide attribute."""
         if self.hide:
             return qt4.QPen(qt4.Qt.NoPen)
         else:
-            return self.makeQPen(painthelper)
-        
+            return self.makeQPen(painter)
+
 class XYPlotLine(Line):
     '''A plot line for plotting data, allowing histogram-steps
     to be plotted.'''
@@ -146,20 +147,20 @@ class Brush(Settings):
         self.add( setting.Bool( 'hide', False,
                                 descr = _('Hide the fill'),
                                 usertext=_('Hide')) )
-        
-    def makeQBrush(self):
-        '''Make a qbrush from the settings.'''
 
-        color = qt4.QColor(self.color)
-        color.setAlphaF( (100-self.transparency) / 100.)
-        return qt4.QBrush( color, self.get('style').qtStyle() )
-    
-    def makeQBrushWHide(self):
+    def makeQBrush(self, painter):
+        '''Make a QBrush from the settings.'''
+        color = painter.docColor(self.color)
+        if self.transparency > 0:
+            color.setAlphaF((100-self.transparency) / 100.)
+        return qt4.QBrush(color, self.get('style').qtStyle())
+
+    def makeQBrushWHide(self, painter):
         """Make a brush, taking account of hide attribute."""
         if self.hide:
             return qt4.QBrush()
         else:
-            return self.makeQBrush()
+            return self.makeQBrush(painter)
 
 class BrushExtended(Settings):
     '''Extended brush style.'''

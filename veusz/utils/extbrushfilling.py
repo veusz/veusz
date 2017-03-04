@@ -195,9 +195,10 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
     style = extbrush.style
     if style in _fillcnvt:
         # standard fill: use Qt styles for painting
-        color = qt4.QColor(extbrush.color)
-        color.setAlphaF( (100-extbrush.transparency) / 100.)
-        brush = qt4.QBrush( color, _fillcnvt[style])
+        color = painter.docColor(extbrush.color)
+        if extbrush.transparency >= 0:
+            color.setAlphaF((100-extbrush.transparency) / 100.)
+        brush = qt4.QBrush(color, _fillcnvt[style])
         if stroke is None:
             painter.fillPath(path, brush)
         else:
@@ -212,13 +213,15 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
 
         if not extbrush.backhide:
             # background brush
-            color = qt4.QColor(extbrush.backcolor)
-            color.setAlphaF( (100-extbrush.backtransparency) / 100.)
-            brush = qt4.QBrush( color )
+            color = painter.docColor(extbrush.backcolor)
+            if extbrush.backtransparency >= 0:
+                color.setAlphaF((100-extbrush.backtransparency) / 100.)
+            brush = qt4.QBrush(color)
             painter.fillPath(path, brush)
 
-        color = qt4.QColor(extbrush.color)
-        color.setAlphaF( (100-extbrush.transparency) / 100.)
+        color = painter.docColor(extbrush.color)
+        if extbrush.transparency >= 0:
+            color.setAlphaF((100-extbrush.transparency) / 100.)
         width = extbrush.get('linewidth').convert(painter)
         lstyle, dashpattern = extbrush.get('linestyle')._linecnvt[
             extbrush.linestyle]

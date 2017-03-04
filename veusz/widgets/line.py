@@ -207,7 +207,7 @@ class Line(plotters.FreePlotter):
 
             # settings for fill
             if not s.Fill.hide:
-                painter.setBrush( s.get('Fill').makeQBrush() )
+                painter.setBrush( s.get('Fill').makeQBrush(painter) )
             else:
                 painter.setBrush( qt4.QBrush() )
 

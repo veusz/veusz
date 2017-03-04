@@ -665,28 +665,28 @@ def _distInvPhys(pixdist, painter, mult, unit):
                       unit )
 
 def _distPerc(match, painter):
-    """Convert from a percentage of maxsize."""
-    return painter.maxsize * 0.01 * float(match.group(1))
+    """Convert from a percentage of maxdim."""
+    return painter.maxdim * 0.01 * float(match.group(1))
 
 def _distInvPerc(pixdist, painter):
     """Convert pixel distance into percentage."""
-    return _idistval(pixdist * 100. / painter.maxsize, '%')
+    return _idistval(pixdist * 100. / painter.maxdim, '%')
 
 def _distFrac(match, painter):
-    """Convert from a fraction a/b of maxsize."""
+    """Convert from a fraction a/b of maxdim."""
     try:
-        return painter.maxsize * float(match.group(1))/float(match.group(4))
+        return painter.maxdim * float(match.group(1))/float(match.group(4))
     except ZeroDivisionError:
         return 0.
 
 def _distRatio(match, painter):
-    """Convert from a simple 0.xx ratio of maxsize."""
+    """Convert from a simple 0.xx ratio of maxdim."""
 
     # if it's greater than 1 then assume it's a point measurement
     if float(match.group(1)) > 1.:
         return _distPhys(match, painter, 1)
 
-    return painter.maxsize * float(match.group(1))
+    return painter.maxdim * float(match.group(1))
 
 # regular expression to match distances
 distre_expr = r'''^
@@ -785,7 +785,6 @@ class Distance(Setting):
 
         dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
                  10pt, 1cm, 20mm, 1inch, 1in, 1" (size)
-        maxsize: size fractions are relative to
         painter: painter to get metrics to convert physical sizes
         '''
 
@@ -1388,9 +1387,9 @@ class Color(ChoiceOrMore):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
 
-    def color(self):
+    def color(self, painter):
         """Return QColor for color."""
-        return qt4.QColor(self.val)
+        return painter.docColor(self.val)
 
     def makeControl(self, *args):
         return controls.Color(self, *args)
@@ -1668,7 +1667,7 @@ class LineSet(Setting):
             style, width, color, hide = v
             width = Distance.convertDistance(painter, width)
             style, dashpattern = LineStyle._linecnvt[style]
-            col = utils.extendedColorToQColor(color)
+            col = painter.docColor(color)
             pen = qt4.QPen(col, width, style)
 
             if dashpattern:
@@ -1731,13 +1730,7 @@ class FillSet(Setting):
         else:
             v = self.val[row % len(self.val)]
             s.style = v[0]
-            col = utils.extendedColorToQColor(v[1])
-            if col.alpha() != 255:
-                s.transparency = int(100 - col.alphaF()*100)
-                col.setAlpha(255)
-                s.color = col.name()
-            else:
-                s.color = v[1]
+            s.color = v[1]
             s.hide = v[2]
             if len(v) == 10:
                 (s.transparency, s.linewidth, s.linestyle,

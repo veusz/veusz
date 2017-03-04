@@ -253,7 +253,7 @@ class NonOrthPoint(Widget):
                         cmap = self.document.evaluate.getColormap(
                             s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
-                    painter.setBrush(s.MarkerFill.makeQBrushWHide())
+                    painter.setBrush(s.MarkerFill.makeQBrushWHide(painter))
                     painter.setPen(s.MarkerLine.makeQPenWHide(painter))
 
                     utils.plotMarkers(painter, px, py, s.marker, markersize,

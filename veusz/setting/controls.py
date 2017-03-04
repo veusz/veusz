@@ -441,6 +441,7 @@ class FillStyleExtended(ChoiceSwitch):
     def _generateIcons(cls):
         """Generate a list of pixmaps for drop down menu."""
 
+        from .. import document
         from . import collections
         brush = collections.BrushExtended("")
         brush.color = 'black'
@@ -453,17 +454,19 @@ class FillStyleExtended(ChoiceSwitch):
         path = qt4.QPainterPath()
         path.addRect(0, 0, size, size)
 
+        doc = document.Document()
+        phelper = document.PaintHelper(doc, (1,1))
+
         for f in utils.extfillstyles:
             pix = qt4.QPixmap(size, size)
             pix.fill()
-            painter = qt4.QPainter(pix)
-            painter.pixperpt = 1.
-            painter.scaling = 1.
+            painter = document.DirectPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
+            painter.updateMetaData(phelper)
             brush.style = f
             utils.brushExtFillPath(painter, brush, path)
             painter.end()
-            icons.append( qt4.QIcon(pix) )
+            icons.append(qt4.QIcon(pix))
 
 class MultiLine(qt4.QTextEdit):
     """For editting multi-line settings."""
@@ -860,16 +863,18 @@ class LineStyle(Choice):
             pix = qt4.QPixmap(*size)
             pix.fill()
 
-            ph = document.PaintHelper(doc, (1, 1))
-
-            painter = qt4.QPainter(pix)
+            painter = document.DirectPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
+
+            phelper = document.PaintHelper(doc, (1, 1))
+            painter.updateMetaData(phelper)
 
             setn.get('style').set(lstyle)
             
-            painter.setPen( setn.makeQPen(ph) )
-            painter.drawLine( int(size[0]*0.1), size[1]/2,
-                              int(size[0]*0.9), size[1]/2 )
+            painter.setPen( setn.makeQPen(painter) )
+            painter.drawLine(
+                int(size[0]*0.1), size[1]//2,
+                int(size[0]*0.9), size[1]//2)
             painter.end()
             icons.append( qt4.QIcon(pix) )
 
@@ -1205,8 +1210,10 @@ class ListSet(qt4.QFrame):
 
     def updateColorButton(self, cntrl, color):
         """Given color control, update color."""
+
         pix = qt4.QPixmap(self.pixsize, self.pixsize)
-        pix.fill(utils.extendedColorToQColor(color))
+        qcolor = self.setting.getDocument().evaluate.colors.get(color)
+        pix.fill(qcolor)
         cntrl.setIcon(qt4.QIcon(pix))
 
     def addToggleButton(self, tooltip):
@@ -1268,8 +1275,10 @@ class ListSet(qt4.QFrame):
         row, col = self.identifyPosn(sender)
 
         rows = self.setting.val
+        qcolor = self.setting.getDocument().evaluate.colors.get(
+            rows[row][col])
         color = qt4.QColorDialog.getColor(
-            utils.extendedColorToQColor(rows[row][col]),
+            qcolor,
             self,
             "Choose color",
             qt4.QColorDialog.ShowAlphaChannel )
@@ -1282,9 +1291,10 @@ class ListSet(qt4.QFrame):
 
             # change the color
             pix = qt4.QPixmap(self.pixsize, self.pixsize)
-            pix.fill( utils.extendedColorToQColor(color) )
-            sender.setIcon( qt4.QIcon(pix) )
-            
+            qcolor = self.setting.getDocument().evaluate.colors.get(color)
+            pix.fill(qcolor)
+            sender.setIcon(qt4.QIcon(pix))
+
 class LineSet(ListSet):
     """A list of line styles.
     """

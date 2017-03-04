@@ -258,11 +258,11 @@ class Document(qt4.QObject):
         return s
 
     def isBlank(self):
-        """Does the document contain widgets and no data"""
+        """Is the document unchanged?"""
         return self.changeset == 0
 
     def setData(self, name, dataset):
-        """Set data to val, with symmetric or negative and positive errors."""
+        """Set dataset in document."""
         self.data[name] = dataset
         dataset.document = self
         dataset.username = name
@@ -277,7 +277,7 @@ class Document(qt4.QObject):
             self.setModified()
 
     def modifiedData(self, dataset):
-        """The named dataset was modified"""
+        """Notify dataset was modified"""
         if dataset in self.data.values():
             self.setModified()
 
@@ -368,38 +368,6 @@ class Document(qt4.QObject):
                 err = _('Error loading plugin %s\n\n%s') % (
                     plugin, traceback.format_exc())
                 qt4.QMessageBox.critical(None, _("Error loading plugin"), err)
-
-    def printTo(self, printer, pages, scaling=1., antialias=False):
-        """Print onto printing device.
-        Returns list of page sizes
-        """
-
-        painter = painthelper.DirectPainter(printer)
-        dpi = (printer.logicalDpiX(), printer.logicalDpiY())
-        if antialias:
-            painter.setRenderHint(qt4.QPainter.Antialiasing, True)
-            painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
-
-        sizes = []
-
-        # This all assumes that only pages can go into the root widget
-        for count, page in enumerate(pages):
-            painter.save()
-            size = self.pageSize(page, dpi=dpi)
-            sizes.append(size)
-            painter.setClipRect(qt4.QRectF(
-                qt4.QPointF(0,0), qt4.QPointF(*size)))
-            helper = painthelper.PaintHelper(
-                self, size, dpi=dpi, directpaint=painter)
-            self.paintTo(helper, page)
-            painter.restore()
-
-            # start new pages between each page
-            if count < len(pages)-1:
-                printer.newPage()
-        painter.end()
-
-        return sizes
 
     def paintTo(self, painthelper, page):
         """Paint page specified to the paint helper."""

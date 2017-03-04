@@ -755,7 +755,7 @@ class PointPlotter(GenericPlotter):
         # draw marker
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
             if not s.MarkerFill.hide:
-                painter.setBrush( s.MarkerFill.makeQBrush() )
+                painter.setBrush( s.MarkerFill.makeQBrush(painter) )
 
             if not s.MarkerLine.hide:
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
@@ -928,7 +928,7 @@ class PointPlotter(GenericPlotter):
                 #print "Painting marker fill"
                 if not s.MarkerFill.hide:
                     # filling for markers
-                    painter.setBrush( s.MarkerFill.makeQBrush() )
+                    painter.setBrush( s.MarkerFill.makeQBrush(painter) )
                 else:
                     # no-filling brush
                     painter.setBrush( qt4.QBrush() )

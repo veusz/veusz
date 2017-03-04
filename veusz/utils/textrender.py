@@ -604,7 +604,6 @@ class RenderState(object):
                  actually_render=True):
         self.font = font
         self.painter = painter
-        self.device = painter.device()
         self.x = x     # current x position
         self.y = y     # current y position
         self.alignhorz = alignhorz
@@ -613,17 +612,11 @@ class RenderState(object):
 
     def fontMetrics(self):
         """Returns font metrics object."""
-        return FontMetrics(self.font, self.device)
+        return FontMetrics(self.font, self.painter.device())
 
     def getPixelsPerPt(self):
         """Return number of pixels per point in the rendering."""
-        painter = self.painter
-        pixperpt = painter.device().logicalDpiY() / 72.
-        try:
-            pixperpt *= painter.scaling
-        except AttributeError:
-            pass
-        return pixperpt
+        return self.painter.pixperpt * self.painter.scaling
 
 class Part(object):
     """Represents a part of the text to be rendered, made up of smaller parts."""
