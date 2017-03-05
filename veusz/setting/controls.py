@@ -883,6 +883,7 @@ class LineStyle(Choice):
 class _ColNotifier(qt4.QObject):
     sigNewColor = qt4.pyqtSignal(cstr)
 
+
 class Color(qt4.QWidget):
     """A control which lets the user choose a color.
 
@@ -891,27 +892,17 @@ class Color(qt4.QWidget):
 
     sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
 
-    _icons = None
-    _colors = None
-    _colnotifier = None
-
     def __init__(self, setting,  parent):
         qt4.QWidget.__init__(self, parent)
 
-        if self._icons is None:
-            self._generateIcons()
-
         self.setting = setting
- 
+        self.document = setting.getDocument()
+        self.colors = self.document.evaluate.colors
+
         # combo box
         c = self.combo = qt4.QComboBox()
         c.setEditable(True)
-        for color in self._colors:
-            c.addItem(self._icons[color], color)
         c.activated[str].connect(self.slotActivated)
-
-        # add color if a color is added by a different combo box
-        Color._colnotifier.sigNewColor.connect(self.addcolorSlot)
 
         # button for selecting colors
         b = self.button = qt4.QPushButton()
@@ -921,77 +912,51 @@ class Color(qt4.QWidget):
         b.setMaximumWidth(24)
         b.clicked.connect(self.slotButtonClicked)
 
+        c.setModel(self.colors.model)
+        self.setColor(self.setting.val)
+
         if setting.readonly:
             c.setEnabled(False)
             b.setEnabled(False)
-                     
+
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0,0,0,0)
         layout.addWidget(c)
         layout.addWidget(b)
 
-        self.setColor( setting.toText() )
+        self.setColor(setting.toText())
         self.setLayout(layout)
         self.setting.setOnModified(self.onModified)
 
-    def addcolorSlot(self, color):
-        """When another Color combo adds a color, add one to this one"""
-        self.combo.addItem(self._icons[color], color)
-
-    @classmethod
-    def _generateIcons(cls):
-        """Generate a list of icons for drop down menu.
-        Does not generate existing icons
-        """
-
-        size = 12
-        if cls._icons is None:
-            cls._icons = {}
-        
-        icons = cls._icons
-        for c in cls._colors:
-            if c not in icons:
-                pix = qt4.QPixmap(size, size)
-                pix.fill( qt4.QColor(c) )
-                icons[c] = qt4.QIcon(pix)
-                if cls._colnotifier is not None:
-                    # tell other combo boxes a color has been added
-                    cls._colnotifier.sigNewColor.emit(c)
-
-        if cls._colnotifier is None:
-            cls._colnotifier = _ColNotifier()
-    
     def slotButtonClicked(self):
         """Open dialog to edit color."""
 
-        col = qt4.QColorDialog.getColor(self.setting.color(), self)
+        col = qt4.QColorDialog.getColor(
+            self.colors.get(self.setting.val), self)
         if col.isValid():
             # change setting
             val = col.name()
             self.sigSettingChanged.emit(self, self.setting, val)
 
-    def slotActivated(self, val):
+    def slotActivated(self, text):
         """A different value is selected."""
-        
-        text = self.combo.currentText()
         val = self.setting.fromText(text)
         self.sigSettingChanged.emit(self, self.setting, val)
 
     def setColor(self, color):
         """Update control with color given."""
 
-        # construct color icon if not there
-        if color not in Color._icons:
-            Color._colors.append(color)
-            Color._generateIcons()
-        
-        # add text to combo if not there
         index = self.combo.findText(color)
+        if index < 0:
+            # add text to combo if not there
+            self.combo.addItem(color)
+            index = self.combo.findText(color)
 
-        # set correct index in combobox
         self.combo.setCurrentIndex(index)
-        self.button.setIcon( self.combo.itemIcon(index) )
+
+        icon = self.combo.itemData(index, qt4.Qt.DecorationRole)
+        self.button.setIcon(icon)
 
     @qt4.pyqtSlot()
     def onModified(self):
@@ -1372,6 +1337,9 @@ class _FillBox(qt4.QScrollArea):
         self.setting = thesetting
 
         self.extbrush = thesetting.returnBrushExtended(row)
+
+        # need to add a real parent, so that the colors can be resolved
+        self.extbrush.parent = thesetting.parent
 
         from ..windows.treeeditwindow import SettingsProxySingle, PropertyList
 

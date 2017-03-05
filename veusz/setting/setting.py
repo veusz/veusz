@@ -1369,19 +1369,10 @@ class Color(ChoiceOrMore):
 
     typename = 'color'
 
-    _colors = [ 'white', 'black', 'red', 'green', 'blue',
-                'cyan', 'magenta', 'yellow',
-                'grey', 'darkred', 'darkgreen', 'darkblue',
-                'darkcyan', 'darkmagenta' ]
-
-    controls.Color._colors = _colors
-
     def __init__(self, name, value, **args):
         """Initialise the color setting with the given name, default
         and description."""
-
-        ChoiceOrMore.__init__(self, name, self._colors, value,
-                              **args)
+        ChoiceOrMore.__init__(self, name, [], value, **args)
 
     def copy(self):
         """Make a copy of the setting."""

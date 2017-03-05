@@ -22,9 +22,10 @@ from __future__ import division
 import re
 
 from .. import qtall as qt4
+from ..compat import crange
 
 # match name of color
-plotcolor_re = re.compile(r'^plot([1-9][0-9]*)$')
+themecolor_re = re.compile(r'^theme([1-9][0-9]*)$')
 
 # match extended color
 extendedcolor_re = re.compile('^#[0-9A-Fa-f]{8}$')
@@ -39,17 +40,40 @@ def makeColor(name):
     else:
         return qt4.QColor(name)
 
-class Colors:
+class Colors(qt4.QObject):
     """Document colors."""
 
+    sigColorsModified = qt4.pyqtSignal()
+
     def __init__(self):
+        qt4.QObject.__init__(self)
+
+        self.defaultcolors = [
+            'foreground',
+            'background',
+            'white',
+            'black',
+            'red',
+            'green',
+            'blue',
+            'cyan',
+            'magenta',
+            'yellow',
+            'grey',
+            'darkred',
+            'darkgreen',
+            'darkblue',
+            'darkcyan',
+            'darkmagenta'
+            ]
+
         self.colors = {
             # line and background colors
             'foreground': '#000000',
             'background': '#ffffff',
         }
 
-        self.plotcolors = [
+        self.themecolors = [
             # default colors (colorbrewer sets 1 and 2)
             '#e41a1c',
             '#377eb8',
@@ -70,14 +94,19 @@ class Colors:
             '#b3b3b3',
             ]
 
+        themecolors = ['theme%i' % (i+1) for i in crange(len(self.themecolors))]
+        self.allcolors = self.defaultcolors + themecolors
+
+        self.model = ColorModel(self, self)
+
     def get(self, name):
         """Get QColor given name."""
 
         if name in self.colors:
             name = self.colors[name]
 
-        # special colors plotXXX, where XXX is a number from 1
-        m = plotcolor_re.match(name)
+        # special colors themeXXX, where XXX is a number from 1
+        m = themecolor_re.match(name)
         if m:
             idx = int(m.group(1))
             return self.getIndex(idx)
@@ -88,7 +117,79 @@ class Colors:
     def getIndex(self, idx):
         """Get color by index given."""
         try:
-            wrapidx = (idx-1) % len(self.plotcolors)
+            wrapidx = (idx-1) % len(self.themecolors)
         except ZeroDivisionError:
             return qt4.QColor()
-        return makeColor(self.plotcolors[wrapidx])
+        return makeColor(self.themecolors[wrapidx])
+
+class ColorModel(qt4.QAbstractListModel):
+    """This is a Qt model to get access to the complete list of colors."""
+
+    def __init__(self, parent, colors):
+        qt4.QAbstractListModel.__init__(self, parent)
+        self.colors = colors
+        self.iconcache = {}
+
+    def rowCount(self, index):
+        if index.isValid():
+            return 0
+        return len(self.colors.allcolors)
+
+    def data(self, index, role):
+
+        row = index.row()
+        if row<0 or row>=len(self.colors.allcolors):
+            return None
+
+        color = self.colors.allcolors[index.row()]
+
+        if role == qt4.Qt.DisplayRole or role == qt4.Qt.EditRole:
+            return color
+        elif role == qt4.Qt.DecorationRole:
+            # icons are cached using rgba as index
+            rgba = self.colors.get(color).rgba()
+            if rgba not in self.iconcache:
+                pixmap = qt4.QPixmap(12, 12)
+                pixmap.fill(self.colors.get(color))
+                icon = qt4.QIcon(pixmap)
+                self.iconcache[rgba] = icon
+            return self.iconcache[rgba]
+
+        return None
+
+    def flags(self, index):
+        if not index.isValid():
+            return qt4.Qt.ItemIsEnabled
+        return (
+            qt4.QAbstractListModel.flags(self, index) | qt4.Qt.ItemIsEditable)
+
+    def setData(self, index, value, role):
+        if role == qt4.Qt.EditRole or role == qt4.Qt.DisplayRole:
+            row = index.row()
+            if row>=0 and row<len(self.colors.allcolors):
+                self.colors.allcolors[row] = value
+                self.dataChanged.emit(index, index)
+            return True
+        return False
+
+    def insertRows(self, row, count, parent):
+        if count<1 or row<0 or row>len(self.colors.allcolors):
+            return False
+
+        self.beginInsertRows(qt4.QModelIndex(), row, row+count-1)
+        self.colors.allcolors = (
+            self.colors.allcolors[:row] + ['']*count +
+            self.colors.allcolors[row:])
+        self.endInsertRows()
+        return True
+
+    def removeRows(self, row, count, parent):
+        if count<=0 or row<0 or (row+count)>len(self.colors.allcolors):
+            return False
+
+        self.beginRemoveRows(qt4.QModelIndex(), row, row+count-1)
+        self.colors.allcolors = (
+            self.colors.allcolors[:row] +
+            self.colors.allcolors[row+count:])
+        self.endRemoveRows()
+        return True
