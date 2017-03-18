@@ -892,7 +892,7 @@ class Color(qt4.QWidget):
 
     sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
 
-    def __init__(self, setting,  parent):
+    def __init__(self, setting, parent):
         qt4.QWidget.__init__(self, parent)
 
         self.setting = setting

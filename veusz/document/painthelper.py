@@ -72,6 +72,10 @@ class PainterRoot(qt4.QPainter):
         """Return color from document."""
         return self.colors.get(name)
 
+    def docColorAuto(self, index):
+        """Return automatic doc color given index."""
+        return self.colors.getIndex(index+1)
+
     def __enter__(self):
         pass
     def __exit__(self, exc_type, exc_value, traceback):
@@ -125,6 +129,7 @@ class PaintHelper(object):
         self.pagesize = ( max(pagesize[0], 1), max(pagesize[1], 1) )
 
         # keep track of states of all widgets
+        # maps (widget, layer) to DrawState
         self.states = {}
 
         # axis to plotter mappings
@@ -139,6 +144,9 @@ class PaintHelper(object):
 
         # keep track of last widget being plotted
         self.widgetstack = []
+
+        # current index for each plotter (if wanting automatic colors)
+        self.autoplotterindex = {}
 
     @property
     def maxdim(self):

@@ -86,6 +86,7 @@ class FunctionPlotter(GenericPlotter):
             descr = _('Function line settings'),
             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
+        s.Line.get('color').newDefault('auto')
 
         s.add( setting.PlotterFill(
             'FillBelow',

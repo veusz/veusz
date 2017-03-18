@@ -367,7 +367,7 @@ class PointPlotter(GenericPlotter):
             formatting=True), 0 )
         s.add( setting.Color(
             'color',
-            'black',
+            'auto',
             descr = _('Master color'),
             usertext = _('Color'),
             formatting=True), 0 )

@@ -418,5 +418,9 @@ class Widget(object):
 
         pass
 
+    def autoColor(self, painter):
+        """Return automatic color for plotting."""
+        return 'foreground'
+
 # allow the factory to instantiate a generic widget
 document.thefactory.register( Widget )

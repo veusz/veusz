@@ -49,8 +49,10 @@ class Colors(qt4.QObject):
         qt4.QObject.__init__(self)
 
         self.defaultcolors = [
+            'auto',
             'foreground',
             'background',
+            'transparent',
             'white',
             'black',
             'red',
@@ -71,6 +73,10 @@ class Colors(qt4.QObject):
             # line and background colors
             'foreground': '#000000',
             'background': '#ffffff',
+            'transparent': '#ffffff00',
+
+            # this is a special color with a special (fake) value
+            'auto': '#31323334',
         }
 
         self.themecolors = [
@@ -97,6 +103,7 @@ class Colors(qt4.QObject):
         themecolors = ['theme%i' % (i+1) for i in crange(len(self.themecolors))]
         self.allcolors = self.defaultcolors + themecolors
 
+        # model for colors to use in qt widgets
         self.model = ColorModel(self, self)
 
     def get(self, name):
@@ -109,18 +116,18 @@ class Colors(qt4.QObject):
         m = themecolor_re.match(name)
         if m:
             idx = int(m.group(1))
-            return self.getIndex(idx)
+            name = self.getIndex(idx)
 
         # standard colors
         return makeColor(name)
 
     def getIndex(self, idx):
-        """Get color by index given."""
+        """Get name of color by index given."""
         try:
             wrapidx = (idx-1) % len(self.themecolors)
         except ZeroDivisionError:
-            return qt4.QColor()
-        return makeColor(self.themecolors[wrapidx])
+            return 'foreground'
+        return self.themecolors[wrapidx]
 
 class ColorModel(qt4.QAbstractListModel):
     """This is a Qt model to get access to the complete list of colors."""
@@ -128,6 +135,8 @@ class ColorModel(qt4.QAbstractListModel):
     def __init__(self, parent, colors):
         qt4.QAbstractListModel.__init__(self, parent)
         self.colors = colors
+
+        # cache of icons for colors indexed by rgba value
         self.iconcache = {}
 
     def rowCount(self, index):
@@ -135,24 +144,44 @@ class ColorModel(qt4.QAbstractListModel):
             return 0
         return len(self.colors.allcolors)
 
-    def data(self, index, role):
+    def makeIcon(self, color):
+        """Make icon for color in cache."""
 
+        xw, yw = 16, 12
+        qcolor = self.colors.get(color)
+        if color.lower() in ('auto', 'transparent'):
+            # make a checkerboard pattern
+            image = qt4.QImage(xw, yw, qt4.QImage.Format_RGB32)
+            if color.lower() == 'auto':
+                cnames = ['orange', 'skyblue', 'green']
+            else:
+                cnames = ['lightgrey', 'darkgrey']
+            cols = [qt4.QColor(c).rgba() for c in cnames]
+            for x in crange(xw):
+                for y in crange(yw):
+                    idx = (x//4 + y//4) % len(cols)
+                    image.setPixel(x, y, cols[idx])
+            pixmap = qt4.QPixmap.fromImage(image)
+        else:
+            # solid color
+            pixmap = qt4.QPixmap(xw, yw)
+            pixmap.fill(qcolor)
+        icon = qt4.QIcon(pixmap)
+        self.iconcache[qcolor.rgba()] = icon
+
+    def data(self, index, role):
         row = index.row()
         if row<0 or row>=len(self.colors.allcolors):
             return None
 
         color = self.colors.allcolors[index.row()]
-
         if role == qt4.Qt.DisplayRole or role == qt4.Qt.EditRole:
             return color
         elif role == qt4.Qt.DecorationRole:
             # icons are cached using rgba as index
             rgba = self.colors.get(color).rgba()
             if rgba not in self.iconcache:
-                pixmap = qt4.QPixmap(12, 12)
-                pixmap.fill(self.colors.get(color))
-                icon = qt4.QIcon(pixmap)
-                self.iconcache[rgba] = icon
+                self.makeIcon(color)
             return self.iconcache[rgba]
 
         return None

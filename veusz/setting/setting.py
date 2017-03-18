@@ -1380,7 +1380,18 @@ class Color(ChoiceOrMore):
 
     def color(self, painter):
         """Return QColor for color."""
-        return painter.docColor(self.val)
+
+        if self.val.lower() == 'auto':
+            # lookup widget
+            w = self.parent
+            while not w.isWidget() and w is not None:
+                w = w.parent
+            if w is None:
+                return qt4.QColor()
+            # get automatic color
+            return painter.docColor(w.autoColor(painter))
+        else:
+            return painter.docColor(self.val)
 
     def makeControl(self, *args):
         return controls.Color(self, *args)

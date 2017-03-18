@@ -63,6 +63,14 @@ class GenericPlotter(widget.Widget):
                             descr = _('Name of Y-axis to use'),
                             usertext=_('Y axis')) )
 
+    def autoColor(self, painter):
+        """Automatic color for plotting."""
+        helper = painter.helper
+        if self in helper.autoplotterindex:
+            return painter.docColorAuto(helper.autoplotterindex[self])
+        else:
+            return 'foreground'
+
     def getAxesNames(self):
         """Returns names of axes used."""
         s = self.settings
