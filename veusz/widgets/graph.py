@@ -250,12 +250,10 @@ class Graph(widget.Widget):
         # don't duplicate drawing axes
         axesdrawn = set()
 
-        # map color indices to children
-        autoplotterindex = 0
+        # reset counter and compute automatic colors
+        painthelper.autoplottercount = 0
         for c in self.children:
-            if c.isplotter and c not in painthelper.autoplotterindex:
-                painthelper.autoplotterindex[c] = autoplotterindex
-                autoplotterindex += 1
+            c.autoColor(painter)
 
         # do normal drawing of children
         # iterate over children in reverse order

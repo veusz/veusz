@@ -1378,8 +1378,12 @@ class Color(ChoiceOrMore):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
 
-    def color(self, painter):
-        """Return QColor for color."""
+    def color(self, painter, dataindex=0):
+        """Return QColor from color.
+
+        painter is a Veusz Painter
+        dataindex is index for automatically getting colors for subdatasets.
+        """
 
         if self.val.lower() == 'auto':
             # lookup widget

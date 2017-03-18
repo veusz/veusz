@@ -418,7 +418,7 @@ class Widget(object):
 
         pass
 
-    def autoColor(self, painter):
+    def autoColor(self, painter, dataindex=0):
         """Return automatic color for plotting."""
         return 'foreground'
 

@@ -69,7 +69,7 @@ class Line(Settings):
             color.setAlphaF((100-self.transparency) / 100.)
         width = self.get('width').convert(painter)
         style, dashpattern = setting.LineStyle._linecnvt[self.style]
-        pen = qt4.QPen( color, width, style )
+        pen = qt4.QPen(color, width, style)
 
         if dashpattern:
             pen.setDashPattern(dashpattern)
@@ -345,7 +345,7 @@ class Text(Settings):
             usertext = _('Underline') ) )
         self.add( setting.Bool(
             'hide', False,
-            descr = _('Hide the text')
+            descr = _('Hide the text'),
             usertext = _('Hide')) )
 
     def copy(self):

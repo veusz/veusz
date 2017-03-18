@@ -146,7 +146,8 @@ class PaintHelper(object):
         self.widgetstack = []
 
         # current index for each plotter (if wanting automatic colors)
-        self.autoplotterindex = {}
+        self.autoplottercount = 0
+        self.autoplottermap = {}
 
     @property
     def maxdim(self):
@@ -309,3 +310,10 @@ class PaintHelper(object):
                 yield state.widget, state.bounds
             # remove the widget itself from the stack and insert children
             stack = state.children + stack[1:]
+
+    def autoColorIndex(self, key):
+        """Return automatic color index for key given."""
+        if key not in self.autoplottermap:
+            self.autoplottermap[key] = self.autoplottercount
+            self.autoplottercount += 1
+        return self.autoplottermap[key]

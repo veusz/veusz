@@ -159,6 +159,11 @@ class NonOrthFunction(Widget):
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable().pickIndex(oldindex, direction, bounds)
 
+    def autoColor(self, painter, dataindex=0):
+        """Automatic color for plotting."""
+        return painter.docColorAuto(
+            painter.helper.autoColorIndex((self, dataindex)))
+
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the function on a plotter.'''
 

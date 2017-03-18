@@ -188,6 +188,11 @@ class NonOrthPoint(Widget):
         return (c.min, c.max, c.scaling, s.MarkerFill.colorMap, 0,
                 s.MarkerFill.colorMapInvert)
 
+    def autoColor(self, painter, dataindex=0):
+        """Automatic color for plotting."""
+        return painter.docColorAuto(
+            painter.helper.autoColorIndex((self, dataindex)))
+
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the data on a plotter.'''
 
