@@ -254,7 +254,7 @@ class OperationWidgetClone(OperationWidgetPaste):
         widgets = OperationWidgetPaste.do(self, document)
         return widgets[0]
 
-class OperationDataPaste(object):
+class OperationDataPaste(operations.Operation):
     """Paste dataset from mime data."""
 
     descr = 'paste data'

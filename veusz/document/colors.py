@@ -40,6 +40,62 @@ def makeColor(name):
     else:
         return qt4.QColor(name)
 
+# Default color themes
+colorthemes = {
+
+    # backward compatibility with old documents
+    'compat': [
+        'black',
+    ],
+
+    # (colorbrewer sets 1 and 2)
+    'default': [
+        '#e41a1c',
+        '#377eb8',
+        '#4daf4a',
+        '#984ea3',
+        '#ff7f00',
+        '#ffff33',
+        '#a65628',
+        '#f781bf',
+        '#999999',
+        '#66c2a5',
+        '#fc8d62',
+        '#8da0cb',
+        '#e78ac3',
+        '#a6d854',
+        '#ffd92f',
+        '#e5c494',
+        '#b3b3b3',
+    ],
+
+    # colorbrewer set 1
+    'colorbrewer1': [
+        '#e41a1c',
+        '#377eb8',
+        '#4daf4a',
+        '#984ea3',
+        '#ff7f00',
+        '#ffff33',
+        '#a65628',
+        '#f781bf',
+        '#999999',
+    ],
+
+    # colorbrewer set 2
+    'colorbrewer2': [
+        '#66c2a5',
+        '#fc8d62',
+        '#8da0cb',
+        '#e78ac3',
+        '#a6d854',
+        '#ffd92f',
+        '#e5c494',
+        '#b3b3b3',
+    ],
+
+}
+
 class Colors(qt4.QObject):
     """Document colors."""
 
@@ -79,32 +135,38 @@ class Colors(qt4.QObject):
             'auto': '#31323334',
         }
 
-        self.themecolors = [
-            # default colors (colorbrewer sets 1 and 2)
-            '#e41a1c',
-            '#377eb8',
-            '#4daf4a',
-            '#984ea3',
-            '#ff7f00',
-            '#ffff33',
-            '#a65628',
-            '#f781bf',
-            '#999999',
-            '#66c2a5',
-            '#fc8d62',
-            '#8da0cb',
-            '#e78ac3',
-            '#a6d854',
-            '#ffd92f',
-            '#e5c494',
-            '#b3b3b3',
-            ]
-
-        themecolors = ['theme%i' % (i+1) for i in crange(len(self.themecolors))]
-        self.allcolors = self.defaultcolors + themecolors
+        self.model = None
+        self.setColorTheme('compat')
 
         # model for colors to use in qt widgets
         self.model = ColorModel(self, self)
+
+    def setColorTheme(self, theme, manual=[]):
+        """Set color theme to name given.
+
+        If theme=='manual', use list provided in manual.
+        """
+
+        if self.model is not None:
+            self.model.beginResetModel()
+
+        self.colortheme = theme
+        self.manualcolors = manual
+
+        if theme == 'manual':
+            self.themecolors = manual
+        else:
+            try:
+                self.themecolors = colorthemes[theme]
+            except KeyError:
+                raise ValueError('Unknown color theme')
+
+        themenames = [
+            'theme%i' % (i+1) for i in crange(len(self.themecolors))]
+        self.allcolors = self.defaultcolors + themenames
+
+        if self.model is not None:
+            self.model.endResetModel()
 
     def get(self, name):
         """Get QColor given name."""

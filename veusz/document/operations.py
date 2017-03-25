@@ -46,7 +46,18 @@ def _(text, disambiguation=None, context="Operations"):
 ###############################################################################
 # Setting operations
 
-class OperationSettingSet(object):
+class Operation(object):
+    """Root class for operations."""
+
+    descr = 'REPLACE THIS'
+
+    def do(self, document):
+        """Apply operation to document."""
+
+    def undo(self, document):
+        """Undo operation."""
+
+class OperationSettingSet(Operation):
     """Set a variable to a value."""
 
     descr = _('change setting')
@@ -76,7 +87,7 @@ class OperationSettingSet(object):
         setting = document.resolveFullSettingPath(self.settingpath)
         setting.set(self.oldvalue)
 
-class OperationSettingPropagate(object):
+class OperationSettingPropagate(Operation):
     """Propagate setting to other widgets."""
     
     descr = _('propagate setting')
@@ -167,7 +178,7 @@ class OperationSettingPropagate(object):
 ###############################################################################
 # Widget operations
         
-class OperationWidgetRename(object):
+class OperationWidgetRename(Operation):
     """Rename widget."""
     
     descr = _('rename')
@@ -192,7 +203,7 @@ class OperationWidgetRename(object):
         widget = document.resolveFullWidgetPath(self.newpath)
         widget.rename(self.oldname)
         
-class OperationWidgetDelete(object):
+class OperationWidgetDelete(Operation):
     """Delete widget."""
     
     descr = _('delete')
@@ -219,7 +230,7 @@ class OperationWidgetDelete(object):
         self.oldwidget.parent = oldparent
         oldparent.addChild(self.oldwidget, index=self.oldindex)
 
-class OperationWidgetsDelete(object):
+class OperationWidgetsDelete(Operation):
     """Delete mutliple widget."""
     
     descr = _('delete')
@@ -265,7 +276,7 @@ class OperationWidgetsDelete(object):
             oldparent = document.resolveFullWidgetPath(self.oldparentpaths[i])
             oldparent.addChild(self.oldwidgets[i], index=self.oldindexes[i])
         
-class OperationWidgetMoveUpDown(object):
+class OperationWidgetMoveUpDown(Operation):
     """Move a widget up or down in the hierarchy."""
 
     descr = _('move')
@@ -294,7 +305,7 @@ class OperationWidgetMoveUpDown(object):
             parent = widget.parent
             parent.moveChild(widget, -self.direction)
             
-class OperationWidgetMove(object):
+class OperationWidgetMove(Operation):
     """Move a widget arbitrarily in the hierarchy."""
 
     descr = _('move')
@@ -365,7 +376,7 @@ class OperationWidgetMove(object):
         if self.oldname is not None:
             child.name = self.oldname
 
-class OperationWidgetAdd(object):
+class OperationWidgetAdd(Operation):
     """Add a widget of specified type to parent."""
 
     descr = _('add')
@@ -413,7 +424,7 @@ class OperationWidgetAdd(object):
 ###############################################################################
 # Dataset operations
     
-class OperationDatasetSet(object):
+class OperationDatasetSet(Operation):
     """Set a dataset to that specified."""
 
     descr = _('set dataset')
@@ -436,7 +447,7 @@ class OperationDatasetSet(object):
         else:
             document.setData(self.datasetname, self.olddata)
 
-class OperationDatasetDelete(object):
+class OperationDatasetDelete(Operation):
     """Delete a dateset."""
 
     descr = _('delete dataset')
@@ -453,7 +464,7 @@ class OperationDatasetDelete(object):
         """Put dataset back"""
         document.setData(self.datasetname, self.olddata)
 
-class OperationDatasetRename(object):
+class OperationDatasetRename(Operation):
     """Rename the dataset.
 
     Assumes newname doesn't already exist
@@ -501,7 +512,7 @@ class OperationDatasetRename(object):
 
         document.renameDataset(self.newname, self.oldname)
 
-class OperationDatasetDuplicate(object):
+class OperationDatasetDuplicate(Operation):
     """Duplicate a dataset.
 
     Assumes duplicate name doesn't already exist
@@ -529,7 +540,7 @@ class OperationDatasetDuplicate(object):
         else:
             document.setData(self.duplname, self.olddata)
         
-class OperationDatasetUnlinkFile(object):
+class OperationDatasetUnlinkFile(Operation):
     """Remove association between dataset and file."""
     descr = _('unlink dataset')
     
@@ -545,7 +556,7 @@ class OperationDatasetUnlinkFile(object):
         dataset = document.data[self.datasetname]
         dataset.linked = self.oldfilelink
 
-class OperationDatasetUnlinkRelation(object):
+class OperationDatasetUnlinkRelation(Operation):
     """Remove association between dataset and another dataset.
     """
     
@@ -563,7 +574,7 @@ class OperationDatasetUnlinkRelation(object):
     def undo(self, document):
         document.setData(self.datasetname, self.olddataset)
         
-class OperationDatasetCreate(object):
+class OperationDatasetCreate(Operation):
     """Create dataset base class."""
 
     def __init__(self, datasetname):
@@ -707,7 +718,7 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         document.setData(self.datasetname, ds)
         return ds
 
-class OperationDatasetsFilter(object):
+class OperationDatasetsFilter(Operation):
     """Operation to filter datasets."""
 
     descr = _("filter datasets")
@@ -769,7 +780,7 @@ class OperationDatasetsFilter(object):
             else:
                 doc.setData(name, val)
 
-class OperationDataset2DBase(object):
+class OperationDataset2DBase(Operation):
     """Operation as base for 2D dataset creation operations."""
 
     def __init__(self, name, link):
@@ -850,7 +861,7 @@ class OperationDataset2DXYFunc(OperationDataset2DBase):
     def makeDSClass(self):
         return datasets.Dataset2DXYFunc(self.xstep, self.ystep, self.expr)
 
-class OperationDatasetUnlinkByFile(object):
+class OperationDatasetUnlinkByFile(Operation):
     """Unlink all datasets associated with file."""
 
     descr = _('unlink datasets')
@@ -875,7 +886,7 @@ class OperationDatasetUnlinkByFile(object):
             except KeyError:
                 pass
 
-class OperationDatasetDeleteByFile(object):
+class OperationDatasetDeleteByFile(Operation):
     """Delete all datasets associated with file."""
 
     descr = _('delete datasets')
@@ -900,7 +911,7 @@ class OperationDatasetDeleteByFile(object):
 ###############################################################################
 # Import datasets
 
-class OperationDataTag(object):
+class OperationDataTag(Operation):
     """Add a tag to a list of datasets."""
 
     descr = _('add dataset tags')
@@ -924,7 +935,7 @@ class OperationDataTag(object):
         for name in self.removetags:
             document.data[name].tags.remove(self.tag)
 
-class OperationDataUntag(object):
+class OperationDataUntag(Operation):
     """Add a tag to a list of datasets."""
 
     descr = _('remove dataset tags')
@@ -947,7 +958,7 @@ class OperationDataUntag(object):
 ###############################################################################
 # Alter dataset
 
-class OperationDatasetAddColumn(object):
+class OperationDatasetAddColumn(Operation):
     """Add a column to a dataset, blanked to zero."""
 
     descr = _('add dataset column')
@@ -977,7 +988,7 @@ class OperationDatasetAddColumn(object):
         setattr(ds, self.columnname, None)
         document.setData(self.datasetname, ds)
 
-class OperationDatasetSetVal(object):
+class OperationDatasetSetVal(Operation):
     """Set a value in the dataset."""
 
     descr = _('change dataset value')
@@ -1004,7 +1015,7 @@ class OperationDatasetSetVal(object):
         datacol[self.row] = self.oldval
         ds.changeValues(self.columnname, datacol)
     
-class OperationDatasetSetVal2D(object):
+class OperationDatasetSetVal2D(Operation):
     """Set a value in a 2D dataset."""
 
     descr = _('change 2D dataset value')
@@ -1029,7 +1040,7 @@ class OperationDatasetSetVal2D(object):
         ds.data[self.row, self.col] = self.oldval
         document.modifiedData(ds)
 
-class OperationDatasetDeleteRow(object):
+class OperationDatasetDeleteRow(Operation):
     """Delete a row or several in the dataset."""
 
     descr = _('delete dataset row')
@@ -1050,7 +1061,7 @@ class OperationDatasetDeleteRow(object):
         ds = document.data[self.datasetname]
         ds.insertRows(self.row, self.numrows, self.saveddata)
 
-class OperationDatasetInsertRow(object):
+class OperationDatasetInsertRow(Operation):
     """Insert a row or several in the dataset."""
 
     descr = _('insert dataset row')
@@ -1074,7 +1085,7 @@ class OperationDatasetInsertRow(object):
 ###############################################################################
 # Custom setting operations
 
-class OperationSetCustom(object):
+class OperationSetCustom(Operation):
     """Set custom objects, such as constants."""
 
     descr = _('set a custom definition')
@@ -1100,7 +1111,7 @@ class OperationSetCustom(object):
 ###############################################################################
 # Misc operations
         
-class OperationMultiple(object):
+class OperationMultiple(Operation):
     """Multiple operations batched into one."""
     
     def __init__(self, operations, descr='change'):
@@ -1159,6 +1170,26 @@ class OperationLoadStyleSheet(OperationMultiple):
 class OperationLoadCustom(OperationLoadStyleSheet):
     descr = _('load custom definitions')
 
+class OperationSetColorTheme(Operation):
+    """Set the color theme used by the document."""
+
+    descr = _('set color theme')
+
+    def __init__(self, theme, manual=[]):
+        self.theme = theme
+        self.manual = manual
+        self.oldtheme = self.oldmanual = None
+
+    def do(self, document):
+        colors = document.evaluate.colors
+        self.oldtheme = colors.colortheme
+        self.oldmanual = colors.manualcolors
+        colors.setColorTheme(self.theme, manual=self.manual)
+
+    def undo(self, document):
+        colors = document.evaluate.colors
+        colors.setColorTheme(self.oldtheme, manual=self.oldmanual)
+
 class OperationToolsPlugin(OperationMultiple):
     """An operation to represent what a tools plugin does."""
     
@@ -1186,7 +1217,7 @@ class OperationToolsPlugin(OperationMultiple):
             raise
         document.batchHistory(None)
 
-class OperationDatasetPlugin(object):
+class OperationDatasetPlugin(Operation):
     """An operation to activate a dataset plugin."""
     
     def __init__(self, plugin, fields, datasetnames={}):
@@ -1241,7 +1272,7 @@ class OperationDatasetPlugin(object):
         for name, ds in citems(self.olddata):
             document.setData(name, ds)
 
-class OperationDatasetHistogram(object):
+class OperationDatasetHistogram(Operation):
     """Operation to make histogram from data."""
 
     descr = _("make histogram")
