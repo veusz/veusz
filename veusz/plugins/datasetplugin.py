@@ -351,7 +351,7 @@ class DatasetPluginHelper(object):
                              xedge=ds.xedge, yedge=ds.yedge,
                              xcent=ds.xcent, ycent=ds.ycent)
         else:
-            raise RuntimeError("Invalid number of dimensions in dataset")
+            return DatasetND(name, ds.data)
 
     def getDatasets(self, names, dimensions=1):
         """Get a list of numerical datasets (of the dimension given)."""

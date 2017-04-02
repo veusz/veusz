@@ -2,6 +2,7 @@ Changes in <next release>:
  * Fix loading translator via command line
  * Show horizontal error lines/fills in key
  * Use iMinuit if available for fitting
+ * Fix for dataset plugins returning nD datasets
 
 Bug fixes in 1.25.1:
  * Fix 2D dataset expressions
