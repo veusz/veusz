@@ -60,13 +60,16 @@ class CustomItemModel(qt4.QAbstractTableModel):
             else:
                 return cust[index.column()]
         elif role == qt4.Qt.ToolTipRole:
-            return (_('Constant, function, import or colormap'),
-                    _('Constant or colormap: enter name\n'
-                      'Function: enter functionname(arg1, arg2...)\n'
-                      'Import: enter module name'),
-                    _('Constant or function: expression giving value\n'
-                      'Import: comma or space separated list of symbols to import\n'
-                      'Colormap: (R,G,B[,alpha]) list surrounded by brackets, e.g. ((10,10,10), (20,20,20,128))'),
+            return (
+                _('Constant, function, import, color or colormap'),
+                _('Constant, color or colormap: enter name\n'
+                  'Function: enter functionname(arg1, arg2...)\n'
+                  'Import: enter module name'),
+                _('Constant or function: expression giving value\n'
+                  'Import: comma or space separated list of symbols to import\n'
+                  'Colormap: (R,G,B[,alpha]) list surrounded by brackets, '
+                  'e.g. ((10,10,10), (20,20,20,128))\n'
+                  'Color: #RRGGBB or #RRGGBBAA'),
                     )[index.column()]
 
         return None
@@ -129,7 +132,8 @@ class CustomItemModel(qt4.QAbstractTableModel):
             row = index.row()
 
             if col == 0:
-                ok = value in ('constant', 'function', 'import', 'colormap')
+                ok = value in (
+                    'constant', 'function', 'import', 'colormap', 'color')
             elif col == 1:
                 dtype = self.document.evaluate.customs[row][0]
                 if dtype == 'constant':
@@ -139,6 +143,8 @@ class CustomItemModel(qt4.QAbstractTableModel):
                 elif dtype == 'import':
                     ok = True
                 elif dtype == 'colormap':
+                    ok = value.strip() != ''
+                elif dtype == 'color':
                     ok = value.strip() != ''
             elif col == 2:
                 dtype = self.document.evaluate.customs[row][0]
@@ -170,7 +176,7 @@ class ComboTypeDeligate(qt4.QItemDelegate):
     def createEditor(self, parent, option, index):
         """Create combobox for editing type."""
         w = qt4.QComboBox(parent)
-        w.addItems(['constant', 'function', 'import', 'colormap'])
+        w.addItems(['constant', 'function', 'import', 'color', 'colormap'])
         w.setFocusPolicy( qt4.Qt.StrongFocus )
         return w
 

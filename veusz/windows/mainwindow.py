@@ -269,6 +269,10 @@ class MainWindow(qt4.QMainWindow):
             # add page and default graph
             self.document.makeDefaultDoc()
 
+            # set color theme
+            self.document.basewidget.settings.get(
+                'colorTheme').set(setting.settingdb['colortheme_default'])
+
             # load defaults if set
             self.loadDefaultStylesheet()
             self.loadDefaultCustomDefinitions()

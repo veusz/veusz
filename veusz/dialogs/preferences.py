@@ -20,6 +20,7 @@ from __future__ import division
 from .. import qtall as qt4
 from .. import setting
 from .. import utils
+from .. import document
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="PrefsDialog"):
@@ -113,11 +114,19 @@ class PreferencesDialog(VeuszDialog):
         this makes a grid of controls for each color
         consisting of label, isdefault check and change color button."""
 
+        setdb = setting.settingdb
+
+        # theme
+        themes = sorted(list(document.colors.colorthemes))
+        self.colorThemeDefCombo.addItems(themes)
+        self.colorThemeDefCombo.setCurrentIndex(
+            themes.index(setdb['colortheme_default']))
+
+        # UI colors
         self.chosencolors = {}
         self.colorbutton = {}
         self.colordefaultcheck = {}
         layout = qt4.QGridLayout()
-        setdb = setting.settingdb
         for row, colname in enumerate(setdb.colors):
             isdefault, colval = setting.settingdb['color_%s' % colname]
             self.chosencolors[colname] = qt4.QColor(colval)
@@ -198,7 +207,10 @@ class PreferencesDialog(VeuszDialog):
         setdb['stylesheet_default'] = self.styleLineEdit.text()
         setdb['custom_default'] = self.customLineEdit.text()
 
-        # colors
+        # color theme
+        setdb['colortheme_default'] = self.colorThemeDefCombo.currentText()
+
+        # UI colors
         for name, color in self.chosencolors.items():
             isdefault = self.colordefaultcheck[name].isChecked()
             colorname = color.name()

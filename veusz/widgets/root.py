@@ -56,7 +56,7 @@ class Root(widget.Widget):
             self.readDefaults()
 
         s.get('englishlocale').setOnModified(self.changeLocale)
-        s.get('colortheme').setOnModified(self.changeColorTheme)
+        s.get('colorTheme').setOnModified(self.changeColorTheme)
 
     @classmethod
     def addSettings(klass, s):
@@ -84,7 +84,7 @@ class Root(widget.Widget):
 
         themes = sorted(list(document.colors.colorthemes))
         s.add( setting.Choice(
-            'colortheme',
+            'colorTheme',
             themes,
             'black',
             descr=_('Color theme'),
@@ -118,7 +118,7 @@ class Root(widget.Widget):
     def changeColorTheme(self):
         """Change color theme used by document."""
         self.document.evaluate.colors.setColorTheme(
-            self.settings.colortheme)
+            self.settings.colorTheme)
 
     def getPage(self, pagenum):
         """Get page widget."""
