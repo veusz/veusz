@@ -78,7 +78,6 @@ class CommandInterface(qt4.QObject):
         'Rename',
         'ResolveReference',
         'Set',
-        'SetColorTheme',
         'SetToReference',
         'SetData',
         'SetData2D',
@@ -393,18 +392,6 @@ class CommandInterface(qt4.QObject):
         
         if self.verbose:
             print( _("Set setting '%s' to %s") % (var, repr(pref.get())) )
-
-    def SetColorTheme(self, theme, manual=[]):
-        """Set the color theme to the name given.
-
-        If theme=='manual' take colors listed in manual, which is a
-        list of text strings.
-        """
-
-        op = operations.OperationSetColorTheme(theme, manual)
-        self.document.applyOperation(op)
-        if self.verbose:
-            print( _( "Set color theme to %s") % repr(theme) )
 
     def SetToReference(self, var, val):
         """Set setting to a reference value."""

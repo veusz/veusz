@@ -44,7 +44,7 @@ def makeColor(name):
 colorthemes = {
 
     # backward compatibility with old documents
-    'compat': [
+    'black': [
         'black',
     ],
 
@@ -128,18 +128,20 @@ class Colors(qt4.QObject):
             'darkmagenta'
             ]
 
-        self.wipe()
+        # model for UI for choosing colors
         self.model = None
-        self.themecolors = []
-        self.setColorTheme('compat')
+
+        # maximum index of colors in the current theme
+        self.maxthemeidx = 1
+        # current theme
+        self.colortheme = 'black'
+        # names of colors in theme
+        self.themenames = []
+        # setup default colors from theme
+        self.wipe()
 
         # model for colors to use in qt widgets
         self.model = ColorModel(self, self)
-
-    def updateModel(self):
-        """Update user color model. Call after using addColor."""
-        if self.model is not None:
-            self.model.updateColorList()
 
     def wipe(self):
         self.colors = {
@@ -151,33 +153,60 @@ class Colors(qt4.QObject):
             # this is a special color with a special (fake) value
             'auto': '#31323334',
         }
+        # maximum color index used
+        self.maxthemeidx = 1
+        # colors defined by user in custom definition
         self.definednames = []
+        # update the theme
+        self.setColorTheme(self.colortheme)
 
     def addColor(self, color, val):
         """Add color to defined list."""
         self.colors[color] = val
         self.definednames.append(color)
 
-    def setColorTheme(self, theme, manual=[]):
-        """Set color theme to name given.
+        # keep track of maximum theme index
+        m = themecolor_re.match(color)
+        if m:
+            self.maxthemeidx = max(self.maxthemeidx, int(m.group(1)))
 
-        If theme=='manual', use list provided in manual.
+    def setColorTheme(self, theme):
+        """Set color theme to name given.
         """
 
-        if theme == 'manual':
-            self.themecolors = manual
-        else:
-            try:
-                self.themecolors = colorthemes[theme]
-            except KeyError:
-                raise ValueError('Unknown color theme')
-
+        try:
+            themecolors = colorthemes[theme]
+        except KeyError:
+            raise ValueError('Unknown color theme')
         self.colortheme = theme
-        self.manualcolors = manual
-        self.themenames = [
-            'theme%i' % (i+1) for i in crange(len(self.themecolors))]
+
+        # delete old theme colors from dict
+        defnset = set(self.definednames)
+        for col in list(self.colors):
+            if themecolor_re.match(col) and col not in defnset:
+                del self.colors[col]
+
+        # now add colors from theme (excluding defined colors)
+        self.themenames = []
+        for i, col in enumerate(themecolors):
+            key = 'theme%i' % (i+1)
+            if key not in defnset:
+                self.colors[key] = col
+                self.themenames.append(key)
+
+        # keep track of maximum theme index
+        self.maxthemeidx = len(themecolors)
+        for color in self.definednames:
+            m = themecolor_re.match(color)
+            if m:
+                self.maxthemeidx = max(self.maxthemeidx, int(m.group(1)))
 
         self.updateModel()
+
+    def updateModel(self):
+        """Update user color model. Call after using addColor."""
+        if self.model is not None:
+            self.model.updateColorList()
 
     def get(self, name):
         """Get QColor given name."""
@@ -186,6 +215,7 @@ class Colors(qt4.QObject):
             name = self.colors[name]
 
         # special colors themeXXX, where XXX is a number from 1
+        # requires wrapping number according to the maximum definition
         m = themecolor_re.match(name)
         if m:
             idx = int(m.group(1))
@@ -197,10 +227,11 @@ class Colors(qt4.QObject):
     def getIndex(self, idx):
         """Get name of color by index given."""
         try:
-            wrapidx = (idx-1) % len(self.themecolors)
-        except ZeroDivisionError:
+            # wrap index to maximum number of colors defined in theme
+            wrapidx = (idx-1) % self.maxthemeidx + 1
+            return self.colors['theme%i' % wrapidx]
+        except (ZeroDivisionError, KeyError):
             return 'foreground'
-        return self.themecolors[wrapidx]
 
 class ColorModel(qt4.QAbstractListModel):
     """This is a Qt model to get access to the complete list of colors."""

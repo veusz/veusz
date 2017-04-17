@@ -140,7 +140,7 @@ class Evaluate:
             else:
                 raise ValueError('Invalid custom type')
 
-        # finish custom definitions
+        # update model after defining custom definitions
         self.colors.updateModel()
 
     def _updateImport(self, module, val):
@@ -412,10 +412,9 @@ class Evaluate:
 
     def saveCustomDefinitions(self, fileobj):
         """Save custom constants and functions."""
-
         for vals in self.customs:
-            fileobj.write('AddCustom(%s, %s, %s)\n' %
-                          tuple([repr(x) for x in vals]))
+            fileobj.write(
+                'AddCustom(%s, %s, %s)\n' % tuple([repr(x) for x in vals]))
 
     def saveCustomFile(self, fileobj):
         """Export the custom settings to a file."""

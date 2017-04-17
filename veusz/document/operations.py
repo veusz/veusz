@@ -1170,26 +1170,6 @@ class OperationLoadStyleSheet(OperationMultiple):
 class OperationLoadCustom(OperationLoadStyleSheet):
     descr = _('load custom definitions')
 
-class OperationSetColorTheme(Operation):
-    """Set the color theme used by the document."""
-
-    descr = _('set color theme')
-
-    def __init__(self, theme, manual=[]):
-        self.theme = theme
-        self.manual = manual
-        self.oldtheme = self.oldmanual = None
-
-    def do(self, document):
-        colors = document.evaluate.colors
-        self.oldtheme = colors.colortheme
-        self.oldmanual = colors.manualcolors
-        colors.setColorTheme(self.theme, manual=self.manual)
-
-    def undo(self, document):
-        colors = document.evaluate.colors
-        colors.setColorTheme(self.oldtheme, manual=self.oldmanual)
-
 class OperationToolsPlugin(OperationMultiple):
     """An operation to represent what a tools plugin does."""
     
