@@ -76,11 +76,12 @@ class Evaluate:
 
         # this is the context used to evaluate expressions
         self.context = {}
-        self.update()
 
         # copy default colormaps
         self.colormaps = utils.ColorMaps()
         self.colors = colors.Colors()
+
+        self.update()
 
         # copies of validated compiled expressions
         self.compiled = {}
@@ -95,6 +96,9 @@ class Evaluate:
         """To be called after custom constants or functions are changed.
         This sets up a safe environment where things can be evaluated
         """
+
+        self.colormaps.wipe()
+        self.colors.wipe()
 
         c = self.context
         c.clear()
@@ -131,8 +135,13 @@ class Evaluate:
                 self._updateImport(name, val)
             elif ctype == 'colormap':
                 self._updateColormap(name, val)
+            elif ctype == 'color':
+                self.colors.addColor(name, val)
             else:
                 raise ValueError('Invalid custom type')
+
+        # finish custom definitions
+        self.colors.updateModel()
 
     def _updateImport(self, module, val):
         """Add an import statement to the eval function context."""

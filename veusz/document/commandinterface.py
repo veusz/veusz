@@ -195,7 +195,7 @@ class CommandInterface(qt4.QObject):
 
         if mode not in ('appendalways', 'append', 'replace'):
             raise RuntimeError('Invalid mode')
-        if ctype not in ('constant', 'import', 'function', 'colormap'):
+        if ctype not in ('constant', 'import', 'function', 'color', 'colormap'):
             raise RuntimeError('Invalid type')
 
         vals = list(self.document.evaluate.customs)

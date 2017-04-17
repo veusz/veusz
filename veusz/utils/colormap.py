@@ -335,6 +335,10 @@ class ColorMaps(object):
     """
 
     def __init__(self):
+        self.wipe()
+
+    def wipe(self):
+        """Reset colormaps to default state."""
         self.maps = dict(_defaultmaps)
 
     def get(self, idx, default=None):

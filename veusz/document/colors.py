@@ -48,14 +48,15 @@ colorthemes = {
         'black',
     ],
 
-    # (colorbrewer sets 1 and 2)
-    'default': [
+    # black and colorbrewer sets 1 and 2 (minus yellow, as it doesn't show)
+    'default1': [
+        '#000000',
         '#e41a1c',
         '#377eb8',
         '#4daf4a',
         '#984ea3',
         '#ff7f00',
-        '#ffff33',
+        #'#ffff33',
         '#a65628',
         '#f781bf',
         '#999999',
@@ -95,6 +96,8 @@ colorthemes = {
     ],
 
 }
+# most up-to-date theme
+colorthemes['default-latest'] = colorthemes['default1']
 
 class Colors(qt4.QObject):
     """Document colors."""
@@ -104,7 +107,7 @@ class Colors(qt4.QObject):
     def __init__(self):
         qt4.QObject.__init__(self)
 
-        self.defaultcolors = [
+        self.defaultnames = [
             'auto',
             'foreground',
             'background',
@@ -125,6 +128,20 @@ class Colors(qt4.QObject):
             'darkmagenta'
             ]
 
+        self.wipe()
+        self.model = None
+        self.themecolors = []
+        self.setColorTheme('compat')
+
+        # model for colors to use in qt widgets
+        self.model = ColorModel(self, self)
+
+    def updateModel(self):
+        """Update user color model. Call after using addColor."""
+        if self.model is not None:
+            self.model.updateColorList()
+
+    def wipe(self):
         self.colors = {
             # line and background colors
             'foreground': '#000000',
@@ -134,24 +151,18 @@ class Colors(qt4.QObject):
             # this is a special color with a special (fake) value
             'auto': '#31323334',
         }
+        self.definednames = []
 
-        self.model = None
-        self.setColorTheme('compat')
-
-        # model for colors to use in qt widgets
-        self.model = ColorModel(self, self)
+    def addColor(self, color, val):
+        """Add color to defined list."""
+        self.colors[color] = val
+        self.definednames.append(color)
 
     def setColorTheme(self, theme, manual=[]):
         """Set color theme to name given.
 
         If theme=='manual', use list provided in manual.
         """
-
-        if self.model is not None:
-            self.model.beginResetModel()
-
-        self.colortheme = theme
-        self.manualcolors = manual
 
         if theme == 'manual':
             self.themecolors = manual
@@ -161,12 +172,12 @@ class Colors(qt4.QObject):
             except KeyError:
                 raise ValueError('Unknown color theme')
 
-        themenames = [
+        self.colortheme = theme
+        self.manualcolors = manual
+        self.themenames = [
             'theme%i' % (i+1) for i in crange(len(self.themecolors))]
-        self.allcolors = self.defaultcolors + themenames
 
-        if self.model is not None:
-            self.model.endResetModel()
+        self.updateModel()
 
     def get(self, name):
         """Get QColor given name."""
@@ -200,11 +211,17 @@ class ColorModel(qt4.QAbstractListModel):
 
         # cache of icons for colors indexed by rgba value
         self.iconcache = {}
+        # list of extra colors added during operation by user
+        self.xtranames = []
+
+        # initialise list of colors
+        self.colorlist = []
+        self.updateColorList()
 
     def rowCount(self, index):
         if index.isValid():
             return 0
-        return len(self.colors.allcolors)
+        return len(self.colorlist)
 
     def makeIcon(self, color):
         """Make icon for color in cache."""
@@ -212,7 +229,7 @@ class ColorModel(qt4.QAbstractListModel):
         xw, yw = 16, 12
         qcolor = self.colors.get(color)
         if color.lower() in ('auto', 'transparent'):
-            # make a checkerboard pattern
+            # make a checkerboard pattern for special colors
             image = qt4.QImage(xw, yw, qt4.QImage.Format_RGB32)
             if color.lower() == 'auto':
                 cnames = ['orange', 'skyblue', 'green']
@@ -233,10 +250,10 @@ class ColorModel(qt4.QAbstractListModel):
 
     def data(self, index, role):
         row = index.row()
-        if row<0 or row>=len(self.colors.allcolors):
+        if row<0 or row>=len(self.colorlist):
             return None
 
-        color = self.colors.allcolors[index.row()]
+        color = self.colorlist[index.row()]
         if role == qt4.Qt.DisplayRole or role == qt4.Qt.EditRole:
             return color
         elif role == qt4.Qt.DecorationRole:
@@ -257,30 +274,89 @@ class ColorModel(qt4.QAbstractListModel):
     def setData(self, index, value, role):
         if role == qt4.Qt.EditRole or role == qt4.Qt.DisplayRole:
             row = index.row()
-            if row>=0 and row<len(self.colors.allcolors):
-                self.colors.allcolors[row] = value
+            if row>=0 and row<len(self.colorlist):
+                self.colorlist[row] = value
+
+                # manually added colors for later
+                if value not in self.xtranames and value[:5] != 'theme':
+                    self.xtranames.append(value)
+
                 self.dataChanged.emit(index, index)
             return True
         return False
 
     def insertRows(self, row, count, parent):
-        if count<1 or row<0 or row>len(self.colors.allcolors):
+        if count<1 or row<0 or row>len(self.colorlist):
             return False
 
         self.beginInsertRows(qt4.QModelIndex(), row, row+count-1)
-        self.colors.allcolors = (
-            self.colors.allcolors[:row] + ['']*count +
-            self.colors.allcolors[row:])
+        self.colorlist = (
+            self.colorlist[:row] + ['']*count +
+            self.colorlist[row:])
         self.endInsertRows()
         return True
 
     def removeRows(self, row, count, parent):
-        if count<=0 or row<0 or (row+count)>len(self.colors.allcolors):
+        if count<=0 or row<0 or (row+count)>len(self.colorlist):
             return False
 
         self.beginRemoveRows(qt4.QModelIndex(), row, row+count-1)
-        self.colors.allcolors = (
-            self.colors.allcolors[:row] +
-            self.colors.allcolors[row+count:])
+        self.colorlist = (
+            self.colorlist[:row] +
+            self.colorlist[row+count:])
         self.endRemoveRows()
         return True
+
+    def updateColorList(self):
+        """Update internal set of colors with updated set from Colors."""
+
+        curcols = self.colorlist
+        oldset = set(curcols)
+
+        # make list + set of new colors
+        newcols = (
+            self.colors.defaultnames + self.colors.definednames +
+            self.colors.themenames + self.xtranames)
+        newset = set(newcols)
+
+        # prune any duplicates
+        if len(newcols) > len(newset):
+            seen = set()
+            out = []
+            for c in newcols:
+                if c not in seen:
+                    out.append(c)
+                    seen.add(c)
+            newcols = out
+
+        # delete missing entries first
+        i = 0
+        while i < len(curcols):
+            col = curcols[i]
+            if col not in newset:
+                self.beginRemoveRows(qt4.QModelIndex(), i, i)
+                del curcols[i]
+                self.endRemoveRows()
+            else:
+                i += 1
+
+        # add new entries
+        for i, ncol in enumerate(newcols):
+            if i == len(curcols) or curcols[i] != ncol:
+                # maybe swap
+                if i<len(curcols) and ncol in oldset:
+                    self.beginRemoveRows(qt4.QModelIndex(), i, i)
+                    del curcols[i]
+                    self.endRemoveRows()
+
+                # simple add
+                self.beginInsertRows(qt4.QModelIndex(), i, i)
+                curcols.insert(i, ncol)
+                self.endInsertRows()
+
+        # delete any extra rows
+        if len(newcols) < len(curcols):
+            self.beginRemoveRows(
+                qt4.QModelIndex(), len(newcols), len(curcols)-1)
+            del curcols[len(newcols):]
+            self.endRemoveRows()
