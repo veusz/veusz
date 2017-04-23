@@ -1090,22 +1090,38 @@ class OperationSetCustom(Operation):
 
     descr = _('set a custom definition')
 
-    def __init__(self, vals):
-        """customtype is the type of custom object to set:
-        eg functions, constants
-        customval is a dict of the values."""
+    # translate ctype below into attribute of evaluate
+    type_to_attr = {
+        'definition': 'def_definitions',
+        'function':   'def_definitions',
+        'constant':   'def_definitions',
+        'import':     'def_imports',
+        'color':      'def_colors',
+        'colormap':   'def_colormaps',
+    }
 
+    def __init__(self, ctype, vals):
+        """Set custom values to be the list given.
+
+        ctype is one of 'definition', 'function', 'constant',
+        'import', 'color' or 'colormap'
+        """
+        self.ctype = ctype
         self.customvals = list(vals)
+
+    def _getlist(self, document):
+        return getattr(document.evaluate, self.type_to_attr[self.ctype])
 
     def do(self, document):
         """Set the custom object."""
-        self.oldval = list(document.evaluate.customs)
-        document.evaluate.customs = self.customvals
+        lst = self._getlist(document)
+        self.oldval = list(lst)
+        lst[:] = self.customvals
         document.evaluate.update()
-        
+
     def undo(self, document):
         """Restore custom object."""
-        document.evaluate.customs = self.oldval
+        self._getlist(document)[:] = self.oldval
         document.evaluate.update()
 
 ###############################################################################

@@ -168,15 +168,18 @@ class CommandInterface(qt4.QObject):
 	constants), a function of 1 or more variables, or a function
 	imported from an external python module.
 
-        ctype is "constant", "function", "import" or "colormap".
+        ctype is "constant", "function", "definition" (either
+        constant or function), "import", "color" or "colormap".
 
-        name is name of constant or colormap, "function(x, y, ...)"
-        or module name.
+        name is name of constant, color or colormap, "function(x, y,
+        ...)"  or module name.
 
         val is definition for constant or function (both are
         _strings_), or is a list of symbols for a module (comma
         separated items in a string). For a colormap, val is a list of
-        4-item tuples containing R,G,B,alpha values from 0 to 255.
+        4-item tuples containing R,G,B,alpha values from 0 to 255. For
+        a color this is a string with the format '#RRGGBB' or
+        '#RRGGBBAA'.
 
         if mode is 'appendalways', the custom value is appended to the
         end of the list even if there is one with the same name. If
@@ -184,6 +187,7 @@ class CommandInterface(qt4.QObject):
         same place in the list or is appended otherwise. If mode is
         'append', then an existing definition is deleted, and the new
         one appended to the end.
+
         """
 
         if ctype == 'colormap':
@@ -194,16 +198,20 @@ class CommandInterface(qt4.QObject):
 
         if mode not in ('appendalways', 'append', 'replace'):
             raise RuntimeError('Invalid mode')
-        if ctype not in ('constant', 'import', 'function', 'color', 'colormap'):
+
+        try:
+            attr = operations.OperationSetCustom.type_to_attr[ctype]
+        except KeyError:
             raise RuntimeError('Invalid type')
 
-        vals = list(self.document.evaluate.customs)
-        item = [ctype, name, val]
+        vals = list(getattr(self.document.evaluate, attr))
+
+        item = [name.strip(), val]
         if mode == 'appendalways':
             vals.append(item)
         else:
             # find any existing item
-            for i, (t, n, v) in enumerate(vals):
+            for i, (n, v) in enumerate(vals):
                 if n == name:
                     if mode == 'append':
                         del vals[i]
@@ -215,7 +223,7 @@ class CommandInterface(qt4.QObject):
                 # no existing item, so append
                 vals.append(item)
 
-        op = operations.OperationSetCustom(vals)
+        op = operations.OperationSetCustom(ctype, vals)
         self.document.applyOperation(op)
 
     def AddImportPath(self, directory):

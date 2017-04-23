@@ -72,7 +72,12 @@ class Evaluate:
         # consists of tuples of (name, type, value)
         # type is constant or function
         # we use this format to preserve evaluation order
-        self.customs = []
+        self.def_imports = []
+        self.def_definitions = []
+        self.def_colors = []
+        self.def_colormaps = []
+
+        #self.customs = []
 
         # this is the context used to evaluate expressions
         self.context = {}
@@ -96,9 +101,6 @@ class Evaluate:
         """To be called after custom constants or functions are changed.
         This sets up a safe environment where things can be evaluated
         """
-
-        self.colormaps.wipe()
-        self.colors.wipe()
 
         c = self.context
         c.clear()
@@ -126,22 +128,20 @@ class Evaluate:
         c['ESCAPE'] = utils.latexEscape
         c['SETTING'] = self._evalsetting
 
-        # custom definitions
-        for ctype, name, val in self.customs:
-            name = name.strip()
-            if ctype == 'constant' or ctype == 'function':
-                self._updateFuncOrConst(ctype, name, val.strip())
-            elif ctype == 'import':
-                self._updateImport(name, val)
-            elif ctype == 'colormap':
-                self._updateColormap(name, val)
-            elif ctype == 'color':
-                self.colors.addColor(name, val)
-            else:
-                raise ValueError('Invalid custom type')
+        for name, val in self.def_imports:
+            self._updateImport(name, val)
 
-        # update model after defining custom definitions
+        for name, val in self.def_definitions:
+            self._updateDefinition(name, val)
+
+        self.colors.wipe()
+        for name, val in self.def_colors:
+            self.colors.addColor(name, val)
         self.colors.updateModel()
+
+        self.colormaps.wipe()
+        for name, val in self.def_colormaps:
+            self._updateColormap(name, val)
 
     def _updateImport(self, module, val):
         """Add an import statement to the eval function context."""
@@ -150,21 +150,21 @@ class Evaluate:
             symbols = identifier_split_re.findall(val)
             toimport = self._processSafeImports(module, symbols)
             if toimport:
-                defn = 'from %s import %s' % (module,
-                                              ', '.join(toimport))
+                defn = 'from %s import %s' % (
+                    module, ', '.join(toimport))
                 try:
                     cexec(defn, self.context)
                 except Exception:
                     self.doc.log(_(
-                        "Failed to import '%s' from module '%s'") %
-                                 (', '.join(toimport), module))
+                        "Failed to import '%s' from module '%s'") % (
+                            ', '.join(toimport), module))
                     return
 
             delta = set(symbols)-set(toimport)
             if delta:
                 self.doc.log(_(
-                    "Did not import '%s' from module '%s'") %
-                             (', '.join(list(delta)), module))
+                    "Did not import '%s' from module '%s'") % (
+                        ', '.join(list(delta)), module))
 
         else:
             self.doc.log( _("Invalid module name '%s'") % module )
@@ -182,6 +182,9 @@ class Evaluate:
 
         out = []
         for entry in colormap:
+            if entry == (-1,0,0,0):
+                continue
+
             for v in entry:
                 try:
                     v - 0
@@ -214,18 +217,17 @@ class Evaluate:
         else:
             self.colormaps[ cstr(name) ] = cmap
 
-    def _updateFuncOrConst(self, ctype, name, val):
+    def _updateDefinition(self, name, val):
         """Update a function or constant in eval function context."""
 
-        if ctype == 'constant':
-            if not identifier_re.match(name):
-                self.doc.log( _("Invalid constant name '%s'") % name )
-                return
+        if identifier_re.match(name):
             defn = val
-        elif ctype == 'function':
+        else:
             m = function_re.match(name)
             if not m:
-                self.doc.log( _("Invalid function specification '%s'") % name )
+                self.doc.log(
+                    _("Invalid function or constant specification '%s'") %
+                    name)
                 return
             name = m.group(1)
             args = m.group(2)
@@ -412,9 +414,16 @@ class Evaluate:
 
     def saveCustomDefinitions(self, fileobj):
         """Save custom constants and functions."""
-        for vals in self.customs:
-            fileobj.write(
-                'AddCustom(%s, %s, %s)\n' % tuple([repr(x) for x in vals]))
+        for ctype, defns in (
+                ('import', self.def_imports),
+                ('definition', self.def_definitions),
+                ('color', self.def_colors),
+                ('colormap', self.def_colormaps)):
+
+            for val in defns:
+                fileobj.write(
+                    'AddCustom(%s, %s, %s)\n' % (
+                        repr(ctype), repr(val[0]), repr(val[1])))
 
     def saveCustomFile(self, fileobj):
         """Export the custom settings to a file."""
