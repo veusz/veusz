@@ -307,15 +307,22 @@ class CommandInterface(qt4.QObject):
 
     def RemoveCustom(self, name):
         """Removes a custom-defined constant, function or import."""
-        vals = list( self.document.evaluate.customs )
-        for i, (t, n, v) in enumerate(vals):
-            if n == name:
-                del vals[i]
-                break
+
+        # look for definiton and delete if found
+        for ctype, attr in (
+                ('import', 'def_imports'),
+                ('definition', 'def_definitions'),
+                ('color', 'def_colors'),
+                ('colormap', 'def_colormaps')):
+            vals = list(getattr(self.document.evaluate, attr))
+            for i, (cname, cval) in enumerate(vals):
+                if name == cname:
+                    del vals[i]
+                    op = operations.OperationSetCustom(ctype, vals)
+                    self.document.applyOperation(op)
+                    return
         else:
             raise ValueError('Custom variable not defined')
-        op = operations.OperationSetCustom(vals)
-        self.document.applyOperation(op)
 
     def To(self, where):
         """Change to a widget within the current widget.

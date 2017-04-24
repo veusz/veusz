@@ -183,6 +183,7 @@ class Evaluate:
         out = []
         for entry in colormap:
             if entry == (-1,0,0,0):
+                out.append(entry)
                 continue
 
             for v in entry:
@@ -393,13 +394,6 @@ class Evaluate:
                 self.doc.sigAllowedImports.emit(module, possibleimport)
 
         return toimport
-
-    def customDict(self):
-        """Return a dictionary mapping custom names to (idx, type, value)."""
-        retn = {}
-        for i, (ctype, name, val) in enumerate(self.customs):
-            retn[name] = (i, ctype, val)
-        return retn
 
     def getColormap(self, name, invert):
         """Get colormap with name given (returning grey if does not exist)."""

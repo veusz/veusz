@@ -461,7 +461,8 @@ class MainWindow(qt4.QMainWindow):
                   self.slotEditPreferences,
                   icon='veusz-edit-prefs'),
             'edit.custom':
-                a(self, _('Edit custom functions and constants'),
+                a(self,
+                  _('Edit custom functions, constants, colors and colormaps'),
                   _('Custom definitions...'),
                   self.slotEditCustom,
                   icon='veusz-edit-custom'),

@@ -27,7 +27,7 @@
        <item>
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Define constants and functions for use in expressions. Functions should be specified as f(x,y) to specify arguments.</string>
+          <string>Define constants and functions for use in expressions. Functions should be specified as f(x,y) to specify arguments. Functions and constants are evaluated in order.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -57,7 +57,7 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Add external Python functions and constants using an import. Enter a module name and list of symbols to import (or &quot;*&quot;).</string>
+          <string>Add external Python functions and constants using an import. Enter a module name and list of symbols to import (comma-separated or &quot;*&quot; for all symbols).</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -87,7 +87,7 @@
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Add user-defined colors</string>
+          <string>Add user-defined colors. The definition of a color is an RGB value, e.g. #102030 or another color name.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -117,7 +117,7 @@
        <item>
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Define colormaps as (C1, C2, ...) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha).</string>
+          <string>Define colormaps as (C1, C2, ...) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

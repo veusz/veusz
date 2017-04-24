@@ -29,7 +29,6 @@ def _(text, disambiguation=None, context="CustomDialog"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-
 class CustomItemModel(qt4.QAbstractTableModel):
     """A model for editing custom items."""
 
