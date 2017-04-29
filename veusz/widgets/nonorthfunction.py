@@ -72,6 +72,7 @@ class NonOrthFunction(Widget):
                             descr = _('Plot line settings'),
                             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
+        s.get('PlotLine').get('color').newDefault('auto')
         s.add( FillBrush('Fill1',
                          descr = _('Fill settings (1)'),
                          usertext = _('Area fill 1')),

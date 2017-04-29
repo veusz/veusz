@@ -78,7 +78,7 @@ class NonOrthPoint(Widget):
         s.add( setting.MarkerColor('Color') )
 
         s.add( setting.Color('color',
-                             'black',
+                             'auto',
                              descr = _('Master color'),
                              usertext = _('Color'),
                              formatting=True), 0 )
