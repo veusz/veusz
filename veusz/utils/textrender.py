@@ -1010,7 +1010,7 @@ class PartColor(Part):
         pen = painter.pen()
         oldcolor = pen.color()
 
-        pen.setColor( qt4.QColor(self.colorname) )
+        pen.setColor( painter.docColor(self.colorname) )
         painter.setPen(pen)
 
         Part.render(self, state)

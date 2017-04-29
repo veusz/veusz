@@ -50,7 +50,6 @@ colorthemes = {
 
     # black and colorbrewer sets 1 and 2 (minus yellow, as it doesn't show)
     'default1': [
-        '#000000',
         '#e41a1c',
         '#377eb8',
         '#4daf4a',

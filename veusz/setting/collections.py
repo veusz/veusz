@@ -370,9 +370,10 @@ class Text(Settings):
 
         return f
 
-    def makeQPen(self):
+    def makeQPen(self, painter):
         """ Return a qt4.QPen object for the font pen """
-        return qt4.QPen(qt4.QColor(self.color))
+        color = self.get('color').color(painter)
+        return qt4.QPen(color)
 
 class PointLabel(Text):
     """For labelling points on plots."""

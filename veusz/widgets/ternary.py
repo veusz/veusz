@@ -438,7 +438,7 @@ class Ternary(NonOrthGraph):
             trightlabels = self._getLabels(tickright*mv, '%Vg')
             tbotlabels = self._getLabels(tickbot*mv, '%Vg')
 
-            painter.setPen( tickLabelSetn.makeQPen() )
+            painter.setPen( tickLabelSetn.makeQPen(painter) )
             font = tickLabelSetn.makeQFont(painter)
             painter.setFont(font)
 
@@ -467,7 +467,7 @@ class Ternary(NonOrthGraph):
 
         if labelSetn is not None and not labelSetn.hide:
             # draw label on edges (if requested)
-            painter.setPen( labelSetn.makeQPen() )
+            painter.setPen( labelSetn.makeQPen(painter) )
             font = labelSetn.makeQFont(painter)
             painter.setFont(font)
 

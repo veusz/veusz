@@ -367,7 +367,7 @@ class Polar(NonOrthGraph):
         scale, fmt = tl.scale, tl.format
         if fmt == 'Auto':
             fmt = atick.autoformat
-        painter.setPen( tl.makeQPen() )
+        painter.setPen( tl.makeQPen(painter) )
         font = tl.makeQFont(painter)
 
         # draw ticks

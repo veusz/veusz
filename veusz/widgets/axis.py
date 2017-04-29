@@ -798,7 +798,7 @@ class Axis(widget.Widget):
         # get information about text scales
         tl = s.get('TickLabels')
         scale = tl.scale
-        pen = tl.makeQPen()
+        pen = tl.makeQPen(painter)
 
         # an extra offset if required
         self._delta_axis += tl.get('offset').convert(painter)
@@ -954,7 +954,7 @@ class Axis(widget.Widget):
             r.ensureInBox( minx=outerbounds[0], maxx=outerbounds[2],
                            miny=outerbounds[1], maxy=outerbounds[3] )
 
-        texttorender.insert(0, (r, s.get('Label').makeQPen()) )
+        texttorender.insert(0, (r, s.get('Label').makeQPen(painter)) )
 
     def chooseName(self):
         """Get default name for axis. Make x and y axes, then axisN."""

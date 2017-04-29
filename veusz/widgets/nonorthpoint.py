@@ -168,7 +168,7 @@ class NonOrthPoint(Widget):
         alignvert = {'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
 
         # make font and len
-        textpen = lab.makeQPen()
+        textpen = lab.makeQPen(painter)
         painter.setPen(textpen)
         font = lab.makeQFont(painter)
         angle = lab.angle
