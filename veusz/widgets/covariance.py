@@ -83,6 +83,7 @@ class Covariance(plotters.GenericPlotter):
             descr = _('Line'),
             usertext = _('Ellipse line')),
                pixmap = 'settings_plotline' )
+        s.get('Line').get('color').newDefault('auto')
 
         s.add( setting.PlotterFill(
             'Fill',
