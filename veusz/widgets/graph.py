@@ -253,7 +253,7 @@ class Graph(widget.Widget):
         # reset counter and compute automatic colors
         painthelper.autoplottercount = 0
         for c in self.children:
-            c.autoColor(painter)
+            c.setupAutoColor(painter)
 
         # do normal drawing of children
         # iterate over children in reverse order

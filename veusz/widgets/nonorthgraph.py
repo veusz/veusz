@@ -150,7 +150,7 @@ class NonOrthGraph(Widget):
             # reset counter and compute automatic colors
             phelper.autoplottercount = 0
             for c in self.children:
-                c.autoColor(painter)
+                c.setupAutoColor(painter)
 
             # plot graph
             datarange = self.getDataRange()

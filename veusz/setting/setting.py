@@ -1388,12 +1388,12 @@ class Color(ChoiceOrMore):
         if self.val.lower() == 'auto':
             # lookup widget
             w = self.parent
-            while not w.isWidget() and w is not None:
+            while w is not None and not w.isWidget():
                 w = w.parent
             if w is None:
                 return qt4.QColor()
             # get automatic color
-            return painter.docColor(w.autoColor(painter))
+            return painter.docColor(w.autoColor(painter, dataindex=dataindex))
         else:
             return painter.docColor(self.val)
 
@@ -1730,6 +1730,7 @@ class FillSet(Setting):
         """Return BrushExtended for the row."""
         from . import collections
         s = collections.BrushExtended('tempbrush')
+        s.parent = self
 
         if len(self.val) == 0:
             s.hide = True

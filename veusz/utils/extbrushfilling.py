@@ -181,7 +181,7 @@ _fillcnvt = {
     }
 
 def brushExtFillPath(painter, extbrush, path, ignorehide=False,
-                     stroke=None):
+                     stroke=None, dataindex=0):
     """Use an BrushExtended settings object to fill a path on painter.
     If ignorehide is True, ignore the hide setting on the brush object.
     stroke is an optional QPen for stroking outline of path
@@ -195,7 +195,7 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
     style = extbrush.style
     if style in _fillcnvt:
         # standard fill: use Qt styles for painting
-        color = extbrush.get('color').color(painter)
+        color = extbrush.get('color').color(painter, dataindex=dataindex)
         if extbrush.transparency >= 0:
             color.setAlphaF((100-extbrush.transparency) / 100.)
         brush = qt4.QBrush(color, _fillcnvt[style])
@@ -213,13 +213,14 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
 
         if not extbrush.backhide:
             # background brush
-            color = extbrush.get('backcolor').color(painter)
+            color = extbrush.get('backcolor').color(
+                painter, dataindex=dataindex)
             if extbrush.backtransparency > 0:
                 color.setAlphaF((100-extbrush.backtransparency) / 100.)
             brush = qt4.QBrush(color)
             painter.fillPath(path, brush)
 
-        color = extbrush.get('color').color(painter)
+        color = extbrush.get('color').color(painter, dataindex=dataindex)
         if extbrush.transparency >= 0:
             color.setAlphaF((100-extbrush.transparency) / 100.)
         width = extbrush.get('linewidth').convert(painter)
