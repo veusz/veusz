@@ -1,7 +1,6 @@
 # Veusz saved document (version 1.25.1)
 # Saved at 2017-04-30T10:42:41.492556
 
-AddImportPath(u'/home/jss/code/veusz')
 AddCustom('color', u'theme2', u'#0055ff')
 AddCustom('color', u'theme1', u'#ff557f')
 ImportString(u'ds1(numeric)','''
