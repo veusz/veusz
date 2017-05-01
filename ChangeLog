@@ -1,4 +1,7 @@
 Changes in <next release>:
+ * Add color themes and automatic coloring of widgets
+ * Custom color definitions
+ * Improved custom definition dialog box
  * Fix loading translator via command line
  * Show horizontal error lines/fills in key
  * Use iMinuit if available for fitting
