@@ -21,7 +21,8 @@ Optional requirements:
  h5py            http://www.h5py.org/
  Astropy >= 0.2  http://www.astropy.org
  pyemf >= 2.0.0  http://pyemf.sourceforge.net/
- PyMinuit        http://code.google.com/p/pyminuit/
+ iminuit         https://github.com/iminuit/iminuit
+ ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
 
 Python 3 support is included in veusz-1.19+, although it has less

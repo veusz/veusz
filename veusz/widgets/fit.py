@@ -34,10 +34,14 @@ from .. import qtall as qt4
 from .function import FunctionPlotter
 from . import widget
 
+# try importing iminuit first, then minuit, then None
 try:
-    import minuit
+    import iminuit as minuit
 except ImportError:
-    minuit = None
+    try:
+        import minuit
+    except ImportError:
+        minuit = None
 
 def _(text, disambiguation=None, context='Fit'):
     """Translate text."""
@@ -65,7 +69,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     fn = eval(fnstr, {'chi2' : chi2, 'N' : N})
 
     print(_('Fitting via Minuit:'))
-    m = minuit.Minuit(fn, fix_x=True, **values)
+    m = minuit.Minuit(fn, **values)
 
     # run the fit
     chi2.runningFit = True
