@@ -8,6 +8,7 @@ Changes in 1.26:
  * Fix for dataset plugins returning nD datasets
  * Add editable automatic axis range, including support for shrinking
    range (-X%), percentage ranges (X-Y%) and limits (<X% and >Y%)
+ * Fix for key if invalid dataset
 
 Bug fixes in 1.25.1:
  * Fix 2D dataset expressions
