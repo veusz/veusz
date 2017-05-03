@@ -20,11 +20,12 @@
 
 import numpy as N
 
-from .commonfn import _
-from .commonfn import *
+from .commonfn import (
+    _, dsPreviewHelper, copyOrNone, convertNumpy,
+    convertNumpyAbs, convertNumpyNegAbs, datasetNameToDescriptorName)
 from .base import DatasetConcreteBase, DatasetException
 
-from ..compat import czip, crange, citems, cbasestr, cstr, crepr
+from ..compat import czip,  crepr
 from .. import utils
 
 class Dataset1DBase(DatasetConcreteBase):

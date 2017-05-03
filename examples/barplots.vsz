@@ -1,29 +1,30 @@
-# Veusz saved document (version 1.3)
-# User: jss
-# Date: Wed, 27 May 2009 19:03:45 +0000
+# Veusz saved document (version 1.25.1)
+# Saved at 2017-04-30T10:42:41.492556
 
-ImportString(u'xvals(numeric)','''
-1.000000e+00
-2.718282e+00
-7.389056e+00
-2.008554e+01
-5.459815e+01
-1.484132e+02
-4.034288e+02
-1.096633e+03
-2.980958e+03
-8.103084e+03
-2.202647e+04
-5.987414e+04
-1.627548e+05
-4.424134e+05
-1.202604e+06
-3.269017e+06
-8.886111e+06
-2.415495e+07
-6.565997e+07
-1.784823e+08
-4.851652e+08
+AddCustom('color', u'theme2', u'#0055ff')
+AddCustom('color', u'theme1', u'#ff557f')
+ImportString(u'ds1(numeric)','''
+0.000000e+00
+3.894183e-01
+7.173561e-01
+9.320391e-01
+9.995736e-01
+9.092974e-01
+6.754632e-01
+3.349882e-01
+-5.837414e-02
+-4.425204e-01
+-7.568025e-01
+-9.516021e-01
+-9.961646e-01
+-8.834547e-01
+-6.312666e-01
+-2.794155e-01
+1.165492e-01
+4.941134e-01
+7.936679e-01
+9.679197e-01
+9.893582e-01
 ''')
 ImportString(u'ds2(numeric)','''
 1.000000e+00
@@ -71,29 +72,30 @@ ImportString(u'dswerr(numeric),+-','''
 2.512598e-01 1.000000e-01
 -1.455000e-01 1.000000e-01
 ''')
-ImportString(u'ds1(numeric)','''
-0.000000e+00
-3.894183e-01
-7.173561e-01
-9.320391e-01
-9.995736e-01
-9.092974e-01
-6.754632e-01
-3.349882e-01
--5.837414e-02
--4.425204e-01
--7.568025e-01
--9.516021e-01
--9.961646e-01
--8.834547e-01
--6.312666e-01
--2.794155e-01
-1.165492e-01
-4.941134e-01
-7.936679e-01
-9.679197e-01
-9.893582e-01
+ImportString(u'xvals(numeric)','''
+1.000000e+00
+2.718282e+00
+7.389056e+00
+2.008554e+01
+5.459815e+01
+1.484132e+02
+4.034288e+02
+1.096633e+03
+2.980958e+03
+8.103084e+03
+2.202647e+04
+5.987414e+04
+1.627548e+05
+4.424134e+05
+1.202604e+06
+3.269017e+06
+8.886111e+06
+2.415495e+07
+6.565997e+07
+1.784823e+08
+4.851652e+08
 ''')
+Set('colorTheme', u'black')
 Set('StyleSheet/Font/font', u'Arial')
 Add('page', name='page1', autoadd=False)
 To('page1')
@@ -117,13 +119,13 @@ To('bar1')
 Set('lengths', (u'ds1', u'ds2'))
 Set('mode', u'stacked')
 Set('keys', (u'a', u'b'))
-Set('BarFill/fills', [('solid', u'#0055ff', False), ('solid', u'#ff557f', False)])
+Set('BarFill/fills', [('solid', u'auto', False)])
 To('..')
 Add('label', name='label1', autoadd=False)
 To('label1')
 Set('label', u'stacked\\\\mode')
 Set('xPos', [0.5])
-Set('yPos', [0.77505549748930258])
+Set('yPos', [0.7750554974893026])
 Set('alignHorz', u'centre')
 To('..')
 Add('key', name='key1', autoadd=False)
@@ -133,7 +135,7 @@ Set('Border/hide', True)
 Set('horzPosn', 'manual')
 Set('vertPosn', 'manual')
 Set('keyLength', u'0.5cm')
-Set('horzManual', 0.70845934924546483)
+Set('horzManual', 0.7084593492454648)
 Set('vertManual', 0.03438193718616283)
 To('..')
 To('..')
@@ -150,13 +152,13 @@ Add('bar', name='bar1', autoadd=False)
 To('bar1')
 Set('lengths', (u'ds1', u'ds2'))
 Set('keys', ('',))
-Set('BarFill/fills', [('solid', u'#0055ff', False), ('solid', u'#ff557f', False)])
+Set('BarFill/fills', [('solid', u'auto', False)])
 To('..')
 Add('label', name='label1', autoadd=False)
 To('label1')
 Set('label', u'grouped\\\\mode')
 Set('xPos', [0.5])
-Set('yPos', [0.77505549748930258])
+Set('yPos', [0.7750554974893026])
 Set('alignHorz', u'centre')
 To('..')
 To('..')
@@ -174,13 +176,13 @@ To('bar1')
 Set('lengths', (u'dswerr',))
 Set('keys', ('',))
 Set('errorstyle', u'barends')
-Set('BarFill/fills', [('solid', u'#0055ff', False), ('solid', u'#ff557f', False)])
+Set('BarFill/fills', [('solid', u'auto', False)])
 To('..')
 Add('label', name='label1', autoadd=False)
 To('label1')
 Set('label', u'error bars')
 Set('xPos', [0.5])
-Set('yPos', [0.90000000000000002])
+Set('yPos', [0.9])
 Set('alignHorz', u'centre')
 To('..')
 To('..')
@@ -210,13 +212,13 @@ Set('keys', ('',))
 Set('barfill', 1.0)
 Set('groupfill', 1.0)
 Set('errorstyle', u'barends')
-Set('BarFill/fills', [('solid', u'#ff557f', False)])
+Set('BarFill/fills', [('solid', u'auto', False)])
 To('..')
 Add('label', name='label1', autoadd=False)
 To('label1')
 Set('label', u'horizontal\\\\with values')
-Set('xPos', [0.050000000000000003])
-Set('yPos', [0.80000000000000004])
+Set('xPos', [0.05])
+Set('yPos', [0.8])
 To('..')
 To('..')
 To('..')

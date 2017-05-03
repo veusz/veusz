@@ -1,7 +1,6 @@
 # Veusz saved document (version 1.15)
 # Saved at 2012-04-21T09:57:53.271330
 
-AddImportPath(u'/home/jss/code/veusz-git/veusz/examples')
 ImportString(u'y1(numeric)','''
 0.000000e+00
 2.000000e+00

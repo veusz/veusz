@@ -154,11 +154,12 @@ class VectorField(plotters.GenericPlotter):
 
         s = self.settings
         painter.setPen( s.Line.makeQPenWHide(painter) )
-        painter.setBrush( s.get('Fill').makeQBrushWHide() )
-        utils.plotLineArrow(painter, x+width, y+height*0.5,
-                            width, 180, height*0.25,
-                            arrowleft=s.arrowfront,
-                            arrowright=s.arrowback)
+        painter.setBrush( s.get('Fill').makeQBrushWHide(painter) )
+        utils.plotLineArrow(
+            painter, x+width, y+height*0.5,
+            width, 180, height*0.25,
+            arrowleft=s.arrowfront,
+            arrowright=s.arrowback)
 
         painter.restore()
 
@@ -228,7 +229,7 @@ class VectorField(plotters.GenericPlotter):
                                      cliprect)
         else:
             arrowsize = s.get('arrowsize').convert(painter)
-            painter.setBrush( s.get('Fill').makeQBrushWHide() )
+            painter.setBrush( s.get('Fill').makeQBrushWHide(painter) )
 
             # this is backward - have to convert from dx, dy to angle, length
             angles = 180 - N.arctan2(dy, dx) * (180./N.pi)

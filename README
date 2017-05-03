@@ -1,4 +1,4 @@
-Veusz 1.25
+Veusz 1.26
 ----------
 http://home.gna.org/veusz/
 
@@ -12,22 +12,16 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.25:
- * Add n-dimensional dataset support
- * Add GetColormap command to return RGBA values
- * Add Colormap sequence plugin for choosing colors of widgets
- * Fill above/below setting shown in key for xy widget
- * Add Covariance widget for plotting covariance ellipses
- * Add lineup, linedown, lineleft and lineright markers
- * Add lineup, linedown and lineextend arrows
-
-Bug fixes:
- * Fix pick indices if non-finite values in data
- * Fix drag and drop of files into Veusz on Windows
- * Raise exception if functions in console request input, avoiding hang
- * Initialise unsafe_mode, in case Veusz used in PyQt embedding
- * Fix crash if setting default setting in default setting window
- * Fix crash in Clone() command on python3
+Changes in 1.26:
+ * Add color themes and automatic coloring of widgets
+ * Custom color definitions
+ * Improved custom definition dialog box
+ * Fix loading translator via command line
+ * Show horizontal error lines/fills in key
+ * Use iMinuit if available for fitting
+ * Fix for dataset plugins returning nD datasets
+ * Add editable automatic axis range, including support for shrinking
+   range (-X%), percentage ranges (X-Y%) and limits (<X% and >Y%)
 
 Features of package:
  Plotting features:

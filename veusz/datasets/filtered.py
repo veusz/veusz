@@ -19,10 +19,9 @@
 from __future__ import division, print_function
 import numpy as N
 
-from ..compat import citems, czip, crepr
+from ..compat import czip, crepr
 
 from .commonfn import _
-from .commonfn import *
 from .base import DatasetBase
 from .oned import Dataset
 from .expression import evalDatasetExpression

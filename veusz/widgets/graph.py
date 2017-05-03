@@ -250,6 +250,11 @@ class Graph(widget.Widget):
         # don't duplicate drawing axes
         axesdrawn = set()
 
+        # reset counter and compute automatic colors
+        painthelper.autoplottercount = 0
+        for c in self.children:
+            c.setupAutoColor(painter)
+
         # do normal drawing of children
         # iterate over children in reverse order
         for c in reversed(self.children):
@@ -280,6 +285,7 @@ class Graph(widget.Widget):
                 iteratebrokenaxes(childbrokenaxes)
 
             else:
+
                 # standard non broken axis drawing
                 c.draw(bounds, painthelper, outerbounds=outerbounds)
 

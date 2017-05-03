@@ -41,6 +41,10 @@ try:
 except ImportError:
     from .slowfuncs import RotatedRectangle
 
+def _(text, disambiguation=None, context='TextRender'):
+    """Translate text."""
+    return qt4.QCoreApplication.translate(context, text, disambiguation)
+
 # this definition is monkey-patched when veusz is running in self-test
 # mode as we need to hack the metrics - urgh
 FontMetrics = qt4.QFontMetricsF
@@ -600,7 +604,6 @@ class RenderState(object):
                  actually_render=True):
         self.font = font
         self.painter = painter
-        self.device = painter.device()
         self.x = x     # current x position
         self.y = y     # current y position
         self.alignhorz = alignhorz
@@ -609,17 +612,11 @@ class RenderState(object):
 
     def fontMetrics(self):
         """Returns font metrics object."""
-        return FontMetrics(self.font, self.device)
+        return FontMetrics(self.font, self.painter.device())
 
     def getPixelsPerPt(self):
         """Return number of pixels per point in the rendering."""
-        painter = self.painter
-        pixperpt = painter.device().logicalDpiY() / 72.
-        try:
-            pixperpt *= painter.scaling
-        except AttributeError:
-            pass
-        return pixperpt
+        return self.painter.pixperpt * self.painter.scaling
 
 class Part(object):
     """Represents a part of the text to be rendered, made up of smaller parts."""
@@ -1013,7 +1010,7 @@ class PartColor(Part):
         pen = painter.pen()
         oldcolor = pen.color()
 
-        pen.setColor( qt4.QColor(self.colorname) )
+        pen.setColor( painter.docColor(self.colorname) )
         painter.setPen(pen)
 
         Part.render(self, state)
@@ -1057,7 +1054,14 @@ _                   # subscript
 
 def latexEscape(text):
     """Escape any special characters in LaTex-like code."""
-    return re.sub(r'([_\^\[\]\{\}\\])', r'\\\1', text)
+    # \\ is converted a unicode-special character and replaced again
+    # with the latex code later, to avoid its parts being replaced in
+    # the next step
+    text = text.replace('\\', u'\ue000')
+    # replace _, ^, {, }, [ and ] with escaped versions
+    text = re.sub(r'([_\^\[\]\{\}])', r'\\\1', text)
+    text = text.replace(u'\ue000', '{\\backslash}')
+    return text
 
 def makePartList(text):
     """Make list of parts from text"""
@@ -1333,14 +1337,17 @@ class _StdRenderer(_Renderer):
     def _expandExpr(self, expr):
         """Expand expression."""
         if self.doc is None:
-            return "*not supported here*"
+            return _("* Evaluation not supported here *")
         else:
             expr = expr.strip()
             try:
                 comp = self.doc.evaluate.compileCheckedExpression(expr)
+                if comp is None:
+                    return _("* Evaluation error *")
+
                 return cstr(eval(comp, self.doc.evaluate.context))
             except Exception as e:
-                return latexEscape(cstr(e))
+                return _("* Evaluation error: %s *") % latexEscape(cstr(e))
 
     def _getWidthHeight(self):
         """Get size of box around text."""
@@ -1420,7 +1427,7 @@ class _MmlRenderer(_Renderer):
         self.size = qt4.QSize(1, 1)
         if not mmlsupport:
             self.mmldoc = None
-            self.error = 'Error: MathML support not built\n'
+            self.error = _('Error: MathML support not built\n')
             return
 
         self.mmldoc = doc = qtmml.QtMmlDocument()
@@ -1428,8 +1435,7 @@ class _MmlRenderer(_Renderer):
             self.mmldoc.setContent(text)
         except ValueError as e:
             self.mmldoc = None
-            self.error = ('Error interpreting MathML: %s\n' %
-                          cstr(e))
+            self.error = _('Error interpreting MathML: %s\n') % cstr(e)
             return
 
         # this is pretty horrible :-(

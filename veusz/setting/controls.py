@@ -514,6 +514,7 @@ class FillStyleExtended(ChoiceSwitch):
     def _generateIcons(cls):
         """Generate a list of pixmaps for drop down menu."""
 
+        from .. import document
         from . import collections
         brush = collections.BrushExtended("")
         brush.color = 'black'
@@ -526,17 +527,19 @@ class FillStyleExtended(ChoiceSwitch):
         path = qt4.QPainterPath()
         path.addRect(0, 0, size, size)
 
+        doc = document.Document()
+        phelper = document.PaintHelper(doc, (1,1))
+
         for f in utils.extfillstyles:
             pix = qt4.QPixmap(size, size)
             pix.fill()
-            painter = qt4.QPainter(pix)
-            painter.pixperpt = 1.
-            painter.scaling = 1.
+            painter = document.DirectPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
+            painter.updateMetaData(phelper)
             brush.style = f
             utils.brushExtFillPath(painter, brush, path)
             painter.end()
-            icons.append( qt4.QIcon(pix) )
+            icons.append(qt4.QIcon(pix))
 
 class MultiLine(qt4.QTextEdit):
     """For editting multi-line settings."""
@@ -928,20 +931,23 @@ class LineStyle(Choice):
         setn.get('color').set('black')
         setn.get('width').set('1pt')
         
+        doc = document.Document()
         for lstyle in cls._lines:
             pix = qt4.QPixmap(*size)
             pix.fill()
 
-            ph = document.PaintHelper( (1, 1) )
-
-            painter = qt4.QPainter(pix)
+            painter = document.DirectPainter(pix)
             painter.setRenderHint(qt4.QPainter.Antialiasing)
+
+            phelper = document.PaintHelper(doc, (1, 1))
+            painter.updateMetaData(phelper)
 
             setn.get('style').set(lstyle)
             
-            painter.setPen( setn.makeQPen(ph) )
-            painter.drawLine( int(size[0]*0.1), size[1]/2,
-                              int(size[0]*0.9), size[1]/2 )
+            painter.setPen( setn.makeQPen(painter) )
+            painter.drawLine(
+                int(size[0]*0.1), size[1]//2,
+                int(size[0]*0.9), size[1]//2)
             painter.end()
             icons.append( qt4.QIcon(pix) )
 
@@ -949,6 +955,7 @@ class LineStyle(Choice):
 
 class _ColNotifier(qt4.QObject):
     sigNewColor = qt4.pyqtSignal(cstr)
+
 
 class Color(qt4.QWidget):
     """A control which lets the user choose a color.
@@ -958,27 +965,17 @@ class Color(qt4.QWidget):
 
     sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
 
-    _icons = None
-    _colors = None
-    _colnotifier = None
-
-    def __init__(self, setting,  parent):
+    def __init__(self, setting, parent):
         qt4.QWidget.__init__(self, parent)
 
-        if self._icons is None:
-            self._generateIcons()
-
         self.setting = setting
- 
+        self.document = setting.getDocument()
+        self.colors = self.document.evaluate.colors
+
         # combo box
         c = self.combo = qt4.QComboBox()
         c.setEditable(True)
-        for color in self._colors:
-            c.addItem(self._icons[color], color)
         c.activated[str].connect(self.slotActivated)
-
-        # add color if a color is added by a different combo box
-        Color._colnotifier.sigNewColor.connect(self.addcolorSlot)
 
         # button for selecting colors
         b = self.button = qt4.QPushButton()
@@ -988,77 +985,51 @@ class Color(qt4.QWidget):
         b.setMaximumWidth(24)
         b.clicked.connect(self.slotButtonClicked)
 
+        c.setModel(self.colors.model)
+        self.setColor(self.setting.val)
+
         if setting.readonly:
             c.setEnabled(False)
             b.setEnabled(False)
-                     
+
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0,0,0,0)
         layout.addWidget(c)
         layout.addWidget(b)
 
-        self.setColor( setting.toText() )
+        self.setColor(setting.toText())
         self.setLayout(layout)
         self.setting.setOnModified(self.onModified)
 
-    def addcolorSlot(self, color):
-        """When another Color combo adds a color, add one to this one"""
-        self.combo.addItem(self._icons[color], color)
-
-    @classmethod
-    def _generateIcons(cls):
-        """Generate a list of icons for drop down menu.
-        Does not generate existing icons
-        """
-
-        size = 12
-        if cls._icons is None:
-            cls._icons = {}
-        
-        icons = cls._icons
-        for c in cls._colors:
-            if c not in icons:
-                pix = qt4.QPixmap(size, size)
-                pix.fill( qt4.QColor(c) )
-                icons[c] = qt4.QIcon(pix)
-                if cls._colnotifier is not None:
-                    # tell other combo boxes a color has been added
-                    cls._colnotifier.sigNewColor.emit(c)
-
-        if cls._colnotifier is None:
-            cls._colnotifier = _ColNotifier()
-    
     def slotButtonClicked(self):
         """Open dialog to edit color."""
 
-        col = qt4.QColorDialog.getColor(self.setting.color(), self)
+        col = qt4.QColorDialog.getColor(
+            self.colors.get(self.setting.val), self)
         if col.isValid():
             # change setting
             val = col.name()
             self.sigSettingChanged.emit(self, self.setting, val)
 
-    def slotActivated(self, val):
+    def slotActivated(self, text):
         """A different value is selected."""
-        
-        text = self.combo.currentText()
         val = self.setting.fromText(text)
         self.sigSettingChanged.emit(self, self.setting, val)
 
     def setColor(self, color):
         """Update control with color given."""
 
-        # construct color icon if not there
-        if color not in Color._icons:
-            Color._colors.append(color)
-            Color._generateIcons()
-        
-        # add text to combo if not there
         index = self.combo.findText(color)
+        if index < 0:
+            # add text to combo if not there
+            self.combo.addItem(color)
+            index = self.combo.findText(color)
 
-        # set correct index in combobox
         self.combo.setCurrentIndex(index)
-        self.button.setIcon( self.combo.itemIcon(index) )
+
+        icon = self.combo.itemData(index, qt4.Qt.DecorationRole)
+        self.button.setIcon(icon)
 
     @qt4.pyqtSlot()
     def onModified(self):
@@ -1277,8 +1248,10 @@ class ListSet(qt4.QFrame):
 
     def updateColorButton(self, cntrl, color):
         """Given color control, update color."""
+
         pix = qt4.QPixmap(self.pixsize, self.pixsize)
-        pix.fill(utils.extendedColorToQColor(color))
+        qcolor = self.setting.getDocument().evaluate.colors.get(color)
+        pix.fill(qcolor)
         cntrl.setIcon(qt4.QIcon(pix))
 
     def addToggleButton(self, tooltip):
@@ -1340,8 +1313,10 @@ class ListSet(qt4.QFrame):
         row, col = self.identifyPosn(sender)
 
         rows = self.setting.val
+        qcolor = self.setting.getDocument().evaluate.colors.get(
+            rows[row][col])
         color = qt4.QColorDialog.getColor(
-            utils.extendedColorToQColor(rows[row][col]),
+            qcolor,
             self,
             "Choose color",
             qt4.QColorDialog.ShowAlphaChannel )
@@ -1354,9 +1329,10 @@ class ListSet(qt4.QFrame):
 
             # change the color
             pix = qt4.QPixmap(self.pixsize, self.pixsize)
-            pix.fill( utils.extendedColorToQColor(color) )
-            sender.setIcon( qt4.QIcon(pix) )
-            
+            qcolor = self.setting.getDocument().evaluate.colors.get(color)
+            pix.fill(qcolor)
+            sender.setIcon(qt4.QIcon(pix))
+
 class LineSet(ListSet):
     """A list of line styles.
     """
@@ -1434,6 +1410,9 @@ class _FillBox(qt4.QScrollArea):
         self.setting = thesetting
 
         self.extbrush = thesetting.returnBrushExtended(row)
+
+        # need to add a real parent, so that the colors can be resolved
+        self.extbrush.parent = thesetting.parent
 
         from ..windows.treeeditwindow import SettingsProxySingle, PropertyList
 

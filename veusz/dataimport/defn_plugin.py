@@ -20,7 +20,6 @@ from __future__ import division, print_function
 import traceback
 
 from .. import document
-from .. import datasets
 from .. import plugins
 from .. import qtall as qt4
 from . import base

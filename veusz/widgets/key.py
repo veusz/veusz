@@ -464,7 +464,7 @@ class Key(widget.Widget):
         # centres key below title
         x += (totalwidth-keyswidth)/2
 
-        textpen = s.get('Text').makeQPen()
+        textpen = s.get('Text').makeQPen(painter)
 
         swap = s.symbolswap
 

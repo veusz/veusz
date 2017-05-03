@@ -56,6 +56,7 @@ class Root(widget.Widget):
             self.readDefaults()
 
         s.get('englishlocale').setOnModified(self.changeLocale)
+        s.get('colorTheme').setOnModified(self.changeColorTheme)
 
     @classmethod
     def addSettings(klass, s):
@@ -81,6 +82,15 @@ class Root(widget.Widget):
                 usertext=_('English locale'),
                 formatting=True) )
 
+        themes = sorted(list(document.colors.colorthemes))
+        s.add( setting.Choice(
+            'colorTheme',
+            themes,
+            'black',
+            descr=_('Color theme'),
+            usertext=_('Color theme'),
+            formatting=True) )
+
         s.add( setting.Notes(
                 'notes', '',
                 descr=_('User-defined notes'),
@@ -104,6 +114,11 @@ class Root(widget.Widget):
         else:
             self.document.locale = qt4.QLocale()
         self.document.locale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
+
+    def changeColorTheme(self):
+        """Change color theme used by document."""
+        self.document.evaluate.colors.setColorTheme(
+            self.settings.colorTheme)
 
     def getPage(self, pagenum):
         """Get page widget."""

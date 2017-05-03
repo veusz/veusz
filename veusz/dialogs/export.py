@@ -294,7 +294,7 @@ class ExportDialog(VeuszDialog):
     def updateExportBackground(self, colorname):
         """Update color on export background."""
         pixmap = qt4.QPixmap(16, 16)
-        col = utils.extendedColorToQColor(colorname)
+        col = self.document.evaluate.colors.get(colorname)
         pixmap.fill(col)
 
         # update button (storing color in button itself - what fun!)
@@ -303,8 +303,10 @@ class ExportDialog(VeuszDialog):
 
     def slotExportBackgroundClicked(self):
         """Button clicked to change background."""
+        qcolor = self.document.evaluate.colors.get(
+            self.exportBackgroundButton.iconcolor)
         color = qt4.QColorDialog.getColor(
-            utils.extendedColorToQColor(self.exportBackgroundButton.iconcolor),
+            qcolor,
             self,
             "Choose color",
             qt4.QColorDialog.ShowAlphaChannel )

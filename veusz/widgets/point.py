@@ -367,7 +367,7 @@ class PointPlotter(GenericPlotter):
             formatting=True), 0 )
         s.add( setting.Color(
             'color',
-            'black',
+            'auto',
             descr = _('Master color'),
             usertext = _('Color'),
             formatting=True), 0 )
@@ -687,24 +687,32 @@ class PointPlotter(GenericPlotter):
 
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line."""
-        painter.save()
-        cliprect = qt4.QRectF(qt4.QPointF(x,y), qt4.QPointF(x+width,y+height))
-        painter.setClipRect(cliprect)
 
-        # draw sample error bar
         s = self.settings
-        size = s.get('markerSize').convert(painter)
-        style = s.errorStyle
 
-        # make some fake error bar data to plot
+        # datasets from document
         xv = s.get('xData').getData(self.document)
         yv = s.get('yData').getData(self.document)
+
+        # whether data has errors
+        hasxerrs = xv and xv.hasErrors()
+        hasyerrs = yv and yv.hasErrors()
+
+        # convert horizontal errors to vertical ones
+        errstyle = s.errorStyle
+        if errstyle in ('linehorz', 'fillhorz', 'likehorzbar'):
+            errstyle = errstyle.replace('horz', 'vert')
+            hasxerrs, hasyerrs = hasyerrs, hasxerrs
+
+        # make some fake error bar data to plot
         yp = y + height/2
         xpts = N.array([x-width, x+width/2, x+2*width])
         ypts = N.array([yp, yp, yp])
 
-        # size of error bars in key
-        errorsize = height*0.4
+        # start drawing
+        painter.save()
+        cliprect = qt4.QRectF(qt4.QPointF(x,y), qt4.QPointF(x+width,y+height))
+        painter.setClipRect(cliprect)
 
         # draw fill setting
         if not s.FillBelow.hide:
@@ -719,12 +727,13 @@ class PointPlotter(GenericPlotter):
             utils.brushExtFillPath(painter, s.FillAbove, path)
 
         # make points for error bars (if any)
-        if xv and xv.hasErrors():
+        errorsize = height*0.4
+        if xv and hasxerrs:
             xneg = N.array([x-width, x+width/2-errorsize, x+2*width])
             xpos = N.array([x-width, x+width/2+errorsize, x+2*width])
         else:
             xneg = xpos = xpts
-        if yv and yv.hasErrors():
+        if yv and hasyerrs:
             yneg = N.array([yp-errorsize, yp-errorsize, yp-errorsize])
             ypos = N.array([yp+errorsize, yp+errorsize, yp+errorsize])
         else:
@@ -732,8 +741,8 @@ class PointPlotter(GenericPlotter):
 
         # plot error bar
         painter.setPen( s.ErrorBarLine.makeQPenWHide(painter) )
-        for function in _errorBarFunctionMap[style]:
-            function(style, xneg, xpos, yneg, ypos, xpts, ypts, s,
+        for function in _errorBarFunctionMap[errstyle]:
+            function(errstyle, xneg, xpos, yneg, ypos, xpts, ypts, s,
                      painter, cliprect)
 
         # draw line
@@ -744,13 +753,14 @@ class PointPlotter(GenericPlotter):
         # draw marker
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
             if not s.MarkerFill.hide:
-                painter.setBrush( s.MarkerFill.makeQBrush() )
+                painter.setBrush( s.MarkerFill.makeQBrush(painter) )
 
             if not s.MarkerLine.hide:
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
             else:
                 painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
 
+            size = s.get('markerSize').convert(painter)
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
 
         painter.restore()
@@ -769,7 +779,7 @@ class PointPlotter(GenericPlotter):
         alignvert = {'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
 
         # make font and len
-        textpen = lab.makeQPen()
+        textpen = lab.makeQPen(painter)
         painter.setPen(textpen)
         font = lab.makeQFont(painter)
         angle = lab.angle
@@ -917,7 +927,7 @@ class PointPlotter(GenericPlotter):
                 #print "Painting marker fill"
                 if not s.MarkerFill.hide:
                     # filling for markers
-                    painter.setBrush( s.MarkerFill.makeQBrush() )
+                    painter.setBrush( s.MarkerFill.makeQBrush(painter) )
                 else:
                     # no-filling brush
                     painter.setBrush( qt4.QBrush() )

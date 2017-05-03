@@ -33,7 +33,9 @@ class DBusInterface(vzdbus.Object):
 
     def __init__(self, doc):
         root = '/Windows/%i/Document' % DBusInterface._ctr
-        vzdbus.Object.__init__(self, vzdbus.sessionbus, root)
+        # possible exception in dbus means we have to check sessionbus
+        if vzdbus.sessionbus is not None:
+            vzdbus.Object.__init__(self, vzdbus.sessionbus, root)
         self.index = DBusInterface._ctr
         DBusInterface._ctr += 1
         self.cmdinter = commandinterpreter.CommandInterpreter(doc)

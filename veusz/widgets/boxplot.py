@@ -365,7 +365,7 @@ class BoxPlot(GenericPlotter):
 
         # draw outliers
         painter.setPen( s.MarkersLine.makeQPenWHide(painter) )
-        painter.setBrush( s.MarkersFill.makeQBrushWHide() )
+        painter.setBrush( s.MarkersFill.makeQBrushWHide(painter) )
         markersize = s.get('markerSize').convert(painter)
         if stats.outliers.shape[0] != 0:
             pltvals = axes[not horz].dataToPlotterCoords(posn, stats.outliers)

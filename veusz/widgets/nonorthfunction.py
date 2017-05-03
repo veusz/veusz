@@ -72,6 +72,7 @@ class NonOrthFunction(Widget):
                             descr = _('Plot line settings'),
                             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
+        s.get('PlotLine').get('color').newDefault('auto')
         s.add( FillBrush('Fill1',
                          descr = _('Fill settings (1)'),
                          usertext = _('Area fill 1')),
@@ -158,6 +159,11 @@ class NonOrthFunction(Widget):
 
     def pickIndex(self, oldindex, direction, bounds):
         return self._pickable().pickIndex(oldindex, direction, bounds)
+
+    def autoColor(self, painter, dataindex=0):
+        """Automatic color for plotting."""
+        return painter.docColorAuto(
+            painter.helper.autoColorIndex((self, dataindex)))
 
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the function on a plotter.'''

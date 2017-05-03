@@ -78,7 +78,7 @@ class NonOrthPoint(Widget):
         s.add( setting.DataColor('Color') )
 
         s.add( setting.Color('color',
-                             'black',
+                             'auto',
                              descr = _('Master color'),
                              usertext = _('Color'),
                              formatting=True), 0 )
@@ -168,7 +168,7 @@ class NonOrthPoint(Widget):
         alignvert = {'top':-1, 'centre':0, 'bottom':1}[lab.posnVert]
 
         # make font and len
-        textpen = lab.makeQPen()
+        textpen = lab.makeQPen(painter)
         painter.setPen(textpen)
         font = lab.makeQFont(painter)
         angle = lab.angle
@@ -187,6 +187,11 @@ class NonOrthPoint(Widget):
         c = s.Color
         return (c.min, c.max, c.scaling, s.MarkerFill.colorMap, 0,
                 s.MarkerFill.colorMapInvert)
+
+    def autoColor(self, painter, dataindex=0):
+        """Automatic color for plotting."""
+        return painter.docColorAuto(
+            painter.helper.autoColorIndex((self, dataindex)))
 
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Plot the data on a plotter.'''
@@ -253,7 +258,7 @@ class NonOrthPoint(Widget):
                         cmap = self.document.evaluate.getColormap(
                             s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
 
-                    painter.setBrush(s.MarkerFill.makeQBrushWHide())
+                    painter.setBrush(s.MarkerFill.makeQBrushWHide(painter))
                     painter.setPen(s.MarkerLine.makeQPenWHide(painter))
 
                     utils.plotMarkers(painter, px, py, s.marker, markersize,

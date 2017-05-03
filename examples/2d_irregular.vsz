@@ -1,7 +1,6 @@
 # Veusz saved document (version 1.19.1)
 # Saved at 2013-12-29T17:02:38.658934
 
-AddImportPath(u'/home/jsanders/code/veusz/examples')
 ImportFile2D(u'2d_irregular.csv', [u'irreg'], gridatedge=True, mode='csv', linked=True)
 Add('page', name='page1', autoadd=False)
 To('page1')

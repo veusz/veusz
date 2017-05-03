@@ -689,28 +689,28 @@ def _distInvPhys(pixdist, painter, mult, unit):
                       unit )
 
 def _distPerc(match, painter):
-    """Convert from a percentage of maxsize."""
-    return painter.maxsize * 0.01 * float(match.group(1))
+    """Convert from a percentage of maxdim."""
+    return painter.maxdim * 0.01 * float(match.group(1))
 
 def _distInvPerc(pixdist, painter):
     """Convert pixel distance into percentage."""
-    return _idistval(pixdist * 100. / painter.maxsize, '%')
+    return _idistval(pixdist * 100. / painter.maxdim, '%')
 
 def _distFrac(match, painter):
-    """Convert from a fraction a/b of maxsize."""
+    """Convert from a fraction a/b of maxdim."""
     try:
-        return painter.maxsize * float(match.group(1))/float(match.group(4))
+        return painter.maxdim * float(match.group(1))/float(match.group(4))
     except ZeroDivisionError:
         return 0.
 
 def _distRatio(match, painter):
-    """Convert from a simple 0.xx ratio of maxsize."""
+    """Convert from a simple 0.xx ratio of maxdim."""
 
     # if it's greater than 1 then assume it's a point measurement
     if float(match.group(1)) > 1.:
         return _distPhys(match, painter, 1)
 
-    return painter.maxsize * float(match.group(1))
+    return painter.maxdim * float(match.group(1))
 
 # regular expression to match distances
 distre_expr = r'''^
@@ -809,7 +809,6 @@ class Distance(Setting):
 
         dist: eg 0.1 (fraction), 10% (percentage), 1/10 (fraction),
                  10pt, 1cm, 20mm, 1inch, 1in, 1" (size)
-        maxsize: size fractions are relative to
         painter: painter to get metrics to convert physical sizes
         '''
 
@@ -1353,7 +1352,6 @@ class DatasetExtended(Dataset):
 
     def getData(self, doc):
         """Return veusz dataset"""
-        from .. import datasets
         if isinstance(self.val, cbasestr):
             return doc.evaluate.evalDatasetExpression(
                 self.val, datatype=self.datatype, dimensions=self.dimensions)
@@ -1398,27 +1396,33 @@ class Color(ChoiceOrMore):
 
     typename = 'color'
 
-    _colors = [ 'white', 'black', 'red', 'green', 'blue',
-                'cyan', 'magenta', 'yellow',
-                'grey', 'darkred', 'darkgreen', 'darkblue',
-                'darkcyan', 'darkmagenta' ]
-
-    controls.Color._colors = _colors
-
     def __init__(self, name, value, **args):
         """Initialise the color setting with the given name, default
         and description."""
-
-        ChoiceOrMore.__init__(self, name, self._colors, value,
-                              **args)
+        ChoiceOrMore.__init__(self, name, [], value, **args)
 
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper((), (), {})
 
-    def color(self):
-        """Return QColor for color."""
-        return qt4.QColor(self.val)
+    def color(self, painter, dataindex=0):
+        """Return QColor from color.
+
+        painter is a Veusz Painter
+        dataindex is index for automatically getting colors for subdatasets.
+        """
+
+        if self.val.lower() == 'auto':
+            # lookup widget
+            w = self.parent
+            while w is not None and not w.isWidget():
+                w = w.parent
+            if w is None:
+                return qt4.QColor()
+            # get automatic color
+            return painter.docColor(w.autoColor(painter, dataindex=dataindex))
+        else:
+            return painter.docColor(self.val)
 
     def makeControl(self, *args):
         return controls.Color(self, *args)
@@ -1696,7 +1700,7 @@ class LineSet(Setting):
             style, width, color, hide = v
             width = Distance.convertDistance(painter, width)
             style, dashpattern = LineStyle._linecnvt[style]
-            col = utils.extendedColorToQColor(color)
+            col = painter.docColor(color)
             pen = qt4.QPen(col, width, style)
 
             if dashpattern:
@@ -1753,19 +1757,14 @@ class FillSet(Setting):
         """Return BrushExtended for the row."""
         from . import collections
         s = collections.BrushExtended('tempbrush')
+        s.parent = self
 
         if len(self.val) == 0:
             s.hide = True
         else:
             v = self.val[row % len(self.val)]
             s.style = v[0]
-            col = utils.extendedColorToQColor(v[1])
-            if col.alpha() != 255:
-                s.transparency = int(100 - col.alphaF()*100)
-                col.setAlpha(255)
-                s.color = col.name()
-            else:
-                s.color = v[1]
+            s.color = v[1]
             s.hide = v[2]
             if len(v) == 10:
                 (s.transparency, s.linewidth, s.linestyle,

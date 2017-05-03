@@ -64,7 +64,7 @@ class StylesheetLine(Settings):
                                      descr=_('Default line width'),
                                      usertext=_('Width'),
                                      formatting=True) )
-        self.add( setting.Color('color', 'black',
+        self.add( setting.Color('color', 'foreground',
                                 descr=_('Default line color'),
                                 usertext=_('Color'),
                                 formatting=True) )
@@ -113,7 +113,7 @@ class StylesheetText(Settings):
                                      descr=_('Default font size'),
                                      usertext=_('Size'),
                                      formatting=True))
-        self.add( setting.Color('color', 'black',
+        self.add( setting.Color('color', 'foreground',
                                 descr=_('Default font color'),
                                 usertext=_('Color'),
                                 formatting=True))

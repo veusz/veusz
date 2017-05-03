@@ -79,10 +79,10 @@
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g fill="none" stroke="#aa00ff" stroke-dasharray="1.8,3.7" stroke-width="1.8">
+<g fill="none" stroke="#a6d854" stroke-dasharray="1.8,3.7" stroke-width="1.8">
 <polyline fill="none" points="173.6,196.4 178.3,204.5 183,212.7 187.7,220.8 192.4,229 197.1,237.1 201.8,245.2 206.5,253.4 211.2,261.5 215.9,269.7 220.6,277.8 225.3,286 230,294.1 234.7,302.2 239.4,310.4 244.1,318.5 248.8,326.7 253.5,334.8 258.2,342.9 262.9,351.1 267.6,359.2 272.3,367.4 277,375.5 281.7,383.6 286.4,391.8 291.1,399.9 295.8,408.1 300.5,416.2 305.2,424.4 309.9,432.5 314.6,440.6 319.3,448.8 319.4,449"/>
 </g>
-<g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#e78ac3" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="matrix(0.3703 0 0 0.3703 313.4 172.6)">
 <path d="m6.2,0c0,3.4,-2.7,6.2,-6.2,6.2c-3.4,0,-6.2,-2.7,-6.2,-6.2c0,-3.4,2.7,-6.2,6.2,-6.2c3.4,0,6.2,2.7,6.2,6.2" id="p0"/>
 </g>
@@ -234,7 +234,7 @@
 <use xlink:href="#p0"/>
 </g>
 </g>
-<g fill="#ff0000" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#8da0cb" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="translate(195.5,395.8)">
 <path d="m0,5.3l5.3,-5.3l-5.3,-5.3l-5.3,5.3l5.3,5.3" id="p1"/>
 </g>
@@ -288,7 +288,7 @@
 <use xlink:href="#p1" x="228.5" y="403.5"/>
 <use xlink:href="#p1" x="195.1" y="384.9"/>
 </g>
-<g fill="#aaffff" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#fc8d62" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="translate(262.4,344.5)">
 <path d="m3.7,0c0,2,-1.6,3.7,-3.7,3.7c-2,0,-3.7,-1.6,-3.7,-3.7c0,-2,1.6,-3.7,3.7,-3.7c2,0,3.7,1.6,3.7,3.7" id="p2"/>
 </g>
@@ -342,13 +342,13 @@
 <use xlink:href="#p2" x="202.4" y="245.7"/>
 <use xlink:href="#p2" x="204.1" y="222.6"/>
 </g>
-<g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">
+<g fill="#66c2a5" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="translate(346.3,375.9)">
 <path d="m0,-7.5l-1.6,5.1l-5.4,0l4.4,3.2l-1.6,5.1l4.4,-3.2l4.4,3.2l-1.6,-5.1l4.4,-3.2l-5.4,0l-1.6,-5.1" id="p3"/>
 </g>
 <use xlink:href="#p3" x="254.2" y="415.8"/>
 </g>
-<g fill="#000000" stroke-width="1">
+<g fill="#66c2a5" stroke-width="1">
 <text x="355.7" y="387.2" font-size="18pt" fill="#000000">Nougat</text>
 <text x="263.5" y="427.1" font-size="18pt" fill="#000000">Chocolate</text>
 </g>

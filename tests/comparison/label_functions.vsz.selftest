@@ -1,0 +1,62 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="531.4px" height="531.4px" version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+<desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
+</clipPath>
+</defs>
+<g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="292.3" y="239.1" font-size="14pt" fill="#000000">Page width: 15cm</text>
+<text x="304.3" y="175.5" font-size="14pt" fill="#000000"><<label_functions.vsz>> is basename</text>
+<text x="172" y="202.9" font-size="14pt" fill="#000000">Escaped text: </text>
+<text x="294.5" y="202.9" font-size="14pt" fill="#000000">\</text>
+<text x="303.3" y="202.9" font-size="14pt" fill="#000000">\2 % ^ _ [] {}</text>
+<text x="107.1" y="267" font-size="14pt" fill="#000000">Loss: 24.0% vs 42.0 mAh/g</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l0,-464.1"/>
+<path d="M60.2,471.2l3.7,0M60.2,448l3.7,0M60.2,424.8l3.7,0M60.2,401.6l3.7,0M60.2,378.4l3.7,0M60.2,355.2l3.7,0M60.2,332l3.7,0M60.2,308.7l3.7,0M60.2,285.5l3.7,0M60.2,262.3l3.7,0M60.2,239.1l3.7,0M60.2,215.9l3.7,0M60.2,192.7l3.7,0M60.2,169.5l3.7,0M60.2,146.3l3.7,0M60.2,123.1l3.7,0M60.2,99.9l3.7,0M60.2,76.7l3.7,0M60.2,53.5l3.7,0M60.2,30.2l3.7,0M60.2,7l3.7,0"/>
+<path d="M60.2,471.2l7.5,0M60.2,378.4l7.5,0M60.2,285.5l7.5,0M60.2,192.7l7.5,0M60.2,99.9l7.5,0M60.2,7l7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="47.9" y="480" font-size="14pt" fill="#000000">0</text>
+<text x="30.4" y="387.1" font-size="14pt" fill="#000000">0.2</text>
+<text x="30.4" y="294.3" font-size="14pt" fill="#000000">0.4</text>
+<text x="30.4" y="201.5" font-size="14pt" fill="#000000">0.6</text>
+<text x="30.4" y="108.6" font-size="14pt" fill="#000000">0.8</text>
+<text x="47.9" y="21" font-size="14pt" fill="#000000">1</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l464.1,0"/>
+<path d="M60.2,471.2l0,-3.7M83.4,471.2l0,-3.7M106.6,471.2l0,-3.7M129.8,471.2l0,-3.7M153,471.2l0,-3.7M176.2,471.2l0,-3.7M199.4,471.2l0,-3.7M222.6,471.2l0,-3.7M245.9,471.2l0,-3.7M269.1,471.2l0,-3.7M292.3,471.2l0,-3.7M315.5,471.2l0,-3.7M338.7,471.2l0,-3.7M361.9,471.2l0,-3.7M385.1,471.2l0,-3.7M408.3,471.2l0,-3.7M431.5,471.2l0,-3.7M454.7,471.2l0,-3.7M477.9,471.2l0,-3.7M501.2,471.2l0,-3.7M524.4,471.2l0,-3.7"/>
+<path d="M60.2,471.2l0,-7.5M153,471.2l0,-7.5M245.9,471.2l0,-7.5M338.7,471.2l0,-7.5M431.5,471.2l0,-7.5M524.4,471.2l0,-7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="55.8" y="476.5" font-size="14pt" fill="#000000">0</text>
+<text x="139.9" y="476.5" font-size="14pt" fill="#000000">0.2</text>
+<text x="232.7" y="476.5" font-size="14pt" fill="#000000">0.4</text>
+<text x="325.6" y="476.5" font-size="14pt" fill="#000000">0.6</text>
+<text x="418.4" y="476.5" font-size="14pt" fill="#000000">0.8</text>
+<text x="520" y="476.5" font-size="14pt" fill="#000000">1</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M524.4,471.2l0,-464.1"/>
+<path d="M524.4,471.2l-3.7,0M524.4,448l-3.7,0M524.4,424.8l-3.7,0M524.4,401.6l-3.7,0M524.4,378.4l-3.7,0M524.4,355.2l-3.7,0M524.4,332l-3.7,0M524.4,308.7l-3.7,0M524.4,285.5l-3.7,0M524.4,262.3l-3.7,0M524.4,239.1l-3.7,0M524.4,215.9l-3.7,0M524.4,192.7l-3.7,0M524.4,169.5l-3.7,0M524.4,146.3l-3.7,0M524.4,123.1l-3.7,0M524.4,99.9l-3.7,0M524.4,76.7l-3.7,0M524.4,53.5l-3.7,0M524.4,30.2l-3.7,0M524.4,7l-3.7,0"/>
+<path d="M524.4,471.2l-7.5,0M524.4,378.4l-7.5,0M524.4,285.5l-7.5,0M524.4,192.7l-7.5,0M524.4,99.9l-7.5,0M524.4,7l-7.5,0"/>
+<path d="M60.2,7l464.1,0"/>
+<path d="M60.2,7l0,3.7M83.4,7l0,3.7M106.6,7l0,3.7M129.8,7l0,3.7M153,7l0,3.7M176.2,7l0,3.7M199.4,7l0,3.7M222.6,7l0,3.7M245.9,7l0,3.7M269.1,7l0,3.7M292.3,7l0,3.7M315.5,7l0,3.7M338.7,7l0,3.7M361.9,7l0,3.7M385.1,7l0,3.7M408.3,7l0,3.7M431.5,7l0,3.7M454.7,7l0,3.7M477.9,7l0,3.7M501.2,7l0,3.7M524.4,7l0,3.7"/>
+<path d="M60.2,7l0,7.5M153,7l0,7.5M245.9,7l0,7.5M338.7,7l0,7.5M431.5,7l0,7.5M524.4,7l0,7.5"/>
+</g>
+</g>
+</g>
+</svg>

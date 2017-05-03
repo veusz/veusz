@@ -1,5 +1,5 @@
-# Veusz saved document (version 1.12.99)
-# Saved at 2011-08-14T11:00:24.842710
+# Veusz saved document (version 1.25.1)
+# Saved at 2017-04-29T15:44:54.108769
 
 ImportString('a1(numeric)','''
 3.785032e+01
@@ -313,10 +313,10 @@ ImportString('b2(numeric)','''
 1.927962e+01
 1.461585e+01
 ''')
-ImportString(u'label(text)',r'''
-u'Nougat'
-u'Chocolate'
-''')
+SetDataText(u'label', [
+    u'Nougat',
+    u'Chocolate',
+])
 ImportString(u'lx(numeric)','''
 6.000000e+01
 4.500000e+01
@@ -379,6 +379,7 @@ ImportString('sizes(numeric)','''
 ''')
 Set('width', '15cm')
 Set('height', '13.9cm')
+Set('colorTheme', u'colorbrewer2')
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('ternary', name='ternary1', autoadd=False)
@@ -405,7 +406,6 @@ To('nonorthpoint1')
 Set('data1', u'a1')
 Set('data2', u'a2')
 Set('PlotLine/hide', True)
-Set('MarkerFill/color', u'#aaffff')
 To('..')
 Add('nonorthpoint', name='nonorthpoint2', autoadd=False)
 To('nonorthpoint2')
@@ -413,7 +413,6 @@ Set('marker', u'diamond')
 Set('data1', u'a3')
 Set('data2', u'a4')
 Set('PlotLine/hide', True)
-Set('MarkerFill/color', u'red')
 To('..')
 Add('nonorthpoint', name='nonorthpoint3', autoadd=False)
 To('nonorthpoint3')
@@ -422,12 +421,10 @@ Set('data1', u'b2')
 Set('data2', u'b1')
 Set('scalePoints', u'sizes')
 Set('PlotLine/hide', True)
-Set('MarkerFill/color', u'blue')
 To('..')
 Add('nonorthfunc', name='nonorthfunc1', autoadd=False)
 To('nonorthfunc1')
 Set('function', u'40')
-Set('PlotLine/color', u'#aa00ff')
 Set('PlotLine/width', u'1.5pt')
 Set('PlotLine/style', u'dotted')
 To('..')

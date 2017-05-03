@@ -23,7 +23,6 @@ import re
 import numpy as N
 
 from .commonfn import _
-from .commonfn import *
 from .base import DatasetExpressionException
 from .oned import Dataset1DBase, Dataset
 from .twod import Dataset2DBase, Dataset2D
@@ -498,7 +497,7 @@ class Dataset2DXYZExpression(Dataset2DBase):
 
         evaluated = {}
 
-        environment = self.document.evaulate.context.copy()
+        environment = self.document.evaluate.context.copy()
         environment['_DS_'] = self.evaluateDataset
 
         # evaluate the x, y and z expressions
@@ -639,7 +638,7 @@ class Dataset2DExpression(Dataset2DBase):
 
     def evalDataset(self):
         """Do actual evaluation."""
-        return self.document.evalDatasetExpression(self.expr, dimensions=2)
+        return evalDatasetExpression(self.document, self.expr, dimensions=2)
 
     def saveDataRelationToText(self, fileobj, name):
         '''Save expression to file.'''

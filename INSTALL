@@ -21,7 +21,8 @@ Optional requirements:
  h5py            http://www.h5py.org/
  Astropy >= 0.2  http://www.astropy.org
  pyemf >= 2.0.0  http://pyemf.sourceforge.net/
- PyMinuit        http://code.google.com/p/pyminuit/
+ iminuit         https://github.com/iminuit/iminuit
+ ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
 
 Python 3 support is included in veusz-1.19+, although it has less
@@ -36,7 +37,7 @@ list a few of the possible method here:
 
 To install on linux to the standard location on the hard disk
 
-# cd veusz-1.25
+# cd veusz-1.25.1
 # python setup.py build
 # su
 [enter root password]
@@ -94,8 +95,8 @@ resources directory to point to the location of the example files.
 If you don't want to install veusz fully or are doing development, it
 can currently be run from its own directory. Do
 
-# tar xzf veusz-1.25.tar.gz                [change version here]
-# cd veusz-1.25
+# tar xzf veusz-1.25.1.tar.gz                [change version here]
+# cd veusz-1.25.1
 # ./run_veusz_inplace
 
 Certain features will be disabled if you do this. You will not be able
@@ -117,8 +118,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xzf veusz-linux-i386-1.25.tar.gz     [change version here]
-# cd veusz-linux-i386-1.25
+# tar xzf veusz-linux-i386-1.25.1.tar.gz     [change version here]
+# cd veusz-linux-i386-1.25.1
 # ./veusz
 
 2.2 Installing in Windows

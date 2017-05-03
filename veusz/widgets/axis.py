@@ -21,6 +21,7 @@ positions."""
 
 from __future__ import division
 import numpy as N
+import re
 
 from ..compat import czip
 from .. import qtall as qt4
@@ -166,30 +167,43 @@ class TickLabel(setting.Text):
                                                 'labels from axis'),
                                       usertext= _('Tick offset') ) )
 
-class AutoRange(setting.Choice):
+class AutoRange(setting.ChoiceOrMore):
     """Choose how to choose range of axis."""
 
     def __init__(self, name, value, **args):
-        setting.Choice.__init__(self,
-                name,
-                ('exact', 'next-tick', '+2%', '+5%', '+10%', '+15%'),
-                value,
-                descr = _('If axis range not specified, use range of '
-                          'data and this setting'),
-                descriptions = (_('Use exact data range'),
-                                _('Use data range, rounding up to tick marks'),
-                                _('Use data range, adding 2% of range'),
-                                _('Use data range, adding 5% of range'),
-                                _('Use data range, adding 10% of range'),
-                                _('Use data range, adding 15% of range'),
-                                ),
-                formatting = True,
-                usertext = _('Auto range'))
+        setting.ChoiceOrMore.__init__(
+            self,
+            'autoRange',
+            ('exact', 'next-tick',
+             '+2%', '+5%', '+10%', '+15%',
+             '-2%', '-5%', '-10%', '-15%',
+             '20-80%', '<20%', '>80%',
+            ),
+            'next-tick',
+            descr = _('If axis range not specified, use range of '
+                      'data and this setting'),
+            descriptions = (
+                _('Use exact data range'),
+                _('Round up to tick marks from data range'),
+                _('Expand 2% beyond data range'),
+                _('Expand 5% beyond data range'),
+                _('Expand 10% beyond data range'),
+                _('Expand 15% beyond data range'),
+                _('Shrink 2% inside data range'),
+                _('Shrink 5% inside data range'),
+                _('Shrink 10% inside data range'),
+                _('Shrink 15% inside data range'),
+                _('20 to 80% of the data range'),
+                _('Up to 20% of the data range'),
+                _('Above 80% of the data range'),
+            ),
+            formatting = True,
+            usertext = _('Auto range'),
+            )
 
     def copy(self):
         """Return copy of this setting."""
         return self._copyHelper((), (), {})
-
 
 ###############################################################################
 
@@ -369,6 +383,49 @@ class Axis(widget.Widget):
         """Return whether any of the bounds are automatically determined."""
         return self.settings.min == 'Auto' or self.settings.max == 'Auto'
 
+    # +5% or -5%
+    re_dr_plusminus = re.compile(r'^\s*([+-][0-9]+)\s*%\s*$')
+    # 5-10%
+    re_dr_percrange = re.compile(r'^\s*(-?[0-9]+)\s*-\s*([0-9]+)\s*%\s*$')
+    # < 5%
+    re_dr_lower = re.compile(r'^\s*<\s*([0-9]+)\s*%\s*$')
+    # > 95%
+    re_dr_upper = re.compile(r'^\s*>\s*([0-9]+)\s*%\s*$')
+
+    def autoRangeToFracs(self, rng):
+        """Convert auto range setting to fractions to expand range by.
+
+        Returns tuple of expansion fractions for left and right
+        """
+
+        # +X% or -Y%
+        m = self.re_dr_plusminus.match(rng)
+        if m:
+            v = float(m.group(1))*0.01
+            return v, v
+
+        # X-Y%
+        m = self.re_dr_percrange.match(rng)
+        if m:
+            v1 = -float(m.group(1))*0.01
+            v2 = -(1-float(m.group(2))*0.01)
+            return v1, v2
+
+        # <X%
+        m = self.re_dr_lower.match(rng)
+        if m:
+            return 0, -(1-float(m.group(1))*0.01)
+
+        # >Y%
+        m = self.re_dr_upper.match(rng)
+        if m:
+            return -(float(m.group(1))*0.01), 0
+
+        # error
+        self.document.log(
+            _("Invalid axis range '%s'") % rng)
+        return 0, 0
+
     def computePlottedRange(self, force=False, overriderange=None):
         """Convert the range requested into a plotted range."""
 
@@ -430,29 +487,35 @@ class Axis(widget.Widget):
             if self.plottedrange[0] == self.plottedrange[1]:
                 self.plottedrange[1] = self.plottedrange[0]*2
 
-        r = s.autoRange
-        if r == 'exact':
+        rng = s.autoRange
+        if rng == 'exact':
             pass
-        elif r == 'next-tick':
+        elif rng == 'next-tick':
             pass
         else:
-            val = {'+2%': 0.02, '+5%': 0.05, '+10%': 0.1, '+15%': 0.15}[r]
-
+            # get fractions to expand range by
+            expandfrac1, expandfrac2 = self.autoRangeToFracs(rng)
+            origrange = list(self.plottedrange)
             if s.log:
                 # logarithmic
                 logrng = abs( N.log(self.plottedrange[1]) -
                            N.log(self.plottedrange[0]) )
                 if s.min == 'Auto':
-                    self.plottedrange[0] /= N.exp(logrng * val)
+                    self.plottedrange[0] /= N.exp(logrng * expandfrac1)
                 if s.max == 'Auto':
-                    self.plottedrange[1] *= N.exp(logrng * val)
+                    self.plottedrange[1] *= N.exp(logrng * expandfrac2)
             else:
                 # linear
                 rng = self.plottedrange[1] - self.plottedrange[0]
                 if s.min == 'Auto':
-                    self.plottedrange[0] -= rng*val
+                    self.plottedrange[0] -= rng*expandfrac1
                 if s.max == 'Auto':
-                    self.plottedrange[1] += rng*val
+                    self.plottedrange[1] += rng*expandfrac2
+
+            # if order is wrong, then give error!
+            if self.plottedrange[1] <= self.plottedrange[0]:
+                self.document.log(_("Invalid axis range '%s'") % rng)
+                self.plottedrange = origrange
 
         self.computeTicks()
 
@@ -809,7 +872,7 @@ class Axis(widget.Widget):
         # get information about text scales
         tl = s.get('TickLabels')
         scale = tl.scale
-        pen = tl.makeQPen()
+        pen = tl.makeQPen(painter)
 
         # an extra offset if required
         self._delta_axis += tl.get('offset').convert(painter)
@@ -965,7 +1028,7 @@ class Axis(widget.Widget):
             r.ensureInBox( minx=outerbounds[0], maxx=outerbounds[2],
                            miny=outerbounds[1], maxy=outerbounds[3] )
 
-        texttorender.insert(0, (r, s.get('Label').makeQPen()) )
+        texttorender.insert(0, (r, s.get('Label').makeQPen(painter)) )
 
     def chooseName(self):
         """Get default name for axis. Make x and y axes, then axisN."""

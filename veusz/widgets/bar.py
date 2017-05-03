@@ -37,7 +37,7 @@ class BarFill(setting.Settings):
     '''Filling of bars.'''
     def __init__(self, name, **args):
         setting.Settings.__init__(self, name, **args)
-        self.add( setting.FillSet('fills', [('solid', 'grey', False)],
+        self.add( setting.FillSet('fills', [('solid', 'auto', False)],
                                   descr = _('Fill styles for dataset bars'),
                                   usertext=_('Fill styles')) )
 
@@ -317,7 +317,8 @@ class BarPlotter(GenericPlotter):
         utils.addNumpyPolygonToPath(
             path, extclip, corners[0], corners[1], corners[2], corners[1],
             corners[2], corners[3], corners[0], corners[3])
-        utils.brushExtFillPath(painter, brush, path, stroke=pen)
+        utils.brushExtFillPath(
+            painter, brush, path, stroke=pen, dataindex=dsnum)
 
     def barDrawGroup(self, painter, posns, maxwidth, dsvals,
                      axes, widgetposn, clip):
@@ -473,7 +474,7 @@ class BarPlotter(GenericPlotter):
 
             # actually draw polygon
             brush = s.BarFill.get('fills').returnBrushExtended(dsnum)
-            utils.brushExtFillPath(painter, brush, path)
+            utils.brushExtFillPath(painter, brush, path, dataindex=dsnum)
 
             # now draw lines
             poly = qt4.QPolygonF()
@@ -499,6 +500,12 @@ class BarPlotter(GenericPlotter):
         if not lengths:
             return 0
         return min( len([k for k in self.settings.keys if k]), len(lengths) )
+
+    def setupAutoColor(self, painter):
+        """Initialise correct number of colors."""
+        lengths = self.settings.get('lengths').getData(self.document)
+        for i in crange(len(lengths)):
+            self.autoColor(painter, dataindex=i)
 
     def getKeyText(self, number):
         """Get key entry."""

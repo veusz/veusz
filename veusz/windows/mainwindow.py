@@ -59,7 +59,9 @@ class DBusWinInterface(vzdbus.Object):
 
     def __init__(self, actions, index):
         prefix = '/Windows/%i/Actions' % index
-        vzdbus.Object.__init__(self, vzdbus.sessionbus, prefix)
+        # possible exception in dbus means we have to check sessionbus
+        if vzdbus.sessionbus is not None:
+            vzdbus.Object.__init__(self, vzdbus.sessionbus, prefix)
         self.actions = actions
 
     @vzdbus.method(dbus_interface=interface, out_signature='as')
@@ -267,6 +269,10 @@ class MainWindow(qt4.QMainWindow):
             # add page and default graph
             self.document.makeDefaultDoc()
 
+            # set color theme
+            self.document.basewidget.settings.get(
+                'colorTheme').set(setting.settingdb['colortheme_default'])
+
             # load defaults if set
             self.loadDefaultStylesheet()
             self.loadDefaultCustomDefinitions()
@@ -455,7 +461,8 @@ class MainWindow(qt4.QMainWindow):
                   self.slotEditPreferences,
                   icon='veusz-edit-prefs'),
             'edit.custom':
-                a(self, _('Edit custom functions and constants'),
+                a(self,
+                  _('Edit custom functions, constants, colors and colormaps'),
                   _('Custom definitions...'),
                   self.slotEditCustom,
                   icon='veusz-edit-custom'),

@@ -59,6 +59,9 @@ defaultValues = {
     'color_cntrlline': (True, 'blue'),
     'color_cntrlcorner': (True, 'black'),
 
+    # document theme
+    'colortheme_default': 'default-latest',
+
     # further ui options
     'toolbar_size': 24,
 
