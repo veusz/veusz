@@ -595,6 +595,21 @@
       </section>
 
       <section>
+        <title>Color theme</title>
+
+        <para>From version 1.26, widgets are colored automatically
+        using the color theme. This theme is specified in the main
+        document widget settings. Widgets are given the colors in
+        order given the order in a graph widget. The default theme can
+        be specified in the preferences dialog box.</para>
+
+        <para>To override a theme, the user can manually specify the
+        individual colors in the custom definitions dialog box. Color
+        "theme1" is used as the first theme color, then "theme2",
+        etc.</para>
+      </section>
+
+      <section>
 	<title>Axis numeric scales</title>
 
 	<para>The way in which numbers are formatted in axis scales is
