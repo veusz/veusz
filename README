@@ -22,6 +22,8 @@ Changes in 1.26:
  * Fix for dataset plugins returning nD datasets
  * Add editable automatic axis range, including support for shrinking
    range (-X%), percentage ranges (X-Y%) and limits (<X% and >Y%)
+ * Fix for key if invalid dataset
+ * For log scaling on image widget, show invalid values as being transparent
 
 Features of package:
  Plotting features:
