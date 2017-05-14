@@ -11,7 +11,7 @@
 !define PRODUCT_NAME "Veusz"
 ;!define PRODUCT_VERSION "1.xx"
 !define PRODUCT_PUBLISHER "Jeremy Sanders"
-!define PRODUCT_WEB_SITE "http://home.gna.org/veusz/"
+!define PRODUCT_WEB_SITE "https://veusz.github.io/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\veusz.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"

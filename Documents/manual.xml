@@ -2799,7 +2799,7 @@ g.Close()
 	<para>
 	  The embed interface has the methods listed in the command
 	  line interface listed in the Veusz manual
-	  http://home.gna.org/veusz/docs/manual.html
+	  https://veusz.github.io/docs/manual.html
 	</para>
 
 	<para>
