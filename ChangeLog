@@ -1,3 +1,7 @@
+Changes in 1.26.1:
+ * Change homepage in program to new site https://veusz.github.io/
+ * Change new version checking to use veusz.github.io
+
 Changes in 1.26:
  * Add color themes and automatic coloring of widgets
  * Custom color definitions
