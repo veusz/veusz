@@ -207,18 +207,19 @@ class ExceptionDialog(VeuszDialog):
         # FIXME: 
         try:
             p = curlrequest.urlopen(
-                'http://veusz.github.io/download/newest-version.html').read().decode('ascii')
-            latest = p.strip()
+                'http://veusz.github.io/download/newest-version.html').read()
+            latest = p.decode('ascii').strip()
+            latestv = [int(i) for i in latest.split('.')]
         except:
-            latest = None
+            latestv = None
 
-        if not latest:
+        if not latestv:
             msg = _('Could not check the latest Veusz version')
         else:
-            current = [int(i) for i in utils.version().split('.')]
-            if current == vsort[-1]:
+            currentv = [int(i) for i in utils.version().split('.')]
+            if currentv == latestv:
                 msg = _('You are running the latest released Veusz version')
-            elif current > vsort[-1]:
+            elif currentv > latestv:
                 msg = _('You are running an unreleased Veusz version')
             else:
                 msg = (_('<b>Your current version of Veusz is old. '
