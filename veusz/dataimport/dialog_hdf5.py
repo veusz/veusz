@@ -27,6 +27,7 @@ from . import base
 from . import defn_hdf5
 
 from . import fits_hdf5_tree
+from . import fits_hdf5_helpers
 
 def _(text, disambiguation=None, context="Import_HDF5"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -42,21 +43,24 @@ def constructTree(hdf5file):
 
     datanodes = []
 
-    def makedatanode(parent, ds):
-        # combine shape from dataset and column (if any)
-        shape = tuple(list(ds.shape)+list(ds.dtype.shape))
-
-        dtype = 'invalid'
-        k = ds.dtype.kind
+    def computedatatype(dtype):
+        datatype = 'invalid'
+        k = dtype.kind
         if k in ('b', 'i', 'u', 'f'):
-            dtype = 'numeric'
+            datatype = 'numeric'
         elif k in ('S', 'a'):
-            dtype = 'text'
+            datatype = 'text'
         elif k == 'O':
             # FIXME: only supporting variable length strings so far
             typ = h5py.check_dtype(vlen=ds.dtype)
             if typ is str:
-                dtype = 'text'
+                datatype = 'text'
+        return datatype
+
+    def makedatanode(parent, ds):
+        # combine shape from dataset and column (if any)
+        shape = tuple(list(ds.shape)+list(ds.dtype.shape))
+        dtype = computedatatype(ds.dtype)
 
         vszattrs = {}
         for attr in ds.attrs:
@@ -88,9 +92,23 @@ def constructTree(hdf5file):
                     # the compound, then its children
                     childnode = fits_hdf5_tree.FileCompoundNode(parent, hchild)
 
-                    for field in list(hchild.dtype.fields.keys()):
-                        fnode = fits_hdf5_tree.FileCompoundSubNode(
-                            childnode, hchild, field)
+                    for field in sorted(hchild.dtype.fields.keys()):
+                        # get types and shape for individual sub-parts
+                        fdtype = hchild.dtype[field]
+                        fdatatype = computedatatype(fdtype)
+                        fshape = tuple(
+                            list(hchild[field].shape)+list(fdtype.shape))
+
+                        fattrs = fits_hdf5_helpers.filterAttrsByName(
+                            hchild.attrs, field)
+                        fnode = fits_hdf5_tree.FileDataNode(
+                            childnode,
+                            hchild.name+'/'+field,
+                            fattrs,
+                            fdatatype,
+                            fdtype,
+                            fshape)
+
                         childnode.children.append(fnode)
                         datanodes.append(fnode)
 

@@ -129,11 +129,17 @@ def applySlices(data, slices):
         data = N.array([], dtype=N.float64)
     return data
 
-# FIXME h5py below
-
 def convertDatasetToObject(data, slices):
     """Convert numpy/hdf dataset to suitable data for veusz.
     Raise _ConvertError if cannot."""
+
+    # lazily-loaded h5py
+    try:
+        from h5py import check_dtype
+    except ImportError:
+        # fallback if no h5py, e.g. only installed fits
+        def check_dtype(vlen=None):
+            return False
 
     if slices:
         data = applySlices(data, slices)
@@ -150,7 +156,7 @@ def convertDatasetToObject(data, slices):
         return data
 
     elif kind in ('S', 'a') or (
-        kind == 'O' and h5py.check_dtype(vlen=data.dtype) is str):
+        kind == 'O' and check_dtype(vlen=data.dtype) is str):
         if hasattr(data, 'ndim') and data.ndim != 1:
             raise _ConvertError(_("Text datasets must have 1 dimension"))
 

@@ -116,9 +116,6 @@ class ErrorNode(Node):
             return self.name
         return None
 
-######################################################################
-# Specific to HDF5 and FITS files
-
 class ImportNameDeligate(qt4.QItemDelegate):
     """This class is for choosing the import name."""
 
@@ -186,8 +183,6 @@ class ImportNameDeligate(qt4.QItemDelegate):
     def updateEditorGeometry(self, editor, option, index):
         """Update editor geometry."""
         editor.setGeometry(option.rect)
-
-
 
 # name for the columns
 _ColName = 0
@@ -369,21 +364,24 @@ class FileDataNode(FileNode):
             elif column == _ColDataType:
                 return self.rawdatatype
             elif column == _ColToImport and not self.grpImport():
-                return _('Check to import this dataset')
+                return _(
+                    'Check to import this dataset')
             elif column == _ColImportName and not self.grpImport():
-                return _('Name to assign after import.\n'
-                         'Special suffixes (+), (-) and (+-) can be used to\n'
-                         'assign error bars to datasets with the same name.')
+                return _(
+                    'Name to assign after import.\n'
+                    'Special suffixes (+), (-) and (+-) can be used to\n'
+                    'assign error bars to datasets with the same name.')
             elif column == _ColSlice:
-                return _('Slice data to create a subset to import.\n'
-                         'This should be ranges for each dimension\n'
-                         'separated by commas.\n'
-                         'Ranges can be empty (:), half (:10),\n'
-                         ' full (4:10), with steps (1:10:2)\n'
-                         ' or negative steps (::-1).\n'
-                         'Example syntax: 2:20\n'
-                         '   :10,:,2:20\n'
-                         '   1:10:5,::5')
+                return _(
+                    'Slice data to create a subset to import.\n'
+                    'This should be ranges for each dimension\n'
+                    'separated by commas.\n'
+                    'Ranges can be empty (:), half (:10),\n'
+                    ' full (4:10), with steps (1:10:2)\n'
+                    ' or negative steps (::-1).\n'
+                    'Example syntax: 2:20\n'
+                    '   :10,:,2:20\n'
+                    '   1:10:5,::5')
 
         elif role == qt4.Qt.CheckStateRole and column == _ColToImport:
             if ( (self.toimport or self.grpImport()) and
@@ -448,15 +446,6 @@ class FileCompoundNode(FileGroupNode):
             elif column == _ColShape:
                 return u'\u00d7'.join([str(x) for x in self.shape])
         return FileGroupNode.data(self, column, role)
-
-class FileCompoundSubNode(FileDataNode):
-    """Sub-data of compound table."""
-
-    def __init__(self, parent, ds, name):
-        attrs = fits_hdf5_helpers.filterAttrsByName(ds.attrs, name)
-        FileDataNode.__init__(
-            self, parent, ds.name + '/' + name,
-            attrs, ds.dtype[name], ds.shape)
 
 ##############################################################################
 
