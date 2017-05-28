@@ -35,6 +35,94 @@ def _(text, disambiguation=None, context="Import_HDF5"):
 # lazily imported
 h5py = None
 
+def dispname(child):
+    """Get display name for HDF5 group/dataset."""
+    return child.name.split('/')[-1]
+
+def computedatatype(dtype):
+    """Compute 'simple' datatype for tree widget from dtype."""
+
+    datatype = 'invalid'
+    k = dtype.kind
+    if k in ('b', 'i', 'u', 'f'):
+        datatype = 'numeric'
+    elif k in ('S', 'a'):
+        datatype = 'text'
+    elif k == 'O':
+        # FIXME: only supporting variable length strings so far
+        typ = h5py.check_dtype(vlen=ds.dtype)
+        if typ is str:
+            datatype = 'text'
+    return datatype
+
+def makedatanode(parent, ds):
+    """Make a node in the tree for importable data."""
+
+    # combine shape from dataset and column (if any)
+    shape = tuple(list(ds.shape)+list(ds.dtype.shape))
+    dtype = computedatatype(ds.dtype)
+
+    vszattrs = {}
+    for attr in ds.attrs:
+        if attr[:4] == 'vsz_':
+            vszattrs[attr] = defn_hdf5.bconv(ds.attrs[attr])
+
+    return fits_hdf5_tree.FileDataNode(
+        parent, ds.name, vszattrs, dtype, ds.dtype, shape, dispname(ds))
+
+def addsub(parent, grp, datanodes):
+    """Recursively descend through groups in the hdf5 file."""
+
+    for child in sorted(grp.keys()):
+        try:
+            hchild = grp[child]
+        except KeyError:
+            continue
+        if isinstance(hchild, h5py.Group):
+            childnode = fits_hdf5_tree.FileGroupNode(
+                parent, hchild.name, dispname(hchild))
+            addsub(childnode, hchild, datanodes)
+        elif isinstance(hchild, h5py.Dataset):
+            try:
+                dtype = hchild.dtype
+            except TypeError:
+                # raised if datatype not supported by h5py
+                continue
+
+            if dtype.kind == 'V':
+                # compound data type - add a special group for
+                # the compound, then its children
+                childnode = fits_hdf5_tree.FileCompoundNode(
+                    parent, hchild.name, dispname(hchild), hchild.shape)
+
+                for field in sorted(hchild.dtype.fields.keys()):
+                    # get types and shape for individual sub-parts
+                    fdtype = hchild.dtype[field]
+                    fdatatype = computedatatype(fdtype)
+                    fshape = tuple(
+                        list(hchild[field].shape)+list(fdtype.shape))
+
+                    fattrs = fits_hdf5_helpers.filterAttrsByName(
+                        hchild.attrs, field)
+                    fnode = fits_hdf5_tree.FileDataNode(
+                        childnode,
+                        hchild.name+'/'+field,
+                        fattrs,
+                        fdatatype,
+                        fdtype,
+                        fshape,
+                        field)
+
+                    childnode.children.append(fnode)
+                    datanodes.append(fnode)
+
+            else:
+                # normal dataset
+                childnode = makedatanode(parent, hchild)
+                datanodes.append(childnode)
+
+        parent.children.append(childnode)
+
 def constructTree(hdf5file):
     """Turn hdf5 file into a tree of nodes.
 
@@ -42,85 +130,8 @@ def constructTree(hdf5file):
     """
 
     datanodes = []
-
-    def computedatatype(dtype):
-        datatype = 'invalid'
-        k = dtype.kind
-        if k in ('b', 'i', 'u', 'f'):
-            datatype = 'numeric'
-        elif k in ('S', 'a'):
-            datatype = 'text'
-        elif k == 'O':
-            # FIXME: only supporting variable length strings so far
-            typ = h5py.check_dtype(vlen=ds.dtype)
-            if typ is str:
-                datatype = 'text'
-        return datatype
-
-    def makedatanode(parent, ds):
-        # combine shape from dataset and column (if any)
-        shape = tuple(list(ds.shape)+list(ds.dtype.shape))
-        dtype = computedatatype(ds.dtype)
-
-        vszattrs = {}
-        for attr in ds.attrs:
-            if attr[:4] == 'vsz_':
-                vszattrs[attr] = defn_hdf5.bconv(ds.attrs[attr])
-
-        return fits_hdf5_tree.FileDataNode(
-            parent, ds.name, vszattrs, dtype, ds.dtype, shape)
-
-    def addsub(parent, grp):
-        """To recursively iterate over each parent."""
-        for child in sorted(grp.keys()):
-            try:
-                hchild = grp[child]
-            except KeyError:
-                continue
-            if isinstance(hchild, h5py.Group):
-                childnode = fits_hdf5_tree.FileGroupNode(parent, hchild)
-                addsub(childnode, hchild)
-            elif isinstance(hchild, h5py.Dataset):
-                try:
-                    dtype = hchild.dtype
-                except TypeError:
-                    # raised if datatype not supported by h5py
-                    continue
-
-                if dtype.kind == 'V':
-                    # compound data type - add a special group for
-                    # the compound, then its children
-                    childnode = fits_hdf5_tree.FileCompoundNode(parent, hchild)
-
-                    for field in sorted(hchild.dtype.fields.keys()):
-                        # get types and shape for individual sub-parts
-                        fdtype = hchild.dtype[field]
-                        fdatatype = computedatatype(fdtype)
-                        fshape = tuple(
-                            list(hchild[field].shape)+list(fdtype.shape))
-
-                        fattrs = fits_hdf5_helpers.filterAttrsByName(
-                            hchild.attrs, field)
-                        fnode = fits_hdf5_tree.FileDataNode(
-                            childnode,
-                            hchild.name+'/'+field,
-                            fattrs,
-                            fdatatype,
-                            fdtype,
-                            fshape)
-
-                        childnode.children.append(fnode)
-                        datanodes.append(fnode)
-
-                else:
-                    # normal dataset
-                    childnode = makedatanode(parent, hchild)
-                    datanodes.append(childnode)
-
-            parent.children.append(childnode)
-
-    root = fits_hdf5_tree.FileGroupNode(None, hdf5file)
-    addsub(root, hdf5file)
+    root = fits_hdf5_tree.FileGroupNode(None, '', '/')
+    addsub(root, hdf5file, datanodes)
     return root, datanodes
 
 class ImportTabHDF5(importdialog.ImportTab):

@@ -211,12 +211,10 @@ class FileNode(Node):
         model.dataChanged.emit(idx1, idx2)
 
 class FileGroupNode(FileNode):
-    def __init__(self, parent, grp):
+    def __init__(self, parent, name, dispname):
         Node.__init__(self, parent)
-        self.fullname = grp.name
-        self.name = grp.name.split("/")[-1]
-        if self.name == '':
-            self.name = '/'
+        self.fullname = name
+        self.name = dispname
         self.grpimport = False
 
     def data(self, column, role):
@@ -227,8 +225,11 @@ class FileGroupNode(FileNode):
                      if self.grpimport or self.grpImport()
                      else qt4.Qt.Unchecked )
 
-        elif role == qt4.Qt.ToolTipRole and column == _ColToImport:
-            return _("Check to import all datasets under this group")
+        elif role == qt4.Qt.ToolTipRole:
+            if column == _ColToImport:
+                return _("Check to import all datasets under this group")
+            elif column == _ColName:
+                return self.fullname
 
         return None
 
@@ -266,22 +267,42 @@ class FileGroupNode(FileNode):
             defflags |= qt4.Qt.ItemIsUserCheckable
         return defflags
 
+class EmptyDataNode(FileNode):
+    """Empty dataset."""
+    def __init__(self, parent, dsname, dispname):
+        Node.__init__(self, parent)
+        self.name = dispname
+        self.fullname = dsname
+
+    def data(self, column, role):
+        """Return data for column"""
+
+        if role == qt4.Qt.DisplayRole:
+            if column == _ColName:
+                return self.name
+            elif column == _ColShape:
+                return _('Empty')
+        elif role == qt4.Qt.ToolTipRole:
+            if column == _ColName:
+                return self.fullname
+
 class FileDataNode(FileNode):
     """Represent an File dataset."""
 
-    def __init__(self, parent, dsname, dsattrs, dtype, rawdtype, shape):
+    def __init__(self, parent, dsname, dsattrs, dtype, rawdtype, shape, dispname):
 
         """Node arguments:
         parent: parent node
-        dsname: dataset name
+        dsname: dataset name (used as tooltip for node)
         dsattrs: attributes of dataset
         dtype: dtype of datatype ('numeric', 'text', 'invalid')
         rawdtype: internal dtype for tooltip
         shape: shape of dataset
+        dispname: display name (text shown for node)
         """
 
         Node.__init__(self, parent)
-        self.name = dsname.split("/")[-1]
+        self.name = dispname
         self.fullname = dsname
         self.rawdatatype = str(rawdtype)
         self.shape = shape
@@ -434,9 +455,9 @@ class FileDataNode(FileNode):
 class FileCompoundNode(FileGroupNode):
     """Node representing a table (Compound data type)."""
 
-    def __init__(self, parent, ds):
-        FileGroupNode.__init__(self, parent, ds)
-        self.shape = ds.shape
+    def __init__(self, parent, name, dispname, shape):
+        FileGroupNode.__init__(self, parent, name, dispname)
+        self.shape = shape
 
     def data(self, column, role):
         """Return data for column"""

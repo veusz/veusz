@@ -251,4 +251,4 @@ class ImportTabFITS(importdialog.ImportTab):
         self.fitsimportstatus.setText(_("Imported dataset '%s'") % name)
         qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
 
-importdialog.registerImportTab(_('FI&TS'), ImportTabFITS)
+#importdialog.registerImportTab(_('FI&TS'), ImportTabFITS)

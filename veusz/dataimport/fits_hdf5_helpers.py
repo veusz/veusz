@@ -17,6 +17,8 @@
 ##############################################################################
 
 from __future__ import division, print_function
+
+import re
 import numpy as N
 
 def _(text, disambiguation=None, context="Import_FITS_HDF5"):
@@ -164,3 +166,70 @@ def convertDatasetToObject(data, slices):
         return strcnv
 
     raise _ConvertError(_("Dataset has an invalid type"))
+
+def getFitsHduNames(fitsfile):
+    """Return list of names to give HDUs given a FITS file."""
+
+    nameset = set()
+    names = []
+
+    for i, hdu in enumerate(fitsfile):
+        name = hdu.name.lower()
+
+        if not name:
+            name = 'hdu%i' % (i+1)
+            # just in case...
+            if name in nameset:
+                name += '-dup'
+        else:
+            # EXTVER distinguishes identical names
+            if 'EXTVER' in hdu.header:
+                name += str(hdu.header['EXTVER'])
+
+            # prevent duplicates
+            if name in nameset:
+                i = 2
+                while name+str(i) in nameset:
+                    i += 1
+                name += str(i)
+
+        nameset.add(name)
+        names.append(name)
+
+    return names
+
+def convertFitsDataFormat(fmt):
+    """Convert FITS TFORM codes into:
+
+    (code, nlen)
+
+    code is 'invalid', 'numeric' or 'text'
+    nlen is number of entries for column
+    """
+
+    m = re.match(r'^([0-9]*)([A-Za-z])([0-9]*)(\.[0-9]+)?$', fmt)
+    if not m:
+        return (None, 'invalid', ())
+    grps = m.groups()
+
+    # length of array
+    try:
+        nlen = int(grps[0])
+    except ValueError:
+        nlen = 1
+    fcode = grps[1]
+    width = grps[2]
+
+    if fcode == 'A' and not width:
+        # note: we can't handle 2d text arrays, so we handle as invalid
+        code = 'text'
+        # even though strings are N characters, they are handled as singles
+        nlen = 1
+
+    elif fcode in 'LXBIJKED':
+        code = 'numeric'
+
+    else:
+        code = 'invalid'
+
+    return code, nlen
