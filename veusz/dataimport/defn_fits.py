@@ -19,14 +19,12 @@
 from __future__ import division, print_function
 
 import collections
-import re
 
 import numpy as N
 from .. import qtall as qt4
-from ..compat import citems, cvalues, cbytes, cunicode, cpy3
+from ..compat import citems, cvalues
 from .. import document
 from .. import datasets
-from .. import utils
 from . import base
 from . import fits_hdf5_helpers
 
@@ -588,5 +586,7 @@ def ImportFITSFile(comm, dsname, filename, hdu,
             linked=linked,
             )
 
+# new import command
 document.registerImportCommand("ImportFileFITS", ImportFileFITS)
+# compatibility with old fits import
 document.registerImportCommand("ImportFITSFile", ImportFITSFile)
