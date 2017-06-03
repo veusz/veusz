@@ -1,5 +1,5 @@
-Veusz 1.26
-----------
+Veusz 1.26.1
+------------
 https://veusz.github.io
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -11,6 +11,10 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 1.26.1:
+ * Change homepage in program to new site https://veusz.github.io/
+ * Change new version checking to use veusz.github.io
 
 Changes in 1.26:
  * Add color themes and automatic coloring of widgets
