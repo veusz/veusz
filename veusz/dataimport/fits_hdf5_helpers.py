@@ -178,7 +178,7 @@ def getFITSHduNames(fitsfile):
     names = []
 
     for i, hdu in enumerate(fitsfile):
-        name = hdu.name.lower()
+        name = hdu.name
 
         if not name:
             name = 'hdu%i' % (i+1)
@@ -186,6 +186,8 @@ def getFITSHduNames(fitsfile):
             while name in nameset:
                 name += '~'
         else:
+            name = name.lower()
+
             # EXTVER distinguishes identical names
             if 'EXTVER' in hdu.header:
                 name = '%s%i' % (name, hdu.header['EXTVER'])

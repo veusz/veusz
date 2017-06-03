@@ -57,7 +57,7 @@ class ImportParamsFITS2(base.ImportParamsBase):
      slices: dict to map hdf names to slices
      twodranges: map hdf names to 2d range (minx, miny, maxx, maxy)
      twod_as_oned: set of hdf names to read 2d dataset as 1d dataset
-     convert_datetime: map float or strings to datetime
+     wcsmodes: how to treat wcs when importing
     """
 
     defaults = {
@@ -66,6 +66,7 @@ class ImportParamsFITS2(base.ImportParamsBase):
         'slices': None,
         'twodranges': None,
         'twod_as_oned': None,
+        'wcsmodes': None,
         }
     defaults.update(base.ImportParamsBase.defaults)
 
@@ -142,12 +143,54 @@ class OperationDataImportFITS2(base.OperationDataImportBase):
         except fits_hdf5_helpers.ConvertError:
             pass
 
+    def getImageWCS(self, hdu, dsname, attr):
+        """Get WCS values for rangex, rangey, applying appropriate mode."""
+
+        # WCS only supported for 2D datasets
+        if len(hdu.shape) != 2:
+            return
+
+        # mode is None for default
+        mode = "linear_wcs"
+        if self.params.wcsmodes:
+            mode = self.params.wcsmodes.get(dsname, "linear_wcs")
+        if 'wcsmode' in attr:
+            mode = attr['wcsmode']
+
+        # standard linear wcs keywords
+        wcs = [hdu.header.get(x, None) for x in (
+            'CRVAL1', 'CRPIX1', 'CDELT1',
+            'CRVAL2', 'CRPIX2', 'CDELT2')]
+
+        if mode == "pixel" or (None in wcs and "wcs" in mode):
+            rangex = rangey = None
+        elif mode == "fraction":
+            rangex = rangey = (0., 1.)
+        elif mode == "pixel_wcs":
+            rangex = (hdu.shape[1]-wcs[1], 0-wcs[1])
+            rangey = (0-wcs[4], hdu.shape[0]-wcs[4])
+        elif mode == "linear_wcs":
+            rangex = (
+                (0-wcs[1])*wcs[2] + wcs[0],
+                (hdu.shape[1]-wcs[1])*wcs[2] + wcs[0])
+            rangey = (
+                (0-wcs[4])*wcs[5] + wcs[3],
+                (hdu.shape[0]-wcs[4])*wcs[5] + wcs[3])
+        else:
+            raise RuntimeError("Invalid WCS mode")
+
+        if rangex and "xrange" not in attr:
+            attr["xrange"] = rangex
+        if rangey and "yrange" not in attr:
+            attr["yrange"] = rangey
+
     def readHduImage(self, hdu, dsname, dsread):
         """Read an image in a HDU."""
 
         attr, colattr = fits_hdf5_helpers.hduVeuszAttrs(hdu)
-        data = hdu.data
-        self.convertDataset(data, attr, dsname, dsread)
+        self.getImageWCS(hdu, dsname, attr)
+
+        self.convertDataset(hdu.data, attr, dsname, dsread)
 
     def readTableColumn(self, hdu, dsname, dsread):
         """Read a specific column from a FITS file."""
@@ -360,6 +403,7 @@ def ImportFileFITS2(
         twodranges=None,
         twod_as_oned=None,
         prefix='', suffix='',
+        wcsmodes=None,
         renames=None,
         linked=False):
     """Import data from a HDF5 file
@@ -393,19 +437,26 @@ def ImportFileFITS2(
     integer to select that index, or a tuple (start, stop, step),
     where the entries are integers or None.
 
-    twodranges is an optional dict giving data ranges for 2d
+    twodranges is an optional dict giving data ranges for 2D
     datasets. It maps names to (minx, miny, maxx, maxy).
 
-    twod_as_oned: optional set containing 2d datasets to attempt to
-    read as 1d
+    twod_as_oned: optional set containing 2D datasets to attempt to
+    read as 1D, treating extra columns as error bars
 
-    renames is a dict mapping old to new dataset names, to be renamed
-    after importing
+    wcsmodes is an optional dict specfying the WCS import mode for 2D
+    datasets in HDUs. The keys are '/hduname' and the values can be
+      'pixel':      number pixel range from 0 to maximum (default)
+      'pixel_wcs':  pixel number relative to WCS reference pixel
+      'linear_wcs': linear coordinate system from the WCS keywords
+      'fraction':   fractional values from 0 to 1.
+
+    renames is an optional dict mapping old to new dataset names, to
+    be renamed after importing
 
     linked specifies that the dataset is linked to the file.
 
     Values under the VEUSZ header keyword can be used to override defaults:
-     'name': set to override name for dataset in veusz
+     'name': override name for dataset
      'slice': slice on importing (use format "start:stop:step,...")
      'range': should be 4 item array to specify x and y ranges:
        [minx, miny, maxx, maxy]
@@ -413,6 +464,7 @@ def ImportFileFITS2(
      'xcent' / 'ycent': arrays giving the centres of pixels
      'xedge' / 'yedge': arrays giving the edges of pixels
      'twod_as_oned': treat 2d dataset as 1d dataset with errors
+     'wcsmode': use specific WCS mode for dataset (see values above)
     These are specified under the VEUSZ header keyword in the form
       KEY=VALUE
     or for column-specific values
@@ -432,6 +484,7 @@ def ImportFileFITS2(
         slices=slices,
         twodranges=twodranges,
         twod_as_oned=twod_as_oned,
+        wcsmodes=wcsmodes,
         prefix=prefix, suffix=suffix,
         renames=renames,
         linked=linked)

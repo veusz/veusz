@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>596</width>
-    <height>447</height>
+    <width>773</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="fitsimportstatus">
      <property name="text">
@@ -29,15 +29,53 @@
      <property name="title">
       <string>2D options</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
        <widget class="QCheckBox" name="fitstwodimport1d">
         <property name="text">
          <string>Import as 1D dataset with error bars</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Image WCS mode</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="fitswcsmode">
+          <item>
+           <property name="text">
+            <string extracomment="Use WCS keywords assuming linear coordinates">Linear (WCS)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string extracomment="Pixels numbered from 0">Pixel (simple)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string extracomment="Pixels numbered from reference pixel">Pixel (WCS)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string extracomment="Fraction from 0 to 1">Fractional</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0" colspan="2">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QLabel" name="label">
@@ -45,19 +83,6 @@
            <string>Range:</string>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item>
          <widget class="QLabel" name="label_2">
@@ -79,19 +104,10 @@
         <item>
          <widget class="QLineEdit" name="fitstwodmaxx"/>
         </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
+       </layout>
+      </item>
+      <item row="1" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <widget class="QLabel" name="label_4">
           <property name="text">

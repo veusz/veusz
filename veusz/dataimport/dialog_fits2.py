@@ -191,6 +191,15 @@ class ImportTabFITS2(importdialog.ImportTab):
         readas1d = node.options.get('twod_as_oned')
         self.fitstwodimport1d.setChecked(bool(readas1d))
 
+        wcsmode = node.options.get('wcsmode', 'linear_wcs')
+        idx = {
+            'linear_wcs': 0,
+            'pixel': 1,
+            'pixel_wcs': 2,
+            'fraction': 3,
+            }[wcsmode]
+        self.fitswcsmode.setCurrentIndex(idx)
+
     def updateOptionsTwoD(self, node):
         """Read options for 2d datasets on dialog."""
 
@@ -220,6 +229,10 @@ class ImportTabFITS2(importdialog.ImportTab):
                 del node.options['twod_as_oned']
             except KeyError:
                 pass
+
+        wcsmode = ['linear_wcs', 'pixel', 'pixel_wcs', 'fraction'][
+            self.fitswcsmode.currentIndex()]
+        node.options['wcsmode'] = wcsmode
 
     def updateOptions(self):
         """Update options for nodes from dialog."""
@@ -263,6 +276,7 @@ class ImportTabFITS2(importdialog.ImportTab):
         slices = {}
         twodranges = {}
         twod_as_oned = set()
+        wcsmodes = {}
 
         for node in self.datanodes:
             inname = node.importname.strip()
@@ -274,6 +288,9 @@ class ImportTabFITS2(importdialog.ImportTab):
                 twodranges[node.fullname]= node.options['twodranges']
             if 'twod_as_oned' in node.options:
                 twod_as_oned.add(node.fullname)
+            if ('wcsmode' in node.options and
+                node.options['wcsmode'] != 'linear_wcs'):
+                wcsmodes[node.fullname] = node.options['wcsmode']
 
         items = []
         def recursiveitems(node):
@@ -297,6 +314,7 @@ class ImportTabFITS2(importdialog.ImportTab):
             slices=slices,
             twodranges=twodranges,
             twod_as_oned=twod_as_oned,
+            wcsmodes=wcsmodes,
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,
