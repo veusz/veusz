@@ -105,9 +105,6 @@ class LinkedFileHDF5(base.LinkedFileBase):
             ('filename', 'items'),
             relpath=relpath)
 
-class _ConvertError(RuntimeError):
-    pass
-
 class _DataRead:
     """Data read from file during import.
 
@@ -120,7 +117,7 @@ class _DataRead:
         self.options = options
 
 class OperationDataImportHDF5(base.OperationDataImportBase):
-    """Import 1d, 2d, text or nd data from a fits file."""
+    """Import 1d, 2d, text or nd data from a HDF5 file."""
 
     descr = _("import HDF5 file")
 
@@ -147,6 +144,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 name = options["vsz_name"]
             else:
                 name = dsname.split("/")[-1].strip()
+
+        # use full path if dataset already exists
         if name in dsread:
             name = dsname.strip()
 
@@ -166,7 +165,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 dataset, aslice)
             dsread[name] = _DataRead(dsname, objdata, options)
 
-        except _ConvertError:
+        except fits_hdf5_helpers.ConvertError:
             pass
 
     def walkFile(self, item, dsread, names=None):

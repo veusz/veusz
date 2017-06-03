@@ -18,6 +18,7 @@
 
 from __future__ import division, print_function
 
+import ast
 import re
 import numpy as N
 
@@ -131,9 +132,12 @@ def applySlices(data, slices):
         data = N.array([], dtype=N.float64)
     return data
 
+class ConvertError(RuntimeError):
+    pass
+
 def convertDatasetToObject(data, slices):
     """Convert numpy/hdf dataset to suitable data for veusz.
-    Raise _ConvertError if cannot."""
+    Raise ConvertError if cannot."""
 
     # lazily-loaded h5py
     try:
@@ -149,25 +153,25 @@ def convertDatasetToObject(data, slices):
     try:
         kind = data.dtype.kind
     except TypeError:
-        raise _ConvertError(_("Could not get data type of dataset"))
+        raise ConvertError(_("Could not get data type of dataset"))
 
     if kind in ('b', 'i', 'u', 'f'):
         data = N.array(data, dtype=N.float64)
         if data.ndim == 0:
-            raise _ConvertError(_("Dataset has no dimensions"))
+            raise ConvertError(_("Dataset has no dimensions"))
         return data
 
     elif kind in ('S', 'a') or (
         kind == 'O' and check_dtype(vlen=data.dtype) is str):
         if hasattr(data, 'ndim') and data.ndim != 1:
-            raise _ConvertError(_("Text datasets must have 1 dimension"))
+            raise ConvertError(_("Text datasets must have 1 dimension"))
 
         strcnv = list(data)
         return strcnv
 
-    raise _ConvertError(_("Dataset has an invalid type"))
+    raise ConvertError(_("Dataset has an invalid type"))
 
-def getFitsHduNames(fitsfile):
+def getFITSHduNames(fitsfile):
     """Return list of names to give HDUs given a FITS file."""
 
     nameset = set()
@@ -178,13 +182,13 @@ def getFitsHduNames(fitsfile):
 
         if not name:
             name = 'hdu%i' % (i+1)
-            # just in case...
-            if name in nameset:
-                name += '-dup'
+            # just in case people start naming HDUs hduX...
+            while name in nameset:
+                name += '~'
         else:
             # EXTVER distinguishes identical names
             if 'EXTVER' in hdu.header:
-                name += str(hdu.header['EXTVER'])
+                name = '%s%i' % (name, hdu.header['EXTVER'])
 
             # prevent duplicates
             if name in nameset:
@@ -198,7 +202,7 @@ def getFitsHduNames(fitsfile):
 
     return names
 
-def convertFitsDataFormat(fmt):
+def convertFITSDataFormat(fmt):
     """Convert FITS TFORM codes into:
 
     (code, nlen)
@@ -207,6 +211,7 @@ def convertFitsDataFormat(fmt):
     nlen is number of entries for column
     """
 
+    # match the fits format text code [r]F[w[.d]]
     m = re.match(r'^([0-9]*)([A-Za-z])([0-9]*)(\.[0-9]+)?$', fmt)
     if not m:
         return (None, 'invalid', ())
@@ -217,7 +222,7 @@ def convertFitsDataFormat(fmt):
         nlen = int(grps[0])
     except ValueError:
         nlen = 1
-    fcode = grps[1]
+    fcode = grps[1].upper()
     width = grps[2]
 
     if fcode == 'A' and not width:
@@ -233,3 +238,55 @@ def convertFitsDataFormat(fmt):
         code = 'invalid'
 
     return code, nlen
+
+def hduVeuszAttrs(hdu):
+    """Get veusz-specific attributes from a HDU header.
+
+    These use the VEUSZ keyword and have the format of
+    KEY=VALUE
+     or
+    COLUMN: KEY=VALUE
+
+    Returns (attrs, colattrs)
+
+    Where attrs is HDU-specific and colattrs is column specific (dict
+    of dicts)
+
+    """
+
+    attrs = {}
+    colattrs = {}
+
+    for k, v in hdu.header.items():
+        if k.lower() == 'veusz':
+
+            # match syntax [OPTIONAL COLUMN:] KEY=VALUE
+            match = re.match(
+                r'^(?:([a-zA-Z0-9_]+)[ ]*:)?[ ]*([a-zA-Z0-9_]+)[ ]*=[ ]*(.*)$',
+                v)
+            if not match:
+                continue
+
+            col, key, tval = match.groups()
+            key = key.lower()
+            tval = tval.strip()
+
+            # convert to python type if possible
+            try:
+                val = ast.literal_eval(tval)
+            except Exception:
+                val = tval
+
+            if col:
+                col = col.lower()
+
+                # column-specific key value
+                if col not in colattrs:
+                    colattrs[col] = {key: val}
+                else:
+                    colattrs[col][key] = val
+            else:
+                # hdu-specific key value
+                attrs[key] = val
+
+    return attrs, colattrs

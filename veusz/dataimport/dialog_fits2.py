@@ -25,7 +25,7 @@ from ..dialogs import importdialog
 from ..compat import cstr
 
 from . import base
-from . import defn_hdf5
+from . import defn_fits2
 
 from . import fits_hdf5_tree
 from . import fits_hdf5_helpers
@@ -36,7 +36,7 @@ def _(text, disambiguation=None, context="Import_FITS"):
 # lazily imported
 fits = None
 
-def loadFitsModule():
+def loadFITSModule():
     global fits
     try:
         from astropy.io import fits
@@ -52,20 +52,16 @@ def makeimagenode(parent, hdu, idx, name, dispname, datanodes):
     if hdu.data is None:
         return fits_hdf5_tree.EmptyDataNode(parent, name, dispname)
 
-    vszattrs = {}
-    for n in hdu.header:
-        if n[:4].lower() == 'vsz_':
-            vszattrs[n.lower()] = hdu.header[n]
-    dtype = hdu.data.dtype
-    datatype = computedatatype(dtype)
-    shape = hdu.data.shape
+    attrs, colattrs = fits_hdf5_helpers.hduVeuszAttrs(hdu)
+    datatype = 'numeric'
+    shape = hdu.shape
 
     node = fits_hdf5_tree.FileDataNode(
         parent,
         name,
-        vszattrs,
+        attrs,
         datatype,
-        dtype,
+        str(hdu.header.get('BITPIX', '')),
         shape,
         dispname)
     datanodes.append(node)
@@ -77,45 +73,41 @@ def constructTree(fitsfile):
     Returns root and list of nodes showing datasets
     """
 
-    hdunames = fits_hdf5_helpers.getFitsHduNames(fitsfile)
+    hdunames = fits_hdf5_helpers.getFITSHduNames(fitsfile)
 
-    root = fits_hdf5_tree.FileGroupNode(None, '', '/')
+    root = fits_hdf5_tree.FileGroupNode(None, '/', '/')
 
     # now iterate over file
     datanodes = []
     for idx, hdu in enumerate(fitsfile):
-        name = hdunames[idx]
-        dispname = '%s (%i)' % (name, idx+1)
+        hduname = hdunames[idx]
+        dispname = '%s [%i]' % (hduname, idx+1)
 
         if hdu.is_image:
             # image hdu
-            makeimagenode(root, hdu, idx, name, dispname, datanodes)
+            makeimagenode(root, hdu, idx, '/%s' % hduname, dispname, datanodes)
 
         elif hasattr(hdu, 'columns'):
             # parent for table
             tabshape = hdu.data.shape
             childnode = fits_hdf5_tree.FileCompoundNode(
-                root, name, dispname, tabshape)
+                root, '/%s' % hduname, dispname, tabshape)
             root.children.append(childnode)
 
-            # for per-column attributes
-            attrs = {}
-            for k in hdu.header:
-                attrs[k.lower()] = hdu.header[k]
+            attrs, colattrs = fits_hdf5_helpers.hduVeuszAttrs(hdu)
 
             # create new nodes for each column in table
             for col in hdu.columns:
-                cdtype = col.dtype
                 cname = col.name.lower()
-
-                cdatatype, clen = fits_hdf5_helpers.convertFitsDataFormat(
+                cdatatype, clen = fits_hdf5_helpers.convertFITSDataFormat(
                     col.format)
                 cshape = tabshape if clen==1 else tuple(list(tabshape)+[clen])
-                cattrs = fits_hdf5_helpers.filterAttrsByName(attrs, cname)
+                # attributes specific to column
+                cattrs = colattrs.get(cname, {})
 
                 cnode = fits_hdf5_tree.FileDataNode(
                     childnode,
-                    name+'/'+cname,
+                    '/%s/%s' % (hduname, cname),
                     cattrs,
                     cdatatype,
                     col.format,
@@ -126,8 +118,8 @@ def constructTree(fitsfile):
 
     return root, datanodes
 
-class ImportTabFits(importdialog.ImportTab):
-    """Tab for importing Fits file."""
+class ImportTabFITS2(importdialog.ImportTab):
+    """Tab for importing FITS file."""
 
     resource = "import_fits2.ui"
     filetypes = ('.fits', '.fit', '.FITS', '.FIT')
@@ -153,7 +145,7 @@ class ImportTabFits(importdialog.ImportTab):
     def doPreview(self, filename, encoding):
         """Show file as tree."""
 
-        loadFitsModule()
+        loadFITSModule()
         if fits is None:
             self.showError(_("Cannot load fits module"))
             return False
@@ -198,7 +190,6 @@ class ImportTabFits(importdialog.ImportTab):
 
         readas1d = node.options.get('twod_as_oned')
         self.fitstwodimport1d.setChecked(bool(readas1d))
-
 
     def updateOptionsTwoD(self, node):
         """Read options for 2d datasets on dialog."""
@@ -299,7 +290,7 @@ class ImportTabFits(importdialog.ImportTab):
         recursiveitems(self.rootnode)
 
         prefix, suffix = self.dialog.getPrefixSuffix(filename)
-        params = defn_hdf5.ImportParamsFits(
+        params = defn_fits2.ImportParamsFITS2(
             filename=filename,
             items=items,
             namemap=namemap,
@@ -311,7 +302,7 @@ class ImportTabFits(importdialog.ImportTab):
             linked=linked,
             )
 
-        op = defn_hdf5.OperationDataImportFits(params)
+        op = defn_fits2.OperationDataImportFITS2(params)
 
         try:
             # actually do the import
@@ -326,4 +317,4 @@ class ImportTabFits(importdialog.ImportTab):
 
         qt4.QTimer.singleShot(4000, self.fitsimportstatus.clear)
 
-importdialog.registerImportTab(_('FI&TS'), ImportTabFits)
+importdialog.registerImportTab(_('FI&TS'), ImportTabFITS2)
