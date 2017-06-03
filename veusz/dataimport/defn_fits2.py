@@ -81,7 +81,7 @@ class LinkedFileFITS2(base.LinkedFileBase):
         """Save the link to the document file."""
         self._saveHelper(
             fileobj,
-            'ImportFileFITS2',
+            'ImportFileFITS',
             ('filename', 'items'),
             relpath=relpath)
 
@@ -395,8 +395,9 @@ class OperationDataImportFITS2(base.OperationDataImportBase):
             fullname = par.prefix + name + par.suffix
             self.outdatasets[fullname] = ds
 
-def ImportFileFITS2(
-        comm, filename,
+def ImportFileFITS(
+        comm,
+        filename,
         items,
         namemap=None,
         slices=None,
@@ -406,16 +407,16 @@ def ImportFileFITS2(
         wcsmodes=None,
         renames=None,
         linked=False):
-    """Import data from a HDF5 file
+    """Import data from a FITS file
 
     items is a list of datasets to be imported.
-    items can look like the following:
+    items are formatted like the following:
      '/': import whole file
-     '/hduname': import whole hdu (image or table)
-     '/hduname/column': import column from table
+     '/hduname': import whole HDU (image or table)
+     '/hduname/column': import column from table HDU
     all values in items should be lower case.
 
-    HDU names have to follow a veusz-specific naming. If the HDU has a
+    HDU names have to follow a Veusz-specific naming. If the HDU has a
     standard name (e.g. primary or events), then this is used.  If the
     HDU has a EXTVER keyword then this number is appended to this
     name.  An extra number is appended if this name is not unique.  If
@@ -423,7 +424,7 @@ def ImportFileFITS2(
     is a number (1 is the primary HDU).
 
     namemap maps an input dataset (using the scheme above for items)
-    to a veusz dataset name. Special suffixes can be used on the veusz
+    to a Veusz dataset name. Special suffixes can be used on the Veusz
     dataset name to indicate that the dataset should be imported
     specially.
 
@@ -495,4 +496,97 @@ def ImportFileFITS2(
         print("Imported datasets %s" % ', '.join(op.outnames))
     return op.outnames
 
-document.registerImportCommand("ImportFileFITS2", ImportFileFITS2)
+def ImportFITSFile(comm, dsname, filename, hdu,
+                   datacol = None, symerrcol = None,
+                   poserrcol = None, negerrcol = None,
+                   wcsmode = None,
+                   renames = None,
+                   linked = False):
+    """Compatibility wrapper for ImportFileFITS.
+    Do not use this in new code.
+
+    Import data from a FITS file
+
+    dsname is the name of the dataset
+    filename is name of the fits file to open
+    hdu is the number/name of the hdu to access
+
+    if the hdu is a table, datacol, symerrcol, poserrcol and negerrcol
+    specify the columns containing the data, symmetric error,
+    positive and negative errors.
+
+    wcsmode is one of ('pixel', 'pixel_wcs' or 'linear_wcs'). None
+    gives 'linear_wcs'. 'pixel' mode just gives pixel values from
+    0 to maximum. 'pixel_wcs' is the pixel number relative to the
+    wcs reference pixel. 'linear_wcs' takes the wcs coordinate,
+    assuming a linear coordinate system. 'fraction' assumes
+    fractional values from 0 to 1.
+
+    renames: dict mapping old to new names if datasets are to
+      be renamed after import
+
+    linked specfies that the dataset is linked to the file
+
+    Returns: list of imported datasets
+
+    """
+
+    # lookup filename
+    realfilename = comm.findFileOnImportPath(filename)
+
+    # work out new HDU name by looking up what would have been chosen
+    # before
+    loadFITSModule()
+    with fits.open(realfilename, 'readonly') as fitsf:
+        hdunames = fits_hdf5_helpers.getFITSHduNames(fitsf)
+        hdu = fitsf[hdu]
+        idx = list(fitsf).index(hdu)
+        hduname = hdunames[idx]
+
+    if datacol is None:
+        # image mode
+        fullname = '/'+hduname
+        return ImportFileFITS(
+            comm,
+            filename,
+            [fullname],
+            namemap={fullname: dsname},
+            renames=renames,
+            wcsmodes={fullname: wcsmode},
+            linked=linked,
+            )
+
+    else:
+        # handle tables
+        dsnames = []
+        namemap = {}
+
+        name = '/%s/%s' % (hduname, datacol)
+        namemap[name] = dsname
+        dsnames.append(name)
+
+        # handle conversion of errors
+        if symerrcol:
+            name = '/%s/%s' % (hduname, symerrcol)
+            namemap[name] = '%s (+-)' % dsname
+            dsnames.append(name)
+        if poserrcol:
+            name = '/%s/%s' % (hduname, poserrcol)
+            namemap[name] = '%s (+)' % dsname
+            dsnames.append(name)
+        if negerrcol:
+            name = '/%s/%s' % (hduname, negerrcol)
+            namemap[name] = '%s (-)' % dsname
+            dsnames.append(name)
+
+        return ImportFileFITS(
+            comm,
+            filename,
+            dsnames,
+            namemap=namemap,
+            renames=renames,
+            linked=linked,
+            )
+
+document.registerImportCommand("ImportFileFITS", ImportFileFITS)
+document.registerImportCommand("ImportFITSFile", ImportFITSFile)
