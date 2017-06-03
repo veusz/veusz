@@ -1,4 +1,4 @@
-#    Copyright (C) 2013 Jeremy S. Sanders
+#    Copyright (C) 2017 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -19,236 +19,319 @@
 from __future__ import division, print_function
 
 from .. import qtall as qt4
+from .. import setting
 from ..dialogs import importdialog
-from ..compat import crange
+from ..compat import cstr
+
+from . import base
 from . import defn_fits
+
+from . import fits_hdf5_tree
+from . import fits_hdf5_helpers
 
 def _(text, disambiguation=None, context="Import_FITS"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-pyfits = None
-class ImportTabFITS(importdialog.ImportTab):
-    """Tab for importing from a FITS file."""
+# lazily imported
+fits = None
 
-    resource = 'import_fits.ui'
-    filetypes = ('.fits', '.fit')
+def loadFITSModule():
+    global fits
+    try:
+        from astropy.io import fits
+    except ImportError:
+        try:
+            import pyfits as fits
+        except ImportError:
+            pass
+
+def makeimagenode(parent, hdu, idx, name, dispname, datanodes):
+    """Node for image-like HDUs."""
+
+    if hdu.data is None:
+        return fits_hdf5_tree.EmptyDataNode(parent, name, dispname)
+
+    attrs, colattrs = fits_hdf5_helpers.hduVeuszAttrs(hdu)
+    datatype = 'numeric'
+    shape = hdu.shape
+
+    node = fits_hdf5_tree.FileDataNode(
+        parent,
+        name,
+        attrs,
+        datatype,
+        str(hdu.header.get('BITPIX', '')),
+        shape,
+        dispname)
+    datanodes.append(node)
+    parent.children.append(node)
+
+def constructTree(fitsfile):
+    """Turn fits file into a tree of nodes.
+
+    Returns root and list of nodes showing datasets
+    """
+
+    hdunames = fits_hdf5_helpers.getFITSHduNames(fitsfile)
+
+    root = fits_hdf5_tree.FileGroupNode(None, '/', '/')
+
+    # now iterate over file
+    datanodes = []
+    for idx, hdu in enumerate(fitsfile):
+        hduname = hdunames[idx]
+        dispname = '%s [%i]' % (hduname, idx+1)
+
+        if hdu.is_image:
+            # image hdu
+            makeimagenode(root, hdu, idx, '/%s' % hduname, dispname, datanodes)
+
+        elif hasattr(hdu, 'columns'):
+            # parent for table
+            tabshape = hdu.data.shape
+            childnode = fits_hdf5_tree.FileCompoundNode(
+                root, '/%s' % hduname, dispname, tabshape)
+            root.children.append(childnode)
+
+            attrs, colattrs = fits_hdf5_helpers.hduVeuszAttrs(hdu)
+
+            # create new nodes for each column in table
+            for col in hdu.columns:
+                cname = col.name.lower()
+                cdatatype, clen = fits_hdf5_helpers.convertFITSDataFormat(
+                    col.format)
+                cshape = tabshape if clen==1 else tuple(list(tabshape)+[clen])
+                # attributes specific to column
+                cattrs = colattrs.get(cname, {})
+
+                cnode = fits_hdf5_tree.FileDataNode(
+                    childnode,
+                    '/%s/%s' % (hduname, cname),
+                    cattrs,
+                    cdatatype,
+                    col.format,
+                    cshape,
+                    cname)
+                childnode.children.append(cnode)
+                datanodes.append(cnode)
+
+    return root, datanodes
+
+class ImportTabFITS(importdialog.ImportTab):
+    """Tab for importing FITS file."""
+
+    resource = "import_fits.ui"
+    filetypes = ('.fits', '.fit', '.FITS', '.FIT')
     filefilter = _('FITS files')
+
+    def showError(self, err):
+        node = fits_hdf5_tree.ErrorNode(None, err)
+        model = fits_hdf5_tree.GenericTreeModel(self, node, [''])
+        self.fitstreeview.setModel(model)
+        self.oldselection = (None, None)
+        self.newCurrentSel(None, None)
 
     def loadUi(self):
         importdialog.ImportTab.loadUi(self)
-        # if different items are selected in fits tab
-        self.fitshdulist.itemSelectionChanged.connect(
-            self.slotFitsUpdateCombos)
-        self.fitsdatasetname.editTextChanged.connect(
-            self.dialog.enableDisableImport)
-        self.fitsdatacolumn.currentIndexChanged.connect(
-            self.dialog.enableDisableImport)
-        self.dialog.prefixcombo.editTextChanged.connect(
-            self.dialog.enableDisableImport)
-        self.dialog.suffixcombo.editTextChanged.connect(
-            self.dialog.enableDisableImport)
+        self.datanodes = []
 
-        self.fitswcsmode.defaultlist = [
-            _('Pixel (simple)'), _('Pixel (WCS)'), _('Fractional'),
-            _('Linear (WCS)')
-            ]
-
-    def reset(self):
-        """Reset controls."""
-        self.fitsdatasetname.setEditText("")
-        for c in ('data', 'sym', 'pos', 'neg'):
-            cntrl = getattr(self, 'fits%scolumn' % c)
-            cntrl.setCurrentIndex(0)
-        self.fitswcsmode.setCurrentIndex(0)
+        valid = qt4.QDoubleValidator(self)
+        valid.setNotation(qt4.QDoubleValidator.ScientificNotation)
+        for w in (self.fitstwodminx, self.fitstwodminy,
+                  self.fitstwodmaxx, self.fitstwodmaxy):
+            w.setValidator(valid)
 
     def doPreview(self, filename, encoding):
-        """Set up controls for FITS file."""
+        """Show file as tree."""
 
-        # load pyfits if available
-        global pyfits
-        if pyfits is None:
-            try:
-                from astropy.io import fits as PF
-                pyfits = PF
-            except ImportError:
-                try:
-                    import pyfits as PF
-                    pyfits = PF
-                except ImportError:
-                    pyfits = None
-
-        # if it isn't
-        if pyfits is None:
-            self.fitslabel.setText(
-                _('FITS file support requires that astropy or PyFITS '
-                  'are installed'))
+        loadFITSModule()
+        if fits is None:
+            self.showError(_("Cannot load fits module"))
             return False
 
-        # try to identify fits file
+        if not filename:
+            self.showError(_("Cannot open file"))
+            return False
+
         try:
-            f = pyfits.open(filename)
-            f[0].header
-            f.close()
-        except Exception:
-            self.clearFITSView()
+            # check can be opened first
+            with open(filename, "r") as f:
+                pass
+            with fits.open(filename, "readonly") as f:
+                self.rootnode, self.datanodes = constructTree(f)
+        except IOError:
+            self.showError(_("Cannot open file"))
             return False
 
-        self.updateFITSView(filename)
+        fits_hdf5_tree.setupTreeView(
+            self.fitstreeview, self.rootnode, self.datanodes)
+        self.fitstreeview.selectionModel().currentChanged.connect(
+            self.newCurrentSel)
+
+        # update widgets for options at bottom
+        self.oldselection = (None, None)
+        self.newCurrentSel(None, None)
+
         return True
 
-    def clearFITSView(self):
-        """If invalid filename, clear fits preview."""
-        self.fitshdulist.clear()
-        for c in ('data', 'sym', 'pos', 'neg'):
-            cntrl = getattr(self, 'fits%scolumn' % c)
-            cntrl.clear()
-            cntrl.setEnabled(False)
+    def showOptionsTwoD(self, node):
+        """Update options for 2d datasets on dialog."""
+        ranges = node.options.get('twodranges')
+        if ranges is None:
+            ranges = [None]*4
 
-    def updateFITSView(self, filename):
-        """Update the fits file details in the import dialog."""
-        f = pyfits.open(str(filename), 'readonly')
-        l = self.fitshdulist
-        l.clear()
+        for w, v in zip((self.fitstwodminx, self.fitstwodminy,
+                         self.fitstwodmaxx, self.fitstwodmaxy), ranges):
+            if v is None:
+                w.clear()
+            else:
+                w.setText(setting.uilocale.toString(v))
 
-        # this is so we can lookup item attributes later
-        self.fitsitemdata = []
-        items = []
-        for hdunum, hdu in enumerate(f):
-            header = hdu.header
-            hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name])
-            data = []
+        readas1d = node.options.get('twod_as_oned')
+        self.fitstwodimport1d.setChecked(bool(readas1d))
+
+        wcsmode = node.options.get('wcsmode', 'linear_wcs')
+        idx = {
+            'linear_wcs': 0,
+            'pixel': 1,
+            'pixel_wcs': 2,
+            'fraction': 3,
+            }[wcsmode]
+        self.fitswcsmode.setCurrentIndex(idx)
+
+    def updateOptionsTwoD(self, node):
+        """Read options for 2d datasets on dialog."""
+
+        rangeout = []
+        for w in (self.fitstwodminx, self.fitstwodminy,
+                  self.fitstwodmaxx, self.fitstwodmaxy):
+            txt = w.text()
+            val, ok = setting.uilocale.toDouble(txt)
+            if not ok: val = None
+            rangeout.append(val)
+
+        if rangeout == [None, None, None, None]:
             try:
-                # if this fails, show an image
-                cols = hdu.columns
+                del node.options['twodranges']
+            except KeyError:
+                pass
 
-                # it's a table
-                data = ['table', cols]
-                rows = header['NAXIS2']
-                descr = _('Table (%i rows)') % rows
+        elif None not in rangeout:
+            # update
+            node.options['twodranges'] = tuple(rangeout)
 
-            except AttributeError:
-                # this is an image
-                naxis = header['NAXIS']
-                data = ['image']
-                dims = [ str(header['NAXIS%i' % (i+1)])
-                         for i in crange(naxis) ]
-                dims = '*'.join(dims)
-                if dims:
-                    dims = '(%s)' % dims
-                descr = _('%iD image %s') % (naxis, dims)
-
-            hduitem = qt4.QTreeWidgetItem([str(hdunum), hdu.name, descr])
-            items.append(hduitem)
-            self.fitsitemdata.append(data)
-
-        if items:
-            l.addTopLevelItems(items)
-            l.setCurrentItem(items[0])
-
-    def slotFitsUpdateCombos(self):
-        """Update list of fits columns when new item is selected."""
-
-        items = self.fitshdulist.selectedItems()
-        if len(items) != 0:
-            item = items[0]
-            hdunum = int( str(item.text(0)) )
+        readas1d = self.fitstwodimport1d.isChecked()
+        if readas1d:
+            node.options['twod_as_oned'] = True
         else:
-            item = None
-            hdunum = -1
+            try:
+                del node.options['twod_as_oned']
+            except KeyError:
+                pass
 
-        cols = ['N/A']
-        enablecolumns = False
-        if hdunum >= 0:
-            data = self.fitsitemdata[hdunum]
-            if data[0] == 'table':
-                enablecolumns = True
-                cols = ['None']
-                cols += ['%s (%s)' %
-                         (i.name, i.format) for i in data[1]]
+        wcsmode = ['linear_wcs', 'pixel', 'pixel_wcs', 'fraction'][
+            self.fitswcsmode.currentIndex()]
+        node.options['wcsmode'] = wcsmode
 
-        for c in ('data', 'sym', 'pos', 'neg'):
-            cntrl = getattr(self, 'fits%scolumn' % c)
-            cntrl.setEnabled(enablecolumns)
-            cntrl.clear()
-            cntrl.addItems(cols)
+    def updateOptions(self):
+        """Update options for nodes from dialog."""
+        if self.oldselection[0] is not None:
+            node, name = self.oldselection
+            # update node options
+            if name == 'twod':
+                self.updateOptionsTwoD(node)
 
-        self.dialog.enableDisableImport()
+    def newCurrentSel(self, new, old):
+        """New item selected in the tree."""
 
-    def okToImport(self):
-        """Check validity of Fits import."""
+        self.updateOptions()
 
-        items = self.fitshdulist.selectedItems()
-        if len(items) != 0:
-            item = items[0]
-            hdunum = int( str(item.text(0)) )
+        # show appropriate widgets at bottom for editing options
+        toshow = node = None
+        if new is not None and new.isValid():
+            node = new.internalPointer()
+            if isinstance(node, fits_hdf5_tree.FileDataNode):
+                if node.getDims() == 2 and node.numeric:
+                    toshow = 'twod'
+                    self.showOptionsTwoD(node)
 
-            # any name for the dataset?
-            filename = self.dialog.filenameedit.text()
-            prefix, suffix = self.dialog.getPrefixSuffix(filename)
+        # so we know which options to update next
+        self.oldselection = (node, toshow)
 
-            if not ( prefix + self.fitsdatasetname.text() +
-                     suffix ).strip():
-                return False
-
-            # if a table, need selected item
-            data = self.fitsitemdata[hdunum]
-            if data[0] != 'image' and self.fitsdatacolumn.currentIndex() == 0:
-                return False
-
-            return True
-        return False
+        for widget, name in (
+            (self.fitstwodgrp, 'twod'),
+            ):
+            if name == toshow:
+                widget.show()
+            else:
+                widget.hide()
 
     def doImport(self, doc, filename, linked, encoding, prefix, suffix, tags):
-        """Import fits file."""
+        """Import file."""
 
-        item = self.fitshdulist.selectedItems()[0]
-        hdunum = int( str(item.text(0)) )
-        data = self.fitsitemdata[hdunum]
+        self.updateOptions()
 
-        name = (prefix + self.fitsdatasetname.text() + suffix).strip()
+        namemap = {}
+        slices = {}
+        twodranges = {}
+        twod_as_oned = set()
+        wcsmodes = {}
 
-        wcsmode = None
-        if data[0] == 'table':
-            # get list of appropriate columns
-            cols = []
+        for node in self.datanodes:
+            inname = node.importname.strip()
+            if inname:
+                namemap[node.fullname] = inname
+            if node.slice:
+                slices[node.fullname] = node.slice
+            if 'twodranges' in node.options:
+                twodranges[node.fullname]= node.options['twodranges']
+            if 'twod_as_oned' in node.options:
+                twod_as_oned.add(node.fullname)
+            if ('wcsmode' in node.options and
+                node.options['wcsmode'] != 'linear_wcs'):
+                wcsmodes[node.fullname] = node.options['wcsmode']
 
-            # get data from controls
-            for c in ('data', 'sym', 'pos', 'neg'):
-                cntrl = getattr(self, 'fits%scolumn' % c)
-
-                i = cntrl.currentIndex()
-                if i == 0:
-                    cols.append(None)
+        items = []
+        def recursiveitems(node):
+            if isinstance(node, fits_hdf5_tree.FileGroupNode):
+                if node.grpimport:
+                    items.append(node.fullname)
                 else:
-                    cols.append(data[1][i-1].name)
+                    for c in node.children:
+                        recursiveitems(c)
+            else:
+                if node.toimport:
+                    items.append(node.fullname)
 
-        else:
-            # item is an image, so no columns
-            cols = [None]*4
-            wcsmode = ('pixel', 'pixel_wcs', 'fraction', 'linear_wcs')[
-                self.fitswcsmode.currentIndex()]
+        recursiveitems(self.rootnode)
 
-        # construct operation to import fits
+        prefix, suffix = self.dialog.getPrefixSuffix(filename)
         params = defn_fits.ImportParamsFITS(
-            dsname=name,
             filename=filename,
-            hdu=hdunum,
-            datacol=cols[0],
-            symerrcol=cols[1],
-            poserrcol=cols[2],
-            negerrcol=cols[3],
-            wcsmode=wcsmode,
+            items=items,
+            namemap=namemap,
+            slices=slices,
+            twodranges=twodranges,
+            twod_as_oned=twod_as_oned,
+            wcsmodes=wcsmodes,
             tags=tags,
+            prefix=prefix, suffix=suffix,
             linked=linked,
             )
 
         op = defn_fits.OperationDataImportFITS(params)
 
-        # actually do the import
-        doc.applyOperation(op)
+        try:
+            # actually do the import
+            doc.applyOperation(op)
 
-        # inform user
-        self.fitsimportstatus.setText(_("Imported dataset '%s'") % name)
-        qt4.QTimer.singleShot(2000, self.fitsimportstatus.clear)
+            # inform user
+            self.fitsimportstatus.setText(
+                _("Import complete (%i datasets)") % len(op.outnames))
 
-#importdialog.registerImportTab(_('FI&TS'), ImportTabFITS)
+        except base.ImportingError as e:
+            self.fitsimportstatus.setText(_("Error: %s") % cstr(e))
+
+        qt4.QTimer.singleShot(4000, self.fitsimportstatus.clear)
+
+importdialog.registerImportTab(_('FI&TS'), ImportTabFITS)

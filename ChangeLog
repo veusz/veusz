@@ -1,3 +1,7 @@
+Changes in <next version>:
+ * New FITS import code and user interface, allowing much more
+   flexible and convenient FITS importing
+
 Changes in 1.26.1:
  * Change homepage in program to new site https://veusz.github.io/
  * Change new version checking to use veusz.github.io

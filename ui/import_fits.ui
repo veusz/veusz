@@ -1,181 +1,140 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>fitstab</class>
- <widget class="QWidget" name="fitstab">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>415</width>
-    <height>383</height>
+    <width>773</width>
+    <height>524</height>
    </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout">
-     <property name="spacing">
-      <number>6</number>
+    <widget class="QLabel" name="fitsimportstatus">
+     <property name="text">
+      <string/>
      </property>
-     <property name="margin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="fitslabel">
-       <property name="text">
-        <string>List of HDUs in FITS file:</string>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="fitsimportstatus">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QTreeWidget" name="fitshdulist">
-     <property name="rootIsDecorated">
-      <bool>false</bool>
-     </property>
-     <property name="columnCount">
-      <number>3</number>
-     </property>
-     <column>
-      <property name="text">
-       <string>HDU</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Type</string>
-      </property>
-     </column>
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_10">
-       <property name="text">
-        <string>Dataset name to use:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="HistoryCombo" name="fitsdatasetname">
-       <property name="toolTip">
-        <string>Column or image specified is imported using the name given here</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>Data FITS column:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="fitsdatacolumn">
-       <property name="toolTip">
-        <string>If importing a table, this is the column used to provide the main data</string>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_12">
-       <property name="text">
-        <string>Symmetric error FITS column:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="fitssymcolumn">
-       <property name="toolTip">
-        <string>Column used for symmetric errors, if appropriate</string>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_13">
-       <property name="text">
-        <string>Positive error FITS column:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QComboBox" name="fitsposcolumn">
-       <property name="toolTip">
-        <string>Column used for positive errors, if appropriate</string>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_14">
-       <property name="text">
-        <string>Negative error FITS column:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QComboBox" name="fitsnegcolumn">
-       <property name="toolTip">
-        <string>Column used for negative errors, if appropriate</string>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Image WCS mode</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="HistoryValueCombo" name="fitswcsmode"/>
-     </item>
-    </layout>
+    <widget class="QTreeView" name="fitstreeview"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="fitstwodgrp">
+     <property name="title">
+      <string>2D options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="fitstwodimport1d">
+        <property name="text">
+         <string>Import as 1D dataset with error bars</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Image WCS mode</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="fitswcsmode">
+          <item>
+           <property name="text">
+            <string extracomment="Use WCS keywords assuming linear coordinates">Linear (WCS)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string extracomment="Pixels numbered from 0">Pixel (simple)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string extracomment="Pixels numbered from reference pixel">Pixel (WCS)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string extracomment="Fraction from 0 to 1">Fractional</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Range:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>x =</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="fitstwodminx"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>→ </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="fitstwodmaxx"/>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>y =</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="fitstwodminy"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>→ </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="fitstwodmaxy"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>HistoryCombo</class>
-   <extends>QComboBox</extends>
-   <header>historycombo.h</header>
-  </customwidget>
-  <customwidget>
-   <class>HistoryValueCombo</class>
-   <extends>QComboBox</extends>
-   <header>historyvaluecombo.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
