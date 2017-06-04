@@ -162,7 +162,7 @@ class Point3D(plotters3d.GenericPlotter3D):
             if cvals is not None:
                 colorvals = utils.applyScaling(
                     cvals.data, s.Color.scaling, s.Color.min, s.Color.max)
-                cmap = self.document.getColormap(
+                cmap = self.document.evaluate.getColormap(
                     s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
                 color2d = colorvals.reshape(1, len(colorvals))
                 colorimg = utils.applyColorMap(

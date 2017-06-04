@@ -152,14 +152,14 @@ class Function3D(plotters3d.GenericPlotter3D):
             if not s.fnx or not s.fny or not s.fnz:
                 return None
 
-            xcomp = self.document.compileCheckedExpression(s.fnx)
-            ycomp = self.document.compileCheckedExpression(s.fny)
-            zcomp = self.document.compileCheckedExpression(s.fnz)
+            xcomp = self.document.evaluate.compileCheckedExpression(s.fnx)
+            ycomp = self.document.evaluate.compileCheckedExpression(s.fny)
+            zcomp = self.document.evaluate.compileCheckedExpression(s.fnz)
             if xcomp is None or ycomp is None or zcomp is None:
                 return None
 
             # evaluate each expression
-            env = self.document.eval_context.copy()
+            env = self.document.evaluate.context.copy()
             env['t'] = N.linspace(0, 1, s.linesteps)
             zeros = N.zeros(s.linesteps, dtype=N.float64)
             try:
@@ -172,7 +172,8 @@ class Function3D(plotters3d.GenericPlotter3D):
 
             fncolor = s.fncolor.strip()
             if fncolor:
-                fncolor = self.document.compileCheckedExpression(fncolor)
+                fncolor = self.document.evaluate.compileCheckedExpression(
+                    fncolor)
                 try:
                     valscolor = eval(fncolor, env) + zeros
                 except:
@@ -201,7 +202,7 @@ class Function3D(plotters3d.GenericPlotter3D):
                 evalpts = N.linspace(arange[0], arange[1], s.linesteps)
 
             # evaluate expressions
-            env = self.document.eval_context.copy()
+            env = self.document.evaluate.context.copy()
             env[var[2]] = evalpts
             zeros = N.zeros(s.linesteps, dtype=N.float64)
             try:
@@ -213,7 +214,8 @@ class Function3D(plotters3d.GenericPlotter3D):
 
             fncolor = s.fncolor.strip()
             if fncolor:
-                fncolor = self.document.compileCheckedExpression(fncolor)
+                fncolor = self.document.evaluate.compileCheckedExpression(
+                    fncolor)
                 try:
                     valscolor = eval(fncolor, env) + zeros
                 except:
@@ -286,14 +288,14 @@ class Function3D(plotters3d.GenericPlotter3D):
         if logax2:
             grid2 = N.exp(grid2)
 
-        env = self.document.eval_context.copy()
+        env = self.document.evaluate.context.copy()
         env[ovar1] = grid1
         env[ovar2] = grid2
 
         fn = getattr(s, 'fn%s' % var)  # get function from user
         if not fn:
             return
-        comp = self.document.compileCheckedExpression(fn)
+        comp = self.document.evaluate.compileCheckedExpression(fn)
         if comp is None:
             return None
 
@@ -304,7 +306,8 @@ class Function3D(plotters3d.GenericPlotter3D):
             return None
 
         if fncolor:
-            compcolor = self.document.compileCheckedExpression(fncolor)
+            compcolor = self.document.evaluate.compileCheckedExpression(
+                fncolor)
             if not compcolor:
                 return
             env[ovar1] = colgrid1
@@ -368,7 +371,7 @@ class Function3D(plotters3d.GenericPlotter3D):
         prop is updated to use the data values colorvars (0-1) to apply
         a color map from the setting setn given."""
 
-        cmap = self.document.getColormap(
+        cmap = self.document.evaluate.getColormap(
             setn.colorMap, setn.colorMapInvert)
         color2d = colorvals.reshape((1, colorvals.size))
         colorimg = utils.applyColorMap(
