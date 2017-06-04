@@ -1,3 +1,12 @@
+Changes in <next version>:
+ * New FITS import code and user interface, allowing much more
+   flexible and convenient FITS importing
+ * Fix half pixel error in linear WCS FITS support
+
+Changes in 1.26.1:
+ * Change homepage in program to new site https://veusz.github.io/
+ * Change new version checking to use veusz.github.io
+
 Changes in 1.26:
  * Add color themes and automatic coloring of widgets
  * Custom color definitions
@@ -9,6 +18,7 @@ Changes in 1.26:
  * Add editable automatic axis range, including support for shrinking
    range (-X%), percentage ranges (X-Y%) and limits (<X% and >Y%)
  * Fix for key if invalid dataset
+ * For log scaling on image widget, show invalid values as being transparent
 
 Bug fixes in 1.25.1:
  * Fix 2D dataset expressions

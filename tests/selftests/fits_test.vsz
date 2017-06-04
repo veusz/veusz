@@ -1,9 +1,7 @@
-# Veusz saved document (version 1.19.1.99)
-# Saved at 2014-01-11T10:59:59.168420
+# Veusz saved document (version 1.26.1)
+# Saved at 2017-06-04T08:23:25.425218
 
-ImportFITSFile(u'img', u'fits_test.fits', 0, linked=True, wcsmode='pixel')
-ImportFITSFile(u'mag', u'fits_test.fits', 1, datacol='V_mag', linked=True)
-ImportFITSFile(u'target', u'fits_test.fits', 1, datacol='target', linked=True)
+ImportFileFITS(u'fits_test.fits', ['/primary', '/hdu1'], linked=True, namemap={'/hdu1/v_mag': u'mag', '/primary': u'img'})
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('grid', name='grid1', autoadd=False)

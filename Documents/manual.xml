@@ -15,7 +15,7 @@
     </author>
 
     <copyright>
-      <year>2016</year>
+      <year>2017</year>
     </copyright>
 
     <legalnotice>
@@ -592,6 +592,21 @@
 	5in and 10pt, and relative units, which are relative to
 	the largest dimension of the page, including 5%, 1/20,
 	0.05.</para>
+      </section>
+
+      <section>
+        <title>Color theme</title>
+
+        <para>From version 1.26, widgets are colored automatically
+        using the color theme. This theme is specified in the main
+        document widget settings. Widgets are given the colors in
+        order given the order in a graph widget. The default theme can
+        be specified in the preferences dialog box.</para>
+
+        <para>To override a theme, the user can manually specify the
+        individual colors in the custom definitions dialog box. Color
+        "theme1" is used as the first theme color, then "theme2",
+        etc.</para>
       </section>
 
       <section>
@@ -1320,33 +1335,81 @@ descriptor alpha beta gamma
       <title>FITS files</title>
       <para>
 	1D, 2D or n-dimensional data can be read from FITS files. 1D
-	data, with optional errors bars, can be read from table
-	extensions, and 2D data from image or primary extensions.
-	Note that pyfits or astropy must be installed to get FITS
-	support.
+	or 2D data can be read from image, primary or table HDUs. nD
+	data can be read from from image or primary extensions.  Note
+	that pyfits or astropy must be installed to get FITS support.
       </para>
 
       <para>
-	To read 1D data, choose a tabular HDU for to import from,
-	enter the name to give the imported data, and choose the
-	columns to assign to the data. Multiple sets of data can be
-	read by repeatedly importing.
+        The import dialog box uses a tree to show the structure of the
+        FITS file. The user can choose to import the whole file, by
+        clicking the check box at the top. They can import data from a
+        particular HDU by selecting that, or individual table columns
+        can be selected.
       </para>
 
       <para>
-	For 2D or n-dimensioanl data, choose an image HDU. Enter the
-	name of the dataset. For 2D data, the data are imported with
-	pixel coordinates by default (i.e. the pixels are numbered
-	with integers). Other modes can be selected under
-	<guilabel>Image WCS mode</guilabel>. These include fractional,
-	where the pixels are numbered between 0 and 1. <guilabel>Pixel
-	(WCS)</guilabel> assigns the pixel coordinate calculated
-	relative to the <varname>CRPIX1/2</varname> header
-	keywords. <guilabel>Linear (WCS)</guilabel> uses linear
-	coordinates where the Pixel (WCS) coordinates are multiplied
-	by the respective <varname>CDELT1/2</varname> values and added
-	to the <varname>CRVAL1/2</varname> values.
+        In the dialog box, a dataset can be given a name for the
+        dataset. Otherwise the HDU or table column name is used.  Note
+        that a prefix and/or suffix can be specified to be added to
+        all dataset names.
       </para>
+
+      <para>
+        If dataset y should have an error bar specified by column
+        yerr, then in the name for yerr, enter 'y (+-)'. Asymmetric
+        error bars can be specified using (+) and (-) on inidividual
+        columns.
+      </para>
+
+      <para>
+        The slice column can be used to only import a subset of the
+        dataset imported. This uses Python slicing syntax, which is
+        comma-separated list of ranges and steps. A range is specified
+        like 10:20, which selects the 11th to 20th items (the indices
+        are numbered from 0, and the final index is one past the index
+        you actually want). A stepped range can look like 10:20:2,
+        which selects every other item in that range. Each of these
+        numbers are optional, so : selects all items on that
+        dimension. For example the slice :,10:14:2 selects all values
+        on the first dimension, but only the 11th and 13th items on
+        the next axis.
+      </para>
+
+      <para>
+        When importing 2D data the user can specify whether to treat
+        this as 1D plus error bars (dimensions should have 2 or 3
+        columns), or specify a range in 2D space the data covers.
+        Veusz will also attempt to use WCS information in the file for
+        the 2D range if not specified. The standard mode is to use the
+        CDELT, CRVAL and CRPIX keywords to specify a linear range for
+        the data. Alternatively the user can specify pixel numbering
+        (numbering from 0 to N-1). There is a fraction option for
+        using a range of 0 to 1. Finally there is a pixel numbering
+        scheme which numbers in pixels from the CRPIX keyword items.
+      </para>
+
+      <para>
+        Some of these options can be specified in the FITS file using
+        the 'VEUSZ' header keyword. This header keyword can be added
+        with the value 'KEY=VALUE' (applying to the whole HDU) or
+        'COLUMN: KEY=VALUE' (applying to a particular column in a
+        table). Supported options for KEY are:
+      </para>
+
+      <programlisting>
+        name: provide name for dataset in VALUE
+        slice: VALUE is slice to apply when importing dataset
+        range: range of data for 2D dataset in form
+               [minx, miny, maxx, maxy]
+        xrange/yrange: range of dataset individually in x or y
+        xcent/ycent: set to list of values giving centers of pixels
+        xedge/yedge: set to list of values giving edges of pixels
+        twod_as_oned: treat as 1D data with error bars if VALUE=1
+        wcsmode: use specific WCS mode for 2D dataset (should be
+                 pixel/pixel_wcs/linear_wcs/fraction)
+      </programlisting>
+
     </section>
 
     <section>
@@ -2046,6 +2109,111 @@ encoding='utf8', renames={})</command></para>
       </section>
 
       <section>
+        <title>ImportFileFITS</title>
+	<anchor id="Command.ImportFileFITS" />
+
+        <para>
+	  <command>ImportFileFits(filename, items, namemap={},
+	  slices={}, twodranges={}, twod_as_oned=set([]),
+	  wcsmodes={}, prefix='', suffix='', renames={},
+	  linked=False)</command>
+        </para>
+
+    <para>Import data from a FITS file.</para>
+
+    <para>items is a list of datasets to be imported.
+    items are formatted like the following:</para>
+    <programlisting>
+     '/': import whole file
+     '/hduname': import whole HDU (image or table)
+     '/hduname/column': import column from table HDU
+    </programlisting>
+    <para>all values in items should be lower case.</para>
+
+    <para>
+    HDU names have to follow a Veusz-specific naming. If the HDU has a
+    standard name (e.g. primary or events), then this is used.  If the
+    HDU has a EXTVER keyword then this number is appended to this
+    name.  An extra number is appended if this name is not unique.  If
+    the HDU has no name, then the name used should be 'hduX', where X
+    is the HDU number (0 is the primary HDU).
+    </para>
+
+    <para>
+    namemap maps an input dataset (using the scheme above for items)
+    to a Veusz dataset name. Special suffixes can be used on the Veusz
+    dataset name to indicate that the dataset should be imported
+    specially.
+    </para>
+
+    <programlisting>
+    'foo (+)': import as +ve error for dataset foo
+    'foo (-)': import as -ve error for dataset foo
+    'foo (+-)': import as symmetric error for dataset foo
+    </programlisting>
+
+    <para>
+    slices is an optional dict specifying slices to be selected when
+    importing. For each dataset to be sliced, provide a tuple of
+    values, one for each dimension. The values should be a single
+    integer to select that index, or a tuple (start, stop, step),
+    where the entries are integers or None.
+    </para>
+
+    <para>
+    twodranges is an optional dict giving data ranges for 2D
+    datasets. It maps names to (minx, miny, maxx, maxy).
+    </para>
+
+    <para>
+    twod_as_oned: optional set containing 2D datasets to attempt to
+    read as 1D, treating extra columns as error bars
+    </para>
+
+    <para>
+    wcsmodes is an optional dict specfying the WCS import mode for 2D
+    datasets in HDUs. The keys are '/hduname' and the values can be
+      'pixel':      number pixel range from 0 to maximum (default)
+      'pixel_wcs':  pixel number relative to WCS reference pixel
+      'linear_wcs': linear coordinate system from the WCS keywords
+      'fraction':   fractional values from 0 to 1.
+    </para>
+
+    <para>
+    renames is an optional dict mapping old to new dataset names, to
+    be renamed after importing
+    </para>
+
+    <para>
+    linked specifies that the dataset is linked to the file.
+    </para>
+
+    <para>
+    Values under the VEUSZ header keyword can be used to override defaults:
+    </para>
+    <programlisting>
+     'name': override name for dataset
+     'slice': slice on importing (use format "start:stop:step,...")
+     'range': should be 4 item array to specify x and y ranges:
+       [minx, miny, maxx, maxy]
+     'xrange' / 'yrange': individual ranges for x and y
+     'xcent' / 'ycent': arrays giving the centres of pixels
+     'xedge' / 'yedge': arrays giving the edges of pixels
+     'twod_as_oned': treat 2d dataset as 1d dataset with errors
+     'wcsmode': use specific WCS mode for dataset (see values above)
+    These are specified under the VEUSZ header keyword in the form
+      KEY=VALUE
+    or for column-specific values
+      COLUMNNAME: KEY=VALUE
+    </programlisting>
+
+    <para>
+    Returns: list of imported datasets
+    </para>
+
+      </section>
+
+      <section>
 	<title>ImportFileHDF5</title>
 	<anchor id="Command.ImportFileHDF5" />
 
@@ -2184,6 +2352,8 @@ def ImportFileND(comm, filename, dataset, shape=None, transpose=False, mode='tex
 	<para><command>ImportFITSFile(datasetname, filename, hdu,
 	    datacol='A', symerrcol='B', poserrcol='C', negerrcol='D',
 	    linked=True/False, renames={})</command></para>
+
+        <para>This command is deprecated. Please do not use in new code, but instead use ImportFileFITS.</para>
 
 	<para>This command does a simple import from a FITS file. The
 FITS format is used within the astronomical community to transport
@@ -2784,7 +2954,7 @@ g.Close()
 	<para>
 	  The embed interface has the methods listed in the command
 	  line interface listed in the Veusz manual
-	  http://home.gna.org/veusz/docs/manual.html
+	  https://veusz.github.io/docs/manual.html
 	</para>
 
 	<para>

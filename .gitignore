@@ -14,7 +14,10 @@ dist/
 Documents/manual.html
 Documents/manual.pdf
 Documents/manual.txt
+Documents/manual.fo
 Documents/veusz.1
+Documents/veusz.man.txt
 Documents/veusz_listen.1
+Documents/veusz_listen.man.txt
 .idea/
 veusz.egg-info/

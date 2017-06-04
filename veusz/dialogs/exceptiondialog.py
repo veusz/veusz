@@ -204,23 +204,22 @@ class ExceptionDialog(VeuszDialog):
         """See whether there is a later version of veusz and inform the
         user."""
 
+        # FIXME: 
         try:
             p = curlrequest.urlopen(
-                'http://download.gna.org/veusz/').read().decode('ascii')
-            versions = re.findall('veusz-([0-9.]+).tar.gz', p)
+                'http://veusz.github.io/download/newest-version.html').read()
+            latest = p.decode('ascii').strip()
+            latestv = [int(i) for i in latest.split('.')]
         except:
-            versions = []
+            latestv = None
 
-        if not versions:
+        if not latestv:
             msg = _('Could not check the latest Veusz version')
         else:
-            vsort = sorted([[int(i) for i in v.split('.')] for v in versions])
-            latest = '.'.join([str(x) for x in vsort[-1]])
-
-            current = [int(i) for i in utils.version().split('.')]
-            if current == vsort[-1]:
+            currentv = [int(i) for i in utils.version().split('.')]
+            if currentv == latestv:
                 msg = _('You are running the latest released Veusz version')
-            elif current > vsort[-1]:
+            elif currentv > latestv:
                 msg = _('You are running an unreleased Veusz version')
             else:
                 msg = (_('<b>Your current version of Veusz is old. '

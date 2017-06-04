@@ -533,9 +533,6 @@ class MainWindow(qt4.QMainWindow):
             'help.home':
                 a(self, _('Go to the Veusz home page on the internet'),
                   _('Home page'), self.slotHelpHomepage),
-            'help.project':
-                a(self, _('Go to the Veusz project page on the internet'),
-                  _('GNA Project page'), self.slotHelpProjectPage),
             'help.bug':
                 a(self, _('Report a bug on the internet'),
                   _('Suggestions and bugs'), self.slotHelpBug),
@@ -613,7 +610,7 @@ class MainWindow(qt4.QMainWindow):
             'data.reload',
             ]
         helpmenu = [
-            'help.home', 'help.project', 'help.bug',
+            'help.home', 'help.bug',
             '',
             'help.tutorial',
             '',
@@ -782,16 +779,12 @@ class MainWindow(qt4.QMainWindow):
 
     def slotHelpHomepage(self):
         """Go to the veusz homepage."""
-        qt4.QDesktopServices.openUrl(qt4.QUrl('http://home.gna.org/veusz/'))
-
-    def slotHelpProjectPage(self):
-        """Go to the veusz project page."""
-        qt4.QDesktopServices.openUrl(qt4.QUrl('http://gna.org/projects/veusz/'))
+        qt4.QDesktopServices.openUrl(qt4.QUrl('https://veusz.github.io/'))
 
     def slotHelpBug(self):
         """Go to the veusz bug page."""
         qt4.QDesktopServices.openUrl(
-            qt4.QUrl('https://gna.org/bugs/?group=veusz') )
+            qt4.QUrl('https://github.com/veusz/veusz/issues') )
 
     def askTutorial(self):
         """Ask if tutorial wanted."""

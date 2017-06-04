@@ -367,16 +367,18 @@ class Graph3D(widget.Widget):
         }[s.rendermode]
         scene = threed.Scene(mode)
 
+        # get ready to paint
+        painter = painthelper.painter(self, bounds)
+
         # add lighting if enabled
         for light in s.Lighting1, s.Lighting2, s.Lighting3:
             if light.enable:
                 scene.addLight(
                     threed.Vec3(light.x, light.y, light.z),
-                    light.get('color').color(),
+                    light.get('color').color(painter),
                     light.intensity*0.01)
 
         # finally render the scene
-        painter = painthelper.painter(self, bounds)
         with painter:
             scene.render(
                 root,
