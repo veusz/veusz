@@ -20,8 +20,6 @@
 
 from __future__ import division
 
-import numpy as N
-
 from ..compat import cbasestr
 from .commonfn import _
 

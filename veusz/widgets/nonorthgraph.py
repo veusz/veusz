@@ -147,6 +147,11 @@ class NonOrthGraph(Widget):
 
         painter = phelper.painter(self, bounds)
         with painter:
+            # reset counter and compute automatic colors
+            phelper.autoplottercount = 0
+            for c in self.children:
+                c.setupAutoColor(painter)
+
             # plot graph
             datarange = self.getDataRange()
             self.drawGraph(painter, bounds, datarange, outerbounds=outerbounds)

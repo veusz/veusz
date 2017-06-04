@@ -20,6 +20,7 @@
 
 from __future__ import division, print_function
 import sys
+import copy
 
 from ..compat import citems, cstr
 from .. import utils
@@ -223,16 +224,34 @@ class OperationDataImportBase(object):
     def addCustoms(self, document, customs):
         """Optionally, add the customs return by plugins to document."""
 
+        type_attrs = {
+            'import': 'def_imports',
+            'color': 'def_colors',
+            'colormap': 'def_colormaps',
+            'constant': 'def_definitions',
+            'function': 'def_definitions',
+            'definition': 'def_definitions',
+            }
+
         if len(customs) > 0:
             doceval = document.evaluate
-            self.oldconst = list(doceval.customs)
-            cd = doceval.customDict()
+            self.oldcustoms = [
+                copy.deepcopy(doceval.def_imports),
+                copy.deepcopy(doceval.def_definitions),
+                copy.deepcopy(doceval.def_colors),
+                copy.deepcopy(doceval.def_colormaps)]
+
+            # FIXME: inefficient for large number of definitions
             for item in customs:
-                if item[1] in cd:
-                    idx, ctype, val = cd[item[1]]
-                    doceval.customs[idx] = item
+                ctype, name, val = item
+                clist = getattr(doceval, type_attrs[ctype])
+                for idx, (cname, cval) in enumerate(clist):
+                    if cname == name:
+                        clist[idx][1] = val
+                        break
                 else:
-                    doceval.customs.append(item)
+                    clist.append([name, val])
+
             doceval.update()
 
     def do(self, document):
@@ -248,7 +267,7 @@ class OperationDataImportBase(object):
         self.outinvalids = {}
 
         # remember datasets in document for undo
-        self.oldconst = None
+        self.oldcustoms = None
 
         # do actual import
         retn = self.doImport()
@@ -289,6 +308,10 @@ class OperationDataImportBase(object):
                 document.setData(name, ds)
 
         # for custom definitions
-        if self.oldconst is not None:
-            document.evaluate.customs = self.oldconst
-            document.evaluate.update()
+        if self.oldcustoms is not None:
+            doceval = document.evaluate
+            doceval.def_imports = self.oldcustoms[0]
+            doceval.def_definitions = self.oldcustoms[1]
+            doceval.def_colors = self.oldcustoms[2]
+            doceval.def_colormaps = self.oldcustoms[3]
+            doceval.update()

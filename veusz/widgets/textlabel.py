@@ -143,7 +143,7 @@ class TextLabel(plotters.FreePlotter):
 
         painter = phelper.painter(self, posn, clip=clip)
         with painter:
-            textpen = s.get('Text').makeQPen()
+            textpen = s.get('Text').makeQPen(painter)
             painter.setPen(textpen)
             font = s.get('Text').makeQFont(painter)
             margin = s.get('margin').convert(painter)

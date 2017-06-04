@@ -25,8 +25,7 @@ import numpy as N
 from ..compat import crepr, cstr
 from .. import utils
 
-from .commonfn import _
-from .commonfn import *
+from .commonfn import _, dsPreviewHelper, convertNumpy
 from .base import (
     DatasetConcreteBase, DatasetException, DatasetExpressionException)
 

@@ -250,7 +250,7 @@ class HistoDataDialog(VeuszDialog):
             self.logarithmic.setChecked(False)
 
         # if there is a manual list of bins
-        if gen.binmanual:
+        if gen.binmanual is not None:
             self.bindata[:] = list(gen.binmanual)
             self.binmodel.reset()
 

@@ -1,7 +1,6 @@
 # Veusz saved document (version 1.15.99)
 # Saved at 2012-07-01T14:28:01.630526
 
-AddImportPath(u'/home/jss/code/veusz-git/veusz/examples')
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)

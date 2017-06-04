@@ -937,7 +937,8 @@ class PlotWindow( qt4.QGraphicsView ):
                 # errors cause an exception window to pop up
                 try:
                     phelper = document.PaintHelper(
-                        size, scaling=self.zoomfactor, dpi=self.dpi)
+                        self.document, size,
+                        scaling=self.zoomfactor, dpi=self.dpi)
                     self.document.paintTo(phelper, self.pagenumber)
 
                 except Exception:

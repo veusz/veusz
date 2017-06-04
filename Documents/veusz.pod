@@ -68,7 +68,7 @@ Displays information about the currently installed version and exits.
 
 =head1 BUGS
 
-Please report bugs at https://gna.org/bugs/?group=veusz
+Please report bugs at https://github.com/veusz/veusz/issues
 
 =head1 AUTHORS
 

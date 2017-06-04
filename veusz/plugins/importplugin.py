@@ -716,7 +716,12 @@ class ImportPluginGnuplot2D(ImportPlugin):
             elif '#' in fields[0]:            # ignore comment lines
                 continue
             else:
-                x,y,z = map(float, fields[0:3])
+                if len(fields) < 3:
+                    raise ImportPluginException(_("Too few columns in file"))
+                try:
+                    x,y,z = map(float, fields[0:3])
+                except ValueError:
+                    raise ImportPluginException(_("Non-numeric data in file"))
                 data_gp_block.append( [x,y,(z-sub)*mult] )
 
         if data_gp_block:                    # append last block if necessary

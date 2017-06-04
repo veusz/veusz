@@ -28,7 +28,7 @@ from .. import qtall as qt4
 from .. import setting
 from .. import utils
 
-from ..compat import cexec, cstr, cstrerror, cbytes, cexceptionuser
+from ..compat import cexec, cstrerror, cbytes, cexceptionuser
 from .commandinterface import CommandInterface
 from . import datasets
 
@@ -188,6 +188,7 @@ def loadHDF5Doc(thedoc, filename, callbackunsafe=None):
 
     with thedoc.suspend():
         thedoc.wipe()
+        thedoc.filename = filename
         hdffile = h5py.File(filename, 'r')
 
         try:
@@ -233,6 +234,7 @@ def loadDocument(thedoc, filename, mode='vsz', callbackunsafe=None):
                              os.path.basename(filename) )
 
         thedoc.wipe()
+        thedoc.filename = filename
         executeScript(thedoc, filename, script, callbackunsafe=callbackunsafe)
 
     elif mode == 'hdf5':

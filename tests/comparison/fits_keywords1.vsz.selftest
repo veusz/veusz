@@ -1,0 +1,108 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="531.4px" height="531.4px" version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+<desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
+</clipPath>
+<clipPath id="c1">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</clipPath>
+</defs>
+<g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m60.2,7l464.1,0l0,464.1l-464.1,0l0,-464.1"/>
+</g>
+</g>
+<g clip-path="url(#c1)">
+<g fill="none" stroke="#4daf4a" stroke-width="0.6">
+<polyline fill="none" points="77.4,434.1 172.9,397 268.4,360 363.9,322.9 459.4,285.8"/>
+</g>
+<g fill="#4daf4a" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(77.4,434.1)">
+<path d="m3.7,0c0,2,-1.6,3.7,-3.7,3.7c-2,0,-3.7,-1.6,-3.7,-3.7c0,-2,1.6,-3.7,3.7,-3.7c2,0,3.7,1.6,3.7,3.7" id="p0"/>
+</g>
+<use xlink:href="#p0" x="172.9" y="397"/>
+<use xlink:href="#p0" x="268.4" y="360"/>
+<use xlink:href="#p0" x="363.9" y="322.9"/>
+<use xlink:href="#p0" x="459.4" y="285.8"/>
+</g>
+<g fill="none" stroke="#377eb8" stroke-width="0.6">
+<polyline fill="none" points="77.4,471.2 125.1,452.7 172.9,422.3 220.6,384.9 268.4,342.1 316.2,294.7 363.9,243.4 411.7,188.5 459.4,130.4 507.2,69.3"/>
+</g>
+<g fill="none" stroke="#377eb8" stroke-linecap="butt" stroke-width="0.6">
+<path d="M77.4,471.2l0,0M125.1,454.5l0,-3.7M172.9,427.2l0,-9.7M220.6,393.5l0,-17.2M268.4,355l0,-25.8M316.2,312.4l0,-35.2M363.9,266.2l0,-45.5M411.7,216.8l0,-56.5M459.4,164.5l0,-68.1M507.2,109.5l0,-80.3"/>
+</g>
+<g fill="#377eb8" stroke-linejoin="miter" stroke-width="0.6">
+<use xlink:href="#p0" x="77.4" y="471.2"/>
+<use xlink:href="#p0" x="125.1" y="452.7"/>
+<use xlink:href="#p0" x="172.9" y="422.3"/>
+<use xlink:href="#p0" x="220.6" y="384.9"/>
+<use xlink:href="#p0" x="268.4" y="342.1"/>
+<use xlink:href="#p0" x="316.2" y="294.7"/>
+<use xlink:href="#p0" x="363.9" y="243.4"/>
+<use xlink:href="#p0" x="411.7" y="188.5"/>
+<use xlink:href="#p0" x="459.4" y="130.4"/>
+<use xlink:href="#p0" x="507.2" y="69.3"/>
+</g>
+<g fill="none" stroke="#e41a1c" stroke-width="0.6">
+<polyline fill="none" points="77.4,471.2 125.1,452.7 172.9,445 220.6,439.1 268.4,434.1 316.2,429.7 363.9,425.8 411.7,422.2 459.4,418.8 507.2,415.6"/>
+</g>
+<g fill="none" stroke="#e41a1c" stroke-linecap="butt" stroke-width="0.6">
+<path d="M77.4,471.2l0,0M125.1,454.5l0,-3.7M172.9,447.6l0,-5.2M220.6,442.3l0,-6.4M268.4,437.8l0,-7.4M316.2,433.9l0,-8.2M363.9,430.3l0,-9M411.7,427.1l0,-9.8M459.4,424l0,-10.4M507.2,421.1l0,-11.1"/>
+</g>
+<g fill="#e41a1c" stroke-linejoin="miter" stroke-width="0.6">
+<use xlink:href="#p0" x="77.4" y="471.2"/>
+<use xlink:href="#p0" x="125.1" y="452.7"/>
+<use xlink:href="#p0" x="172.9" y="445"/>
+<use xlink:href="#p0" x="220.6" y="439.1"/>
+<use xlink:href="#p0" x="268.4" y="434.1"/>
+<use xlink:href="#p0" x="316.2" y="429.7"/>
+<use xlink:href="#p0" x="363.9" y="425.8"/>
+<use xlink:href="#p0" x="411.7" y="422.2"/>
+<use xlink:href="#p0" x="459.4" y="418.8"/>
+<use xlink:href="#p0" x="507.2" y="415.6"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l0,-464.1"/>
+<path d="M60.2,471.2l3.7,0M60.2,452.7l3.7,0M60.2,434.1l3.7,0M60.2,415.6l3.7,0M60.2,397l3.7,0M60.2,378.5l3.7,0M60.2,360l3.7,0M60.2,341.4l3.7,0M60.2,322.9l3.7,0M60.2,304.3l3.7,0M60.2,285.8l3.7,0M60.2,267.2l3.7,0M60.2,248.7l3.7,0M60.2,230.2l3.7,0M60.2,211.6l3.7,0M60.2,193.1l3.7,0M60.2,174.5l3.7,0M60.2,156l3.7,0M60.2,137.5l3.7,0M60.2,118.9l3.7,0M60.2,100.4l3.7,0M60.2,81.8l3.7,0M60.2,63.3l3.7,0M60.2,44.7l3.7,0M60.2,26.2l3.7,0M60.2,7.7l3.7,0"/>
+<path d="M60.2,471.2l7.5,0M60.2,378.5l7.5,0M60.2,285.8l7.5,0M60.2,193.1l7.5,0M60.2,100.4l7.5,0M60.2,7.7l7.5,0"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="47.9" y="480" font-size="14pt" fill="#000000">0</text>
+<text x="47.9" y="387.2" font-size="14pt" fill="#000000">5</text>
+<text x="39.2" y="294.5" font-size="14pt" fill="#000000">10</text>
+<text x="39.2" y="201.8" font-size="14pt" fill="#000000">15</text>
+<text x="39.2" y="109.1" font-size="14pt" fill="#000000">20</text>
+<text x="39.2" y="21" font-size="14pt" fill="#000000">25</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M60.2,471.2l464.1,0"/>
+<path d="M77.4,471.2l0,-3.7M101.3,471.2l0,-3.7M125.1,471.2l0,-3.7M149,471.2l0,-3.7M172.9,471.2l0,-3.7M196.8,471.2l0,-3.7M220.6,471.2l0,-3.7M244.5,471.2l0,-3.7M268.4,471.2l0,-3.7M292.3,471.2l0,-3.7M316.2,471.2l0,-3.7M340,471.2l0,-3.7M363.9,471.2l0,-3.7M387.8,471.2l0,-3.7M411.7,471.2l0,-3.7M435.5,471.2l0,-3.7M459.4,471.2l0,-3.7M483.3,471.2l0,-3.7M507.2,471.2l0,-3.7"/>
+<path d="M77.4,471.2l0,-7.5M172.9,471.2l0,-7.5M268.4,471.2l0,-7.5M363.9,471.2l0,-7.5M459.4,471.2l0,-7.5"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="73" y="476.5" font-size="14pt" fill="#000000">0</text>
+<text x="168.5" y="476.5" font-size="14pt" fill="#000000">2</text>
+<text x="264" y="476.5" font-size="14pt" fill="#000000">4</text>
+<text x="359.5" y="476.5" font-size="14pt" fill="#000000">6</text>
+<text x="455" y="476.5" font-size="14pt" fill="#000000">8</text>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M524.4,471.2l0,-464.1"/>
+<path d="M524.4,471.2l-3.7,0M524.4,452.7l-3.7,0M524.4,434.1l-3.7,0M524.4,415.6l-3.7,0M524.4,397l-3.7,0M524.4,378.5l-3.7,0M524.4,360l-3.7,0M524.4,341.4l-3.7,0M524.4,322.9l-3.7,0M524.4,304.3l-3.7,0M524.4,285.8l-3.7,0M524.4,267.2l-3.7,0M524.4,248.7l-3.7,0M524.4,230.2l-3.7,0M524.4,211.6l-3.7,0M524.4,193.1l-3.7,0M524.4,174.5l-3.7,0M524.4,156l-3.7,0M524.4,137.5l-3.7,0M524.4,118.9l-3.7,0M524.4,100.4l-3.7,0M524.4,81.8l-3.7,0M524.4,63.3l-3.7,0M524.4,44.7l-3.7,0M524.4,26.2l-3.7,0M524.4,7.7l-3.7,0"/>
+<path d="M524.4,471.2l-7.5,0M524.4,378.5l-7.5,0M524.4,285.8l-7.5,0M524.4,193.1l-7.5,0M524.4,100.4l-7.5,0M524.4,7.7l-7.5,0"/>
+<path d="M60.2,7l464.1,0"/>
+<path d="M77.4,7l0,3.7M101.3,7l0,3.7M125.1,7l0,3.7M149,7l0,3.7M172.9,7l0,3.7M196.8,7l0,3.7M220.6,7l0,3.7M244.5,7l0,3.7M268.4,7l0,3.7M292.3,7l0,3.7M316.2,7l0,3.7M340,7l0,3.7M363.9,7l0,3.7M387.8,7l0,3.7M411.7,7l0,3.7M435.5,7l0,3.7M459.4,7l0,3.7M483.3,7l0,3.7M507.2,7l0,3.7"/>
+<path d="M77.4,7l0,7.5M172.9,7l0,7.5M268.4,7l0,7.5M363.9,7l0,7.5M459.4,7l0,7.5"/>
+</g>
+</g>
+</g>
+</svg>

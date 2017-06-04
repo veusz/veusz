@@ -26,6 +26,8 @@ from .oned import Dataset
 from .twod import Dataset2D
 from .text import DatasetText
 
+from ..compat import cstr
+
 def valsToDataset(vals, datatype, dimensions):
     """Return a dataset given a numpy array of values."""
 

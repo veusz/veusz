@@ -59,7 +59,9 @@ class DBusWinInterface(vzdbus.Object):
 
     def __init__(self, actions, index):
         prefix = '/Windows/%i/Actions' % index
-        vzdbus.Object.__init__(self, vzdbus.sessionbus, prefix)
+        # possible exception in dbus means we have to check sessionbus
+        if vzdbus.sessionbus is not None:
+            vzdbus.Object.__init__(self, vzdbus.sessionbus, prefix)
         self.actions = actions
 
     @vzdbus.method(dbus_interface=interface, out_signature='as')
@@ -267,6 +269,10 @@ class MainWindow(qt4.QMainWindow):
             # add page and default graph
             self.document.makeDefaultDoc()
 
+            # set color theme
+            self.document.basewidget.settings.get(
+                'colorTheme').set(setting.settingdb['colortheme_default'])
+
             # load defaults if set
             self.loadDefaultStylesheet()
             self.loadDefaultCustomDefinitions()
@@ -455,7 +461,8 @@ class MainWindow(qt4.QMainWindow):
                   self.slotEditPreferences,
                   icon='veusz-edit-prefs'),
             'edit.custom':
-                a(self, _('Edit custom functions and constants'),
+                a(self,
+                  _('Edit custom functions, constants, colors and colormaps'),
                   _('Custom definitions...'),
                   self.slotEditCustom,
                   icon='veusz-edit-custom'),
@@ -526,9 +533,6 @@ class MainWindow(qt4.QMainWindow):
             'help.home':
                 a(self, _('Go to the Veusz home page on the internet'),
                   _('Home page'), self.slotHelpHomepage),
-            'help.project':
-                a(self, _('Go to the Veusz project page on the internet'),
-                  _('GNA Project page'), self.slotHelpProjectPage),
             'help.bug':
                 a(self, _('Report a bug on the internet'),
                   _('Suggestions and bugs'), self.slotHelpBug),
@@ -606,7 +610,7 @@ class MainWindow(qt4.QMainWindow):
             'data.reload',
             ]
         helpmenu = [
-            'help.home', 'help.project', 'help.bug',
+            'help.home', 'help.bug',
             '',
             'help.tutorial',
             '',
@@ -775,16 +779,12 @@ class MainWindow(qt4.QMainWindow):
 
     def slotHelpHomepage(self):
         """Go to the veusz homepage."""
-        qt4.QDesktopServices.openUrl(qt4.QUrl('http://home.gna.org/veusz/'))
-
-    def slotHelpProjectPage(self):
-        """Go to the veusz project page."""
-        qt4.QDesktopServices.openUrl(qt4.QUrl('http://gna.org/projects/veusz/'))
+        qt4.QDesktopServices.openUrl(qt4.QUrl('https://veusz.github.io/'))
 
     def slotHelpBug(self):
         """Go to the veusz bug page."""
         qt4.QDesktopServices.openUrl(
-            qt4.QUrl('https://gna.org/bugs/?group=veusz') )
+            qt4.QUrl('https://github.com/veusz/veusz/issues') )
 
     def askTutorial(self):
         """Ask if tutorial wanted."""

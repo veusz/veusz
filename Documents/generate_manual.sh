@@ -32,3 +32,6 @@ fop manual.fo -pdf manual.pdf
 release=$(cat ../VERSION)
 pod2man --release=${release} --center="Veusz"  veusz.pod > veusz.1
 pod2man --release=${release} --center="Veusz"  veusz_listen.pod > veusz_listen.1
+
+MANWIDTH=76 man ./veusz.1 > veusz.man.txt
+MANWIDTH=76 man ./veusz_listen.1 > veusz_listen.man.txt

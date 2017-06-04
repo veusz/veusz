@@ -1,0 +1,32 @@
+# Veusz saved document (version 1.25)
+# Saved at 2016-12-19T09:47:28.291928
+
+SetData2DExpressionXYZ(u'twodx', u'xds*1', u'yds + 0', u'xds+yds*2', linked=True)
+ImportString(u'xds(numeric)','''
+0.000000e+00
+0.000000e+00
+1.000000e+00
+1.000000e+00
+''')
+ImportString(u'yds(numeric)','''
+0.000000e+00
+1.000000e+00
+0.000000e+00
+1.000000e+00
+''')
+Add('page', name='page1', autoadd=False)
+To('page1')
+Add('graph', name='graph1', autoadd=False)
+To('graph1')
+Add('axis', name='x', autoadd=False)
+Add('axis', name='y', autoadd=False)
+To('y')
+Set('direction', 'vertical')
+To('..')
+Add('xy', name='xy1', autoadd=False)
+To('xy1')
+Set('xData', [])
+Set('yData', u'ravel(twodx)')
+To('..')
+To('..')
+To('..')

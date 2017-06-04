@@ -28,6 +28,7 @@ from .. import document
 from .. import datasets
 from .. import utils
 from . import base
+from . import fits_hdf5_helpers
 
 def _(text, disambiguation=None, context="Import_HDF5"):
     return qt4.QCoreApplication.translate(context, text, disambiguation)
@@ -67,141 +68,6 @@ def auto_deref_attr(attr, attrs, grp):
         val = N.array(val)
     return bconv(val)
 
-def filterAttrsByName(attrs, name):
-    """For compound datasets, attributes can be given on a per-column basis.
-    This filters the attributes by the column name."""
-
-    name = name.strip()
-    attrsout = {}
-    for a in attrs:
-        # attributes with _dsname suffixes are copied
-        if a[:4] == "vsz_" and a[-len(name)-1:] == "_"+name:
-            attrsout[a[:-len(name)-1]] = attrs[a]
-    return attrsout
-
-def convertTextToSlice(slicetxt, numdims):
-    """Convert a value like 0:1:3,:,::-1 to a tuple slice
-    ((0,1,3), (None, None, None), (None, None, -1))
-    or reduce dimensions such as :,3 -> ((None,None,None),3)
-
-    Also checks number of dimensions (including reduced) is numdims.
-
-    Return -1 on error
-    """
-
-    if slicetxt.strip() == '':
-        return None
-
-    slicearray = slicetxt.split(',')
-    if len(slicearray) != numdims:
-        # slice needs same dimensions as data
-        return -1
-
-    allsliceout = []
-    for sliceap_idx, sliceap in enumerate(slicearray):
-        sliceparts = sliceap.strip().split(':')
-
-        if len(sliceparts) == 1:
-            # reduce dimensions with single index
-            try:
-                allsliceout.append(int(sliceparts[0]))
-            except ValueError:
-                # invalid index
-                return -1
-        elif len(sliceparts) not in (2, 3):
-            return -1
-        else:
-            sliceout = []
-            for p in sliceparts:
-                p = p.strip()
-                if not p:
-                    sliceout.append(None)
-                else:
-                    try:
-                        sliceout.append(int(p))
-                    except ValueError:
-                        return -1
-            if len(sliceout) == 2:
-                sliceout.append(None)
-            allsliceout.append(tuple(sliceout))
-
-    allempty = True
-    for s in allsliceout:
-        if s != (None, None, None):
-            allempty = False
-    if allempty:
-        return None
-
-    return tuple(allsliceout)
-
-def convertSliceToText(slice):
-    """Convert tuple slice into text."""
-    if slice is None:
-        return ''
-    out = []
-    for spart in slice:
-        if isinstance(spart, int):
-            # single index
-            out.append(str(spart))
-            continue
-
-        sparttxt = []
-        for p in spart:
-            if p is not None:
-                sparttxt.append(str(p))
-            else:
-                sparttxt.append('')
-        if sparttxt[-1] == '':
-            del sparttxt[-1]
-        out.append(':'.join(sparttxt))
-    return ', '.join(out)
-
-def applySlices(data, slices):
-    """Given hdf/numpy dataset, apply slicing tuple to it and return data."""
-    slist = []
-    for s in slices:
-        if isinstance(s, int):
-            slist.append(s)
-        else:
-            slist.append(slice(*s))
-            if s[2] is not None and s[2] < 0:
-                # negative slicing doesn't work in h5py, so we
-                # make a copy
-                data = N.array(data)
-    try:
-        data = data[tuple(slist)]
-    except (ValueError, IndexError):
-        data = N.array([], dtype=N.float64)
-    return data
-
-def convertDatasetToObject(data, slices):
-    """Convert numpy/hdf dataset to suitable data for veusz.
-    Raise _ConvertError if cannot."""
-
-    if slices:
-        data = applySlices(data, slices)
-
-    try:
-        kind = data.dtype.kind
-    except TypeError:
-        raise _ConvertError(_("Could not get kind of HDF5 dataset"))
-
-    if kind in ('b', 'i', 'u', 'f'):
-        data = N.array(data, dtype=N.float64)
-        if data.ndim == 0:
-            raise _ConvertError(_("HDF5 dataset has no dimensions"))
-        return data
-
-    elif kind in ('S', 'a') or (
-        kind == 'O' and h5py.check_dtype(vlen=data.dtype)):
-        if hasattr(data, 'ndim') and data.ndim != 1:
-            raise _ConvertError(_("HDF5 text datasets must have 1 dimension"))
-
-        strcnv = list(data)
-        return strcnv
-
-    raise _ConvertError(_("HDF5 dataset has an invalid type"))
-
 class ImportParamsHDF5(base.ImportParamsBase):
     """HDF5 file import parameters.
 
@@ -239,9 +105,6 @@ class LinkedFileHDF5(base.LinkedFileBase):
             ('filename', 'items'),
             relpath=relpath)
 
-class _ConvertError(RuntimeError):
-    pass
-
 class _DataRead:
     """Data read from file during import.
 
@@ -254,7 +117,7 @@ class _DataRead:
         self.options = options
 
 class OperationDataImportHDF5(base.OperationDataImportBase):
-    """Import 1d, 2d, text or nd data from a fits file."""
+    """Import 1d, 2d, text or nd data from a HDF5 file."""
 
     descr = _("import HDF5 file")
 
@@ -281,6 +144,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                 name = options["vsz_name"]
             else:
                 name = dsname.split("/")[-1].strip()
+
+        # use full path if dataset already exists
         if name in dsread:
             name = dsname.strip()
 
@@ -288,17 +153,19 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             # implement slicing
             aslice = None
             if "vsz_slice" in options:
-                s = convertTextToSlice(options["vsz_slice"], len(dataset.shape))
+                s = fits_hdf5_helpers.convertTextToSlice(
+                    options["vsz_slice"], len(dataset.shape))
                 if s != -1:
                     aslice = s
             if self.params.slices and dsname in self.params.slices:
                 aslice = self.params.slices[dsname]
 
             # finally return data
-            objdata = convertDatasetToObject(dataset, aslice)
+            objdata = fits_hdf5_helpers.convertDatasetToObject(
+                dataset, aslice)
             dsread[name] = _DataRead(dsname, objdata, options)
 
-        except _ConvertError:
+        except fits_hdf5_helpers.ConvertError:
             pass
 
     def walkFile(self, item, dsread, names=None):
@@ -320,7 +187,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     names = item.dtype.names 
 
                 for name in names:
-                    attrs = filterAttrsByName(item.attrs, name)
+                    attrs = fits_hdf5_helpers.filterAttrsByName(item.attrs, name)
                     self.readDataset(item[name], attrs, item.name+"/"+name,
                                      dsread)
             else:

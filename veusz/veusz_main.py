@@ -40,12 +40,12 @@ from veusz import utils
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2016 <jeremy@jeremysanders.net> and contributors
+Copyright (C) Jeremy Sanders 2003-2017 <jeremy@jeremysanders.net> and contributors
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
 splashcopyr='''<b><font color="purple">Veusz %s<br></font></b>
-Copyright (C) Jeremy Sanders 2003-2016 and contributors<br>
+Copyright (C) Jeremy Sanders 2003-2017 and contributors<br>
 Licenced under the GPL (version 2 or greater)
 '''
 
@@ -187,6 +187,7 @@ class VeuszApp(qt4.QApplication):
         self.openeventfiles = []
         self.startupdone = False
         self.splash = None
+        self.trans = None
 
     def openMainWindow(self, args):
         """Open the main window with any loaded files."""
@@ -235,9 +236,9 @@ class VeuszApp(qt4.QApplication):
 
         # optionally load a translation
         if self.options.translation:
-            trans = qt4.QTranslator()
-            trans.load(self.options.translation)
-            self.installTranslator(trans)
+            self.trans = qt4.QTranslator()
+            self.trans.load(self.options.translation)
+            self.installTranslator(self.trans)
 
         self.thread = ImportThread()
         self.thread.finished.connect(self.slotStartApplication)

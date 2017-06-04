@@ -335,6 +335,10 @@ class ColorMaps(object):
     """
 
     def __init__(self):
+        self.wipe()
+
+    def wipe(self):
+        """Reset colormaps to default state."""
         self.maps = dict(_defaultmaps)
 
     def get(self, idx, default=None):
@@ -454,7 +458,7 @@ def applyScaling(data, mode, minval, maxval):
         with N.errstate(invalid='ignore', divide='ignore'):
             invrange = 1./(N.log(maxval)-N.log(minval))
             data = (N.log(data)-N.log(minval)) * invrange
-        data[~N.isfinite(data)] = 0
+        data[~N.isfinite(data)] = N.nan
 
     elif mode == 'squared':
         # squared scaling

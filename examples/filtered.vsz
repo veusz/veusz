@@ -1,7 +1,6 @@
 # Veusz saved document (version 1.22.99)
 # Saved at 2015-04-14T17:42:14.659501
 
-AddImportPath(u'/home/jss/code/veusz/examples')
 FilterDatasets(u'filter_x>6', [u'filter_x', u'filter_y'], prefix=u'filter2_')
 FilterDatasets(u'y>2.5', [u'x', 'y'], prefix=u'filter_')
 SetDataRange(u'x', 50, (0.0, 10.0), linked=True)

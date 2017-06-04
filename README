@@ -1,6 +1,6 @@
-Veusz 1.25
-----------
-http://home.gna.org/veusz/
+Veusz 1.26.1
+------------
+https://veusz.github.io
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready Postscript, PDF or SVG output. Graphs are built-up
@@ -12,22 +12,22 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.25:
- * Add n-dimensional dataset support
- * Add GetColormap command to return RGBA values
- * Add Colormap sequence plugin for choosing colors of widgets
- * Fill above/below setting shown in key for xy widget
- * Add Covariance widget for plotting covariance ellipses
- * Add lineup, linedown, lineleft and lineright markers
- * Add lineup, linedown and lineextend arrows
+Changes in 1.26.1:
+ * Change homepage in program to new site https://veusz.github.io/
+ * Change new version checking to use veusz.github.io
 
-Bug fixes:
- * Fix pick indices if non-finite values in data
- * Fix drag and drop of files into Veusz on Windows
- * Raise exception if functions in console request input, avoiding hang
- * Initialise unsafe_mode, in case Veusz used in PyQt embedding
- * Fix crash if setting default setting in default setting window
- * Fix crash in Clone() command on python3
+Changes in 1.26:
+ * Add color themes and automatic coloring of widgets
+ * Custom color definitions
+ * Improved custom definition dialog box
+ * Fix loading translator via command line
+ * Show horizontal error lines/fills in key
+ * Use iMinuit if available for fitting
+ * Fix for dataset plugins returning nD datasets
+ * Add editable automatic axis range, including support for shrinking
+   range (-X%), percentage ranges (X-Y%) and limits (<X% and >Y%)
+ * Fix for key if invalid dataset
+ * For log scaling on image widget, show invalid values as being transparent
 
 Features of package:
  Plotting features:
@@ -76,9 +76,9 @@ Features of package:
 
 Requirements for source install:
  Python 2.x (2.6 or greater required) or 3.x (3.3 or greater required)
-   http://www.python.org/
+   https://www.python.org/
  Qt >= 4.6 (free edition)
-   http://www.trolltech.com/products/qt/
+   https://www.qt.io/
  PyQt >= 4.5 (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/software/pyqt/
    http://www.riverbankcomputing.co.uk/software/sip/
@@ -102,20 +102,9 @@ Optional requirements:
  SAMPy or astropy >= 0.4 (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
 
-Veusz is Copyright (C) 2003-2015 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2017 Jeremy Sanders <jeremy@jeremysanders.net>
  and contributors.
 It is licensed under the GPL (version 2 or greater).
 
-For documentation on using Veusz, see the "Documents" directory. The
-manual is in PDF, HTML and text format (generated from docbook). The
-examples are also useful documentation. Please also see and contribute
-to the Veusz wiki: https://github.com/jeremysanders/veusz/wiki
-
-If you enjoy using Veusz, we would love to hear from you. Please join
-the mailing lists at
-
-https://gna.org/mail/?group=veusz
-
-to discuss new features or if you'd like to contribute code. The
-latest code can always be found in the Git repository
-at https://github.com/jeremysanders/veusz.git.
+The latest code can be found in the Git repository at
+https://github.com/veusz/veusz

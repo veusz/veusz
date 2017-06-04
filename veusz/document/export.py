@@ -126,6 +126,38 @@ def fixupPSBoundingBox(infname, outfname, pagewidth, size):
                         int(math.ceil(origheight)) )
                 fout.write(line)
 
+def printPages(doc, printer, pages, scaling=1., antialias=False):
+    """Print onto printing device.
+    Returns list of page sizes
+    """
+
+    painter = painthelper.DirectPainter(printer)
+    dpi = (printer.logicalDpiX(), printer.logicalDpiY())
+    if antialias:
+        painter.setRenderHint(qt4.QPainter.Antialiasing, True)
+        painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
+
+    sizes = []
+
+    # This all assumes that only pages can go into the root widget
+    for count, page in enumerate(pages):
+        painter.save()
+        size = doc.pageSize(page, dpi=dpi)
+        sizes.append(size)
+        painter.setClipRect(qt4.QRectF(
+            qt4.QPointF(0,0), qt4.QPointF(*size)))
+        helper = painthelper.PaintHelper(
+            doc, size, dpi=dpi, directpaint=painter)
+        doc.paintTo(helper, page)
+        painter.restore()
+
+        # start new pages between each page
+        if count < len(pages)-1:
+            printer.newPage()
+    painter.end()
+
+    return sizes
+
 class Export(object):
     """Class to do the document exporting.
     
@@ -206,7 +238,7 @@ class Export(object):
         """Render page using paint helper to painter.
         This first renders to the helper, then to the painter
         """
-        helper = painthelper.PaintHelper(size, dpi=dpi, directpaint=painter)
+        helper = painthelper.PaintHelper(self.doc, size, dpi=dpi, directpaint=painter)
         painter.setClipRect( qt4.QRectF(
                 qt4.QPointF(0,0), qt4.QPointF(*size)) )
         painter.save()
@@ -240,7 +272,7 @@ class Export(object):
         size = self.doc.pageSize(page, dpi=(dpi,dpi))
 
         # create real output image
-        backqcolor = utils.extendedColorToQColor(self.backcolor)
+        backqcolor = self.doc.evaluate.colors.get(self.backcolor)
         if format == 'png':
             # transparent output
             image = qt4.QImage(size[0], size[1],
@@ -315,7 +347,7 @@ class Export(object):
                 'Only single pages allowed for .eps. Use .ps instead.')
 
         # render ranges and return size of each page
-        sizes = self.doc.printTo(printer, pages)
+        sizes = printPages(self.doc, printer, pages)
 
         # We have to modify the page sizes or bounding boxes to match
         # the document. This is copied to a temporary file.
@@ -437,4 +469,4 @@ def printDialog(parentwindow, document, filename=None):
         pages *= prnt.copyCount()
 
         # do the printing
-        document.printTo(prnt, pages)
+        printPages(document, prnt, pages)

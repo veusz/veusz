@@ -51,10 +51,46 @@ class DrawState(object):
         # list of child widgets states
         self.children = []
 
-class Painter(qt4.QPainter):
-    def __init__(self, helper, widget, outdev):
-        qt4.QPainter.__init__(self, outdev)
+class PainterRoot(qt4.QPainter):
+    """Base class for painting of widgets."""
+
+    def updateMetaData(self, helper):
+        """Update metadeta from helper
+
+        These values are used during plotting."""
+
         self.helper = helper
+        self.document = helper.document
+        self.colors = self.document.evaluate.colors
+        self.scaling = helper.scaling
+        self.pixperpt = helper.pixperpt
+        self.dpi = helper.dpi[1]
+        self.pagesize = helper.pagesize
+        self.maxdim = max(*self.pagesize)
+
+    def docColor(self, name):
+        """Return color from document."""
+        return self.colors.get(name)
+
+    def docColorAuto(self, index):
+        """Return automatic doc color given index."""
+        return self.colors.getIndex(index+1)
+
+    def __enter__(self):
+        pass
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
+
+class DirectPainter(PainterRoot):
+    """Painter class for direct painting with PaintHelper below.
+    """
+
+class RecordPainter(PainterRoot):
+    """This is the painter subclass for rendering in Veusz, which keeps
+    track of which widget is being painted."""
+
+    def __init__(self, widget, outdev):
+        PainterRoot.__init__(self, outdev)
         self.widget = widget
 
     def __enter__(self):
@@ -64,26 +100,19 @@ class Painter(qt4.QPainter):
     def __exit__(self, exc_type, exc_value, traceback):
         self.helper.widgetstack.pop()
 
-class DirectPainter(qt4.QPainter):
-    """Painter class for direct painting with PaintHelper below.
-    Use save() and restore() around this.
-    """
-
-    def __enter__(self):
-        pass
-    def __exit__(self, exc_type, exc_value, traceback):
-        pass
-
 class PaintHelper(object):
     """Helper used when painting widgets.
+
+    Designed to be used for a particular page.
 
     Provides a QPainter to each widget for plotting.
     Records the controlgraphs for each widget.
     Holds the scaling, dpi and size of the page.
+
     """
 
-    def __init__(self, pagesize, scaling=1., dpi=(100, 100),
-                 directpaint=None):
+    def __init__(self, document, pagesize,
+                 scaling=1., dpi=(100, 100), directpaint=None):
         """Initialise using page size (tuple of pixelw, pixelh).
 
         If directpaint is set to a painter, use this directly rather
@@ -93,12 +122,14 @@ class PaintHelper(object):
         the painter.
         """
 
+        self.document = document
         self.dpi = dpi
         self.scaling = scaling
         self.pixperpt = self.dpi[1] / 72.
         self.pagesize = ( max(pagesize[0], 1), max(pagesize[1], 1) )
 
         # keep track of states of all widgets
+        # maps (widget, layer) to DrawState
         self.states = {}
 
         # axis to plotter mappings
@@ -114,8 +145,12 @@ class PaintHelper(object):
         # keep track of last widget being plotted
         self.widgetstack = []
 
+        # current index for each plotter (if wanting automatic colors)
+        self.autoplottercount = 0
+        self.autoplottermap = {}
+
     @property
-    def maxsize(self):
+    def maxdim(self):
         """Return maximum page dimension (using PaintHelper's DPI)."""
         return max(*self.pagesize)
 
@@ -123,11 +158,6 @@ class PaintHelper(object):
         """Return a tuple size for the page given an output device dpi."""
         return ( int(self.pagesize[0]/self.dpi[0] * dpi),
                  int(self.pagesize[1]/self.dpi[1] * dpi) )
-
-    def updatePageSize(self, pagew, pageh):
-        """Update page size to value given (in user text units."""
-        self.pagesize = ( setting.Distance.convertDistance(self, pagew),
-                          setting.Distance.convertDistance(self, pageh) )
 
     def painter(self, widget, bounds, clip=None, layer=None):
         """Return a painter for use when drawing the widget.
@@ -152,7 +182,7 @@ class PaintHelper(object):
 
         if self.directpaint is None:
             # save to multiple recorded layers
-            p = Painter(self, widget, s.record)
+            p = RecordPainter(widget, s.record)
         else:
             # only paint to one output painter
             p = self.directpaint
@@ -160,11 +190,7 @@ class PaintHelper(object):
             p.restore()
             p.save()
 
-        p.scaling = self.scaling
-        p.pixperpt = self.pixperpt
-        p.pagesize = self.pagesize
-        p.maxsize = max(*self.pagesize)
-        p.dpi = self.dpi[1]
+        p.updateMetaData(self)
 
         if clip is not None:
             p.setClipRect(clip)
@@ -284,3 +310,10 @@ class PaintHelper(object):
                 yield state.widget, state.bounds
             # remove the widget itself from the stack and insert children
             stack = state.children + stack[1:]
+
+    def autoColorIndex(self, key):
+        """Return automatic color index for key given."""
+        if key not in self.autoplottermap:
+            self.autoplottermap[key] = self.autoplottercount
+            self.autoplottercount += 1
+        return self.autoplottermap[key]

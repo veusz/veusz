@@ -24,7 +24,9 @@ import datetime
 
 import numpy as N
 
-from ..compat import citems, cstr, cexec, CStringIO, cexecfile
+from . import colors
+
+from ..compat import citems, cstr, cexec
 from .. import setting
 from .. import utils
 from .. import datasets
@@ -70,14 +72,21 @@ class Evaluate:
         # consists of tuples of (name, type, value)
         # type is constant or function
         # we use this format to preserve evaluation order
-        self.customs = []
+        self.def_imports = []
+        self.def_definitions = []
+        self.def_colors = []
+        self.def_colormaps = []
+
+        #self.customs = []
 
         # this is the context used to evaluate expressions
         self.context = {}
-        self.update()
 
         # copy default colormaps
         self.colormaps = utils.ColorMaps()
+        self.colors = colors.Colors()
+
+        self.update()
 
         # copies of validated compiled expressions
         self.compiled = {}
@@ -119,17 +128,20 @@ class Evaluate:
         c['ESCAPE'] = utils.latexEscape
         c['SETTING'] = self._evalsetting
 
-        # custom definitions
-        for ctype, name, val in self.customs:
-            name = name.strip()
-            if ctype == 'constant' or ctype == 'function':
-                self._updateFuncOrConst(ctype, name, val.strip())
-            elif ctype == 'import':
-                self._updateImport(name, val)
-            elif ctype == 'colormap':
-                self._updateColormap(name, val)
-            else:
-                raise ValueError('Invalid custom type')
+        for name, val in self.def_imports:
+            self._updateImport(name, val)
+
+        for name, val in self.def_definitions:
+            self._updateDefinition(name, val)
+
+        self.colors.wipe()
+        for name, val in self.def_colors:
+            self.colors.addColor(name, val)
+        self.colors.updateModel()
+
+        self.colormaps.wipe()
+        for name, val in self.def_colormaps:
+            self._updateColormap(name, val)
 
     def _updateImport(self, module, val):
         """Add an import statement to the eval function context."""
@@ -138,21 +150,21 @@ class Evaluate:
             symbols = identifier_split_re.findall(val)
             toimport = self._processSafeImports(module, symbols)
             if toimport:
-                defn = 'from %s import %s' % (module,
-                                              ', '.join(toimport))
+                defn = 'from %s import %s' % (
+                    module, ', '.join(toimport))
                 try:
                     cexec(defn, self.context)
                 except Exception:
                     self.doc.log(_(
-                        "Failed to import '%s' from module '%s'") %
-                                 (', '.join(toimport), module))
+                        "Failed to import '%s' from module '%s'") % (
+                            ', '.join(toimport), module))
                     return
 
             delta = set(symbols)-set(toimport)
             if delta:
                 self.doc.log(_(
-                    "Did not import '%s' from module '%s'") %
-                             (', '.join(list(delta)), module))
+                    "Did not import '%s' from module '%s'") % (
+                        ', '.join(list(delta)), module))
 
         else:
             self.doc.log( _("Invalid module name '%s'") % module )
@@ -170,6 +182,10 @@ class Evaluate:
 
         out = []
         for entry in colormap:
+            if entry == (-1,0,0,0):
+                out.append(entry)
+                continue
+
             for v in entry:
                 try:
                     v - 0
@@ -202,18 +218,17 @@ class Evaluate:
         else:
             self.colormaps[ cstr(name) ] = cmap
 
-    def _updateFuncOrConst(self, ctype, name, val):
+    def _updateDefinition(self, name, val):
         """Update a function or constant in eval function context."""
 
-        if ctype == 'constant':
-            if not identifier_re.match(name):
-                self.doc.log( _("Invalid constant name '%s'") % name )
-                return
+        if identifier_re.match(name):
             defn = val
-        elif ctype == 'function':
+        else:
             m = function_re.match(name)
             if not m:
-                self.doc.log( _("Invalid function specification '%s'") % name )
+                self.doc.log(
+                    _("Invalid function or constant specification '%s'") %
+                    name)
                 return
             name = m.group(1)
             args = m.group(2)
@@ -286,9 +301,9 @@ class Evaluate:
         """DATA(name, [part]) eval: return dataset as array."""
         if part not in ('data', 'perr', 'serr', 'nerr'):
             raise RuntimeError("Invalid dataset part '%s'" % part)
-        if name not in self.data:
+        if name not in self.doc.data:
             raise RuntimeError("Dataset '%s' does not exist" % name)
-        data = getattr(self.data[name], part)
+        data = getattr(self.doc.data[name], part)
 
         if isinstance(data, N.ndarray):
             return N.array(data)
@@ -298,15 +313,15 @@ class Evaluate:
 
     def _evalfilename(self):
         """FILENAME() eval: returns filename."""
-        return utils.latexEscape(self.filename)
+        return utils.latexEscape(self.doc.filename)
 
     def _evalbasename(self):
         """BASENAME() eval: returns base filename."""
-        return utils.latexEscape(os.path.basename(self.filename))
+        return utils.latexEscape(os.path.basename(self.doc.filename))
 
     def _evalsetting(self, path):
         """SETTING() eval: return setting given full path."""
-        return self.resolveFullSettingPath(path).get()
+        return self.doc.resolveFullSettingPath(path).get()
 
     def evalDatasetExpression(self, expr, part='data', datatype='numeric',
                               dimensions=1):
@@ -380,13 +395,6 @@ class Evaluate:
 
         return toimport
 
-    def customDict(self):
-        """Return a dictionary mapping custom names to (idx, type, value)."""
-        retn = {}
-        for i, (ctype, name, val) in enumerate(self.customs):
-            retn[name] = (i, ctype, val)
-        return retn
-
     def getColormap(self, name, invert):
         """Get colormap with name given (returning grey if does not exist)."""
         cmap = self.colormaps.get(name, self.colormaps['grey'])
@@ -400,10 +408,16 @@ class Evaluate:
 
     def saveCustomDefinitions(self, fileobj):
         """Save custom constants and functions."""
+        for ctype, defns in (
+                ('import', self.def_imports),
+                ('definition', self.def_definitions),
+                ('color', self.def_colors),
+                ('colormap', self.def_colormaps)):
 
-        for vals in self.customs:
-            fileobj.write('AddCustom(%s, %s, %s)\n' %
-                          tuple([repr(x) for x in vals]))
+            for val in defns:
+                fileobj.write(
+                    'AddCustom(%s, %s, %s)\n' % (
+                        repr(ctype), repr(val[0]), repr(val[1])))
 
     def saveCustomFile(self, fileobj):
         """Export the custom settings to a file."""

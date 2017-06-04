@@ -25,8 +25,7 @@ import numpy as N
 from .. import utils
 from ..compat import cbasestr, cstr, crepr
 
-from .commonfn import _
-from .commonfn import *
+from .commonfn import _, convertNumpy, datasetNameToDescriptorName
 from .oned import Dataset1DBase
 
 class DatasetDateTimeBase(Dataset1DBase):

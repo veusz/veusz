@@ -1,5 +1,5 @@
-# Veusz saved document (version 1.16)
-# Saved at 2013-01-12T17:10:05.245549
+# Veusz saved document (version 1.25.1)
+# Saved at 2017-04-30T10:56:21.427544
 
 ImportString(u'r(numeric)','''
 2.029732e+00
@@ -41,6 +41,7 @@ ImportString(u'theta(numeric)','''
 3.200000e+02
 3.400000e+02
 ''')
+Set('colorTheme', u'colorbrewer1')
 Set('StyleSheet/Font/font', u'Arial')
 Add('page', name='page1', autoadd=False)
 To('page1')
@@ -81,9 +82,8 @@ Add('nonorthfunc', name='nonorthfunc1', autoadd=False)
 To('nonorthfunc1')
 Set('function', u'1+cos(b/180*pi)')
 Set('variable', u'b')
-Set('PlotLine/color', u'blue')
 Set('PlotLine/width', u'1pt')
-Set('Fill1/color', u'blue')
+Set('Fill1/color', u'auto')
 Set('Fill1/hide', False)
 Set('Fill1/transparency', 80)
 To('..')
@@ -91,9 +91,8 @@ Add('nonorthfunc', name='nonorthfunc2', autoadd=False)
 To('nonorthfunc2')
 Set('function', u'2+sin(b/180*pi)*cos(b/180*pi)')
 Set('variable', u'b')
-Set('PlotLine/color', u'red')
 Set('PlotLine/width', u'1pt')
-Set('Fill1/color', u'red')
+Set('Fill1/color', u'auto')
 Set('Fill1/hide', False)
 Set('Fill1/transparency', 80)
 To('..')
