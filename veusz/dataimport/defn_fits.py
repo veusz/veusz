@@ -169,11 +169,11 @@ class OperationDataImportFITS(base.OperationDataImportBase):
             rangey = (0-wcs[4], hdu.shape[0]-wcs[4])
         elif mode == "linear_wcs":
             rangex = (
-                (0-wcs[1])*wcs[2] + wcs[0],
-                (hdu.shape[1]-wcs[1])*wcs[2] + wcs[0])
+                (0.5-wcs[1])*wcs[2] + wcs[0],
+                (hdu.shape[1]+0.5-wcs[1])*wcs[2] + wcs[0])
             rangey = (
-                (0-wcs[4])*wcs[5] + wcs[3],
-                (hdu.shape[0]-wcs[4])*wcs[5] + wcs[3])
+                (0.5-wcs[4])*wcs[5] + wcs[3],
+                (hdu.shape[0]+0.5-wcs[4])*wcs[5] + wcs[3])
         else:
             raise RuntimeError("Invalid WCS mode")
 
