@@ -16,12 +16,12 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
 
 import collections
 
 import numpy as N
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..compat import citems, cvalues
 from .. import document
 from .. import datasets
@@ -29,7 +29,7 @@ from . import base
 from . import fits_hdf5_helpers
 
 def _(text, disambiguation=None, context="Import_FITS"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # lazily imported
 fits = None
@@ -352,11 +352,7 @@ class OperationDataImportFITS(base.OperationDataImportBase):
         """Convert textual data to a veusz dataset."""
 
         tdata = list(dread.data)
-
-        # standard text dataset
-        ds = datasets.DatasetText(tdata)
-
-        return ds
+        return datasets.DatasetText(tdata)
 
     def doImport(self):
         """Do the import."""
@@ -401,8 +397,8 @@ def ImportFileFITS(
         slices=None,
         twodranges=None,
         twod_as_oned=None,
-        prefix='', suffix='',
         wcsmodes=None,
+        prefix='', suffix='',
         renames=None,
         linked=False):
     """Import data from a FITS file
@@ -542,6 +538,10 @@ def ImportFITSFile(comm, dsname, filename, hdu,
         hduname = hdunames[idx]
 
     if datacol is None:
+        # default is pixel here
+        if wcsmode is None:
+            wcsmode = 'pixel'
+
         # image mode
         fullname = '/'+hduname
         return ImportFileFITS(

@@ -16,14 +16,16 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
 
 import ast
 import re
 import numpy as N
 
+from .. import qtall as qt
+
 def _(text, disambiguation=None, context="Import_FITS_HDF5"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def filterAttrsByName(attrs, name):
     """For compound datasets, attributes can be given on a per-column basis.
@@ -161,7 +163,7 @@ def convertDatasetToObject(data, slices):
             raise ConvertError(_("Dataset has no dimensions"))
         return data
 
-    elif kind in ('S', 'a') or (
+    elif kind in ('S', 'a', 'U') or (
         kind == 'O' and check_dtype(vlen=data.dtype) is str):
         if hasattr(data, 'ndim') and data.ndim != 1:
             raise ConvertError(_("Text datasets must have 1 dimension"))

@@ -16,9 +16,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from ..dialogs import importdialog
 from ..compat import cstr
@@ -30,7 +30,7 @@ from . import fits_hdf5_tree
 from . import fits_hdf5_helpers
 
 def _(text, disambiguation=None, context="Import_FITS"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # lazily imported
 fits = None
@@ -135,8 +135,8 @@ class ImportTabFITS(importdialog.ImportTab):
         importdialog.ImportTab.loadUi(self)
         self.datanodes = []
 
-        valid = qt4.QDoubleValidator(self)
-        valid.setNotation(qt4.QDoubleValidator.ScientificNotation)
+        valid = qt.QDoubleValidator(self)
+        valid.setNotation(qt.QDoubleValidator.ScientificNotation)
         for w in (self.fitstwodminx, self.fitstwodminy,
                   self.fitstwodmaxx, self.fitstwodmaxy):
             w.setValidator(valid)
@@ -332,6 +332,6 @@ class ImportTabFITS(importdialog.ImportTab):
         except base.ImportingError as e:
             self.fitsimportstatus.setText(_("Error: %s") % cstr(e))
 
-        qt4.QTimer.singleShot(4000, self.fitsimportstatus.clear)
+        qt.QTimer.singleShot(4000, self.fitsimportstatus.clear)
 
 importdialog.registerImportTab(_('FI&TS'), ImportTabFITS)
