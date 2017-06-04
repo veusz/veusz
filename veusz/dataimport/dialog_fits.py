@@ -80,7 +80,7 @@ def constructTree(fitsfile):
     datanodes = []
     for idx, hdu in enumerate(fitsfile):
         hduname = hdunames[idx]
-        dispname = '%s [%i]' % (hduname, idx+1)
+        dispname = '%s [%i]' % (hduname, idx)
 
         if hdu.is_image:
             # image hdu

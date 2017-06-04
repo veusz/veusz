@@ -415,7 +415,7 @@ def ImportFileFITS(
     HDU has a EXTVER keyword then this number is appended to this
     name.  An extra number is appended if this name is not unique.  If
     the HDU has no name, then the name used should be 'hduX', where X
-    is a number (1 is the primary HDU).
+    is the HDU number (0 is the primary HDU).
 
     namemap maps an input dataset (using the scheme above for items)
     to a Veusz dataset name. Special suffixes can be used on the Veusz

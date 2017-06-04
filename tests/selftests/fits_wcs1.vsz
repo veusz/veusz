@@ -1,9 +1,8 @@
 # Veusz saved document (version 1.26.1)
 # Saved at 2017-06-04T09:01:38.276617
 
-AddImportPath(u'/home/jss/code/veusz/tests/selftests')
 ImportFileFITS(u'fits_test.fits', ['/wcstest42'], linked=True)
-Set('colorTheme', 'default-latest')
+Set('colorTheme', 'default1')
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('graph', name='graph1', autoadd=False)

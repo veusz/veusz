@@ -183,7 +183,7 @@ def getFITSHduNames(fitsfile):
         name = hdu.name
 
         if not name:
-            name = 'hdu%i' % (i+1)
+            name = 'hdu%i' % i
             # just in case people start naming HDUs hduX...
             while name in nameset:
                 name += '~'

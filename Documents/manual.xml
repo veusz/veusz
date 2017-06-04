@@ -2136,7 +2136,7 @@ encoding='utf8', renames={})</command></para>
     HDU has a EXTVER keyword then this number is appended to this
     name.  An extra number is appended if this name is not unique.  If
     the HDU has no name, then the name used should be 'hduX', where X
-    is a number (1 is the primary HDU).
+    is the HDU number (0 is the primary HDU).
     </para>
 
     <para>

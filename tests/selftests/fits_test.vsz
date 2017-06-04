@@ -1,7 +1,7 @@
 # Veusz saved document (version 1.26.1)
 # Saved at 2017-06-04T08:23:25.425218
 
-ImportFileFITS(u'fits_test.fits', ['/primary', '/hdu2'], linked=True, namemap={'/hdu2/v_mag': u'mag', '/primary': u'img'})
+ImportFileFITS(u'fits_test.fits', ['/primary', '/hdu1'], linked=True, namemap={'/hdu1/v_mag': u'mag', '/primary': u'img'})
 Add('page', name='page1', autoadd=False)
 To('page1')
 Add('grid', name='grid1', autoadd=False)
