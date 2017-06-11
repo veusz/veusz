@@ -141,13 +141,13 @@ class ImportNameDeligate(qt.QItemDelegate):
                 # add error bars for other datasets
                 out.append(
                     ('%s (+-)' % name,
-                     _("Import as symmetric error bar for '%s'" % name)) )
+                     _("Import as symmetric error bar for '%s'") % name) )
                 out.append(
                     ('%s (+)' % name,
-                     _("Import as positive error bar for '%s'" % name)) )
+                     _("Import as positive error bar for '%s'") % name) )
                 out.append(
                     ('%s (-)' % name,
-                     _("Import as negative error bar for '%s'" % name)) )
+                     _("Import as negative error bar for '%s'") % name) )
         out.sort()
 
         # remove duplicates
