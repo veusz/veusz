@@ -429,9 +429,6 @@ class Document(qt4.QObject):
             reldirname = os.path.dirname( os.path.abspath(fileobj.name) )
             fileobj.write('AddImportPath(%s)\n' % repr(reldirname))
 
-        # add custom definitions
-        self.evaluate.saveCustomDefinitions(fileobj)
-
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
         savedlinks = {}
@@ -445,6 +442,9 @@ class Document(qt4.QObject):
 
         # save tags of datasets
         self.saveDatasetTags(fileobj)
+
+        # add custom definitions
+        self.evaluate.saveCustomDefinitions(fileobj)
 
         # save the actual tree structure
         fileobj.write(self.basewidget.getSaveText())

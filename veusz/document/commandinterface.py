@@ -526,9 +526,9 @@ class CommandInterface(qt4.QObject):
                   " Range of data = %s\n"
                   " Range of symmetric error = %s\n"
                   " Range of positive error = %s\n"
-                  " Range of negative error = %s" % (
+                  " Range of negative error = %s") % (
                       name, numsteps, repr(val),
-                      repr(symerr), repr(poserr), repr(negerr)) )
+                      repr(symerr), repr(poserr), repr(negerr))
               )
 
     def SetData2DExpression(self, name, expr, linked=False):

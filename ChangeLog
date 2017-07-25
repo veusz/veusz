@@ -2,6 +2,8 @@ Changes in <next version>:
  * New FITS import code and user interface, allowing much more
    flexible and convenient FITS importing
  * Fix half pixel error in linear WCS FITS support
+ * Save custom definitions after importing data, to allow customs
+   to depend on datasets.
 
 Changes in 1.26.1:
  * Change homepage in program to new site https://veusz.github.io/
