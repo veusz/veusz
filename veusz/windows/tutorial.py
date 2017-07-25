@@ -448,7 +448,7 @@ class AddXYPlotter(TutorialStep):
 <p>The point plotting widget plots datasets loaded in Veusz.</p>
 
 <p class="usercmd">The flashing icon adds a point plotting (xy)
-widget. Click on this, or go to the Add menu and choose "Add xy".</p>
+widget. Click on this, or go to the Insert menu and choose "Add xy".</p>
 '''), mainwin,
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.xy']),
@@ -528,7 +528,7 @@ class AddXY2nd(TutorialStep):
 <code>gamma</code> on the same graph.</p>
 
 <p class="usercmd">Add a second point plotting (xy) widget using the
-flashing icon, or go to the Add menu and choose "Add xy".</p>
+flashing icon, or go to the Insert menu and choose "Add xy".</p>
 '''), mainwin,
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.xy']),
