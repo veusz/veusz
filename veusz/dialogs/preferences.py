@@ -108,6 +108,9 @@ class PreferencesDialog(VeuszDialog):
 
         # python path
         self.externalPythonPath.setText(setdb['external_pythonpath'])
+        self.externalGhostscript.setText(setdb['external_ghostscript'])
+        self.externalGhostscriptBrowse.clicked.connect(
+            self.externalGhostscriptBrowseClicked)
 
     def setupColorTab(self):
         """Initialise color tab
@@ -226,6 +229,7 @@ class PreferencesDialog(VeuszDialog):
 
         # python path
         setdb['external_pythonpath'] = self.externalPythonPath.text()
+        setdb['external_ghostscript'] = self.externalGhostscript.text()
 
         self.plotwindow.updatePlotSettings()
 
@@ -260,3 +264,11 @@ class PreferencesDialog(VeuszDialog):
         sel = self.pluginList.selectionModel().currentIndex()
         if sel.isValid():
             self.pluginmodel.removeRow( sel.row() )
+
+    def externalGhostscriptBrowseClicked(self):
+        """Choose a ghostscript executable."""
+
+        filename = self.parent().fileOpenDialog(
+            [_('All files (*)')], _('Choose ghostscript executable'))
+        if filename:
+            self.externalGhostscript.setText(filename)

@@ -24,9 +24,12 @@ import random
 import math
 import codecs
 import re
+import sys
+import subprocess
 
 from ..compat import crange
 from .. import qtall as qt4
+from .. import setting
 from .. import utils
 
 try:
@@ -109,23 +112,6 @@ def fixupPDFIndices(text):
 
     return text
 
-def fixupPSBoundingBox(infname, outfname, pagewidth, size):
-    """Make bounding box for EPS/PS match size given."""
-    with open(infname, 'rU') as fin:
-        with open(outfname, 'w') as fout:
-            for line in fin:
-                if line[:14] == '%%BoundingBox:':
-                    # replace bounding box line by calculated one
-                    parts = line.split()
-                    widthfactor = float(parts[3]) / pagewidth
-                    origheight = float(parts[4])
-                    line = "%s %i %i %i %i\n" % (
-                        parts[0], 0,
-                        int(math.floor(origheight-widthfactor*size[1])),
-                        int(math.ceil(widthfactor*size[0])),
-                        int(math.ceil(origheight)) )
-                fout.write(line)
-
 def printPages(doc, printer, pages, scaling=1., antialias=False):
     """Print onto printing device.
     Returns list of page sizes
@@ -164,30 +150,62 @@ class Export(object):
     This is split from document to make that class cleaner.
     """
 
-    formats = [
-        (["bmp"], _("Windows bitmap")),
-        (["eps"], _("Encapsulated Postscript")),
-        (["ps"], _("Postscript")),
-        (["jpg"], _("Jpeg bitmap")),
-        (["pdf"], _("Portable Document Format")),
-        #(["pic"], _("QT Pic format")),
-        (["png"], _("Portable Network Graphics")),
-        (["svg"], _("Scalable Vector Graphics")),
-        (["tiff"], _("Tagged Image File Format bitmap")),
-        (["xpm"], _("X Pixmap")),
+    # whether ghostscript has been searched for
+    gs_searched = False
+    # its path if it exists
+    gs_exe = None
+
+    @classmethod
+    def searchGhostscript(klass):
+        """Find location of Ghostscript executable."""
+        if not klass.gs_searched:
+            # test for existence of ghostscript
+            hasgs = False
+            gs = setting.settingdb["external_ghostscript"]
+            if gs:
+                if os.path.isfile(gs) and os.access(gs, os.X_OK):
+                    klass.gs_exe = gs
+            else:
+                exe = "gs.exe" if sys.platform == "win32" else "gs"
+                found = utils.findOnPath(exe)
+                if found:
+                    klass.gs_exe = found
+
+            klass.gs_searched = True
+
+    @classmethod
+    def getFormats(klass):
+        """Return list of formats in form of tuples of extension and description."""
+        formats = [
+            (["bmp"], _("Windows bitmap")),
+            (["jpg"], _("Jpeg bitmap")),
+            (["pdf"], _("Portable Document Format")),
+            (["png"], _("Portable Network Graphics")),
+            (["svg"], _("Scalable Vector Graphics")),
+            (["tiff"], _("Tagged Image File Format bitmap")),
+            (["xpm"], _("X Pixmap")),
         ]
 
-    if hasemf:
-        formats.append( (["emf"], _("Windows Enhanced Metafile")) )
-        formats.sort()
+        if hasemf:
+            formats.append( (["emf"], _("Windows Enhanced Metafile")) )
 
-    def __init__(self, doc, filename, pagenumber, color=True, bitmapdpi=100,
+        klass.searchGhostscript()
+        if klass.gs_exe:
+            formats += [
+                (["eps"], _("Encapsulated Postscript")),
+                (["ps"], _("Postscript")),
+                ]
+
+        formats.sort()
+        return formats
+
+    def __init__(self, doc, filename, pagenumbers, color=True, bitmapdpi=100,
                  antialias=True, quality=85, backcolor='#ffffff00',
                  pdfdpi=150, svgtextastext=False):
         """Initialise export class. Parameters are:
         doc: document to write
         filename: output filename
-        pagenumber: pagenumber to export or list of pages for some formats
+        pagenumbers: list of pages to export
         color: use color or try to use monochrome
         bitmapdpi: assume this dpi value when writing images
         antialias: antialias text and lines when writing bitmaps
@@ -199,7 +217,7 @@ class Export(object):
 
         self.doc = doc
         self.filename = filename
-        self.pagenumber = pagenumber
+        self.pagenumbers = pagenumbers
         self.color = color
         self.bitmapdpi = bitmapdpi
         self.antialias = antialias
@@ -213,23 +231,26 @@ class Export(object):
 
         ext = os.path.splitext(self.filename)[1].lower()
 
-        if ext in ('.eps', '.ps', '.pdf'):
-            self.exportPDFOrPS(ext)
+        if ext == '.pdf':
+            self.exportPDF(self.filename)
+
+        elif ext in ('.eps', '.ps'):
+            self.exportPS(self.filename, ext)
 
         elif ext in ('.png', '.jpg', '.jpeg', '.bmp', '.tiff', '.xpm'):
-            self.exportBitmap(ext)
+            self.exportBitmap(self.filename, ext)
 
         elif ext == '.svg':
-            self.exportSVG()
+            self.exportSVG(self.filename)
 
         elif ext == '.selftest':
-            self.exportSelfTest()
+            self.exportSelfTest(self.filename)
 
         elif ext == '.pic':
-            self.exportPIC()
+            self.exportPIC(self.filename)
 
         elif ext == '.emf' and hasemf:
-            self.exportEMF()
+            self.exportEMF(self.filename)
 
         else:
             raise RuntimeError("File type '%s' not supported" % ext)
@@ -250,20 +271,17 @@ class Export(object):
         """Check single number of pages or throw exception,
         else return page number."""
 
-        try:
-            if len(self.pagenumber) != 1:
-                raise RuntimeError(
-                    'Can only export a single page in this format')
-            return self.pagenumber[0]
-        except TypeError:
-            return self.pagenumber
+        if len(self.pagenumbers) != 1:
+            raise RuntimeError(
+                'Can only export a single page in this format')
+        return self.pagenumbers[0]
 
-    def exportBitmap(self, ext):
+    def exportBitmap(self, filename, ext):
         """Export to a bitmap format."""
 
-        format = ext[1:] # setFormat() doesn't want the leading '.'
-        if format == 'jpeg':
-            format = 'jpg'
+        fmt = ext.strip('.') # setFormat() doesn't want the leading '.'
+        if fmt == 'jpeg':
+            fmt = 'jpg'
 
         page = self.getSinglePage()
 
@@ -273,7 +291,7 @@ class Export(object):
 
         # create real output image
         backqcolor = self.doc.evaluate.colors.get(self.backcolor)
-        if format == 'png':
+        if fmt == 'png':
             # transparent output
             image = qt4.QImage(size[0], size[1],
                                qt4.QImage.Format_ARGB32_Premultiplied)
@@ -298,8 +316,8 @@ class Export(object):
 
         # write image to disk
         writer = qt4.QImageWriter()
-        writer.setFormat(qt4.QByteArray(format))
-        writer.setFileName(self.filename)
+        writer.setFormat(fmt.encode('ascii'))
+        writer.setFileName(filename)
 
         # enable LZW compression for TIFFs
         writer.setCompression(1)
@@ -312,7 +330,7 @@ class Export(object):
         except AttributeError:
             pass
 
-        if format == 'png':
+        if fmt == 'png':
             # min quality for png as it makes no difference to output
             # and makes file size smaller
             writer.setQuality(0)
@@ -321,8 +339,8 @@ class Export(object):
 
         writer.write(image)
 
-    def exportPDFOrPS(self, ext):
-        """Export to EPS or PDF format."""
+    def exportPDF(self, filename):
+        """Export to PDF format."""
 
         # setup printer with requested parameters
         printer = qt4.QPrinter()
@@ -330,53 +348,68 @@ class Export(object):
         printer.setFullPage(True)
         printer.setColorMode(
             qt4.QPrinter.Color if self.color else qt4.QPrinter.GrayScale)
-        printer.setOutputFormat(
-            qt4.QPrinter.PdfFormat if ext=='.pdf' else
-            qt4.QPrinter.PostScriptFormat)
-        printer.setOutputFileName(self.filename)
+        printer.setOutputFormat(qt4.QPrinter.PdfFormat)
+        printer.setOutputFileName(filename)
         printer.setCreator('Veusz %s' % utils.version())
 
-        # convert page to list if necessary
-        try:
-            pages = list(self.pagenumber)
-        except TypeError:
-            pages = [self.pagenumber]
-
-        if len(pages) != 1 and ext == '.eps':
-            raise RuntimeError(
-                'Only single pages allowed for .eps. Use .ps instead.')
-
         # render ranges and return size of each page
-        sizes = printPages(self.doc, printer, pages)
+        sizes = printPages(self.doc, printer, self.pagenumbers)
 
         # We have to modify the page sizes or bounding boxes to match
         # the document. This is copied to a temporary file.
-        tmpfile = "%s.tmp.%i" % (self.filename, random.randint(0,1000000))
+        tmpfile = "%s.tmp.%i" % (filename, random.randint(0,1000000))
 
-        if ext == '.eps' or ext == '.ps':
-            # only 1 size allowed for PS, so use maximum
-            maxsize = sizes[0]
-            for size in sizes[1:]:
-                maxsize = max(size[0], maxsize[0]), max(size[1], maxsize[1])
-
-            fixupPSBoundingBox(self.filename, tmpfile, printer.width(), maxsize)
-
-        elif ext == '.pdf':
-            # change pdf bounding box and correct pdf index
-            with open(self.filename, 'rb') as fin:
-                text = fin.read()
-            text = scalePDFMediaBox(text, printer.width(), sizes)
-            text = fixupPDFIndices(text)
-            with open(tmpfile, 'wb') as fout:
-                fout.write(text)
-        else:
-            raise RuntimeError('Invalid file type')
+        # change pdf bounding box and correct pdf index
+        with open(filename, 'rb') as fin:
+            text = fin.read()
+        text = scalePDFMediaBox(text, printer.width(), sizes)
+        text = fixupPDFIndices(text)
+        with open(tmpfile, 'wb') as fout:
+            fout.write(text)
 
         # replace original by temporary
-        os.remove(self.filename)
-        os.rename(tmpfile, self.filename)
+        os.remove(filename)
+        os.rename(tmpfile, filename)
 
-    def exportSVG(self):
+    def exportPS(self, filename, ext):
+        """Export to PS/EPS via conversion with Ghostscript.
+
+        ext == '.eps' or '.ps'
+        """
+
+        if len(self.pagenumbers) != 1 and ext == '.eps':
+            raise RuntimeError(
+                'Only single pages allowed for .eps. Use .ps instead.')
+
+        self.searchGhostscript()
+        if not self.gs_exe:
+            raise RuntimeError("Cannot write Postscript with Ghostscript")
+
+        # do conversion
+        tmpfilepdf = "%s.tmp.%i.pdf" % (filename, random.randint(0,1000000))
+        tmpfileps = "%s.tmp.%i%s" % (filename, random.randint(0,1000000), ext)
+
+        self.exportPDF(tmpfilepdf)
+
+        # choose device depending on extension
+        device = 'eps2write' if ext == '.eps' else 'ps2write'
+
+        cmd = [
+            self.gs_exe,
+            '-q', '-dNOCACHE', '-dNOPAUSE', '-dBATCH', '-dSAFER',
+            '-sDEVICE=%s' % device,
+            '-sOutputFile=%s' % tmpfileps,
+            tmpfilepdf
+            ]
+        try:
+            subprocess.call(cmd)
+        except OSError as e:
+            raise RuntimeError("Could not run ghostscript: %s" % str(e))
+
+        os.unlink(tmpfilepdf)
+        os.rename(tmpfileps, filename)
+
+    def exportSVG(self, filename):
         """Export document as SVG"""
 
         page = self.getSinglePage()
@@ -384,13 +417,13 @@ class Export(object):
         dpi = svg_export.dpi * 1.
         size = self.doc.pageSize(
             page, dpi=(dpi,dpi), integer=False)
-        with codecs.open(self.filename, 'w', 'utf-8') as f:
+        with codecs.open(filename, 'w', 'utf-8') as f:
             paintdev = svg_export.SVGPaintDevice(
                 f, size[0]/dpi, size[1]/dpi, writetextastext=self.svgtextastext)
             painter = painthelper.DirectPainter(paintdev)
             self.renderPage(page, size, (dpi,dpi), painter)
 
-    def exportSelfTest(self):
+    def exportSelfTest(self, filename):
         """Export document for testing"""
 
         page = self.getSinglePage()
@@ -399,13 +432,13 @@ class Export(object):
         size = width, height = self.doc.pageSize(
             page, dpi=(dpi,dpi), integer=False)
 
-        f = open(self.filename, 'w')
+        f = open(filename, 'w')
         paintdev = selftest_export.SelfTestPaintDevice(f, width/dpi, height/dpi)
         painter = painthelper.DirectPainter(paintdev)
         self.renderPage(page, size, (dpi,dpi), painter)
         f.close()
 
-    def exportPIC(self):
+    def exportPIC(self, filename):
         """Export document as Qt PIC"""
 
         page = self.getSinglePage()
@@ -416,9 +449,9 @@ class Export(object):
         dpi = (pic.logicalDpiX(), pic.logicalDpiY())
         size = self.doc.pageSize(page, dpi=dpi)
         self.renderPage(page, size, dpi, painter)
-        pic.save(self.filename)
+        pic.save(filename)
 
-    def exportEMF(self):
+    def exportEMF(self, filename):
         """Export document as EMF."""
 
         page = self.getSinglePage()
@@ -428,7 +461,7 @@ class Export(object):
         paintdev = emf_export.EMFPaintDevice(size[0]/dpi, size[1]/dpi, dpi=dpi)
         painter = painthelper.DirectPainter(paintdev)
         self.renderPage(page, size, (dpi,dpi), painter)
-        paintdev.paintEngine().saveFile(self.filename)
+        paintdev.paintEngine().saveFile(filename)
 
 def printDialog(parentwindow, document, filename=None):
     """Open a print dialog and print document."""

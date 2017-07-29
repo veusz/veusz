@@ -66,8 +66,9 @@ def findOnPath(cmd):
     path = os.getenv('PATH', os.path.defpath)
     pathparts = path.split(os.path.pathsep)
     for dirname in pathparts:
+        dirname = dirname.strip('"')
         cmdtry = os.path.join(dirname, cmd)
-        if os.path.isfile(cmdtry):
+        if os.path.isfile(cmdtry) and os.access(cmdtry, os.X_OK):
             return cmdtry
     return None
 

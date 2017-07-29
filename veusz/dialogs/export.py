@@ -74,7 +74,7 @@ class ExportDialog(VeuszDialog):
 
         # get allowed types (some formats are disabled if no helper)
         docfmts = set()
-        for types, descr in document.Export.formats:
+        for types, descr in document.Export.getFormats():
             docfmts.update(types)
         # disable type if not allowed
         for fmt, radio in citems(self.fmtradios):
@@ -211,7 +211,7 @@ class ExportDialog(VeuszDialog):
         filters = []
         # a list of extensions which are allowed
         validextns = []
-        formats = document.Export.formats
+        formats = document.Export.getFormats()
         for extns, name in formats:
             extensions = " ".join(["*." + item for item in extns])
             # join eveything together to make a filter string
@@ -363,8 +363,8 @@ class ExportDialog(VeuszDialog):
 
         export = document.Export(
             self.document,
-            '',  # filename
-            0,   # page number
+            '',    # filename
+            [0],   # page numbers
             bitmapdpi=setdb['export_DPI'],
             pdfdpi=setdb['export_DPI_PDF'],
             antialias=setdb['export_antialias'],
@@ -407,7 +407,7 @@ class ExportDialog(VeuszDialog):
             try:
                 # actually do the export
                 export.export()
-                pagecount[0] += len(export.pagenumber)
+                pagecount[0] += len(export.pagenumbers)
             except (RuntimeError, EnvironmentError) as e:
                 # errors from the export
                 if isinstance(e, EnvironmentError):
@@ -426,7 +426,7 @@ class ExportDialog(VeuszDialog):
             # write pages to multiple files
             for page in pages:
                 pagename = self.document.getPage(page).name
-                export.pagenumber = [page]
+                export.pagenumbers = [page]
                 export.filename = os.path.join(
                     os.path.dirname(filename),
                     os.path.basename(filename).replace(PAGENUM, str(page+1)).
@@ -435,7 +435,7 @@ class ExportDialog(VeuszDialog):
                 _checkAndExport()
         else:
             # write page/pages to single file
-            export.pagenumber = pages
+            export.pagenumbers = pages
             export.filename = filename
             _checkAndExport()
 

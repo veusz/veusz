@@ -83,6 +83,9 @@ defaultValues = {
 
     # add these directories to the python path (colon-separated)
     'external_pythonpath': '',
+
+    # location of ghostscript (or empty to search)
+    'external_ghostscript': '',
     }
 
 class _SettingDB(object):

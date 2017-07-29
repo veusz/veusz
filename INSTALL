@@ -24,6 +24,7 @@ Optional requirements:
  iminuit         https://github.com/iminuit/iminuit
  ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
+ Ghostscript     https://www.ghostscript.com/ (for EPS/PS output)
 
 Python 3 support is included in veusz-1.19+, although it has less
 testing than Python 2 support. Note that the source code is compatible
