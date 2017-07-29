@@ -279,7 +279,7 @@ class Export(object):
     def exportBitmap(self, filename, ext):
         """Export to a bitmap format."""
 
-        fmt = ext.strip('.') # setFormat() doesn't want the leading '.'
+        fmt = ext.lstrip('.') # setFormat() doesn't want the leading '.'
         if fmt == 'jpeg':
             fmt = 'jpg'
 
@@ -385,11 +385,15 @@ class Export(object):
         if not self.gs_exe:
             raise RuntimeError("Cannot write Postscript with Ghostscript")
 
-        # do conversion
-        tmpfilepdf = "%s.tmp.%i.pdf" % (filename, random.randint(0,1000000))
-        tmpfileps = "%s.tmp.%i%s" % (filename, random.randint(0,1000000), ext)
+        # write to pdf file first
+        tmpfilepdf = "%s.tmp.%i.pdf" % (
+            filename, random.randint(0,1000000))
+        tmpfileps = "%s.tmp.%i%s" % (
+            filename, random.randint(0,1000000), ext)
 
         self.exportPDF(tmpfilepdf)
+
+        # do conversion with ghostscript
 
         # choose device depending on extension
         device = 'eps2write' if ext == '.eps' else 'ps2write'
@@ -402,11 +406,18 @@ class Export(object):
             tmpfilepdf
             ]
         try:
-            subprocess.call(cmd)
-        except OSError as e:
+            subprocess.check_call(cmd)
+        except Exception as e:
             raise RuntimeError("Could not run ghostscript: %s" % str(e))
 
-        os.unlink(tmpfilepdf)
+        if not os.path.isfile(tmpfileps):
+            raise RuntimeError("Ghostscript failed to create %s" % tmpfileps)
+
+        os.remove(tmpfilepdf)
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
         os.rename(tmpfileps, filename)
 
     def exportSVG(self, filename):
@@ -432,11 +443,11 @@ class Export(object):
         size = width, height = self.doc.pageSize(
             page, dpi=(dpi,dpi), integer=False)
 
-        f = open(filename, 'w')
-        paintdev = selftest_export.SelfTestPaintDevice(f, width/dpi, height/dpi)
-        painter = painthelper.DirectPainter(paintdev)
-        self.renderPage(page, size, (dpi,dpi), painter)
-        f.close()
+        with open(filename, 'w') as fout:
+            paintdev = selftest_export.SelfTestPaintDevice(
+                fout, width/dpi, height/dpi)
+            painter = painthelper.DirectPainter(paintdev)
+            self.renderPage(page, size, (dpi,dpi), painter)
 
     def exportPIC(self, filename):
         """Export document as Qt PIC"""
