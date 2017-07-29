@@ -49,87 +49,38 @@ def _(text, disambiguation=None, context="Export"):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-def scalePDFMediaBox(text, pagewidth, reqdsizes):
-    """Take the PDF file text and adjust the page size.
-    pagewidth: full page width
-    reqdsizes: list of tuples of width, height
-    """
-
-    outtext = b''
-    outidx = 0
-    for size, match in zip(
-            reqdsizes,
-            re.finditer(
-                br'^/MediaBox \[([0-9]+) ([0-9]+) ([0-9]+) ([0-9]+)\]$',
-                text, re.MULTILINE)):
-
-        box = [float(x) for x in match.groups()]
-        widthfactor = (box[2]-box[0])/pagewidth
-        newbox = ('/MediaBox [%i %i %i %i]' % (
-            int(box[0]),
-            int(math.floor(box[3]-widthfactor*size[1])),
-            int(math.ceil(box[0]+widthfactor*size[0])),
-            int(math.ceil(box[3]))
-        )).encode('ascii')
-
-        outtext += text[outidx:match.start()] + newbox
-        outidx = match.end()
-
-    outtext += text[outidx:]
-    return outtext
-
-def fixupPDFIndices(text):
-    """Fixup index table in PDF.
-
-    Basically, we need to find the start of each obj in the file
-    These indices are then placed in an xref table at the end
-    The index to the xref table is placed after a startxref
-    """
-
-    # find occurences of obj in string
-    indices = {}
-    for m in re.finditer(b'([0-9]+) 0 obj', text):
-        index = int(m.group(1))
-        indices[index] = m.start(0)
-
-    # build up xref block (note trailing spaces)
-    xref = [b'xref', ('0 %i' % (len(indices)+1)).encode('ascii'),
-            b'0000000000 65535 f ']
-    for i in crange(len(indices)):
-        xref.append( ('%010i %05i n ' % (indices[i+1], 0)).encode('ascii') )
-    xref.append(b'trailer\n')
-    xref = b'\n'.join(xref)
-
-    # replace current xref with this one
-    xref_match = re.search(b'^xref\n.*trailer\n', text, re.DOTALL | re.MULTILINE)
-    xref_index = xref_match.start(0)
-    text = text[:xref_index] + xref + text[xref_match.end(0):]
-
-    # put the correct index to the xref after startxref
-    startxref_re = re.compile(b'^startxref\n[0-9]+\n', re.DOTALL | re.MULTILINE)
-    text = startxref_re.sub( ('startxref\n%i\n' % xref_index).encode('ascii'),
-                             text)
-
-    return text
-
-def printPages(doc, printer, pages, scaling=1., antialias=False):
+def printPages(doc, printer, pages, scaling=1., antialias=False, setsizes=False):
     """Print onto printing device.
     Returns list of page sizes
+    setsizes: Set page size on printer to page sizes
     """
 
-    painter = painthelper.DirectPainter(printer)
+    if not pages:
+        return
+
     dpi = (printer.logicalDpiX(), printer.logicalDpiY())
+
+    def getUpdateSize(page):
+        size = doc.pageSize(page, dpi=dpi, integer=False)
+        if setsizes:
+            # update paper size on printer
+            sizeinchx, sizeinchy = size[0]/dpi[0], size[1]/dpi[1]
+            pagesize = qt4.QPageSize(
+                qt4.QSizeF(sizeinchx, sizeinchy), qt4.QPageSize.Inch)
+            layout = qt4.QPageLayout(
+                pagesize, qt4.QPageLayout.Portrait, qt4.QMarginsF())
+            printer.setPageLayout(layout)
+        return size
+
+    size = getUpdateSize(pages[0])
+    painter = painthelper.DirectPainter(printer)
     if antialias:
         painter.setRenderHint(qt4.QPainter.Antialiasing, True)
         painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
 
-    sizes = []
-
     # This all assumes that only pages can go into the root widget
     for count, page in enumerate(pages):
         painter.save()
-        size = doc.pageSize(page, dpi=dpi)
-        sizes.append(size)
         painter.setClipRect(qt4.QRectF(
             qt4.QPointF(0,0), qt4.QPointF(*size)))
         helper = painthelper.PaintHelper(
@@ -139,14 +90,15 @@ def printPages(doc, printer, pages, scaling=1., antialias=False):
 
         # start new pages between each page
         if count < len(pages)-1:
+            # set page size before newPage!
+            size = getUpdateSize(pages[count+1])
             printer.newPage()
-    painter.end()
 
-    return sizes
+    painter.end()
 
 class Export(object):
     """Class to do the document exporting.
-    
+
     This is split from document to make that class cleaner.
     """
 
@@ -352,24 +304,7 @@ class Export(object):
         printer.setOutputFileName(filename)
         printer.setCreator('Veusz %s' % utils.version())
 
-        # render ranges and return size of each page
-        sizes = printPages(self.doc, printer, self.pagenumbers)
-
-        # We have to modify the page sizes or bounding boxes to match
-        # the document. This is copied to a temporary file.
-        tmpfile = "%s.tmp.%i" % (filename, random.randint(0,1000000))
-
-        # change pdf bounding box and correct pdf index
-        with open(filename, 'rb') as fin:
-            text = fin.read()
-        text = scalePDFMediaBox(text, printer.width(), sizes)
-        text = fixupPDFIndices(text)
-        with open(tmpfile, 'wb') as fout:
-            fout.write(text)
-
-        # replace original by temporary
-        os.remove(filename)
-        os.rename(tmpfile, filename)
+        printPages(self.doc, printer, self.pagenumbers, setsizes=True)
 
     def exportPS(self, filename, ext):
         """Export to PS/EPS via conversion with Ghostscript.
@@ -478,8 +413,8 @@ def printDialog(parentwindow, document, filename=None):
     """Open a print dialog and print document."""
 
     if document.getNumberPages() == 0:
-        qt4.QMessageBox.warning(parentwindow, _("Error - Veusz"),
-                                _("No pages to print"))
+        qt4.QMessageBox.warning(
+            parentwindow, _("Error - Veusz"), _("No pages to print"))
         return
 
     prnt = qt4.QPrinter(qt4.QPrinter.HighResolution)
