@@ -883,8 +883,7 @@ class MainWindow(qt4.QMainWindow):
 
         # restore docked window geometry
         if 'geometry_mainwindowstate' in setdb:
-            b = qt4.QByteArray(setdb['geometry_mainwindowstate'])
-            self.restoreState(b)
+            self.restoreState(setdb['geometry_mainwindowstate'])
 
     def slotFileNew(self):
         """New file."""
