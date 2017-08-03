@@ -31,7 +31,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import cstr, cstrerror, cgetcwd
+from ..compat import cstr, cstrerror, cgetcwd, cbytes
 from .. import qtall as qt4
 
 from .. import document
@@ -855,7 +855,7 @@ class MainWindow(qt4.QMainWindow):
 
         # store docked windows
         data = self.saveState().data()
-        setdb['geometry_mainwindowstate'] = data
+        setdb['geometry_mainwindowstate'] = cbytes(data)
 
         # save current setting db
         setdb.writeSettings()
@@ -883,7 +883,11 @@ class MainWindow(qt4.QMainWindow):
 
         # restore docked window geometry
         if 'geometry_mainwindowstate' in setdb:
-            self.restoreState(setdb['geometry_mainwindowstate'])
+            try:
+                self.restoreState(setdb['geometry_mainwindowstate'])
+            except Exception:
+                # type can be wrong if switching between Py2/3 PyQ4/5
+                pass
 
     def slotFileNew(self):
         """New file."""
