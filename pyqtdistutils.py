@@ -95,8 +95,6 @@ class build_ext (distutils.command.build_ext.build_ext):
                 '-framework', 'QtXml',
                 '-framework', 'QtWidgets',
                 ]
-        elif sys.platform == 'win32':
-            extension.libraries = ['QtGui5', 'QtCore5', 'QtXml5', 'QtWidgets5']
         else:
             extension.libraries = ['Qt5Gui', 'Qt5Core', 'Qt5Xml', 'Qt5Widgets']
         extension.library_dirs = [QT_LIB_DIR]
