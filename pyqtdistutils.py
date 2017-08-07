@@ -62,9 +62,8 @@ class build_ext (distutils.command.build_ext.build_ext):
 
         raise RuntimeError('cannot parse SIP-generated "%s"' % sbf)
 
-    def get_includes(self):
-
-        incdirs = []
+    def get_cpp_includes(self):
+        incdirs = [QT_INC_DIR]
         for mod in ('QtCore', 'QtGui', 'QtWidgets', 'QtXml'):
             if QT_IS_FRAMEWORK:
                 incdirs.append(
@@ -81,23 +80,29 @@ class build_ext (distutils.command.build_ext.build_ext):
         indirs = list(set([os.path.dirname(x) for x in sources]))
 
         # Add the SIP and Qt include directories to the include path
-        extension.include_dirs += [
-            SIP_INC_DIR,
-            QT_INC_DIR,
-            ] + self.get_includes() + indirs
+        extension.include_dirs += [SIP_INC_DIR] + indirs
 
         # link against libraries
-        if QT_IS_FRAMEWORK:
-            extension.extra_link_args = [
-                '-F', os.path.join(QT_LIB_DIR),
-                '-framework', 'QtGui',
-                '-framework', 'QtCore',
-                '-framework', 'QtXml',
-                '-framework', 'QtWidgets',
-                ]
-        else:
-            extension.libraries = ['Qt5Gui', 'Qt5Core', 'Qt5Xml', 'Qt5Widgets']
-        extension.library_dirs = [QT_LIB_DIR]
+        if extension.language == 'c++':
+            extension.include_dirs += self.get_cpp_includes()
+
+            if QT_IS_FRAMEWORK:
+                extension.extra_link_args = [
+                    '-F', os.path.join(QT_LIB_DIR),
+                    '-framework', 'QtGui',
+                    '-framework', 'QtCore',
+                    '-framework', 'QtXml',
+                    '-framework', 'QtWidgets',
+                    ]
+                extension.extra_compile_args = [
+                    '-F', os.path.join(QT_LIB_DIR),
+                    # not sure how to detect below, so hard coded
+                    '-std=gnu++11',
+                    ]
+            else:
+                extension.libraries = [
+                    'Qt5Gui', 'Qt5Core', 'Qt5Xml', 'Qt5Widgets']
+            extension.library_dirs = [QT_LIB_DIR]
 
         depends = extension.depends
 
