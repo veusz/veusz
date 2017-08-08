@@ -93,9 +93,11 @@ class build_ext (distutils.command.build_ext.build_ext):
                     '-framework', 'QtCore',
                     '-framework', 'QtXml',
                     '-framework', 'QtWidgets',
+                    '-Wl,-rpath,@executable_path/Frameworks',
+                    '-Wl,-rpath,' + QT_LIB_DIR
                     ]
                 extension.extra_compile_args = [
-                    '-F', os.path.join(QT_LIB_DIR),
+                    '-F', QT_LIB_DIR,
                     # not sure how to detect below, so hard coded
                     '-std=gnu++11',
                     ]
