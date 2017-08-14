@@ -18,7 +18,6 @@
 
 from __future__ import division, print_function, absolute_import
 
-from ..compat import cstr
 from .. import qtall as qt
 from . import fits_hdf5_helpers
 
@@ -332,11 +331,12 @@ class FileDataNode(FileNode):
         slice = None
         if "vsz_slice" in self.attrs:
             slice = fits_hdf5_helpers.convertTextToSlice(
-                self.attrs["vsz_slice"], len(self.shape))
+                fits_hdf5_helpers.convertFromBytes(self.attrs["vsz_slice"]),
+                len(self.shape))
         if self.slice:
             slice = self.slice
 
-        if slice:
+        if slice and slice != -1:
             shapei = 0
             for s in slice:
                 if isinstance(s, int):
@@ -369,14 +369,16 @@ class FileDataNode(FileNode):
                         return self.importname
                     elif "vsz_name" in self.attrs:
                         # needs to be converted to unicode to work!
-                        return cstr(self.attrs["vsz_name"])
+                        return fits_hdf5_helpers.convertFromBytes(
+                            self.attrs["vsz_name"])
                     return None
 
             elif column == _ColSlice:
                 if self.slice:
                     return fits_hdf5_helpers.convertSliceToText(self.slice)
                 elif "vsz_slice" in self.attrs:
-                    return cstr(self.attrs["vsz_slice"])
+                    return fits_hdf5_helpers.convertFromBytes(
+                        self.attrs["vsz_slice"])
                 return None
 
         elif role == qt.Qt.ToolTipRole:
