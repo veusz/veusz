@@ -6,7 +6,7 @@ import os.path
 #thisdir=os.path.dirname(os.path.abspath(__file__))
 
 a = Analysis(
-    ['veusz/veusz_main.py'],
+    ['../veusz/veusz_main.py'],
     pathex=[],
     hiddenimports=['h5py.defs', 'h5py.utils', 'h5py.h5ac', 'h5py._proxy',
                    'iminuit', 'iminuit.latex', 'iminuit._plotting', 'iminuit.frontends'],
@@ -45,12 +45,12 @@ for f in ( glob.glob('icons/*.png')  + glob.glob('icons/*.ico') +
     binaries.append( (f, f, 'DATA') )
 
 excludes = set([
-        'libXi.so.6', 'libX11-xcb.so.1', 'libX11.so.6',
-        'libXext.so.6', 'libXau.so.6', 'libICE.so.6',
+        #'libXi.so.6', 'libX11-xcb.so.1', 'libX11.so.6',
+        #'libXext.so.6', 'libXau.so.6', 'libICE.so.6',
         'libreadline.so.6', 'readline.so',
         '_curses.so', 'libncursesw.so.5',
         'termios.so', 'libtinfo.so.5',
-        'libz.so.1',
+        #'libz.so.1',
         ])
 # remove libraries in the set above
 binaries[:] = [b for b in binaries if b[0] not in excludes]
