@@ -8,7 +8,9 @@ block_cipher = None
 a = Analysis(['../veusz/veusz_main.py'],
              binaries=[],
              datas=[],
-             hiddenimports=[],
+             hiddenimports=[
+        'h5py.defs', 'h5py.utils', 'h5py.h5ac', 'h5py._proxy',
+        'iminuit', 'iminuit.latex', 'iminuit._plotting', 'iminuit.frontends'],
              hookspath=[],
              runtime_hooks=[],
              excludes=[],

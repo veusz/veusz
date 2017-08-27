@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 #    Copyright (C) 2008 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
@@ -34,19 +34,19 @@ try:
     import setuptools
     from setuptools import setup, Extension
     from setuptools.command.install import install as orig_install
-    
+
     extraoptions['install_requires'] = ['numpy']
     extraoptions['extras_require'] = {
-        "optional": ['astropy', 'pyemf', 'sampy', 'pyMinuit', 'h5py']
+        "optional": ['astropy', 'pyemf', 'sampy', 'iminuit', 'h5py']
     }
-    
+
     extraoptions['entry_points'] = {
         'gui_scripts' : [
             'veusz = veusz.veusz_main:run',
             'veusz_listen = veusz.veusz_listen:run'
             ]
         }
-  
+
 except ImportError:
     import distutils
     from distutils.core import setup, Extension
@@ -54,7 +54,7 @@ except ImportError:
 
     extraoptions['requires'] = ['numpy']
     extraoptions['scripts'] =  ['scripts/veusz', 'scripts/veusz_listen']
-    
+
 from distutils.command.install_data import install_data
 import pyqtdistutils
 
@@ -81,7 +81,7 @@ class install(orig_install):
 #  data installer with improved intelligence over distutils
 #  data files are copied into the project directory instead
 #  of willy-nilly
-class smart_install_data(install_data):   
+class smart_install_data(install_data):
     def run(self):
         install_cmd = self.get_finalized_command('install')
         if install_cmd.veusz_resource_dir:
@@ -112,43 +112,6 @@ def findData(dirname, extns):
         files += glob.glob(os.path.join(dirname, '*.'+extn))
     files.sort()
     return (dirname, files)
-
-    
-if sys.platform == 'darwin':
-    try:
-        import py2app
-        # extra arguments for mac py2app to associate files
-        plist = {
-            'CFBundleName': 'Veusz',
-            'CFBundleShortVersionString': version,
-            'CFBundleIdentifier': 'org.python.veusz',
-            'CFBundleDocumentTypes': [{
-                    'CFBundleTypeExtensions': ['vsz'],
-                    'CFBundleTypeName': 'Veusz document',
-                    'CFBundleTypeRole': 'Editor',
-                    }]
-            }
-        
-        extraoptions = {
-            'setup_requires': ['py2app'],
-            'app': ['veusz/veusz_main.py'],
-            'options': { 'py2app': {'argv_emulation': False,
-                                    'includes': ('veusz.helpers._nc_cntr',
-                                                 'veusz.helpers.qtloops',
-                                                 'h5py.defs',
-                                                 'h5py.h5ac',
-                                                 'h5py.utils',
-                                                 'h5py._errors',
-                                                 'h5py._proxy'),
-                                    'plist': plist,
-                                    'iconfile': 'icons/veusz.icns',
-                                    }
-                         }
-        }
-        
-    # let's hope setuptools/distutils will do the right thing
-    except ImportError:
-        pass
 
 setup(name = 'veusz',
       version = version,
@@ -229,7 +192,7 @@ setup(name = 'veusz',
                                 numpy.get_include()],
                   ),
         ],
-                                
+
       cmdclass = {'build_ext': pyqtdistutils.build_ext,
                   'install_data': smart_install_data,
                   'install': install},
