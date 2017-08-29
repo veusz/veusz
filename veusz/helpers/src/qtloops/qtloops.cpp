@@ -320,6 +320,28 @@ void addCubicsToPainterPath(QPainterPath& path, const QPolygonF& poly)
     }
 }
 
+namespace
+{
+  // should a transparent image format be used given colormap and imagedata?
+  bool useTransparent(const Numpy2DIntObj& colors, const Numpy2DObj& imgdata)
+  {
+    // check if transparency in colormap
+    const int numcolors = colors.dims[0];
+    for(int i=0; i<numcolors; ++i)
+      if( colors(3,i) != 255 )
+        return true;
+
+    // now have to check for non-finite values in data
+    // this is presumably slow: cache or something else?
+    const int len = imgdata.dims[0]*imgdata.dims[1];
+    for(int i=0; i<len; ++i)
+      if( not isFinite(imgdata.data[i]) )
+        return true;
+
+    return false;
+  }
+}
+
 QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 		     bool forcetrans)
 {
@@ -336,17 +358,11 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
   // if the first value in the color is -1 then switch to jumping mode
   const bool jumps = colors(0,0) == -1;
 
-  QImage::Format format = QImage::Format_RGB32;
-  if( forcetrans )
+  QImage::Format format;
+  if( forcetrans or useTransparent(colors, imgdata) )
     format = QImage::Format_ARGB32;
   else
-    {
-      for(int i = 0; i < numcolors; ++i)
-	{
-	  if( colors(i, 3) != 255 )
-	    format = QImage::Format_ARGB32;
-	}
-    }
+    format = QImage::Format_RGB32;
 
   // make image
   QImage img(xw, yw, format);
