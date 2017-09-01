@@ -5,6 +5,7 @@ Changes in <next version>:
  * Save custom definitions after importing data, to allow customs
    to depend on datasets.
  * Fix logical errors in transparency in image widget
+ * Fix for Python 3 unable to generally sort (name, instance)
 
 Changes in 1.26.1:
  * Change homepage in program to new site https://veusz.github.io/
