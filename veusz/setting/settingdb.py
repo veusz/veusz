@@ -83,6 +83,9 @@ defaultValues = {
 
     # add these directories to the python path (colon-separated)
     'external_pythonpath': '',
+
+    # translation file to load
+    'translation_file': '',
     }
 
 class _SettingDB(object):

@@ -34,7 +34,7 @@ except ImportError:
         os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) )
     import veusz
 
-from veusz.compat import czip, cbytes
+from veusz.compat import czip, cbytes, cstr
 from veusz import qtall as qt4
 from veusz import utils
 
@@ -234,12 +234,6 @@ class VeuszApp(qt4.QApplication):
             self.splash = makeSplashLogo()
             self.splash.show()
 
-        # optionally load a translation
-        if self.options.translation:
-            self.trans = qt4.QTranslator()
-            self.trans.load(self.options.translation)
-            self.installTranslator(self.trans)
-
         self.thread = ImportThread()
         self.thread.finished.connect(self.slotStartApplication)
         self.thread.start()
@@ -254,6 +248,9 @@ class VeuszApp(qt4.QApplication):
         vzdbus.setup()
         vzsamp.setup()
 
+        # add text if we want to display an error after startup
+        startuperrors = []
+
         from veusz import document
         from veusz import setting
 
@@ -264,13 +261,29 @@ class VeuszApp(qt4.QApplication):
         setting.transient_settings['unsafe_mode'] = bool(
             options.unsafe_mode)
 
+        # optionally load a translation
+        txfile = options.translation or setting.settingdb['translation_file']
+        if txfile:
+            try:
+                with open(txfile, 'rb'):
+                    pass
+            except IOError:
+                startuperrors.append('Cannot open translation "%s"' % txfile)
+            else:
+                self.trans = qt4.QTranslator()
+                self.trans.load(txfile)
+                self.installTranslator(self.trans)
+
         # add directories to path
         if setting.settingdb['external_pythonpath']:
             sys.path += setting.settingdb['external_pythonpath'].split(':')
 
         # load any requested plugins
         if options.plugin:
-            document.Document.loadPlugins(pluginlist=options.plugin)
+            try:
+                document.Document.loadPlugins(pluginlist=options.plugin)
+            except RuntimeError as e:
+                startuperrors.append(cstr(e))
 
         # different modes
         if options.listen:
@@ -288,6 +301,11 @@ class VeuszApp(qt4.QApplication):
         # clear splash when startup done
         if self.splash is not None:
             self.splash.finish(self.topLevelWidgets()[0])
+
+        # this has to be displayed after the main window is created,
+        # otherwise it never gets shown
+        for error in startuperrors:
+            qt4.QMessageBox.critical(None, "Veusz", error)
 
 def run():
     '''Run the main application.'''
