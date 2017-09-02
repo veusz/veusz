@@ -408,7 +408,7 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
     }
 
 
-  if(not hasalpha)
+  if(!hasalpha)
     {
       // return image without transparency for speed / space improvements
 #if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
