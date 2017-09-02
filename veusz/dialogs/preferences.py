@@ -62,6 +62,9 @@ class PreferencesDialog(VeuszDialog):
             setdb['plot_updatepolicy'])
         self.intervalCombo.setCurrentIndex(index)
         self.threadSpinBox.setValue( setdb['plot_numthreads'] )
+        self.translationEdit.setText( setdb['translation_file'] )
+        self.translationBrowseButton.clicked.connect(
+            self.translationBrowseClicked)
 
         # disable thread option if not supported
         if not qt4.QFontDatabase.supportsThreadedFontRendering():
@@ -183,6 +186,7 @@ class PreferencesDialog(VeuszDialog):
         setdb['plot_antialias'] = self.antialiasCheck.isChecked()
         setdb['ui_english'] = self.englishCheck.isChecked()
         setdb['plot_numthreads'] = self.threadSpinBox.value()
+        setdb['translation_file'] = self.translationEdit.text()
 
         # use cwd
         setdb['dirname_usecwd'] = self.dirDocCWDRadio.isChecked()
@@ -231,6 +235,13 @@ class PreferencesDialog(VeuszDialog):
 
         # write settings out now, rather than wait until the end
         setdb.writeSettings()
+
+    def translationBrowseClicked(self):
+        """Browse for a translation."""
+        filename = self.parent().fileOpenDialog(
+            [_('Translation file (*.qm)')], _('Choose translation file'))
+        if filename:
+            self.translationEdit.setText(filename)
 
     def styleBrowseClicked(self):
         """Browse for a stylesheet."""

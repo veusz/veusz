@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>660</width>
-    <height>281</height>
+    <height>341</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,99 +23,120 @@
       <attribute name="title">
        <string>View</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0" colspan="2">
-          <widget class="QCheckBox" name="antialiasCheck">
-           <property name="toolTip">
-            <string>Use antialiasing to smooth jagged edges</string>
-           </property>
-           <property name="text">
-            <string>Antialiasing</string>
-           </property>
-          </widget>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="antialiasCheck">
+         <property name="toolTip">
+          <string>Use antialiasing to smooth jagged edges</string>
+         </property>
+         <property name="text">
+          <string>Antialiasing</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="englishCheck">
+         <property name="toolTip">
+          <string>Please restart Veusz after changing this option</string>
+         </property>
+         <property name="text">
+          <string>Override system locale settings to show Veusz in US/English</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Update interval</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QComboBox" name="intervalCombo">
+         <property name="toolTip">
+          <string>How often Veusz will update the plot if it has changed</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Toolbar icon size</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="iconSizeCombo">
+         <item>
+          <property name="text">
+           <string>8</string>
+          </property>
          </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QCheckBox" name="englishCheck">
-           <property name="toolTip">
-            <string>Please restart Veusz after changing this option</string>
-           </property>
-           <property name="text">
-            <string>Override system locale settings to show Veusz in US/English</string>
-           </property>
-          </widget>
+         <item>
+          <property name="text">
+           <string>16</string>
+          </property>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Update interval</string>
-           </property>
-          </widget>
+         <item>
+          <property name="text">
+           <string>24</string>
+          </property>
          </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="intervalCombo">
-           <property name="toolTip">
-            <string>How often Veusz will update the plot if it has changed</string>
-           </property>
-          </widget>
+         <item>
+          <property name="text">
+           <string>32</string>
+          </property>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Toolbar icon size</string>
-           </property>
-          </widget>
+         <item>
+          <property name="text">
+           <string>48</string>
+          </property>
          </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="iconSizeCombo">
-           <item>
-            <property name="text">
-             <string>8</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>16</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>24</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>32</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>48</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>64</string>
-            </property>
-           </item>
-          </widget>
+         <item>
+          <property name="text">
+           <string>64</string>
+          </property>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>Number of drawing threads</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QSpinBox" name="threadSpinBox">
-           <property name="toolTip">
-            <string>Maximum number of parallel threads to use for drawing plots.
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Number of drawing threads</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QSpinBox" name="threadSpinBox">
+         <property name="toolTip">
+          <string>Maximum number of parallel threads to use for drawing plots.
 Set to 0 to disable threads.</string>
+         </property>
+         <property name="maximum">
+          <number>16</number>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Translation</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLineEdit" name="translationEdit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load an externally-provided translation file on startup&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
-           <property name="maximum">
-            <number>16</number>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="translationBrowseButton">
+           <property name="text">
+            <string>Browse...</string>
            </property>
           </widget>
          </item>

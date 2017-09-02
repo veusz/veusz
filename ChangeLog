@@ -4,6 +4,7 @@ Changes in <next version>:
  * Fix half pixel error in linear WCS FITS support
  * Save custom definitions after importing data, to allow customs
    to depend on datasets.
+ * Add preference for loading translation file
  * Fix logical errors in transparency in image widget
  * If cannot find translation or plugin, do not end app after showing error
  * Fix for Python 3 unable to generally sort (name, instance)

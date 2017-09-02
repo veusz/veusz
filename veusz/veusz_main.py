@@ -264,15 +264,12 @@ class VeuszApp(qt4.QApplication):
         # optionally load a translation
         txfile = options.translation or setting.settingdb['translation_file']
         if txfile:
-            try:
-                with open(txfile, 'rb'):
-                    pass
-            except IOError:
-                startuperrors.append('Cannot open translation "%s"' % txfile)
-            else:
-                self.trans = qt4.QTranslator()
-                self.trans.load(txfile)
+            self.trans = qt4.QTranslator()
+            if self.trans.load(txfile):
                 self.installTranslator(self.trans)
+            else:
+                startuperrors.append(
+                    'Error loading translation "%s"' % txfile)
 
         # add directories to path
         if setting.settingdb['external_pythonpath']:
