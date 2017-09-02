@@ -136,7 +136,7 @@ class ReloadData(VeuszDialog):
             linked.add(ds.linked)
 
         linked = [(l.filename, l) for l in linked]
-        linked.sort()
+        linked.sort(key=lambda x: x[0])
 
         # list datasets for each linked file
         for lname, link in linked:

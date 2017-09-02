@@ -6,6 +6,7 @@ Changes in <next version>:
    to depend on datasets.
  * Fix logical errors in transparency in image widget
  * If cannot find translation or plugin, do not end app after showing error
+ * Fix for Python 3 unable to generally sort (name, instance)
 
 Changes in 1.26.1:
  * Change homepage in program to new site https://veusz.github.io/
