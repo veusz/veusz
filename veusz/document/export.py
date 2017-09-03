@@ -106,22 +106,45 @@ class Export(object):
     gs_searched = False
     # its path if it exists
     gs_exe = None
+    # map extensions to ghostscript devices
+    gs_dev = None
 
     @classmethod
     def searchGhostscript(klass):
         """Find location of Ghostscript executable."""
         if not klass.gs_searched:
             # test for existence of ghostscript
-            hasgs = False
+
             gs = setting.settingdb["external_ghostscript"]
+            gs_exe = None
             if gs:
                 if os.path.isfile(gs) and os.access(gs, os.X_OK):
-                    klass.gs_exe = gs
+                    gs_exe = gs
             else:
                 exe = "gs.exe" if sys.platform == "win32" else "gs"
                 found = utils.findOnPath(exe)
                 if found:
-                    klass.gs_exe = found
+                    gs_exe = found
+
+            if gs_exe:
+                try:
+                    # check output devices contain
+                    #  ps2write/eps2write or pswrite/epswrite
+                    popen = subprocess.Popen(
+                        [gs_exe, '-h'], stdout=subprocess.PIPE)
+                    text = popen.stdout.read()
+                    if ( re.search(r'\bps2write\b', text) and
+                         re.search(r'\beps2write\b', text) ):
+                        klass.gs_dev = {'.ps': 'ps2write', '.eps': 'eps2write'}
+                    elif ( re.search(r'\bpswrite\b', text) and
+                           re.search(r'\bepswrite\b', text) ):
+                        klass.gs_dev = {'.ps': 'pswrite', '.eps': 'epswrite'}
+                    else:
+                        raise RuntimeError('No supported devices')
+                except Exception as e:
+                    pass
+                else:
+                    klass.gs_exe = gs_exe
 
             klass.gs_searched = True
 
@@ -328,15 +351,11 @@ class Export(object):
 
         self.exportPDF(tmpfilepdf)
 
-        # do conversion with ghostscript
-
-        # choose device depending on extension
-        device = 'eps2write' if ext == '.eps' else 'ps2write'
-
+        # run ghostscript to covert from pdf to postscript
         cmd = [
             self.gs_exe,
             '-q', '-dNOCACHE', '-dNOPAUSE', '-dBATCH', '-dSAFER',
-            '-sDEVICE=%s' % device,
+            '-sDEVICE=%s' % self.gs_dev[ext],
             '-sOutputFile=%s' % tmpfileps,
             tmpfilepdf
             ]
