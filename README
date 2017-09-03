@@ -1,5 +1,5 @@
-Veusz 1.26.1
-------------
+Veusz 1.27
+----------
 https://veusz.github.io
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -12,7 +12,16 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in <next version>:
+Changes in 1.27:
+ * New FITS import code and user interface, allowing much more
+   flexible and convenient FITS importing
+ * Fix half pixel error in linear WCS FITS support
+ * Save custom definitions after importing data, to allow customs
+   to depend on datasets.
+ * Add preference for loading translation file
+ * Fix logical errors in transparency in image widget
+ * If cannot find translation or plugin, do not end app after showing error
+ * Fix for Python 3 for reloading datasets
 
 Features of package:
  Plotting features:

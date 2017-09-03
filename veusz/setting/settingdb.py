@@ -86,6 +86,9 @@ defaultValues = {
 
     # location of ghostscript (or empty to search)
     'external_ghostscript': '',
+
+    # translation file to load
+    'translation_file': '',
     }
 
 class _SettingDB(object):

@@ -1,12 +1,18 @@
 Changes in <next version>:
  * Update to PyQt5 / Qt5
+ * Use Ghostscript to write EPS/PS formats
+ * Use pyinstaller for MacOS builds instead of py2app
+
+Changes in 1.27:
  * New FITS import code and user interface, allowing much more
    flexible and convenient FITS importing
  * Fix half pixel error in linear WCS FITS support
  * Save custom definitions after importing data, to allow customs
    to depend on datasets.
- * Use Ghostscript to write EPS/PS formats
- * Use pyinstaller for MacOS builds instead of py2app
+ * Add preference for loading translation file
+ * Fix logical errors in transparency in image widget
+ * If cannot find translation or plugin, do not end app after showing error
+ * Fix for Python 3 for reloading datasets
 
 Changes in 1.26.1:
  * Change homepage in program to new site https://veusz.github.io/

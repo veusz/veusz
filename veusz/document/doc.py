@@ -367,7 +367,7 @@ class Document(qt4.QObject):
             except Exception:
                 err = _('Error loading plugin %s\n\n%s') % (
                     plugin, traceback.format_exc())
-                qt4.QMessageBox.critical(None, _("Error loading plugin"), err)
+                raise RuntimeError(err)
 
     def paintTo(self, painthelper, page):
         """Paint page specified to the paint helper."""
