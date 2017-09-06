@@ -277,7 +277,7 @@ class FloatSlider(qt4.QWidget):
 
         layout = qt4.QHBoxLayout()
         layout.setSpacing(0)
-        layout.setMargin(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
         s = self.slider = qt4.QSlider(qt4.Qt.Horizontal)
