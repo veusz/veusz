@@ -47,7 +47,7 @@
 #ifndef QTMMLWIDGET_H
 #define QTMMLWIDGET_H
 
-#include <QtGui/QFrame>
+#include <QtWidgets/QFrame>
 #include <QtXml/QtXml>
 
 class MmlDocument;

@@ -62,6 +62,9 @@ class PreferencesDialog(VeuszDialog):
             setdb['plot_updatepolicy'])
         self.intervalCombo.setCurrentIndex(index)
         self.threadSpinBox.setValue( setdb['plot_numthreads'] )
+        self.translationEdit.setText( setdb['translation_file'] )
+        self.translationBrowseButton.clicked.connect(
+            self.translationBrowseClicked)
 
         # disable thread option if not supported
         if not qt4.QFontDatabase.supportsThreadedFontRendering():
@@ -108,6 +111,9 @@ class PreferencesDialog(VeuszDialog):
 
         # python path
         self.externalPythonPath.setText(setdb['external_pythonpath'])
+        self.externalGhostscript.setText(setdb['external_ghostscript'])
+        self.externalGhostscriptBrowse.clicked.connect(
+            self.externalGhostscriptBrowseClicked)
 
     def setupColorTab(self):
         """Initialise color tab
@@ -183,6 +189,7 @@ class PreferencesDialog(VeuszDialog):
         setdb['plot_antialias'] = self.antialiasCheck.isChecked()
         setdb['ui_english'] = self.englishCheck.isChecked()
         setdb['plot_numthreads'] = self.threadSpinBox.value()
+        setdb['translation_file'] = self.translationEdit.text()
 
         # use cwd
         setdb['dirname_usecwd'] = self.dirDocCWDRadio.isChecked()
@@ -226,11 +233,19 @@ class PreferencesDialog(VeuszDialog):
 
         # python path
         setdb['external_pythonpath'] = self.externalPythonPath.text()
+        setdb['external_ghostscript'] = self.externalGhostscript.text()
 
         self.plotwindow.updatePlotSettings()
 
         # write settings out now, rather than wait until the end
         setdb.writeSettings()
+
+    def translationBrowseClicked(self):
+        """Browse for a translation."""
+        filename = self.parent().fileOpenDialog(
+            [_('Translation file (*.qm)')], _('Choose translation file'))
+        if filename:
+            self.translationEdit.setText(filename)
 
     def styleBrowseClicked(self):
         """Browse for a stylesheet."""
@@ -260,3 +275,11 @@ class PreferencesDialog(VeuszDialog):
         sel = self.pluginList.selectionModel().currentIndex()
         if sel.isValid():
             self.pluginmodel.removeRow( sel.row() )
+
+    def externalGhostscriptBrowseClicked(self):
+        """Choose a ghostscript executable."""
+
+        filename = self.parent().fileOpenDialog(
+            [_('All files (*)')], _('Choose ghostscript executable'))
+        if filename:
+            self.externalGhostscript.setText(filename)

@@ -9,13 +9,13 @@ Veusz uses distutils for its installation. See below for how to use it.
 Requirements:
  python2 >= 2.6 or python3 >= 3.3
                  http://www.python.org/
- PyQt >= 4.6     http://www.riverbankcomputing.co.uk/software/pyqt/
+ PyQt >= 5.2     http://www.riverbankcomputing.co.uk/software/pyqt/
  numpy >= 1.0    http://numpy.scipy.org/
 
 PyQt requires
- Qt4 >= 4.7      http://www.trolltech.com/products/qt/ (free version)
+ Qt5 >= 5.2      https://www.qt.io/developers/
                  latest version recommended
- SIP >= 4.12     http://www.riverbankcomputing.co.uk/software/sip/
+ SIP >= 4.15     http://www.riverbankcomputing.co.uk/software/sip/
 
 Optional requirements:
  h5py            http://www.h5py.org/
@@ -24,11 +24,11 @@ Optional requirements:
  iminuit         https://github.com/iminuit/iminuit
  ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
+ Ghostscript     https://www.ghostscript.com/ (for EPS/PS output)
 
-Python 3 support is included in veusz-1.19+, although it has less
-testing than Python 2 support. Note that the source code is compatible
-with both python versions and does not need translation with 2to3. The
-optional dependency pyemf does not have Python 3 support.
+Python 3 support is included in veusz-1.19+. Note that the source code
+is compatible with both python versions and does not need translation
+with 2to3. The optional dependency pyemf does not have Python 3 support.
 
 1.1 Full installation with distutils
 ====================================
@@ -37,7 +37,7 @@ list a few of the possible method here:
 
 To install on linux to the standard location on the hard disk
 
-# cd veusz-1.26.1
+# cd veusz-1.27
 # python setup.py build
 # su
 [enter root password]
@@ -95,8 +95,8 @@ resources directory to point to the location of the example files.
 If you don't want to install veusz fully or are doing development, it
 can currently be run from its own directory. Do
 
-# tar xzf veusz-1.26.1.tar.gz                [change version here]
-# cd veusz-1.26.1
+# tar xzf veusz-1.27.tar.gz                [change version here]
+# cd veusz-1.27
 # ./run_veusz_inplace
 
 Certain features will be disabled if you do this. You will not be able
@@ -118,8 +118,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xzf veusz-linux-i386-1.26.1.tar.gz     [change version here]
-# cd veusz-linux-i386-1.26.1
+# tar xzf veusz-linux-i386-1.27.tar.gz     [change version here]
+# cd veusz-linux-i386-1.27
 # ./veusz
 
 2.2 Installing in Windows

@@ -496,6 +496,7 @@ class TabbedFormatting(qt4.QTabWidget):
 
     def __init__(self, document, setnsproxy, shownames=False):
         qt4.QTabWidget.__init__(self)
+        self.setUsesScrollButtons(True)
         self.document = document
 
         if setnsproxy is None:

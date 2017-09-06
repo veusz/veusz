@@ -336,20 +336,11 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
   // if the first value in the color is -1 then switch to jumping mode
   const bool jumps = colors(0,0) == -1;
 
-  QImage::Format format = QImage::Format_RGB32;
-  if( forcetrans )
-    format = QImage::Format_ARGB32;
-  else
-    {
-      for(int i = 0; i < numcolors; ++i)
-	{
-	  if( colors(i, 3) != 255 )
-	    format = QImage::Format_ARGB32;
-	}
-    }
-
   // make image
-  QImage img(xw, yw, format);
+  QImage img(xw, yw, QImage::Format_ARGB32);
+
+  // does the image use alpha values?
+  bool hasalpha = false;
 
   // iterate over input pixels
   for(int y=0; y<yw; ++y)
@@ -396,21 +387,40 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 		  const int band2 = min(band + 1, numbands);
 		  const double delta1 = 1.-delta;
 
+                  // we add 0.5 before truncating to round to nearest int
 		  b = int(delta1*colors(0, band) +
-			  delta *colors(0, band2));
+			  delta *colors(0, band2) + 0.5);
 		  g = int(delta1*colors(1, band) +
-			  delta *colors(1, band2));
+			  delta *colors(1, band2) + 0.5);
 		  r = int(delta1*colors(2, band) +
-			  delta *colors(2, band2));
+			  delta *colors(2, band2) + 0.5);
 		  a = int(delta1*colors(3, band) +
-			  delta *colors(3, band2));
+			  delta *colors(3, band2) + 0.5);
 	      
 		}
 	    }
 
+          if(a != 255)
+            hasalpha = true;
+
 	  *(scanline+x) = qRgba(r, g, b, a);
 	}
     }
+
+
+  if(!hasalpha)
+    {
+      // return image without transparency for speed / space improvements
+#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 0)
+      // recent qt version
+      // just change the format to the non-transparent version
+      img.reinterpretAsFormat(QImage::Format_RGB32);
+#else
+      // do slower conversion of data
+      return img.convertToFormat(QImage::Format_RGB32);
+#endif
+    }
+
   return img;
 }
 

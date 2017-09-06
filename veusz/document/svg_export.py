@@ -569,6 +569,7 @@ class SVGPaintDevice(qt4.QPaintDevice):
 
     def metric(self, m):
         """Return the metrics of the painter."""
+
         if m == qt4.QPaintDevice.PdmWidth:
             return int(self.engine.width * dpi)
         elif m == qt4.QPaintDevice.PdmHeight:
@@ -589,3 +590,9 @@ class SVGPaintDevice(qt4.QPaintDevice):
             return int(dpi)
         elif m == qt4.QPaintDevice.PdmPhysicalDpiY:
             return int(dpi)
+        elif m == qt4.QPaintDevice.PdmDevicePixelRatio:
+            return 1
+
+        # Qt >= 5.6
+        elif m == getattr(qt4.QPaintDevice, 'PdmDevicePixelRatioScaled', -1):
+            return 1

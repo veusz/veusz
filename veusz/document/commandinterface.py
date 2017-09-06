@@ -526,9 +526,9 @@ class CommandInterface(qt4.QObject):
                   " Range of data = %s\n"
                   " Range of symmetric error = %s\n"
                   " Range of positive error = %s\n"
-                  " Range of negative error = %s" % (
+                  " Range of negative error = %s") % (
                       name, numsteps, repr(val),
-                      repr(symerr), repr(poserr), repr(negerr)) )
+                      repr(symerr), repr(poserr), repr(negerr))
               )
 
     def SetData2DExpression(self, name, expr, linked=False):
@@ -740,13 +740,13 @@ class CommandInterface(qt4.QObject):
         """Print document."""
         export.printDialog(None, self.document)
             
-    def Export(self, filename, color=True, page=0, dpi=100,
+    def Export(self, filename, color=True, page=[0], dpi=100,
                antialias=True, quality=85, backcolor='#ffffff00',
                pdfdpi=150, svgtextastext=False):
         """Export plot to filename.
 
         color is True or False if color is requested in output file
-        page is the pagenumber to export (or list for multipage formats)
+        page is a list of page numbers to export
         dpi is the number of dots per inch for bitmap output files
         antialias antialiases output if True
         quality is a quality parameter for jpeg output
@@ -756,10 +756,17 @@ class CommandInterface(qt4.QObject):
         svgtextastext: write text in SVG as text, rather than curves
         """
 
-        e = export.Export(self.document, filename, page, color=color,
-                          bitmapdpi=dpi, antialias=antialias,
-                          quality=quality, backcolor=backcolor,
-                          pdfdpi=pdfdpi, svgtextastext=svgtextastext)
+        # compatibility where page was a single number
+        try:
+            pages = [p for p in page]
+        except TypeError:
+            pages = [page]
+
+        e = export.Export(
+            self.document, filename, pages, color=color,
+            bitmapdpi=dpi, antialias=antialias,
+            quality=quality, backcolor=backcolor,
+            pdfdpi=pdfdpi, svgtextastext=svgtextastext)
         e.export()
 
     def Rename(self, widget, newname):

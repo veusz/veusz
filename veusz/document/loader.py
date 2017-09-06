@@ -195,15 +195,17 @@ def loadHDF5Doc(thedoc, filename, callbackunsafe=None):
             vszformat = hdffile['Veusz'].attrs['vsz_format']
             vszversion = hdffile['Veusz'].attrs['vsz_version']
         except KeyError:
-            raise LoadError(_("HDF5 file '%s' is not a Veusz saved document") %
-                            os.path.basename(filename))
+            raise LoadError(
+                _("HDF5 file '%s' is not a Veusz saved document") %
+                os.path.basename(filename))
 
         maxformat = 1
         if vszformat > maxformat:
-            raise LoadError(_("This document version (%i) is not supported. "
-                              "It was written by Veusz %s.\n"
-                              "This Veusz only supports document version %i." %
-                              (vszformat, vszversion, maxformat)))
+            raise LoadError(
+                _("This document version (%i) is not supported. "
+                  "It was written by Veusz %s.\n"
+                  "This Veusz only supports document version %i.") %
+                (vszformat, vszversion, maxformat))
 
         # load document
         script = hdffile['Veusz']['Document']['document'][0].decode('utf-8')

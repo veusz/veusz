@@ -337,7 +337,7 @@ class EMFPaintEngine(qt4.QPaintEngine):
             clipmode = {
                  qt4.Qt.ReplaceClip: pyemf.RGN_COPY,
                  qt4.Qt.IntersectClip: pyemf.RGN_AND,
-                 qt4.Qt.UniteClip: pyemf.RGN_OR}[operation]
+            }[operation]
         else:
             # is this the only wave to get rid of clipping?
             self.emf.BeginPath()
@@ -410,3 +410,9 @@ class EMFPaintDevice(qt4.QPaintDevice):
             return int(self.engine.dpi)
         elif m == qt4.QPaintDevice.PdmPhysicalDpiY:
             return int(self.engine.dpi)
+        elif m == qt4.QPaintDevice.PdmDevicePixelRatio:
+            return 1
+
+        # Qt >= 5.6
+        elif m == getattr(qt4.QPaintDevice, 'PdmDevicePixelRatioScaled', -1):
+            return 1

@@ -265,9 +265,9 @@ class Graph(widget.Widget):
             axes = axesofwidget.get(c, None)
             if axes is not None and any((a in brokenaxes for a in axes)):
                 # handle broken axes
-                childbrokenaxes = sorted([ (a.name, a) for a in axes
-                                           if a in brokenaxes ])
-                childbrokenaxes.sort()
+                childbrokenaxes = sorted(
+                    [(a.name, a) for a in axes if a in brokenaxes],
+                    key=lambda x: x[0])
                 def iteratebrokenaxes(b):
                     """Recursively iterate over each broken axis and redraw
                     child for each.

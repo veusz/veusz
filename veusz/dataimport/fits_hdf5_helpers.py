@@ -18,6 +18,7 @@
 
 from __future__ import division, print_function, absolute_import
 
+import sys
 import ast
 import re
 import numpy as N
@@ -136,6 +137,15 @@ def applySlices(data, slices):
 
 class ConvertError(RuntimeError):
     pass
+
+def convertFromBytes(s):
+    """h5py often returns bytes instead of unicode.
+    This decodes if in bytes
+    """
+    if sys.version_info[0] == 3:
+        if isinstance(s, bytes):
+            return s.decode('utf-8')
+    return s
 
 def convertDatasetToObject(data, slices):
     """Convert numpy/hdf dataset to suitable data for veusz.

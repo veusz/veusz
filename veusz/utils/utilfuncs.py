@@ -23,6 +23,7 @@ from __future__ import division
 import sys
 import string
 import re
+import os
 import os.path
 import threading
 import codecs
@@ -46,11 +47,8 @@ def _getVeuszDirectory():
     """Get resource and examples directories for Veusz."""
 
     if hasattr(sys, 'frozen'):
-        # for pyinstaller/py2app compatability
+        # for pyinstaller compatability
         resdir = os.path.dirname(os.path.abspath(sys.executable))
-        if sys.platform == 'darwin':
-            # special case for py2app
-            resdir = os.path.join(resdir, '..', 'Resources')
     else:
         # standard installation
         resdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -585,3 +583,14 @@ def unescapeHDFDataName(name):
 def allNotNone(*items):
     """Are all the items not None."""
     return not any((x is None for x in items))
+
+def findOnPath(cmd):
+    """Find a command on the system path, or None if does not exist."""
+    path = os.getenv('PATH', os.path.defpath)
+    pathparts = path.split(os.path.pathsep)
+    for dirname in pathparts:
+        dirname = dirname.strip('"')
+        cmdtry = os.path.join(dirname, cmd)
+        if os.path.isfile(cmdtry) and os.access(cmdtry, os.X_OK):
+            return cmdtry
+    return None

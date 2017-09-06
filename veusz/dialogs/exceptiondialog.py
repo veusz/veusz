@@ -240,8 +240,8 @@ class ExceptionDialog(VeuszDialog):
 
     def saveButtonSlot(self):
         filename = qt4.QFileDialog.getSaveFileName(self, 'Save File')
-        if filename:
-            f = open(filename, 'w')
+        if filename[0]:
+            f = open(filename[0], 'w')
             f.write(createReportText(self.backtrace))
             f.close()
 

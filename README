@@ -1,5 +1,5 @@
-Veusz 1.26.1
-------------
+Veusz 1.27
+----------
 https://veusz.github.io
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -12,22 +12,16 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.26.1:
- * Change homepage in program to new site https://veusz.github.io/
- * Change new version checking to use veusz.github.io
-
-Changes in 1.26:
- * Add color themes and automatic coloring of widgets
- * Custom color definitions
- * Improved custom definition dialog box
- * Fix loading translator via command line
- * Show horizontal error lines/fills in key
- * Use iMinuit if available for fitting
- * Fix for dataset plugins returning nD datasets
- * Add editable automatic axis range, including support for shrinking
-   range (-X%), percentage ranges (X-Y%) and limits (<X% and >Y%)
- * Fix for key if invalid dataset
- * For log scaling on image widget, show invalid values as being transparent
+Changes in 1.27:
+ * New FITS import code and user interface, allowing much more
+   flexible and convenient FITS importing
+ * Fix half pixel error in linear WCS FITS support
+ * Save custom definitions after importing data, to allow customs
+   to depend on datasets.
+ * Add preference for loading translation file
+ * Fix logical errors in transparency in image widget
+ * If cannot find translation or plugin, do not end app after showing error
+ * Fix for Python 3 for reloading datasets
 
 Features of package:
  Plotting features:
@@ -79,7 +73,7 @@ Requirements for source install:
    https://www.python.org/
  Qt >= 4.6 (free edition)
    https://www.qt.io/
- PyQt >= 4.5 (SIP is required to be installed first)
+ PyQt >= 5.2  (SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/software/pyqt/
    http://www.riverbankcomputing.co.uk/software/sip/
  numpy >= 1.0

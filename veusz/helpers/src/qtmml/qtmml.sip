@@ -20,6 +20,7 @@
 
 %Import(name=QtCore/QtCoremod.sip)
 %Import(name=QtGui/QtGuimod.sip)
+%Import(name=QtWidgets/QtWidgetsmod.sip)
 
 %ModuleHeaderCode
  // we have to do this twice, so define as a template

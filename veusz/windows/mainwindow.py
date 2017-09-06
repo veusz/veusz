@@ -31,7 +31,7 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import cstr, cstrerror, cgetcwd
+from ..compat import cstr, cstrerror, cgetcwd, cbytes
 from .. import qtall as qt4
 
 from .. import document
@@ -233,13 +233,13 @@ class MainWindow(qt4.QMainWindow):
 
     def dragEnterEvent(self, event):
         """Check whether event is valid to be dropped."""
-        if (event.provides("text/uri-list") and
+        if (event.mimeData().hasUrls() and
             self._getVeuszDropFiles(event)):
             event.acceptProposedAction()
 
     def dropEvent(self, event):
         """Respond to a drop event on the current window"""
-        if event.provides("text/uri-list"):
+        if event.mimeData().hasUrls():
             files = self._getVeuszDropFiles(event)
             if files:
                 if self.document.isBlank():
@@ -855,7 +855,7 @@ class MainWindow(qt4.QMainWindow):
 
         # store docked windows
         data = self.saveState().data()
-        setdb['geometry_mainwindowstate'] = data
+        setdb['geometry_mainwindowstate'] = cbytes(data)
 
         # save current setting db
         setdb.writeSettings()
@@ -883,8 +883,11 @@ class MainWindow(qt4.QMainWindow):
 
         # restore docked window geometry
         if 'geometry_mainwindowstate' in setdb:
-            b = qt4.QByteArray(setdb['geometry_mainwindowstate'])
-            self.restoreState(b)
+            try:
+                self.restoreState(setdb['geometry_mainwindowstate'])
+            except Exception:
+                # type can be wrong if switching between Py2/3 PyQ4/5
+                pass
 
     def slotFileNew(self):
         """New file."""

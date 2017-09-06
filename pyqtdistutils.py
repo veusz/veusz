@@ -10,32 +10,29 @@ from distutils.dep_util import newer, newer_group
 import os
 import sys
 
-import sip
-sip.setapi('QString', 2)
-
 import sipconfig
-import PyQt4.QtCore
+import PyQt5.QtCore
 
 ##################################################################
 # try to get various useful things we need in order to build
 # this is likely to break, I'm sure
 
-QT_LIB_DIR = PyQt4.QtCore.QLibraryInfo.location(
-    PyQt4.QtCore.QLibraryInfo.LibrariesPath)
-QT_INC_DIR = PyQt4.QtCore.QLibraryInfo.location(
-    PyQt4.QtCore.QLibraryInfo.HeadersPath)
+QT_LIB_DIR = PyQt5.QtCore.QLibraryInfo.location(
+    PyQt5.QtCore.QLibraryInfo.LibrariesPath)
+QT_INC_DIR = PyQt5.QtCore.QLibraryInfo.location(
+    PyQt5.QtCore.QLibraryInfo.HeadersPath)
 QT_IS_FRAMEWORK = os.path.exists(
     os.path.join(QT_LIB_DIR, 'QtCore.framework') )
 
 try:
     # >= 4.10
-    SIP_FLAGS = PyQt4.QtCore.PYQT_CONFIGURATION['sip_flags']
+    SIP_FLAGS = PyQt5.QtCore.PYQT_CONFIGURATION['sip_flags']
 except:
-    import PyQt4.pyqtconfig
-    SIP_FLAGS = PyQt4.pyqtconfig.Configuration().pyqt_sip_flags
+    import PyQt5.pyqtconfig
+    SIP_FLAGS = PyQt5.pyqtconfig.Configuration().pyqt_sip_flags
 
 PYQT_SIP_DIR = os.path.join(
-    sipconfig.Configuration().default_sip_dir, 'PyQt4')
+    sipconfig.Configuration().default_sip_dir, 'PyQt5')
 
 SIP_BIN = sipconfig.Configuration().sip_bin
 SIP_INC_DIR = sipconfig.Configuration().sip_inc_dir
@@ -65,10 +62,9 @@ class build_ext (distutils.command.build_ext.build_ext):
 
         raise RuntimeError('cannot parse SIP-generated "%s"' % sbf)
 
-    def get_includes(self):
-
-        incdirs = []
-        for mod in ('QtCore', 'QtGui', 'QtXml'):
+    def get_cpp_includes(self):
+        incdirs = [QT_INC_DIR]
+        for mod in ('QtCore', 'QtGui', 'QtWidgets', 'QtXml'):
             if QT_IS_FRAMEWORK:
                 incdirs.append(
                     os.path.join(QT_LIB_DIR, mod + '.framework', 'Headers') )
@@ -84,24 +80,31 @@ class build_ext (distutils.command.build_ext.build_ext):
         indirs = list(set([os.path.dirname(x) for x in sources]))
 
         # Add the SIP and Qt include directories to the include path
-        extension.include_dirs += [
-            SIP_INC_DIR,
-            QT_INC_DIR,
-            ] + self.get_includes() + indirs
+        extension.include_dirs += [SIP_INC_DIR] + indirs
 
         # link against libraries
-        if QT_IS_FRAMEWORK:
-            extension.extra_link_args = [
-                '-F', os.path.join(QT_LIB_DIR),
-                '-framework', 'QtGui',
-                '-framework', 'QtCore',
-                '-framework', 'QtXml'
-                ]
-        elif sys.platform == 'win32':
-            extension.libraries = ['QtGui4', 'QtCore4', 'QtXml4']
-        else:
-            extension.libraries = ['QtGui', 'QtCore', 'QtXml']
-        extension.library_dirs = [QT_LIB_DIR]
+        if extension.language == 'c++':
+            extension.include_dirs += self.get_cpp_includes()
+
+            if QT_IS_FRAMEWORK:
+                extension.extra_link_args = [
+                    '-F', os.path.join(QT_LIB_DIR),
+                    '-framework', 'QtGui',
+                    '-framework', 'QtCore',
+                    '-framework', 'QtXml',
+                    '-framework', 'QtWidgets',
+                    '-Wl,-rpath,@executable_path/Frameworks',
+                    '-Wl,-rpath,' + QT_LIB_DIR
+                    ]
+                extension.extra_compile_args = [
+                    '-F', QT_LIB_DIR,
+                    # not sure how to detect below, so hard coded
+                    '-std=gnu++11',
+                    ]
+            else:
+                extension.libraries = [
+                    'Qt5Gui', 'Qt5Core', 'Qt5Xml', 'Qt5Widgets']
+            extension.library_dirs = [QT_LIB_DIR]
 
         depends = extension.depends
 

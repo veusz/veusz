@@ -44,10 +44,10 @@
 ** 
 ****************************************************************************/
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtCore/QString>
 #include <QtCore/QMap>
-#include <QtGui/QDesktopWidget>
+#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 
