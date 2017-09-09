@@ -19,3 +19,5 @@ Documents/veusz_listen.1
 Documents/veusz_listen.man.txt
 .idea/
 veusz.egg-info/
+
+Documents/new_manual/_build
