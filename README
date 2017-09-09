@@ -3,25 +3,21 @@ Veusz 1.27
 https://veusz.github.io
 
 Veusz is a scientific plotting package.  It is designed to produce
-publication-ready Postscript, PDF or SVG output. Graphs are built-up
-by combining plotting widgets. The user interface aims to be simple,
-consistent and powerful.
+publication-ready PDF or SVG output. Graphs are built-up by combining
+plotting widgets. The user interface aims to be simple, consistent and
+powerful.
 
 Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 1.27:
- * New FITS import code and user interface, allowing much more
-   flexible and convenient FITS importing
- * Fix half pixel error in linear WCS FITS support
- * Save custom definitions after importing data, to allow customs
-   to depend on datasets.
- * Add preference for loading translation file
- * Fix logical errors in transparency in image widget
- * If cannot find translation or plugin, do not end app after showing error
- * Fix for Python 3 for reloading datasets
+Changes in <next version>:
+ * Update to PyQt5 and Qt5
+ * Use Ghostscript to write EPS/PS formats
+ * Use pyinstaller for MacOS builds instead of py2app
+ * Windows build requires Windows 7 minimum
+ * MacOS build requires MacOS 10.10 minimum
 
 Features of package:
  Plotting features:
@@ -48,7 +44,7 @@ Features of package:
   * Axis scales using functional forms
   * Plotting functions of datasets
  Input and output:
-  * EPS/PDF/PNG/SVG/EMF export
+  * PDF/EPS/PNG/SVG/EMF export
   * Dataset creation/manipulation
   * Embed Veusz within other programs
   * Text, HDF5, CSV, FITS, NPY/NPZ, QDP, binary and user-plugin importing
@@ -71,10 +67,11 @@ Features of package:
 Requirements for source install:
  Python 2.x (2.6 or greater required) or 3.x (3.3 or greater required)
    https://www.python.org/
- Qt >= 4.6 (free edition)
+ Qt >= 5.2 (free edition)
    https://www.qt.io/
- PyQt >= 5.2  (SIP is required to be installed first)
+ PyQt >= 5.2  (Qt and SIP is required to be installed first)
    http://www.riverbankcomputing.co.uk/software/pyqt/
+ SIP >= 4.15
    http://www.riverbankcomputing.co.uk/software/sip/
  numpy >= 1.0
    http://numpy.scipy.org/
@@ -82,23 +79,23 @@ Requirements for source install:
 Optional requirements:
  h5py (optional for HDF5 support)
    http://www.h5py.org/
- astropy >= 0.2 or PyFITS >= 1.1 (optional for FITS import)
-   http://www.stsci.edu/resources/software_hardware/pyfits
-   http://www.astropy.org/
  pyemf >= 2.0.0 (optional for EMF export)
    http://pyemf.sourceforge.net/
- PyMinuit >= 1.1.2 (optional improved fitting)
-   http://code.google.com/p/pyminuit/
+   https://github.com/jeremysanders/pyemf (Python 3 port in development)
+ iminuit or PyMinuit >= 1.12 (optional improved fitting)
+  https://github.com/iminuit/iminuit
  dbus-python, for dbus interface
    http://dbus.freedesktop.org/doc/dbus-python/
- astropy (optional for VO table import)
+ astropy (optional for VO table import or FITS import)
    http://www.astropy.org/
  SAMPy or astropy >= 0.4 (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
+ Ghostscript (for EPS/PS output)
+   https://www.ghostscript.com/
 
 Veusz is Copyright (C) 2003-2017 Jeremy Sanders <jeremy@jeremysanders.net>
  and contributors.
 It is licensed under the GPL (version 2 or greater).
 
-The latest code can be found in the Git repository at
+The latest source code can be found in the Git repository at
 https://github.com/veusz/veusz
