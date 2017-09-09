@@ -26,14 +26,7 @@ import os.path
 import signal
 import optparse
 
-# trick to make sure veusz is on the path, if being run as a script
-try:
-    import veusz
-except ImportError:
-    sys.path.append(
-        os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) )
-    import veusz
-
+import veusz
 from veusz.compat import czip, cbytes, cstr
 from veusz import qtall as qt4
 from veusz import utils
