@@ -5,6 +5,7 @@
 # Based on Pyrex.Distutils, written by Graham Fawcett and Darrel Gallion.
 
 from __future__ import division
+from distutils.sysconfig import customize_compiler
 import distutils.command.build_ext
 from distutils.dep_util import newer, newer_group
 import os
@@ -144,3 +145,13 @@ class build_ext (distutils.command.build_ext.build_ext):
                     '-I', PYQT_SIP_DIR,
                     '-b', sbf,
                     source])
+
+    def build_extensions(self):
+        # remove annoying flag which causes warning for c++ sources
+        # https://stackoverflow.com/a/36293331/351771
+        customize_compiler(self.compiler)
+        try:
+            self.compiler.compiler_so.remove("-Wstrict-prototypes")
+        except (AttributeError, ValueError):
+            pass
+        distutils.command.build_ext.build_ext.build_extensions(self)
