@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #    Copyright (C) 2009 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #

@@ -4,12 +4,12 @@
 # Written by Giovanni Bajo <rasky at develer dot com>
 # Based on Pyrex.Distutils, written by Graham Fawcett and Darrel Gallion.
 
-from __future__ import division
+from __future__ import division, print_function, absolute_import
+import os
+
 from distutils.sysconfig import customize_compiler
 import distutils.command.build_ext
 from distutils.dep_util import newer, newer_group
-import os
-import sys
 
 import sipconfig
 import PyQt5.QtCore
@@ -25,12 +25,7 @@ QT_INC_DIR = PyQt5.QtCore.QLibraryInfo.location(
 QT_IS_FRAMEWORK = os.path.exists(
     os.path.join(QT_LIB_DIR, 'QtCore.framework') )
 
-try:
-    # >= 4.10
-    SIP_FLAGS = PyQt5.QtCore.PYQT_CONFIGURATION['sip_flags']
-except:
-    import PyQt5.pyqtconfig
-    SIP_FLAGS = PyQt5.pyqtconfig.Configuration().pyqt_sip_flags
+SIP_FLAGS = PyQt5.QtCore.PYQT_CONFIGURATION['sip_flags']
 
 PYQT_SIP_DIR = os.path.join(
     sipconfig.Configuration().default_sip_dir, 'PyQt5')
@@ -73,7 +68,9 @@ class build_ext (distutils.command.build_ext.build_ext):
                 incdirs.append( os.path.join(QT_INC_DIR, mod) )
         return incdirs
 
-    def swig_sources (self, sources, extension=None):
+    def swig_sources(self, sources, extension=None):
+        """Compile SIP files and setup Qt compile options."""
+
         if not self.extensions:
             return
 
@@ -88,6 +85,7 @@ class build_ext (distutils.command.build_ext.build_ext):
             extension.include_dirs += self.get_cpp_includes()
 
             if QT_IS_FRAMEWORK:
+                # Mac OS framework
                 extension.extra_link_args = [
                     '-F', os.path.join(QT_LIB_DIR),
                     '-framework', 'QtGui',

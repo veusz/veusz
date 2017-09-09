@@ -22,13 +22,15 @@
 Veusz distutils setup script
 see the file INSTALL for details on how to install Veusz
 """
-from __future__ import division
+
+from __future__ import division, print_function
 
 import glob
 import os.path
 import sys
 import numpy
 
+# use setuptools, or backward compatibility
 extraoptions = {}
 try:
     import setuptools
@@ -99,11 +101,11 @@ class smart_install_data(install_data):
         return install_data.run(self)
 
 descr = '''Veusz is a scientific plotting package, designed to create
-publication-ready Postscript, PDF and SVG output. It features GUI,
-command-line, and scripting interfaces. Graphs are constructed from
-"widgets", allowing complex layouts to be designed. Veusz supports
-plotting functions, data with errors, keys, labels, stacked plots,
-multiple plots, and fitting data.'''
+publication-ready PDF and SVG output. It features GUI, command-line,
+and scripting interfaces. Graphs are constructed from "widgets",
+allowing complex layouts to be designed. Veusz supports plotting
+functions, data with errors, keys, labels, stacked plots, multiple
+plots, and fitting data.'''
 
 def findData(dirname, extns):
     """Return tuple for directory name and list of file extensions for data."""

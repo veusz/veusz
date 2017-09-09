@@ -3285,7 +3285,7 @@ SetData('x', arange(20))
 SetData('y', arange(20)**2)
 Add('xy')
 Zoom(0.5)
-Export("foo.eps")
+Export("foo.pdf")
 Quit()
 </programlisting>
       </informalexample>
