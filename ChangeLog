@@ -4,6 +4,7 @@ Changes in <next version>:
  * Use pyinstaller for MacOS builds instead of py2app
  * Windows build requires Windows 7 minimum
  * MacOS build requires MacOS 10.10 minimum
+ * Move to using Sphinx for documentation
 
 Changes in 1.27:
  * New FITS import code and user interface, allowing much more

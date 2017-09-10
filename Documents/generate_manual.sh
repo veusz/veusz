@@ -17,21 +17,28 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-# generate the output manual files from the input docbook file
-# uses xmlto and fop
+# generate the manual and man pages
 
 # DO NOT EDIT THE OUTPUT FILES!
 
-# this is pretty ugly
-xmlto html-nochunks -m config.xsl manual.xml
-xmlto text manual.xml
+set -ex
 
-xmlto fo manual.xml
-fop manual.fo -pdf manual.pdf
-
+# Make the man pages
 release=$(cat ../VERSION)
 pod2man --release=${release} --center="Veusz"  veusz.pod > veusz.1
 pod2man --release=${release} --center="Veusz"  veusz_listen.pod > veusz_listen.1
 
 MANWIDTH=76 man ./veusz.1 > veusz.man.txt
 MANWIDTH=76 man ./veusz_listen.1 > veusz_listen.man.txt
+
+# Make the manual
+pushd manual-source
+make clean
+make html
+make latexpdf
+popd
+mkdir manual/pdf
+mv manual/latex/veusz.pdf manual/pdf/
+rm -rf manual/latex/ manual/doctrees/
+
+
