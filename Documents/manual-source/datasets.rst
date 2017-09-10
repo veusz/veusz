@@ -22,7 +22,7 @@ Note that a prefix and suffix can be given when importing. These are
 added to the front or back of each dataset name imported. They are
 convenient for grouping data together.
 
-.. image:: _static/images/importdialog.png
+.. image:: _images/importdialog.png
 
 We list the various types of import below.
 
@@ -481,7 +481,7 @@ For instance, if the user has already imported dataset d, then they
 can create d2 which consists of d**2. Expressions are in Python numpy
 syntax and can include the usual mathematical functions.
 
-.. image:: _static/images/createdataset.png
+.. image:: _images/createdataset.png
 
 Expressions for error bars can also be given. By appending
 :command:`_data`, :command:`_serr`, :command:`_perr` or
@@ -542,7 +542,7 @@ User defined constants or functions can be defined in the "Custom
 definitions" dialog box under the edit menu. Functions can also be
 imported from external python modules.
 
-.. image:: _static/images/customdefinition.png
+.. image:: _images/customdefinition.png
 
 Custom definitions are defined on a per-document basis, but can be
 saved or loaded into a file. A default custom definitions file can be

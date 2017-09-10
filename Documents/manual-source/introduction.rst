@@ -464,7 +464,7 @@ The main window
 You should see the main window when you run Veusz (you can just type
 the veusz command in Unix).
 
-.. image:: _static/images/mainwindow.png
+.. image:: _images/mainwindow.png
 
 The Veusz window is split into several sections. At the top is the
 menu bar and tool bar. These work in the usual way to other
@@ -527,7 +527,7 @@ automatically adds a new Page and Graph (with axes) to the document.
 
 You will see something like this:
 
-.. image:: _static/images/winwithgraph.png
+.. image:: _images/winwithgraph.png
 
 Select the x axis which has been added to the document (click on `x`
 in the selection window). In the properties window you will see a
