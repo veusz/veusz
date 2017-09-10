@@ -13,9 +13,9 @@ recursive-include tests *.py *.sh *.vsz *.selftest *.csv *.dat *.npy *.npz *.qdp
 # manual source and output
 recursive-include Documents/manual *
 recursive-include Documents/manual-source *.rst *.py Makefile make.bat *.png .gitignore
-include Documents/*.1
-include Documents/*.pod
-include Documents/*.txt
-include Documents/*.sh
+include Documents/man-page/*.1
+include Documents/man-page/*.pod
+include Documents/man-page/*.man.txt
+include Documents/Makefile
 #include Documents/*.xsl
 #include Documents/*.py

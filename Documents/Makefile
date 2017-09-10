@@ -27,12 +27,13 @@ all: man manual
 # man pages
 
 %.1: %.pod $(verfile)
-	pod2man --release=$(RELEASE) --center="Veusz"  $< > $@
+	pod2man --release=$(RELEASE) --center="Veusz" $< > $@
 
 %.man.txt: %.1
 	MANWIDTH=76 man ./$< > $@
 
-man: veusz.1 veusz_listen.1 veusz.man.txt veusz_listen.man.txt
+man: man-page/veusz.1 man-page/veusz_listen.1 \
+	man-page/veusz.man.txt man-page/veusz_listen.man.txt
 
 ############################################################################
 # manual
@@ -52,4 +53,4 @@ manual: manual/html/index.html manual/pdf/veusz.pdf
 ############################################################################
 
 clean:
-	rm -rf manual/html manual/pdf manual/latexpdf *.1 *.man.txt
+	rm -rf manual/html manual/pdf manual/latexpdf man-page/*.1 man-page/*.man.txt

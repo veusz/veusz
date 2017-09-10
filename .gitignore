@@ -9,10 +9,8 @@ MANIFEST
 dist/
 
 # generated manual files
-Documents/veusz.1
-Documents/veusz.man.txt
-Documents/veusz_listen.1
-Documents/veusz_listen.man.txt
+Documents/man-page/*.1
+Documents/man-page/*.man.txt
 Documents/manual/
 
 .idea/

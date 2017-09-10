@@ -148,8 +148,13 @@ into your Applications directory.
   may save space in repositories to separate out the helpers
   sub-module.
 
-- Veusz includes man pages in Documents/veusz.1 Documents/veusz_listen.1
+- Veusz includes man pages in Documents/man-page/veusz.1 and
+  Documents/man-page/veusz_listen.1
   These are not automatically installed by distutils.
+
+- A manual in HTML and PDF format can be found in Documents/manual/
+  This and the the man pages can be regenerated using the Makefile in
+  Documents, if Sphinx is installed (make clean; make).
 
 - Veusz also includes freedesktop mime, desktop and appdata files in
   the support subdirectory which can be installed to better integrate
