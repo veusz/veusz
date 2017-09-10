@@ -31,8 +31,7 @@ with Veusz commands if they come from a trusted source.
 =item B<--listen>
 
 Read Veusz commands from stdin, executing them, then writing the
-results to stdout. This option is intended to replace the veusz_listen
-standalone program.
+results to stdout. This option replaces the old veusz_listen.
 
 In this mode Veusz does not read any input documents, but will use the
 first argument to the program as the window title, if given.

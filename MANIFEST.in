@@ -1,6 +1,6 @@
 include VERSION AUTHORS ChangeLog COPYING INSTALL README
 include MANIFEST.in setup.py pyqtdistutils.py setup.cfg run_veusz_inplace
-include scripts/veusz scripts/veusz_listen
+include scripts/veusz
 recursive-include icons *.icns *.png *.ico *.svg LICENSE-*
 recursive-include support *.xml *.desktop
 recursive-include ui *.ui
@@ -17,5 +17,3 @@ include Documents/man-page/*.1
 include Documents/man-page/*.pod
 include Documents/man-page/*.man.txt
 include Documents/Makefile
-#include Documents/*.xsl
-#include Documents/*.py

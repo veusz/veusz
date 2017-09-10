@@ -35,8 +35,8 @@ The command prompt supports history (use the up and down cursor keys
 to recall previous commands).
 
 Most of the commands listed below can be used in the in-program
-command line interface, using the embedding interface or using
-veusz_listen. Commands specific to particular modes are documented as
+command line interface, using the embedding interface or using `veusz
+--listen`. Commands specific to particular modes are documented as
 such.
 
 Veusz also includes a new object-oriented version of the API, which is
@@ -180,7 +180,7 @@ EnableToolbar
 :command:`EnableToolbar(enable=True)`
 
 Enable/disable the zooming toolbar in the plotwindow. This command is
-only supported in embedded mode or from veusz_listen.
+only supported in embedded mode or from `veusz --listen`.
 
 Export
 ------
@@ -232,7 +232,7 @@ ForceUpdate
 Force the window to be updated to reflect the current state of the
 document. Often used when periodic updates have been disabled (see
 SetUpdateInterval). This command is only supported in embedded mode or
-from veusz_listen.
+from `veusz --listen`.
 
 Get
 ---
@@ -769,7 +769,7 @@ MoveToPage
 Updates window to show the page number given of the document.
 
 Note: this command is only supported in the embedding interface or
-veusz_listen.
+`veusz --listen`.
 
 ReloadData
 ----------
@@ -814,7 +814,7 @@ ResizeWindow
 Resizes window to be width by height pixels.
 
 Note: this command is only supported in the embedding interface or
-veusz_listen.
+`veusz --listen`.
 
 Save
 ----
@@ -1014,7 +1014,7 @@ the document. Disabling updates and using the ForceUpdate command will
 allow the user to control updates directly.
 
 Note: this command is only supported in the embedding interface or
-veusz_listen.
+`veusz --listen`.
 
 SetVerbose
 ----------
@@ -1070,7 +1070,7 @@ Quit
 
 :command:`Quit()`
 
-Quits Veusz. This is only supported in veusz_listen.
+Quits Veusz. This is only supported in `veusz --listen`.
 
 WaitForClose
 ------------
@@ -1094,7 +1094,7 @@ Sets the plot zoom factor, relative to a 1:1 scaling. factor can also
 be "width", "height" or "page", to zoom to the page width, height or
 page, respectively.
 
-This is only supported in embedded mode or veusz_listen.
+This is only supported in embedded mode or `veusz --listen`.
 
 Security
 ########
@@ -1447,22 +1447,21 @@ Non Python programs
 ===================
 
 Support for non Python programs is available in a limited
-form. External programs may execute the :command:`veusz_listen`
-executable or :command:`veusz_listen.py` Python module. Veusz will
-read its input from the standard input, and write output to standard
-output. This is a full Python execution environment, and supports all
-the scripting commands mentioned in :ref:`Commands <Commands>`, a
-:command:`Quit()` command, the :command:`EnableToolbar()` and the
-:command:`Zoom(factor)` command listed above. Only one window is
-supported at once, but many :command:`veusz_listen` programs may be
-started.
+form. External programs may execute Veusz using :command:`veusz
+--listen`. Veusz will read its input from the standard input, and
+write output to standard output. This is a full Python execution
+environment, and supports all the scripting commands mentioned in
+:ref:`Commands <Commands>`, a :command:`Quit()` command, the
+:command:`EnableToolbar()` and the :command:`Zoom(factor)` command
+listed above. Only one window is supported at once, but many
+:command:`veusz --listen` programs may be started.
 
-:command:`veusz_listen` may be used from the shell command line by
+:command:`veusz --listen` may be used from the shell command line by
 doing something like:
 
-..
+.. code-block:: bash
 
-    veusz_listen < in.vsz
+    veusz --listen < in.vsz
 
 where :command:`in.vsz` contains:
 

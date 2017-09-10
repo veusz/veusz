@@ -7,6 +7,7 @@ Changes in <next version>:
  * Move to using Sphinx for documentation
  * Add Makefile for documentation and remove build script
  * Use isfinite() on FreeBSD
+ * Drop old veusz_listen script in favour of veusz --listen
 
 Changes in 1.27:
  * New FITS import code and user interface, allowing much more

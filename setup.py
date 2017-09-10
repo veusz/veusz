@@ -45,7 +45,6 @@ try:
     extraoptions['entry_points'] = {
         'gui_scripts' : [
             'veusz = veusz.veusz_main:run',
-            'veusz_listen = veusz.veusz_listen:run'
             ]
         }
 
@@ -55,7 +54,7 @@ except ImportError:
     from distutils.command.install import install as orig_install
 
     extraoptions['requires'] = ['numpy']
-    extraoptions['scripts'] =  ['scripts/veusz', 'scripts/veusz_listen']
+    extraoptions['scripts'] =  ['scripts/veusz']
 
 from distutils.command.install_data import install_data
 import pyqtdistutils
