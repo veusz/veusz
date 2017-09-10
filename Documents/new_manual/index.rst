@@ -3,18 +3,28 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-veusz documentation
+Veusz documentation
 ===================
 
-veusz is a Python module for fitting surface brightness profiles of
-galaxy clusters with or without assuming hydrostatic equilibrium.
+Jeremy Sanders
+
+Copyright 2017
+
+This document is licensed under the GNU General Public
+License, version 2 or greater. Please see the file COPYING for
+details, or see `<http://www.gnu.org/licenses/gpl-2.0.html>`_.
+
+This is the documentation for Veusz. Veusz is a multiplatform
+scientific plotting package with a graphical user interface.
 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-   manual.rst
+   introduction.rst
+   datasets.rst
+   api.rst
 
 Indices and tables
 ==================

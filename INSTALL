@@ -21,15 +21,16 @@ Optional requirements:
  h5py            http://www.h5py.org/
  astropy >= 0.4  http://www.astropy.org/
  pyemf >= 2.0.0  http://pyemf.sourceforge.net/
-                 https://github.com/jeremysanders/pyemf
  iminuit         https://github.com/iminuit/iminuit
  ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
  Ghostscript     https://www.ghostscript.com/ (for EPS/PS output)
+ Sphinx          http://www.sphinx-doc.org/en/stable/ (to rebuild manual)
 
-Python 3 support is included in veusz-1.19+. Note that the source code
-is compatible with both python versions and does not need translation
-with 2to3. The optional dependency pyemf does not have Python 3 support.
+Note that the source code is compatible with both python 2.6+ and
+3.3+. It does not need translation with 2to3. The optional dependency
+pyemf does not have Python 3 support, but an in-development version of
+pyemf for Python 3 can be found at https://github.com/jeremysanders/pyemf.
 
 1.1 Full installation with distutils
 ====================================
