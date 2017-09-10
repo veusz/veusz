@@ -6,6 +6,7 @@ Changes in <next version>:
  * MacOS build requires MacOS 10.10 minimum
  * Move to using Sphinx for documentation
  * Add Makefile for documentation and remove build script
+ * Use isfinite() on FreeBSD
 
 Changes in 1.27:
  * New FITS import code and user interface, allowing much more
