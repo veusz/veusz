@@ -37,6 +37,10 @@ man: man-page/veusz.1 man-page/veusz.man.txt
 ############################################################################
 # manual
 
+manual-pdf: manual/pdf/veusz.pdf
+
+manual-html: manual/html/index.html
+
 manual/pdf/veusz.pdf: $(mansources) $(verfile)
 	make -C manual-source latexpdf
 	mkdir -p manual/pdf
@@ -46,11 +50,11 @@ manual/pdf/veusz.pdf: $(mansources) $(verfile)
 manual/html/index.html: $(mansources) $(verfile)
 	make -C manual-source html
 
-manual: manual/html/index.html manual/pdf/veusz.pdf
+manual: manual-html manual-pdf
 	rm -rf manual/doctrees/
 
 ############################################################################
 
 clean:
-	rm -rf manual/html manual/pdf manual/latexpdf \
-		man-page/*.1 man-page/*.man.txt
+	rm -f man-page/*.1 man-page/*.man.txt
+	make -C manual-source clean
