@@ -1,4 +1,4 @@
-Changes in <next version>:
+Changes in 2.0:
  * Update to PyQt5 and Qt5
  * Use Ghostscript to write EPS/PS formats
  * Use pyinstaller for MacOS builds instead of py2app
