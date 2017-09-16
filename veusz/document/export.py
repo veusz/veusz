@@ -137,7 +137,9 @@ class Export(object):
                     # check output devices contain
                     #  ps2write/eps2write or pswrite/epswrite
                     popen = subprocess.Popen(
-                        [gs_exe, '-h'], stdout=subprocess.PIPE)
+                        [gs_exe, '-h'],
+                        stdout=subprocess.PIPE,
+                        universal_newlines=True)
                     text = popen.stdout.read()
 
                     if re.search(r'\beps2write\b', text):
