@@ -1,3 +1,6 @@
+Changes in <next version>:
+ * Fix setting manual bins in histogram dialog box
+
 Changes in 2.0:
  * Update to PyQt5 and Qt5
  * Use Ghostscript to write EPS/PS formats

@@ -19,7 +19,7 @@
 from __future__ import division
 
 from ..compat import crange, citems, cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from .. import datasets
 from .. import document
@@ -28,30 +28,30 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="HistogramDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def checkValidator(combo):
     """Is this validator ok?"""
     valid = combo.validator()
     state, s, x = valid.validate(combo.currentText(), 0)
-    return state == qt4.QValidator.Acceptable
+    return state == qt.QValidator.Acceptable
 
-class ManualBinModel(qt4.QAbstractListModel):
+class ManualBinModel(qt.QAbstractListModel):
     """Model to store a list of floating point values in a list."""
     def __init__(self, thedata):
-        qt4.QAbstractListModel.__init__(self)
+        qt.QAbstractListModel.__init__(self)
         self.thedata = thedata
     def data(self, index, role):
-        if role == qt4.Qt.DisplayRole and index.isValid():
+        if role == qt.Qt.DisplayRole and index.isValid():
             return float(self.thedata[index.row()])
         return None
     def rowCount(self, parent):
         return len(self.thedata)
     def flags(self, index):
-        return ( qt4.Qt.ItemIsSelectable | qt4.Qt.ItemIsEnabled |
-                 qt4.Qt.ItemIsEditable )
+        return ( qt.Qt.ItemIsSelectable | qt.Qt.ItemIsEnabled |
+                 qt.Qt.ItemIsEditable )
     def setData(self, index, value, role):
-        if role == qt4.Qt.EditRole:
+        if role == qt.Qt.EditRole:
             try:
                 val = float(value)
             except ValueError:
@@ -71,13 +71,13 @@ class HistoDataDialog(VeuszDialog):
         self.document = document
 
         self.minval.default = self.maxval.default = ['Auto']
-        regexp = qt4.QRegExp("^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?|Auto$")
-        validator = qt4.QRegExpValidator(regexp, self)
+        regexp = qt.QRegExp("^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?|Auto$")
+        validator = qt.QRegExpValidator(regexp, self)
         self.minval.setValidator(validator)
         self.maxval.setValidator(validator)
-        self.buttonBox.button(qt4.QDialogButtonBox.Apply).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.Apply).clicked.connect(
             self.applyClicked )
-        self.buttonBox.button(qt4.QDialogButtonBox.Reset).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.Reset).clicked.connect(
             self.resetClicked )
         self.bingenerate.clicked.connect(self.generateManualBins)
         self.binadd.clicked.connect(self.addManualBins)
@@ -183,28 +183,35 @@ class HistoDataDialog(VeuszDialog):
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError as ex:
-            qt4.QMessageBox.warning(self, _("Invalid parameters"), cstr(ex))
+            qt.QMessageBox.warning(self, _("Invalid parameters"), cstr(ex))
             return
+
+        self.binmodel.beginRemoveRows(qt.QModelIndex(), 0, len(self.bindata)-1)
+        del self.bindata[:]
+        self.binmodel.endRemoveRows()
 
         if p.expr != '':
             p.manualbins = []
             gen = p.getGenerator(self.document)
-            self.bindata[:] = list(gen.binLocations())
-        else:
-            del self.bindata[:]
-        self.binmodel.reset()
+            locs = list(gen.binLocations())
+            self.binmodel.beginInsertRows(qt.QModelIndex(), 0, len(locs)-1)
+            self.bindata += locs
+            self.binmodel.endInsertRows()
 
     def addManualBins(self):
         """Add an extra bin to the manual list."""
+        self.binmodel.beginInsertRows(qt.QModelIndex(), 0, 0)
         self.bindata.insert(0, 0.)
-        self.binmodel.reset()
+        self.binmodel.endInsertRows()
 
     def removeManualBins(self):
         """Remove selected bins."""
         indexes = self.binmanuals.selectionModel().selectedIndexes()
         if indexes:
-            del self.bindata[ indexes[0].row() ]
-            self.binmodel.reset()
+            row = indexes[0].row()
+            self.binmodel.beginRemoveRows(qt.QModelIndex(), row, row)
+            del self.bindata[row]
+            self.binmodel.endRemoveRows()
 
     def resetClicked(self):
         """Reset button clicked."""
@@ -217,8 +224,9 @@ class HistoDataDialog(VeuszDialog):
         self.maxval.setEditText("Auto")
         self.logarithmic.setChecked(False)
 
+        self.binmodel.beginRemoveRows(qt.QModelIndex(), 0, len(self.bindata)-1)
         del self.bindata[:]
-        self.binmodel.reset()
+        self.binmodel.endRemoveRows()
 
         self.errorBars.setChecked(False)
         self.counts.click()
@@ -251,8 +259,9 @@ class HistoDataDialog(VeuszDialog):
 
         # if there is a manual list of bins
         if gen.binmanual is not None:
+            self.binmodel.beginResetModel()
             self.bindata[:] = list(gen.binmanual)
-            self.binmodel.reset()
+            self.binmodel.endResetModel()
 
         # select correct method
         {'counts': self.counts, 'density': self.density,
@@ -268,7 +277,7 @@ class HistoDataDialog(VeuszDialog):
     def applyClicked(self):
         """Create histogram."""
 
-        qt4.QTimer.singleShot(4000, self.statuslabel.clear)
+        qt.QTimer.singleShot(4000, self.statuslabel.clear)
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError as ex:
