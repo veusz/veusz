@@ -42,6 +42,7 @@ class GenericPlotter(widget.Widget):
     def __init__(self, parent, name=None):
         """Initialise object, setting axes."""
         widget.Widget.__init__(self, parent, name=name)
+        self.settings.get('key').setOnModified(self.auto_key)
 
     @classmethod
     def allowedParentTypes(klass):
@@ -83,6 +84,9 @@ class GenericPlotter(widget.Widget):
     def getKeyText(self, number):
         """Get key entry."""
         return self.settings.key
+    
+    def auto_key(self):
+        return False
 
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw the plot symbol and/or line at (x,y) in a box width*height.

@@ -184,11 +184,14 @@ class DatasetHistoGenerator(object):
 
         # lookup names of datasets in document
         bindsname = valuedsname = ''
+        dss = []
         for name, ds in citems(self.document.data):
             if ds is self.bindataset:
                 bindsname = name
+                dss.append((ds, bindsname))
             elif ds is self.valuedataset:
                 valuedsname = name
+                dss.append((ds, valuedsname))
 
         fileobj.write( ("CreateHistogram(%s, %s, %s, binparams=%s, "
                         "binmanual=%s, method=%s, "
@@ -197,6 +200,10 @@ class DatasetHistoGenerator(object):
                         repr(self.binparams), repr(self.binmanual),
                         repr(self.method), repr(self.cumulative),
                         repr(self.errors)) )
+        
+        for ds, name in dss:
+            ds.saveDataAttr(fileobj, name)
+        
 
     def linkedInformation(self):
         """Informating about linking."""

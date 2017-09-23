@@ -74,6 +74,14 @@ class DatasetConcreteBase(DatasetBase):
         # modified by the document on SetData, etc, but can be set for
         # temporary datasets.
         self.username = None
+        
+        # A dictionary containing all user/plugin-defined dataset attributes
+        self.attr = {'label': ''}
+        
+    def saveDataAttr(self, fileobj, name):
+        for attr, val in self.attr.iteritems():
+            out = "SetDataAttr({!r}, {!r}, {!r})\n".format(name, attr, val)
+            fileobj.write(out)
 
     def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
@@ -92,6 +100,7 @@ class DatasetConcreteBase(DatasetBase):
     def saveToFile(self, fileobj, name, mode='text', hdfgroup=None):
         """Save dataset to file."""
         self.saveDataRelationToText(fileobj, name)
+        self.saveDataAttr(fileobj, name)
         if self.linked is None:
             if mode == 'text':
                 self.saveDataDumpToText(fileobj, name)
