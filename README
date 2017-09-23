@@ -12,6 +12,12 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
+Changes in 2.0.1:
+ * Fix crash setting manual bins in histogram dialog box
+ * Add missing DLLs to Windows installer
+ * Fix version number in Mac OS package
+ * Add new colormaps (thanks to yingchaolu)
+
 Changes in 2.0:
  * Update to PyQt5 and Qt5
  * Use Ghostscript to write EPS/PS formats

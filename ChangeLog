@@ -1,5 +1,8 @@
-Changes in <next version>:
- * Fix setting manual bins in histogram dialog box
+Changes in 2.0.1:
+ * Fix crash setting manual bins in histogram dialog box
+ * Add missing DLLs to Windows installer
+ * Fix version number in Mac OS package
+ * Add new colormaps (thanks to yingchaolu)
 
 Changes in 2.0:
  * Update to PyQt5 and Qt5
