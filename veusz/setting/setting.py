@@ -121,7 +121,7 @@ class Setting(object):
         if isinstance(self._val, ReferenceBase):
             return self._val.resolve(self).get()
         else:
-            return self.convertFrom(self._val)
+            return self._val
 
     def set(self, v):
         """Set the value."""
@@ -130,7 +130,7 @@ class Setting(object):
             self._val = v
         else:
             # this also removes the linked value if there is one set
-            self._val = self.convertTo(v)
+            self._val = self.normalize(v)
 
         self.onmodified.onModified.emit()
 
@@ -306,14 +306,12 @@ class Setting(object):
         This shouldn't often be used as it defeats the automatic updation.
         Used for temporary modifications."""
 
-        self._val = self.convertTo(val)
+        self._val = self.normalize(val)
 
-    def convertTo(self, val):
-        """Convert for storage."""
-        return val
+    def normalize(self, val):
+        """Convert external value to normalized form for storing
 
-    def convertFrom(self, val):
-        """Convert to storage."""
+        Raises a utils.InvalidType if this is not possible."""
         return val
 
     def makeControl(self, *args):
@@ -376,9 +374,9 @@ class SettingBackwardCompat(Setting):
         """Get setting this setting forwards to."""
         return self.parent.getFromPath(self.relpath)
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if self.parent is not None:
-            return self.getForward().convertTo(val)
+            return self.getForward().normalize(val)
 
     def toText(self):
         return self.getForward().toText()
@@ -418,7 +416,7 @@ class Str(Setting):
 
     typename = 'str'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, cbasestr):
             return val
         raise utils.InvalidType
@@ -446,7 +444,7 @@ class Bool(Setting):
 
     typename = 'bool'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if type(val) in (bool, int):
             return bool(val)
         raise utils.InvalidType
@@ -495,7 +493,7 @@ class Int(Setting):
         return self._copyHelper((), (), {'minval': self.minval,
                                          'maxval': self.maxval})
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, int):
             if val >= self.minval and val <= self.maxval:
                 return val
@@ -554,7 +552,7 @@ class Float(Setting):
         return self._copyHelper((), (), {'minval': self.minval,
                                          'maxval': self.maxval})
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, int) or isinstance(val, float):
             return _finiteRangeFloat(val,
                                      minval=self.minval, maxval=self.maxval)
@@ -569,7 +567,7 @@ class Float(Setting):
         except ValueError:
             # try to evaluate
             f = self.safeEvalHelper(text)
-        return self.convertTo(f)
+        return self.normalize(f)
 
     def makeControl(self, *args):
         return controls.Edit(self, *args)
@@ -579,23 +577,16 @@ class FloatOrAuto(Float):
 
     typename = 'float-or-auto'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if type(val) in (int, float):
             return _finiteRangeFloat(val, minval=self.minval, maxval=self.maxval)
         elif isinstance(val, cbasestr) and val.strip().lower() == 'auto':
-            return None
+            return 'Auto'
         else:
             raise utils.InvalidType
 
-    def convertFrom(self, val):
-        if val is None:
-            return 'Auto'
-        else:
-            return Float.convertFrom(self, val)
-
     def toText(self):
-        if self.val is None or (isinstance(self.val, cbasestr) and
-                                self.val.lower() == 'auto'):
+        if isinstance(self.val, cbasestr) and self.val.lower() == 'auto':
             return 'Auto'
         else:
             return ui_floattostring(self.val)
@@ -614,23 +605,16 @@ class IntOrAuto(Setting):
 
     typename = 'int-or-auto'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, int):
             return val
         elif isinstance(val, cbasestr) and val.strip().lower() == 'auto':
-            return None
+            return 'Auto'
         else:
             raise utils.InvalidType
 
-    def convertFrom(self, val):
-        if val is None:
-            return 'Auto'
-        else:
-            return val
-
     def toText(self):
-        if self.val is None or (isinstance(self.val, cbasestr) and
-                                self.val.lower() == 'auto'):
+        if isinstance(self.val, cbasestr) and self.val.lower() == 'auto':
             return 'Auto'
         else:
             return uilocale.toString(self.val)
@@ -757,7 +741,7 @@ class Distance(Setting):
 
         return kls.distre.match(dist) is not None
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if self.distre.match(val) is not None:
             return val
         else:
@@ -881,7 +865,7 @@ class Choice(Setting):
         """Make a copy of the setting."""
         return self._copyHelper((self.vallist,), (), {})
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if val in self.vallist:
             return val
         else:
@@ -924,7 +908,7 @@ class ChoiceOrMore(Setting):
         """Make a copy of the setting."""
         return self._copyHelper((self.vallist,), (), {})
 
-    def convertTo(self, val):
+    def normalize(self, val):
         return val
 
     def toText(self):
@@ -942,7 +926,7 @@ class FloatChoice(ChoiceOrMore):
 
     typename = 'float-choice'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, int) or isinstance(val, float):
             return _finiteRangeFloat(val)
         raise utils.InvalidType
@@ -956,7 +940,7 @@ class FloatChoice(ChoiceOrMore):
         except ValueError:
             # try to evaluate
             f = self.safeEvalHelper(text)
-        return self.convertTo(f)
+        return self.normalize(f)
 
     def makeControl(self, *args):
         argsv = {'descriptions': self.descriptions}
@@ -968,7 +952,7 @@ class FloatDict(Setting):
 
     typename = 'float-dict'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if type(val) != dict:
             raise utils.InvalidType
 
@@ -1016,7 +1000,7 @@ class FloatList(Setting):
 
     typename = 'float-list'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if type(val) not in (list, tuple):
             raise utils.InvalidType
 
@@ -1094,7 +1078,7 @@ class WidgetPath(Str):
         """
 
         # this is a bit of a hack, so we don't have to pass a value
-        # for the setting (which we need to from convertTo)
+        # for the setting (which we need to from normalize)
         if val is None:
             val = self.val
 
@@ -1166,7 +1150,7 @@ class Strings(Setting):
 
     typename = 'str-multi'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Takes a tuple/list of strings:
         ('ds1','ds2'...)
         """
@@ -1203,7 +1187,7 @@ class Datasets(Setting):
         self.dimensions = dimensions
         self.datatype = datatype
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Takes a tuple/list of strings:
         ('ds1','ds2'...)
         """
@@ -1249,7 +1233,7 @@ class DatasetExtended(Dataset):
 
     typename = 'dataset-extended'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Check is a string (dataset name or expression) or a list of
         floats (numbers).
         """
@@ -1629,7 +1613,7 @@ class LineSet(Setting):
 
     typename='line-multi'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Takes a tuple/list of tuples:
         [('dotted', '1pt', 'color', <trans>, False), ...]
 
@@ -1691,7 +1675,7 @@ class FillSet(Setting):
 
     typename = 'fill-multi'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Takes a tuple/list of tuples:
         [('solid', 'color', False), ...]
 
@@ -1753,7 +1737,7 @@ class Filename(Str):
     def makeControl(self, *args):
         return controls.Filename(self, 'file', *args)
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if sys.platform == 'win32':
             val = val.replace('\\', '/')
         return val
@@ -1930,7 +1914,7 @@ class RotateInterval(Choice):
                          '0', '45', '90', '135', '180'),
                         val, **args)
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Store rotate angle."""
         # backward compatibility with rotate option
         # False: angle 0
@@ -1939,7 +1923,7 @@ class RotateInterval(Choice):
             val = '0'
         elif val == True:
             val = '90'
-        return Choice.convertTo(self, val)
+        return Choice.normalize(self, val)
 
     def copy(self):
         """Make a copy of the setting."""
