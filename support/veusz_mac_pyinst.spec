@@ -57,7 +57,13 @@ coll = COLLECT(exe,
                upx=False,
                name='veusz')
 
+version = open('VERSION').read().strip()
+
 app = BUNDLE(coll,
              name='Veusz.app',
              icon='icons/veusz.icns',
-             bundle_identifier=None)
+             bundle_identifier=None,
+             info_plist={
+        'CFBundleShortVersionString': version,
+        }
+             )

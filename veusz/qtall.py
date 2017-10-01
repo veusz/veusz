@@ -16,14 +16,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-"""A convenience module to import both the used Qt symbols from."""
+"""A convenience module to import used Qt symbols from."""
 
-from __future__ import division
-import sys
-import os
-# disable KDE specific dialog boxes as they are currently broken
-if sys.platform != 'win32' and sys.platform != 'darwin':
-    os.environ['QT_PLATFORM_PLUGIN'] = 'none'
+from __future__ import print_function, division, absolute_import
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *

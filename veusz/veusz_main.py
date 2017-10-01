@@ -26,14 +26,7 @@ import os.path
 import signal
 import optparse
 
-# trick to make sure veusz is on the path, if being run as a script
-try:
-    import veusz
-except ImportError:
-    sys.path.append(
-        os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) )
-    import veusz
-
+import veusz
 from veusz.compat import czip, cbytes, cstr
 from veusz import qtall as qt4
 from veusz import utils
@@ -306,14 +299,6 @@ class VeuszApp(qt4.QApplication):
 
 def run():
     '''Run the main application.'''
-
-    # nasty workaround for bug that causes non-modal windows not to
-    # appear on mac see
-    # https://github.com/jeremysanders/veusz/issues/39
-    if sys.platform == 'darwin':
-        import glob
-        for f in glob.glob(os.environ['HOME'] + '/Library/Saved Application State/org.python.veusz.*/*'):
-            os.unlink(f)
 
     # jump to the embedding client entry point if required
     if len(sys.argv) == 2 and sys.argv[1] == '--embed-remote':

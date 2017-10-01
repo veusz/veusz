@@ -115,32 +115,41 @@ class Export(object):
         if not klass.gs_searched:
             # test for existence of ghostscript
 
-            gs = setting.settingdb["external_ghostscript"]
             gs_exe = None
+
+            gs = setting.settingdb["external_ghostscript"]
             if gs:
                 if os.path.isfile(gs) and os.access(gs, os.X_OK):
                     gs_exe = gs
             else:
-                exe = "gs.exe" if sys.platform == "win32" else "gs"
-                found = utils.findOnPath(exe)
-                if found:
-                    gs_exe = found
+                if sys.platform == "win32":
+                    # look for ghostscript as 64 and 32 bit versions
+                    gs_exe = utils.findOnPath("gswin64c.exe")
+                    if not gs_exe:
+                        gs_exe = utils.findOnPath("gswin32c.exe")
+                else:
+                    # unix tends to call it just gs
+                    gs_exe = utils.findOnPath("gs")
 
+            klass.gs_dev = dev = {}
             if gs_exe:
                 try:
                     # check output devices contain
                     #  ps2write/eps2write or pswrite/epswrite
                     popen = subprocess.Popen(
-                        [gs_exe, '-h'], stdout=subprocess.PIPE)
+                        [gs_exe, '-h'],
+                        stdout=subprocess.PIPE,
+                        universal_newlines=True)
                     text = popen.stdout.read()
-                    if ( re.search(r'\bps2write\b', text) and
-                         re.search(r'\beps2write\b', text) ):
-                        klass.gs_dev = {'.ps': 'ps2write', '.eps': 'eps2write'}
-                    elif ( re.search(r'\bpswrite\b', text) and
-                           re.search(r'\bepswrite\b', text) ):
-                        klass.gs_dev = {'.ps': 'pswrite', '.eps': 'epswrite'}
-                    else:
-                        raise RuntimeError('No supported devices')
+
+                    if re.search(r'\beps2write\b', text):
+                        dev['.eps'] = 'eps2write'
+                    elif re.search(r'\bepswrite\b', text):
+                        dev['.eps'] = 'epswrite'
+                    if re.search(r'\bps2write\b', text):
+                        dev['.ps'] = 'ps2write'
+                    elif re.search(r'\bpswrite\b', text):
+                        dev['.ps'] = 'pswrite'
                 except Exception as e:
                     pass
                 else:
@@ -165,11 +174,10 @@ class Export(object):
             formats.append( (["emf"], _("Windows Enhanced Metafile")) )
 
         klass.searchGhostscript()
-        if klass.gs_exe:
-            formats += [
-                (["eps"], _("Encapsulated Postscript")),
-                (["ps"], _("Postscript")),
-                ]
+        if '.eps' in klass.gs_dev:
+            formats.append((["eps"], _("Encapsulated Postscript")))
+        if '.ps' in klass.gs_dev:
+            formats.append((["ps"], _("Postscript")))
 
         formats.sort()
         return formats

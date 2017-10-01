@@ -1,7 +1,19 @@
-Changes in <next version>:
- * Update to PyQt5 / Qt5
+Changes in 2.0.1:
+ * Fix crash setting manual bins in histogram dialog box
+ * Add missing DLLs to Windows installer
+ * Fix version number in Mac OS package
+ * Add new colormaps (thanks to yingchaolu)
+
+Changes in 2.0:
+ * Update to PyQt5 and Qt5
  * Use Ghostscript to write EPS/PS formats
  * Use pyinstaller for MacOS builds instead of py2app
+ * Windows build requires Windows 7 minimum
+ * MacOS build requires MacOS 10.10 minimum
+ * Move to using Sphinx for documentation
+ * Add Makefile for documentation and remove build script
+ * Use isfinite() on FreeBSD
+ * Drop old veusz_listen script in favour of veusz --listen
 
 Changes in 1.27:
  * New FITS import code and user interface, allowing much more

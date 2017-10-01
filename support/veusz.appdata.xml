@@ -9,8 +9,8 @@
     <p>
       Veusz is an interactive graphical scientific plotting and
       graphing package. It is designed to produce publication-ready
-      Postscript or PDF output. SVG, EMF and bitmap export formats are
-      also supported. Data can be read from text, CSV, HDF5 or FITS
+      PDF output. SVG, EMF and bitmap export formats are also
+      supported. Data can be read from text, CSV, HDF5 or FITS
       files. In addition, you can also enter, manipulate or examine
       data from within the application.  The program also provides a
       command line and scripting interface (based on Python) to its

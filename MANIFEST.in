@@ -1,10 +1,19 @@
 include VERSION AUTHORS ChangeLog COPYING INSTALL README
 include MANIFEST.in setup.py pyqtdistutils.py setup.cfg run_veusz_inplace
-include scripts/veusz scripts/veusz_listen
-recursive-include tests *.py *.sh *.vsz *.selftest *.csv *.dat *.npy *.npz *.qdp *.pco *.fits *.hdf5
-recursive-include Documents *.xml *.sh *.png *.txt *.pdf *.html *.xsl *.py *.pod *.1
+include scripts/veusz
 recursive-include icons *.icns *.png *.ico *.svg LICENSE-*
 recursive-include support *.xml *.desktop
 recursive-include ui *.ui
 recursive-include examples *.vsz *.py *.csv *.dat
 recursive-include veusz/helpers *.c *.cpp *.h README LICENSE_* QtMml*
+
+# self tests
+recursive-include tests *.py *.sh *.vsz *.selftest *.csv *.dat *.npy *.npz *.qdp *.pco *.fits *.hdf5
+
+# manual source and output
+recursive-include Documents/manual *
+recursive-include Documents/manual-source *.rst *.py Makefile make.bat *.png .gitignore
+include Documents/man-page/*.1
+include Documents/man-page/*.pod
+include Documents/man-page/*.man.txt
+include Documents/Makefile

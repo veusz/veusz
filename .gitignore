@@ -10,14 +10,10 @@ MANIFEST
 *.o
 dist/
 
-# generated files
-Documents/manual.html
-Documents/manual.pdf
-Documents/manual.txt
-Documents/manual.fo
-Documents/veusz.1
-Documents/veusz.man.txt
-Documents/veusz_listen.1
-Documents/veusz_listen.man.txt
+# generated manual files
+Documents/man-page/*.1
+Documents/man-page/*.man.txt
+Documents/manual/
+
 .idea/
 veusz.egg-info/
