@@ -438,29 +438,8 @@ class Axis3D(widget.Widget):
             if self.plottedrange[0] == self.plottedrange[1]:
                 self.plottedrange[1] = self.plottedrange[0]*2
 
-        r = s.autoRange
-        if r == 'exact':
-            pass
-        elif r == 'next-tick':
-            pass
-        else:
-            val = {'+2%': 0.02, '+5%': 0.05, '+10%': 0.1, '+15%': 0.15}[r]
-
-            if s.log:
-                # logarithmic
-                logrng = abs( N.log(self.plottedrange[1]) -
-                           N.log(self.plottedrange[0]) )
-                if s.min == 'Auto':
-                    self.plottedrange[0] /= N.exp(logrng * val)
-                if s.max == 'Auto':
-                    self.plottedrange[1] *= N.exp(logrng * val)
-            else:
-                # linear
-                rng = self.plottedrange[1] - self.plottedrange[0]
-                if s.min == 'Auto':
-                    self.plottedrange[0] -= rng*val
-                if s.max == 'Auto':
-                    self.plottedrange[1] += rng*val
+        s.get('autoRange').adjustPlottedRange(
+            self.plottedrange, s.min=='Auto', s.max=='Auto', s.log, self.document)
 
         self.computeTicks()
 

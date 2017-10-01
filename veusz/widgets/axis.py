@@ -170,6 +170,15 @@ class TickLabel(setting.Text):
 class AutoRange(setting.ChoiceOrMore):
     """Choose how to choose range of axis."""
 
+    # +5% or -5%
+    re_dr_plusminus = re.compile(r'^\s*([+-][0-9]+)\s*%\s*$')
+    # 5-10%
+    re_dr_percrange = re.compile(r'^\s*(-?[0-9]+)\s*-\s*([0-9]+)\s*%\s*$')
+    # < 5%
+    re_dr_lower = re.compile(r'^\s*<\s*([0-9]+)\s*%\s*$')
+    # > 95%
+    re_dr_upper = re.compile(r'^\s*>\s*([0-9]+)\s*%\s*$')
+
     def __init__(self, name, value, **args):
         setting.ChoiceOrMore.__init__(
             self,
@@ -204,6 +213,77 @@ class AutoRange(setting.ChoiceOrMore):
     def copy(self):
         """Return copy of this setting."""
         return self._copyHelper((), (), {})
+
+    def autoRangeToFracs(self, rng, doc):
+        """Convert auto range setting to fractions to expand range by.
+
+        Returns tuple of expansion fractions for left and right
+        """
+
+        # +X% or -Y%
+        m = self.re_dr_plusminus.match(rng)
+        if m:
+            v = float(m.group(1))*0.01
+            return v, v
+
+        # X-Y%
+        m = self.re_dr_percrange.match(rng)
+        if m:
+            v1 = -float(m.group(1))*0.01
+            v2 = -(1-float(m.group(2))*0.01)
+            return v1, v2
+
+        # <X%
+        m = self.re_dr_lower.match(rng)
+        if m:
+            return 0, -(1-float(m.group(1))*0.01)
+
+        # >Y%
+        m = self.re_dr_upper.match(rng)
+        if m:
+            return -(float(m.group(1))*0.01), 0
+
+        # error
+        doc.log(_("Invalid axis range '%s'") % rng)
+        return 0, 0
+
+    def adjustPlottedRange(self, plottedrange, adjustmin, adjustmax, log, doc):
+        """Adjust plotted range list given settings.
+        plottedrange: [minval, maxval]
+        adjustmin/adjustmax: bool whether to adjust
+        log: is log axis
+        doc: Document object
+        """
+        rng = self.val
+        if rng == 'exact':
+            pass
+        elif rng == 'next-tick':
+            pass
+        else:
+            # get fractions to expand range by
+            expandfrac1, expandfrac2 = self.autoRangeToFracs(
+                rng, doc)
+            origrange = list(plottedrange)
+            if log:
+                # logarithmic
+                logrng = abs( N.log(plottedrange[1]) -
+                           N.log(plottedrange[0]) )
+                if adjustmin:
+                    plottedrange[0] /= N.exp(logrng * expandfrac1)
+                if adjustmax:
+                    plottedrange[1] *= N.exp(logrng * expandfrac2)
+            else:
+                # linear
+                rng = plottedrange[1] - plottedrange[0]
+                if adjustmin:
+                    plottedrange[0] -= rng*expandfrac1
+                if adjustmax:
+                    plottedrange[1] += rng*expandfrac2
+
+            # if order is wrong, then give error!
+            if plottedrange[1] <= plottedrange[0]:
+                doc.log(_("Invalid axis range '%s'") % rng)
+                plottedrange[:] = origrange
 
 ###############################################################################
 
@@ -383,48 +463,6 @@ class Axis(widget.Widget):
         """Return whether any of the bounds are automatically determined."""
         return self.settings.min == 'Auto' or self.settings.max == 'Auto'
 
-    # +5% or -5%
-    re_dr_plusminus = re.compile(r'^\s*([+-][0-9]+)\s*%\s*$')
-    # 5-10%
-    re_dr_percrange = re.compile(r'^\s*(-?[0-9]+)\s*-\s*([0-9]+)\s*%\s*$')
-    # < 5%
-    re_dr_lower = re.compile(r'^\s*<\s*([0-9]+)\s*%\s*$')
-    # > 95%
-    re_dr_upper = re.compile(r'^\s*>\s*([0-9]+)\s*%\s*$')
-
-    def autoRangeToFracs(self, rng):
-        """Convert auto range setting to fractions to expand range by.
-
-        Returns tuple of expansion fractions for left and right
-        """
-
-        # +X% or -Y%
-        m = self.re_dr_plusminus.match(rng)
-        if m:
-            v = float(m.group(1))*0.01
-            return v, v
-
-        # X-Y%
-        m = self.re_dr_percrange.match(rng)
-        if m:
-            v1 = -float(m.group(1))*0.01
-            v2 = -(1-float(m.group(2))*0.01)
-            return v1, v2
-
-        # <X%
-        m = self.re_dr_lower.match(rng)
-        if m:
-            return 0, -(1-float(m.group(1))*0.01)
-
-        # >Y%
-        m = self.re_dr_upper.match(rng)
-        if m:
-            return -(float(m.group(1))*0.01), 0
-
-        # error
-        self.document.log(
-            _("Invalid axis range '%s'") % rng)
-        return 0, 0
 
     def computePlottedRange(self, force=False, overriderange=None):
         """Convert the range requested into a plotted range."""
@@ -487,35 +525,8 @@ class Axis(widget.Widget):
             if self.plottedrange[0] == self.plottedrange[1]:
                 self.plottedrange[1] = self.plottedrange[0]*2
 
-        rng = s.autoRange
-        if rng == 'exact':
-            pass
-        elif rng == 'next-tick':
-            pass
-        else:
-            # get fractions to expand range by
-            expandfrac1, expandfrac2 = self.autoRangeToFracs(rng)
-            origrange = list(self.plottedrange)
-            if s.log:
-                # logarithmic
-                logrng = abs( N.log(self.plottedrange[1]) -
-                           N.log(self.plottedrange[0]) )
-                if s.min == 'Auto':
-                    self.plottedrange[0] /= N.exp(logrng * expandfrac1)
-                if s.max == 'Auto':
-                    self.plottedrange[1] *= N.exp(logrng * expandfrac2)
-            else:
-                # linear
-                rng = self.plottedrange[1] - self.plottedrange[0]
-                if s.min == 'Auto':
-                    self.plottedrange[0] -= rng*expandfrac1
-                if s.max == 'Auto':
-                    self.plottedrange[1] += rng*expandfrac2
-
-            # if order is wrong, then give error!
-            if self.plottedrange[1] <= self.plottedrange[0]:
-                self.document.log(_("Invalid axis range '%s'") % rng)
-                self.plottedrange = origrange
+        s.get('autoRange').adjustPlottedRange(
+            self.plottedrange, s.min=='Auto', s.max=='Auto', s.log, self.document)
 
         self.computeTicks()
 
