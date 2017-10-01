@@ -23,7 +23,7 @@ e.g.
 s = Int('foo', 5)
 s.get()
 s.set(42)
-s.fromText('42')
+s.fromUIText('42')
 """
 
 from __future__ import division
@@ -183,12 +183,12 @@ class Setting(object):
     path = property(_path, None, None,
                     'Return the full path of the setting')
 
-    def toText(self):
-        """Convert the type to text for saving."""
+    def toUIText(self):
+        """Convert the type to text to show in UI."""
         return ""
 
-    def fromText(self, text):
-        """Convert text to type suitable for setting.
+    def fromUIText(self, text):
+        """Convert text from UI into type for setting.
 
         Raises utils.InvalidType if cannot convert."""
         return None
@@ -211,7 +211,7 @@ class Setting(object):
             pass
 
         if deftext is not None:
-            self.val = self.fromText(deftext)
+            self.val = self.fromUIText(deftext)
             self.default = self.val
 
     def removeDefault(self):
@@ -252,7 +252,7 @@ class Setting(object):
             path = '%s_NAME:%s' % (item.name, path)
 
         # set the default
-        settingdb[path] = self.toText()
+        settingdb[path] = self.toUIText()
 
     def saveText(self, saveall, rootname = ''):
         """Return text to restore the value of this setting."""
@@ -378,11 +378,11 @@ class SettingBackwardCompat(Setting):
         if self.parent is not None:
             return self.getForward().normalize(val)
 
-    def toText(self):
-        return self.getForward().toText()
+    def toUIText(self):
+        return self.getForward().toUIText()
 
-    def fromText(self, val):
-        return self.getForward().fromText(val)
+    def fromUIText(self, val):
+        return self.getForward().fromUIText(val)
 
     def set(self, val):
         if self.parent is not None and not isinstance(val, ReferenceBase):
@@ -421,10 +421,10 @@ class Str(Setting):
             return val
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return self.val
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         return text
 
     def makeControl(self, *args):
@@ -449,13 +449,13 @@ class Bool(Setting):
             return bool(val)
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         if self.val:
             return 'True'
         else:
             return 'False'
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         t = text.strip().lower()
         if t in ('true', '1', 't', 'y', 'yes'):
             return True
@@ -501,10 +501,10 @@ class Int(Setting):
                 raise utils.InvalidType('Out of range allowed')
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return uilocale.toString(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         i, ok = uilocale.toLongLong(text)
         if not ok:
             raise ValueError
@@ -554,14 +554,14 @@ class Float(Setting):
 
     def normalize(self, val):
         if isinstance(val, int) or isinstance(val, float):
-            return _finiteRangeFloat(val,
-                                     minval=self.minval, maxval=self.maxval)
+            return _finiteRangeFloat(
+                val, minval=self.minval, maxval=self.maxval)
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         try:
             f = ui_stringtofloat(text)
         except ValueError:
@@ -585,17 +585,17 @@ class FloatOrAuto(Float):
         else:
             raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         if isinstance(self.val, cbasestr) and self.val.lower() == 'auto':
             return 'Auto'
         else:
             return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
-            return Float.fromText(self, text)
+            return Float.fromUIText(self, text)
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
@@ -613,13 +613,13 @@ class IntOrAuto(Setting):
         else:
             raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         if isinstance(self.val, cbasestr) and self.val.lower() == 'auto':
             return 'Auto'
         else:
             return uilocale.toString(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
@@ -747,11 +747,11 @@ class Distance(Setting):
         else:
             raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         # convert decimal point to display locale
         return self.val.replace('.', uilocale.decimalPoint())
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         # convert decimal point from display locale
         text = text.replace(uilocale.decimalPoint(), '.')
 
@@ -871,10 +871,10 @@ class Choice(Setting):
         else:
             raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return self.val
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         if text in self.vallist:
             return text
         else:
@@ -911,10 +911,10 @@ class ChoiceOrMore(Setting):
     def normalize(self, val):
         return val
 
-    def toText(self):
+    def toUIText(self):
         return self.val
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         return text
 
     def makeControl(self, *args):
@@ -931,10 +931,10 @@ class FloatChoice(ChoiceOrMore):
             return _finiteRangeFloat(val)
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         try:
             f = ui_stringtofloat(text)
         except ValueError:
@@ -963,12 +963,12 @@ class FloatDict(Setting):
         # return copy
         return dict(val)
 
-    def toText(self):
+    def toUIText(self):
         text = ['%s = %s' % (k, ui_floattostring(self.val[k]))
                 for k in sorted(self.val)]
         return '\n'.join(text)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         """Do conversion from list of a=X\n values."""
 
         out = {}
@@ -1013,7 +1013,7 @@ class FloatList(Setting):
                 out.append( float(i) )
         return out
 
-    def toText(self):
+    def toUIText(self):
         """Make a string a, b, c."""
         # can't use the comma for splitting if used as a decimal point
 
@@ -1022,7 +1022,7 @@ class FloatList(Setting):
             join = '; '
         return join.join( [ui_floattostring(x) for x in self.val] )
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         """Convert from a, b, c or a b c."""
 
         # don't use commas if it is the decimal separator
@@ -1251,7 +1251,7 @@ class DatasetExtended(Dataset):
                     pass
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         if isinstance(self.val, cbasestr):
             return self.val
         else:
@@ -1262,7 +1262,7 @@ class DatasetExtended(Dataset):
             return join.join( [ ui_floattostring(x)
                                 for x in self.val ] )
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         """Convert from text."""
 
         text = text.strip()
@@ -1946,7 +1946,7 @@ class AxisBound(FloatOrAuto):
     def makeControl(self, *args):
         return controls.AxisBound(self, *args)
 
-    def toText(self):
+    def toUIText(self):
         """Convert to text, taking into account mode of Axis.
         Displays datetimes in date format if used
         """
@@ -1961,13 +1961,13 @@ class AxisBound(FloatOrAuto):
              mode == 'datetime' ):
             return utils.dateFloatToString(v)
 
-        return FloatOrAuto.toText(self)
+        return FloatOrAuto.toUIText(self)
 
-    def fromText(self, txt):
+    def fromUIText(self, txt):
         """Convert from text, allowing datetimes."""
 
         v = utils.dateStringToDate(txt)
         if N.isfinite(v):
             return v
         else:
-            return FloatOrAuto.fromText(self, txt)
+            return FloatOrAuto.fromUIText(self, txt)

@@ -89,8 +89,9 @@ class Widget(object):
         self.children = []
         
         # settings for widget
-        self.settings = setting.Settings( 'Widget_' + self.typename,
-                                          setnsmode='widgetsettings' )
+        self.settings = setting.Settings(
+            'Widget_' + self.typename,
+            setnsmode='widgetsettings')
         self.settings.parent = self
 
         self.addSettings(self.settings)
