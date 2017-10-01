@@ -456,7 +456,7 @@ class Line3D(Settings):
             descr = _('Hide the line'),
             usertext=_('Hide')) )
 
-    def makeLineProp(self):
+    def makeLineProp(self, painter):
         """Construct line properties object for assigning to 3D object."""
 
         if self.hide:
@@ -468,7 +468,7 @@ class Line3D(Settings):
         else:
             style, dash = setting.LineStyle._linecnvt[self.style]
 
-        col = qt4.QColor(self.color)
+        col = self.get('color').color(painter)
         from ..helpers import threed
         return threed.LineProp(
             r=col.redF(), g=col.greenF(), b=col.blueF(),
@@ -502,12 +502,12 @@ class Surface3D(Settings):
             descr = _('Hide surface'),
             usertext=_('Hide')) )
 
-    def makeSurfaceProp(self):
+    def makeSurfaceProp(self, painter):
         """Properties to assign to surface."""
         if self.hide:
             return None
 
-        col = qt4.QColor(self.color)
+        col = self.get('color').color(painter)
         from ..helpers import threed
         return threed.SurfaceProp(
             r=col.redF(), g=col.greenF(), b=col.blueF(),

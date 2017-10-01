@@ -143,7 +143,7 @@ class Point3D(plotters3d.GenericPlotter3D):
         if data:
             data.rangeVisit(updateRange)
 
-    def dataDrawPointsLine(self, cont, coord):
+    def dataDrawPointsLine(self, painter, cont, coord):
         """Draw point and plot line."""
 
         s = self.settings
@@ -155,9 +155,9 @@ class Point3D(plotters3d.GenericPlotter3D):
 
         markerlineprop = markerfillprop = None
         if not s.MarkerLine.hide:
-            markerlineprop = s.MarkerLine.makeLineProp()
+            markerlineprop = s.MarkerLine.makeLineProp(painter)
         if filled and not s.MarkerFill.hide:
-            markerfillprop = s.MarkerFill.makeSurfaceProp()
+            markerfillprop = s.MarkerFill.makeSurfaceProp(painter)
             cvals = s.Color.get('data').getData(doc)
             if cvals is not None:
                 colorvals = utils.applyScaling(
@@ -170,18 +170,19 @@ class Point3D(plotters3d.GenericPlotter3D):
                 markerfillprop.setRGBs(colorimg)
 
         if markerlineprop or markerfillprop:
-            ptobj = threed.Points(coord[0], coord[1], coord[2], pointpath,
-                                  markerlineprop, markerfillprop)
+            ptobj = threed.Points(
+                coord[0], coord[1], coord[2], pointpath,
+                markerlineprop, markerfillprop)
             if scalepts:
                 ptobj.setSizes(threed.ValVector(scalepts.data))
             cont.addObject(ptobj)
 
         if not s.PlotLine.hide:
-            lineobj = threed.PolyLine(s.PlotLine.makeLineProp())
+            lineobj = threed.PolyLine(s.PlotLine.makeLineProp(painter))
             lineobj.addPoints(*coord)
             cont.addObject(lineobj)
 
-    def dataDrawErrorBars(self, cont, axes, coord, datasets):
+    def dataDrawErrorBars(self, painter, cont, axes, coord, datasets):
         """Draw error bars for points."""
 
         # TODO: Different error styles
@@ -190,7 +191,7 @@ class Point3D(plotters3d.GenericPlotter3D):
         if err.hide:
             return
 
-        prop = err.makeLineProp()
+        prop = err.makeLineProp(painter)
 
         for i in range(3):
             ds = datasets[i]
@@ -211,18 +212,20 @@ class Point3D(plotters3d.GenericPlotter3D):
             coordend = list(coord)
             if neg is not None:
                 coordend[i] = threed.ValVector(axes[i].dataToLogicalCoords(neg))
-                line = threed.LineSegments(coord[0], coord[1], coord[2],
-                                           coordend[0], coordend[1], coordend[2],
-                                           prop)
+                line = threed.LineSegments(
+                    coord[0], coord[1], coord[2],
+                    coordend[0], coordend[1], coordend[2],
+                    prop)
                 cont.addObject(line)
             if pos is not None:
                 coordend[i] = threed.ValVector(axes[i].dataToLogicalCoords(pos))
-                line = threed.LineSegments(coord[0], coord[1], coord[2],
-                                           coordend[0], coordend[1], coordend[2],
-                                           prop)
+                line = threed.LineSegments(
+                    coord[0], coord[1], coord[2],
+                    coordend[0], coordend[1], coordend[2],
+                    prop)
                 cont.addObject(line)
 
-    def dataDrawToObject(self, axes):
+    def dataDrawToObject(self, painter, axes):
         """Do drawing of axis."""
 
         s = self.settings
@@ -245,8 +248,8 @@ class Point3D(plotters3d.GenericPlotter3D):
         ]
 
         clipcont = self.makeClipContainer(axes)
-        self.dataDrawPointsLine(clipcont, coord)
-        self.dataDrawErrorBars(clipcont, axes, coord, [xv, yv, zv])
+        self.dataDrawPointsLine(painter, clipcont, coord)
+        self.dataDrawErrorBars(painter, clipcont, axes, coord, [xv, yv, zv])
 
         return clipcont
 

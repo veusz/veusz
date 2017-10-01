@@ -176,7 +176,7 @@ class GenericPlotter3D(widget.Widget):
                         axes[1].settings.upperPosition,
                         axes[2].settings.upperPosition))
 
-    def drawToObject(self):
+    def drawToObject(self, painter):
         # exit if hidden or function blank
         if self.settings.hide:
             return
@@ -186,8 +186,8 @@ class GenericPlotter3D(widget.Widget):
         if not axes:
             return
         else:
-            return self.dataDrawToObject(axes)
+            return self.dataDrawToObject(painter, axes)
 
-    def dataDrawToObject(self, axes):
+    def dataDrawToObject(self, painter, axes):
         """Actually plot the data."""
         pass

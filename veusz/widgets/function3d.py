@@ -378,7 +378,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             cmap, 'linear', color2d, 0., 1., setn.transparency)
         prop.setRGBs(colorimg)
 
-    def dataDrawSurface(self, axes, container):
+    def dataDrawSurface(self, painter, axes, container):
         """Draw a surface plot."""
         retn = self.getGridVals()
         if not retn:
@@ -392,12 +392,12 @@ class Function3D(plotters3d.GenericPlotter3D):
         surfprop = lineprop = None
         s = self.settings
         if not s.Surface.hide:
-            surfprop = s.Surface.makeSurfaceProp()
+            surfprop = s.Surface.makeSurfaceProp(painter)
             if colors is not None:
                 self.updatePropColorMap(surfprop, s.Surface, colors)
 
         if not s.Line.hide:
-            lineprop = s.Line.makeLineProp()
+            lineprop = s.Line.makeLineProp(painter)
 
         dirn = {'x': threed.Mesh.X_DIRN,
                 'y': threed.Mesh.Y_DIRN,
@@ -409,7 +409,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             dirn, lineprop, surfprop)
         container.addObject(mesh)
 
-    def dataDrawLine(self, axes, clipcontainer):
+    def dataDrawLine(self, painter, axes, clipcontainer):
         """Draw a line function."""
 
         s = self.settings
@@ -421,7 +421,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             return
 
         valsx, valsy, valsz, valscolor = retn
-        lineprop = s.Line.makeLineProp()
+        lineprop = s.Line.makeLineProp(painter)
         if valscolor is not None:
             self.updatePropColorMap(lineprop, s.Line, valscolor)
 
@@ -436,7 +436,7 @@ class Function3D(plotters3d.GenericPlotter3D):
 
         clipcontainer.addObject(line)
 
-    def dataDrawToObject(self, axes):
+    def dataDrawToObject(self, painter, axes):
         """Do actual drawing of function."""
 
         s = self.settings
@@ -450,9 +450,9 @@ class Function3D(plotters3d.GenericPlotter3D):
 
         clipcontainer = self.makeClipContainer(axes)
         if mode in ('x,y,z=fns(t)', 'x,y=fns(z)', 'y,z=fns(x)', 'x,z=fns(y)'):
-            self.dataDrawLine(axes, clipcontainer)
+            self.dataDrawLine(painter, axes, clipcontainer)
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
-            self.dataDrawSurface(axes, clipcontainer)
+            self.dataDrawSurface(painter, axes, clipcontainer)
 
         return clipcontainer
 

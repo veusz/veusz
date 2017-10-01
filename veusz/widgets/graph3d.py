@@ -258,11 +258,11 @@ class Graph3D(widget.Widget):
                  s.get('rightMargin').convert(painthelper),
                  s.get('bottomMargin').convert(painthelper) )
 
-    def addBorder(self, root):
+    def addBorder(self, painter, root):
         s = self.settings
         if s.Border.hide:
             return
-        lineprop = s.Border.makeLineProp()
+        lineprop = s.Border.makeLineProp(painter)
         edges = N.array(self._borderedges)
         ls = threed.LineSegments(
             threed.ValVector(N.ravel(edges[:,0,:])),
@@ -270,11 +270,11 @@ class Graph3D(widget.Widget):
             lineprop)
         root.addObject(ls)
 
-    def addBackSurface(self, root):
+    def addBackSurface(self, painter, root):
         back = self.settings.Back
         if back.hide:
             return
-        prop = back.makeSurfaceProp()
+        prop = back.makeSurfaceProp(painter)
 
         # triangles with the correct orientation of the norm vector
         # not to draw the surface if it is pointing towards the viewer
@@ -340,16 +340,19 @@ class Graph3D(widget.Widget):
             scaleM *
             threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
 
+        # painter is passed to below to get colors, etc
+        painter = painthelper.painter(self, bounds)
+
         # build 3d scene from children
         for c in self.children:
-           obj = c.drawToObject()
+           obj = c.drawToObject(painter)
            if obj:
                root.addObject(obj)
 
         # add graph box
-        self.addBorder(root)
+        self.addBorder(painter, root)
         # add graph behind fill
-        self.addBackSurface(root)
+        self.addBackSurface(painter, root)
 
         camera = threed.Camera()
         # camera necessary to make x,y,z coordinates point in the
@@ -366,9 +369,6 @@ class Graph3D(widget.Widget):
             'bsp': threed.Scene.RENDER_BSP,
         }[s.rendermode]
         scene = threed.Scene(mode)
-
-        # get ready to paint
-        painter = painthelper.painter(self, bounds)
 
         # add lighting if enabled
         for light in s.Lighting1, s.Lighting2, s.Lighting3:

@@ -556,7 +556,7 @@ class Axis3D(widget.Widget):
             op2list = [op2]
         return itertools.product(op1list, op2list)
 
-    def addAxisLine(self, cont, dirn):
+    def addAxisLine(self, painter, cont, dirn):
         """Build list of lines to draw axis line, mirroring if necessary.
 
         Returns list of start and end points of axis lines
@@ -581,7 +581,7 @@ class Axis3D(widget.Widget):
         if not s.Line.hide:
             startpts = threed.ValVector(N.ravel(outstart))
             endpts = threed.ValVector(N.ravel(outend))
-            lineprop = s.Line.makeLineProp()
+            lineprop = s.Line.makeLineProp(painter)
             cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
 
         return list(zip(outstart, outend))
@@ -609,7 +609,7 @@ class Axis3D(widget.Widget):
             atl.addAxisChoice(threed.Vec3(*startpos), threed.Vec3(*endpos))
         cont.addObject(atl)
 
-    def addAxisTicks(self, cont, dirn, linecoords, tickprops, labelsprop,
+    def addAxisTicks(self, painter, cont, dirn, linecoords, tickprops, labelsprop,
                      tickvals):
         """Add ticks for the vals and tick properties class given.
         linecoords: coordinates of start and end points of lines
@@ -659,22 +659,22 @@ class Axis3D(widget.Widget):
         if not tickprops.hide:
             startpts = threed.ValVector(N.concatenate(outstart))
             endpts = threed.ValVector(N.concatenate(outend))
-            lineprop = tickprops.makeLineProp()
+            lineprop = tickprops.makeLineProp(painter)
             cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
 
-    def drawToObject(self):
+    def drawToObject(self, painter):
 
         s = self.settings
         dirn = s.direction
 
         cont = threed.ObjectContainer()
 
-        linecoords = self.addAxisLine(cont, dirn)
+        linecoords = self.addAxisLine(painter, cont, dirn)
         self.addAxisTicks(
-            cont, dirn, linecoords, s.MajorTicks, s.TickLabels,
+            painter, cont, dirn, linecoords, s.MajorTicks, s.TickLabels,
             self.majortickscalc)
         self.addAxisTicks(
-            cont, dirn, linecoords, s.MinorTicks, None,
+            painter, cont, dirn, linecoords, s.MinorTicks, None,
             self.minortickscalc)
 
         return cont

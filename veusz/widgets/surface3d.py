@@ -129,14 +129,14 @@ class Surface3D(plotters3d.GenericPlotter3D):
             axrange[0] = min(axrange[0], rng[0])
             axrange[1] = max(axrange[1], rng[1])
 
-    def drawSurface(self, container, axes, dataset):
+    def drawSurface(self, painter, container, axes, dataset):
         """Add the surface to the container."""
 
         s = self.settings
         if s.Surface.hide and s.Line.hide:
             return
-        surfprop = s.Surface.makeSurfaceProp()
-        lineprop = s.Line.makeLineProp()
+        surfprop = s.Surface.makeSurfaceProp(painter)
+        lineprop = s.Line.makeLineProp(painter)
         highres = s.highres
 
         # axes to plot coordinates on
@@ -171,7 +171,7 @@ class Surface3D(plotters3d.GenericPlotter3D):
             lineprop, surfprop)
         container.addObject(mesh)
 
-    def dataDrawToObject(self, axes):
+    def dataDrawToObject(self, painter, axes):
         """Do actual drawing of function."""
 
         s = self.settings
@@ -187,7 +187,7 @@ class Surface3D(plotters3d.GenericPlotter3D):
             return
 
         clipcontainer = self.makeClipContainer(axes)
-        self.drawSurface(clipcontainer, axes, data)
+        self.drawSurface(painter, clipcontainer, axes, data)
 
         return clipcontainer
 
