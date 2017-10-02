@@ -73,7 +73,7 @@ class Setting(object):
         self.hidden = hidden
         self.default = value
         self.onmodified = OnModified()
-        self._val = None
+        self._val = self._ref = None
 
         # calls the set function for the val property
         self.val = value
@@ -90,10 +90,7 @@ class Setting(object):
         optinal as optional arguments
         """
 
-        if isinstance(self._val, ReferenceBase):
-            val = self._val
-        else:
-            val = self.val
+        val = self._ref if self._ref else self._val
 
         args = (self.name,) + before + (val,) + after
 
@@ -118,8 +115,8 @@ class Setting(object):
     def get(self):
         """Get the value."""
 
-        if isinstance(self._val, ReferenceBase):
-            return self._val.resolve(self).get()
+        if self._ref:
+            return self._ref.resolve(self).get()
         else:
             return self._val
 
@@ -127,24 +124,26 @@ class Setting(object):
         """Set the value."""
 
         if isinstance(v, ReferenceBase):
-            self._val = v
+            self._val = None
+            self._ref = v
         else:
-            # this also removes the linked value if there is one set
             self._val = self.normalize(v)
+            self._ref = None
 
         self.onmodified.onModified.emit()
 
-    val = property(get, set, None,
-                   'Get or modify the value of the setting')
+    val = property(
+        get, set, None,
+        'Get or modify the value of the setting')
 
     def isReference(self):
         """Is this a setting a reference to another object."""
-        return isinstance(self._val, ReferenceBase)
+        return bool(self._ref)
 
     def getReference(self):
         """Return the reference object. Raise ValueError if not a reference"""
-        if isinstance(self._val, ReferenceBase):
-            return self._val
+        if self._ref:
+            return self._ref
         else:
             raise ValueError("Setting is not a reference")
 
@@ -197,9 +196,9 @@ class Setting(object):
         """Return text to restore the value of this setting."""
 
         if (saveall or not self.isDefault()) and not self.readonly:
-            if isinstance(self._val, ReferenceBase):
+            if self._ref:
                 return "SetToReference('%s%s', %s)\n" % (
-                    rootname, self.name, crepr(self._val.value))
+                    rootname, self.name, crepr(self._ref.value))
             else:
                 return "Set('%s%s', %s)\n" % (
                     rootname, self.name, crepr(self.val) )
@@ -210,9 +209,9 @@ class Setting(object):
         """Set the function to be called on modification (passing True)."""
         self.onmodified.onModified.connect(fn)
 
-        if isinstance(self._val, ReferenceBase):
+        if self._ref:
             # tell references to notify us if they are modified
-            self._val.setOnModified(self, fn)
+            self._ref.setOnModified(self, fn)
 
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""
@@ -227,17 +226,17 @@ class Setting(object):
         """Is the current value a default?
         This also returns true if it is linked to the appropriate stylesheet
         """
-        if ( isinstance(self._val, ReferenceBase) and
-             isinstance(self.default, ReferenceBase) ):
-            return self._val.value == self.default.value
+
+        if self._ref and isinstance(self.default, ReferenceBase):
+            return self._ref.value == self.default.value
         else:
             return self.val == self.default
 
     def isDefaultLink(self):
         """Is this a link to the default stylesheet value."""
 
-        return ( isinstance(self._val, ReferenceBase) and
-                 self._val.value == self.getStylesheetLink() )
+        return ( self._ref and
+                 self._ref.value == self.getStylesheetLink() )
 
     def setSilent(self, val):
         """Set the setting, without propagating modified flags.
@@ -245,6 +244,7 @@ class Setting(object):
         This shouldn't often be used as it defeats the automatic updation.
         Used for temporary modifications."""
 
+        self._ref = None
         self._val = self.normalize(val)
 
     def normalize(self, val):
