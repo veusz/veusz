@@ -53,7 +53,7 @@ class TextLabel(plotters.FreePlotter):
         plotters.FreePlotter.__init__(self, parent, name=name)
 
         if type(self) == TextLabel:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

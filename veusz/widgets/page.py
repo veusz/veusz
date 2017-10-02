@@ -287,7 +287,7 @@ class Page(widget.Widget):
         """Initialise object."""
         widget.Widget.__init__(self, parent, name=name)
         if type(self) == Page:
-            self.readDefaults()
+            self.linkToStylesheet()
  
     @classmethod
     def addSettings(klass, s):

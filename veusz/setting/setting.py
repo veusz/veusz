@@ -193,27 +193,6 @@ class Setting(object):
         Raises utils.InvalidType if cannot convert."""
         return None
 
-    def readDefaults(self, root, widgetname):
-        """Check whether the user has a default for this setting."""
-
-        deftext = None
-        unnamedpath = '%s/%s' % (root, self.name)
-        try:
-            deftext = settingdb[unnamedpath]
-        except KeyError:
-            pass
-
-        # named defaults supersedes normal defaults
-        namedpath = '%s_NAME:%s' % (widgetname, unnamedpath)
-        try:
-            deftext = settingdb[namedpath]
-        except KeyError:
-            pass
-
-        if deftext is not None:
-            self.val = self.fromUIText(deftext)
-            self.default = self.val
-
     def removeDefault(self):
         """Remove the default setting for this setting."""
 

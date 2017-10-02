@@ -1,3 +1,6 @@
+Changes in <next version>:
+ * Cleanup of internal Setting code
+
 Changes in 2.0.1:
  * Fix crash setting manual bins in histogram dialog box
  * Add missing DLLs to Windows installer

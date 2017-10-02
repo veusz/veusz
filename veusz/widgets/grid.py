@@ -160,7 +160,7 @@ class Grid(widget.Widget):
 
         # we're not descended from
         if type(self) == Grid:
-            self.readDefaults()
+            self.linkToStylesheet()
 
         self.addAction( widget.Action(
                 'zeroMargins', self.actionZeroMargins,

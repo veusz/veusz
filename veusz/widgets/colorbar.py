@@ -50,7 +50,7 @@ class ColorBar(axis.Axis):
 
         axis.Axis.__init__(self, parent, name=name)
         if type(self) == ColorBar:
-            self.readDefaults()
+            self.linkToStylesheet()
         
     @classmethod
     def addSettings(klass, s):

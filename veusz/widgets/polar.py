@@ -130,7 +130,7 @@ class Polar(NonOrthGraph):
         '''Initialise polar plot.'''
         NonOrthGraph.__init__(self, parent, name=name)
         if type(self) == NonOrthGraph:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

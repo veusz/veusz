@@ -116,7 +116,7 @@ class BoxPlot(GenericPlotter):
         """Initialise box plot."""
         GenericPlotter.__init__(self, parent, name=name)
         if type(self) == BoxPlot:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

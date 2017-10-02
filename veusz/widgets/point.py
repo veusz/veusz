@@ -325,7 +325,7 @@ class PointPlotter(GenericPlotter):
 
         GenericPlotter.__init__(self, parent, name=name)
         if type(self) == PointPlotter:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

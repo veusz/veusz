@@ -182,7 +182,7 @@ class AxisFunction(axis.Axis):
         self.boundschangeset = -1
 
         if type(self) == AxisFunction:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

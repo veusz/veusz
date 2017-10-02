@@ -46,7 +46,7 @@ class VectorField(plotters.GenericPlotter):
         plotters.GenericPlotter.__init__(self, parent, name=name)
 
         if type(self) == VectorField:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

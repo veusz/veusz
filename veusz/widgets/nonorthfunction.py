@@ -46,7 +46,7 @@ class NonOrthFunction(Widget):
         '''Initialise plotter.'''
         Widget.__init__(self, parent, name=name)
         if type(self) == NonOrthFunction:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

@@ -167,7 +167,7 @@ class Key(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
         if type(self) == Key:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

@@ -49,7 +49,7 @@ class NonOrthPoint(Widget):
         """Initialise plotter."""
         Widget.__init__(self, parent, name=name)
         if type(self) == NonOrthPoint:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

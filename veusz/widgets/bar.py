@@ -71,7 +71,7 @@ class BarPlotter(GenericPlotter):
         """Initialise bar chart."""
         GenericPlotter.__init__(self, parent, name=name)
         if type(self) == BarPlotter:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

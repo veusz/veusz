@@ -184,7 +184,7 @@ class Axis(widget.Widget):
         s = self.settings
 
         if type(self) == Axis:
-            self.readDefaults()
+            self.linkToStylesheet()
 
         if self.name == 'y' and s.direction != 'vertical':
             s.direction = 'vertical'

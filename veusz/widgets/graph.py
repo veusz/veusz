@@ -44,7 +44,7 @@ class Graph(widget.Widget):
         """Initialise object and create axes."""
 
         widget.Widget.__init__(self, parent, name=name)
-        self.readDefaults()
+        self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

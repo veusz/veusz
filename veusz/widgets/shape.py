@@ -201,7 +201,7 @@ class Rectangle(BoxShape):
     def __init__(self, parent, name=None):
         BoxShape.__init__(self, parent, name=name)
         if type(self) == Rectangle:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):
@@ -234,7 +234,7 @@ class Ellipse(BoxShape):
     def __init__(self, parent, name=None):
         BoxShape.__init__(self, parent, name=name)
         if type(self) == Ellipse:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     def drawShape(self, painter, rect):
         s = self.settings
@@ -252,7 +252,7 @@ class ImageFile(BoxShape):
     def __init__(self, parent, name=None):
         BoxShape.__init__(self, parent, name=name)
         if type(self) == ImageFile:
-            self.readDefaults()
+            self.linkToStylesheet()
 
         self.cacheimage = None
         self.cachefilename = None

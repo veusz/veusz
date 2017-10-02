@@ -47,7 +47,7 @@ class FunctionPlotter(GenericPlotter):
         GenericPlotter.__init__(self, parent, name=name)
 
         if type(self) == FunctionPlotter:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

@@ -49,7 +49,7 @@ class AxisBroken(axis.Axis):
         self.breakchangeset = -1
 
         if type(self) == AxisBroken:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

@@ -150,7 +150,7 @@ class Image(plotters.GenericPlotter):
         plotters.GenericPlotter.__init__(self, parent, name=name)
 
         if type(self) == Image:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

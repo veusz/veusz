@@ -46,7 +46,7 @@ class Line(plotters.FreePlotter):
         """Construct plotter."""
         plotters.FreePlotter.__init__(self, parent, name=name)
         if type(self) == Line:
-            self.readDefaults()
+            self.linkToStylesheet()
 
     @classmethod
     def addSettings(klass, s):

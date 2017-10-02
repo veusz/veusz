@@ -126,7 +126,7 @@ class Fit(FunctionPlotter):
         FunctionPlotter.__init__(self, parent, name=name)
 
         if type(self) == Fit:
-            self.readDefaults()
+            self.linkToStylesheet()
 
         self.addAction( widget.Action('fit', self.actionFit,
                                       descr = _('Fit function'),

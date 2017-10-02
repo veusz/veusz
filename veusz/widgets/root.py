@@ -53,7 +53,7 @@ class Root(widget.Widget):
         self.fillStylesheet(stylesheet)
 
         if type(self) == Root:
-            self.readDefaults()
+            self.linkToStylesheet()
 
         s.get('englishlocale').setOnModified(self.changeLocale)
         s.get('colorTheme').setOnModified(self.changeColorTheme)
