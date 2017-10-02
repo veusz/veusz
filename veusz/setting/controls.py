@@ -1016,7 +1016,7 @@ class Axis(WidgetSelector):
 
         # get parent widget
         widget = self.setting.parent
-        while not widget.isWidget() and widget is not None:
+        while not widget.iswidget and widget is not None:
             widget = widget.parent
 
         # get list of axis widgets up the tree

@@ -117,7 +117,7 @@ class OperationSettingPropagate(Operation):
         # work out path of setting relative to widget
         path = []
         s = setting
-        while not s.isWidget():
+        while not s.iswidget:
             path.insert(0, s.name)
             s = s.parent
         self.setpath = path[1:]

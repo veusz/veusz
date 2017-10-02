@@ -65,6 +65,7 @@ class Widget(object):
 
     isaxis = False
     isplotter = False
+    iswidget = True
 
     def __init__(self, parent, name=None):
         """Initialise a blank widget."""
@@ -111,10 +112,6 @@ class Widget(object):
                             descr = _('Hide object'),
                             usertext = _('Hide'),
                             formatting = True) )
-
-    def isWidget(self):
-        """Is this object a widget?"""
-        return True
 
     def getDocument(self):
         """Return document.

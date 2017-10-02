@@ -28,6 +28,8 @@ class Settings(object):
     # differentiate widgets, settings and setting
     nodetype = 'settings'
 
+    iswidget = False
+
     def __init__(self, name, descr = '', usertext='', pixmap='',
                  setnsmode='formatting'):
         """A new Settings with a name.
@@ -59,10 +61,6 @@ class Settings(object):
         for name in self.setnames:
             s.add( self.setdict[name].copy() )
         return s
-
-    def isWidget(self):
-        """Is this object a widget?"""
-        return False
 
     def getList(self):
         """Get a list of setting or settings types."""
@@ -227,7 +225,7 @@ class Settings(object):
         if _root is None:
             path = []
             obj = self
-            while not obj.parent.isWidget():
+            while not obj.parent.iswidget:
                 path.insert(0, obj.name)
                 obj = obj.parent
             path = ['', 'StyleSheet', obj.parent.typename] + path + ['']

@@ -53,6 +53,8 @@ class Setting(object):
 
     typename = 'setting'
 
+    iswidget = False
+
     def __init__(self, name, value, descr='', usertext='',
                  formatting=False, hidden=False):
         """Initialise the values.
@@ -77,10 +79,6 @@ class Setting(object):
 
         # calls the set function for the val property
         self.val = value
-
-    def isWidget(self):
-        """Is this object a widget?"""
-        return False
 
     def _copyHelper(self, before, after, optional):
         """Help copy an object.
@@ -152,7 +150,7 @@ class Setting(object):
         stylesheet."""
         path = []
         obj = self
-        while not obj.parent.isWidget():
+        while not obj.parent.iswidget:
             path.insert(0, obj.name)
             obj = obj.parent
         path = ['', 'StyleSheet', obj.parent.typename] + path
@@ -169,7 +167,7 @@ class Setting(object):
         while obj is not None:
             # logic easier to understand here
             # do not add settings name for settings of widget
-            if not obj.isWidget() and obj.parent.isWidget():
+            if not obj.iswidget and obj.parent.iswidget:
                 pass
             else:
                 if obj.name == '/':
@@ -275,7 +273,7 @@ class Setting(object):
     def getWidget(self):
         """Return associated widget."""
         w = self.parent
-        while not w.isWidget():
+        while not w.iswidget:
             w = w.parent
         return w
 
@@ -1026,7 +1024,7 @@ class WidgetPath(Str):
 
         # find the widget associated with this setting
         widget = self
-        while not widget.isWidget():
+        while not widget.iswidget:
             widget = widget.parent
 
         # usually makes sense to give paths relative to a parent of a widget
@@ -1311,7 +1309,7 @@ class Color(ChoiceOrMore):
         if self.val.lower() == 'auto':
             # lookup widget
             w = self.parent
-            while w is not None and not w.isWidget():
+            while w is not None and not w.iswidget:
                 w = w.parent
             if w is None:
                 return qt4.QColor()
@@ -1481,7 +1479,7 @@ class WidgetChoice(Str):
 
         # find widget which contains setting
         widget = self.parent
-        while not widget.isWidget() and widget is not None:
+        while not widget.iswidget and widget is not None:
             widget = widget.parent
 
         # get widget's parent

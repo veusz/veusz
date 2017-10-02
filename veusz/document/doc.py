@@ -595,7 +595,7 @@ class Document(qt4.QObject):
             elif p == '.' or len(p) == 0:
                 pass
             else:
-                if obj.isWidget():
+                if obj.iswidget:
                     child = obj.getChild(p)
                     if child is not None:
                         obj = child

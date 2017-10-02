@@ -788,7 +788,7 @@ class CommandInterface(qt4.QObject):
         """
         item = self.document.resolveItem(self.currentwidget, path)
 
-        if hasattr(item, 'isWidget') and item.isWidget():
+        if getattr(item, 'iswidget', False):
             return 'widget'
         elif isinstance(item, setting.Settings):
             return 'settinggroup'
@@ -804,7 +804,7 @@ class CommandInterface(qt4.QObject):
         item = self.document.resolveItem(self.currentwidget, path)
 
         out = []
-        if hasattr(item, 'isWidget') and item.isWidget():
+        if getattr(item, 'iswidget', False):
             if types == 'all' or types == 'widget':
                 out += item.childnames
             if types == 'all' or types == 'settinggroup':
@@ -824,7 +824,7 @@ class CommandInterface(qt4.QObject):
         Raises a ValueError if the path doesn't point to a widget."""
 
         item = self.document.resolveItem(self.currentwidget, path)
-        if hasattr(item, 'isWidget') and item.isWidget():
+        if getattr(item, 'iswidget', False):
             return item.typename
         else:
             raise ValueError("Path '%s' is not a widget" % path)

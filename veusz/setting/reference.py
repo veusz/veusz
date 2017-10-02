@@ -83,7 +83,7 @@ class Reference(ReferenceBase):
             elif p == '':
                 pass
             else:
-                if item.isWidget():
+                if item.iswidget:
                     child = item.getChild(p)
                     if not child:
                         try:
