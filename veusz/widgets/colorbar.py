@@ -45,13 +45,6 @@ class ColorBar(axis.Axis):
     description = _('Image color bar')
     isaxis = False
 
-    def __init__(self, parent, name=None):
-        """Initialise object and create axes."""
-
-        axis.Axis.__init__(self, parent, name=name)
-        if type(self) == ColorBar:
-            self.linkToStylesheet()
-        
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

@@ -183,9 +183,6 @@ class Contour(plotters.GenericPlotter):
         self._cachedpolygons = None
         self._cachedsubcontours = None
 
-        if type(self) == Contour:
-            self.linkToStylesheet()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

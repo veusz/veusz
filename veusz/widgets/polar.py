@@ -126,12 +126,6 @@ class Polar(NonOrthGraph):
     allowusercreation = True
     description = _('Polar graph')
 
-    def __init__(self, parent, name=None):
-        '''Initialise polar plot.'''
-        NonOrthGraph.__init__(self, parent, name=name)
-        if type(self) == NonOrthGraph:
-            self.linkToStylesheet()
-
     @classmethod
     def addSettings(klass, s):
         '''Construct list of settings.'''

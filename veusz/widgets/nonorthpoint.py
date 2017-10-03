@@ -45,12 +45,6 @@ class NonOrthPoint(Widget):
     allowusercreation = True
     description = _('Plot points on a graph with non-orthogonal axes')
 
-    def __init__(self, parent, name=None):
-        """Initialise plotter."""
-        Widget.__init__(self, parent, name=name)
-        if type(self) == NonOrthPoint:
-            self.linkToStylesheet()
-
     @classmethod
     def addSettings(klass, s):
         '''Settings for widget.'''

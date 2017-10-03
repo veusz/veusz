@@ -199,11 +199,6 @@ class Rectangle(BoxShape):
     description = _('Rectangle')
     allowusercreation = True
 
-    def __init__(self, parent, name=None):
-        BoxShape.__init__(self, parent, name=name)
-        if type(self) == Rectangle:
-            self.linkToStylesheet()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
@@ -232,11 +227,6 @@ class Ellipse(BoxShape):
     description = _('Ellipse')
     allowusercreation = True
 
-    def __init__(self, parent, name=None):
-        BoxShape.__init__(self, parent, name=name)
-        if type(self) == Ellipse:
-            self.linkToStylesheet()
-
     def drawShape(self, painter, rect):
         s = self.settings
         path = qt4.QPainterPath()
@@ -252,8 +242,6 @@ class ImageFile(BoxShape):
 
     def __init__(self, parent, name=None):
         BoxShape.__init__(self, parent, name=name)
-        if type(self) == ImageFile:
-            self.linkToStylesheet()
 
         self.cacheimage = None
         self.cachefilename = None

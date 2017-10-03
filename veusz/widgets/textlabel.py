@@ -49,12 +49,6 @@ class TextLabel(plotters.FreePlotter):
     description = _('Text label')
     allowusercreation = True
 
-    def __init__(self, parent, name=None):
-        plotters.FreePlotter.__init__(self, parent, name=name)
-
-        if type(self) == TextLabel:
-            self.linkToStylesheet()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

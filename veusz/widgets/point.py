@@ -318,15 +318,6 @@ class PointPlotter(GenericPlotter):
     allowusercreation=True
     description=_('Plot points with lines and errorbars')
 
-    def __init__(self, parent, name=None):
-        """Initialise XY plotter plotting (xdata, ydata).
-
-        xdata and ydata are strings specifying the data in the document"""
-
-        GenericPlotter.__init__(self, parent, name=name)
-        if type(self) == PointPlotter:
-            self.linkToStylesheet()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

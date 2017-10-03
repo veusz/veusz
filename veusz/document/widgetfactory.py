@@ -34,7 +34,7 @@ class WidgetFactory(object):
         self.regwidgets[classobj.typename] = classobj
 
     def makeWidget(self, widgetname, parent, name=None, autoadd=True,
-                   index=-1, **optargs):
+                   index=-1, document=None, **optargs):
         """Make a new widget of the appropriate type."""
 
         # check for / in name of widget
@@ -42,6 +42,11 @@ class WidgetFactory(object):
             raise ValueError('name cannot contain "/"')
 
         w = self.regwidgets[widgetname](parent, name=name)
+        if document is not None:
+            w.document = document
+        elif parent is not None:
+            w.document = parent.document
+        w.linkToStylesheet()
 
         # set all the passed default settings
         for name, val in citems(optargs):

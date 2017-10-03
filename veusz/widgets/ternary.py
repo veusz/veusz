@@ -68,12 +68,6 @@ class Ternary(NonOrthGraph):
     allowusercreation = True
     description = _('Ternary graph')
 
-    def __init__(self, parent, name=None):
-        '''Initialise ternary plot.'''
-        NonOrthGraph.__init__(self, parent, name=name)
-        if type(self) == NonOrthGraph:
-            self.linkToStylesheet()
-
     @classmethod
     def addSettings(klass, s):
         '''Construct list of settings.'''

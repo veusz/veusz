@@ -115,8 +115,7 @@ class Document(qt4.QObject):
         """Wipe out any stored data."""
         self.data = {}
         self.basewidget = widgetfactory.thefactory.makeWidget(
-            'document', None, None)
-        self.basewidget.document = self
+            'document', None, None, document=self)
         self.setModified(False)
         self.filename = ""
         self.evaluate.wipe()

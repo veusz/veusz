@@ -40,12 +40,6 @@ class Graph(widget.Widget):
     allowusercreation = True
     description = _('Base graph')
 
-    def __init__(self, parent, name=None):
-        """Initialise object and create axes."""
-
-        widget.Widget.__init__(self, parent, name=name)
-        self.linkToStylesheet()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
