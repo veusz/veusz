@@ -228,7 +228,7 @@ class Setting(object):
         if self._ref and isinstance(self.default, ReferenceBase):
             return self._ref.value == self.default.value
         else:
-            return self.val == self.default
+            return self._val == self.default
 
     def isDefaultLink(self):
         """Is this a link to the default stylesheet value."""
@@ -297,18 +297,20 @@ class SettingBackwardCompat(Setting):
 
     typename = 'backward-compat'
 
-    def __init__(self, name, newrelpath, val, translatefn = None,
+    def __init__(self, name, newrelpath, val, translatefn=None,
                  **args):
         """Point this setting to another.
         newrelpath is a path relative to this setting's parent
         """
 
         self.translatefn = translatefn
+        args['hidden'] = True
         Setting.__init__(self, name, val, **args)
         self.relpath = newrelpath.split('/')
 
     def getForward(self):
         """Get setting this setting forwards to."""
+        # FIXME: does not work for .. entries
         return self.parent.getFromPath(self.relpath)
 
     def normalize(self, val):

@@ -105,19 +105,19 @@ class Settings(object):
         else:
             self.setnames.insert(posn, name)
         setting.parent = self
-        
+
         if pixmap:
             setting.pixmap = pixmap
 
         if readonly:
             setting.readonly = True
-        
+
     def remove(self, name):
         """Remove name from the list of settings."""
 
         del self.setnames[ self.setnames.index( name ) ]
         del self.setdict[ name ]
-        
+
     def __setattr__(self, name, val):
         """Allow us to do
 
@@ -183,7 +183,7 @@ class Settings(object):
         name = path[0]
         if name in self.setdict:
             val = self.setdict[name]
-                
+
             if len(path) == 1:
                 if isinstance(val, Settings):
                     raise ValueError(
@@ -218,7 +218,7 @@ class Settings(object):
 
     def linkToStylesheet(self, _root=None):
         """Link the settings within this Settings to a stylesheet.
-        
+
         _root is an internal parameter as this function is recursive."""
 
         # build up root part of pathname to reference
@@ -237,7 +237,9 @@ class Settings(object):
             if isinstance(setn, Settings):
                 # call recursively if this is a Settings
                 setn.linkToStylesheet(_root=thispath+'/')
-            else:
+            elif not setn.hidden and (setn.isReference() or setn.isDefault()):
+                # link to stylesheet if the setting is a visible one
+
                 # check that reference resolves
                 ref = Reference(thispath)
                 try:

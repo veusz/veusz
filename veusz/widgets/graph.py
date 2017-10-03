@@ -102,9 +102,11 @@ class Graph(widget.Widget):
 
         from . import axis
         if self.parent.getChild('x') is None:
-            axis.Axis(self, name='x')
+            ax = axis.Axis(self, name='x')
+            ax.linkToStylesheet()
         if self.parent.getChild('y') is None:
-            axis.Axis(self, name='y')
+            ay = axis.Axis(self, name='y')
+            ay.linkToStylesheet()
 
     def getAxesDict(self, axesnames, ignoremissing=False):
         """Get the axes for widgets to plot against.
