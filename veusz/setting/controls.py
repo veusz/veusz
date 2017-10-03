@@ -1723,10 +1723,11 @@ class Filename(qt4.QWidget):
             filefilter = ("Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
                           "*.gif *.xbm *.xpm);;" + filefilter)
 
-        filename = qt4.QFileDialog.getOpenFileName(
+        retn = qt4.QFileDialog.getOpenFileName(
             self, title, self.edit.text(), filefilter)
 
-        if filename:
+        if retn:
+            filename = retn[0]
             self.sigSettingChanged.emit(self, self.setting, filename)
 
     def validateAndSet(self):

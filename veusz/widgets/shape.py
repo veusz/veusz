@@ -19,6 +19,7 @@
 """For plotting shapes."""
 
 from __future__ import division, print_function
+import codecs
 import itertools
 import os
 
@@ -307,7 +308,7 @@ class ImageFile(BoxShape):
             return
 
         # convert to base 64 to make it nicer in the saved file
-        encoded = cbytes(qt4.QByteArray(data).toBase64()).decode('ascii')
+        encoded = codecs.encode(data, 'base64').decode('ascii')
 
         # now put embedded data in hidden setting
         ops = [
@@ -331,7 +332,7 @@ class ImageFile(BoxShape):
         self.cacheimage = qt4.QImage()
 
         # convert the embedded data from base64 and load into the image
-        decoded = qt4.QByteArray.fromBase64(s.embeddedImageData)
+        decoded = s.embeddedImageData.encode('ascii').decode('base64')
         self.cacheimage.loadFromData(decoded)
 
         # we cache the data we have decoded

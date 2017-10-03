@@ -1,5 +1,6 @@
 Changes in <next version>:
  * Cleanup of internal Setting code
+ * Fix filename chooser and embedding in ImageFile widget
 
 Changes in 2.0.1:
  * Fix crash setting manual bins in histogram dialog box
