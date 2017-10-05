@@ -262,10 +262,8 @@ class Setting(object):
         """Return document."""
         p = self.parent
         while p:
-            try:
-                return p.getDocument()
-            except AttributeError:
-                pass
+            if p.iswidget:
+                return p.document
             p = p.parent
         return None
 
@@ -305,12 +303,12 @@ class SettingBackwardCompat(Setting):
         self.translatefn = translatefn
         args['hidden'] = True
         Setting.__init__(self, name, val, **args)
-        self.relpath = newrelpath.split('/')
+        self.relpath = newrelpath
 
     def getForward(self):
         """Get setting this setting forwards to."""
-        # FIXME: does not work for .. entries
-        return self.parent.getFromPath(self.relpath)
+        doc = self.getDocument()
+        return doc.resolveSettingPath(self.parent, self.relpath)
 
     def normalize(self, val):
         if self.parent is not None:
@@ -335,8 +333,8 @@ class SettingBackwardCompat(Setting):
         return self.getForward().get()
 
     def copy(self):
-        return self._copyHelper(('/'.join(self.relpath),), (),
-                                {'translatefn': self.translatefn})
+        return self._copyHelper(
+            (self.relpath,), (), {'translatefn': self.translatefn})
 
     def makeControl(self, *args):
         return None
@@ -388,10 +386,7 @@ class Bool(Setting):
         raise utils.InvalidType
 
     def toUIText(self):
-        if self.val:
-            return 'True'
-        else:
-            return 'False'
+        return 'True' if self.val else 'False'
 
     def fromUIText(self, text):
         t = text.strip().lower()

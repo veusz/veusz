@@ -154,6 +154,7 @@ class OperationSettingPropagate(Operation):
             setting = document.resolveSettingPath(None, setpath)
             setting.set(setval)
 
+    @staticmethod
     def _recursiveGet(root, name, typename, outlist, maxlevels):
         """Add those widgets in root with name and type to outlist.
 
@@ -170,10 +171,8 @@ class OperationSettingPropagate(Operation):
                      (w.typename == typename or typename is None) ):
                     outlist.append(w)
 
-                OperationSettingPropagate._recursiveGet(w, name, typename,
-                                                        outlist, newmaxlevels)
-
-    _recursiveGet = staticmethod(_recursiveGet)
+                OperationSettingPropagate._recursiveGet(
+                    w, name, typename, outlist, newmaxlevels)
 
 ###############################################################################
 # Widget operations

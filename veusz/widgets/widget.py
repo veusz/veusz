@@ -162,6 +162,7 @@ class Widget(object):
         return parent is None or any(
             ( isinstance(parent, t) for t in self.allowedParentTypes() ) )
 
+    @classmethod
     def willAllowParent(cls, parent):
         """Is the parent of an allowed type to have this type as a child?"""
 
@@ -174,7 +175,6 @@ class Widget(object):
             if isinstance(parent, p):
                 return True
         return False
-    willAllowParent = classmethod(willAllowParent)
 
     def addChild(self, child, index=9999999):
         """Add child to list.

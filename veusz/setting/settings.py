@@ -180,27 +180,6 @@ class Settings(object):
         else:
             return self.setdict[name]
 
-    def getFromPath(self, path):
-        """Get setting according to the path given as a list."""
-
-        name = path[0]
-        if name in self.setdict:
-            val = self.setdict[name]
-
-            if len(path) == 1:
-                if isinstance(val, Settings):
-                    raise ValueError(
-                        '"%s" is a list of settings, not a setting' % name)
-                else:
-                    return val
-            else:
-                if isinstance(val, Settings):
-                    return val.getFromPath(path[1:])
-                else:
-                    raise ValueError('"%s" not a valid subsetting' % name)
-        else:
-            raise ValueError('"%s" is not a setting' % name)
-
     def saveText(self, saveall, rootname = None):
         """Return the text which would reload the settings.
 
