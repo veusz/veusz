@@ -65,7 +65,11 @@ class Widget(object):
 
     isaxis = False
     isplotter = False
+
+    # various items in class hierarchy
     iswidget = True
+    issetting = False
+    issettings = False
 
     def __init__(self, parent, name=None):
         """Initialise a blank widget."""
@@ -228,6 +232,7 @@ class Widget(object):
 
     def getChild(self, name):
         """Return a child with a name."""
+        #print('getChild', self, name)
         for i in self.children:
             if i.name == name:
                 return i

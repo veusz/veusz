@@ -647,7 +647,7 @@ deletes it from the document.</p>
     def slotCheckDelete(self, *args):
         d = self.mainwin.document
         try:
-            d.resolve(d.basewidget, '/page1/graph1')
+            d.resolveWidgetPath(None, '/page1/graph1')
         except ValueError:
             # success!
             self.nextStep.emit()

@@ -61,48 +61,48 @@ class OperationSettingSet(Operation):
     """Set a variable to a value."""
 
     descr = _('change setting')
-    
+
     def __init__(self, setting, value):
         """Set the setting to value.
         Setting may be a widget path
         """
-        
+
         if isinstance(setting, cbasestr):
             self.settingpath = setting
         else:
             self.settingpath = setting.path
         self.value = value
-        
+
     def do(self, document):
         """Apply setting variable."""
-        setting = document.resolveFullSettingPath(self.settingpath)
+        setting = document.resolveSettingPath(None, self.settingpath)
         if setting.isReference():
             self.oldvalue = setting.getReference()
         else:
             self.oldvalue = setting.get()
         setting.set(self.value)
-        
+
     def undo(self, document):
         """Return old value back..."""
-        setting = document.resolveFullSettingPath(self.settingpath)
+        setting = document.resolveSettingPath(None, self.settingpath)
         setting.set(self.oldvalue)
 
 class OperationSettingPropagate(Operation):
     """Propagate setting to other widgets."""
-    
+
     descr = _('propagate setting')
-    
+
     def __init__(self, setting, widgetname = None, root = None,
                  maxlevels = -1):
 
         """Take the setting given, and propagate it to other widgets,
         according to the parameters here.
-        
+
         If widgetname is given then only propagate it to widgets with
         the name given.
 
         widgets are located from the widget given (root if not set)
-        
+
         Up to maxlevels levels of widgets are changed (<0 means infinite)
         """
 
@@ -122,15 +122,15 @@ class OperationSettingPropagate(Operation):
             s = s.parent
         self.setpath = path[1:]
         self.widgettype = s.typename
-        
+
     def do(self, document):
         """Apply the setting propagation."""
         # default is root widget
         if not self.rootpath:
             root = document.basewidget
         else:
-            root = document.resolveFullWidgetPath(self.rootpath)
-            
+            root = document.resolveWidgetPath(None, self.rootpath)
+
         # get a list of matching widgets
         widgetlist = []
         self._recursiveGet(root, self.widgetname, self.widgettype, widgetlist,
@@ -146,30 +146,30 @@ class OperationSettingPropagate(Operation):
 
             self.restorevals[s.path] = s.val
             s.set(self.val)
-          
+
     def undo(self, document):
         """Undo all those changes."""
-        
+
         for setpath, setval in citems(self.restorevals):
-            setting = document.resolveFullSettingPath(setpath)
+            setting = document.resolveSettingPath(None, setpath)
             setting.set(setval)
 
     def _recursiveGet(root, name, typename, outlist, maxlevels):
         """Add those widgets in root with name and type to outlist.
-    
+
         If name or typename are None, then ignore the criterion.
         maxlevels is the maximum number of levels to check
         """
-    
+
         if maxlevels != 0:
-    
+
             # if levels is not zero, add the children of this root
             newmaxlevels = maxlevels - 1
             for w in root.children:
                 if ( (w.name == name or name is None) and
                      (w.typename == typename or typename is None) ):
                     outlist.append(w)
-    
+
                 OperationSettingPropagate._recursiveGet(w, name, typename,
                                                         outlist, newmaxlevels)
 
@@ -177,71 +177,71 @@ class OperationSettingPropagate(Operation):
 
 ###############################################################################
 # Widget operations
-        
+
 class OperationWidgetRename(Operation):
     """Rename widget."""
-    
+
     descr = _('rename')
-    
+
     def __init__(self, widget, newname):
         """Rename the widget to newname."""
-        
+
         self.widgetpath = widget.path
         self.newname = newname
-        
+
     def do(self, document):
         """Rename widget."""
-        
-        widget = document.resolveFullWidgetPath(self.widgetpath)
+
+        widget = document.resolveWidgetPath(None, self.widgetpath)
         self.oldname = widget.name
         widget.rename(self.newname)
         self.newpath = widget.path
-        
+
     def undo(self, document):
         """Undo rename."""
-        
-        widget = document.resolveFullWidgetPath(self.newpath)
+
+        widget = document.resolveWidgetPath(None, self.newpath)
         widget.rename(self.oldname)
-        
+
 class OperationWidgetDelete(Operation):
     """Delete widget."""
-    
+
     descr = _('delete')
-    
+
     def __init__(self, widget):
         """Delete the widget."""
-        
+
         self.widgetpath = widget.path
-        
+
     def do(self, document):
         """Delete widget."""
-        
-        self.oldwidget = document.resolveFullWidgetPath(self.widgetpath)
+
+        self.oldwidget = document.resolveWidgetPath(None, self.widgetpath)
         oldparent = self.oldwidget.parent
         self.oldwidget.parent = None
         self.oldparentpath = oldparent.path
         self.oldindex = oldparent.children.index(self.oldwidget)
         oldparent.removeChild(self.oldwidget.name)
-        
+
     def undo(self, document):
         """Restore deleted widget."""
-        
-        oldparent = document.resolveFullWidgetPath(self.oldparentpath)
+
+        oldparent = document.resolveWidgetPath(None, self.oldparentpath)
         self.oldwidget.parent = oldparent
         oldparent.addChild(self.oldwidget, index=self.oldindex)
 
 class OperationWidgetsDelete(Operation):
     """Delete mutliple widget."""
-    
+
     descr = _('delete')
-    
+
     def __init__(self, widgets):
         """Delete the widget."""
         self.widgetpaths = [w.path for w in widgets]
-        
+
     def do(self, document):
         """Delete widget."""
-        
+
         # ignore widgets which share ancestry
         # as deleting the parent deletes the child
         widgetpaths = list(self.widgetpaths)
@@ -262,7 +262,7 @@ class OperationWidgetsDelete(Operation):
 
         # delete each widget keeping track of details
         for path in widgetpaths:
-            self.oldwidgets.append( document.resolveFullWidgetPath(path) )
+            self.oldwidgets.append( document.resolveWidgetPath(None, path) )
             oldparent = self.oldwidgets[-1].parent
             self.oldparentpaths.append( oldparent.path )
             self.oldindexes.append( oldparent.children.index(self.oldwidgets[-1]) )
@@ -270,41 +270,41 @@ class OperationWidgetsDelete(Operation):
 
     def undo(self, document):
         """Restore deleted widget."""
-        
+
         # put back widgets in reverse order so that indexes are corrent
         for i in crange(len(self.oldwidgets)-1,-1,-1):
-            oldparent = document.resolveFullWidgetPath(self.oldparentpaths[i])
+            oldparent = document.resolveWidgetPath(None, self.oldparentpaths[i])
             oldparent.addChild(self.oldwidgets[i], index=self.oldindexes[i])
-        
+
 class OperationWidgetMoveUpDown(Operation):
     """Move a widget up or down in the hierarchy."""
 
     descr = _('move')
-    
+
     def __init__(self, widget, direction):
         """Move the widget specified up or down in the hierarchy.
-        
+
         direction is -1 for 'up' or +1 for 'down'
         """
-        
+
         self.widgetpath = widget.path
         self.direction = direction
-    
+
     def do(self, document):
         """Move the widget."""
-        
-        widget = document.resolveFullWidgetPath(self.widgetpath)
+
+        widget = document.resolveWidgetPath(None, self.widgetpath)
         parent = widget.parent
         self.suceeded = parent.moveChild(widget, self.direction)
         self.newpath = widget.path
-    
+
     def undo(self, document):
         """Move it back."""
         if self.suceeded:
-            widget = document.resolveFullWidgetPath(self.newpath)
+            widget = document.resolveWidgetPath(None, self.newpath)
             parent = widget.parent
             parent.moveChild(widget, -self.direction)
-            
+
 class OperationWidgetMove(Operation):
     """Move a widget arbitrarily in the hierarchy."""
 
@@ -320,9 +320,9 @@ class OperationWidgetMove(Operation):
     def do(self, document):
         """Move widget."""
 
-        child = document.resolveFullWidgetPath(self.oldchildpath)
+        child = document.resolveWidgetPath(None, self.oldchildpath)
         oldparent = child.parent
-        newparent = document.resolveFullWidgetPath(self.newparentpath)
+        newparent = document.resolveWidgetPath(None, self.newparentpath)
         self.oldchildindex = oldparent.children.index(child)
         self.oldparentpath = oldparent.path
         self.oldname = None
@@ -362,9 +362,9 @@ class OperationWidgetMove(Operation):
     def undo(self, document):
         """Undo move."""
 
-        newparent = document.resolveFullWidgetPath(self.newparentpath)
-        child = document.resolveFullWidgetPath(self.newchildpath)
-        oldparent = document.resolveFullWidgetPath(self.oldparentpath)
+        newparent = document.resolveWidgetPath(None, self.newparentpath)
+        child = document.resolveWidgetPath(None, self.newchildpath)
+        oldparent = document.resolveWidgetPath(None, self.oldparentpath)
 
         # remove from new parent
         del newparent.children[self.newindex]
@@ -380,11 +380,11 @@ class OperationWidgetAdd(Operation):
     """Add a widget of specified type to parent."""
 
     descr = _('add')
-    
+
     def __init__(self, parent, type, autoadd=True, name=None,
                  index=-1, **defaultvals):
         """Add a widget of type given
-        
+
         parent is the parent widget
         type is the type to add (string)
         autoadd adds children automatically for some widgets
@@ -392,21 +392,21 @@ class OperationWidgetAdd(Operation):
         index is position in parent to add the widget
         settings can be passed to the created widgets as optional arguments
         """
-        
+
         self.parentpath = parent.path
         self.type = type
         self.autoadd = autoadd
         self.name = name
         self.index = index
         self.defaultvals = defaultvals
-        
+
     def do(self, document):
         """Create the new widget.
-        
+
         Returns the new widget
         """
-        
-        parent = document.resolveFullWidgetPath(self.parentpath)
+
+        parent = document.resolveWidgetPath(None, self.parentpath)
         w = widgetfactory.thefactory.makeWidget(self.type, parent,
                                                 autoadd=self.autoadd,
                                                 name=self.name,
@@ -414,16 +414,16 @@ class OperationWidgetAdd(Operation):
                                                 **self.defaultvals)
         self.createdname = w.name
         return w
-        
+
     def undo(self, document):
         """Remove the added widget."""
-        
-        parent = document.resolveFullWidgetPath(self.parentpath)
+
+        parent = document.resolveWidgetPath(None, self.parentpath)
         parent.removeChild(self.createdname)
 
 ###############################################################################
 # Dataset operations
-    
+
 class OperationDatasetSet(Operation):
     """Set a dataset to that specified."""
 
@@ -534,24 +534,24 @@ class OperationDatasetDuplicate(Operation):
 
     def undo(self, document):
         """Delete the duplicate"""
-        
+
         if self.olddata is None:
             document.deleteData(self.duplname)
         else:
             document.setData(self.duplname, self.olddata)
-        
+
 class OperationDatasetUnlinkFile(Operation):
     """Remove association between dataset and file."""
     descr = _('unlink dataset')
-    
+
     def __init__(self, datasetname):
         self.datasetname = datasetname
-        
+
     def do(self, document):
         dataset = document.data[self.datasetname]
         self.oldfilelink = dataset.linked
         dataset.linked = None
-        
+
     def undo(self, document):
         dataset = document.data[self.datasetname]
         dataset.linked = self.oldfilelink
@@ -559,21 +559,21 @@ class OperationDatasetUnlinkFile(Operation):
 class OperationDatasetUnlinkRelation(Operation):
     """Remove association between dataset and another dataset.
     """
-    
+
     descr = _('unlink dataset')
-    
+
     def __init__(self, datasetname):
         self.datasetname = datasetname
-        
+
     def do(self, document):
         dataset = document.data[self.datasetname]
         self.olddataset = dataset
         ds = dataset.returnCopy()
         document.setData(self.datasetname, ds)
-        
+
     def undo(self, document):
         document.setData(self.datasetname, self.olddataset)
-        
+
 class OperationDatasetCreate(Operation):
     """Create dataset base class."""
 
@@ -601,7 +601,7 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
 
     def __init__(self, datasetname, numsteps, parts, linked=False):
         """Create a dataset with numsteps values.
-        
+
         parts is a dict containing keys 'data', 'serr', 'perr' and/or 'nerr'. The values
         are tuples with (start, stop) values for each range.
         """
@@ -609,7 +609,7 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
         self.numsteps = numsteps
         self.parts = parts
         self.linked = linked
-        
+
     def do(self, document):
         """Create dataset using range."""
 
@@ -640,7 +640,7 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
 
     def __init__(self, datasetname, t0, t1, numsteps, parts, linked=False):
         """Create a parametric dataset.
-        
+
         Variable t goes from t0 to t1 in numsteps.
         parts is a dict with keys 'data', 'serr', 'perr' and/or 'nerr'
         The values are expressions for evaluating."""
@@ -674,15 +674,15 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
 
     def __init__(self, datasetname, parts, link, parametric=None):
         """Create a dataset from existing dataset using expressions.
-        
+
         parts is a dict with keys 'data', 'serr', 'perr' and/or 'nerr'
         The values are expressions for evaluating.
-        
+
         If link is True, then the dataset is linked to the expressions
         Parametric is a tuple (min, max, numitems) if creating parametric
         datasets.
         """
-        
+
         OperationDatasetCreate.__init__(self, datasetname)
         self.parts = parts
         self.link = link
@@ -700,7 +700,7 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
         ds.document = document
 
         return ds.updateEvaluation()
-        
+
     def do(self, document):
         """Create the dataset."""
         OperationDatasetCreate.do(self, document)
@@ -714,7 +714,7 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
             # copy these values if we don't want to link
             ds = datasets.Dataset(data=ds.data, serr=ds.serr,
                                   perr=ds.perr, nerr=ds.nerr)
-        
+
         document.setData(self.datasetname, ds)
         return ds
 
@@ -787,7 +787,7 @@ class OperationDataset2DBase(Operation):
         """Setup operation."""
         self.datasetname = name
         self.link = link
-    
+
     def validateExpression(self, document):
         """Validate expression is okay."""
         ds = self.makeDSClass()
@@ -965,7 +965,7 @@ class OperationDatasetAddColumn(Operation):
 
     def __init__(self, datasetname, columnname):
         """Initialise column columnname in datasetname.
-        
+
         columnname can be one of 'data', 'serr', 'perr' or 'nerr'
         """
         self.datasetname = datasetname
@@ -992,14 +992,14 @@ class OperationDatasetSetVal(Operation):
     """Set a value in the dataset."""
 
     descr = _('change dataset value')
-    
+
     def __init__(self, datasetname, columnname, row, val):
         """Set row in column columnname to val."""
         self.datasetname = datasetname
         self.columnname = columnname
         self.row = row
         self.val = val
-        
+
     def do(self, document):
         """Set the value."""
         ds = document.data[self.datasetname]
@@ -1014,7 +1014,7 @@ class OperationDatasetSetVal(Operation):
         datacol = getattr(ds, self.columnname)
         datacol[self.row] = self.oldval
         ds.changeValues(self.columnname, datacol)
-    
+
 class OperationDatasetSetVal2D(Operation):
     """Set a value in a 2D dataset."""
 
@@ -1044,13 +1044,13 @@ class OperationDatasetDeleteRow(Operation):
     """Delete a row or several in the dataset."""
 
     descr = _('delete dataset row')
-    
+
     def __init__(self, datasetname, row, numrows=1):
         """Delete a row in a dataset."""
         self.datasetname = datasetname
         self.row = row
         self.numrows = numrows
-        
+
     def do(self, document):
         """Set the value."""
         ds = document.data[self.datasetname]
@@ -1065,13 +1065,13 @@ class OperationDatasetInsertRow(Operation):
     """Insert a row or several in the dataset."""
 
     descr = _('insert dataset row')
-    
+
     def __init__(self, datasetname, row, numrows=1):
         """Delete a row in a dataset."""
         self.datasetname = datasetname
         self.row = row
         self.numrows = numrows
-        
+
     def do(self, document):
         """Set the value."""
         ds = document.data[self.datasetname]
@@ -1126,31 +1126,31 @@ class OperationSetCustom(Operation):
 
 ###############################################################################
 # Misc operations
-        
+
 class OperationMultiple(Operation):
     """Multiple operations batched into one."""
-    
+
     def __init__(self, operations, descr='change'):
         """A batch operation made up of the operations in list.
-        
+
         Optional argument descr gives a description of the combined operation
         """
         self.operations = operations
         if descr:
             self.descr = descr
-        
+
     def addOperation(self, op):
         """Add an operation to the list of operations."""
         self.operations.append(op)
-        
+
     def do(self, document):
         """Do the multiple operations."""
         for op in self.operations:
             op.do(document)
-            
+
     def undo(self, document):
         """Undo the multiple operations."""
-        
+
         # operations need to undone in reverse order
         for op in self.operations[::-1]:
             op.undo(document)
@@ -1188,14 +1188,14 @@ class OperationLoadCustom(OperationLoadStyleSheet):
 
 class OperationToolsPlugin(OperationMultiple):
     """An operation to represent what a tools plugin does."""
-    
+
     def __init__(self, plugin, fields):
         """Use tools plugin, passing fields."""
         OperationMultiple.__init__(self, [], descr=None)
         self.plugin = plugin
         self.fields = fields
         self.descr = plugin.name
-        
+
     def do(self, document):
         """Use the plugin."""
 
@@ -1215,14 +1215,14 @@ class OperationToolsPlugin(OperationMultiple):
 
 class OperationDatasetPlugin(Operation):
     """An operation to activate a dataset plugin."""
-    
+
     def __init__(self, plugin, fields, datasetnames={}):
         """Use dataset plugin, passing fields."""
         self.plugin = plugin
         self.fields = fields
         self.descr = plugin.name
         self.names = datasetnames
-        
+
     def do(self, document):
         """Use the plugin.
         """

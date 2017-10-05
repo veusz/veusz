@@ -246,7 +246,7 @@ class SettingsProxyMulti(SettingsProxy):
         if self._root:
             sname = self._root + '/' + sname
         for w in self.widgets:
-            s = self.document.resolveFullSettingPath(w.path + '/' + sname)
+            s = self.document.resolveSettingPath(None, w.path+'/'+sname)
             if s.val != val:
                 ops.append(document.OperationSettingSet(s, val))
         # apply all operations

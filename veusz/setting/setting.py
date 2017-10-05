@@ -53,7 +53,10 @@ class Setting(object):
 
     typename = 'setting'
 
+    # various items in class hierarchy
     iswidget = False
+    issetting = True
+    issettings = False
 
     def __init__(self, name, value, descr='', usertext='',
                  formatting=False, hidden=False):
@@ -160,7 +163,8 @@ class Setting(object):
         """Make this setting link to stylesheet setting, if possible."""
         self.set( Reference(self.getStylesheetLink()) )
 
-    def _path(self):
+    @property
+    def path(self):
         """Return full path of setting."""
         path = []
         obj = self
@@ -176,9 +180,6 @@ class Setting(object):
                     path.insert(0, obj.name)
             obj = obj.parent
         return '/'.join(path)
-
-    path = property(_path, None, None,
-                    'Return the full path of the setting')
 
     def toUIText(self):
         """Convert the type to text to show in UI."""
@@ -232,9 +233,7 @@ class Setting(object):
 
     def isDefaultLink(self):
         """Is this a link to the default stylesheet value."""
-
-        return ( self._ref and
-                 self._ref.value == self.getStylesheetLink() )
+        return self._ref and self._ref.value == self.getStylesheetLink()
 
     def setSilent(self, val):
         """Set the setting, without propagating modified flags.
@@ -1035,7 +1034,7 @@ class WidgetPath(Str):
 
         # resolve the text to a widget
         try:
-            widget = widget.document.resolve(widget, val)
+            widget = widget.document.resolveWidgetPath(widget, val)
         except ValueError:
             raise utils.InvalidType
 

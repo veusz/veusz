@@ -1,6 +1,6 @@
 # commandinterface.py
 # this module supplies the command line interface for plotting
- 
+
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -98,7 +98,7 @@ class CommandInterface(qt4.QObject):
 
     # commands which can modify disk, etc
     unsafe_commands = (
-        'Export',        
+        'Export',
         'Print',
         'Save',
         )
@@ -151,7 +151,8 @@ class CommandInterface(qt4.QObject):
 
         at = self.currentwidget
         if 'widget' in args_opt:
-            at = self.document.resolve(self.currentwidget, args_opt['widget'])
+            at = self.document.resolveWidgetPath(
+                self.currentwidget, args_opt['widget'])
             del args_opt['widget']
 
         op = operations.OperationWidgetAdd(at, widgettype, **args_opt)
@@ -234,14 +235,14 @@ class CommandInterface(qt4.QObject):
     def CloneWidget(self, widget, newparent, newname=None):
         """Clone the widget given, placing the copy in newparent and
         the name given.
-        
+
         newname is an optional new name to give it
 
         Returns new widget path
         """
 
-        widget = self.document.resolve(self.currentwidget, widget)
-        newparent = self.document.resolve(self.currentwidget, newparent)
+        widget = self.document.resolveWidgetPath(self.currentwidget, widget)
+        newparent = self.document.resolveWidgetPath(self.currentwidget, newparent)
         op = mime.OperationWidgetClone(widget, newparent, newname)
         w = self.document.applyOperation(op)
         return w.path
@@ -299,7 +300,7 @@ class CommandInterface(qt4.QObject):
 
     def Remove(self, name):
         """Remove a widget from the dataset."""
-        w = self.document.resolve(self.currentwidget, name)
+        w = self.document.resolveWidgetPath(self.currentwidget, name)
         op = operations.OperationWidgetDelete(w)
         self.document.applyOperation(op)
         if self.verbose:
@@ -330,8 +331,9 @@ class CommandInterface(qt4.QObject):
         where is a path to the widget relative to the current widget
         """
 
-        self.currentwidget = self.document.resolve(self.currentwidget,
-                                                   where)
+        self.currentwidget = self.document.resolveWidgetPath(
+            self.currentwidget,
+            where)
 
         if self.verbose:
             print(_("Changed to widget '%s'") % self.currentwidget.path)
@@ -339,7 +341,7 @@ class CommandInterface(qt4.QObject):
     def List(self, where='.'):
         """List the contents of a widget, by default the current widget."""
 
-        widget = self.document.resolve(self.currentwidget, where)
+        widget = self.document.resolveWidgetPath(self.currentwidget, where)
         children = widget.childnames
 
         if len(children) == 0:
@@ -352,13 +354,13 @@ class CommandInterface(qt4.QObject):
 
     def Get(self, var):
         """Get the value of a setting."""
-        return self.currentwidget.prefLookup(var).val
+        return self.document.resolveSettingPath(self.currentwidget, var).val
 
     def GetChildren(self, where='.'):
         """Return a list of widgets which are children of the widget of the
         path given."""
         return list(
-            self.document.resolve(self.currentwidget, where).childnames )
+            self.document.resolveWidgetPath(self.currentwidget, where).childnames )
 
     def GetColormap(self, name, invert=False, nvals=256):
         """Return an array of [red,green,blue,alpha] values
@@ -382,9 +384,9 @@ class CommandInterface(qt4.QObject):
         If it is not a reference return None.
         """
 
-        pref = self.currentwidget.prefLookup(setn)
-        if pref.isReference():
-            real = pref.getReference().resolve(pref)
+        setn = self.document.resolveSettingPath(self.currentwidget, setn)
+        if setn.isReference():
+            real = setn.getReference().resolve(setn)
             return real.path
         else:
             return None
@@ -398,25 +400,23 @@ class CommandInterface(qt4.QObject):
         """
         self.document.save(filename, mode)
 
-    def Set(self, var, val):
+    def Set(self, setting_path, val):
         """Set the value of a setting."""
-        pref = self.currentwidget.prefLookup(var)
-
-        op = operations.OperationSettingSet(pref, val)
+        setn = self.document.resolveSettingPath(self.currentwidget, setting_path)
+        op = operations.OperationSettingSet(setn, val)
         self.document.applyOperation(op)
-        
-        if self.verbose:
-            print( _("Set setting '%s' to %s") % (var, repr(pref.get())) )
 
-    def SetToReference(self, var, val):
+        if self.verbose:
+            print( _("Set setting '%s' to %s") % (setting_path, repr(setn.get())) )
+
+    def SetToReference(self, setting_path, val):
         """Set setting to a reference value."""
-
-        pref = self.currentwidget.prefLookup(var)
-        op = operations.OperationSettingSet(pref, setting.Reference(val))
+        setn = self.document.resolveSettingPath(self.currentwidget, setting_path)
+        op = operations.OperationSettingSet(setn, setting.Reference(val))
         self.document.applyOperation(op)
-        
+
         if self.verbose:
-            print( _( "Set setting '%s' to %s") % (var, repr(pref.get())) )
+            print( _( "Set setting '%s' to %s") % (setting_path, repr(setn.get())) )
 
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
         """Create/set dataset name with values (and optionally errors)."""
@@ -424,7 +424,7 @@ class CommandInterface(qt4.QObject):
         data = datasets.Dataset(val, symerr, negerr, poserr)
         op = operations.OperationDatasetSet(name, data)
         self.document.applyOperation(op)
- 
+
         if self.verbose:
             print(
                 _("Set dataset '%s':\n"
@@ -461,7 +461,7 @@ class CommandInterface(qt4.QObject):
         are used, and so on.
         To access a specific part of the dataset y, the suffixes _data, _serr, _perr,
         and _nerr can be appended.
-        
+
         If linked is True then the expressions are reevaluated if the document
         is modified
 
@@ -475,7 +475,7 @@ class CommandInterface(qt4.QObject):
                                                          parametric=parametric)
 
         data = self.document.applyOperation(op)
-        
+
         if self.verbose:
             print(
                 _("Set dataset '%s' based on expression:\n"
@@ -518,7 +518,7 @@ class CommandInterface(qt4.QObject):
         op = operations.OperationDatasetCreateRange(name, numsteps, parts,
                                                     linked)
         self.document.applyOperation(op)
-        
+
         if self.verbose:
             print(
                 _("Set dataset '%s' based on range:\n"
@@ -731,7 +731,7 @@ class CommandInterface(qt4.QObject):
     def Action(self, action, widget='.'):
         """Performs action on current widget."""
 
-        w = self.document.resolve(self.currentwidget, widget)
+        w = self.document.resolveWidgetPath(self.currentwidget, widget)
 
         # run action
         w.getAction(action).function()
@@ -739,7 +739,7 @@ class CommandInterface(qt4.QObject):
     def Print(self):
         """Print document."""
         export.printDialog(None, self.document)
-            
+
     def Export(self, filename, color=True, page=[0], dpi=100,
                antialias=True, quality=85, backcolor='#ffffff00',
                pdfdpi=150, svgtextastext=False):
@@ -775,7 +775,7 @@ class CommandInterface(qt4.QObject):
         eg Rename('graph1/xy1', 'scatter')
         This function does not move widgets."""
 
-        w = self.document.resolve(self.currentwidget, widget)
+        w = self.document.resolveWidgetPath(self.currentwidget, widget)
         op = operations.OperationWidgetRename(w, newname)
         self.document.applyOperation(op)
 
@@ -786,11 +786,11 @@ class CommandInterface(qt4.QObject):
         Returns type of node given.
         Return values are: 'widget', 'settings' or 'setting'
         """
-        item = self.document.resolveItem(self.currentwidget, path)
+        item = self.document.resolvePath(self.currentwidget, path)
 
-        if getattr(item, 'iswidget', False):
+        if item.iswidget:
             return 'widget'
-        elif isinstance(item, setting.Settings):
+        elif item.issettings:
             return 'settinggroup'
         else:
             return 'setting'
@@ -801,17 +801,17 @@ class CommandInterface(qt4.QObject):
 
         Returns a list of the names of the children of this node."""
 
-        item = self.document.resolveItem(self.currentwidget, path)
+        item = self.document.resolvePath(self.currentwidget, path)
 
         out = []
-        if getattr(item, 'iswidget', False):
+        if item.iswidget:
             if types == 'all' or types == 'widget':
                 out += item.childnames
             if types == 'all' or types == 'settinggroup':
                 out += [s.name for s in item.settings.getSettingsList()]
             if types == 'all' or types == 'setting':
                 out += [s.name for s in item.settings.getSettingList()]
-        elif isinstance(item, setting.Settings):
+        elif item.issettings:
             if types == 'all' or types == 'settinggroup':
                 out += [s.name for s in item.getSettingsList()]
             if types == 'all' or types == 'setting':
@@ -823,19 +823,19 @@ class CommandInterface(qt4.QObject):
 
         Raises a ValueError if the path doesn't point to a widget."""
 
-        item = self.document.resolveItem(self.currentwidget, path)
-        if getattr(item, 'iswidget', False):
+        item = self.document.resolvePath(self.currentwidget, path)
+        if item.iswidget:
             return item.typename
         else:
             raise ValueError("Path '%s' is not a widget" % path)
 
-    def SettingType(self, path):
+    def SettingType(self, setting_path):
         """Get the type of setting (a string) for the path given.
 
         Raise a ValueError if path is not a setting
         """
 
-        setn = self.currentwidget.prefLookup(path)
+        setn = self.document.resolveSettingPath(self.currentwidget, setting_path)
         return setn.typename
 
     def TagDatasets(self, tag, datasets):

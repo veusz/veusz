@@ -28,7 +28,10 @@ class Settings(object):
     # differentiate widgets, settings and setting
     nodetype = 'settings'
 
+    # various items in class hierarchy
     iswidget = False
+    issetting = False
+    issettings = True
 
     def __init__(self, name, descr = '', usertext='', pixmap='',
                  setnsmode='formatting'):
