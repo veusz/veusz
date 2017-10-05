@@ -394,7 +394,7 @@ class OperationWidgetAdd(Operation):
         """
 
         self.parentpath = parent.path
-        self.type = type
+        self.wtype = type
         self.autoadd = autoadd
         self.name = name
         self.index = index
@@ -407,11 +407,12 @@ class OperationWidgetAdd(Operation):
         """
 
         parent = document.resolveWidgetPath(None, self.parentpath)
-        w = widgetfactory.thefactory.makeWidget(self.type, parent,
-                                                autoadd=self.autoadd,
-                                                name=self.name,
-                                                index=self.index,
-                                                **self.defaultvals)
+        w = widgetfactory.thefactory.makeWidget(
+            self.wtype, parent, document,
+            autoadd=self.autoadd,
+            name=self.name,
+            index=self.index,
+            **self.defaultvals)
         self.createdname = w.name
         return w
 

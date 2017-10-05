@@ -115,7 +115,7 @@ class Document(qt4.QObject):
         """Wipe out any stored data."""
         self.data = {}
         self.basewidget = widgetfactory.thefactory.makeWidget(
-            'document', None, None, document=self)
+            'document', None, self)
         self.setModified(False)
         self.filename = ""
         self.evaluate.wipe()
@@ -147,8 +147,8 @@ class Document(qt4.QObject):
 
     def makeDefaultDoc(self):
         """Add default widgets to create document."""
-        page = widgetfactory.thefactory.makeWidget('page', self.basewidget)
-        widgetfactory.thefactory.makeWidget('graph', page)
+        page = widgetfactory.thefactory.makeWidget('page', self.basewidget, self)
+        widgetfactory.thefactory.makeWidget('graph', page, self)
         self.setModified()
         self.setModified(False)
         self.changeset = 0

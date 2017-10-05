@@ -69,8 +69,8 @@ class TutorialStep(qt4.QObject):
     def slotNextSetting(self, *args):
         """Check setting to emit next."""
         try:
-            setn = self.mainwin.document.basewidget.prefLookup(
-                self.nextonsetting[0]).get()
+            setn = self.mainwin.document.resolveSettingPath(
+                None, self.nextonsetting[0]).get()
             if self.nextonsetting[1](setn):
                 self.nextStep.emit()
         except ValueError:

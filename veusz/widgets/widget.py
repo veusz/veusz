@@ -206,30 +206,6 @@ class Widget(object):
         this is (e.g. function)."""
         return ''
 
-    def prefLookup(self, name):
-        """Get the value of a preference in the form foo/bar/baz"""
-
-        if len(name) > 0 and name[0] == '/':
-            obj = self.document.basewidget
-            name = name[1:]
-        else:
-            obj = self
-
-        parts = name.split('/')
-        noparts = len(parts)
-
-        # this could be recursive, but why bother
-        # loop while we iterate through the family
-        i = 0
-        while i < noparts and obj.hasChild( parts[i] ):
-            obj = obj.getChild( parts[i] )
-            i += 1
-
-        if i == noparts:
-            raise ValueError("Specified a widget, not a setting")
-        else:
-            return obj.settings.getFromPath( parts[i:] )
-
     def getChild(self, name):
         """Return a child with a name."""
         #print('getChild', self, name)
