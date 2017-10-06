@@ -103,27 +103,27 @@ class CommandInterpreter(object):
 
     def _pythonise(self, text):
         """Internal routine to convert commands in the form Cmd a b c into Cmd(a,b,c)."""
-        
+
         out = ''
         # iterate over lines
-        for l in text.split('\n'):
-            parts = l.split()
+        for line in text.split('\n'):
+            parts = line.split()
 
             # turn Cmd a b c into Cmd(a,b,c)
             if len(parts) != 0 and parts[0] in self.cmds:
-                l = utils.pythonise(l)
+                line = utils.pythonise(line)
 
-            out += l + '\n'
+            out += line + '\n'
 
         return out
-        
+
     def run(self, inputcmds, filename = None):
         """ Run a set of commands inside the preserved environment.
 
         inputcmds: a string with the commands to run
         filename: a filename to report if there are errors
         """
-        
+
         if filename is None:
             filename = '<string>'
 
@@ -150,27 +150,23 @@ class CommandInterpreter(object):
         try:
             c = compile(inputcmds, filename, stattype)
         except (OverflowError, ValueError, SyntaxError):
-            i = sys.exc_info()
-            backtrace = traceback.format_exception( *i )
-            for l in backtrace:
-                sys.stderr.write(l)
+            info = sys.exc_info()
+            backtrace = traceback.format_exception(*info)
+            for line in backtrace:
+                sys.stderr.write(line)
 
         else:
             # block update signals from document while updating
-            self.document.suspendUpdates()
-
-            try:
-                # execute the code
-                cexec(c, self.globals)
-            except:
-                # print out the backtrace to stderr
-                i = sys.exc_info()
-                backtrace = traceback.format_exception( *i )
-                for l in backtrace:
-                    sys.stderr.write(l)
-
-            # reenable documents
-            self.document.enableUpdates()
+            with self.document.suspend():
+                try:
+                    # execute the code
+                    cexec(c, self.globals)
+                except:
+                    # print out the backtrace to stderr
+                    info = sys.exc_info()
+                    backtrace = traceback.format_exception(*info)
+                    for line in backtrace:
+                        sys.stderr.write(line)
 
         # return output streams
         sys.stdout, sys.stderr, sys.stdin = saved
@@ -178,21 +174,21 @@ class CommandInterpreter(object):
     def Load(self, filename):
         """Replace the document with a new one from the filename."""
 
-        f = io.open(filename, 'rU', encoding='utf8')
-        self.document.wipe()
-        self.interface.To('/')
-        oldfile = self.globals['__file__']
-        self.globals['__file__'] = os.path.abspath(filename)
+        with io.open(filename, 'rU', encoding='utf8') as f:
+            self.document.wipe()
+            self.interface.To('/')
+            oldfile = self.globals['__file__']
+            self.globals['__file__'] = os.path.abspath(filename)
 
-        self.interface.importpath.append(
-            os.path.dirname(os.path.abspath(filename)))
-        self.runFile(f)
-        self.interface.importpath.pop()
-        self.globals['__file__'] = oldfile
-        self.document.setModified()
-        self.document.setModified(False)
-        self.document.clearHistory()
-        
+            self.interface.importpath.append(
+                os.path.dirname(os.path.abspath(filename)))
+            self.runFile(f)
+            self.interface.importpath.pop()
+            self.globals['__file__'] = oldfile
+            self.document.setModified()
+            self.document.setModified(False)
+            self.document.clearHistory()
+
     def runFile(self, fileobject):
         """ Run a file in the preserved environment."""
 
@@ -202,27 +198,23 @@ class CommandInterpreter(object):
         sys.stdout = self.write_stdout
         sys.stderr = self.write_stderr
 
-        self.document.suspendUpdates()
-
-        # actually run the code
-        try:
-            cexec(fileobject.read(), self.globals)
-        except Exception:
-            # print out the backtrace to stderr
-            i = sys.exc_info()
-            backtrace = traceback.format_exception( *i )
-            for l in backtrace:
-                sys.stderr.write(l)            
-
-        self.document.enableUpdates()
+        with self.document.suspend():
+            # actually run the code
+            try:
+                cexec(fileobject.read(), self.globals)
+            except Exception:
+                # print out the backtrace to stderr
+                info = sys.exc_info()
+                backtrace = traceback.format_exception(*info)
+                for line in backtrace:
+                    sys.stderr.write(line)
 
         # return output streams
         sys.stdout = temp_stdout
         sys.stderr = temp_stderr
 
-    # FIXME: need a version of this that can throw exceptions instead
     def evaluate(self, expression):
-        """ Evaluate an expression in the environment."""
+        """Evaluate an expression in the environment."""
 
         # preserve output streams
         temp_stdout = sys.stdout
@@ -235,10 +227,10 @@ class CommandInterpreter(object):
             retn = eval(expression, self.globals)
         except Exception:
             # print out the backtrace to stderr
-            i = sys.exc_info()
-            backtrace = traceback.format_exception( *i )
-            for l in backtrace:
-                sys.stderr.write(l)
+            info = sys.exc_info()
+            backtrace = traceback.format_exception(*info)
+            for line in backtrace:
+                sys.stderr.write(line)
             retn = None
 
         # return output streams
@@ -265,15 +257,14 @@ class CommandInterpreter(object):
         self.globals['_tmp_args0'] = args
         self.globals['_tmp_args1'] = namedargs
 
-        print(name, args, namedargs)
+        #print(name, args, namedargs)
         try:
             retn = eval('%s(*_tmp_args0, **_tmp_args1)' % name)
         except Exception as e:
             # return exception picked if exception
             retn = e
-            
+
         del self.globals['_tmp_args0']
         del self.globals['_tmp_args1']
 
         return pickle.dumps(retn)
-    

@@ -225,21 +225,19 @@ class Document(qt4.QObject):
         """Set dataset in document."""
         self.data[name] = dataset
         dataset.document = self
-        dataset.username = name
 
         # update the change tracking
         self.setModified()
 
     def deleteData(self, name):
         """Remove a dataset"""
-        if name in self.data:
-            del self.data[name]
-            self.setModified()
+        del self.data[name]
+        self.setModified()
 
     def modifiedData(self, dataset):
         """Notify dataset was modified"""
-        if dataset in self.data.values():
-            self.setModified()
+        assert dataset in self.data.values()
+        self.setModified()
 
     def getLinkedFiles(self, filenames=None):
         """Get a list of LinkedFile objects used by the document.
@@ -290,7 +288,6 @@ class Document(qt4.QObject):
         d = self.data[oldname]
         del self.data[oldname]
         self.data[newname] = d
-        d.username = newname
 
         self.setModified()
 
