@@ -481,14 +481,18 @@ class Document(qt4.QObject):
 
         self.filename = filename
 
-    def load(self, filename, mode='vsz', callbackunsafe=None):
+    def load(self, filename, mode='vsz',
+             callbackunsafe=None,
+             callbackimporterror=None):
         """Load document from file.
 
         mode is 'vsz' or 'hdf5'
         """
         from . import loader
-        loader.loadDocument(self, filename, mode=mode,
-                            callbackunsafe=callbackunsafe)
+        loader.loadDocument(
+            self, filename, mode=mode,
+            callbackunsafe=callbackunsafe,
+            callbackimporterror=callbackimporterror)
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""

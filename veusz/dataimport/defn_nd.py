@@ -168,4 +168,5 @@ def ImportStringND(comm, dataset, dstring, shape=None, transpose=False):
     return op.outnames
 
 document.registerImportCommand('ImportFileND', ImportFileND)
-document.registerImportCommand('ImportStringND', ImportStringND)
+document.registerImportCommand(
+    'ImportStringND', ImportStringND, filenamearg=-1)

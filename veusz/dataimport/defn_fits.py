@@ -589,4 +589,4 @@ def ImportFITSFile(comm, dsname, filename, hdu,
 # new import command
 document.registerImportCommand("ImportFileFITS", ImportFileFITS)
 # compatibility with old fits import
-document.registerImportCommand("ImportFITSFile", ImportFITSFile)
+document.registerImportCommand("ImportFITSFile", ImportFITSFile, filenamearg=1)

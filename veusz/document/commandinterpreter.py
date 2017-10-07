@@ -81,9 +81,10 @@ class CommandInterpreter(object):
 
         # define commands for interface
         self.cmds = {}
-        for cmd in CommandInterface.safe_commands:
-            self.cmds[cmd] = getattr(ifc, cmd)
-        for cmd in CommandInterface.unsafe_commands:
+        for cmd in (
+                CommandInterface.safe_commands +
+                CommandInterface.unsafe_commands +
+                CommandInterface.import_commands):
             self.cmds[cmd] = getattr(ifc, cmd)
         self.cmds['GPL'] = self.GPL
         self.cmds['Load'] = self.Load

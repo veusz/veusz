@@ -131,6 +131,8 @@ class ImportPluginExample(ImportPlugin):
             return [datasetplugin.Dataset1D(params.field_results["name"], data),
                     datasetplugin.Constant("testconst", "42"),
                     datasetplugin.Function("testfunc(x)", "testconst*x**2")]
+        except IOError as e:
+            raise e
         except Exception as e:
             raise ImportPluginException(cstr(e))
 
@@ -520,6 +522,8 @@ class ImportPluginNpy(ImportPlugin):
 
         try:
             retn = N.load(params.filename)
+        except IOError as e:
+            raise e
         except Exception as e:
             raise ImportPluginException(_("Error while reading file: %s") %
                                         cstr(e))
@@ -574,6 +578,8 @@ class ImportPluginNpz(ImportPlugin):
 
         try:
             retn = N.load(params.filename)
+        except IOError as e:
+            raise e
         except Exception as e:
             raise ImportPluginException(_("Error while reading file: %s") %
                                         cstr(e))

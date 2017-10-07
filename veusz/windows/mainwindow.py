@@ -1043,6 +1043,25 @@ class MainWindow(qt4.QMainWindow):
             qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.WaitCursor))
             return msgbox.clickedButton() is cont
 
+        def _callbackimporterror(filename, error):
+            """Ask user if they want to give a new filename in case of import
+            error.
+            """
+            qt4.QApplication.restoreOverrideCursor()
+            msgbox = qt4.QMessageBox(self)
+            msgbox.setWindowTitle(_("Import error"))
+            msgbox.setText(
+                _("Could not import data from file '%s':\n\n %s") % (
+                    filename, error))
+            msgbox.setInformativeText(_("Do you want to look for another file?"))
+            msgbox.setStandardButtons(qt4.QMessageBox.Yes | qt4.QMessageBox.Cancel)
+            filename = None
+            if msgbox.exec_() == qt4.QMessageBox.Yes:
+                filename = qt4.QFileDialog.getOpenFileName(self, "Choose data file")
+                filename = filename[0] if filename else None
+            qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.WaitCursor))
+            return filename
+
         # save stdout and stderr, then redirect to console
         stdout, stderr = sys.stdout, sys.stderr
         sys.stdout = self.console.con_stdout
@@ -1065,7 +1084,8 @@ class MainWindow(qt4.QMainWindow):
             self.document.load(
                 filename,
                 mode=mode,
-                callbackunsafe=_callbackunsafe)
+                callbackunsafe=_callbackunsafe,
+                callbackimporterror=_callbackimporterror)
 
         except document.LoadError as e:
             from ..dialogs.errorloading import ErrorLoadingDialog

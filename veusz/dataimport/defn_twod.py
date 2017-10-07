@@ -197,4 +197,5 @@ def ImportString2D(comm, datasetnames, dstring, xrange=None, yrange=None,
     return op.outnames
 
 document.registerImportCommand('ImportFile2D', ImportFile2D)
-document.registerImportCommand('ImportString2D', ImportString2D)
+document.registerImportCommand(
+    'ImportString2D', ImportString2D, filenamearg=-1)

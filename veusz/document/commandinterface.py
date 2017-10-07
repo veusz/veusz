@@ -44,15 +44,16 @@ def _(text, disambiguation=None, context='CommandInterface'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-def registerImportCommand(name, method):
+def registerImportCommand(name, method, filenamearg=0):
     """Add command to command interface."""
     setattr(CommandInterface, name, method)
-    CommandInterface.safe_commands.append(name)
+    CommandInterface.import_commands.append(name)
+    CommandInterface.import_filenamearg[name] = filenamearg
 
 class CommandInterface(qt4.QObject):
     """Class provides command interface."""
 
-    # commands which are safe in any script
+    # commands which are safe in any script (excluding import commands)
     safe_commands = [
         'Action',
         'Add',
@@ -78,7 +79,6 @@ class CommandInterface(qt4.QObject):
         'Rename',
         'ResolveReference',
         'Set',
-        'SetToReference',
         'SetData',
         'SetData2D',
         'SetData2DExpression',
@@ -89,19 +89,25 @@ class CommandInterface(qt4.QObject):
         'SetDataND',
         'SetDataRange',
         'SetDataText',
-        'SettingType',
+        'SetToReference',
         'SetVerbose',
+        'SettingType',
         'TagDatasets',
         'To',
         'WidgetType',
         ]
 
+    # commands for importing data
+    import_commands = []
+    # number of argument which contains filename
+    import_filenamearg = {}
+
     # commands which can modify disk, etc
-    unsafe_commands = (
+    unsafe_commands = [
         'Export',
         'Print',
         'Save',
-        )
+        ]
 
     def __init__(self, document):
         """Initialise the interface."""

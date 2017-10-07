@@ -52,7 +52,39 @@ def bconv(s):
         return s.decode('utf-8')
     return s
 
-def executeScript(thedoc, filename, script, callbackunsafe=None):
+def _importcaller(interface, name, callbackimporterror):
+    """Wrap an import statement to check for IOError."""
+    def wrapped(*args, **argsk):
+        while True:
+            try:
+                getattr(interface, name)(*args, **argsk)
+            except IOError as e:
+                errmsg = cexceptionuser(e)
+                fnameidx = interface.import_filenamearg[name]
+                assert fnameidx >= 0
+                filename = args[fnameidx]
+                raiseerror = True
+                if callbackimporterror:
+                    # used by mainwindow to show dialog and get new filename
+                    fname = callbackimporterror(filename, errmsg)
+                    if fname:
+                        # put new filename into function argument list
+                        args = list(args)
+                        args[fnameidx] = fname
+                        raiseerror = False
+                if raiseerror:
+                    # send error message back to UI
+                    raise LoadError(
+                        _("Error reading file '%s':\n\n%s") %
+                        (filename, errmsg))
+            else:
+                # imported ok
+                break
+    return wrapped
+
+def executeScript(thedoc, filename, script,
+                  callbackunsafe=None,
+                  callbackimporterror=None):
     """Execute a script for the document.
 
     This handles setting up the environment and checking for unsafe
@@ -62,6 +94,7 @@ def executeScript(thedoc, filename, script, callbackunsafe=None):
     script: text to execute
     callbackunsafe: should be set to a function to ask the user whether it is
       ok to execute any unsafe commands found. Return True if ok.
+    callbackimporterror(filename, error): should be set to function to return new filename in case of import error, or False if none
 
     User should wipe docment before calling this.
     """
@@ -108,6 +141,10 @@ def executeScript(thedoc, filename, script, callbackunsafe=None):
         return wrapped
     for name in interface.unsafe_commands:
         env[name] = _unsafecaller(getattr(interface, name))
+
+    # override import commands with wrapper
+    for name in interface.import_commands:
+        env[name] = _importcaller(interface, name, callbackimporterror)
 
     # get ready for loading document
     env['__file__'] = filename
@@ -177,7 +214,9 @@ def tagHDF5Datasets(thedoc, hdffile):
             dsname = name.decode('utf-8')
             thedoc.data[dsname].tags.add(vsztag)
 
-def loadHDF5Doc(thedoc, filename, callbackunsafe=None):
+def loadHDF5Doc(thedoc, filename,
+                callbackunsafe=None,
+                callbackimporterror=None):
     """Load an HDF5 of the name given."""
 
     try:
@@ -209,7 +248,10 @@ def loadHDF5Doc(thedoc, filename, callbackunsafe=None):
 
         # load document
         script = hdffile['Veusz']['Document']['document'][0].decode('utf-8')
-        executeScript(thedoc, filename, script, callbackunsafe=callbackunsafe)
+        executeScript(
+            thedoc, filename, script,
+            callbackunsafe=callbackunsafe,
+            callbackimporterror=callbackimporterror)
 
         # then load datasets
         loadHDF5Datasets(thedoc, hdffile)
@@ -218,7 +260,9 @@ def loadHDF5Doc(thedoc, filename, callbackunsafe=None):
 
         hdffile.close()
 
-def loadDocument(thedoc, filename, mode='vsz', callbackunsafe=None):
+def loadDocument(thedoc, filename, mode='vsz',
+                 callbackunsafe=None,
+                 callbackimporterror=None):
     """Load document from file.
 
     mode is 'vsz' or 'hdf5'
@@ -237,10 +281,16 @@ def loadDocument(thedoc, filename, mode='vsz', callbackunsafe=None):
 
         thedoc.wipe()
         thedoc.filename = filename
-        executeScript(thedoc, filename, script, callbackunsafe=callbackunsafe)
+        executeScript(
+            thedoc, filename, script,
+            callbackunsafe=callbackunsafe,
+            callbackimporterror=callbackimporterror)
 
     elif mode == 'hdf5':
-        loadHDF5Doc(thedoc, filename, callbackunsafe=callbackunsafe)
+        loadHDF5Doc(
+            thedoc, filename,
+            callbackunsafe=callbackunsafe,
+            callbackimporterror=callbackimporterror)
 
     else:
         raise RuntimeError('Invalid load mode')
