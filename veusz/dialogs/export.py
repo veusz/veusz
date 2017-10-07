@@ -376,16 +376,13 @@ class ExportDialog(VeuszDialog):
 
         def _overwriteQuestion(filename):
             """Ask user whether file can be overwritten."""
-            msgbox = qt4.QMessageBox(
-                qt4.QMessageBox.Question,
+            retn = qt4.QMessageBox.question(
+                self,
                 _("Overwrite file?"),
                 _("The file %s already exists") % os.path.basename(filename),
-                qt4.QMessageBox.Save | qt4.QMessageBox.Ignore,
-                self)
-            msgbox.setDefaultButton(qt4.QMessageBox.Ignore)
-            msgbox.button(qt4.QMessageBox.Save).setText(_('Overwrite'))
-            msgbox.button(qt4.QMessageBox.Ignore).setText(_('Keep'))
-            return msgbox.exec_() == qt4.QMessageBox.Save
+                qt4.QMessageBox.Save | qt4.QMessageBox.Cancel,
+                qt4.QMessageBox.Cancel)
+            return retn == qt4.QMessageBox.Save
 
         # count exported pages (in list so can be modified in function)
         pagecount = [0]
@@ -443,4 +440,5 @@ class ExportDialog(VeuszDialog):
         if dirname:
             setting.settingdb['dirname_export'] = dirname
 
-        self.showMessage(_('Exported %i page(s)') % pagecount[0])
+        if pagecount[0] > 0:
+            self.showMessage(_('Exported %i page(s)') % pagecount[0])
