@@ -1,7 +1,8 @@
 Changes in <next version>:
- * Cleanup of internal Setting code
- * Cleanup of stylesheet linking code
+ * Cleanup of stylesheet, setting and widget code
  * Fix filename chooser and embedding in ImageFile widget
+ * Force C++11 compilation on Unix
+ * Fix reload and unsafe loading dialog boxes
 
 Changes in 2.0.1:
  * Fix crash setting manual bins in histogram dialog box
