@@ -67,7 +67,7 @@ class Edit(qt4.QLineEdit):
         qt4.QLineEdit.__init__(self, parent)
         self.setting = setting
 
-        self.setText( setting.toText() )
+        self.setText( setting.toUIText() )
         self.editingFinished.connect(self.validateAndSet)
         self.setting.setOnModified(self.onModified)
 
@@ -79,7 +79,7 @@ class Edit(qt4.QLineEdit):
 
         text = self.text()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromUIText(text)
             styleClear(self)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -89,7 +89,7 @@ class Edit(qt4.QLineEdit):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.setText( self.setting.toText() )
+        self.setText( self.setting.toUIText() )
 
 class _EditBox(qt4.QTextEdit):
     """A popup edit box to support editing long text sections.
@@ -179,7 +179,7 @@ class String(qt4.QWidget):
         layout.addWidget(b)
 
         # set the text of the widget to the 
-        self.edit.setText( setting.toText() )
+        self.edit.setText( setting.toUIText() )
 
         self.edit.editingFinished.connect(self.validateAndSet)
         b.toggled.connect(self.buttonToggled)
@@ -218,7 +218,7 @@ class String(qt4.QWidget):
 
         text = self.edit.text()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromUIText(text)
             styleClear(self.edit)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -228,7 +228,7 @@ class String(qt4.QWidget):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.edit.setText( self.setting.toText() )
+        self.edit.setText( self.setting.toUIText() )
 
 class Int(qt4.QSpinBox):
     """A control for changing an integer."""
@@ -313,7 +313,7 @@ class FloatSlider(qt4.QWidget):
 
     @qt4.pyqtSlot()
     def onModified(self):
-        self.edit.setText(self.setting.toText())
+        self.edit.setText(self.setting.toUIText())
         self.slider.setValue(int(round(
             self.setting.get()/self.setting.scale)))
 
@@ -412,13 +412,13 @@ class Choice(qt4.QComboBox):
 
         # choose the correct setting
         try:
-            index = list(vallist).index(setting.toText())
+            index = list(vallist).index(setting.toUIText())
             self.setCurrentIndex(index)
         except ValueError:
             # for cases when this is editable
             # set the text of the widget to the setting
             assert iseditable
-            self.setEditText( setting.toText() )
+            self.setEditText( setting.toUIText() )
 
         # if a different item is selected
         self.activated[str].connect(self.slotActivated)
@@ -449,7 +449,7 @@ class Choice(qt4.QComboBox):
                 text = self.vallist[idx]
 
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromUIText(text)
             styleClear(self)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -459,7 +459,7 @@ class Choice(qt4.QComboBox):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        text = self.setting.toText()
+        text = self.setting.toUIText()
 
         # convert to ui text
         if self.uilist is not None:
@@ -556,7 +556,7 @@ class MultiLine(qt4.QTextEdit):
         self.setTabChangesFocus(True)
         
         # set the text of the widget to the 
-        self.setPlainText( setting.toText() )
+        self.setPlainText( setting.toUIText() )
 
         self.setting.setOnModified(self.onModified)
 
@@ -587,7 +587,7 @@ class MultiLine(qt4.QTextEdit):
 
         text = self.toPlainText()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromUIText(text)
             styleClear(self)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -597,7 +597,7 @@ class MultiLine(qt4.QTextEdit):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.setPlainText( self.setting.toText() )
+        self.setPlainText( self.setting.toUIText() )
 
 class Notes(MultiLine):
     """For editing notes."""
@@ -998,7 +998,7 @@ class Color(qt4.QWidget):
         layout.addWidget(c)
         layout.addWidget(b)
 
-        self.setColor(setting.toText())
+        self.setColor(setting.toUIText())
         self.setLayout(layout)
         self.setting.setOnModified(self.onModified)
 
@@ -1014,7 +1014,7 @@ class Color(qt4.QWidget):
 
     def slotActivated(self, text):
         """A different value is selected."""
-        val = self.setting.fromText(text)
+        val = self.setting.fromUIText(text)
         self.sigSettingChanged.emit(self, self.setting, val)
 
     def setColor(self, color):
@@ -1034,7 +1034,7 @@ class Color(qt4.QWidget):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.setColor( self.setting.toText() )
+        self.setColor( self.setting.toUIText() )
 
 class WidgetSelector(Choice):
     """For choosing from a list of widgets."""
@@ -1089,7 +1089,7 @@ class Axis(WidgetSelector):
 
         # get parent widget
         widget = self.setting.parent
-        while not widget.isWidget() and widget is not None:
+        while not widget.iswidget and widget is not None:
             widget = widget.parent
 
         # get list of axis widgets up the tree
@@ -1763,7 +1763,7 @@ class Filename(qt4.QWidget):
 
         # the actual edit control
         self.edit = qt4.QLineEdit()
-        self.edit.setText( setting.toText() )
+        self.edit.setText( setting.toUIText() )
         layout.addWidget(self.edit)
         
         b = self.button = DotDotButton(checkable=False,
@@ -1796,10 +1796,11 @@ class Filename(qt4.QWidget):
             filefilter = ("Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
                           "*.gif *.xbm *.xpm);;" + filefilter)
 
-        filename = qt4.QFileDialog.getOpenFileName(
+        retn = qt4.QFileDialog.getOpenFileName(
             self, title, self.edit.text(), filefilter)
 
-        if filename:
+        if retn:
+            filename = retn[0]
             self.sigSettingChanged.emit(self, self.setting, filename)
 
     def validateAndSet(self):
@@ -1807,7 +1808,7 @@ class Filename(qt4.QWidget):
 
         text = self.edit.text()
         try:
-            val = self.setting.fromText(text)
+            val = self.setting.fromUIText(text)
             styleClear(self.edit)
             self.sigSettingChanged.emit(self, self.setting, val)
 
@@ -1817,7 +1818,7 @@ class Filename(qt4.QWidget):
     @qt4.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
-        self.edit.setText( self.setting.toText() )
+        self.edit.setText( self.setting.toUIText() )
 
 class FontFamily(qt4.QFontComboBox):
     """List the font families, showing each font."""
@@ -1856,7 +1857,7 @@ class FontFamily(qt4.QFontComboBox):
     @qt4.pyqtSlot()
     def onModified(self):
         """Make control reflect chosen setting."""
-        self.setCurrentFont( qt4.QFont(self.setting.toText()) )
+        self.setCurrentFont( qt4.QFont(self.setting.toUIText()) )
 
 class ErrorStyle(Choice):
     """Choose different error bar styles."""
@@ -1948,4 +1949,4 @@ class AxisBound(Choice):
         Re-set text as float or date."""
 
         if self.currentText().lower() != 'auto':
-            self.setEditText( self.setting.toText() )
+            self.setEditText( self.setting.toUIText() )

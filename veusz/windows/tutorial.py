@@ -69,8 +69,8 @@ class TutorialStep(qt4.QObject):
     def slotNextSetting(self, *args):
         """Check setting to emit next."""
         try:
-            setn = self.mainwin.document.basewidget.prefLookup(
-                self.nextonsetting[0]).get()
+            setn = self.mainwin.document.resolveSettingPath(
+                None, self.nextonsetting[0]).get()
             if self.nextonsetting[1](setn):
                 self.nextStep.emit()
         except ValueError:
@@ -647,7 +647,7 @@ deletes it from the document.</p>
     def slotCheckDelete(self, *args):
         d = self.mainwin.document
         try:
-            d.resolve(d.basewidget, '/page1/graph1')
+            d.resolveWidgetPath(None, '/page1/graph1')
         except ValueError:
             # success!
             self.nextStep.emit()

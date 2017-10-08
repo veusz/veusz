@@ -1024,27 +1024,43 @@ class MainWindow(qt4.QMainWindow):
         Return True if loaded ok
         """
 
-        class _unsafeCmdMsgBox(qt4.QMessageBox):
-            """Show document is unsafe."""
-            def __init__(self, window):
-                qt4.QMessageBox.__init__(
-                    self, _("Unsafe code in document"),
-                    _("The document '%s' contains potentially unsafe code "
-                      "which may damage your computer or data. Please check "
-                      "that the file comes from a trusted source.") % filename,
-                    qt4.QMessageBox.Warning,
-                    qt4.QMessageBox.Yes,
-                    qt4.QMessageBox.No | qt4.QMessageBox.Default,
-                    qt4.QMessageBox.NoButton,
-                    window)
-                self.setButtonText(qt4.QMessageBox.Yes, _("C&ontinue anyway"))
-                self.setButtonText(qt4.QMessageBox.No, _("&Stop loading"))
-
         def _callbackunsafe():
+            """Callback when loading document to ask whether ok to continue loading
+            if unsafe commands are found."""
             qt4.QApplication.restoreOverrideCursor()
-            v = _unsafeCmdMsgBox(self).exec_()
-            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
-            return v == qt4.QMessageBox.Yes
+            msgbox = qt4.QMessageBox(
+                qt4.QMessageBox.Warning,
+                _("Unsafe code in document"),
+                _("The document '%s' contains potentially unsafe code "
+                  "which may damage your computer or data. Please check "
+                  "that the file comes from a trusted source.") % filename,
+                qt4.QMessageBox.NoButton,
+                self)
+            cont = msgbox.addButton(_("C&ontinue anyway"), qt4.QMessageBox.AcceptRole)
+            stop = msgbox.addButton(_("&Stop loading"), qt4.QMessageBox.RejectRole)
+            msgbox.setDefaultButton(stop)
+            msgbox.exec_()
+            qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.WaitCursor))
+            return msgbox.clickedButton() is cont
+
+        def _callbackimporterror(filename, error):
+            """Ask user if they want to give a new filename in case of import
+            error.
+            """
+            qt4.QApplication.restoreOverrideCursor()
+            msgbox = qt4.QMessageBox(self)
+            msgbox.setWindowTitle(_("Import error"))
+            msgbox.setText(
+                _("Could not import data from file '%s':\n\n %s") % (
+                    filename, error))
+            msgbox.setInformativeText(_("Do you want to look for another file?"))
+            msgbox.setStandardButtons(qt4.QMessageBox.Yes | qt4.QMessageBox.Cancel)
+            filename = None
+            if msgbox.exec_() == qt4.QMessageBox.Yes:
+                filename = qt4.QFileDialog.getOpenFileName(self, "Choose data file")
+                filename = filename[0] if filename else None
+            qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.WaitCursor))
+            return filename
 
         # save stdout and stderr, then redirect to console
         stdout, stderr = sys.stdout, sys.stderr
@@ -1068,7 +1084,8 @@ class MainWindow(qt4.QMainWindow):
             self.document.load(
                 filename,
                 mode=mode,
-                callbackunsafe=_callbackunsafe)
+                callbackunsafe=_callbackunsafe,
+                callbackimporterror=_callbackimporterror)
 
         except document.LoadError as e:
             from ..dialogs.errorloading import ErrorLoadingDialog
@@ -1172,17 +1189,13 @@ class MainWindow(qt4.QMainWindow):
     def slotFileReload(self):
         """Reload document from saved version."""
 
-        mb = qt4.QMessageBox(
+        retn = qt4.QMessageBox.warning(
+            self,
             _("Reload file"),
             _("Reload document from file, losing any changes?"),
-            qt4.QMessageBox.Warning,
-            qt4.QMessageBox.Cancel,
-            qt4.QMessageBox.Yes,
-            qt4.QMessageBox.NoButton,
-            self)
-        mb.setButtonText(qt4.QMessageBox.Yes, _("&Reload"))
-        mb.setDefaultButton(qt4.QMessageBox.Cancel)
-        if mb.exec_() == qt4.QMessageBox.Yes:
+            qt4.QMessageBox.Yes | qt4.QMessageBox.Cancel,
+            qt4.QMessageBox.Cancel)
+        if retn == qt4.QMessageBox.Yes:
             if not os.path.exists(self.filename):
                 qt4.QMessageBox.critical(
                     self,

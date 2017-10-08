@@ -41,14 +41,6 @@ class FunctionPlotter(GenericPlotter):
     allowusercreation=True
     description=_('Plot a function')
 
-    def __init__(self, parent, name=None):
-        """Initialise plotter."""
-
-        GenericPlotter.__init__(self, parent, name=name)
-
-        if type(self) == FunctionPlotter:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

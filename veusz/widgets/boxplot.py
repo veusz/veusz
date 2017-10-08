@@ -112,12 +112,6 @@ class BoxPlot(GenericPlotter):
     allowusercreation=True
     description=_('Plot box plots')
 
-    def __init__(self, parent, name=None):
-        """Initialise box plot."""
-        GenericPlotter.__init__(self, parent, name=name)
-        if type(self) == BoxPlot:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

@@ -40,10 +40,6 @@ class GenericPlotter3D(widget.Widget):
     typename = 'genericplotter3d'
     isplotter = True
 
-    def __init__(self, parent, name=None):
-        """Initialise object, setting axes."""
-        widget.Widget.__init__(self, parent, name=name)
-
     @classmethod
     def allowedParentTypes(klass):
         from . import graph3d

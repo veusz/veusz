@@ -87,7 +87,7 @@ class _CommandEdit(qt4.QLineEdit):
         self.setText("")
 
         # keep the command for history
-        self.history.append( command )
+        self.history.append(command)
         self.history_posn = len(self.history)
         self.entered_text = ''
 
@@ -253,16 +253,15 @@ class ConsoleWindow(qt4.QDockWidget):
             self.con_stdout, self.con_stderr, self.con_stdin)
 
         # catch any exceptions, printing problems to stderr
-        self.document.suspendUpdates()
-        try:
-            func()
-        except:
-            # print out the backtrace to stderr
-            i = sys.exc_info()
-            backtrace = traceback.format_exception( *i )
-            for l in backtrace:
-                sys.stderr.write(l)
-        self.document.enableUpdates()
+        with self.document.suspend():
+            try:
+                func()
+            except:
+                # print out the backtrace to stderr
+                info = sys.exc_info()
+                backtrace = traceback.format_exception(*info)
+                for line in backtrace:
+                    sys.stderr.write(line)
 
         # return output streams
         sys.stdout, sys.stderr, sys.stdin = saved
@@ -306,10 +305,10 @@ class ConsoleWindow(qt4.QDockWidget):
         # check whether command can be compiled
         # c set to None if incomplete
         try:
-            c = codeop.compile_command(newc)
+            comp = codeop.compile_command(newc)
         except Exception:
             # we want errors to be caught by self.interpreter.run below
-            c = 1
+            comp = 1
 
         # which prompt?
         prompt = '>>>'
@@ -320,19 +319,20 @@ class ConsoleWindow(qt4.QDockWidget):
         self.appendOutput('%s %s\n' % (prompt, command), 'command')
 
         # are we ready to run this?
-        if c is None or (len(command) != 0 and
-                         len(self.command_build) != 0 and
-                         (command[0] == ' ' or command[0] == '\t')):
+        if comp is None or (
+                len(command) != 0 and
+                len(self.command_build) != 0 and
+                (command[0] == ' ' or command[0] == '\t')):
             # build up the expression
             self.command_build = newc
             # modify the prompt
-            self._prompt.setText( '...' )
+            self._prompt.setText('...')
         else:
             # actually execute the command
             self.interpreter.run(newc)
             self.command_build = ''
             # modify the prompt
-            self._prompt.setText( '>>>' )
+            self._prompt.setText('>>>')
 
     def slotDocumentLog(self, text):
         """Output information if the document logs something."""

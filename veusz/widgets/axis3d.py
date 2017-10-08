@@ -235,9 +235,6 @@ class Axis3D(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
 
-        if type(self) == Axis3D:
-            self.readDefaults()
-
         for n in ('x', 'y', 'z'):
             if self.name == n and s.direction != n:
                 s.direction = n

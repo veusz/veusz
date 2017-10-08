@@ -94,12 +94,6 @@ class Graph3D(widget.Widget):
         (1.0, 0.5, 0.5),
     )
 
-    def __init__(self, parent, name=None):
-        """Initialise object and create axes."""
-
-        widget.Widget.__init__(self, parent, name=name)
-        self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
@@ -217,7 +211,8 @@ class Graph3D(widget.Widget):
         from . import axis3d
         for n in ('x', 'y', 'z'):
             if self.parent.getChild(n) is None:
-                axis3d.Axis3D(self, name=n)
+                ax = axis3d.Axis3D(self, name=n)
+                ax.linkToStylesheet()
 
     def getAxesDict(self, axesnames, ignoremissing=False):
         """Get the axes for widgets to plot against.

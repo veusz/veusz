@@ -48,9 +48,6 @@ class AxisBroken(axis.Axis):
         self.rangeswitch = None
         self.breakchangeset = -1
 
-        if type(self) == AxisBroken:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         '''Construct list of settings.'''

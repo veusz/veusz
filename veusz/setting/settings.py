@@ -28,6 +28,11 @@ class Settings(object):
     # differentiate widgets, settings and setting
     nodetype = 'settings'
 
+    # various items in class hierarchy
+    iswidget = False
+    issetting = False
+    issettings = True
+
     def __init__(self, name, descr = '', usertext='', pixmap='',
                  setnsmode='formatting'):
         """A new Settings with a name.
@@ -59,10 +64,6 @@ class Settings(object):
         for name in self.setnames:
             s.add( self.setdict[name].copy() )
         return s
-
-    def isWidget(self):
-        """Is this object a widget?"""
-        return False
 
     def getList(self):
         """Get a list of setting or settings types."""
@@ -107,19 +108,19 @@ class Settings(object):
         else:
             self.setnames.insert(posn, name)
         setting.parent = self
-        
+
         if pixmap:
             setting.pixmap = pixmap
 
         if readonly:
             setting.readonly = True
-        
+
     def remove(self, name):
         """Remove name from the list of settings."""
 
         del self.setnames[ self.setnames.index( name ) ]
         del self.setdict[ name ]
-        
+
     def __setattr__(self, name, val):
         """Allow us to do
 
@@ -179,27 +180,6 @@ class Settings(object):
         else:
             return self.setdict[name]
 
-    def getFromPath(self, path):
-        """Get setting according to the path given as a list."""
-
-        name = path[0]
-        if name in self.setdict:
-            val = self.setdict[name]
-                
-            if len(path) == 1:
-                if isinstance(val, Settings):
-                    raise ValueError(
-                        '"%s" is a list of settings, not a setting' % name)
-                else:
-                    return val
-            else:
-                if isinstance(val, Settings):
-                    return val.getFromPath(path[1:])
-                else:
-                    raise ValueError('"%s" not a valid subsetting' % name)
-        else:
-            raise ValueError('"%s" is not a setting' % name)
-
     def saveText(self, saveall, rootname = None):
         """Return the text which would reload the settings.
 
@@ -218,29 +198,16 @@ class Settings(object):
                          for name in self.setnames] )
         return text
 
-    def readDefaults(self, root, widgetname):
-        """Return default values from saved text.
-
-        root is the path of the setting in the db, built up by settings
-        above this one
-
-        widgetname is the name of the widget this setting belongs to
-        """
-
-        root = '%s/%s' % (root, self.name)
-        for s in list(self.setdict.values()):
-            s.readDefaults(root, widgetname)
-
     def linkToStylesheet(self, _root=None):
         """Link the settings within this Settings to a stylesheet.
-        
+
         _root is an internal parameter as this function is recursive."""
 
         # build up root part of pathname to reference
         if _root is None:
             path = []
             obj = self
-            while not obj.parent.isWidget():
+            while not obj.parent.iswidget:
                 path.insert(0, obj.name)
                 obj = obj.parent
             path = ['', 'StyleSheet', obj.parent.typename] + path + ['']
@@ -252,7 +219,9 @@ class Settings(object):
             if isinstance(setn, Settings):
                 # call recursively if this is a Settings
                 setn.linkToStylesheet(_root=thispath+'/')
-            else:
+            elif not setn.hidden and (setn.isReference() or setn.isDefault()):
+                # link to stylesheet if the setting is a visible one
+
                 # check that reference resolves
                 ref = Reference(thispath)
                 try:

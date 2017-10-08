@@ -47,13 +47,11 @@ class Root(widget.Widget):
         self.document = document
 
         # don't want user to be able to hide entire document
-        stylesheet = setting.StyleSheet(descr=_('Master settings for document'),
-                                        usertext=_('Style sheet'))
+        stylesheet = setting.StyleSheet(
+            descr=_('Master settings for document'),
+            usertext=_('Style sheet'))
         s.add(stylesheet)
         self.fillStylesheet(stylesheet)
-
-        if type(self) == Root:
-            self.readDefaults()
 
         s.get('englishlocale').setOnModified(self.changeLocale)
         s.get('colorTheme').setOnModified(self.changeColorTheme)

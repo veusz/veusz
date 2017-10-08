@@ -158,10 +158,6 @@ class Grid(widget.Widget):
 
         widget.Widget.__init__(self, parent, name=name)
 
-        # we're not descended from
-        if type(self) == Grid:
-            self.readDefaults()
-
         self.addAction( widget.Action(
                 'zeroMargins', self.actionZeroMargins,
                 descr = _('Zero margins of graphs in grid'),

@@ -163,12 +163,6 @@ class Key(widget.Widget):
     description = _('Plot key')
     allowusercreation = True
 
-    def __init__(self, parent, name=None):
-        widget.Widget.__init__(self, parent, name=name)
-
-        if type(self) == Key:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

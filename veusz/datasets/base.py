@@ -70,11 +70,6 @@ class DatasetConcreteBase(DatasetBase):
         # tags applied to dataset
         self.tags = set()
 
-        # A name for the dataset to show to the user.  This is
-        # modified by the document on SetData, etc, but can be set for
-        # temporary datasets.
-        self.username = None
-
     def saveLinksToSavedDoc(self, fileobj, savedlinks, relpath=None):
         '''Save the link to the saved document, if this dataset is linked.
 

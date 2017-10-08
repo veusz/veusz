@@ -40,14 +40,6 @@ class VectorField(plotters.GenericPlotter):
     allowusercreation = True
     description = _('Plot a vector field')
 
-    def __init__(self, parent, name=None):
-        """Initialse vector field plotter."""
-
-        plotters.GenericPlotter.__init__(self, parent, name=name)
-
-        if type(self) == VectorField:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         '''Construct list of settings.'''

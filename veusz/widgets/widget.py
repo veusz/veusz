@@ -66,6 +66,11 @@ class Widget(object):
     isaxis = False
     isplotter = False
 
+    # various items in class hierarchy
+    iswidget = True
+    issetting = False
+    issettings = False
+
     def __init__(self, parent, name=None):
         """Initialise a blank widget."""
 
@@ -89,8 +94,9 @@ class Widget(object):
         self.children = []
         
         # settings for widget
-        self.settings = setting.Settings( 'Widget_' + self.typename,
-                                          setnsmode='widgetsettings' )
+        self.settings = setting.Settings(
+            'Widget_' + self.typename,
+            setnsmode='widgetsettings')
         self.settings.parent = self
 
         self.addSettings(self.settings)
@@ -110,10 +116,6 @@ class Widget(object):
                             descr = _('Hide object'),
                             usertext = _('Hide'),
                             formatting = True) )
-
-    def isWidget(self):
-        """Is this object a widget?"""
-        return True
 
     def getDocument(self):
         """Return document.
@@ -160,6 +162,7 @@ class Widget(object):
         return parent is None or any(
             ( isinstance(parent, t) for t in self.allowedParentTypes() ) )
 
+    @classmethod
     def willAllowParent(cls, parent):
         """Is the parent of an allowed type to have this type as a child?"""
 
@@ -172,7 +175,6 @@ class Widget(object):
             if isinstance(parent, p):
                 return True
         return False
-    willAllowParent = classmethod(willAllowParent)
 
     def addChild(self, child, index=9999999):
         """Add child to list.
@@ -204,32 +206,9 @@ class Widget(object):
         this is (e.g. function)."""
         return ''
 
-    def prefLookup(self, name):
-        """Get the value of a preference in the form foo/bar/baz"""
-
-        if len(name) > 0 and name[0] == '/':
-            obj = self.document.basewidget
-            name = name[1:]
-        else:
-            obj = self
-
-        parts = name.split('/')
-        noparts = len(parts)
-
-        # this could be recursive, but why bother
-        # loop while we iterate through the family
-        i = 0
-        while i < noparts and obj.hasChild( parts[i] ):
-            obj = obj.getChild( parts[i] )
-            i += 1
-
-        if i == noparts:
-            raise ValueError("Specified a widget, not a setting")
-        else:
-            return obj.settings.getFromPath( parts[i:] )
-
     def getChild(self, name):
         """Return a child with a name."""
+        #print('getChild', self, name)
         for i in self.children:
             if i.name == name:
                 return i
@@ -333,11 +312,8 @@ class Widget(object):
 
         return text
 
-    def readDefaults(self):
-        """Read the default settings.
-        Also set settings to stylesheet
-        """
-        self.settings.readDefaults('', self.name)
+    def linkToStylesheet(self):
+        """Links settings to stylesheet."""
         self.settings.linkToStylesheet()
 
     def buildFlatWidgetList(self, thelist):

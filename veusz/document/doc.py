@@ -21,7 +21,7 @@
 
 """A class to represent Veusz documents, with dataset classes."""
 
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 import codecs
 import os.path
 import traceback
@@ -115,8 +115,7 @@ class Document(qt4.QObject):
         """Wipe out any stored data."""
         self.data = {}
         self.basewidget = widgetfactory.thefactory.makeWidget(
-            'document', None, None)
-        self.basewidget.document = self
+            'document', None, self)
         self.setModified(False)
         self.filename = ""
         self.evaluate.wipe()
@@ -148,8 +147,8 @@ class Document(qt4.QObject):
 
     def makeDefaultDoc(self):
         """Add default widgets to create document."""
-        page = widgetfactory.thefactory.makeWidget('page', self.basewidget)
-        widgetfactory.thefactory.makeWidget('graph', page)
+        page = widgetfactory.thefactory.makeWidget('page', self.basewidget, self)
+        widgetfactory.thefactory.makeWidget('graph', page, self)
         self.setModified()
         self.setModified(False)
         self.changeset = 0
@@ -218,45 +217,6 @@ class Document(qt4.QObject):
         """Returns True if previous operation can be redone."""
         return len(self.historyredo) != 0
 
-    def resolveFullWidgetPath(self, path):
-        """Translate the widget path given into the widget."""
-
-        widget = self.basewidget
-        for p in [i for i in path.split('/') if i != '']:
-            for child in widget.children:
-                if p == child.name:
-                    widget = child
-                    break
-            else:
-                # break wasn't called
-                assert False
-        return widget
-
-    def resolveFullSettingPath(self, path):
-        """Translate setting path into setting object."""
-
-        # find appropriate widget
-        widget = self.basewidget
-        parts = [i for i in path.split('/') if i != '']
-        while len(parts) > 0:
-            for child in widget.children:
-                if parts[0] == child.name:
-                    widget = child
-                    del parts[0]
-                    break
-            else:
-                # no child with name
-                break
-
-        # get Setting object
-        s = widget.settings
-        while isinstance(s, setting.Settings) and parts[0] in s.setdict:
-            s = s.get(parts[0])
-            del parts[0]
-
-        assert isinstance(s, setting.Setting)
-        return s
-
     def isBlank(self):
         """Is the document unchanged?"""
         return self.changeset == 0
@@ -265,21 +225,19 @@ class Document(qt4.QObject):
         """Set dataset in document."""
         self.data[name] = dataset
         dataset.document = self
-        dataset.username = name
 
         # update the change tracking
         self.setModified()
 
     def deleteData(self, name):
         """Remove a dataset"""
-        if name in self.data:
-            del self.data[name]
-            self.setModified()
+        del self.data[name]
+        self.setModified()
 
     def modifiedData(self, dataset):
         """Notify dataset was modified"""
-        if dataset in self.data.values():
-            self.setModified()
+        assert dataset in self.data.values()
+        self.setModified()
 
     def getLinkedFiles(self, filenames=None):
         """Get a list of LinkedFile objects used by the document.
@@ -330,7 +288,6 @@ class Document(qt4.QObject):
         d = self.data[oldname]
         del self.data[oldname]
         self.data[newname] = d
-        d.username = newname
 
         self.setModified()
 
@@ -524,14 +481,18 @@ class Document(qt4.QObject):
 
         self.filename = filename
 
-    def load(self, filename, mode='vsz', callbackunsafe=None):
+    def load(self, filename, mode='vsz',
+             callbackunsafe=None,
+             callbackimporterror=None):
         """Load document from file.
 
         mode is 'vsz' or 'hdf5'
         """
         from . import loader
-        loader.loadDocument(self, filename, mode=mode,
-                            callbackunsafe=callbackunsafe)
+        loader.loadDocument(
+            self, filename, mode=mode,
+            callbackunsafe=callbackunsafe,
+            callbackimporterror=callbackimporterror)
 
     def exportStyleSheet(self, fileobj):
         """Export the StyleSheet to a file."""
@@ -572,21 +533,19 @@ class Document(qt4.QObject):
             self.basewidget,
             dpi=dpi, scaling=scaling, integer=integer)
 
-    def resolveItem(self, fromwidget, where):
-        """Resolve item relative to fromwidget.
+    def resolvePath(self, fromobj, path):
+        """Resolve item relative to fromobj.
+
+        If fromobj is None, then an absolute path is assumed.
+
         Returns a widget, setting or settings as appropriate.
         """
-        parts = where.split('/')
 
-        if where[:1] == '/':
-            # relative to base directory
-            obj = self.basewidget
-        else:
-            # relative to here
-            obj = fromwidget
+        # where to search from
+        obj = self.basewidget if (path[:1]=='/' or fromobj is None) else fromobj
 
-        # iterate over parts in string
-        for p in parts:
+        # iterate over path parts
+        for p in path.split('/'):
             if p == '..':
                 p = obj.parent
                 if p is None:
@@ -594,62 +553,44 @@ class Document(qt4.QObject):
                 obj = p
             elif p == '.' or len(p) == 0:
                 pass
-            else:
-                if obj.isWidget():
-                    child = obj.getChild(p)
-                    if child is not None:
-                        obj = child
-                    else:
-                        if p in obj.settings:
-                            obj = obj.settings[p]
-                        else:
-                            raise ValueError("Widget has no child %s" % p)
+            elif obj.iswidget:
+                if p in obj.settings:
+                    obj = obj.settings.get(p)
                 else:
-                    if isinstance(obj, setting.Settings):
-                        try:
-                            obj = obj.get(p)
-                        except KeyError:
-                            raise ValueError("Settings has no child %s" % p)
-                    else:
-                        raise ValueError("Item has no children")
+                    widget = obj.getChild(p)
+                    if widget is None:
+                        raise ValueError("Widget has no child %s" % p)
+                    obj = widget
+            elif obj.issettings:
+                try:
+                    obj = obj.get(p)
+                except KeyError:
+                    raise ValueError("Settings has no child %s" % p)
+            else:
+                raise ValueError("Item has no children")
 
-        # return widget
         return obj
 
-    def resolve(self, fromwidget, where):
-        """Resolve graph relative to the widget fromwidget
+    def resolveWidgetPath(self, fromobj, path):
+        """Resolve path to Widget.
 
-        Allows unix-style specifiers, e.g. /graph1/x
-        Returns widget
+        If fromobj is None, then is resolved to root widget.
+        Raises ValueError if path is invalid or not to widget.
         """
+        obj = self.resolvePath(fromobj, path)
+        if not obj.iswidget:
+            raise ValueError("Not path to widget")
+        return obj
 
-        parts = where.split('/')
+    def resolveSettingPath(self, fromobj, path):
+        """Resolve path to Setting.
 
-        if where[:1] == '/':
-            # relative to base directory
-            obj = self.basewidget
-        else:
-            # relative to here
-            obj = fromwidget
-
-        # iterate over parts in string
-        for p in parts:
-            if p == '..':
-                # relative to parent object
-                p = obj.parent
-                if p is None:
-                    raise ValueError("Base graph has no parent")
-                obj = p
-            elif p == '.' or len(p) == 0:
-                # relative to here
-                pass
-            else:
-                # child specified
-                obj = obj.getChild( p )
-                if obj is None:
-                    raise ValueError("Child '%s' does not exist" % p)
-
-        # return widget
+        If fromobj is None, then is resolved to root widget.
+        Raises ValueError if path is invalid or not to Setting.
+        """
+        obj = self.resolvePath(fromobj, path)
+        if not obj.issetting:
+            raise ValueError("Not path to setting")
         return obj
 
     def walkNodes(self, tocall, root=None,

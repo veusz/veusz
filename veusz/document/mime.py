@@ -184,7 +184,7 @@ class OperationWidgetPaste(operations.OperationMultiple):
 
         # fire up interpreter to read file
         interpreter = commandinterpreter.CommandInterpreter(document)
-        parentwidget = document.resolveFullWidgetPath(self.parentpath)
+        parentwidget = document.resolveWidgetPath(None, self.parentpath)
 
         lines = self.mimedata.split('\n')
         numwidgets = int(lines[0])

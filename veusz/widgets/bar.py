@@ -67,12 +67,6 @@ class BarPlotter(GenericPlotter):
     allowusercreation=True
     description=_('Plot bar charts')
 
-    def __init__(self, parent, name=None):
-        """Initialise bar chart."""
-        GenericPlotter.__init__(self, parent, name=name)
-        if type(self) == BarPlotter:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

@@ -33,7 +33,7 @@ class WidgetFactory(object):
         """Register a class with the factory."""
         self.regwidgets[classobj.typename] = classobj
 
-    def makeWidget(self, widgetname, parent, name=None, autoadd=True,
+    def makeWidget(self, widgettype, parent, document, name=None, autoadd=True,
                    index=-1, **optargs):
         """Make a new widget of the appropriate type."""
 
@@ -41,14 +41,16 @@ class WidgetFactory(object):
         if name is not None and name.find('/') != -1:
             raise ValueError('name cannot contain "/"')
 
-        w = self.regwidgets[widgetname](parent, name=name)
+        w = self.regwidgets[widgettype](parent, name=name)
+        w.document = document
+        w.linkToStylesheet()
 
         # set all the passed default settings
         for name, val in citems(optargs):
             # allow subsettings to be set using __ -> syntax
             name = name.replace('__', '/')
 
-            w.prefLookup(name).set(val)
+            document.resolveSettingPath(w, name).set(val)
 
         if autoadd:
             w.addDefaultSubWidgets()

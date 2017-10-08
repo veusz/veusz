@@ -42,12 +42,6 @@ class Line(plotters.FreePlotter):
     description=_('Line or arrow')
     allowusercreation = True
     
-    def __init__(self, parent, name=None):
-        """Construct plotter."""
-        plotters.FreePlotter.__init__(self, parent, name=name)
-        if type(self) == Line:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

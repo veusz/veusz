@@ -183,4 +183,4 @@ def ImportString(comm, descriptor, dstring, useblocks=False):
     return (op.outnames, op.outinvalids)
 
 document.registerImportCommand('ImportFile', ImportFile)
-document.registerImportCommand('ImportString', ImportString)
+document.registerImportCommand('ImportString', ImportString, filenamearg=-1)

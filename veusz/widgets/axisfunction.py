@@ -181,9 +181,6 @@ class AxisFunction(axis.Axis):
         self.funcchangeset = -1
         self.boundschangeset = -1
 
-        if type(self) == AxisFunction:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         '''Construct list of settings.'''

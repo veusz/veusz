@@ -280,12 +280,6 @@ class Page(widget.Widget):
     typename='page'
     allowusercreation = True
     description=_('Blank page')
-
-    def __init__(self, parent, name=None):
-        """Initialise object."""
-        widget.Widget.__init__(self, parent, name=name)
-        if type(self) == Page:
-            self.readDefaults()
  
     @classmethod
     def addSettings(klass, s):

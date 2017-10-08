@@ -40,12 +40,6 @@ class Graph(widget.Widget):
     allowusercreation = True
     description = _('Base graph')
 
-    def __init__(self, parent, name=None):
-        """Initialise object and create axes."""
-
-        widget.Widget.__init__(self, parent, name=name)
-        self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
@@ -108,9 +102,11 @@ class Graph(widget.Widget):
 
         from . import axis
         if self.parent.getChild('x') is None:
-            axis.Axis(self, name='x')
+            ax = axis.Axis(self, name='x')
+            ax.linkToStylesheet()
         if self.parent.getChild('y') is None:
-            axis.Axis(self, name='y')
+            ay = axis.Axis(self, name='y')
+            ay.linkToStylesheet()
 
     def getAxesDict(self, axesnames, ignoremissing=False):
         """Get the axes for widgets to plot against.

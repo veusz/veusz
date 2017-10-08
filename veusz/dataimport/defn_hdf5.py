@@ -209,7 +209,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         """Read data from hdf5 file and return a dict of names to data."""
 
         dsread = {}
-        with h5py.File(self.params.filename) as hdff:
+        with h5py.File(self.params.filename, "r") as hdff:
             for hi in self.params.items:
                 # workaround for h5py bug
                 # using unicode names for groups/datasets does not work

@@ -39,10 +39,6 @@ class GenericPlotter(widget.Widget):
     typename='genericplotter'
     isplotter = True
 
-    def __init__(self, parent, name=None):
-        """Initialise object, setting axes."""
-        widget.Widget.__init__(self, parent, name=name)
-
     @classmethod
     def allowedParentTypes(klass):
         from . import graph

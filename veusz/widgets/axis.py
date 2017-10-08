@@ -301,9 +301,6 @@ class Axis(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
         s = self.settings
 
-        if type(self) == Axis:
-            self.readDefaults()
-
         if self.name == 'y' and s.direction != 'vertical':
             s.direction = 'vertical'
         elif self.name == 'x' and s.direction != 'horizontal':

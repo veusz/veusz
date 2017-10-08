@@ -23,7 +23,7 @@ e.g.
 s = Int('foo', 5)
 s.get()
 s.set(42)
-s.fromText('42')
+s.fromUIText('42')
 """
 
 from __future__ import division
@@ -53,6 +53,11 @@ class Setting(object):
 
     typename = 'setting'
 
+    # various items in class hierarchy
+    iswidget = False
+    issetting = True
+    issettings = False
+
     def __init__(self, name, value, descr='', usertext='',
                  formatting=False, hidden=False):
         """Initialise the values.
@@ -73,14 +78,10 @@ class Setting(object):
         self.hidden = hidden
         self.default = value
         self.onmodified = OnModified()
-        self._val = None
+        self._val = self._ref = None
 
         # calls the set function for the val property
         self.val = value
-
-    def isWidget(self):
-        """Is this object a widget?"""
-        return False
 
     def _copyHelper(self, before, after, optional):
         """Help copy an object.
@@ -90,10 +91,7 @@ class Setting(object):
         optinal as optional arguments
         """
 
-        if isinstance(self._val, ReferenceBase):
-            val = self._val
-        else:
-            val = self.val
+        val = self._ref if self._ref else self._val
 
         args = (self.name,) + before + (val,) + after
 
@@ -118,33 +116,35 @@ class Setting(object):
     def get(self):
         """Get the value."""
 
-        if isinstance(self._val, ReferenceBase):
-            return self._val.resolve(self).get()
+        if self._ref:
+            return self._ref.resolve(self).get()
         else:
-            return self.convertFrom(self._val)
+            return self._val
 
     def set(self, v):
         """Set the value."""
 
         if isinstance(v, ReferenceBase):
-            self._val = v
+            self._val = None
+            self._ref = v
         else:
-            # this also removes the linked value if there is one set
-            self._val = self.convertTo(v)
+            self._val = self.normalize(v)
+            self._ref = None
 
         self.onmodified.onModified.emit()
 
-    val = property(get, set, None,
-                   'Get or modify the value of the setting')
+    val = property(
+        get, set, None,
+        'Get or modify the value of the setting')
 
     def isReference(self):
         """Is this a setting a reference to another object."""
-        return isinstance(self._val, ReferenceBase)
+        return bool(self._ref)
 
     def getReference(self):
         """Return the reference object. Raise ValueError if not a reference"""
-        if isinstance(self._val, ReferenceBase):
-            return self._val
+        if self._ref:
+            return self._ref
         else:
             raise ValueError("Setting is not a reference")
 
@@ -153,7 +153,7 @@ class Setting(object):
         stylesheet."""
         path = []
         obj = self
-        while not obj.parent.isWidget():
+        while not obj.parent.iswidget:
             path.insert(0, obj.name)
             obj = obj.parent
         path = ['', 'StyleSheet', obj.parent.typename] + path
@@ -163,14 +163,15 @@ class Setting(object):
         """Make this setting link to stylesheet setting, if possible."""
         self.set( Reference(self.getStylesheetLink()) )
 
-    def _path(self):
+    @property
+    def path(self):
         """Return full path of setting."""
         path = []
         obj = self
         while obj is not None:
             # logic easier to understand here
             # do not add settings name for settings of widget
-            if not obj.isWidget() and obj.parent.isWidget():
+            if not obj.iswidget and obj.parent.iswidget:
                 pass
             else:
                 if obj.name == '/':
@@ -180,90 +181,26 @@ class Setting(object):
             obj = obj.parent
         return '/'.join(path)
 
-    path = property(_path, None, None,
-                    'Return the full path of the setting')
-
-    def toText(self):
-        """Convert the type to text for saving."""
+    def toUIText(self):
+        """Convert the type to text to show in UI."""
         return ""
 
-    def fromText(self, text):
-        """Convert text to type suitable for setting.
+    def fromUIText(self, text):
+        """Convert text from UI into type for setting.
 
         Raises utils.InvalidType if cannot convert."""
         return None
-
-    def readDefaults(self, root, widgetname):
-        """Check whether the user has a default for this setting."""
-
-        deftext = None
-        unnamedpath = '%s/%s' % (root, self.name)
-        try:
-            deftext = settingdb[unnamedpath]
-        except KeyError:
-            pass
-
-        # named defaults supersedes normal defaults
-        namedpath = '%s_NAME:%s' % (widgetname, unnamedpath)
-        try:
-            deftext = settingdb[namedpath]
-        except KeyError:
-            pass
-
-        if deftext is not None:
-            self.val = self.fromText(deftext)
-            self.default = self.val
-
-    def removeDefault(self):
-        """Remove the default setting for this setting."""
-
-        # build up setting path
-        path = ''
-        item = self
-        while not item.isWidget():
-            path = '/%s%s' % (item.name, path)
-            item = item.parent
-
-        # remove the settings (ignore if they are not set)
-        if path in settingdb:
-            del settingdb[path]
-
-        # specific setting to this widgetname
-        namedpath = '%s_NAME:%s' % (item.name, path)
-
-        if namedpath in settingdb:
-            del settingdb[namedpath]
-
-    def setAsDefault(self, withwidgetname = False):
-        """Set the current value of this setting as the default value
-
-        If withwidthname is True, then it is only the default for widgets
-        of the particular name this setting is contained within."""
-
-        # build up setting path
-        path = ''
-        item = self
-        while not item.isWidget():
-            path = '/%s%s' % (item.name, path)
-            item = item.parent
-
-        # if the setting is only for widgets with a certain name
-        if withwidgetname:
-            path = '%s_NAME:%s' % (item.name, path)
-
-        # set the default
-        settingdb[path] = self.toText()
 
     def saveText(self, saveall, rootname = ''):
         """Return text to restore the value of this setting."""
 
         if (saveall or not self.isDefault()) and not self.readonly:
-            if isinstance(self._val, ReferenceBase):
-                return "SetToReference('%s%s', %s)\n" % (rootname, self.name,
-                                                         crepr(self._val.value))
+            if self._ref:
+                return "SetToReference('%s%s', %s)\n" % (
+                    rootname, self.name, crepr(self._ref.value))
             else:
-                return "Set('%s%s', %s)\n" % ( rootname, self.name,
-                                               crepr(self.val) )
+                return "Set('%s%s', %s)\n" % (
+                    rootname, self.name, crepr(self.val) )
         else:
             return ''
 
@@ -271,9 +208,9 @@ class Setting(object):
         """Set the function to be called on modification (passing True)."""
         self.onmodified.onModified.connect(fn)
 
-        if isinstance(self._val, ReferenceBase):
+        if self._ref:
             # tell references to notify us if they are modified
-            self._val.setOnModified(self, fn)
+            self._ref.setOnModified(self, fn)
 
     def removeOnModified(self, fn):
         """Remove the function from the list of function to be called."""
@@ -288,17 +225,15 @@ class Setting(object):
         """Is the current value a default?
         This also returns true if it is linked to the appropriate stylesheet
         """
-        if ( isinstance(self._val, ReferenceBase) and
-             isinstance(self.default, ReferenceBase) ):
-            return self._val.value == self.default.value
+
+        if self._ref and isinstance(self.default, ReferenceBase):
+            return self._ref.value == self.default.value
         else:
-            return self.val == self.default
+            return self._val == self.default
 
     def isDefaultLink(self):
         """Is this a link to the default stylesheet value."""
-
-        return ( isinstance(self._val, ReferenceBase) and
-                 self._val.value == self.getStylesheetLink() )
+        return self._ref and self._ref.value == self.getStylesheetLink()
 
     def setSilent(self, val):
         """Set the setting, without propagating modified flags.
@@ -306,14 +241,13 @@ class Setting(object):
         This shouldn't often be used as it defeats the automatic updation.
         Used for temporary modifications."""
 
-        self._val = self.convertTo(val)
+        self._ref = None
+        self._val = self.normalize(val)
 
-    def convertTo(self, val):
-        """Convert for storage."""
-        return val
+    def normalize(self, val):
+        """Convert external value to normalized form for storing
 
-    def convertFrom(self, val):
-        """Convert to storage."""
+        Raises a utils.InvalidType if this is not possible."""
         return val
 
     def makeControl(self, *args):
@@ -328,17 +262,15 @@ class Setting(object):
         """Return document."""
         p = self.parent
         while p:
-            try:
-                return p.getDocument()
-            except AttributeError:
-                pass
+            if p.iswidget:
+                return p.document
             p = p.parent
         return None
 
     def getWidget(self):
         """Return associated widget."""
         w = self.parent
-        while not w.isWidget():
+        while not w.iswidget:
             w = w.parent
         return w
 
@@ -362,29 +294,31 @@ class SettingBackwardCompat(Setting):
 
     typename = 'backward-compat'
 
-    def __init__(self, name, newrelpath, val, translatefn = None,
+    def __init__(self, name, newrelpath, val, translatefn=None,
                  **args):
         """Point this setting to another.
         newrelpath is a path relative to this setting's parent
         """
 
         self.translatefn = translatefn
+        args['hidden'] = True
         Setting.__init__(self, name, val, **args)
-        self.relpath = newrelpath.split('/')
+        self.relpath = newrelpath
 
     def getForward(self):
         """Get setting this setting forwards to."""
-        return self.parent.getFromPath(self.relpath)
+        doc = self.getDocument()
+        return doc.resolveSettingPath(self.parent, self.relpath)
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if self.parent is not None:
-            return self.getForward().convertTo(val)
+            return self.getForward().normalize(val)
 
-    def toText(self):
-        return self.getForward().toText()
+    def toUIText(self):
+        return self.getForward().toUIText()
 
-    def fromText(self, val):
-        return self.getForward().fromText(val)
+    def fromUIText(self, val):
+        return self.getForward().fromUIText(val)
 
     def set(self, val):
         if self.parent is not None and not isinstance(val, ReferenceBase):
@@ -399,8 +333,8 @@ class SettingBackwardCompat(Setting):
         return self.getForward().get()
 
     def copy(self):
-        return self._copyHelper(('/'.join(self.relpath),), (),
-                                {'translatefn': self.translatefn})
+        return self._copyHelper(
+            (self.relpath,), (), {'translatefn': self.translatefn})
 
     def makeControl(self, *args):
         return None
@@ -418,15 +352,15 @@ class Str(Setting):
 
     typename = 'str'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, cbasestr):
             return val
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return self.val
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         return text
 
     def makeControl(self, *args):
@@ -446,18 +380,15 @@ class Bool(Setting):
 
     typename = 'bool'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if type(val) in (bool, int):
             return bool(val)
         raise utils.InvalidType
 
-    def toText(self):
-        if self.val:
-            return 'True'
-        else:
-            return 'False'
+    def toUIText(self):
+        return 'True' if self.val else 'False'
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         t = text.strip().lower()
         if t in ('true', '1', 't', 'y', 'yes'):
             return True
@@ -495,7 +426,7 @@ class Int(Setting):
         return self._copyHelper((), (), {'minval': self.minval,
                                          'maxval': self.maxval})
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, int):
             if val >= self.minval and val <= self.maxval:
                 return val
@@ -503,10 +434,10 @@ class Int(Setting):
                 raise utils.InvalidType('Out of range allowed')
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return uilocale.toString(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         i, ok = uilocale.toLongLong(text)
         if not ok:
             raise ValueError
@@ -554,22 +485,22 @@ class Float(Setting):
         return self._copyHelper((), (), {'minval': self.minval,
                                          'maxval': self.maxval})
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, int) or isinstance(val, float):
-            return _finiteRangeFloat(val,
-                                     minval=self.minval, maxval=self.maxval)
+            return _finiteRangeFloat(
+                val, minval=self.minval, maxval=self.maxval)
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         try:
             f = ui_stringtofloat(text)
         except ValueError:
             # try to evaluate
             f = self.safeEvalHelper(text)
-        return self.convertTo(f)
+        return self.normalize(f)
 
     def makeControl(self, *args):
         return controls.Edit(self, *args)
@@ -579,32 +510,25 @@ class FloatOrAuto(Float):
 
     typename = 'float-or-auto'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if type(val) in (int, float):
             return _finiteRangeFloat(val, minval=self.minval, maxval=self.maxval)
         elif isinstance(val, cbasestr) and val.strip().lower() == 'auto':
-            return None
+            return 'Auto'
         else:
             raise utils.InvalidType
 
-    def convertFrom(self, val):
-        if val is None:
-            return 'Auto'
-        else:
-            return Float.convertFrom(self, val)
-
-    def toText(self):
-        if self.val is None or (isinstance(self.val, cbasestr) and
-                                self.val.lower() == 'auto'):
+    def toUIText(self):
+        if isinstance(self.val, cbasestr) and self.val.lower() == 'auto':
             return 'Auto'
         else:
             return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
-            return Float.fromText(self, text)
+            return Float.fromUIText(self, text)
 
     def makeControl(self, *args):
         return controls.Choice(self, True, ['Auto'], *args)
@@ -638,28 +562,21 @@ class IntOrAuto(Setting):
 
     typename = 'int-or-auto'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, int):
             return val
         elif isinstance(val, cbasestr) and val.strip().lower() == 'auto':
-            return None
+            return 'Auto'
         else:
             raise utils.InvalidType
 
-    def convertFrom(self, val):
-        if val is None:
-            return 'Auto'
-        else:
-            return val
-
-    def toText(self):
-        if self.val is None or (isinstance(self.val, cbasestr) and
-                                self.val.lower() == 'auto'):
+    def toUIText(self):
+        if isinstance(self.val, cbasestr) and self.val.lower() == 'auto':
             return 'Auto'
         else:
             return uilocale.toString(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         if text.strip().lower() == 'auto':
             return 'Auto'
         else:
@@ -781,17 +698,17 @@ class Distance(Setting):
 
         return kls.distre.match(dist) is not None
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if self.distre.match(val) is not None:
             return val
         else:
             raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         # convert decimal point to display locale
         return self.val.replace('.', uilocale.decimalPoint())
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         # convert decimal point from display locale
         text = text.replace(uilocale.decimalPoint(), '.')
 
@@ -908,16 +825,16 @@ class Choice(Setting):
             (self.vallist,), (), {
                 'descriptions': self.descriptions, 'uilist': self.uilist})
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if val in self.vallist:
             return val
         else:
             raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return self.val
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         if text in self.vallist:
             return text
         else:
@@ -951,13 +868,13 @@ class ChoiceOrMore(Setting):
             (self.vallist,), (), {
                 'descriptions': self.descriptions})
 
-    def convertTo(self, val):
+    def normalize(self, val):
         return val
 
-    def toText(self):
+    def toUIText(self):
         return self.val
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         return text
 
     def makeControl(self, *args):
@@ -969,21 +886,21 @@ class FloatChoice(ChoiceOrMore):
 
     typename = 'float-choice'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if isinstance(val, int) or isinstance(val, float):
             return _finiteRangeFloat(val)
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         return ui_floattostring(self.val)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         try:
             f = ui_stringtofloat(text)
         except ValueError:
             # try to evaluate
             f = self.safeEvalHelper(text)
-        return self.convertTo(f)
+        return self.normalize(f)
 
     def makeControl(self, *args):
         argsv = {'descriptions': self.descriptions}
@@ -995,7 +912,7 @@ class FloatDict(Setting):
 
     typename = 'float-dict'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if type(val) != dict:
             raise utils.InvalidType
 
@@ -1006,12 +923,12 @@ class FloatDict(Setting):
         # return copy
         return dict(val)
 
-    def toText(self):
+    def toUIText(self):
         text = ['%s = %s' % (k, ui_floattostring(self.val[k]))
                 for k in sorted(self.val)]
         return '\n'.join(text)
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         """Do conversion from list of a=X\n values."""
 
         out = {}
@@ -1043,7 +960,7 @@ class FloatList(Setting):
 
     typename = 'float-list'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if type(val) not in (list, tuple):
             raise utils.InvalidType
 
@@ -1056,7 +973,7 @@ class FloatList(Setting):
                 out.append( float(i) )
         return out
 
-    def toText(self):
+    def toUIText(self):
         """Make a string a, b, c."""
         # can't use the comma for splitting if used as a decimal point
 
@@ -1065,7 +982,7 @@ class FloatList(Setting):
             join = '; '
         return join.join( [ui_floattostring(x) for x in self.val] )
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         """Convert from a, b, c or a b c."""
 
         # don't use commas if it is the decimal separator
@@ -1121,7 +1038,7 @@ class WidgetPath(Str):
         """
 
         # this is a bit of a hack, so we don't have to pass a value
-        # for the setting (which we need to from convertTo)
+        # for the setting (which we need to from normalize)
         if val is None:
             val = self.val
 
@@ -1130,7 +1047,7 @@ class WidgetPath(Str):
 
         # find the widget associated with this setting
         widget = self
-        while not widget.isWidget():
+        while not widget.iswidget:
             widget = widget.parent
 
         # usually makes sense to give paths relative to a parent of a widget
@@ -1139,7 +1056,7 @@ class WidgetPath(Str):
 
         # resolve the text to a widget
         try:
-            widget = widget.document.resolve(widget, val)
+            widget = widget.document.resolveWidgetPath(widget, val)
         except ValueError:
             raise utils.InvalidType
 
@@ -1193,7 +1110,7 @@ class Strings(Setting):
 
     typename = 'str-multi'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Takes a tuple/list of strings:
         ('ds1','ds2'...)
         """
@@ -1230,7 +1147,7 @@ class Datasets(Setting):
         self.dimensions = dimensions
         self.datatype = datatype
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Takes a tuple/list of strings:
         ('ds1','ds2'...)
         """
@@ -1276,7 +1193,7 @@ class DatasetExtended(Dataset):
 
     typename = 'dataset-extended'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Check is a string (dataset name or expression) or a list of
         floats (numbers).
         """
@@ -1294,7 +1211,7 @@ class DatasetExtended(Dataset):
                     pass
         raise utils.InvalidType
 
-    def toText(self):
+    def toUIText(self):
         if isinstance(self.val, cbasestr):
             return self.val
         else:
@@ -1305,7 +1222,7 @@ class DatasetExtended(Dataset):
             return join.join( [ ui_floattostring(x)
                                 for x in self.val ] )
 
-    def fromText(self, text):
+    def fromUIText(self, text):
         """Convert from text."""
 
         text = text.strip()
@@ -1415,7 +1332,7 @@ class Color(ChoiceOrMore):
         if self.val.lower() == 'auto':
             # lookup widget
             w = self.parent
-            while w is not None and not w.isWidget():
+            while w is not None and not w.iswidget:
                 w = w.parent
             if w is None:
                 return qt4.QColor()
@@ -1585,7 +1502,7 @@ class WidgetChoice(Str):
 
         # find widget which contains setting
         widget = self.parent
-        while not widget.isWidget() and widget is not None:
+        while not widget.iswidget and widget is not None:
             widget = widget.parent
 
         # get widget's parent
@@ -1656,7 +1573,7 @@ class LineSet(Setting):
 
     typename='line-multi'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Takes a tuple/list of tuples:
         [('dotted', '1pt', 'color', <trans>, False), ...]
 
@@ -1718,7 +1635,7 @@ class FillSet(Setting):
 
     typename = 'fill-multi'
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Takes a tuple/list of tuples:
         [('solid', 'color', False), ...]
 
@@ -1780,7 +1697,7 @@ class Filename(Str):
     def makeControl(self, *args):
         return controls.Filename(self, 'file', *args)
 
-    def convertTo(self, val):
+    def normalize(self, val):
         if sys.platform == 'win32':
             val = val.replace('\\', '/')
         return val
@@ -1957,7 +1874,7 @@ class RotateInterval(Choice):
                          '0', '45', '90', '135', '180'),
                         val, **args)
 
-    def convertTo(self, val):
+    def normalize(self, val):
         """Store rotate angle."""
         # backward compatibility with rotate option
         # False: angle 0
@@ -1966,7 +1883,7 @@ class RotateInterval(Choice):
             val = '0'
         elif val == True:
             val = '90'
-        return Choice.convertTo(self, val)
+        return Choice.normalize(self, val)
 
     def copy(self):
         """Make a copy of the setting."""
@@ -1989,7 +1906,7 @@ class AxisBound(FloatOrAuto):
     def makeControl(self, *args):
         return controls.AxisBound(self, *args)
 
-    def toText(self):
+    def toUIText(self):
         """Convert to text, taking into account mode of Axis.
         Displays datetimes in date format if used
         """
@@ -2004,13 +1921,13 @@ class AxisBound(FloatOrAuto):
              mode == 'datetime' ):
             return utils.dateFloatToString(v)
 
-        return FloatOrAuto.toText(self)
+        return FloatOrAuto.toUIText(self)
 
-    def fromText(self, txt):
+    def fromUIText(self, txt):
         """Convert from text, allowing datetimes."""
 
         v = utils.dateStringToDate(txt)
         if N.isfinite(v):
             return v
         else:
-            return FloatOrAuto.fromText(self, txt)
+            return FloatOrAuto.fromUIText(self, txt)

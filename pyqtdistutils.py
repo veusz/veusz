@@ -97,13 +97,15 @@ class build_ext (distutils.command.build_ext.build_ext):
                     ]
                 extension.extra_compile_args = [
                     '-F', QT_LIB_DIR,
-                    # not sure how to detect below, so hard coded
-                    '-std=gnu++11',
                     ]
             else:
                 extension.libraries = [
                     'Qt5Gui', 'Qt5Core', 'Qt5Xml', 'Qt5Widgets']
             extension.library_dirs = [QT_LIB_DIR]
+
+            # may cause problems with compilers which don't allow this
+            if self.compiler.compiler_type == 'unix':
+                extension.extra_compile_args.append('-std=c++11')
 
         depends = extension.depends
 

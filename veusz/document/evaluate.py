@@ -321,7 +321,7 @@ class Evaluate:
 
     def _evalsetting(self, path):
         """SETTING() eval: return setting given full path."""
-        return self.doc.resolveFullSettingPath(path).get()
+        return self.doc.resolveSettingPath(None, path).get()
 
     def evalDatasetExpression(self, expr, part='data', datatype='numeric',
                               dimensions=1):

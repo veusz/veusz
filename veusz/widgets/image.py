@@ -144,14 +144,6 @@ class Image(plotters.GenericPlotter):
     allowusercreation=True
     description=_('Plot a 2d dataset as an image')
 
-    def __init__(self, parent, name=None):
-        """Initialise plotter with axes."""
-
-        plotters.GenericPlotter.__init__(self, parent, name=name)
-
-        if type(self) == Image:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""

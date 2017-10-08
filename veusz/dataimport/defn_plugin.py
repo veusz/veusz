@@ -145,12 +145,8 @@ def ImportFilePlugin(comm, plugin, filename, **args):
         plugin=plugin, filename=realfilename, **args)
 
     op = OperationDataImportPlugin(params)
-    try:
-        comm.document.applyOperation(op)
-    except:
-        comm.document.log("Error in plugin %s" % plugin)
-        exc =  ''.join(traceback.format_exc())
-        comm.document.log(exc)
+    comm.document.applyOperation(op)
     return op.outnames, op.outcustoms
 
-document.registerImportCommand('ImportFilePlugin', ImportFilePlugin)
+document.registerImportCommand(
+    'ImportFilePlugin', ImportFilePlugin, filenamearg=1)

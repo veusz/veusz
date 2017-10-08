@@ -187,21 +187,22 @@ class EmbedApplication(qt4.QApplication):
         self.clients = {}
         self.clientcounter = 0
 
+    @staticmethod
     def readLenFromSocket(thesocket, length):
         """Read length bytes from socket."""
         s = b''
         while len(s) < length:
             s += thesocket.recv(length-len(s))
         return s
-    readLenFromSocket = staticmethod(readLenFromSocket)
 
+    @staticmethod
     def writeToSocket(thesocket, data):
         """Write to socket until all data written."""
         count = 0
         while count < len(data):
             count += thesocket.send(data[count:])
-    writeToSocket = staticmethod(writeToSocket)
 
+    @staticmethod
     def readCommand(thesocket):
         # get length of packet
         length = struct.unpack('<I', EmbedApplication.readLenFromSocket(
@@ -209,7 +210,6 @@ class EmbedApplication(qt4.QApplication):
         # unpickle command and arguments
         temp = EmbedApplication.readLenFromSocket(thesocket, length)
         return pickle.loads(temp)
-    readCommand = staticmethod(readCommand)
 
     def makeNewClient(self, title, doc=None, hidden=False):
         """Make a new client window."""

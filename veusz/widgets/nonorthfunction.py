@@ -42,12 +42,6 @@ class NonOrthFunction(Widget):
     allowusercreation = True
     description = _('Plot a function on graphs with non-orthogonal axes')
 
-    def __init__(self, parent, name=None):
-        '''Initialise plotter.'''
-        Widget.__init__(self, parent, name=name)
-        if type(self) == NonOrthFunction:
-            self.readDefaults()
-
     @classmethod
     def addSettings(klass, s):
         '''Settings for widget.'''
