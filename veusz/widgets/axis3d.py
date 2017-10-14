@@ -57,10 +57,10 @@ class _AxisTickLabels(threed.AxisTickLabels):
     def drawLabel(self, painter, index, pt, ax1, ax2, quad, dirn):
         """Draw the label, as requested by the Scene."""
 
-        painter.setPen(qt4.QPen())
-
         font = self.labelsprop.makeQFont(painter)
         painter.setFont(font)
+        pen = self.labelsprop.makeQPen(painter)
+        painter.setPen(pen)
 
         label = self.labels[index]
         renderer = utils.Renderer(
