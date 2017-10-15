@@ -574,9 +574,9 @@ void Text::draw(QPainter* painter,
 
 void TriangleFacing::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
-  Vec3 torigin = vec4to3(outerM*Vec4(0,0,0,1));
-  Vec3 norm = cross(points[1]-points[0], points[2]-points[0]);
-  Vec3 tnorm = vec4to3(outerM*vec3to4(norm));
+  const Vec3 torigin = vec4to3(outerM*Vec4(0,0,0,1));
+  const Vec3 norm = cross(points[1]-points[0], points[2]-points[0]);
+  const Vec3 tnorm = vec4to3(outerM*vec3to4(norm));
 
   // norm points towards +z
   if(tnorm(2) > torigin(2))
@@ -595,8 +595,8 @@ ObjectContainer::~ObjectContainer()
 
 void ObjectContainer::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
-  Mat4 totM(outerM*objM);
-  unsigned s=objects.size();
+  const Mat4 totM(outerM*objM);
+  const unsigned s=objects.size();
   for(unsigned i=0; i<s; ++i)
     objects[i]->getFragments(perspM, totM, v);
 }
@@ -605,8 +605,8 @@ void ObjectContainer::getFragments(const Mat4& perspM, const Mat4& outerM, Fragm
 
 void FacingContainer::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
-  Vec3 origin = vec4to3(outerM*Vec4(0,0,0,1));
-  Vec3 tnorm = vec4to3(outerM*vec3to4(norm));
+  const Vec3 origin = vec4to3(outerM*Vec4(0,0,0,1));
+  const Vec3 tnorm = vec4to3(outerM*vec3to4(norm));
 
   // norm points towards +z
   if(tnorm(2) > origin(2))
@@ -794,17 +794,17 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
   fp.lineprop = 0;
   fp.pathsize = 1;
 
-  Vec3 axstart = starts[bestaxis];
-  Vec3 delta = ends[bestaxis]-axstart;
+  const Vec3 axstart = starts[bestaxis];
+  const Vec3 delta = ends[bestaxis]-axstart;
 
   // scene coordinates of axis ends
-  Vec3 axstart_scene = vec4to3(outerM*vec3to4(axstart));
-  Vec3 axend_scene = vec4to3(outerM*vec3to4(ends[bestaxis]));
+  const Vec3 axstart_scene = vec4to3(outerM*vec3to4(axstart));
+  const Vec3 axend_scene = vec4to3(outerM*vec3to4(ends[bestaxis]));
 
   for(unsigned i=0; i<tickfracs.size(); ++i)
     {
       fp.index = i;
-      Vec3 pt = axstart + delta*(tickfracs[i]);
+      const Vec3 pt = axstart + delta*(tickfracs[i]);
 
       fp.points[0] = vec4to3(outerM*vec3to4(pt));
       fp.points[1] = axstart_scene;
