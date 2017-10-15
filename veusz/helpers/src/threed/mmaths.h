@@ -56,6 +56,14 @@ struct Vec4
   {
     return Vec4(v[0]*f, v[1]*f, v[2]*f, v[3]*f);
   }
+  Vec4& operator+=(const Vec4& o)
+  {
+    v[0]+=o.v[0]; v[1]+=o.v[1]; v[2]+=o.v[2]; v[3]+=o.v[3]; return *this;
+  }
+  Vec4& operator-=(const Vec4& o)
+  {
+    v[0]-=o.v[0]; v[1]-=o.v[1]; v[2]-=o.v[2]; v[3]-=o.v[3]; return *this;
+  }
   inline bool operator==(const Vec4& o) const
   {
     return v[0]==o.v[0] && v[1]==o.v[1] && v[2]==o.v[2] && v[3]==o.v[3];
@@ -117,6 +125,15 @@ struct Vec3
   {
     return Vec3(v[0]*f, v[1]*f, v[2]*f);
   }
+  Vec3& operator+=(const Vec3& o)
+  {
+    v[0]+=o.v[0]; v[1]+=o.v[1]; v[2]+=o.v[2]; return *this;
+  }
+  Vec3& operator-=(const Vec3& o)
+  {
+    v[0]-=o.v[0]; v[1]-=o.v[1]; v[2]-=o.v[2]; return *this;
+  }
+
   inline bool operator==(const Vec3& o) const
   {
     return v[0]==o.v[0] && v[1]==o.v[1] && v[2]==o.v[2];
@@ -354,6 +371,14 @@ struct Vec2
   inline Vec2 operator*(double f) const
   {
     return Vec2(v[0]*f, v[1]*f);
+  }
+  Vec2& operator+=(const Vec2& o)
+  {
+    v[0]+=o.v[0]; v[1]+=o.v[1]; return *this;
+  }
+  Vec2& operator-=(const Vec2& o)
+  {
+    v[0]-=o.v[0]; v[1]-=o.v[1]; return *this;
   }
   inline bool operator==(const Vec2& o) const
   {

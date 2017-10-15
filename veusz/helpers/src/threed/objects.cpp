@@ -656,26 +656,22 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
   // Determine from faces, which side of the axis is inside and which outside
   // Setup drawLabel for the right axis
 
-  unsigned numentries = std::min(starts.size(), ends.size());
+  const unsigned numentries = std::min(starts.size(), ends.size());
   if(numentries == 0)
     return;
 
-  Vec3 boxpts[2];
-  boxpts[0] = box1; boxpts[1] = box2;
+  const Vec3 boxpts[2] = {box1, box2};
 
-  // compute corners of cube in scene coordinates
+  // compute corners of cube in projected coordinates
   // (0,0,0),(0,0,1),(0,1,0),(0,1,1),(1,0,0),(1,0,1),(1,1,0),(1,1,1)
-  Vec3 scene_corners[8];
-  Vec2 proj_corners[8];
+  Vec3 proj_corners[8];
   for(unsigned i0=0; i0<2; ++i0)
     for(unsigned i1=0; i1<2; ++i1)
       for(unsigned i2=0; i2<2; ++i2)
         {
-          Vec3 pt(boxpts[i0](0), boxpts[i1](1), boxpts[i2](2));
-          Vec4 scenecoord(outerM*vec3to4(pt));
-          scene_corners[i2+i1*2+i0*4] = vec4to3(scenecoord);
+          const Vec3 pt(boxpts[i0](0), boxpts[i1](1), boxpts[i2](2));
           proj_corners[i2+i1*2+i0*4] =
-            vec3to2(calcProjVec(perspM, scenecoord));
+            calcProjVec(perspM, outerM*vec3to4(pt));
         }
 
   // point indices for faces of cube
@@ -686,16 +682,18 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
   };
 
   // scene and projected coords of axis ends
-  std::vector<Vec3> pt_starts, pt_ends;
-  std::vector<Vec2> proj_starts, proj_ends;
+  std::vector<Vec3> proj_starts, proj_ends;
   for(unsigned axis=0; axis!=numentries; ++axis)
     {
-      Vec4 pstart = outerM*vec3to4(starts[axis]);
-      pt_starts.push_back(vec4to3(pstart));
-      proj_starts.push_back(vec3to2(calcProjVec(perspM, pstart)));
-      Vec4 pend = outerM*vec3to4(ends[axis]);
-      pt_ends.push_back(vec4to3(pend));
-      proj_ends.push_back(vec3to2(calcProjVec(perspM, pend)));
+      // ends shifted slightly inwards for overlap checks
+      // (fixes issues in ends exactly overlapping with
+      //  face edges causing overlap to fail)
+      const Vec3 delta(ends[axis]-starts[axis]);
+      const Vec4 start_in = vec3to4(starts[axis]+delta*0.001);
+      const Vec4 end_in = vec3to4(starts[axis]+delta*0.999);
+
+      proj_starts.push_back(calcProjVec(perspM, outerM*start_in));
+      proj_ends.push_back(calcProjVec(perspM, outerM*end_in));
     }
 
   // find axes which don't overlap with faces in 2D
@@ -704,8 +702,8 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
   std::vector<Vec2> facepts;
   for(unsigned axis=0; axis!=numentries; ++axis)
     {
-      Vec2 linept1 = proj_starts[axis];
-      Vec2 linept2 = proj_ends[axis];
+      const Vec2 linept1 = vec3to2(proj_starts[axis]);
+      const Vec2 linept2 = vec3to2(proj_ends[axis]);
 
       bool overlap=0;
 
@@ -714,7 +712,7 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
         {
           facepts.resize(0);
           for(unsigned i=0; i<4; ++i)
-            facepts.push_back(proj_corners[faces[face][i]]);
+            facepts.push_back(vec3to2(proj_corners[faces[face][i]]));
           twodPolyMakeClockwise(&facepts);
 
           if( twodLineIntersectPolygon(linept1, linept2, facepts) )
@@ -732,19 +730,11 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
         axchoices.push_back(axis);
     }
 
-  // change the following to use projected coordinates and depth
-  // instead?
-
-  // get approx centre of cube by averaging corners
-  double centx, centy, centz;
-  centx = centy = centz = 0;
+  // get approx projected centre of cube by averaging corners
+  Vec3 cent;
   for(unsigned i=0; i<8; ++i)
-    {
-      centx += scene_corners[i](0);
-      centy += scene_corners[i](1);
-      centz += scene_corners[i](2);
-    }
-  centx *= (1./8); centy *= (1./8); centz *= (1./8);
+    cent += proj_corners[i];
+  cent *= (1./8);
 
   // currently-prefered axis number
   unsigned bestaxis = 0;
@@ -767,26 +757,23 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
   for(std::vector<unsigned>::const_iterator choice=axchoices.begin();
       choice!=axchoices.end(); ++choice)
     {
-      double avx = 0.5*(pt_starts[*choice](0)+pt_ends[*choice](0));
-      double avy = 0.5*(pt_starts[*choice](1)+pt_ends[*choice](1));
-      double avz = 0.5*(pt_starts[*choice](2)+pt_ends[*choice](2));
+      const Vec3 av((proj_starts[*choice]+proj_ends[*choice])*0.5);
 
       // score is weighted towards front, then bottom, then left
-      int score = ((avx <= centx)*10 +
-                   (avy >  centy)*11 +
-                   (avz >  centz)*12 );
+      const int score = ((av(0) <= cent(0))*10 +
+                         (av(1) >  cent(1))*11 +
+                         (av(2) <  cent(2))*12 );
       if(score > bestscore)
         {
           bestscore = score;
           bestaxis = *choice;
 
           // which quadrant is axis in
-          bestquad = (avx<=centx)*2 + (avy>centy);
+          bestquad = (av(0)<=cent(0))*2 + (av(1)>cent(1));
 
           // which direction is axis in?
-          double dx = pt_ends[*choice](0)-pt_starts[*choice](0);
-          double dy = pt_ends[*choice](1)-pt_starts[*choice](1);
-          bestdirn = (dx<0)*2 + (dy<0);
+          const Vec3 delta = proj_ends[*choice]-proj_starts[*choice];
+          bestdirn = (delta(0)<0)*2 + (delta(1)<0);
         }
     }
 
