@@ -433,7 +433,7 @@ void Scene::render(Object* root,
   draworder.resize(0);
 
   // get fragments for whole scene
-  root->getFragments(cam.viewM, fragments);
+  root->getFragments(cam.perspM, cam.viewM, fragments);
 
   switch(mode)
     {

@@ -35,7 +35,7 @@ class Object
  public:
   virtual ~Object();
 
-  virtual void getFragments(const Mat4& outerM, FragmentVector& v);
+  virtual void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 };
 
 class Triangle : public Object
@@ -52,7 +52,7 @@ class Triangle : public Object
     points[0] = a; points[1] = b; points[2] = c;
   }
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
  public:
   Vec3 points[3];
@@ -81,7 +81,7 @@ public:
 
   void addPoints(const ValVector& x, const ValVector& y, const ValVector& z);
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
 public:
   Vec3Vector points;
@@ -97,7 +97,7 @@ public:
   LineSegments(const ValVector& pts1, const ValVector& pts2,
                const LineProp* prop);
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
 public:
   Vec3Vector points;
@@ -125,11 +125,11 @@ public:
   {
   }
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
 private:
-  void getSurfaceFragments(const Mat4& outerM, FragmentVector& v);
-  void getLineFragments(const Mat4& outerM, FragmentVector& v);
+  void getSurfaceFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
+  void getLineFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
   void getVecIdxs(unsigned &vidx_h, unsigned &vidx_1, unsigned &vidx_2) const;
 
@@ -160,7 +160,7 @@ public:
   {
   }
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
 public:
   ValVector edges1, edges2, vals;
@@ -187,7 +187,7 @@ public:
 
   void setSizes(const ValVector& _sizes) { sizes = _sizes; }
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
 private:
   FragmentPathParameters fragparams;
@@ -208,7 +208,7 @@ public:
   // pos1 and pos2 contain a list of x,y,z values
   Text(const ValVector& _pos1, const ValVector& _pos2);
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
   virtual void draw(QPainter* painter,
                     QPointF pt1, QPointF pt2, QPointF pt3,
@@ -238,7 +238,7 @@ public:
     : Triangle(a, b, c, prop)
   {}
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 };
 
 // container of objects with transformation matrix of children
@@ -252,7 +252,7 @@ class ObjectContainer : public Object
     {}
 
   ~ObjectContainer();
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
   void addObject(Object* obj)
   {
@@ -274,7 +274,7 @@ public:
     : ObjectContainer(), norm(_norm)
   {
   }
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
 public:
   Vec3 norm;
@@ -298,7 +298,7 @@ public:
                          QPointF pt, QPointF ax1, QPointF ax2,
                          int quad, int dirn);
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
 private:
   Vec3 box1, box2;

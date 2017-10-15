@@ -150,12 +150,12 @@ namespace
 } // namespace
 
 
-void ClipContainer::getFragments(const Mat4& outerM, FragmentVector& v)
+void ClipContainer::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   // get fragments for children (and range in vector)
   const unsigned fragstart = v.size();
   for(unsigned i=0, s=objects.size(); i<s; ++i)
-    objects[i]->getFragments(outerM, v);
+    objects[i]->getFragments(perspM, outerM, v);
 
   // these are the points defining the clipping cube
   Vec3 pts[8];

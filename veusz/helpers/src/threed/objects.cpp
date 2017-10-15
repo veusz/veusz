@@ -27,14 +27,14 @@ Object::~Object()
 {
 }
 
-void Object::getFragments(const Mat4& outerM, FragmentVector& v)
+void Object::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
 }
 
 // Triangle
 ///////////
 
-void Triangle::getFragments(const Mat4& outerM, FragmentVector& v)
+void Triangle::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   Fragment f;
   f.type = Fragment::FR_TRIANGLE;
@@ -58,7 +58,7 @@ void PolyLine::addPoints(const ValVector& x, const ValVector& y, const ValVector
     points.push_back(Vec3(x[i], y[i], z[i]));
 }
 
-void PolyLine::getFragments(const Mat4& outerM, FragmentVector& v)
+void PolyLine::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   Fragment f;
   f.type = Fragment::FR_LINESEG;
@@ -109,7 +109,7 @@ LineSegments::LineSegments(const ValVector& pts1, const ValVector& pts2,
     }
 }
 
-void LineSegments::getFragments(const Mat4& outerM, FragmentVector& v)
+void LineSegments::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   Fragment f;
   f.type = Fragment::FR_LINESEG;
@@ -144,13 +144,13 @@ void Mesh::getVecIdxs(unsigned &vidx_h, unsigned &vidx_1, unsigned &vidx_2) cons
     }
 }
 
-void Mesh::getFragments(const Mat4& outerM, FragmentVector& v)
+void Mesh::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
-  getLineFragments(outerM, v);
-  getSurfaceFragments(outerM, v);
+  getLineFragments(perspM, outerM, v);
+  getSurfaceFragments(perspM, outerM, v);
 }
 
-void Mesh::getLineFragments(const Mat4& outerM, FragmentVector& v)
+void Mesh::getLineFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   if(lineprop.ptr() == 0)
     return;
@@ -195,7 +195,7 @@ void Mesh::getLineFragments(const Mat4& outerM, FragmentVector& v)
     }
 }
 
-void Mesh::getSurfaceFragments(const Mat4& outerM, FragmentVector& v)
+void Mesh::getSurfaceFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   if(surfaceprop.ptr() == 0)
     return;
@@ -302,7 +302,7 @@ namespace
   };
 };
 
-void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
+void DataMesh::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   // check indices
   bool found[3] = {0, 0, 0};
@@ -488,7 +488,7 @@ void DataMesh::getFragments(const Mat4& outerM, FragmentVector& v)
 // Points
 /////////
 
-void Points::getFragments(const Mat4& outerM, FragmentVector& v)
+void Points::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   fragparams.path = &path;
   fragparams.scaleedges = scaleedges;
@@ -540,7 +540,7 @@ void Text::TextPathParameters::callback(QPainter* painter,
   text->draw(painter, pt1, pt2, pt3, index, scale, linescale);
 }
 
-void Text::getFragments(const Mat4& outerM, FragmentVector& v)
+void Text::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   Fragment fp;
   fp.type = Fragment::FR_PATH;
@@ -572,7 +572,7 @@ void Text::draw(QPainter* painter,
 // TriangleFacing
 /////////////////
 
-void TriangleFacing::getFragments(const Mat4& outerM, FragmentVector& v)
+void TriangleFacing::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   Vec3 torigin = vec4to3(outerM*Vec4(0,0,0,1));
   Vec3 norm = cross(points[1]-points[0], points[2]-points[0]);
@@ -580,7 +580,7 @@ void TriangleFacing::getFragments(const Mat4& outerM, FragmentVector& v)
 
   // norm points towards +z
   if(tnorm(2) > torigin(2))
-    Triangle::getFragments(outerM, v);
+    Triangle::getFragments(perspM, outerM, v);
 }
 
 // ObjectContainer
@@ -593,24 +593,24 @@ ObjectContainer::~ObjectContainer()
 }
 
 
-void ObjectContainer::getFragments(const Mat4& outerM, FragmentVector& v)
+void ObjectContainer::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   Mat4 totM(outerM*objM);
   unsigned s=objects.size();
   for(unsigned i=0; i<s; ++i)
-    objects[i]->getFragments(totM, v);
+    objects[i]->getFragments(perspM, totM, v);
 }
 
 // FacingContainer
 
-void FacingContainer::getFragments(const Mat4& outerM, FragmentVector& v)
+void FacingContainer::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   Vec3 origin = vec4to3(outerM*Vec4(0,0,0,1));
   Vec3 tnorm = vec4to3(outerM*vec3to4(norm));
 
   // norm points towards +z
   if(tnorm(2) > origin(2))
-    ObjectContainer::getFragments(outerM, v);
+    ObjectContainer::getFragments(perspM, outerM, v);
 }
 
 // AxisTickLabels
@@ -644,7 +644,7 @@ void AxisTickLabels::drawLabel(QPainter* painter, unsigned index,
 {
 }
 
-void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
+void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& fragvec)
 {
   // algorithm:
 
@@ -665,13 +665,17 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
 
   // compute corners of cube in scene coordinates
   // (0,0,0),(0,0,1),(0,1,0),(0,1,1),(1,0,0),(1,0,1),(1,1,0),(1,1,1)
-  Vec3 scenecorners[8];
+  Vec3 scene_corners[8];
+  Vec2 proj_corners[8];
   for(unsigned i0=0; i0<2; ++i0)
     for(unsigned i1=0; i1<2; ++i1)
       for(unsigned i2=0; i2<2; ++i2)
         {
           Vec3 pt(boxpts[i0](0), boxpts[i1](1), boxpts[i2](2));
-          scenecorners[i2+i1*2+i0*4] = vec4to3(outerM*vec3to4(pt));
+          Vec4 scenecoord(outerM*vec3to4(pt));
+          scene_corners[i2+i1*2+i0*4] = vec4to3(scenecoord);
+          proj_corners[i2+i1*2+i0*4] =
+            vec3to2(calcProjVec(perspM, scenecoord));
         }
 
   // point indices for faces of cube
@@ -681,12 +685,17 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
     {0,4,6,2} /* z==0 */, {1,5,7,3} /* z==1 */
   };
 
-  // scene coords of axis ends
+  // scene and projected coords of axis ends
   std::vector<Vec3> pt_starts, pt_ends;
+  std::vector<Vec2> proj_starts, proj_ends;
   for(unsigned axis=0; axis!=numentries; ++axis)
     {
-      pt_starts.push_back(vec4to3(outerM*vec3to4(starts[axis])));
-      pt_ends.push_back(vec4to3(outerM*vec3to4(ends[axis])));
+      Vec4 pstart = outerM*vec3to4(starts[axis]);
+      pt_starts.push_back(vec4to3(pstart));
+      proj_starts.push_back(vec3to2(calcProjVec(perspM, pstart)));
+      Vec4 pend = outerM*vec3to4(ends[axis]);
+      pt_ends.push_back(vec4to3(pend));
+      proj_ends.push_back(vec3to2(calcProjVec(perspM, pend)));
     }
 
   // find axes which don't overlap with faces in 2D
@@ -695,8 +704,8 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
   std::vector<Vec2> facepts;
   for(unsigned axis=0; axis!=numentries; ++axis)
     {
-      Vec2 linept1 = vec3to2(pt_starts[axis]);
-      Vec2 linept2 = vec3to2(pt_ends[axis]);
+      Vec2 linept1 = proj_starts[axis];
+      Vec2 linept2 = proj_ends[axis];
 
       bool overlap=0;
 
@@ -705,7 +714,7 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
         {
           facepts.resize(0);
           for(unsigned i=0; i<4; ++i)
-            facepts.push_back(vec3to2(scenecorners[faces[face][i]]));
+            facepts.push_back(proj_corners[faces[face][i]]);
           twodPolyMakeClockwise(&facepts);
 
           if( twodLineIntersectPolygon(linept1, linept2, facepts) )
@@ -723,14 +732,17 @@ void AxisTickLabels::getFragments(const Mat4& outerM, FragmentVector& fragvec)
         axchoices.push_back(axis);
     }
 
+  // change the following to use projected coordinates and depth
+  // instead?
+
   // get approx centre of cube by averaging corners
   double centx, centy, centz;
   centx = centy = centz = 0;
   for(unsigned i=0; i<8; ++i)
     {
-      centx += scenecorners[i](0);
-      centy += scenecorners[i](1);
-      centz += scenecorners[i](2);
+      centx += scene_corners[i](0);
+      centy += scene_corners[i](1);
+      centz += scene_corners[i](2);
     }
   centx *= (1./8); centy *= (1./8); centz *= (1./8);
 

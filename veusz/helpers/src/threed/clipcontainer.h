@@ -33,7 +33,7 @@ public:
   {
   }
 
-  void getFragments(const Mat4& outerM, FragmentVector& v);
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
   bool pointInBounds(Vec3 pt) const
   {
