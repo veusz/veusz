@@ -32,6 +32,19 @@ def _(text, disambiguation=None, context='Covariance'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
+class CovarianceLine(setting.Line):
+    def __init__(self, name, **args):
+        setting.Line.__init__(self, name, **args)
+
+        self.add( setting.Int(
+            'steps',
+            25,
+            minval=4,
+            descr=_('Number of line steps to draw'),
+            usertext=_('Steps') ))
+
+        self.get('color').newDefault('auto')
+
 class Covariance(plotters.GenericPlotter):
     """Plot covariance matrix for points as shapes."""
 
@@ -78,12 +91,11 @@ class Covariance(plotters.GenericPlotter):
             descr=_('X values, given by dataset, expression or list of values'),
             usertext=_('X data')), 0 )
 
-        s.add( setting.Line(
+        s.add( CovarianceLine(
             'Line',
             descr = _('Line'),
             usertext = _('Ellipse line')),
                pixmap = 'settings_plotline' )
-        s.get('Line').get('color').newDefault('auto')
 
         s.add( setting.PlotterFill(
             'Fill',
@@ -175,7 +187,8 @@ class Covariance(plotters.GenericPlotter):
         eigcomb = eigvecs * sqrtvals[:,:,None]
 
         # generate points in ellipse
-        x = N.linspace(0, N.pi*2, 25, endpoint=False)
+        numsteps = s.Line.steps
+        x = N.linspace(0, N.pi*2, numsteps, endpoint=False)
         f1, f2 = N.cos(x), N.sin(x)
 
         combv = f1*eigcomb[:,0,:,None] + f2*eigcomb[:,1,:,None]

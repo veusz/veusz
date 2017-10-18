@@ -6,6 +6,7 @@ Changes in <next version>:
  * Fix filename chooser and embedding in ImageFile widget
  * Force C++11 compilation on Unix
  * Fix document reload, export warning and unsafe loading dialogs
+ * Parameterize number of line steps in covariance widget
 
 Changes in 2.0.1:
  * Fix crash setting manual bins in histogram dialog box
