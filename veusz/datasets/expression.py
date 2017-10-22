@@ -133,6 +133,9 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
             if vals.ndim == 1:
                 # 1d, so ok
                 return Dataset(data=vals)
+            elif vals.ndim == 0:
+                # single value
+                return Dataset(data=[vals])
             elif vals.ndim == 2:
                 # 2d, see whether data are error bars
                 if vals.shape[0] == 2:

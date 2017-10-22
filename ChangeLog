@@ -8,6 +8,7 @@ Changes in <next version>:
  * Fix document reload, export warning and unsafe loading dialogs
  * Parameterize number of line steps in covariance widget
  * Report error line number for csv reading exceptions
+ * Convert values from expressions to 1D arrays when required
 
 Changes in 2.0.1:
  * Fix crash setting manual bins in histogram dialog box
