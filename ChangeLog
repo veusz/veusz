@@ -9,6 +9,7 @@ Changes in <next version>:
  * Parameterize number of line steps in covariance widget
  * Report error line number for csv reading exceptions
  * Convert values from expressions to 1D arrays when required
+ * Take account of endsize setting for bar plot error bars
 
 Changes in 2.0.1:
  * Fix crash setting manual bins in histogram dialog box
