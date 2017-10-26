@@ -10,6 +10,7 @@ Changes in <next version>:
  * Report error line number for csv reading exceptions
  * Convert values from expressions to 1D arrays when required
  * Take account of endsize setting for bar plot error bars
+ * Remove dependence on sipconfig in build and add sip build parameters
 
 Changes in 2.0.1:
  * Fix crash setting manual bins in histogram dialog box

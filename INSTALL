@@ -92,6 +92,19 @@ for packagers who want to place the example files in
 testing, it is suggested that an "examples" symlink is added to the
 resources directory to point to the location of the example files.
 
+1.1.3 SIP parameters
+====================
+By default the build will look for the SIP executable on the current
+path (as sip/sip5/sip.exe/sip5.exe), the SIP include file in the
+Python include directory and the SIP files in python-prefix/share/sip
+(excluding share on Windows). If you want to manually specify these,
+you can run the Python setup.py build_ext stage before build, with the
+parameters:
+
+  --sip-exe=EXE          SIP executable
+  --sip-include-dir=DIR  SIP include directory (location of sip.h)
+  --sip-dir=DIR          base directory for SIP files
+
 1.3 Running in-place
 ====================
 If you don't want to install veusz fully or are doing development, it
