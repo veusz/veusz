@@ -1,4 +1,4 @@
-Changes in <next version>:
+Changes in 2.1:
  * If file cannot be imported on document load, ask user for a new filename
  * Only open HDF5 files in readonly mode
  * Do not simply log errors when loading data with ImportPlugins
