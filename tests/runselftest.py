@@ -47,6 +47,9 @@ import sys
 import subprocess
 import optparse
 
+# this needs to be set before main imports
+os.environ['LC_ALL'] = 'C'
+
 try:
     import h5py
 except ImportError:
@@ -260,8 +263,6 @@ def fltStr(v, prec=1):
     return oldflt(v, prec=prec)
 
 if __name__ == '__main__':
-    os.environ['LC_ALL'] = 'C'
-
     app = qt4.QApplication([])
 
     setting.transient_settings['unsafe_mode'] = True
