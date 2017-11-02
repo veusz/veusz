@@ -1,6 +1,4 @@
-Veusz 2.1
----------
-https://veusz.github.io
+# [Veusz 2.1](https://veusz.github.io)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -12,19 +10,19 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 2.1:
- * If file cannot be imported on document load, ask user for a new filename
- * Only open HDF5 files in readonly mode
- * Do not simply log errors when loading data with ImportPlugins
- * Cleanup of stylesheet, setting and widget code
- * Fix filename chooser and embedding in ImageFile widget
- * Force C++11 compilation on Unix
- * Fix document reload, export warning and unsafe loading dialogs
- * Parameterize number of line steps in covariance widget
- * Report error line number for csv reading exceptions
- * Convert values from expressions to 1D arrays when required
- * Take account of endsize setting for bar plot error bars
- * Remove dependence on sipconfig in build and add sip build parameters
+## Changes in 2.1:
+  - If file cannot be imported on document load, ask user for a new filename
+  - Only open HDF5 files in readonly mode
+  - Do not simply log errors when loading data with ImportPlugins
+  - Cleanup of stylesheet, setting and widget code
+  - Fix filename chooser and embedding in ImageFile widget
+  - Force C++11 compilation on Unix
+  - Fix document reload, export warning and unsafe loading dialogs
+  - Parameterize number of line steps in covariance widget
+  - Report error line number for csv reading exceptions
+  - Convert values from expressions to 1D arrays when required
+  - Take account of endsize setting for bar plot error bars
+  - Remove dependence on sipconfig in build and add sip build parameters
 
 Features of package:
  Plotting features:
