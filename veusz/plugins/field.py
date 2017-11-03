@@ -191,7 +191,7 @@ class _FieldSetting(Field):
 
     def makeControl(self, doc, currentwidget):
         """Use setting makeControl method to make control."""
-        self.setn.parent = self # setting looks to parent for document
+        self.setn.parent = doc.basewidget # setting looks to parent for document
         self.setn.set(self.default)
 
         self.document = doc
