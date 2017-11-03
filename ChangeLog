@@ -1,5 +1,6 @@
 Changes in <next version>:
- * Fix Fields in plugins
+ * Fix Fields in dataset plugins
+ * Fix data import plugins
 
 Changes in 2.1:
  * If file cannot be imported on document load, ask user for a new filename
