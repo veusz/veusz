@@ -596,3 +596,6 @@ class SVGPaintDevice(qt4.QPaintDevice):
         # Qt >= 5.6
         elif m == getattr(qt4.QPaintDevice, 'PdmDevicePixelRatioScaled', -1):
             return 1
+
+        else:
+            raise RuntimeError('Invalid metric argument '+repr(m))
