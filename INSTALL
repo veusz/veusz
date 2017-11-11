@@ -16,7 +16,7 @@ Requirements:
 PyQt requires
  Qt5 >= 5.2      https://www.qt.io/developers/
                  latest version recommended
- SIP >= 4.15     http://www.riverbankcomputing.co.uk/software/sip/
+ SIP >= 4.15     https://www.riverbankcomputing.co.uk/software/sip/
 
 Optional requirements:
  h5py            http://www.h5py.org/

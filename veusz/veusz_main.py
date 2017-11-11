@@ -79,6 +79,10 @@ def makeSplashLogo():
     splash.move((screen.width()-layout.sizeHint().width())/2,
         (screen.height()-layout.sizeHint().height())/2)
 
+    # make sure dialog goes away - avoid problem if a message box pops
+    # up before it is removed
+    qt.QTimer.singleShot(2000, splash.hide)
+
     return splash
 
 def excepthook(excepttype, exceptvalue, tracebackobj):

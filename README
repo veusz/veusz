@@ -18,6 +18,7 @@ Changes in 2.1.1:
  * Use deprecated sipconfig if available to find SIP files
  * Fix problems with opening files using command line arguments with
    some encodings
+ * Hide splash if program takes too long to start
 
 Changes in 2.1:
  * If file cannot be imported on document load, ask user for a new filename
