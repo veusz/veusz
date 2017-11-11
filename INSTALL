@@ -8,9 +8,10 @@ Veusz uses distutils for its installation. See below for how to use it.
 
 Requirements:
  python2 >= 2.6 or python3 >= 3.3
-                 http://www.python.org/
- PyQt >= 5.2     http://www.riverbankcomputing.co.uk/software/pyqt/
- numpy >= 1.0    http://numpy.scipy.org/
+                 https://www.python.org/
+ PyQt >= 5.2     https://www.riverbankcomputing.co.uk/software/pyqt/
+ numpy >= 1.0    http://www.numpy.org/
+ argparse        https://pypi.python.org/pypi/argparse (Python 2.6 only)
 
 PyQt requires
  Qt5 >= 5.2      https://www.qt.io/developers/
@@ -21,6 +22,7 @@ Optional requirements:
  h5py            http://www.h5py.org/
  astropy >= 0.4  http://www.astropy.org/
  pyemf >= 2.0.0  http://pyemf.sourceforge.net/
+                 (for Python3 see https://github.com/jeremysanders/pyemf)
  iminuit         https://github.com/iminuit/iminuit
  ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/

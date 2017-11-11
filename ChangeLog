@@ -2,6 +2,8 @@ Changes in 2.1.1:
  * Fix Fields in dataset plugins
  * Fix data import plugins
  * Use deprecated sipconfig if available to find SIP files
+ * Fix problems with opening files using command line arguments with
+   some encodings
 
 Changes in 2.1:
  * If file cannot be imported on document load, ask user for a new filename

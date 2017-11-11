@@ -16,6 +16,8 @@ Changes in 2.1.1:
  * Fix Fields in dataset plugins
  * Fix data import plugins
  * Use deprecated sipconfig if available to find SIP files
+ * Fix problems with opening files using command line arguments with
+   some encodings
 
 Changes in 2.1:
  * If file cannot be imported on document load, ask user for a new filename
@@ -82,11 +84,13 @@ Requirements for source install:
  Qt >= 5.2 (free edition)
    https://www.qt.io/
  PyQt >= 5.2  (Qt and SIP is required to be installed first)
-   http://www.riverbankcomputing.co.uk/software/pyqt/
+   https://www.riverbankcomputing.co.uk/software/pyqt/
  SIP >= 4.15
-   http://www.riverbankcomputing.co.uk/software/sip/
+   https://www.riverbankcomputing.co.uk/software/sip/
  numpy >= 1.0
-   http://numpy.scipy.org/
+   http://www.numpy.org/
+ argparse  (for Python 2.6 only)
+   https://pypi.python.org/pypi/argparse
 
 Optional requirements:
  h5py (optional for HDF5 support)
