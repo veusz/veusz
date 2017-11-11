@@ -1,4 +1,5 @@
 Changes in 2.1.1:
+ * Fix dashed/dotted custom lines in EMF output
  * Fix Fields in dataset plugins
  * Fix data import plugins
  * Use deprecated sipconfig if available to find SIP files

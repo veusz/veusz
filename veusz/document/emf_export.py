@@ -39,7 +39,7 @@ def isStockObject(obj):
 class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
     """Extended pen creation record with custom line style."""
 
-    emr_typedef = [
+    typedef = [
         ('i','handle',0),
         ('i','offBmi',0),
         ('i','cbBmi',0),
@@ -51,7 +51,7 @@ class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
         ('i','color'),
         ('i','brushhatch',0),
         ('i','numstyleentries')]
-    
+
     def __init__(self, style=pyemf.PS_SOLID, width=1, color=0,
                  styleentries=[]):
         """Create pen.
@@ -63,18 +63,13 @@ class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
         self.color = pyemf._normalizeColor(color)
         self.brushstyle = 0x0  # solid
 
-        if style & pyemf.PS_USERSTYLE == 0:
-            self.styleentries = []
-        else:
-            self.styleentries = styleentries
+        if style & pyemf.PS_STYLE_MASK != pyemf.PS_USERSTYLE:
+            styleentries = []
 
-        self.numstyleentries = len(self.styleentries)
-
-    def sizeExtra(self):
-        return struct.calcsize("i")*len(self.styleentries)
-
-    def serializeExtra(self, fh):
-        self.serializeList(fh, "i", self.styleentries)
+        self.numstyleentries = len(styleentries)
+        if styleentries:
+            self.unhandleddata = struct.pack(
+                "i"*self.numstyleentries, *styleentries)
 
     def hasHandle(self):
         return True
@@ -282,7 +277,7 @@ class EMFPaintEngine(qt4.QPaintEngine):
         color = (qc.red(), qc.green(), qc.blue())
         self.pencolor = color
 
-        if pen.style() & qt4.Qt.CustomDashLine:
+        if pen.style() == qt4.Qt.CustomDashLine:
             # make an extended pen if we need a custom dash pattern
             dash = [int(pen.widthF()*scale*f) for f in pen.dashPattern()]
             newpen = self.emf._appendHandle(
@@ -416,3 +411,6 @@ class EMFPaintDevice(qt4.QPaintDevice):
         # Qt >= 5.6
         elif m == getattr(qt4.QPaintDevice, 'PdmDevicePixelRatioScaled', -1):
             return 1
+
+        else:
+            raise RuntimeError("Invalid metric parameter: %i" % m)
