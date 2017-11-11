@@ -94,12 +94,14 @@ resources directory to point to the location of the example files.
 
 1.1.3 SIP parameters
 ====================
-By default the build will look for the SIP executable on the current
-path (as sip/sip5/sip.exe/sip5.exe), the SIP include file in the
-Python include directory and the SIP files in python-prefix/share/sip
-(excluding share on Windows). If you want to manually specify these,
-you can run the Python setup.py build_ext stage before build, with the
-parameters:
+By default the location of the SIP executable, the SIP include file
+location and the SIP files are obtained from sipconfig. sipconfig is
+now deprecated. If sipconfig is not found, the build will look for the
+SIP executable on the current path (as sip/sip5/sip.exe/sip5.exe), the
+SIP include file in the Python include directory and the SIP files in
+python-prefix/share/sip (excluding share on Windows). If you want to
+manually specify these, you can run the Python setup.py build_ext
+stage before build, with the parameters:
 
   --sip-exe=EXE          SIP executable
   --sip-include-dir=DIR  SIP include directory (location of sip.h)

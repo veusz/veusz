@@ -15,6 +15,7 @@ external sources such as Internet sockets or other programs.
 Changes in 2.1.1:
  * Fix Fields in dataset plugins
  * Fix data import plugins
+ * Use deprecated sipconfig if available to find SIP files
 
 Changes in 2.1:
  * If file cannot be imported on document load, ask user for a new filename

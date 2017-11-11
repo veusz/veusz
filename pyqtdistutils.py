@@ -27,6 +27,20 @@ QT_IS_FRAMEWORK = os.path.exists(
 
 SIP_FLAGS = PyQt5.QtCore.PYQT_CONFIGURATION['sip_flags']
 
+try:
+    # sipconfig is deprecated but necessary to find sip reliably
+    import sipconfig
+except ImportError:
+    # try to guess locations
+    DEF_SIP_DIR = None
+    DEF_SIP_BIN = None
+    DEF_SIP_INC_DIR = None
+else:
+    # use sipconfig if found
+    DEF_SIP_DIR = sipconfig.Configuration().default_sip_dir
+    DEF_SIP_BIN = sipconfig.Configuration().sip_bin
+    DEF_SIP_INC_DIR = sipconfig.Configuration().sip_inc_dir
+
 ##################################################################
 
 def findSipOnPath():
@@ -95,12 +109,16 @@ class build_ext(distutils.command.build_ext.build_ext):
 
         build_cmd = self.get_finalized_command('build_ext')
 
-        sip_exe = build_cmd.sip_exe or findSipOnPath()
-        sip_inc_dir = build_cmd.sip_include_dir or sysconfig.get_path('include')
-
+        # executable in order of priority using or
+        sip_exe = build_cmd.sip_exe or DEF_SIP_BIN or findSipOnPath()
+        sip_inc_dir = (
+            build_cmd.sip_include_dir or DEF_SIP_INC_DIR or
+            sysconfig.get_path('include'))
         # python data directory
         data_dir = sys.prefix if sys.platform=='win32' else sys.prefix+'/share'
-        sip_dir = build_cmd.sip_dir or os.path.join(data_dir, 'sip')
+        sip_dir = (
+            build_cmd.sip_dir or DEF_SIP_DIR or
+            os.path.join(data_dir, 'sip'))
 
         # add directory of input files as include path
         indirs = list(set([os.path.dirname(x) for x in sources]))
