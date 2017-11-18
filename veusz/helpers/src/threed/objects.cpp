@@ -634,12 +634,14 @@ void AxisTickLabels::PathParameters::callback(QPainter* painter,
                                               double scale, double linescale)
 {
   painter->save();
-  tl->drawLabel(painter, index, pt, ax1, ax2, quad, dirn);
+  tl->drawLabel(painter, index, pt, ax1, ax2, axangle, quad, dirn);
   painter->restore();
 }
 
 void AxisTickLabels::drawLabel(QPainter* painter, unsigned index,
-                               QPointF pt, QPointF ax1, QPointF ax2,
+                               QPointF pt,
+                               QPointF ax1, QPointF ax2,
+                               double axangle,
                                int quad, int dirn)
 {
 }
@@ -730,11 +732,8 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
         axchoices.push_back(axis);
     }
 
-  // get approx projected centre of cube by averaging corners
-  Vec3 cent;
-  for(unsigned i=0; i<8; ++i)
-    cent += proj_corners[i];
-  cent *= (1./8);
+  // get projected cube centre
+  const Vec3 proj_cent(calcProjVec(perspM,outerM*vec3to4((box1+box2)*0.5)));
 
   // currently-prefered axis number
   unsigned bestaxis = 0;
@@ -760,16 +759,16 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
       const Vec3 av((proj_starts[*choice]+proj_ends[*choice])*0.5);
 
       // score is weighted towards front, then bottom, then left
-      const int score = ((av(0) <= cent(0))*10 +
-                         (av(1) >  cent(1))*11 +
-                         (av(2) <  cent(2))*12 );
+      const int score = ((av(0) <= proj_cent(0))*10 +
+                         (av(1) >  proj_cent(1))*11 +
+                         (av(2) <  proj_cent(2))*12 );
       if(score > bestscore)
         {
           bestscore = score;
           bestaxis = *choice;
 
           // which quadrant is axis in
-          bestquad = (av(0)<=cent(0))*2 + (av(1)>cent(1));
+          bestquad = (av(0)<=proj_cent(0))*2 + (av(1)>proj_cent(1));
 
           // which direction is axis in?
           const Vec3 delta = proj_ends[*choice]-proj_starts[*choice];
@@ -782,6 +781,10 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
   fragparams.path = 0;
   fragparams.scaleedges = 0;
   fragparams.runcallback = 1;
+
+  fragparams.axangle = (180/M_PI) * std::atan2
+    ((proj_starts[bestaxis](1)+proj_ends[bestaxis](1))*0.5 - proj_cent(1),
+     (proj_starts[bestaxis](0)+proj_ends[bestaxis](0))*0.5 - proj_cent(0));
   fragparams.quad = bestquad;
   fragparams.dirn = bestdirn;
 

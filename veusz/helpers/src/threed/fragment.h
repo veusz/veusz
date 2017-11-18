@@ -66,7 +66,7 @@ struct Fragment
 
   // pointer to object, to avoid self-comparison.
   Object* object;
-  // optional pointer to a paramters object
+  // optional pointer to a parameters object
   FragmentParameters* params;
 
   // drawing style

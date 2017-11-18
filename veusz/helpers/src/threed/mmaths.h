@@ -477,4 +477,36 @@ typedef std::vector<double> ValVector;
 
 //////////////////////////////////////////////////////////////////////////////
 
+#if 0
+// debug:
+#include <cstdio>
+using std::printf;
+
+inline void print(const Mat4& m)
+{
+  printf("% 7.3f % 7.3f % 7.3f % 7.3f\n", m(0,0), m(0,1), m(0,2), m(0,3));
+  printf("% 7.3f % 7.3f % 7.3f % 7.3f\n", m(1,0), m(1,1), m(1,2), m(1,3));
+  printf("% 7.3f % 7.3f % 7.3f % 7.3f\n", m(2,0), m(2,1), m(2,2), m(2,3));
+  printf("% 7.3f % 7.3f % 7.3f % 7.3f\n", m(3,0), m(3,1), m(3,2), m(3,3));
+}
+
+inline void print(const Mat3& m)
+{
+  printf("% 7.3f % 7.3f % 7.3f\n", m(0,0), m(0,1), m(0,2));
+  printf("% 7.3f % 7.3f % 7.3f\n", m(1,0), m(1,1), m(1,2));
+  printf("% 7.3f % 7.3f % 7.3f\n", m(2,0), m(2,1), m(2,2));
+}
+
+inline void print(const Vec4& v)
+{
+  printf("% 7.3f % 7.3f % 7.3f % 7.3f\n", v(0), v(1), v(2), v(3));
+}
+
+inline void print(const Vec3& v)
+{
+  printf("% 7.3f % 7.3f % 7.3f\n", v(0), v(1), v(2));
+}
+
+#endif
+
 #endif

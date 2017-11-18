@@ -299,7 +299,7 @@ class FloatSlider(qt4.QWidget):
     def validateAndSet(self):
         """Validate text is numeric."""
         try:
-            val = self.setting.fromText(self.edit.text())
+            val = self.setting.fromUIText(self.edit.text())
             styleClear(self.edit)
             self.sigSettingChanged.emit(self, self.setting, val)
 

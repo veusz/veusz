@@ -16,10 +16,10 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-"""Widget to plot axes, and to handle conversion of coordinates to plot
+"""Widget to plot 3D axes, and to handle conversion of coordinates to plot
 positions."""
 
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 import math
 import numpy as N
 import itertools
@@ -28,7 +28,7 @@ from . import widget
 from . import axisticks
 from .axis import AxisLabel, TickLabel, AutoRange
 from ..compat import czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
@@ -44,7 +44,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class _AxisTickLabels(threed.AxisTickLabels):
     """For drawing tick labels."""
@@ -54,8 +54,53 @@ class _AxisTickLabels(threed.AxisTickLabels):
         self.labels = labels
         self.labelsprop = labelsprop
 
-    def drawLabel(self, painter, index, pt, ax1, ax2, quad, dirn):
-        """Draw the label, as requested by the Scene."""
+    def drawLabel(self, painter, index, pt, ax1, ax2, axangle, quad, dirn):
+
+        font = self.labelsprop.makeQFont(painter)
+        painter.setFont(font)
+        pen = self.labelsprop.makeQPen(painter)
+        painter.setPen(pen)
+
+        painter.translate(pt.x(), pt.y())
+
+        # angle of axis inclination
+        angle = math.atan2(ax2.y()-ax1.y(), ax2.x()-ax1.x()) * (180/math.pi)
+
+        # vector to axis from graph centre
+        cvecy = math.sin(axangle*math.pi/180)
+        cvecx = math.cos(axangle*math.pi/180)
+
+        # character upright vector
+        avecy = math.sin((angle-90)*math.pi/180)
+        avecx = math.cos((angle-90)*math.pi/180)
+        dot = cvecx*avecx+cvecy*avecy
+
+        #print('axangle % 7.2f  angle % 7.2f  delta % 7.2f  dot % 7.2f' % (
+        #    axangle, angle, axangle+angle, dot), self.labels[index])
+
+        # flip depending on relative direction of label and graph centre
+        if dot < 0:
+            angle = angle+180
+            if angle > 180:
+                angle = angle-360
+
+        # flip if upside down
+        align = -1
+        if angle < -90 or angle > 90:
+            angle = angle+180
+            align = 1
+
+        painter.rotate(angle)
+
+        label = self.labels[index]
+        renderer = utils.Renderer(
+            painter, font, 0, 0, label,
+            alignhorz=0, alignvert=align,
+            usefullheight=True)
+        renderer.render()
+
+    def drawLabelHorz(self, painter, index, pt, ax1, ax2, quad, dirn):
+        """Draw the label horizontally, as requested by the Scene."""
 
         font = self.labelsprop.makeQFont(painter)
         painter.setFont(font)
@@ -68,7 +113,7 @@ class _AxisTickLabels(threed.AxisTickLabels):
         bounds = renderer.getBounds()
         width, height = bounds[2]-bounds[0], bounds[3]-bounds[1]
 
-        fm = qt4.QFontMetricsF(font, painter.device())
+        fm = qt.QFontMetricsF(font, painter.device())
         height += fm.ascent()
         width += fm.ascent()*0.5
 
@@ -107,16 +152,6 @@ class _AxisTickLabels(threed.AxisTickLabels):
                 xoffset = width*0.5+hshift
                 yoffset = -vshift if dx/dy >= 0 else vshift
 
-        # painter.setPen(qt4.QPen(qt4.QColor("red")))
-        # painter.drawEllipse(qt4.QRectF(
-        #     pt.x()-2, pt.y()-2, 4, 4))
-
-        # painter.setPen(qt4.QPen())
-        # painter.drawRect(qt4.QRectF(
-        #     qt4.QPointF(pt.x()+xoffset-width*0.5, pt.y()+yoffset-height*0.5),
-        #     qt4.QPointF(pt.x()+xoffset+width*0.5, pt.y()+yoffset+height*0.5)
-        # ))
-
         painter.translate(pt.x()+xoffset, pt.y()+yoffset)
         renderer.render()
 
@@ -131,7 +166,7 @@ class _AxisTickLabels(threed.AxisTickLabels):
 
 #     def draw(self, painter, pt1, pt2, index, scale, linescale):
 #         painter.save()
-#         painter.setPen(qt4.QPen())
+#         painter.setPen(qt.QPen())
 
 #         font = self.labelprop.makeQFont(painter)
 #         fm = utils.FontMetrics(font, painter.device())
@@ -145,7 +180,7 @@ class _AxisTickLabels(threed.AxisTickLabels):
 #         scale = offset / math.sqrt(delpt[0]**2+delpt[1]**2)
 #         delpt = (delpt[0]*scale, delpt[1]*scale)
 
-#         ptrans = qt4.QPointF(pt1.x()-delpt[1], pt1.y()+delpt[0])
+#         ptrans = qt.QPointF(pt1.x()-delpt[1], pt1.y()+delpt[0])
 
 #         painter.translate(ptrans)
 

@@ -411,7 +411,9 @@ public:
   void addAxisChoice(const Vec3& start, const Vec3& end);
 
   virtual void drawLabel(QPainter* painter, unsigned index,
-                         QPointF pt, QPointF ax1, QPointF ax2,
+                         QPointF pt,
+                         QPointF ax1, QPointF ax2,
+                         double axangle,
                          int quad, int dirn);
 };
 

@@ -295,7 +295,9 @@ public:
   // override this: draw reqested label at origin, with alignment
   // given
   virtual void drawLabel(QPainter* painter, unsigned index,
-                         QPointF pt, QPointF ax1, QPointF ax2,
+                         QPointF pt,
+                         QPointF ax1, QPointF ax2,
+                         double axangle,
                          int quad, int dirn);
 
   void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
@@ -309,8 +311,9 @@ private:
   struct PathParameters : public FragmentPathParameters
   {
     void callback(QPainter* painter, QPointF pt, QPointF ax1, QPointF ax2,
-                  unsigned index,  double scale, double linescale);
+                  unsigned index, double scale, double linescale);
     AxisTickLabels* tl;
+    double axangle;
     int quad;
     int dirn;
   };
