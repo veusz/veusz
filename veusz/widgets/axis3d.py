@@ -620,33 +620,32 @@ class Axis3D(widget.Widget):
             op1pts2 = N.full_like(tfracs, op1+ticklen*(1 if op1 < 0.5 else -1))
             op2pts2 = N.full_like(tfracs, op2+ticklen*(1 if op2 < 0.5 else -1))
 
-            # the small 1e-3 offset is to define where up is on the label
+            # swap coordinates depending on axis direction
             if dirn == 'x':
                 ptsonaxis = (tfracs, op1pts, op2pts)
                 ptsoff1 = (tfracs, op1pts2, op2pts)
                 ptsoff2 = (tfracs, op1pts, op2pts2)
-                ptsalong = (tfracs+1e-3, op1pts, op2pts)
             elif dirn == 'y':
                 ptsonaxis = (op1pts, tfracs, op2pts)
                 ptsoff1 = (op1pts2, tfracs, op2pts)
                 ptsoff2 = (op1pts, tfracs, op2pts2)
-                ptsalong = (op1pts, tfracs+1e-3, op2pts)
             else:
                 ptsonaxis = (op1pts, op2pts, tfracs)
                 ptsoff1 = (op1pts2, op2pts, tfracs)
                 ptsoff2 = (op1pts, op2pts2, tfracs)
-                ptsalong = (op1pts, op2pts, tfracs+1e-3)
 
             outstart += [N.ravel(N.column_stack(ptsonaxis)),
                          N.ravel(N.column_stack(ptsonaxis))]
             outend += [N.ravel(N.column_stack(ptsoff1)),
                        N.ravel(N.column_stack(ptsoff2))]
 
+        # add labels for ticks and axis label
         if ticklabelsprop is not None:
             self.addLabels(
                 cont, linecoords, ticklabelsprop, tfracs, tickvals,
                 self.settings.label, self.settings.Label)
 
+        # add ticks themselves
         if not tickprops.hide:
             startpts = threed.ValVector(N.concatenate(outstart))
             endpts = threed.ValVector(N.concatenate(outend))
@@ -660,7 +659,43 @@ class Axis3D(widget.Widget):
         dirn: 'x', 'y', 'z' for axis
         """
 
-        # FIXME: TODO
+        if gridprops.hide:
+            return
+
+        tfracs = self.dataToLogicalCoords(tickvals)
+        ones = N.ones(tfracs.shape)
+        zeros = N.zeros(tfracs.shape)
+
+        outstart = []
+        outend = []
+
+        pts1 = [
+            (tfracs, zeros, zeros),
+            (tfracs, zeros, zeros),
+            (tfracs, ones, ones),
+            (tfracs, ones, ones)
+        ]
+        pts2 = [
+            (tfracs, zeros, ones),
+            (tfracs, ones, zeros),
+            (tfracs, zeros, ones),
+            (tfracs, ones, zeros)
+        ]
+
+        if dirn == 'y':
+            pts1 = [(c,a,b) for a,b,c in pts1]
+            pts2 = [(c,a,b) for a,b,c in pts2]
+        elif dirn == 'z':
+            pts1 = [(b,c,a) for a,b,c in pts1]
+            pts2 = [(b,c,a) for a,b,c in pts2]
+
+        outstart = N.ravel(N.column_stack(N.concatenate(pts1)))
+        outend = N.ravel(N.column_stack(N.concatenate(pts2)))
+
+        startpts = threed.ValVector(outstart)
+        endpts = threed.ValVector(outend)
+        lineprop = gridprops.makeLineProp(painter)
+        cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
 
     def drawToObject(self, painter):
 
@@ -677,15 +712,12 @@ class Axis3D(widget.Widget):
             painter, cont, dirn, linecoords, s.MinorTicks, None,
             self.minortickscalc)
 
-        if not s.GridLines.hide:
-            self.addGridLines(
-                painter, cont, dirn, linecoords, s.GridLines,
-                self.majortickscalc)
-        if not s.MinorGridLines.hide:
-            self.addGridLines(
-                painter, cont, dirn, linecoords, s.MinorGridLines,
-                self.majortickscalc)
-
+        self.addGridLines(
+            painter, cont, dirn, linecoords, s.GridLines,
+            self.majortickscalc)
+        self.addGridLines(
+            painter, cont, dirn, linecoords, s.MinorGridLines,
+            self.minortickscalc)
 
         return cont
 
