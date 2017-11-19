@@ -26,7 +26,7 @@ import itertools
 
 from . import widget
 from . import axisticks
-from .axis import AxisLabel, TickLabel, AutoRange
+from .axis import TickLabel, AutoRange
 from ..compat import czip
 from .. import qtall as qt
 from .. import document
@@ -39,27 +39,36 @@ except ImportError:
     # compatibility if threed is not compiled
     class _dummy:
         def __init__(self):
-            self.AxisTickLabels = object
+            self.AxisLabels = object
     threed = _dummy()
 
 def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class _AxisTickLabels(threed.AxisTickLabels):
-    """For drawing tick labels."""
+class _AxisLabels(threed.AxisLabels):
+    """For drawing tick labels.
 
-    def __init__(self, box1, box2, fracs, labels, labelsprop):
-        threed.AxisTickLabels.__init__(self, box1, box2, fracs)
-        self.labels = labels
-        self.labelsprop = labelsprop
+    box1,2: points at corners of graph
+    tickfracs: fractions along axis for tick labels
+    ticklabels: list of labels to plot at fracs
+    ticklabelsprop: font properties for ticks
+    axislabel: label for axis
+    axislabelposn: position of axis label (or -1 for no label)
+    axislabelprop: font properties for axislabel
+    """
 
-    def drawLabel(self, painter, index, pt, ax1, ax2, axangle, quad, dirn):
+    def __init__(self, box1, box2, tickfracs, ticklabels, ticklabelsprop,
+                 axislabel, axislabelposn, axislabelprop):
+        threed.AxisLabels.__init__(self, box1, box2, tickfracs, axislabelposn)
+        self.ticklabels = ticklabels
+        self.ticklabelsprop = ticklabelsprop
+        self.axislabel = axislabel
+        self.axislabelposn = axislabelposn
+        self.axislabelprop = axislabelprop
 
-        font = self.labelsprop.makeQFont(painter)
-        painter.setFont(font)
-        pen = self.labelsprop.makeQPen(painter)
-        painter.setPen(pen)
+    def drawLabel(self, painter, index, pt, ax1, ax2, axangle):
+        """Called when scene wants to paint label."""
 
         painter.translate(pt.x(), pt.y())
 
@@ -76,7 +85,7 @@ class _AxisTickLabels(threed.AxisTickLabels):
         dot = cvecx*avecx+cvecy*avecy
 
         #print('axangle % 7.2f  angle % 7.2f  delta % 7.2f  dot % 7.2f' % (
-        #    axangle, angle, axangle+angle, dot), self.labels[index])
+        #    axangle, angle, axangle+angle, dot), self.ticklabels[index])
 
         # flip depending on relative direction of label and graph centre
         if dot < 0:
@@ -85,117 +94,62 @@ class _AxisTickLabels(threed.AxisTickLabels):
                 angle = angle-360
 
         # flip if upside down
-        align = -1
         if angle < -90 or angle > 90:
             angle = angle+180
-            align = 1
+            valign = 1
+        else:
+            valign = -1
 
         painter.rotate(angle)
 
-        label = self.labels[index]
+        if index >= 0:
+            self.drawTickLabel(painter, index, valign)
+        else:
+            self.drawAxisLabel(painter, valign)
+
+    def drawTickLabel(self, painter, index, valign):
+        """Draw a tick label."""
+
+        font = self.ticklabelsprop.makeQFont(painter)
+        painter.setFont(font)
+        pen = self.ticklabelsprop.makeQPen(painter)
+        painter.setPen(pen)
+
+        label = self.ticklabels[index]
         renderer = utils.Renderer(
             painter, font, 0, 0, label,
-            alignhorz=0, alignvert=align,
+            alignhorz=0, alignvert=valign,
             usefullheight=True)
         renderer.render()
 
-    def drawLabelHorz(self, painter, index, pt, ax1, ax2, quad, dirn):
-        """Draw the label horizontally, as requested by the Scene."""
+    def drawAxisLabel(self, painter, valign):
+        """Draw label for axis."""
 
-        font = self.labelsprop.makeQFont(painter)
-        painter.setFont(font)
-        pen = self.labelsprop.makeQPen(painter)
-        painter.setPen(pen)
+        # y increment from labels closer to axis
+        deltay = 0
+        if self.ticklabels:
+            font = self.ticklabelsprop.makeQFont(painter)
+            fm = utils.FontMetrics(font, painter.device())
+            deltay = valign*fm.lineSpacing()
 
-        label = self.labels[index]
-        renderer = utils.Renderer(
-            painter, font, 0, 0, label, alignhorz=0, alignvert=0)
-        bounds = renderer.getBounds()
-        width, height = bounds[2]-bounds[0], bounds[3]-bounds[1]
-
-        fm = qt.QFontMetricsF(font, painter.device())
-        height += fm.ascent()
-        width += fm.ascent()*0.5
-
-        # is the axis more horizontal than vertical?
-        dx, dy = ax2.x()-ax1.x(), ax2.y()-ax1.y()
-        horz = abs(dx) > abs(dy)
-
-        if horz:
-            # t=tan theta
-            t = abs(dy/dx)
-            # these are shifts reqired so that text bounding box does
-            # not hit axis
-            hshift = t*(height*0.5+t*width *0.5)/(1+t*t)
-            vshift = t*(width *0.5-t*height*0.5)/(1+t*t)
-
-            if quad == 0 or quad == 2:
-                # top horizontal axis: text at top
-                yoffset = -height*0.5-vshift
-                xoffset = hshift if dy/dx>=0 else -hshift
-            else:
-                # bottom horizontal axis: text at top
-                yoffset = height*0.5+vshift
-                xoffset = -hshift if dy/dx>=0 else hshift
-
+        # change alignment depending on label position
+        if self.axislabelposn==0.:
+            halign = -1
+        elif self.axislabelposn==1.:
+            halign = 1
         else:
-            t = abs(dx/dy)
-            vshift = t*(width *0.5+t*height*0.5)/(1+t*t)
-            hshift = t*(height*0.5-t*width *0.5)/(1+t*t)
+            halign = 0
 
-            if quad == 2 or quad == 3:
-                # left vertical axis: text at left
-                xoffset = -width*0.5-hshift
-                yoffset = vshift if dx/dy >= 0 else -vshift
-            else:
-                # right vertical axis: text at right
-                xoffset = width*0.5+hshift
-                yoffset = -vshift if dx/dy >= 0 else vshift
-
-        painter.translate(pt.x()+xoffset, pt.y()+yoffset)
+        # draw label
+        font = self.axislabelprop.makeQFont(painter)
+        painter.setFont(font)
+        pen = self.axislabelprop.makeQPen(painter)
+        painter.setPen(pen)
+        renderer = utils.Renderer(
+            painter, font, 0, deltay, self.axislabel,
+            alignhorz=halign, alignvert=valign,
+            usefullheight=True)
         renderer.render()
-
-# class _AxisTickText(threed.Text):
-#     """For drawing text at 3D locations."""
-#     def __init__(self, posns, posnsalong, textlist, labelprop, params):
-#         threed.Text.__init__(
-#             self, threed.ValVector(posns), threed.ValVector(posnsalong))
-#         self.textlist = textlist
-#         self.labelprop = labelprop
-#         self.params = params
-
-#     def draw(self, painter, pt1, pt2, index, scale, linescale):
-#         painter.save()
-#         painter.setPen(qt.QPen())
-
-#         font = self.labelprop.makeQFont(painter)
-#         fm = utils.FontMetrics(font, painter.device())
-#         offset = self.labelprop.get('offset').convert(painter)
-#         offset += fm.leading() + fm.descent()
-
-#         # convert offset into perp dirn from delpt
-#         # normalise vector
-
-#         delpt = (pt2.x()-pt1.x(), pt2.y()-pt1.y())
-#         scale = offset / math.sqrt(delpt[0]**2+delpt[1]**2)
-#         delpt = (delpt[0]*scale, delpt[1]*scale)
-
-#         ptrans = qt.QPointF(pt1.x()-delpt[1], pt1.y()+delpt[0])
-
-#         painter.translate(ptrans)
-
-#         angle = math.atan2(delpt[1], delpt[0]) * 180/math.pi
-#         # prevent text going upside down
-#         alignvert = 1
-#         #if angle < -90 or angle > 90:
-#         #    angle = 180+angle
-#         #    #alignvert = -alignvert
-#         painter.rotate(angle)
-#         r = utils.Renderer(
-#             painter, font, 0, 0, self.textlist[index],
-#             alignhorz=0, alignvert=alignvert)
-#         r.render()
-#         painter.restore()
 
 class MajorTick(setting.Line3D):
     '''Major tick settings.'''
@@ -254,6 +208,18 @@ class MinorGridLine(setting.Line3D):
 
         self.get('color').newDefault('lightgrey')
         self.get('hide').newDefault(True)
+
+class AxisLabel(setting.Text):
+    """Axis label."""
+
+    def __init__(self, name, **args):
+        setting.Text.__init__(self, name, **args)
+        self.add( setting.Choice(
+            'position',
+            ('at-minimum', 'centre', 'at-maximum'),
+            'centre',
+            descr = _('Position of axis label'),
+            usertext = _('Position') ) )
 
 class Axis3D(widget.Widget):
     """Manages and draws an axis."""
@@ -597,31 +563,43 @@ class Axis3D(widget.Widget):
 
         return list(zip(outstart, outend))
 
-    def addTickLabels(self, cont, linecoords, labelsprop, tickfracs,
-                      tickvals):
+    def addLabels(self, cont, linecoords, ticklabelsprop, tickfracs, tickvals,
+                  axislabel, axislabelprop):
         """Make tick labels for axis."""
 
-        if labelsprop.hide:
-            return
+        if not ticklabelsprop.hide:
+            # make strings for labels
+            fmt = ticklabelsprop.format
+            if fmt.lower() == 'auto':
+                fmt = self.autoformat
+            scale = ticklabelsprop.scale
+            ticklabels = [
+                utils.formatNumber(v*scale, fmt, locale=self.document.locale)
+                for v in tickvals ]
+        else:
+            tickvals = ticklabels = tickfracs = []
 
-        # make strings for labels
-        fmt = labelsprop.format
-        if fmt.lower() == 'auto':
-            fmt = self.autoformat
-        scale = labelsprop.scale
-        labels = [ utils.formatNumber(v*scale, fmt, locale=self.document.locale)
-                   for v in tickvals ]
+        # disable drawing of label
+        if axislabelprop.hide:
+            axislabel = ""
+            axislabelposn = -1
+        else:
+            axislabelposn = {
+                'at-minimum': 0,
+                'centre': 0.5,
+                'at-maximum': 1}[axislabelprop.position]
 
-        atl = _AxisTickLabels(
+        atl = _AxisLabels(
             threed.Vec3(0,0,0), threed.Vec3(1,1,1),
-            threed.ValVector(tickfracs),
-            labels, labelsprop)
+            threed.ValVector(tickfracs), ticklabels, ticklabelsprop,
+            axislabel, axislabelposn, axislabelprop)
+
         for startpos, endpos in linecoords:
             atl.addAxisChoice(threed.Vec3(*startpos), threed.Vec3(*endpos))
         cont.addObject(atl)
 
-    def addAxisTicks(self, painter, cont, dirn, linecoords, tickprops, labelsprop,
-                     tickvals):
+    def addAxisTicks(self, painter, cont, dirn, linecoords, tickprops,
+                     ticklabelsprop, tickvals):
         """Add ticks for the vals and tick properties class given.
         linecoords: coordinates of start and end points of lines
         labelprops: properties of label, or None
@@ -664,14 +642,25 @@ class Axis3D(widget.Widget):
             outend += [N.ravel(N.column_stack(ptsoff1)),
                        N.ravel(N.column_stack(ptsoff2))]
 
-        if labelsprop is not None:
-            self.addTickLabels(cont, linecoords, labelsprop, tfracs, tickvals)
+        if ticklabelsprop is not None:
+            self.addLabels(
+                cont, linecoords, ticklabelsprop, tfracs, tickvals,
+                self.settings.label, self.settings.Label)
 
         if not tickprops.hide:
             startpts = threed.ValVector(N.concatenate(outstart))
             endpts = threed.ValVector(N.concatenate(outend))
             lineprop = tickprops.makeLineProp(painter)
             cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
+
+    def addGridLines(self, painter, cont, dirn, linecoords, gridprops, tickvals):
+        """Add ticks for the vals and tick properties class given.
+        linecoords: coordinates of start and end points of lines
+        cont: container to add ticks
+        dirn: 'x', 'y', 'z' for axis
+        """
+
+        # FIXME: TODO
 
     def drawToObject(self, painter):
 
@@ -687,6 +676,16 @@ class Axis3D(widget.Widget):
         self.addAxisTicks(
             painter, cont, dirn, linecoords, s.MinorTicks, None,
             self.minortickscalc)
+
+        if not s.GridLines.hide:
+            self.addGridLines(
+                painter, cont, dirn, linecoords, s.GridLines,
+                self.majortickscalc)
+        if not s.MinorGridLines.hide:
+            self.addGridLines(
+                painter, cont, dirn, linecoords, s.MinorGridLines,
+                self.majortickscalc)
+
 
         return cont
 

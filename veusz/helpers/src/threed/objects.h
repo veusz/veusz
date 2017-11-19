@@ -219,7 +219,7 @@ private:
   {
   public:
     void callback(QPainter* painter, QPointF pt1, QPointF pt2, QPointF pt3,
-                  unsigned index,  double scale, double linescale);
+                  int index,  double scale, double linescale);
     Text* text;
   };
 
@@ -283,39 +283,39 @@ public:
 
 // This class draws tick labels with correct choice of axis
 
-class AxisTickLabels : public Object
+class AxisLabels : public Object
 {
 public:
   // cube defined to be between these corners
-  AxisTickLabels(const Vec3& _box1, const Vec3& _box2,
-                 const ValVector& _tickfracs);
+  AxisLabels(const Vec3& _box1, const Vec3& _box2,
+             const ValVector& _tickfracs,
+             double _labelfrac);
 
   void addAxisChoice(const Vec3& start, const Vec3& end);
 
   // override this: draw reqested label at origin, with alignment
   // given
-  virtual void drawLabel(QPainter* painter, unsigned index,
+  // (if index==-1, then draw axis label)
+  virtual void drawLabel(QPainter* painter, int index,
                          QPointF pt,
                          QPointF ax1, QPointF ax2,
-                         double axangle,
-                         int quad, int dirn);
+                         double axangle);
 
   void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
 
 private:
   Vec3 box1, box2;
   ValVector tickfracs;
+  double labelfrac;
   std::vector<Vec3> starts, ends;
 
 private:
   struct PathParameters : public FragmentPathParameters
   {
     void callback(QPainter* painter, QPointF pt, QPointF ax1, QPointF ax2,
-                  unsigned index, double scale, double linescale);
-    AxisTickLabels* tl;
+                  int index, double scale, double linescale);
+    AxisLabels* tl;
     double axangle;
-    int quad;
-    int dirn;
   };
 
   PathParameters fragparams;

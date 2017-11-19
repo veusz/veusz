@@ -50,7 +50,7 @@ struct FragmentPathParameters : public FragmentParameters
   // optional callback function if runcallback is set
   virtual void callback(QPainter* painter,
                         QPointF pt1, QPointF pt2, QPointF pt3,
-                        unsigned index,  double scale, double linescale);
+                        int index, double scale, double linescale);
 };
 
 // created by drawing Objects to draw to screen

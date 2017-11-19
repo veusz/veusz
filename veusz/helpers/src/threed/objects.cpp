@@ -492,7 +492,7 @@ void Points::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector
 {
   fragparams.path = &path;
   fragparams.scaleedges = scaleedges;
-  fragparams.runcallback = 0;
+  fragparams.runcallback = false;
 
   Fragment fp;
   fp.type = Fragment::FR_PATH;
@@ -528,13 +528,13 @@ Text::Text(const ValVector& _pos1, const ValVector& _pos2)
 {
   fragparams.text = this;
   fragparams.path = 0;
-  fragparams.scaleedges = 0;
-  fragparams.runcallback = 1;
+  fragparams.scaleedges = false;
+  fragparams.runcallback = true;
 }
 
 void Text::TextPathParameters::callback(QPainter* painter,
                                         QPointF pt1, QPointF pt2, QPointF pt3,
-                                        unsigned index,
+                                        int index,
                                         double scale, double linescale)
 {
   text->draw(painter, pt1, pt2, pt3, index, scale, linescale);
@@ -613,40 +613,41 @@ void FacingContainer::getFragments(const Mat4& perspM, const Mat4& outerM, Fragm
     ObjectContainer::getFragments(perspM, outerM, v);
 }
 
-// AxisTickLabels
+// AxisLabels
 
-AxisTickLabels::AxisTickLabels(const Vec3& _box1, const Vec3& _box2,
-                               const ValVector& _tickfracs)
+AxisLabels::AxisLabels(const Vec3& _box1, const Vec3& _box2,
+                       const ValVector& _tickfracs,
+                       double _labelfrac)
   : box1(_box1), box2(_box2),
-    tickfracs(_tickfracs)
+    tickfracs(_tickfracs),
+    labelfrac(_labelfrac)
 {
 }
 
-void AxisTickLabels::addAxisChoice(const Vec3& _start, const Vec3& _end)
+void AxisLabels::addAxisChoice(const Vec3& _start, const Vec3& _end)
 {
   starts.push_back(_start);
   ends.push_back(_end);
 }
 
-void AxisTickLabels::PathParameters::callback(QPainter* painter,
-                                              QPointF pt, QPointF ax1, QPointF ax2,
-                                              unsigned index,
-                                              double scale, double linescale)
+void AxisLabels::PathParameters::callback(QPainter* painter,
+                                          QPointF pt, QPointF ax1, QPointF ax2,
+                                          int index,
+                                          double scale, double linescale)
 {
   painter->save();
-  tl->drawLabel(painter, index, pt, ax1, ax2, axangle, quad, dirn);
+  tl->drawLabel(painter, index, pt, ax1, ax2, axangle);
   painter->restore();
 }
 
-void AxisTickLabels::drawLabel(QPainter* painter, unsigned index,
-                               QPointF pt,
-                               QPointF ax1, QPointF ax2,
-                               double axangle,
-                               int quad, int dirn)
+void AxisLabels::drawLabel(QPainter* painter, int index,
+                           QPointF pt,
+                           QPointF ax1, QPointF ax2,
+                           double axangle)
 {
 }
 
-void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& fragvec)
+void AxisLabels::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& fragvec)
 {
   // algorithm:
 
@@ -740,19 +741,6 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
   // axes are scored to prefer front, bottom, left axes
   int bestscore = -1;
 
-  // quadrant of best axis: where axis is approx in space
-  // 0 == top right
-  // 1 == bottom right
-  // 2 == top left
-  // 3 == bottom left
-  int bestquad = -1;
-  // axis direction (dx>0=rightwards, dy>0=topwards)
-  // 0 == dx>=0 and dy>=0
-  // 1 == dx>=0 and dy<0
-  // 2 == dx<0  and dy>=0
-  // 3 == dx<0  and dy<0
-  int bestdirn = -1;
-
   for(std::vector<unsigned>::const_iterator choice=axchoices.begin();
       choice!=axchoices.end(); ++choice)
     {
@@ -766,27 +754,25 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
         {
           bestscore = score;
           bestaxis = *choice;
-
-          // which quadrant is axis in
-          bestquad = (av(0)<=proj_cent(0))*2 + (av(1)>proj_cent(1));
-
-          // which direction is axis in?
-          const Vec3 delta = proj_ends[*choice]-proj_starts[*choice];
-          bestdirn = (delta(0)<0)*2 + (delta(1)<0);
         }
     }
 
   // initialise PathParameters with best axis
   fragparams.tl = this;
   fragparams.path = 0;
-  fragparams.scaleedges = 0;
-  fragparams.runcallback = 1;
+  fragparams.scaleedges = false;
+  fragparams.runcallback = true;
 
   fragparams.axangle = (180/M_PI) * std::atan2
     ((proj_starts[bestaxis](1)+proj_ends[bestaxis](1))*0.5 - proj_cent(1),
      (proj_starts[bestaxis](0)+proj_ends[bestaxis](0))*0.5 - proj_cent(0));
-  fragparams.quad = bestquad;
-  fragparams.dirn = bestdirn;
+
+  const Vec3 axstart = starts[bestaxis];
+  const Vec3 delta = ends[bestaxis]-axstart;
+
+  // scene coordinates of axis ends
+  const Vec3 axstart_scene = vec4to3(outerM*vec3to4(axstart));
+  const Vec3 axend_scene = vec4to3(outerM*vec3to4(ends[bestaxis]));
 
   // ok, now we add the number fragments for the best choice of axis
   Fragment fp;
@@ -797,22 +783,27 @@ void AxisTickLabels::getFragments(const Mat4& perspM, const Mat4& outerM, Fragme
   fp.lineprop = 0;
   fp.pathsize = 1;
 
-  const Vec3 axstart = starts[bestaxis];
-  const Vec3 delta = ends[bestaxis]-axstart;
+  fp.points[1] = axstart_scene;
+  fp.points[2] = axend_scene;
 
-  // scene coordinates of axis ends
-  const Vec3 axstart_scene = vec4to3(outerM*vec3to4(axstart));
-  const Vec3 axend_scene = vec4to3(outerM*vec3to4(ends[bestaxis]));
-
+  // add tick labels
   for(unsigned i=0; i<tickfracs.size(); ++i)
     {
       fp.index = i;
       const Vec3 pt = axstart + delta*(tickfracs[i]);
 
       fp.points[0] = vec4to3(outerM*vec3to4(pt));
-      fp.points[1] = axstart_scene;
-      fp.points[2] = axend_scene;
-
       fragvec.push_back(fp);
     }
+
+  // add main axis label
+  if(labelfrac >= 0)
+    {
+      fp.index = -1;
+      const Vec3 pt = axstart + delta*labelfrac;
+
+      fp.points[0] = vec4to3(outerM*vec3to4(pt));
+      fragvec.push_back(fp);
+    }
+
 }
