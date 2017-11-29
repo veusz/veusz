@@ -121,7 +121,7 @@ class ColorsRandomize(ToolsPlugin):
         if fields['randxy']:
             for node in fromwidget.WalkWidgets(widgettype='xy'):
                 col = self.getRandomColor(col1, col2)
-                node.PlotLine.color = col
+                node.color.val = col
 
         if fields['randfunc']:
             for node in fromwidget.WalkWidgets(widgettype='function'):
@@ -249,7 +249,7 @@ class ColorsSequence(ToolsPlugin):
             if fields['randxy'] and t == 'xy':
                 col = colatidx(idx)
                 idx += 1
-                node.PlotLine.color = col
+                node.color.val = col
 
             if fields['randfunc'] and t == 'function':
                 node.Line.color.val = colatidx(idx)
