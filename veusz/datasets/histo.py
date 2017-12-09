@@ -20,7 +20,7 @@ from __future__ import division
 import numpy as N
 
 from ..compat import citems
-
+from .. import utils
 from .commonfn import _
 from .oned import Dataset1DBase
 from .expression import evalDatasetExpression
@@ -190,13 +190,17 @@ class DatasetHistoGenerator(object):
             elif ds is self.valuedataset:
                 valuedsname = name
 
-        fileobj.write( ("CreateHistogram(%s, %s, %s, binparams=%s, "
-                        "binmanual=%s, method=%s, "
-                        "cumulative=%s, errors=%s)\n") %
-                       (repr(self.inexpr), repr(bindsname), repr(valuedsname),
-                        repr(self.binparams), repr(self.binmanual),
-                        repr(self.method), repr(self.cumulative),
-                        repr(self.errors)) )
+        fileobj.write(
+            "CreateHistogram(%s, %s, %s, binparams=%s, "
+            "binmanual=%s, method=%s, "
+            "cumulative=%s, errors=%s)\n" % (
+                utils.rrepr(self.inexpr),
+                utils.rrepr(bindsname),
+                utils.rrepr(valuedsname),
+                utils.rrepr(self.binparams), utils.rrepr(self.binmanual),
+                utils.rrepr(self.method), utils.rrepr(self.cumulative),
+                utils.rrepr(self.errors))
+        )
 
     def linkedInformation(self):
         """Informating about linking."""

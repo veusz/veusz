@@ -417,7 +417,9 @@ class Evaluate:
             for val in defns:
                 fileobj.write(
                     'AddCustom(%s, %s, %s)\n' % (
-                        repr(ctype), repr(val[0]), repr(val[1])))
+                        utils.rrepr(ctype),
+                        utils.rrepr(val[0]),
+                        utils.rrepr(val[1])))
 
     def saveCustomFile(self, fileobj):
         """Export the custom settings to a file."""

@@ -363,8 +363,8 @@ class Document(qt4.QObject):
 
         # write out tags
         for tag, val in sorted(bytag.items()):
-            fileobj.write('TagDatasets(%s, %s)\n' %
-                          (repr(tag), repr(val)))
+            fileobj.write(
+                'TagDatasets(%s, %s)\n' % (utils.rrepr(tag), utils.rrepr(val)))
 
     def saveToFile(self, fileobj):
         """Save the text representing a document to a file.
@@ -384,7 +384,7 @@ class Document(qt4.QObject):
         reldirname = None
         if getattr(fileobj, 'name', False):
             reldirname = os.path.dirname( os.path.abspath(fileobj.name) )
-            fileobj.write('AddImportPath(%s)\n' % repr(reldirname))
+            fileobj.write('AddImportPath(%s)\n' % utils.rrepr(reldirname))
 
         # save those datasets which are linked
         # we do this first in case the datasets are overridden below
@@ -427,7 +427,7 @@ class Document(qt4.QObject):
         reldirname = None
         if getattr(fileobj, 'filename', False):
             reldirname = os.path.dirname( os.path.abspath(fileobj.filename) )
-            textstream.write('AddImportPath(%s)\n' % repr(reldirname))
+            textstream.write('AddImportPath(%s)\n' % utils.rrepr(reldirname))
 
         # add custom definitions
         self.evaluate.saveCustomDefinitions(textstream)
