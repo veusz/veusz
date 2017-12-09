@@ -1,6 +1,7 @@
 Changes in <next version>:
  * Fix colormap sequence and randomize plugins
  * Change hyphen to minus sign when using standard C formatting in tick labels
+ * Fix for Chinese and Korean characters in filenames on Windows
 
 Changes in 2.1.1:
  * Fix dashed/dotted custom lines in EMF output
