@@ -143,7 +143,8 @@ class Surface3D(plotters3d.GenericPlotter3D):
         idxs = self.mode_idxs[self.settings.mode]
 
         # convert to logical coordinates
-        data = axes[idxs[0]].dataToLogicalCoords(dataset.data)
+        data = axes[idxs[0]].dataToLogicalCoords(
+            N.ravel(N.transpose(dataset.data)))
         e = dataset.getPixelEdges()
         edges1 = axes[idxs[1]].dataToLogicalCoords(e[0])
         edges2 = axes[idxs[2]].dataToLogicalCoords(e[1])
@@ -151,9 +152,9 @@ class Surface3D(plotters3d.GenericPlotter3D):
         # compute colors, if set
         colordata = s.DataColor.get('data').getData(self.document)
         if surfprop is not None and colordata is not None:
-            cmap = self.document.getColormap(
+            cmap = self.document.evaluate.getColormap(
                 s.Surface.colorMap, s.Surface.colorMapInvert)
-            cdata = colordata.data
+            cdata = N.transpose(colordata.data)
             cdata = cdata.reshape((1, cdata.size))
             colorimg = utils.applyColorMap(
                 cmap, s.DataColor.scaling,
@@ -165,7 +166,7 @@ class Surface3D(plotters3d.GenericPlotter3D):
         mesh = threed.DataMesh(
             threed.ValVector(edges1),
             threed.ValVector(edges2),
-            threed.ValVector(N.ravel(data)),
+            threed.ValVector(data),
             idxs[0], idxs[1], idxs[2],
             highres,
             lineprop, surfprop)
