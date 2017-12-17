@@ -140,7 +140,6 @@ public:
   PropSmartPtr<const SurfaceProp> surfaceprop;
 };
 
-
 // Grid of data values, where the centres of the bins are specified.
 // There should be 1 more values along edges than values in array.
 // idxval, edge1, edge2 give the index of the axis (x=0,y=1,z=2) for

@@ -29,7 +29,9 @@
 // These classes describe the color and properties of a surface or line
 
 // A reference counting scheme (PropSmartPtr) is used to keep track of
-// when to delete them
+// when to delete them. PropSmartPtr is an intrusive pointer, which
+// uses a reference count in the object to keep track of how many
+// copies are used.
 
 typedef std::vector<QRgb> RGBVec;
 
@@ -55,7 +57,7 @@ struct SurfaceProp
 
   bool hasRGBs() const { return !rgbs.empty(); };
   void setRGBs(const QImage& img) { _qimage2rgbvec(img, rgbs); }
-  
+
   double r, g, b;
   double refl, trans;
   RGBVec rgbs;
@@ -91,8 +93,8 @@ struct LineProp
 
 //#include <stdio.h>
 
-// this class is for automatically deleting the Surface/LineProp
-// instances when the reference count drops back to 0
+// intrusive pointer class is for automatically deleting the
+// Surface/LineProp instances when the reference count drops back to 0
 template<class T>
 class PropSmartPtr
 {
