@@ -61,11 +61,12 @@ private:
   // compute projected coordinates
   void projectFragments(const Camera& cam);
 
-  void doDrawing(QPainter* painter, const Mat3& screenM, double linescale);
+  void doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
+                 const Camera& cam);
 
   void drawPath(QPainter* painter, const Fragment& frag,
                 QPointF pt1, QPointF pt2, QPointF pt3,
-                double linescale);
+                double linescale, double distscale);
 
   // different rendering modes
   void renderPainters(const Camera& cam);

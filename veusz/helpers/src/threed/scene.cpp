@@ -175,20 +175,24 @@ QPen Scene::surfaceProp2QPen(const Fragment& frag) const
 
 void Scene::drawPath(QPainter* painter, const Fragment& frag,
                      QPointF pt1, QPointF pt2, QPointF pt3,
-                     double linescale)
+                     double linescale, double distscale)
 {
   FragmentPathParameters* pars =
     static_cast<FragmentPathParameters*>(frag.params);
   double scale = frag.pathsize*linescale;
 
+  if(pars->scalepersp)
+    scale *= distscale;
+
   // hook into drawing routine
   if(pars->runcallback)
     {
-      pars->callback(painter, pt1, pt2, pt3, frag.index, scale, linescale);
+      pars->callback(painter, pt1, pt2, pt3, frag.index, scale,
+                     linescale);
       return;
     }
 
-  if(pars->scaleedges)
+  if(pars->scaleline)
     {
       painter->save();
       painter->translate(pt1.x(), pt1.y());
@@ -212,12 +216,16 @@ void Scene::drawPath(QPainter* painter, const Fragment& frag,
     }
 }
 
-void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
+void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
+                      const Camera& cam)
 {
   // draw fragments
   LineProp const* lline = 0;
   SurfaceProp const* lsurf = 0;
   Fragment::FragmentType ltype = Fragment::FR_NONE;
+
+  // distance to centre of plot
+  const double dist0 = vec4to3(cam.viewM*Vec4(0,0,0)).rad();
 
   QPen no_pen(Qt::NoPen);
   QBrush no_brush(Qt::NoBrush);
@@ -293,8 +301,12 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale)
                   lsurf = frag.surfaceprop;
                   painter->setBrush(surfaceProp2QBrush(frag));
                 }
+
+              // ratio of distance for size scaling
+              const double distinvratio = dist0 / frag.points[0].rad();
+
               drawPath(painter, frag, projpts[0], projpts[1], projpts[2],
-                       linescale);
+                       linescale, distinvratio);
             }
 	  break;
 
@@ -453,7 +465,7 @@ void Scene::render(Object* root,
   double linescale = std::max(std::abs(x2-x1), std::abs(y2-y1)) * (1./1000);
 
   // finally draw items
-  doDrawing(painter, screenM, linescale);
+  doDrawing(painter, screenM, linescale, cam);
 
   // don't decrease size of fragments unnecessarily, unless it is large
   init_fragments_size = fragments.size();

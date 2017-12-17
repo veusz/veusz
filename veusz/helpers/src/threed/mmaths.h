@@ -436,14 +436,14 @@ inline Vec2 vec3to2(const Vec3& v)
 // do projection, getting x,y coordinate and depth
 inline Vec3 calcProjVec(const Mat4& projM, const Vec4& v)
 {
-  Vec4 nv(v*projM);
+  Vec4 nv(projM*v);
   double inv = 1/nv(3);
   return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
 }
 
 inline Vec3 calcProjVec(const Mat4& projM, const Vec3& v)
 {
-  Vec4 nv(vec3to4(v)*projM);
+  Vec4 nv(projM*vec3to4(v));
   double inv = 1/nv(3);
   return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
 }

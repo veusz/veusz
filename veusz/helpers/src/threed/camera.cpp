@@ -63,33 +63,32 @@ void Camera::setPointing(const Vec3 &_eye, const Vec3 &target, const Vec3 &up)
   combM = perspM * viewM;
 }
 
-void Camera::setPerspective(double fovy_degrees, double aspect,
+void Camera::setPerspective(double fov_degrees,
 			    double znear, double zfar)
 {
-  double r = std::tan(fovy_degrees * (M_PI/180./2.)) * znear;
-  double left = -r*aspect;
-  double right = r*aspect;
-  double bottom = -r;
-  double top = r;
+  // matrix from Scratchapixel 2
+  // https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix
 
-  perspM(0,0) = (2*znear)/(right-left);
-  perspM(0,1) = 0;
-  perspM(0,2) = 0;
-  perspM(0,3) = 0;
+  double scale = 1/std::tan(fov_degrees*(M_PI/180/2));
 
+  perspM(0,0) = scale;
   perspM(1,0) = 0;
-  perspM(1,1) = (2*znear)/(top-bottom);
-  perspM(1,2) = 0;
-  perspM(1,3) = 0;
-
   perspM(2,0) = 0;
-  perspM(2,1) = 0;
-  perspM(2,2) = -(zfar+znear)/(zfar-znear);
-  perspM(2,3) = -1;
-
   perspM(3,0) = 0;
+
+  perspM(0,1) = 0;
+  perspM(1,1) = scale;
+  perspM(2,1) = 0;
   perspM(3,1) = 0;
-  perspM(3,2) = -(2*zfar*znear)/(zfar-znear);
+
+  perspM(0,2) = 0;
+  perspM(1,2) = 0;
+  perspM(2,2) = -zfar/(zfar-znear);
+  perspM(3,2) = -1;
+
+  perspM(0,3) = 0;
+  perspM(1,3) = 0;
+  perspM(2,3) = -zfar*znear/(zfar-znear);
   perspM(3,3) = 0;
 
   combM = perspM * viewM;

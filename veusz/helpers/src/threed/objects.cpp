@@ -491,7 +491,8 @@ void DataMesh::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVect
 void Points::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   fragparams.path = &path;
-  fragparams.scaleedges = scaleedges;
+  fragparams.scaleline = scaleline;
+  fragparams.scalepersp = scalepersp;
   fragparams.runcallback = false;
 
   Fragment fp;
@@ -528,7 +529,8 @@ Text::Text(const ValVector& _pos1, const ValVector& _pos2)
 {
   fragparams.text = this;
   fragparams.path = 0;
-  fragparams.scaleedges = false;
+  fragparams.scaleline = false;
+  fragparams.scalepersp = false;
   fragparams.runcallback = true;
 }
 
@@ -760,7 +762,8 @@ void AxisLabels::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVe
   // initialise PathParameters with best axis
   fragparams.tl = this;
   fragparams.path = 0;
-  fragparams.scaleedges = false;
+  fragparams.scaleline = false;
+  fragparams.scalepersp = false;
   fragparams.runcallback = true;
 
   fragparams.axangle = (180/M_PI) * std::atan2

@@ -49,6 +49,16 @@ class MarkerFill3D(setting.Surface3DWColorMap):
         setting.Surface3DWColorMap.__init__(self, name, **args)
         self.get('reflectivity').hidden = True
 
+class MarkerLine3D(setting.Line3D):
+    """Border around markers."""
+    def __init__(self, name, **args):
+        setting.Line3D.__init__(self, name, **args)
+        self.add( setting.Bool(
+            'scale', True,
+            descr=_('Scale border with marker size'),
+            usertext=_('Scale'),
+            formatting=True), 4)
+
 class Point3D(plotters3d.GenericPlotter3D):
     """Plotting points in 3D."""
 
@@ -64,7 +74,7 @@ class Point3D(plotters3d.GenericPlotter3D):
                 descr=_('Z values, given by dataset, expression or list of values'),
                 usertext=_('Z data')), 0 )
         s.add( setting.DatasetExtended(
-                'yData', 'y',
+               'yData', 'y',
                 descr=_('Y values, given by dataset, expression or list of values'),
                 usertext=_('Y data')), 0 )
         s.add( setting.DatasetExtended(
@@ -81,6 +91,11 @@ class Point3D(plotters3d.GenericPlotter3D):
                       ' or list of values'),
             usertext=_('Scale markers')), 6 )
 
+        s.add( setting.Bool(
+            'scalePersp', True,
+            descr=_('Scale marker size using perspective'),
+            usertext=_('Perspective'),
+            formatting=True), 0)
         s.add( setting.Float(
             'markerSize', 10,
             minval=0, maxval=1000,
@@ -103,9 +118,9 @@ class Point3D(plotters3d.GenericPlotter3D):
             descr = _('Marker fill settings'),
             usertext=_('Marker fill')),
               pixmap='settings_plotmarkerfill' )
-        s.add( setting.Line3D(
+        s.add( MarkerLine3D(
             'MarkerLine',
-            descr = _('Line around marker settings'),
+            descr = _('Marker border settings'),
             usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
         s.add( setting.Line3D(
@@ -175,6 +190,8 @@ class Point3D(plotters3d.GenericPlotter3D):
                 markerlineprop, markerfillprop)
             if scalepts:
                 ptobj.setSizes(threed.ValVector(scalepts.data))
+            ptobj.scalepersp = s.scalePersp
+            ptobj.scaleline = s.MarkerLine.scale
             cont.addObject(ptobj)
 
         if not s.PlotLine.hide:

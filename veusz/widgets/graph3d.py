@@ -357,7 +357,7 @@ class Graph3D(widget.Widget):
             threed.Vec3(0,  0, -s.distance),
             threed.Vec3(0,  0,  0),
             threed.Vec3(0, -1,  0))
-        camera.setPerspective(45, 1, 4, 6)
+        camera.setPerspective(90, 1, 100)
 
         mode = {
             'painters': threed.Scene.RENDER_PAINTERS,

@@ -32,12 +32,11 @@ class Camera
   // See glm code lookAt
   void setPointing(const Vec3 &eye, const Vec3 &target, const Vec3 &up);
 
-  // fovy_degrees: field of view in y direction in degrees
-  // aspect: aspect ratio
+  // fovy_degrees: total field of view in degrees
   // znear: clip things nearer than this (should be as big as
   //        possible for precision)
-  //zfar: far clipping plane.
-  void setPerspective(double fovy_degrees=45, double aspect=1,
+  // zfar: far clipping plane.
+  void setPerspective(double fov_degrees=90,
 		      double znear=0.1, double zfar=100);
 
  public:

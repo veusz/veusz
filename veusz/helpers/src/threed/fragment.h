@@ -45,7 +45,8 @@ struct FragmentParameters
 struct FragmentPathParameters : public FragmentParameters
 {
   QPainterPath* path;
-  bool scaleedges;
+  bool scaleline;
+  bool scalepersp;
   bool runcallback;
   // optional callback function if runcallback is set
   virtual void callback(QPainter* painter,

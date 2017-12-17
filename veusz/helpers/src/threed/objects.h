@@ -180,7 +180,8 @@ public:
          const LineProp* pointedge=0, const SurfaceProp* pointfill=0)
     : x(px), y(py), z(pz),
       path(pp),
-      scaleedges(1),
+      scaleline(true),
+      scalepersp(true),
       lineedge(pointedge), surfacefill(pointfill)
   {
   }
@@ -196,7 +197,7 @@ public:
   ValVector x, y, z;
   ValVector sizes;
   QPainterPath path;
-  bool scaleedges;
+  bool scaleline, scalepersp;
   PropSmartPtr<const LineProp> lineedge;
   PropSmartPtr<const SurfaceProp> surfacefill;
 };

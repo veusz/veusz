@@ -350,6 +350,9 @@ class Points : public Object /NoDefaultCtors/
          const SurfaceProp* pointfill /Transfer/);
 
   void setSizes(const ValVector& _sizes);
+
+  bool scaleline;
+  bool scalepersp;
 };
 
 // a "text" class which calls back draw() when drawing is requested
@@ -439,7 +442,7 @@ class Camera
  public:
   Camera();
   void setPointing(const Vec3 &eye, const Vec3 &target, const Vec3 &up);
-  void setPerspective(double fovy_degrees=45, double aspect=1,
+  void setPerspective(double fov_degrees=45,
 		      double znear=0.1, double zfar=100.);
 
  public:
