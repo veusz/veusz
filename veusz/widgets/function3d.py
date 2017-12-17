@@ -41,6 +41,7 @@ class Function3D(plotters3d.GenericPlotter3D):
 
     typename='function3d'
     description=_('3D function')
+    allowusercreation=True
 
     # list of the supported modes
     _modes = [

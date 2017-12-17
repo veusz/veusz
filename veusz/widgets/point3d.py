@@ -64,6 +64,7 @@ class Point3D(plotters3d.GenericPlotter3D):
 
     typename='point3d'
     description=_('3D points')
+    allowusercreation=True
 
     @classmethod
     def addSettings(klass, s):

@@ -41,6 +41,7 @@ class Surface3D(plotters3d.GenericPlotter3D):
 
     typename = 'surface3d'
     description = _('3D surface')
+    allowusercreation=True
 
     # list of modes allowed
     modes = (
