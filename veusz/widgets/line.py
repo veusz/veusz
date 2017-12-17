@@ -41,48 +41,56 @@ class Line(plotters.FreePlotter):
     typename='line'
     description=_('Line or arrow')
     allowusercreation = True
-    
+
+    @staticmethod
+    def showOrHideSetn(v):
+        """Whether to show or hide length/angle or position."""
+        a = ('length', 'angle')
+        b = ('xPos2', 'yPos2')
+        return (a,b) if v=='length-angle' else (b,a)
+
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
         plotters.FreePlotter.addSettings(s)
 
         s.add( setting.ChoiceSwitch(
-                'mode',
-                ('length-angle', 'point-to-point'),
-                'length-angle',
-                descr=_('Provide line position and length,angle or '
-                        'first and second points'),
-                usertext=_('Mode'),
-                formatting=False,
-                showfn = lambda val: val == 'length-angle',
-                settingstrue = ('length', 'angle'),
-                settingsfalse = ('xPos2', 'yPos2'),
-                ), 0)
+            'mode',
+            ('length-angle', 'point-to-point'),
+            'length-angle',
+            descr=_('Provide line position and length,angle or '
+                    'first and second points'),
+            usertext=_('Mode'),
+            formatting=False,
+            showfn=klass.showOrHideSetn), 0)
 
         s.add( setting.DatasetExtended(
-                'length', [0.2],
-                descr=_('List of fractional lengths, dataset or expression'),
-                usertext=_('Lengths'),
-                formatting=False), 4 )
+            'length',
+            [0.2],
+            descr=_('List of fractional lengths, dataset or expression'),
+            usertext=_('Lengths'),
+            formatting=False), 4 )
         s.add( setting.DatasetExtended(
-                'angle', [0.],
-                descr=_('List of angle of lines, dataset or expression '
-                        '(degrees)'),
-                usertext=_('Angles'),
-                formatting=False), 5 )
+            'angle',
+            [0.],
+            descr=_('List of angle of lines, dataset or expression '
+                    '(degrees)'),
+            usertext=_('Angles'),
+            formatting=False), 5 )
         s.add( setting.DatasetExtended(
-                'xPos2', [1.],
-                descr=_('List of fractional X coordinates, dataset or '
-                        'expression for point 2'),
-                usertext=_('X positions 2'),
-                formatting=False), 6 )
+            'xPos2',
+            [1.],
+            descr=_('List of fractional X coordinates, dataset or '
+                    'expression for point 2'),
+            usertext=_('X positions 2'),
+            formatting=False), 6 )
         s.add( setting.DatasetExtended(
-                'yPos2', [1.],
-                descr=_('List of fractional Y coordinates, dataset or '
-                        'expression for point 2'),
-                usertext=_('Y positions 2'),
-                formatting=False), 7 )
+            'yPos2',
+            [1.],
+            descr=_('List of fractional Y coordinates, dataset or '
+                    'expression for point 2'),
+            usertext=_('Y positions 2'),
+            formatting=False), 7 )
 
         s.add( setting.Bool('clip', False,
                             descr=_('Clip line to its container'),

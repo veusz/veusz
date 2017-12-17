@@ -1819,14 +1819,15 @@ class BoolSwitch(Bool):
 class ChoiceSwitch(Choice):
     """Show or hide other settings based on the choice given here."""
 
-    def __init__(self, name, vallist, value, settingstrue=[], settingsfalse=[],
-                 showfn=lambda val: True, **args):
-        """Enables/disables a set of settings if True or False
-        settingsfalse and settingstrue are lists of names of settings
-        which are hidden/shown to user depending on showfn(val)."""
+    def __init__(self, name, vallist, value,
+                 showfn=lambda x: ((),()),
+                 **args):
+        """Enables/disables a set of settings depending on showfn(val)
 
-        self.sfalse = settingsfalse
-        self.strue = settingstrue
+        showfn(val) returns (show, hide), where show and hide are
+        lists of settings to show or hide
+        """
+
         self.showfn = showfn
         Choice.__init__(self, name, vallist, value, **args)
 
@@ -1834,29 +1835,32 @@ class ChoiceSwitch(Choice):
         return controls.ChoiceSwitch(self, False, self.vallist, *args)
 
     def copy(self):
-        return self._copyHelper((self.vallist,), (),
-                                {'settingsfalse': self.sfalse,
-                                 'settingstrue': self.strue,
-                                 'showfn': self.showfn})
+        return self._copyHelper(
+            (self.vallist,), (),
+            {'showfn': self.showfn})
 
 class FillStyleExtended(ChoiceSwitch):
     """A setting for the different fill styles provided by Qt."""
 
     typename = 'fill-style-ext'
 
-    _strue = ( 'linewidth', 'linestyle', 'patternspacing',
-               'backcolor', 'backtransparency', 'backhide' )
-
     @staticmethod
-    def _ishatch(val):
-        """Is this a hatching fill?"""
-        return not ( val == 'solid' or val.find('dense') >= 0 )
+    def _showsetns(val):
+        """Get list of settings to show or hide"""
+        hatchsetns = (
+            'linewidth', 'linestyle', 'patternspacing',
+            'backcolor', 'backtransparency', 'backhide')
+
+        if val == 'solid' or val.find('dense') >= 0:
+            return ((), hatchsetns)
+        else:
+            return (hatchsetns, ())
 
     def __init__(self, name, value, **args):
-        ChoiceSwitch.__init__(self, name, utils.extfillstyles, value,
-                              settingstrue=self._strue, settingsfalse=(),
-                              showfn=self._ishatch,
-                              **args)
+        ChoiceSwitch.__init__(
+            self, name, utils.extfillstyles, value,
+            showfn=self._showsetns,
+            **args)
 
     def copy(self):
         """Make a copy of the setting."""

@@ -488,12 +488,7 @@ class ChoiceSwitch(Choice):
 
     def updateState(self):
         """Set hidden state of settings."""
-        s1, s2 = self.setting.strue, self.setting.sfalse
-        if self.setting.showfn(self.setting.val):
-            show, hide = s1, s2
-        else:
-            show, hide = s2, s1
-
+        show, hide = self.setting.showfn(self.setting.val)
         if hasattr(self.parent(), 'showHideSettings'):
             self.parent().showHideSettings(show, hide)
 

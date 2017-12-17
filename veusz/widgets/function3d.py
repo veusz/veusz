@@ -79,6 +79,20 @@ class Function3D(plotters3d.GenericPlotter3D):
         'x,z=fns(y)': ('x', 'z', 'y'),
     }
 
+    @staticmethod
+    def _fnsetnshowhide(v):
+        """Return which function settings to show or hide depending on
+        mode."""
+        return {
+            'z=fn(x,y)': (('fnz',), ('fnx', 'fny')),
+            'x=fn(y,z)': (('fnx',), ('fny', 'fnz')),
+            'y=fn(x,z)': (('fny',), ('fnx', 'fnz')),
+            'x,y,z=fns(t)': (('fnx', 'fny', 'fnz'), ()),
+            'x,y=fns(z)': (('fnx', 'fny'), ('fnz',)),
+            'y,z=fns(x)': (('fny', 'fnz'), ('fnx',)),
+            'x,z=fns(y)': (('fnx', 'fnz'), ('fny',)),
+            }[v]
+
     @classmethod
     def addSettings(klass, s):
         plotters3d.GenericPlotter3D.addSettings(s)
@@ -98,11 +112,12 @@ class Function3D(plotters3d.GenericPlotter3D):
                       ' in each direction'),
             usertext=_('Surface steps'),
             formatting=True ))
-        s.add(setting.Choice(
+        s.add(setting.ChoiceSwitch(
             'mode', klass._modes,
             'x,y,z=fns(t)',
             descr=_('Type of function to plot'),
-            usertext=_('Mode') ), 0)
+            usertext=_('Mode'),
+            showfn=klass._fnsetnshowhide), 0)
 
         s.add(setting.Str(
             'fnx', '',

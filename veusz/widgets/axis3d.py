@@ -659,6 +659,7 @@ class Axis3D(widget.Widget):
         dirn: 'x', 'y', 'z' for axis
         """
 
+        return
         if gridprops.hide:
             return
 
@@ -669,6 +670,7 @@ class Axis3D(widget.Widget):
         outstart = []
         outend = []
 
+        # positions of grid lines for x axis
         pts1 = [
             (tfracs, zeros, zeros),
             (tfracs, zeros, zeros),
@@ -681,21 +683,35 @@ class Axis3D(widget.Widget):
             (tfracs, zeros, ones),
             (tfracs, ones, zeros)
         ]
+        # norm for each face, so we can draw back of cube
+        norms = [
+            (0, -1, 0),
+            (0, 0, -1),
+            (0, -1, 0),
+            (0, 0, -1)
+        ]
 
+        # swap coordinates for other axes
         if dirn == 'y':
-            pts1 = [(c,a,b) for a,b,c in pts1]
-            pts2 = [(c,a,b) for a,b,c in pts2]
+            pts1  = [(c,a,b) for a,b,c in pts1]
+            pts2  = [(c,a,b) for a,b,c in pts2]
+            norms = [(c,a,b) for a,b,c in norms]
         elif dirn == 'z':
-            pts1 = [(b,c,a) for a,b,c in pts1]
-            pts2 = [(b,c,a) for a,b,c in pts2]
+            pts1  = [(b,c,a) for a,b,c in pts1]
+            pts2  = [(b,c,a) for a,b,c in pts2]
+            norms = [(b,c,a) for a,b,c in norms]
 
-        outstart = N.ravel(N.column_stack(N.concatenate(pts1)))
-        outend = N.ravel(N.column_stack(N.concatenate(pts2)))
-
-        startpts = threed.ValVector(outstart)
-        endpts = threed.ValVector(outend)
+        # add lines on each face
         lineprop = gridprops.makeLineProp(painter)
-        cont.addObject(threed.LineSegments(startpts, endpts, lineprop))
+        for p1, p2, n in czip(pts1, pts2, norms):
+            s1 = threed.ValVector(N.ravel(0.5*(N.column_stack(p1)+N.column_stack(p2))))
+            s2 = threed.ValVector(N.ravel(0.5*(N.column_stack(p1)+N.column_stack(p2))+0.2*norms))
+
+            face = threed.FacingContainer(threed.Vec3(*n))
+            c1 = threed.ValVector(N.ravel(N.column_stack(p1)))
+            c2 = threed.ValVector(N.ravel(N.column_stack(p2)))
+            face.addObject(threed.LineSegments(c1, c2, lineprop))
+            cont.addObject(face)
 
     def drawToObject(self, painter):
 
