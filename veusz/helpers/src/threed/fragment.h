@@ -29,7 +29,7 @@
 #include "properties.h"
 #include "mmaths.h"
 
-#define LINE_DELTA_DEPTH 1e-3
+#define LINE_DELTA_DEPTH 1e-6
 
 // from objects.h
 class Object;

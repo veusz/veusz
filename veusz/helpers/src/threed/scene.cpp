@@ -415,12 +415,12 @@ void Scene::renderBSP(const Camera& cam)
       switch(f->type)
         {
         case Fragment::FR_LINESEG:
-          f->points[0](2) += 1e-3;
-          f->points[1](2) += 1e-3;
+          f->points[0](2) += LINE_DELTA_DEPTH;
+          f->points[1](2) += LINE_DELTA_DEPTH;
           break;
         case Fragment::FR_PATH:
-          f->points[0](2) += 2e-3;
-          f->points[1](2) += 2e-3;
+          f->points[0](2) += 2*LINE_DELTA_DEPTH;
+          f->points[1](2) += 2*LINE_DELTA_DEPTH;
           break;
         default:
           break;
