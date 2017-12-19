@@ -21,7 +21,7 @@
 from __future__ import division, print_function
 import numpy as N
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import document
 from .. import utils
@@ -34,7 +34,7 @@ from . import plotters3d
 
 def _(text, disambiguation=None, context='Function3D'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""

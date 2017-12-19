@@ -24,7 +24,7 @@ import sys
 import math
 import numpy as N
 from ..compat import cvalues
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from . import widget
@@ -37,7 +37,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='Graph3D'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # non-reflective back of cube
 class BackSurface(setting.Surface3D):

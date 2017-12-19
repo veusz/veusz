@@ -19,7 +19,7 @@
 """Generic 3D plotting widet."""
 
 from __future__ import division, print_function
-from .. import qtall as qt4
+from .. import qtall as qt
 import numpy as N
 
 from .. import setting
@@ -32,7 +32,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='Plotters3D'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class GenericPlotter3D(widget.Widget):
     """Generic plotter."""

@@ -21,7 +21,7 @@
 from __future__ import division, print_function
 import numpy as N
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import document
 from .. import utils
@@ -35,7 +35,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='Point3D'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class PlotLine3D(setting.Line3D):
     """Plot line."""
