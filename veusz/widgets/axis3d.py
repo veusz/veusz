@@ -659,7 +659,6 @@ class Axis3D(widget.Widget):
         dirn: 'x', 'y', 'z' for axis
         """
 
-        return
         if gridprops.hide:
             return
 
@@ -683,12 +682,12 @@ class Axis3D(widget.Widget):
             (tfracs, zeros, ones),
             (tfracs, ones, zeros)
         ]
-        # norm for each face, so we can draw back of cube
+        # norm for each face, so we can draw back of cube only
         norms = [
-            (0, -1, 0),
-            (0, 0, -1),
-            (0, -1, 0),
-            (0, 0, -1)
+            (0,  1,  0),
+            (0,  0,  1),
+            (0,  0, -1),
+            (0, -1,  0)
         ]
 
         # swap coordinates for other axes
@@ -704,9 +703,7 @@ class Axis3D(widget.Widget):
         # add lines on each face
         lineprop = gridprops.makeLineProp(painter)
         for p1, p2, n in czip(pts1, pts2, norms):
-            s1 = threed.ValVector(N.ravel(0.5*(N.column_stack(p1)+N.column_stack(p2))))
-            s2 = threed.ValVector(N.ravel(0.5*(N.column_stack(p1)+N.column_stack(p2))+0.2*norms))
-
+            # container only shows face if norm points to observer
             face = threed.FacingContainer(threed.Vec3(*n))
             c1 = threed.ValVector(N.ravel(N.column_stack(p1)))
             c2 = threed.ValVector(N.ravel(N.column_stack(p2)))
