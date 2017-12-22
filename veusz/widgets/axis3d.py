@@ -516,6 +516,14 @@ class Axis3D(widget.Widget):
         log2 = N.log(self.plottedrange[1])
         return (N.log(N.clip(v, 1e-99, 1e99)) - log1) / (log2 - log1)
 
+    def transformToAxis(self, v):
+        """Return value to give equal-spaced values in transformed coordinates."""
+        return N.log(v) if self.settings.log else v
+
+    def transformFromAxis(self, v):
+        """Convert transformed values back."""
+        return N.exp(v) if self.settings.log else v
+
     def getAutoMirrorCombs(self):
         """Get combinations of other position for auto mirroring."""
         s = self.settings

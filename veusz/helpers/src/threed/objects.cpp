@@ -485,6 +485,116 @@ void DataMesh::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVect
 
 }
 
+// MultiCuboid
+//////////////
+
+void MultiCuboid::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
+{
+  // nothing to draw
+  if( lineprop.ptr()==0 && surfaceprop.ptr()==0 )
+    return;
+
+  // used to draw the grid and surface
+  Fragment ft;
+  ft.type = Fragment::FR_TRIANGLE;
+  ft.surfaceprop = surfaceprop.ptr();
+  ft.lineprop = 0;
+  ft.object = this;
+
+  Fragment fl;
+  fl.type = Fragment::FR_LINESEG;
+  fl.surfaceprop = 0;
+  fl.lineprop = lineprop.ptr();
+  fl.object = this;
+
+  // triangles for drawing surface of cube
+  static const int triidx[12][3][3] = {
+    {{0,0,0}, {0,0,1}, {1,0,0}},
+    {{0,0,1}, {0,0,0}, {0,1,0}},
+    {{0,1,0}, {0,1,1}, {0,0,1}},
+    {{0,1,0}, {1,1,0}, {0,1,1}},
+    {{0,1,0}, {0,0,0}, {1,0,0}},
+    {{0,1,1}, {1,0,1}, {0,0,1}},
+    {{0,1,1}, {1,1,1}, {1,0,1}},
+    {{1,0,0}, {1,1,0}, {0,1,0}},
+    {{1,0,1}, {1,0,0}, {0,0,1}},
+    {{1,0,1}, {1,1,0}, {1,0,0}},
+    {{1,0,1}, {1,1,1}, {1,1,0}},
+    {{1,1,0}, {1,1,1}, {0,1,1}}
+  };
+
+  // lines for drawing edges of cube
+  static const int edgeidx[12][2][3] = {
+    {{0,0,0}, {0,0,1}},
+    {{0,0,0}, {0,1,0}},
+    {{0,0,0}, {1,0,0}},
+    {{0,0,1}, {0,1,1}},
+    {{0,0,1}, {1,0,1}},
+    {{0,1,0}, {0,1,1}},
+    {{0,1,0}, {1,1,0}},
+    {{0,1,1}, {1,1,1}},
+    {{1,0,0}, {1,0,1}},
+    {{1,0,0}, {1,1,0}},
+    {{1,0,1}, {1,1,1}},
+    {{1,1,0}, {1,1,1}}
+  };
+
+  /// maximum size of array
+  const int sizex = std::min(xmin.size(), xmax.size());
+  const int sizey = std::min(ymin.size(), ymax.size());
+  const int sizez = std::min(zmin.size(), zmax.size());
+  const int size = std::min(std::min(sizex, sizey), sizez);
+
+  for(int i=0; i<size; ++i)
+    {
+      const double x[2] = {xmin[i], xmax[i]};
+      const double y[2] = {ymin[i], ymax[i]};
+      const double z[2] = {zmin[i], zmax[i]};
+
+      if(ft.surfaceprop != 0 && !ft.surfaceprop->hide)
+        {
+          ft.index = i;
+
+          // iterate over triangles in cube
+          for(int tri=0; tri<12; ++tri)
+            {
+              // points for triangle
+              for(int pt=0; pt<3; ++pt)
+                {
+                  ft.points[pt] = vec4to3(outerM*
+                                          Vec4(x[triidx[tri][pt][0]],
+                                               y[triidx[tri][pt][1]],
+                                               z[triidx[tri][pt][2]]));
+                }
+              if(ft.isVisible())
+                v.push_back(ft);
+            }
+        }
+
+      if(fl.lineprop !=0 && !fl.lineprop->hide)
+        {
+          fl.index = i;
+
+          // iterate over edges
+          for(int edge=0; edge<12; ++edge)
+            {
+              // points for line
+              for(int pt=0; pt<2; ++pt)
+                {
+                  fl.points[pt] = vec4to3(outerM*
+                                          Vec4(x[edgeidx[edge][pt][0]],
+                                               y[edgeidx[edge][pt][1]],
+                                               z[edgeidx[edge][pt][2]]));
+                }
+              if(fl.isVisible())
+                v.push_back(fl);
+            }
+        }
+
+    } // loop over cuboids
+
+}
+
 // Points
 /////////
 

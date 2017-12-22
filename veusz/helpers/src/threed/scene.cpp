@@ -129,14 +129,8 @@ QPen Scene::lineProp2QPen(const Fragment& frag, double linescale) const
   if(frag.usecalccolor)
     col = QColor::fromRgb(frag.calccolor);
   else
-    {
-      if(p->hasRGBs())
-        col = QColor::fromRgba
-          ( p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)] );
-      else
-        col = QColor(int(p->r*255), int(p->g*255),
-                     int(p->b*255), int((1-p->trans)*255));
-    }
+    col = p->color(frag.index);
+
   return QPen(QBrush(col), p->width*linescale);
 }
 
@@ -146,15 +140,7 @@ QColor Scene::surfaceProp2QColor(const Fragment& frag) const
   if(frag.usecalccolor)
     return QColor::fromRgba(frag.calccolor);
 
-  const SurfaceProp* p = frag.surfaceprop;
-  if(p->hasRGBs())
-    {
-      QRgb rgb = p->rgbs[std::min(unsigned(p->rgbs.size())-1,frag.index)];
-      return QColor::fromRgba(rgb);
-    }
-
-  return QColor(int(p->r*255), int(p->g*255), int(p->b*255),
-                int((1-p->trans)*255));
+  return frag.surfaceprop->color(frag.index);
 }
 
 QBrush Scene::surfaceProp2QBrush(const Fragment& frag) const

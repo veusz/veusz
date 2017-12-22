@@ -338,6 +338,19 @@ class DataMesh : public Object /NoDefaultCtors/
            const SurfaceProp* sprop /Transfer/);
 };
 
+class MultiCuboid : public Object
+{
+%TypeHeaderCode
+#include <objects.h>
+%End
+public:
+  MultiCuboid(const ValVector& _xmin, const ValVector& _xmax,
+              const ValVector& _ymin, const ValVector& _ymax,
+              const ValVector& _zmin, const ValVector& _zmax,
+              const LineProp* lprop /Transfer/,
+              const SurfaceProp* sprop /Transfer/);
+};
+
 class Points : public Object /NoDefaultCtors/
 {
 %TypeHeaderCode

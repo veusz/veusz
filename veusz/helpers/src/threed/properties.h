@@ -58,6 +58,16 @@ struct SurfaceProp
   bool hasRGBs() const { return !rgbs.empty(); };
   void setRGBs(const QImage& img) { _qimage2rgbvec(img, rgbs); }
 
+  QColor color(unsigned idx) const
+  {
+    if(rgbs.empty())
+      return QColor(int(r*255), int(g*255),
+                    int(b*255), int((1-trans)*255));
+    else
+      return QColor::fromRgba
+        ( rgbs[std::min(unsigned(rgbs.size())-1,idx)] );
+  }
+
   double r, g, b;
   double refl, trans;
   RGBVec rgbs;
@@ -80,6 +90,16 @@ struct LineProp
 
   bool hasRGBs() const { return !rgbs.empty(); };
   void setRGBs(const QImage& img) { _qimage2rgbvec(img, rgbs); }
+
+  QColor color(unsigned idx) const
+  {
+    if(rgbs.empty())
+      return QColor(int(r*255), int(g*255),
+                    int(b*255), int((1-trans)*255));
+    else
+      return QColor::fromRgba
+        ( rgbs[std::min(unsigned(rgbs.size())-1,idx)] );
+  }
 
   double r, g, b;
   double trans;
@@ -136,5 +156,6 @@ public:
 private:
   T* p_;
 };
+
 
 #endif

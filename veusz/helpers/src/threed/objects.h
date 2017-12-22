@@ -170,6 +170,30 @@ public:
   PropSmartPtr<const SurfaceProp> surfaceprop;
 };
 
+// multiple cuboids
+class MultiCuboid : public Object
+{
+public:
+  MultiCuboid(const ValVector& _xmin, const ValVector& _xmax,
+              const ValVector& _ymin, const ValVector& _ymax,
+              const ValVector& _zmin, const ValVector& _zmax,
+              const LineProp* lprop=0, const SurfaceProp* sprop=0)
+    : xmin(_xmin), xmax(_xmax),
+      ymin(_ymin), ymax(_ymax),
+      zmin(_zmin), zmax(_zmax),
+      lineprop(lprop), surfaceprop(sprop)
+  {
+  }
+
+  void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
+
+public:
+  ValVector xmin, xmax, ymin, ymax, zmin, zmax;
+
+  PropSmartPtr<const LineProp> lineprop;
+  PropSmartPtr<const SurfaceProp> surfaceprop;
+};
+
 // a set of points to plot
 class Points : public Object
 {

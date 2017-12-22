@@ -183,6 +183,24 @@ struct Fragment
       proj[i] = calcProjVec(projM, points[i]);
   }
 
+  // is fragment visible based on transparency?
+  bool isVisible() const
+  {
+    bool vis=false;
+    if((type==FR_TRIANGLE || type==FR_PATH) && surfaceprop!=0)
+      {
+        if(surfaceprop->color(index).alpha() > 0)
+          vis = true;
+      }
+
+    if((type==FR_LINESEG || type==FR_PATH) && lineprop!=0)
+      {
+        if(lineprop->color(index).alpha() > 0)
+          vis = true;
+      }
+    return vis;
+  }
+
 };
 
 typedef std::vector<Fragment> FragmentVector;
