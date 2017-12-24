@@ -33,22 +33,6 @@
 
 namespace
 {
-  struct FragDepthCompareMax
-  {
-    FragDepthCompareMax(FragmentVector& v)
-      : vec(v)
-    {}
-
-    bool operator()(unsigned i, unsigned j) const
-    {
-      double d1 = vec[i].maxDepth();
-      double d2 = vec[j].maxDepth();
-      return d1 > d2;
-    }
-
-    FragmentVector& vec;
-  };
-
   // Make scaling matrix to move points to correct output range
   Mat3 makeScreenM(const FragmentVector& frags,
 		   double x1, double y1, double x2, double y2)
@@ -384,7 +368,11 @@ void Scene::renderPainters(const Camera& cam)
     draworder.push_back(i);
 
   std::sort(draworder.begin(), draworder.end(),
-            FragDepthCompareMax(fragments));
+            [this](unsigned i, unsigned j)
+            {
+              return fragments[i].maxDepth() > fragments[j].maxDepth();
+            }
+            );
 }
 
 void Scene::renderBSP(const Camera& cam)
