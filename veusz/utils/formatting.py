@@ -52,6 +52,7 @@ def localeFormat(totfmt, args, locale=None):
                 i += 1
             except IndexError:
                 raise TypeError("Not enough arguments for format string")
+            s = s.replace('-', u'\u2212')
             if locale is not None and code in 'eEfFgG':
                 s = s.replace('.', locale.decimalPoint())
 
@@ -233,8 +234,7 @@ def formatNumber(num, formatstr, locale=None):
         else:
             # standard C formatting
             try:
-                out = localeFormat('%' + farg + ftype, (num,),
-                                   locale=locale)
+                out = localeFormat('%' + farg + ftype, (num,), locale=locale)
             except:
                 out = _formaterror
 
@@ -243,4 +243,3 @@ def formatNumber(num, formatstr, locale=None):
         formatstr = formatstr[match.end():]
 
     return ''.join(outitems)
-

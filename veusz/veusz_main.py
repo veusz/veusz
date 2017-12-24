@@ -24,16 +24,17 @@ from __future__ import division
 import sys
 import os.path
 import signal
-import optparse
+import argparse
 
 import veusz
 from veusz.compat import czip, cbytes, cstr
-from veusz import qtall as qt4
+from veusz import qtall as qt
 from veusz import utils
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2017 <jeremy@jeremysanders.net> and contributors
+Copyright (C) Jeremy Sanders 2003-2017 <jeremy@jeremysanders.net>
+ and contributors
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
@@ -44,39 +45,43 @@ Licenced under the GPL (version 2 or greater)
 
 def handleIntSignal(signum, frame):
     '''Ask windows to close if Ctrl+C pressed.'''
-    qt4.qApp.closeAllWindows()
+    qt.qApp.closeAllWindows()
 
 def makeSplashLogo():
     '''Make a splash screen logo.'''
 
-    splash = qt4.QSplashScreen()
+    splash = qt.QSplashScreen()
     splash.setStyleSheet("background-color:white;")
-    
+
     # draw logo on pixmap
-    layout = qt4.QVBoxLayout(splash)
+    layout = qt.QVBoxLayout(splash)
     pm = utils.getPixmap('logo.png')
-    logo = qt4.QLabel()            
+    logo = qt.QLabel()
     logo.setPixmap(pm)
-    logo.setAlignment(qt4.Qt.AlignCenter)
+    logo.setAlignment(qt.Qt.AlignCenter)
     layout.addWidget(logo)
-    
+
     # add copyright text
-    message = qt4.QLabel()
+    message = qt.QLabel()
     message.setText(splashcopyr % utils.version())
-    message.setAlignment(qt4.Qt.AlignCenter)
+    message.setAlignment(qt.Qt.AlignCenter)
     # increase size of font
     font = message.font()
     font.setPointSize(font.pointSize()*1.5)
     message.setFont(font)
     layout.addWidget(message)
-    h = qt4.QFontMetrics(font).height()
+    h = qt.QFontMetrics(font).height()
     layout.setContentsMargins(h,h,h,h)
 
     # Center the spash screen
     splash.setGeometry(5, 5, 100, 100)
-    screen = qt4.QDesktopWidget().screenGeometry()
-    splash.move((screen.width()-layout.sizeHint().width())/2, 
+    screen = qt.QDesktopWidget().screenGeometry()
+    splash.move((screen.width()-layout.sizeHint().width())/2,
         (screen.height()-layout.sizeHint().height())/2)
+
+    # make sure dialog goes away - avoid problem if a message box pops
+    # up before it is removed
+    qt.QTimer.singleShot(2000, splash.hide)
 
     return splash
 
@@ -91,23 +96,23 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
         d = ExceptionDialog((excepttype, exceptvalue, tracebackobj), None)
         d.exec_()
 
-def listen(args, quiet):
+def listen(docs, quiet):
     '''For running with --listen option.'''
     from veusz.veusz_listen import openWindow
-    openWindow(args, quiet=quiet)
+    openWindow(docs, quiet=quiet)
 
-def export(exports, args):
+def export(exports, docs):
     '''A shortcut to load a set of files and export them.'''
     from veusz import document
     from veusz import utils
-    for expfn, vsz in czip(exports, args[1:]):
+    for expfn, vsz in czip(exports, docs):
         doc = document.Document()
         ci = document.CommandInterpreter(doc)
         ci.Load(vsz)
         ci.run('Export(%s)' % repr(expfn))
 
 def convertArgsUnicode(args):
-    '''Convert set of arguments to unicode.
+    '''Convert set of arguments to unicode (for Python 2).
     Arguments in argv use current file system encoding
     '''
     enc = sys.getfilesystemencoding()
@@ -117,12 +122,12 @@ def convertArgsUnicode(args):
     out = []
     for a in args:
         if isinstance(a, cbytes):
-            out.append( a.decode(enc) )
+            out.append(a.decode(enc))
         else:
             out.append(a)
     return out
 
-class ImportThread(qt4.QThread):
+class ImportThread(qt.QThread):
     '''Do import of main code within another thread.
     Main application runs when this is done
     '''
@@ -131,11 +136,11 @@ class ImportThread(qt4.QThread):
         from veusz import widgets
         from veusz import dataimport
 
-class VeuszApp(qt4.QApplication):
+class VeuszApp(qt.QApplication):
     """Event which can open mac files."""
 
-    def __init__(self, args):
-        qt4.QApplication.__init__(self, args)
+    def __init__(self):
+        qt.QApplication.__init__(self, sys.argv)
 
         self.lastWindowClosed.connect(self.quit)
 
@@ -143,46 +148,63 @@ class VeuszApp(qt4.QApplication):
         signal.signal(signal.SIGINT, handleIntSignal)
 
         # parse command line options
-        parser = optparse.OptionParser(
-            usage='%prog [options] filename.vsz ...',
+        parser = argparse.ArgumentParser(
+            description='Veusz scientific plotting package')
+        parser.add_argument(
+            '--version', action='version',
             version=copyr % utils.version())
-        parser.add_option('--unsafe-mode', action='store_true',
-                          help='disable safety checks when running documents'
-                          ' or scripts')
-        parser.add_option('--listen', action='store_true',
-                          help='read and execute Veusz commands from stdin,'
-                          ' replacing veusz_listen')
-        parser.add_option('--quiet', action='store_true',
-                          help='if in listening mode, do not open a window but'
-                          ' execute commands quietly')
-        parser.add_option('--export', action='append', metavar='FILE',
-                          help='export the next document to this'
-                          ' output image file, exiting when finished')
-        parser.add_option('--embed-remote', action='store_true',
-                          help=optparse.SUPPRESS_HELP)
-        parser.add_option('--plugin', action='append', metavar='FILE',
-                          help='load the plugin from the file given for '
-                          'the session')
-        parser.add_option('--translation', metavar='FILE',
-                          help='load the translation .qm file given')
-        options, args = parser.parse_args(self.arguments())
+        parser.add_argument(
+            '--unsafe-mode',
+            action='store_true',
+            help='disable safety checks when running documents'
+            ' or scripts')
+        parser.add_argument(
+            '--listen',
+            action='store_true',
+            help='read and execute Veusz commands from stdin,'
+            ' replacing veusz_listen')
+        parser.add_argument(
+            '--quiet',
+            action='store_true',
+            help='if in listening mode, do not open a window but'
+            ' execute commands quietly')
+        parser.add_argument(
+            '--export', action='append', metavar='FILE',
+            help='export the next document to this'
+            ' output image file, exiting when finished')
+        parser.add_argument(
+            '--embed-remote',
+            action='store_true',
+            help='(internal - not for external use)')
+        parser.add_argument(
+            '--plugin', action='append', metavar='FILE',
+            help='load the plugin from the file given for '
+            'the session')
+        parser.add_argument(
+            '--translation', metavar='FILE',
+            help='load the translation .qm file given')
+        parser.add_argument(
+            'docs', metavar='FILE', nargs='*',
+            help='document to load')
+
+        self.args = args = parser.parse_args()
+
+        args.docs = convertArgsUnicode(args.docs)
 
         # export files to make images
-        if options.export and len(options.export) != len(args)-1:
-            parser.error(
-                'export option needs same number of documents and '
-                'output files')
-
-        # convert args to unicode from filesystem strings
-        self.args = convertArgsUnicode(args)
-        self.options = options
+        if args.export:
+            if len(args.export) != len(args.docs):
+                parser.error(
+                    'export option needs same number of documents and '
+                    'output files')
+            args.export = convertArgsUnicode(args.export)
 
         self.openeventfiles = []
         self.startupdone = False
         self.splash = None
         self.trans = None
 
-    def openMainWindow(self, args):
+    def openMainWindow(self, docs):
         """Open the main window with any loaded files."""
         from veusz.windows.mainwindow import MainWindow
 
@@ -191,9 +213,9 @@ class VeuszApp(qt4.QApplication):
             if isinstance(w, MainWindow) and w.document.isBlank():
                 emptywins.append(w)
 
-        if len(args) > 1:
+        if docs:
             # load in filenames given
-            for filename in args[1:]:
+            for filename in docs:
                 if not emptywins:
                     MainWindow.CreateWindow(filename)
                 else:
@@ -202,27 +224,29 @@ class VeuszApp(qt4.QApplication):
             # create blank window
             MainWindow.CreateWindow()
 
-    def checkOpen(self):
+    def openPendingFiles(self):
         """If startup complete, open any files."""
         if self.startupdone:
             self.openMainWindow([None] + self.openeventfiles)
             del self.openeventfiles[:]
         else:
-            qt4.QTimer.singleShot(100, self.checkOpen)
+            qt.QTimer.singleShot(100, self.openPendingFiles)
 
     def event(self, event):
-        """Handle events. This is the only way to get the FileOpen event."""
-        if event.type() == qt4.QEvent.FileOpen:
+        """Handle events. This is the only way to get the FileOpen event.
+        FileOpen is used by MacOS to open files.
+        """
+        if event.type() == qt.QEvent.FileOpen:
             self.openeventfiles.append(event.file())
             # need to wait until startup has finished
-            qt4.QTimer.singleShot(100, self.checkOpen)
+            qt.QTimer.singleShot(100, self.openPendingFiles)
             return True
-        return qt4.QApplication.event(self, event)
+        return qt.QApplication.event(self, event)
 
     def startup(self):
         """Do startup."""
 
-        if not (self.options.listen or self.options.export):
+        if not (self.args.listen or self.args.export):
             # show the splash screen on normal start
             self.splash = makeSplashLogo()
             self.splash.show()
@@ -234,7 +258,6 @@ class VeuszApp(qt4.QApplication):
     def slotStartApplication(self):
         """Start app, after modules imported."""
 
-        options = self.options
         args = self.args
 
         from veusz.utils import vzdbus, vzsamp
@@ -252,12 +275,12 @@ class VeuszApp(qt4.QApplication):
 
         # for people who want to run any old script
         setting.transient_settings['unsafe_mode'] = bool(
-            options.unsafe_mode)
+            args.unsafe_mode)
 
         # optionally load a translation
-        txfile = options.translation or setting.settingdb['translation_file']
+        txfile = args.translation or setting.settingdb['translation_file']
         if txfile:
-            self.trans = qt4.QTranslator()
+            self.trans = qt.QTranslator()
             if self.trans.load(txfile):
                 self.installTranslator(self.trans)
             else:
@@ -269,23 +292,23 @@ class VeuszApp(qt4.QApplication):
             sys.path += setting.settingdb['external_pythonpath'].split(':')
 
         # load any requested plugins
-        if options.plugin:
+        if args.plugin:
             try:
-                document.Document.loadPlugins(pluginlist=options.plugin)
+                document.Document.loadPlugins(pluginlist=args.plugin)
             except RuntimeError as e:
                 startuperrors.append(cstr(e))
 
         # different modes
-        if options.listen:
+        if args.listen:
             # listen to incoming commands
-            listen(args, quiet=options.quiet)
-        elif options.export:
-            export(options.export, args)
+            listen(args.docs, quiet=args.quiet)
+        elif args.export:
+            export(args.export, args.docs)
             self.quit()
             sys.exit(0)
         else:
             # standard start main window
-            self.openMainWindow(args)
+            self.openMainWindow(args.docs)
             self.startupdone = True
 
         # clear splash when startup done
@@ -295,7 +318,7 @@ class VeuszApp(qt4.QApplication):
         # this has to be displayed after the main window is created,
         # otherwise it never gets shown
         for error in startuperrors:
-            qt4.QMessageBox.critical(None, "Veusz", error)
+            qt.QMessageBox.critical(None, "Veusz", error)
 
 def run():
     '''Run the main application.'''
@@ -310,7 +333,7 @@ def run():
     # the idea is to postpone the imports until the splash screen
     # is shown
 
-    app = VeuszApp(sys.argv)
+    app = VeuszApp()
     app.startup()
     app.exec_()
 

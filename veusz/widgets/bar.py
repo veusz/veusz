@@ -276,9 +276,10 @@ class BarPlotter(GenericPlotter):
         maxcoord = N.clip(maxcoord, -32767, 32767)
 
         # draw error bars
-        painter.setPen( self.settings.ErrorBarLine.makeQPenWHide(painter) )
-        w = barwidth*0.25
-        if ishorz:
+        ebl = self.settings.ErrorBarLine
+        painter.setPen( ebl.makeQPenWHide(painter) )
+        w = barwidth*0.25*ebl.endsize
+        if ishorz and not ebl.hideHorz:
             utils.plotLinesToPainter(painter, mincoord, posns,
                                      maxcoord, posns)
             if s.errorstyle == 'barends':
@@ -286,7 +287,7 @@ class BarPlotter(GenericPlotter):
                                          mincoord, posns+w)
                 utils.plotLinesToPainter(painter, maxcoord, posns-w,
                                          maxcoord, posns+w)
-        else:
+        elif not ishorz and not ebl.hideVert:
             utils.plotLinesToPainter(painter, posns, mincoord,
                                      posns, maxcoord)
             if s.errorstyle == 'barends':

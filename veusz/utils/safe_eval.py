@@ -23,16 +23,16 @@ The idea is to examine the compiled ast tree and chack for invalid
 entries
 """
 
-# don't do this as it messes up imported files
+# don't do this as it affects imported files
 # from __future__ import division
 import ast
 
-from ..compat import cstr, cbuiltins
-from .. import qtall as qt4
+from ..compat import cstr, cpy3, cbuiltins
+from .. import qtall as qt
 
 def _(text, disambiguation=None, context='SafeEval'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # blacklist of nodes
 forbidden_nodes = set((
@@ -193,10 +193,11 @@ def compileChecked(code, mode='eval', filename='<string>',
     mode = 'exec' or 'eval'
     """
 
-    try:
-        # non ascii filenames break without encoding
+    # python2 needs filename encoded
+    if not cpy3:
         filename = filename.encode('utf-8')
 
+    try:
         tree = ast.parse(code, filename, mode)
     except Exception as e:
         raise ValueError(_('Unable to parse file: %s') % cstr(e))

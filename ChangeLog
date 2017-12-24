@@ -1,4 +1,19 @@
 Changes in <next version>:
+ * Fix colormap sequence and randomize plugins
+ * Change hyphen to minus sign when using standard C formatting in tick labels
+ * Fix for Chinese and Korean characters in filenames on Windows
+ * Sort DatasetPlugin arguments for diffing
+
+Changes in 2.1.1:
+ * Fix dashed/dotted custom lines in EMF output
+ * Fix Fields in dataset plugins
+ * Fix data import plugins
+ * Use deprecated sipconfig if available to find SIP files
+ * Fix problems with opening files using command line arguments with
+   some encodings
+ * Hide splash if program takes too long to start
+
+Changes in 2.1:
  * If file cannot be imported on document load, ask user for a new filename
  * Only open HDF5 files in readonly mode
  * Do not simply log errors when loading data with ImportPlugins
@@ -6,6 +21,11 @@ Changes in <next version>:
  * Fix filename chooser and embedding in ImageFile widget
  * Force C++11 compilation on Unix
  * Fix document reload, export warning and unsafe loading dialogs
+ * Parameterize number of line steps in covariance widget
+ * Report error line number for csv reading exceptions
+ * Convert values from expressions to 1D arrays when required
+ * Take account of endsize setting for bar plot error bars
+ * Remove dependence on sipconfig in build and add sip build parameters
 
 Changes in 2.0.1:
  * Fix crash setting manual bins in histogram dialog box

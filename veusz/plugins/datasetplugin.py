@@ -420,7 +420,7 @@ class DatasetPluginManager(object):
     def saveToFile(self, fileobj):
         """Save command to load in plugin and parameters."""
 
-        args = [ repr(self.plugin.name), repr(self.fields) ]
+        args = [ utils.rrepr(self.plugin.name), utils.rrepr(self.fields) ]
 
         # look for renamed or deleted datasets
         names = {}
@@ -435,7 +435,7 @@ class DatasetPluginManager(object):
                 names[dsname] = currentname
 
         if names:
-            args.append( "datasetnames="+repr(names) )
+            args.append( "datasetnames="+utils.rrepr(names) )
 
         fileobj.write( 'DatasetPlugin(%s)\n' % (', '.join(args)) )
 

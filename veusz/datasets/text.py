@@ -68,7 +68,7 @@ class DatasetText(DatasetConcreteBase):
     def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
-        fileobj.write("SetDataText(%s, [\n" % repr(name))
+        fileobj.write("SetDataText(%s, [\n" % crepr(name))
         for line in self.data:
             fileobj.write("    %s,\n" % crepr(line))
         fileobj.write("])\n")

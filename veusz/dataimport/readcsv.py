@@ -21,9 +21,11 @@ in an easy-to-use manner."""
 
 from __future__ import division
 import re
+import csv
 import numpy as N
 
-from ..compat import crange, cnext, CIterator
+from .base import ImportingError
+from ..compat import crange, cnext, cstr, CIterator
 from .. import datasets
 from .. import utils
 from .. import qtall as qt4
@@ -37,13 +39,19 @@ class _FileReaderCols(CIterator):
     def __init__(self, csvreader):
         self.csvreader = csvreader
         self.maxlen = 0
+        self.line = 1
 
     def __iter__(self):
         return self
 
     def __next__(self):
         """Return next row."""
-        row = cnext(self.csvreader)
+        try:
+            row = cnext(self.csvreader)
+        except csv.Error as e:
+            raise ImportingError("Error in line %i: %s" % (self.line, cstr(e)))
+
+        self.line += 1
 
         # add blank columns up to maximum previously read
         self.maxlen = max(self.maxlen, len(row))
@@ -61,9 +69,14 @@ class _FileReaderRows(CIterator):
         self.data = []
         self.maxlength = 0
 
-        for line in csvreader:
-            self.maxlength = max(self.maxlength, len(line))
-            self.data.append(line)
+        lineno = 1
+        try:
+            for line in csvreader:
+                self.maxlength = max(self.maxlength, len(line))
+                self.data.append(line)
+                lineno += 1
+        except csv.Error as e:
+            raise ImportingError("Error in line %i: %s" % (lineno, cstr(e)))
 
         self.counter = 0
 

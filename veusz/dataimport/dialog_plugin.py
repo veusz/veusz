@@ -16,7 +16,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
+from __future__ import division, print_function, absolute_import
 
 from .. import qtall as qt4
 from .. import setting
@@ -115,9 +115,13 @@ class ImportTabPlugins(importdialog.ImportTab):
                 cntrl.deleteLater()
         del self.fields[:]
 
+        # requires a document to make controls below
+        import veusz.document
+        tempdoc = veusz.document.Document()
+
         # make new controls
         for row, field in enumerate(plugin.fields):
-            cntrls = field.makeControl(None, None)
+            cntrls = field.makeControl(tempdoc, None)
             layout.addWidget(cntrls[0], row, 0)
             layout.addWidget(cntrls[1], row, 1)
             self.fields.append(cntrls)
