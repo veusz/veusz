@@ -853,10 +853,9 @@ void AxisLabels::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVe
   // axes are scored to prefer front, bottom, left axes
   int bestscore = -1;
 
-  for(std::vector<unsigned>::const_iterator choice=axchoices.begin();
-      choice!=axchoices.end(); ++choice)
+  for(unsigned choice : axchoices)
     {
-      const Vec3 av((proj_starts[*choice]+proj_ends[*choice])*0.5);
+      const Vec3 av((proj_starts[choice]+proj_ends[choice])*0.5);
 
       // score is weighted towards front, then bottom, then left
       const int score = ((av(0) <= proj_cent(0))*10 +
@@ -865,7 +864,7 @@ void AxisLabels::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVe
       if(score > bestscore)
         {
           bestscore = score;
-          bestaxis = *choice;
+          bestaxis = choice;
         }
     }
 

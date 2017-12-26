@@ -57,9 +57,10 @@ def autoedges(data, fillfactor):
 
     return edges, idxs
 
-class _data:
-    def __init__(self, **args):
-        self.__dict__.update(args)
+class DataColor(setting.DataColor):
+    def __init__(self, *args, **argsv):
+        setting.DataColor.__init__(self, *args, **argsv)
+        self.get('data').newDefault('v')
 
 class Volume3D(plotters3d.GenericPlotter3D):
     """Plotting points in 3D."""
@@ -74,7 +75,7 @@ class Volume3D(plotters3d.GenericPlotter3D):
 
         s.add( setting.DatasetExtended(
             'transData', '',
-            descr=_('Transparency dataset (0-1)'),
+            descr=_('Transparency dataset, optional, 0-1'),
             usertext=_('Transparency')), 0 )
         s.add( setting.DatasetExtended(
             'zData', 'z',
@@ -88,7 +89,7 @@ class Volume3D(plotters3d.GenericPlotter3D):
             'xData', 'x',
             descr=_('X dataset'),
             usertext=_('X data')), 0 )
-        s.add(setting.DataColor(
+        s.add(DataColor(
             'DataColor', dimensions=1),
               0)
 
@@ -171,7 +172,6 @@ class Volume3D(plotters3d.GenericPlotter3D):
         zv = s.get('zData').getData(doc)
         vv = s.DataColor.get('data').getData(doc)
         if not xv or not yv or not zv or not vv:
-            print('no data')
             return
         trans = s.get('transData').getData(doc)
 
@@ -226,7 +226,7 @@ class Volume3D(plotters3d.GenericPlotter3D):
         yedges = axes[1].transformFromAxis(yedges)
         zedges = axes[2].transformFromAxis(zedges)
 
-        return _data(
+        return utils.Struct(
             xedges=xedges, xidxs=xidxs, yedges=yedges, yidxs=yidxs,
             zedges=zedges, zidxs=zidxs,
             vals=vv, trans=trans)

@@ -42,12 +42,12 @@ namespace
     minx = miny = std::numeric_limits<double>::infinity();
     maxx = maxy = -std::numeric_limits<double>::infinity();
 
-    for(FragmentVector::const_iterator f=frags.begin(); f!=frags.end(); ++f)
+    for(auto const& f : frags)
       {
-	for(unsigned p=0, np=f->nPointsVisible(); p<np; ++p)
+	for(unsigned p=0, np=f.nPointsVisible(); p<np; ++p)
 	  {
-	    double x = f->proj[p](0);
-	    double y = f->proj[p](1);
+	    double x = f.proj[p](0);
+	    double y = f.proj[p](1);
 	    if(std::isfinite(x) && std::isfinite(y))
 	      {
 		minx = std::min(minx, x);
@@ -294,29 +294,28 @@ void Scene::calcLighting()
   if(lights.empty())
     return;
 
-  for(FragmentVector::iterator frag=fragments.begin();
-      frag!=fragments.end(); ++frag)
+  for(auto &frag : fragments)
     {
-      if(frag->type == Fragment::FR_TRIANGLE && frag->surfaceprop != 0)
+      if(frag.type == Fragment::FR_TRIANGLE && frag.surfaceprop != 0)
         {
           // Calculate triangle norm. Make sure norm points towards
           // the viewer @ (0,0,0)
-          Vec3 tripos = (frag->points[0] + frag->points[1] +
-                         frag->points[2]) * (1./3.);
-          Vec3 norm = cross(frag->points[1] - frag->points[0],
-                            frag->points[2] - frag->points[0]);
+          Vec3 tripos = (frag.points[0] + frag.points[1] +
+                         frag.points[2]) * (1./3.);
+          Vec3 norm = cross(frag.points[1] - frag.points[0],
+                            frag.points[2] - frag.points[0]);
           if(dot(tripos, norm)<0)
             norm = -norm;
           norm.normalise();
 
           // get color of surface
-          const SurfaceProp* prop = frag->surfaceprop;
+          const SurfaceProp* prop = frag.surfaceprop;
           double r, g, b, a;
 
           if(prop->hasRGBs())
             {
               QRgb rgb = prop->
-                rgbs[std::min(frag->index, unsigned(prop->rgbs.size())-1)];
+                rgbs[std::min(frag.index, unsigned(prop->rgbs.size())-1)];
               r=qRed(rgb)*(1./255.); g=qGreen(rgb)*(1./255.);
               b=qBlue(rgb)*(1./255.); a=qAlpha(rgb)*(1./255.);
             }
@@ -326,25 +325,24 @@ void Scene::calcLighting()
             }
 
           // add lighting contributions
-          for(std::vector<Light>::const_iterator light = lights.begin();
-              light != lights.end(); ++light)
+          for(auto const& light : lights)
             {
               // Now dot vector from light source to triangle with norm
-              Vec3 light2tri = tripos-light->posn;
+              Vec3 light2tri = tripos-light.posn;
               light2tri.normalise();
 
               // add new lighting index
               double dotprod = std::max(0., dot(light2tri, norm));
 
               double delta = prop->refl * dotprod;
-              r += delta*light->r; g += delta*light->g; b += delta*light->b;
+              r += delta*light.r; g += delta*light.g; b += delta*light.b;
             }
 
-          frag->calccolor = qRgba( clip(int(r*255), 0, 255),
-                                   clip(int(g*255), 0, 255),
-                                   clip(int(b*255), 0, 255),
-                                   clip(int(a*255), 0, 255) );
-          frag->usecalccolor = 1;
+          frag.calccolor = qRgba( clip(int(r*255), 0, 255),
+                                  clip(int(g*255), 0, 255),
+                                  clip(int(b*255), 0, 255),
+                                  clip(int(a*255), 0, 255) );
+          frag.usecalccolor = 1;
         }
     }
 }
@@ -352,9 +350,9 @@ void Scene::calcLighting()
 void Scene::projectFragments(const Camera& cam)
 {
   // convert 3d to 2d coordinates using the Camera
-  for(FragmentVector::iterator f=fragments.begin(); f!=fragments.end(); ++f)
-    for(unsigned pi=0, np=f->nPointsTotal(); pi<np; ++pi)
-      f->proj[pi] = calcProjVec(cam.perspM, f->points[pi]);
+  for(auto& f : fragments)
+    for(unsigned pi=0, np=f.nPointsTotal(); pi<np; ++pi)
+      f.proj[pi] = calcProjVec(cam.perspM, f.points[pi]);
 }
 
 void Scene::renderPainters(const Camera& cam)
@@ -384,17 +382,17 @@ void Scene::renderBSP(const Camera& cam)
   // This is a hack to force lines to be rendered in front of
   // triangles and paths to be rendered in front of lines. Suggestions
   // to fix this are welcome.
-  for(FragmentVector::iterator f=fragments.begin(); f!=fragments.end(); ++f)
+  for(auto& f : fragments)
     {
-      switch(f->type)
+      switch(f.type)
         {
         case Fragment::FR_LINESEG:
-          f->points[0](2) += LINE_DELTA_DEPTH;
-          f->points[1](2) += LINE_DELTA_DEPTH;
+          f.points[0](2) += LINE_DELTA_DEPTH;
+          f.points[1](2) += LINE_DELTA_DEPTH;
           break;
         case Fragment::FR_PATH:
-          f->points[0](2) += 2*LINE_DELTA_DEPTH;
-          f->points[1](2) += 2*LINE_DELTA_DEPTH;
+          f.points[0](2) += 2*LINE_DELTA_DEPTH;
+          f.points[1](2) += 2*LINE_DELTA_DEPTH;
           break;
         default:
           break;

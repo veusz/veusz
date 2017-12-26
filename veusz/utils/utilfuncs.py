@@ -152,7 +152,7 @@ def pythonise(text):
     to make it easier for users. We also have to take account of quotes
     and backslashes.
     """
-    
+
     out = ''
     insingle = False    # in a single quote section
     indouble = False    # in a double quote section
@@ -594,3 +594,14 @@ def findOnPath(cmd):
         if os.path.isfile(cmdtry) and os.access(cmdtry, os.X_OK):
             return cmdtry
     return None
+
+class Struct:
+    """Simple structure-like class."""
+
+    def __init__(self, **args):
+        self.__dict__.update(args)
+
+    def __repr__(self):
+        return '<%s>' % str(
+            ', '.join('%s:%s' % (k, repr(getattr(self, k)))
+                       for k in sorted(self.__dict__)))
