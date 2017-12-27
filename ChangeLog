@@ -3,6 +3,7 @@ Changes in <next version>:
  * Change hyphen to minus sign when using standard C formatting in tick labels
  * Fix for Chinese and Korean characters in filenames on Windows
  * Sort DatasetPlugin arguments for diffing
+ * Fix bitmap EMF export in Python 3
 
 Changes in 2.1.1:
  * Fix dashed/dotted custom lines in EMF output

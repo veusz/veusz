@@ -23,11 +23,12 @@ Requires: PyQt-x11-gpl-4.6-snapshot-20090906.tar.gz
           pyemf
 """
 
-from __future__ import division
+from __future__ import division, absolute_import
 import struct
 
 import pyemf
 from .. import qtall as qt4
+from ..compat import cbytes
 
 inch_mm = 25.4
 scale = 100
@@ -145,13 +146,13 @@ class EMFPaintEngine(qt4.QPaintEngine):
         """Draw pixmap to display."""
 
         # convert pixmap to BMP format
-        bytes = qt4.QByteArray()
-        buffer = qt4.QBuffer(bytes)
-        buffer.open(qt4.QIODevice.WriteOnly)
-        pixmap.save(buffer, "BMP")
+        bytearr = qt4.QByteArray()
+        buf = qt4.QBuffer(bytearr)
+        buf.open(qt4.QIODevice.WriteOnly)
+        pixmap.save(buf, "BMP")
 
         # chop off bmp header to get DIB
-        bmp = str(buffer.data())
+        bmp = cbytes(buf.data())
         dib = bmp[0xe:]
         hdrsize, = struct.unpack('<i', bmp[0xe:0x12])
         dataindex, = struct.unpack('<i', bmp[0xa:0xe])
