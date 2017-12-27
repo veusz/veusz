@@ -173,9 +173,10 @@ class EMFPaintEngine(qt4.QPaintEngine):
         epix.cySrc = sr.height()
 
         epix.dwRop = 0xcc0020 # SRCCOPY
-        epix.offBmiSrc = epix.serializeOffset()
+        offset = epix.minstructsize + 8
+        epix.offBmiSrc = offset
         epix.cbBmiSrc = hdrsize
-        epix.offBitsSrc = epix.serializeOffset() + dataindex - 0xe
+        epix.offBitsSrc = offset + dataindex - 0xe
         epix.cbBitsSrc = datasize
         epix.iUsageSrc = 0x0 # DIB_RGB_COLORS
 
