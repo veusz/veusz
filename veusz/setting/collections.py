@@ -78,7 +78,7 @@ class Line(Settings):
 
     def makeQPenWHide(self, painter):
         """Make a pen, taking account of hide attribute."""
-        if self.hide:
+        if self.hide or self.transparency == 100:
             return qt4.QPen(qt4.Qt.NoPen)
         else:
             return self.makeQPen(painter)
@@ -172,7 +172,7 @@ class Brush(Settings):
 
     def makeQBrushWHide(self, painter):
         """Make a brush, taking account of hide attribute."""
-        if self.hide:
+        if self.hide or self.transparency == 100:
             return qt4.QBrush()
         else:
             return self.makeQBrush(painter)
