@@ -24,6 +24,8 @@
 #include <vector>
 #include <cmath>
 
+#define PI 3.14159265358979323846
+
 //////////////////////////////////////////////////////////////////////////////
 // 4-vector
 struct Vec4
@@ -269,6 +271,12 @@ struct Mat3
 	  m[y][x] = 0;
   }
 
+  Mat3(double a, double b, double c,
+       double d, double e, double f,
+       double g, double h, double i)
+    : m{{a,b,c},{d,e,f},{g,h,i}}
+  {}
+
   inline double& operator()(unsigned y, unsigned x) { return m[y][x]; }
   inline double operator()(unsigned y, unsigned x) const { return m[y][x]; }
 
@@ -333,6 +341,15 @@ inline Mat3 translateM3(double dx, double dy)
   m(1,0)=0; m(1,1)=1; m(1,2)=dy;
   m(2,0)=0; m(2,1)=0; m(2,2)=1;
   return m;
+}
+
+// determinant
+inline double det(const Mat3& m)
+{
+  return
+    m(0,0)*m(1,1)*m(2,2) - m(2,0)*m(1,1)*m(0,2) +
+    m(1,0)*m(2,1)*m(0,2) - m(1,0)*m(0,1)*m(2,2) +
+    m(2,0)*m(0,1)*m(1,2) - m(0,0)*m(2,1)*m(1,2);
 }
 
 //////////////////////////////////////////////////////////////////////////////

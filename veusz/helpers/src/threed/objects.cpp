@@ -875,7 +875,7 @@ void AxisLabels::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVe
   fragparams.scalepersp = false;
   fragparams.runcallback = true;
 
-  fragparams.axangle = (180/M_PI) * std::atan2
+  fragparams.axangle = (180/PI) * std::atan2
     ((proj_starts[bestaxis](1)+proj_ends[bestaxis](1))*0.5 - proj_cent(1),
      (proj_starts[bestaxis](0)+proj_ends[bestaxis](0))*0.5 - proj_cent(0));
 

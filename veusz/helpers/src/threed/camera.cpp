@@ -69,7 +69,7 @@ void Camera::setPerspective(double fov_degrees,
   // matrix from Scratchapixel 2
   // https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix
 
-  double scale = 1/std::tan(fov_degrees*(M_PI/180/2));
+  double scale = 1/std::tan(fov_degrees*(PI/180/2));
 
   perspM(0,0) = scale;
   perspM(1,0) = 0;
