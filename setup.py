@@ -169,7 +169,8 @@ setup(name = 'veusz',
                    'veusz/helpers/src/threed/twod.cpp',
                    'veusz/helpers/src/threed/threed.sip'],
                   language="c++",
-                  include_dirs=['veusz/helpers/src/threed'],
+                  include_dirs=[
+                      'veusz/helpers/src/threed', numpy.get_include()],
                   ),
 
         # mathml widget
