@@ -90,6 +90,11 @@ excluded_tests = set([
 
         # don't expect this to work
         'mathml.vsz',
+
+        # 3d not finished
+        '3d_function.vsz',
+        '3d_points.vsz',
+        '3d_surface.vsz',
     ])
 
 class StupidFontMetrics(object):
@@ -119,6 +124,9 @@ class StupidFontMetrics(object):
 
     def boundingRectChar(self, c):
         return qt4.QRectF(0, 0, self.height()*0.5, self.height())
+
+    def lineSpacing(self):
+        return 0.1*self.height()
 
 _pt = utils.textrender.PartText
 class PartTextAscii(_pt):
