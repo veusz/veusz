@@ -197,6 +197,9 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
         # standard fill: use Qt styles for painting
         color = extbrush.get('color').color(painter, dataindex=dataindex)
         if extbrush.transparency >= 0:
+            if extbrush.transparency == 100:
+                # skip filling fully transparent areas
+                return
             color.setAlphaF((100-extbrush.transparency) / 100.)
         brush = qt4.QBrush(color, _fillcnvt[style])
         if stroke is None:
