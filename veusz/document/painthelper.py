@@ -112,8 +112,9 @@ class PaintHelper(object):
     """
 
     def __init__(self, document, pagesize,
-                 scaling=1., dpi=(100, 100), directpaint=None):
+                 scaling=1, dpi=(100, 100), directpaint=None):
         """Initialise using page size (tuple of pixelw, pixelh).
+        Note: size can be float, which will be truncated
 
         If directpaint is set to a painter, use this directly rather
         than creating separate layers for rendering later. In this
@@ -126,7 +127,11 @@ class PaintHelper(object):
         self.dpi = dpi
         self.scaling = scaling
         self.pixperpt = self.dpi[1] / 72.
-        self.pagesize = ( max(pagesize[0], 1), max(pagesize[1], 1) )
+
+        # page size in pixels (without default zoom)
+        self.rawpagesize = max(pagesize[0], 1), max(pagesize[1], 1)
+        # page size after applying scaling
+        self.pagesize = self.rawpagesize[0]/scaling, self.rawpagesize[1]/scaling
 
         # keep track of states of all widgets
         # maps (widget, layer) to DrawState
@@ -190,10 +195,17 @@ class PaintHelper(object):
             p.restore()
             p.save()
 
-        p.updateMetaData(self)
-
         if clip is not None:
-            p.setClipRect(clip)
+            # have to clip before scaling, avoiding a qt bug where the clipping
+            # seems to happen in the wrong place
+            p.setClipRect(qt4.QRectF(
+                clip.topLeft()*self.scaling, clip.bottomRight()*self.scaling))
+
+        # scale (used for zooming)
+        if self.scaling != 1:
+            p.scale(self.scaling, self.scaling)
+
+        p.updateMetaData(self)
 
         return p
 

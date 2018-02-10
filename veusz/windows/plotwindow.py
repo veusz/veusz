@@ -133,8 +133,9 @@ class RenderControl(qt4.QObject):
 
         # don't process jobs which have been superseded
         if lastadded == jobid:
-            img = qt4.QImage(helper.pagesize[0], helper.pagesize[1],
-                             qt4.QImage.Format_ARGB32_Premultiplied)
+            img = qt4.QImage(
+                int(helper.rawpagesize[0]), int(helper.rawpagesize[1]),
+                qt4.QImage.Format_ARGB32_Premultiplied)
             img.fill( setting.settingdb.color('page').rgb() )
 
             painter = qt4.QPainter(img)
@@ -931,7 +932,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
             if self.pagenumber >= 0:
                 size = self.document.pageSize(
-                    self.pagenumber, scaling=self.zoomfactor)
+                    self.pagenumber, scaling=self.zoomfactor, integer=False)
 
                 # draw the data into the buffer
                 # errors cause an exception window to pop up

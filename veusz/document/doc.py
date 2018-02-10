@@ -507,9 +507,9 @@ class Document(qt4.QObject):
         if dpi is None:
             p = qt4.QPixmap(1, 1)
             dpi = (p.logicalDpiX(), p.logicalDpiY())
-        helper = painthelper.PaintHelper(self, (1,1), dpi=dpi, scaling=scaling)
-        w = widget.settings.get('width').convert(helper)
-        h = widget.settings.get('height').convert(helper)
+        helper = painthelper.PaintHelper(self, (1,1), dpi=dpi)
+        w = widget.settings.get('width').convert(helper) * scaling
+        h = widget.settings.get('height').convert(helper) * scaling
         if integer:
             return int(w), int(h)
         else:

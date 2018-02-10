@@ -413,7 +413,7 @@ class AxisBroken(axis.Axis):
 
         # make control item for axis
         phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
-                    self, self.settings.direction, self.coordParr1,
+                    self, phelper, self.settings.direction, self.coordParr1,
                     self.coordParr2, self.coordPerp, posn) ])
 
 # allow the factory to instantiate the widget

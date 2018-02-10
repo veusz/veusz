@@ -616,7 +616,7 @@ class RenderState(object):
 
     def getPixelsPerPt(self):
         """Return number of pixels per point in the rendering."""
-        return self.painter.pixperpt * self.painter.scaling
+        return self.painter.pixperpt
 
 class Part(object):
     """Represents a part of the text to be rendered, made up of smaller parts."""
@@ -1464,13 +1464,12 @@ class _MmlRenderer(_Renderer):
         ptsize = self.font.pointSizeF()
         if ptsize < 0:
             ptsize = self.font.pixelSize() / self.painter.pixperpt
-        ptsize /= self.painter.scaling
 
         doc.setBaseFontPointSize(ptsize * upscale)
 
         # the output will be painted finally scaled
         self.drawscale = (
-            self.painter.scaling * self.painter.dpi / screendev.logicalDpiY()
+            self.painter.dpi / screendev.logicalDpiY()
             / upscale )
         self.size = doc.size() * self.drawscale
 
