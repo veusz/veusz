@@ -22,7 +22,8 @@
 """About dialog module."""
 
 from __future__ import division
-from .. import qtall as qt4
+import os.path
+from .. import qtall as qt
 from .. import utils
 from .veuszdialog import VeuszDialog
 
@@ -33,9 +34,10 @@ class AboutDialog(VeuszDialog):
         VeuszDialog.__init__(self, mainwindow, 'about.ui', modal=True)
 
         # draw logo in dialog
-        self.frame.setBackgroundRole(qt4.QPalette.Base)
-        self.frame.setAutoFillBackground(True)
-        self.logolabel.setPixmap( utils.getPixmap('logo.png') )
+        logo = utils.SvgWidgetFixedAspect(os.path.join(utils.imagedir, 'logo.svg'))
+        self.logolayout.addWidget(logo)
+        self.logoframe.setBackgroundRole(qt.QPalette.Base)
+        self.logoframe.setAutoFillBackground(True)
 
         # add version to copyright text
         copyrighttext = self.copyrightlabel.text()

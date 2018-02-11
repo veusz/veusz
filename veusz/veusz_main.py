@@ -47,7 +47,7 @@ def handleIntSignal(signum, frame):
     '''Ask windows to close if Ctrl+C pressed.'''
     qt.qApp.closeAllWindows()
 
-def makeSplashLogo():
+def makeSplash(app):
     '''Make a splash screen logo.'''
 
     splash = qt.QSplashScreen()
@@ -55,9 +55,8 @@ def makeSplashLogo():
 
     # draw logo on pixmap
     layout = qt.QVBoxLayout(splash)
-    pm = utils.getPixmap('logo.png')
     logo = qt.QLabel()
-    logo.setPixmap(pm)
+    logo.setPixmap(utils.getPixmap('logo.png'))
     logo.setAlignment(qt.Qt.AlignCenter)
     layout.addWidget(logo)
 
@@ -248,7 +247,7 @@ class VeuszApp(qt.QApplication):
 
         if not (self.args.listen or self.args.export):
             # show the splash screen on normal start
-            self.splash = makeSplashLogo()
+            self.splash = makeSplash(self)
             self.splash.show()
 
         self.thread = ImportThread()
@@ -323,16 +322,21 @@ class VeuszApp(qt.QApplication):
 def run():
     '''Run the main application.'''
 
+    # high DPI support
+    try:
+        qt.QApplication.setAttribute(qt.Qt.AA_EnableHighDpiScaling, True)
+        qt.QApplication.setAttribute(qt.Qt.AA_UseHighDpiPixmaps, True)
+    except AttributeError:
+        # old qt versions
+        pass
+
     # jump to the embedding client entry point if required
     if len(sys.argv) == 2 and sys.argv[1] == '--embed-remote':
         from veusz.embed_remote import runremote
         runremote()
         return
 
-    # this function is spaghetti-like and has nasty code paths.
-    # the idea is to postpone the imports until the splash screen
-    # is shown
-
+    # start me up
     app = VeuszApp()
     app.startup()
     app.exec_()
