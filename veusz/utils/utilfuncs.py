@@ -34,7 +34,7 @@ from collections import defaultdict
 
 from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes, crepr, \
     crange
-from .. import qtall as qt4
+from .. import qtall as qt
 import numpy as N
 
 class IgnoreException(Exception):
@@ -138,9 +138,9 @@ def extendedColorFromQColor(col):
 
 def pixmapAsHtml(pix):
     """Get QPixmap as html image text."""
-    ba = qt4.QByteArray()
-    buf = qt4.QBuffer(ba)
-    buf.open(qt4.QIODevice.WriteOnly)
+    ba = qt.QByteArray()
+    buf = qt.QBuffer(ba)
+    buf.open(qt.QIODevice.WriteOnly)
     pix.toImage().save(buf, "PNG")
     b64 = cbytes(buf.data().toBase64()).decode('ascii')
     return '<img src="data:image/png;base64,%s">' % b64
@@ -322,7 +322,7 @@ def openEncoding(filename, encoding, mode='r'):
     instead.
     """
     if filename == '{clipboard}':
-        text = qt4.QApplication.clipboard().text()
+        text = qt.QApplication.clipboard().text()
         return CStringIO(text)
     else:
         return io.open(filename, mode, encoding=encoding, errors='ignore')
@@ -369,7 +369,7 @@ def get_unicode_csv_reader(filename, dialect=csv.excel,
             f = _UTF8Recoder(open(filename), encoding)
     else:
         # take the unicode clipboard and just put into utf-8 format
-        s = qt4.QApplication.clipboard().text()
+        s = qt.QApplication.clipboard().text()
         if not cpy3:
             s = s.encode("utf-8")
         f = CStringIO(s)
@@ -415,7 +415,7 @@ def populateCombo(combo, items):
 def positionFloatingPopup(popup, widget):
     """Position a popped up window (popup) to side and below widget given."""
     pos = widget.parentWidget().mapToGlobal( widget.pos() )
-    desktop = qt4.QApplication.desktop()
+    desktop = qt.QApplication.desktop()
 
     # recalculates out position so that size is correct below
     popup.adjustSize()
@@ -605,3 +605,36 @@ class Struct:
         return '<%s>' % str(
             ', '.join('%s:%s' % (k, repr(getattr(self, k)))
                        for k in sorted(self.__dict__)))
+
+class SvgWidgetFixedAspect(qt.QWidget):
+    """Draw an SVG file with the aspect ratio fixed to the original."""
+
+    def __init__(self, filename, *args):
+        qt.QWidget.__init__(self, *args)
+        self.renderer = qt.QSvgRenderer(filename, self)
+        self.defwidth = self.renderer.defaultSize().width()
+        self.defheight = self.renderer.defaultSize().height()
+
+    def sizeHint(self):
+        return qt.QSize(self.defwidth, self.defheight)
+
+    def paintEvent(self, evt):
+        painter = qt.QPainter(self)
+
+        w = self.width()
+        h = self.height()
+
+        ratio_x = w / self.defwidth
+        ratio_y = h / self.defheight
+        if ratio_x < ratio_y:
+            outw = w
+            outh = w*self.defheight//self.defwidth
+            left = 0
+            top = (h-outh)//2
+        else:
+            outw = h*self.defwidth//self.defheight
+            outh = h
+            left = (w-outw)//2
+            top = 0
+
+        self.renderer.render(painter, qt.QRectF(left, top, outw, outh))

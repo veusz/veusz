@@ -1197,7 +1197,7 @@ class Axis(widget.Widget):
 
         # make control item for axis
         phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
-                    self, s.direction, self.coordParr1,
+                    self, phelper, s.direction, self.coordParr1,
                     self.coordParr2, self.coordPerp, posn) ])
 
         # get tick vals

@@ -117,7 +117,6 @@ class BoxShape(Shape):
                          not s.get('width').isDataset(d) and
                          not s.get('height').isDataset(d) and
                          not s.get('rotate').isDataset(d) )
-        controlgraphitems = []
 
         clip = None
         if s.clip:
@@ -147,9 +146,10 @@ class BoxShape(Shape):
                 self.drawShape(painter, qt4.QRectF(-wp*0.5, -hp*0.5, wp, hp))
                 painter.restore()
 
+        controlgraphitems = []
         if x is not None and isnotdataset:
             cgi = controlgraph.ControlResizableBox(
-                self, [x, y], [wp, hp], r, allowrotate=True)
+                self, phelper, [x, y], [wp, hp], r, allowrotate=True)
             cgi.index = index
             cgi.widgetposn = posn
             index += 1

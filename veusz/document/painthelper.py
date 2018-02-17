@@ -105,28 +105,37 @@ class PaintHelper(object):
 
     Designed to be used for a particular page.
 
-    Provides a QPainter to each widget for plotting.
+    Provides a QPainter/RecordPainter to each widget for plotting.
     Records the controlgraphs for each widget.
     Holds the scaling, dpi and size of the page.
 
     """
 
     def __init__(self, document, pagesize,
-                 scaling=1., dpi=(100, 100), directpaint=None):
-        """Initialise using page size (tuple of pixelw, pixelh).
-
-        If directpaint is set to a painter, use this directly rather
-        than creating separate layers for rendering later. In this
-        case the painter must be a DirectPainter object, and
-        save()/restore() must be placed around doing the rendering to
-        the painter.
+                 scaling=1, devicepixelratio=1, dpi=(100, 100),
+                 directpaint=None):
+        """
+        pagesize: tuple (pixelw, pixelh), which can be float.
+         This is the page size in the coordinates presented to graph drawing.
+        scaling: scaling from graph coordinates to native coordinates
+        devicepixelratio: high DPI scaling factor from logical to native pixels
+        dpi: tuple of X and Y dpi for graph coordinates
+        directpaint: use this painter directly, rather than using RecordPainter
+          to store each widget painting
         """
 
         self.document = document
         self.dpi = dpi
         self.scaling = scaling
+        # scaling factor, excluding high-DPI factor (for controlgraphs)
+        self.cgscale = scaling / devicepixelratio
+        self.devicepixelratio = devicepixelratio
         self.pixperpt = self.dpi[1] / 72.
-        self.pagesize = ( max(pagesize[0], 1), max(pagesize[1], 1) )
+
+        # page size in native pixels (without default zoom)
+        self.rawpagesize = max(pagesize[0], 1), max(pagesize[1], 1)
+        # page size in graph pixels
+        self.pagesize = self.rawpagesize[0]/scaling, self.rawpagesize[1]/scaling
 
         # keep track of states of all widgets
         # maps (widget, layer) to DrawState
@@ -190,10 +199,17 @@ class PaintHelper(object):
             p.restore()
             p.save()
 
-        p.updateMetaData(self)
-
         if clip is not None:
-            p.setClipRect(clip)
+            # have to clip before scaling, avoiding a qt bug where the clipping
+            # seems to happen in the wrong place
+            p.setClipRect(qt4.QRectF(
+                clip.topLeft()*self.scaling, clip.bottomRight()*self.scaling))
+
+        # scale (used for zooming)
+        if self.scaling != 1:
+            p.scale(self.scaling, self.scaling)
+
+        p.updateMetaData(self)
 
         return p
 
@@ -232,7 +248,11 @@ class PaintHelper(object):
         root is the root widget to recurse from
         if antialias is true, do test for antialiased drawing
         """
-        
+
+        # convert screen to bitmap coordinates
+        x *= self.devicepixelratio
+        y *= self.devicepixelratio
+
         # make a small image filled with a specific color
         box = 3
         specialcolor = qt4.QColor(254, 255, 254)

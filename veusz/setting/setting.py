@@ -593,8 +593,7 @@ class IntOrAuto(Setting):
 
 def _distPhys(match, painter, mult):
     """Convert a physical unit measure in multiples of points."""
-    return (painter.pixperpt * mult *
-            float(match.group(1)) * painter.scaling)
+    return painter.pixperpt * mult * float(match.group(1))
 
 def _idistval(val, unit):
     """Convert value to text, dropping zeros and . points on right."""
@@ -602,8 +601,7 @@ def _idistval(val, unit):
 
 def _distInvPhys(pixdist, painter, mult, unit):
     """Convert number of pixels into physical distance."""
-    return _idistval( pixdist / (mult * painter.pixperpt * painter.scaling),
-                      unit )
+    return _idistval(pixdist / (mult*painter.pixperpt), unit)
 
 def _distPerc(match, painter):
     """Convert from a percentage of maxdim."""

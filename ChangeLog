@@ -4,6 +4,11 @@ Changes in <next version>:
  * Fix for Chinese and Korean characters in filenames on Windows
  * Sort DatasetPlugin arguments for diffing
  * Fix bitmap EMF export in Python 3
+ * The redo operation can now be done multiple times
+ * Add support for high DPI displays
+ * Change zoom code scale plots, rather than changing the size of elements,
+   so that plots look more similar at different zoom levels
+ * Hide fully transparent objects, rather than trying to draw them
 
 Changes in 2.1.1:
  * Fix dashed/dotted custom lines in EMF output

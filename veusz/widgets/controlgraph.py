@@ -27,64 +27,101 @@ from __future__ import division
 import math
 
 from ..compat import crange, czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 
 def _(text, disambiguation=None, context='controlgraph'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 ##############################################################################
 
-class _ShapeCorner(qt4.QGraphicsRectItem):
+class _ScaledShape:
+    """Mixing class for shapes which can return scaled positions.
+
+    The control items are plotted on a zoomed plot, so the raw
+    unscaled coordinates need to be scaled by params.cgscale to be in
+    the correct position.
+
+    We could scale everything to achieve this, but the line widths and
+    size of objects would be changed.
+
+    """
+
+    def setScaledPos(self, x, y):
+        self.setPos(x*self.params.cgscale, y*self.params.cgscale)
+
+    def scaledPos(self):
+        return self.pos()/self.params.cgscale
+
+    def setScaledLine(self, x1, y1, x2, y2):
+        s = self.params.cgscale
+        self.setLine(x1*s, y1*s, x2*s, y2*s)
+
+    def setScaledLinePos(self, x1, y1, x2, y2):
+        s = self.params.cgscale
+        self.setPos(x1*s, y1*s)
+        self.setLine(0,0,(x2-x1)*s,(y2-y1)*s)
+
+    def scaledX(self):
+        return self.x()/self.params.cgscale
+
+    def scaledY(self):
+        return self.y()/self.params.cgscale
+
+##############################################################################
+
+class _ShapeCorner(qt.QGraphicsRectItem, _ScaledShape):
     """Representing the corners of the rectangle."""
-    def __init__(self, parent, rotator=False):
-        qt4.QGraphicsRectItem.__init__(self, parent)
+    def __init__(self, parent, params, rotator=False):
+        qt.QGraphicsRectItem.__init__(self, parent)
+        self.params = params
         if rotator:
-            self.setBrush( qt4.QBrush(setting.settingdb.color('cntrlline')) )
+            self.setBrush( qt.QBrush(setting.settingdb.color('cntrlline')) )
             self.setRect(-3, -3, 6, 6)
         else:
-            self.setBrush(qt4.QBrush(setting.settingdb.color('cntrlcorner')) )
+            self.setBrush(qt.QBrush(setting.settingdb.color('cntrlcorner')) )
             self.setRect(-5, -5, 10, 10)
-        self.setPen(qt4.QPen(qt4.Qt.NoPen))
-        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
+        self.setPen(qt.QPen(qt.Qt.NoPen))
+        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
         self.setZValue(3.)
 
     def mouseMoveEvent(self, event):
         """Notify parent on move."""
-        qt4.QGraphicsRectItem.mouseMoveEvent(self, event)
+        qt.QGraphicsRectItem.mouseMoveEvent(self, event)
         self.parentItem().updateFromCorner(self, event)
 
     def mouseReleaseEvent(self, event):
         """Notify parent on unclicking."""
-        qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
+        qt.QGraphicsRectItem.mouseReleaseEvent(self, event)
         self.parentItem().updateWidget()
 
 ##############################################################################
 
 def controlLinePen():
     """Get pen for lines around shapes."""
-    return qt4.QPen(setting.settingdb.color('cntrlline'), 2, qt4.Qt.DotLine)
+    return qt.QPen(setting.settingdb.color('cntrlline'), 2, qt.Qt.DotLine)
 
-class _EdgeLine(qt4.QGraphicsLineItem):
+class _EdgeLine(qt.QGraphicsLineItem, _ScaledShape):
     """Line used for edges of resizing box."""
-    def __init__(self, parent, ismovable=True):
-        qt4.QGraphicsLineItem.__init__(self, parent)
+    def __init__(self, parent, params, ismovable=True):
+        qt.QGraphicsLineItem.__init__(self, parent)
         self.setPen(controlLinePen())
         self.setZValue(2.)
+        self.params = params
         if ismovable:
-            self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
-            self.setCursor(qt4.Qt.SizeAllCursor)
+            self.setFlag(qt.QGraphicsItem.ItemIsMovable)
+            self.setCursor(qt.Qt.SizeAllCursor)
 
     def mouseMoveEvent(self, event):
         """Notify parent on move."""
-        qt4.QGraphicsLineItem.mouseMoveEvent(self, event)
-        self.parentItem().updateFromLine(self, self.pos())
+        qt.QGraphicsLineItem.mouseMoveEvent(self, event)
+        self.parentItem().updateFromLine(self, self.scaledPos())
 
     def mouseReleaseEvent(self, event):
         """Notify parent on unclicking."""
-        qt4.QGraphicsLineItem.mouseReleaseEvent(self, event)
+        qt.QGraphicsLineItem.mouseReleaseEvent(self, event)
         self.parentItem().updateWidget()
 
 ##############################################################################
@@ -112,7 +149,7 @@ class ControlMarginBox(object):
         # we need these later to convert back to original units
         self.document = painthelper.document
         self.pagesize = painthelper.pagesize
-        self.scaling = painthelper.scaling
+        self.cgscale = painthelper.cgscale
         self.dpi = painthelper.dpi
 
     def createGraphicsItem(self, parent):
@@ -135,7 +172,7 @@ class ControlMarginBox(object):
         # set up fake painthelper containing veusz scalings
         helper = document.PaintHelper(
             self.document, self.pagesize,
-            scaling=self.scaling, dpi=self.dpi)
+            scaling=self.cgscale, dpi=self.dpi)
 
         # convert to physical units
         left = s.get('leftMargin').convertInverse(left, helper)
@@ -167,7 +204,7 @@ class ControlMarginBox(object):
         # set up fake painter containing veusz scalings
         helper = document.PaintHelper(
             self.document, self.pagesize,
-            scaling=self.scaling, dpi=self.dpi)
+            scaling=self.cgscale, dpi=self.dpi)
 
         # convert to physical units
         width = s.get('width').convertInverse(width, helper)
@@ -181,7 +218,7 @@ class ControlMarginBox(object):
         self.widget.document.applyOperation(
             document.OperationMultiple(operations, descr=_('change page size')))
 
-class _GraphMarginBox(qt4.QGraphicsItem):
+class _GraphMarginBox(qt.QGraphicsItem):
     """A box which can be moved or resized.
 
     Can automatically set margins or widget
@@ -193,18 +230,18 @@ class _GraphMarginBox(qt4.QGraphicsItem):
     def __init__(self, parent, params):
         """Create control box item."""
 
-        qt4.QGraphicsItem.__init__(self, parent)
+        qt.QGraphicsItem.__init__(self, parent)
         self.params = params
 
         self.setZValue(2.)
 
         # create corners of box
-        self.corners = [_ShapeCorner(self)
-                        for i in crange(4)]
+        self.corners = [_ShapeCorner(self, params) for i in crange(4)]
 
         # lines connecting corners
         self.lines = [
-            _EdgeLine(self, ismovable=params.ismovable) for i in crange(4)]
+            _EdgeLine(self, params, ismovable=params.ismovable)
+            for i in crange(4)]
 
         # hide corners if box is not resizable
         if not params.isresizable:
@@ -219,10 +256,10 @@ class _GraphMarginBox(qt4.QGraphicsItem):
         par = self.params
         pos = par.posn
         # update cursors
-        self.corners[0].setCursor(qt4.Qt.SizeFDiagCursor)
-        self.corners[1].setCursor(qt4.Qt.SizeBDiagCursor)
-        self.corners[2].setCursor(qt4.Qt.SizeBDiagCursor)
-        self.corners[3].setCursor(qt4.Qt.SizeFDiagCursor)
+        self.corners[0].setCursor(qt.Qt.SizeFDiagCursor)
+        self.corners[1].setCursor(qt.Qt.SizeBDiagCursor)
+        self.corners[2].setCursor(qt.Qt.SizeBDiagCursor)
+        self.corners[3].setCursor(qt.Qt.SizeFDiagCursor)
 
         # trim box to maximum size
         pos[0] = max(pos[0], par.maxposn[0])
@@ -233,18 +270,14 @@ class _GraphMarginBox(qt4.QGraphicsItem):
         # move corners
         for corner, (xindex, yindex) in czip(self.corners,
                                              self.mapcornertoposn):
-            corner.setPos(pos[xindex], pos[yindex])
+            corner.setScaledPos(pos[xindex], pos[yindex])
 
         # move lines
         w, h = pos[2]-pos[0], pos[3]-pos[1]
-        self.lines[0].setPos(pos[0], pos[1])
-        self.lines[0].setLine(0, 0,  w,  0)
-        self.lines[1].setPos(pos[2], pos[1])
-        self.lines[1].setLine(0, 0,  0,  h)
-        self.lines[2].setPos(pos[2], pos[3])
-        self.lines[2].setLine(0, 0, -w,  0)
-        self.lines[3].setPos(pos[0], pos[3])
-        self.lines[3].setLine(0, 0,  0, -h)
+        self.lines[0].setScaledLinePos(pos[0], pos[1], pos[0]+w, pos[1])
+        self.lines[1].setScaledLinePos(pos[2], pos[1], pos[2], pos[1]+h)
+        self.lines[2].setScaledLinePos(pos[2], pos[3], pos[2]-w, pos[3])
+        self.lines[3].setScaledLinePos(pos[0], pos[3], pos[0], pos[3]-h)
 
     def updateFromLine(self, line, thispos):
         """Edge line of box was moved - update bounding box."""
@@ -288,8 +321,8 @@ class _GraphMarginBox(qt4.QGraphicsItem):
             return
 
         pos = self.params.posn
-        pos[ self.mapcornertoposn[index][0] ] = corner.x()
-        pos[ self.mapcornertoposn[index][1] ] = corner.y()
+        pos[ self.mapcornertoposn[index][0] ] = corner.scaledX()
+        pos[ self.mapcornertoposn[index][1] ] = corner.scaledY()
 
         # this is needed if the corners move past each other
         if pos[0] > pos[2]:
@@ -304,17 +337,16 @@ class _GraphMarginBox(qt4.QGraphicsItem):
             self.corners[1], self.corners[3] = self.corners[3], self.corners[1]
 
         self.updateCornerPosns()
-        
+
     def boundingRect(self):
-        return qt4.QRectF(0, 0, 0, 0)
+        return qt.QRectF(0, 0, 0, 0)
 
     def paint(self, painter, option, widget):
-        """Intentionally empty painter."""
+        pass
 
     def updateWidget(self):
         """Update widget margins."""
         self.params.widget.updateControlItem(self.params)
-
 
 ##############################################################################
 
@@ -323,7 +355,7 @@ class ControlResizableBox(object):
     Item resizes centred around a position
     """
 
-    def __init__(self, widget, posn, dims, angle, allowrotate=False):
+    def __init__(self, widget, phelper, posn, dims, angle, allowrotate=False):
         """Initialise with widget and boxbounds shape.
         Rotation is allowed if allowrotate is set
         """
@@ -332,11 +364,12 @@ class ControlResizableBox(object):
         self.dims = dims
         self.angle = angle
         self.allowrotate = allowrotate
+        self.cgscale = phelper.cgscale
 
     def createGraphicsItem(self, parent):
         return _GraphResizableBox(parent, self)
 
-class _GraphResizableBox(qt4.QGraphicsItem):
+class _GraphResizableBox(qt.QGraphicsItem):
     """Control a resizable box.
     Item resizes centred around a position
     """
@@ -346,27 +379,27 @@ class _GraphResizableBox(qt4.QGraphicsItem):
         Rotation is allowed if allowrotate is set
         """
 
-        qt4.QGraphicsItem.__init__(self, parent)
+        qt.QGraphicsItem.__init__(self, parent)
         self.params = params
 
         # create child graphicsitem for each corner
-        self.corners = [_ShapeCorner(self) for i in crange(4)]
-        self.corners[0].setCursor(qt4.Qt.SizeFDiagCursor)
-        self.corners[1].setCursor(qt4.Qt.SizeBDiagCursor)
-        self.corners[2].setCursor(qt4.Qt.SizeBDiagCursor)
-        self.corners[3].setCursor(qt4.Qt.SizeFDiagCursor)
+        self.corners = [_ShapeCorner(self, params) for i in crange(4)]
+        self.corners[0].setCursor(qt.Qt.SizeFDiagCursor)
+        self.corners[1].setCursor(qt.Qt.SizeBDiagCursor)
+        self.corners[2].setCursor(qt.Qt.SizeBDiagCursor)
+        self.corners[3].setCursor(qt.Qt.SizeFDiagCursor)
         for c in self.corners:
             c.setToolTip(_('Hold shift to resize symmetrically'))
 
         # lines connecting corners
         self.lines = [
-            _EdgeLine(self, ismovable=True) for i in crange(4)]
+            _EdgeLine(self, params, ismovable=True) for i in crange(4)]
 
         # whether box is allowed to be rotated
         self.rotator = None
         if params.allowrotate:
-            self.rotator = _ShapeCorner(self, rotator=True)
-            self.rotator.setCursor(qt4.Qt.CrossCursor)
+            self.rotator = _ShapeCorner(self, params, rotator=True)
+            self.rotator.setCursor(qt.Qt.CrossCursor)
 
         self.updateCorners()
 
@@ -375,8 +408,8 @@ class _GraphResizableBox(qt4.QGraphicsItem):
 
         par = self.params
 
-        x = corner.pos().x()-par.posn[0]
-        y = corner.pos().y()-par.posn[1]
+        x = corner.scaledX()-par.posn[0]
+        y = corner.scaledY()-par.posn[1]
 
         if corner in self.corners:
             # rotate position back
@@ -385,7 +418,7 @@ class _GraphResizableBox(qt4.QGraphicsItem):
             tx = x*c-y*s
             ty = x*s+y*c
 
-            if event.modifiers() & qt4.Qt.ShiftModifier:
+            if event.modifiers() & qt.Qt.ShiftModifier:
                 # expand around centre
                 par.dims[0] = abs(tx*2)
                 par.dims[1] = abs(ty*2)
@@ -430,32 +463,34 @@ class _GraphResizableBox(qt4.QGraphicsItem):
         for corn, (xd, yd) in czip(
                 self.corners, ((-1, -1), (1, -1), (-1, 1), (1, 1))):
             dx, dy = xd*par.dims[0]*0.5, yd*par.dims[1]*0.5
-            corn.setPos(dx*c-dy*s + par.posn[0],
-                        dx*s+dy*c + par.posn[1])
+            corn.setScaledPos(
+                dx*c-dy*s + par.posn[0],
+                dx*s+dy*c + par.posn[1])
 
         if self.rotator:
             # set rotator position (constant distance)
             dx, dy = 0, -par.dims[1]*0.5
             nx = dx*c-dy*s
             ny = dx*s+dy*c
-            self.rotator.setPos(nx+par.posn[0], ny+par.posn[1])
+            self.rotator.setScaledPos(nx+par.posn[0], ny+par.posn[1])
 
         self.linepos = []
         corn = self.corners
         for i, (ci1, ci2) in enumerate(((0, 1), (2, 0), (1, 3), (2, 3))):
-            pos = (corn[ci1].x(), corn[ci1].y())
-            self.lines[i].setPos(*pos)
-            self.lines[i].setLine(
-                0, 0, corn[ci2].x()-pos[0], corn[ci2].y()-pos[1])
-            self.linepos.append(pos)
+            pos1 = corn[ci1].scaledX(), corn[ci1].scaledY()
+            self.lines[i].setScaledLinePos(
+                pos1[0], pos1[1],
+                corn[ci2].scaledX(), corn[ci2].scaledY())
+            self.linepos.append(pos1)
 
     def updateFromLine(self, line, thispos):
         """Edge line of box was moved - update bounding box."""
 
         # need old coordinate to work out how far line has moved
         oldpos = self.linepos[self.lines.index(line)]
-        dx = line.pos().x() - oldpos[0]
-        dy = line.pos().y() - oldpos[1]
+
+        dx = line.scaledX() - oldpos[0]
+        dy = line.scaledY() - oldpos[1]
         self.params.posn[0] += dx
         self.params.posn[1] += dy
 
@@ -468,7 +503,7 @@ class _GraphResizableBox(qt4.QGraphicsItem):
 
     def boundingRect(self):
         """Intentionally zero bounding rect."""
-        return qt4.QRectF(0, 0, 0, 0)
+        return qt.QRectF(0, 0, 0, 0)
 
     def paint(self, painter, option, widget):
         """Intentionally empty painter."""
@@ -494,8 +529,8 @@ class ControlMovableBox(ControlMarginBox):
 class _GraphMovableBox(_GraphMarginBox):
     def __init__(self, parent, params):
         _GraphMarginBox.__init__(self, parent, params)
-        self.cross = _ShapeCorner(self)
-        self.cross.setCursor(qt4.Qt.SizeAllCursor)
+        self.cross = _ShapeCorner(self, params)
+        self.cross.setCursor(qt.Qt.SizeAllCursor)
         self.updateCornerPosns()
 
     def updateCornerPosns(self):
@@ -504,14 +539,15 @@ class _GraphMovableBox(_GraphMarginBox):
         par = self.params
         if hasattr(self, 'cross'):
             # this fails if called before self.cross is initialised!
-            self.cross.setPos( par.deltacrosspos[0] + par.posn[0],
-                               par.deltacrosspos[1] + par.posn[1] )
+            self.cross.setScaledPos(
+                par.deltacrosspos[0] + par.posn[0],
+                par.deltacrosspos[1] + par.posn[1])
 
     def updateFromCorner(self, corner, event):
         if corner == self.cross:
             # if cross moves, move whole box
             par = self.params
-            cx, cy = self.cross.pos().x(), self.cross.pos().y()
+            cx, cy = self.cross.scaledX(), self.cross.scaledY()
             dx = cx - (par.deltacrosspos[0] + par.posn[0])
             dy = cy - (par.deltacrosspos[1] + par.posn[1])
 
@@ -527,77 +563,80 @@ class _GraphMovableBox(_GraphMarginBox):
 
 class ControlLine(object):
     """For controlling the position and ends of a line."""
-    def __init__(self, widget, x1, y1, x2, y2):
+    def __init__(self, widget, phelper, x1, y1, x2, y2):
         self.widget = widget
         self.line = x1, y1, x2, y2
+        self.cgscale = phelper.cgscale
+
     def createGraphicsItem(self, parent):
         return _GraphLine(parent, self)
 
-class _GraphLine(qt4.QGraphicsLineItem):
+class _GraphLine(qt.QGraphicsLineItem, _ScaledShape):
     """Represents the line as a graphics item."""
     def __init__(self, parent, params):
-        l = params.line
-        qt4.QGraphicsLineItem.__init__(self, l[0], l[1], l[2], l[3], parent)
+        qt.QGraphicsLineItem.__init__(self, parent)
         self.params = params
-
-        self.setCursor(qt4.Qt.SizeAllCursor)
-        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
-        self.setZValue(1.)
+        l = self.params.line
+        self.setScaledLine(l[0], l[1], l[2], l[3])
+        self.setCursor(qt.Qt.SizeAllCursor)
+        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
         self.setPen(controlLinePen())
-        self.pts = [_ShapeCorner(self, rotator=True),
-                    _ShapeCorner(self, rotator=True)]
-        self.pts[0].setPos(params.line[0], params.line[1])
-        self.pts[1].setPos(params.line[2], params.line[3])
-        self.pts[0].setCursor(qt4.Qt.CrossCursor)
-        self.pts[1].setCursor(qt4.Qt.CrossCursor)
+        self.setZValue(1.)
+
+        self.p0 = _ShapeCorner(self, params, rotator=True)
+        self.p0.setScaledPos(params.line[0], params.line[1])
+        self.p0.setCursor(qt.Qt.CrossCursor)
+        self.p1 = _ShapeCorner(self, params, rotator=True)
+        self.p1.setScaledPos(params.line[2], params.line[3])
+        self.p1.setCursor(qt.Qt.CrossCursor)
 
     def updateFromCorner(self, corner, event):
         """Take position and update ends of line."""
-        line = (self.pts[0].x(), self.pts[0].y(),
-                self.pts[1].x(), self.pts[1].y())
-        self.setLine(*line)
+        c = (self.p0.scaledX(), self.p0.scaledY(),
+             self.p1.scaledX(), self.p1.scaledY())
+        self.setScaledLine(*c)
 
     def mouseReleaseEvent(self, event):
         """If widget has moved, tell it."""
-        qt4.QGraphicsItem.mouseReleaseEvent(self, event)
+        qt.QGraphicsItem.mouseReleaseEvent(self, event)
         self.updateWidget()
 
     def updateWidget(self):
         """Update caller with position and line positions."""
 
-        pt1 = ( self.pts[0].x() + self.pos().x(),
-                self.pts[0].y() + self.pos().y() )
-        pt2 = ( self.pts[1].x() + self.pos().x(),
-                self.pts[1].y() + self.pos().y() )
+        x, y = self.scaledX(), self.scaledY()
+        pt1 = self.p0.scaledX()+x, self.p0.scaledY()+y
+        pt2 = self.p1.scaledX()+x, self.p1.scaledY()+y
 
         self.params.widget.updateControlItem(self.params, pt1, pt2)
 
 #############################################################################
 
-class _AxisGraphicsLineItem(qt4.QGraphicsLineItem):
-    def __init__(self, parent):
-        qt4.QGraphicsLineItem.__init__(self, parent)
+class _AxisGraphicsLineItem(qt.QGraphicsLineItem, _ScaledShape):
+    def __init__(self, parent, params):
+        qt.QGraphicsLineItem.__init__(self, parent)
         self.parent = parent
+        self.params = params
 
         self.setPen(controlLinePen())
         self.setZValue(2.)
-        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
+        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
 
     def mouseReleaseEvent(self, event):
         """Notify finished."""
-        qt4.QGraphicsLineItem.mouseReleaseEvent(self, event)
+        qt.QGraphicsLineItem.mouseReleaseEvent(self, event)
         self.parent.updateWidget()
 
     def mouseMoveEvent(self, event):
         """Move the axis."""
-        qt4.QGraphicsLineItem.mouseMoveEvent(self, event)
+        qt.QGraphicsLineItem.mouseMoveEvent(self, event)
         self.parent.doLineUpdate()
 
 class ControlAxisLine(object):
     """Controlling position of an axis."""
 
-    def __init__(self, widget, direction, minpos, maxpos, axispos,
-                 maxposn):
+    def __init__(self, widget, painthelper, direction,
+                 minpos, maxpos, axispos, maxposn):
         self.widget = widget
         self.direction = direction
         if minpos > maxpos:
@@ -606,6 +645,7 @@ class ControlAxisLine(object):
         self.maxpos = self.maxzoom = self.maxorig = maxpos
         self.axisorigpos = self.axispos = axispos
         self.maxposn = maxposn
+        self.cgscale = painthelper.cgscale
 
     def zoomed(self):
         """Is this a zoom?"""
@@ -619,20 +659,20 @@ class ControlAxisLine(object):
     def createGraphicsItem(self, parent):
         return _GraphAxisLine(parent, self)
 
-class _GraphAxisLine(qt4.QGraphicsItem):
+class _GraphAxisLine(qt.QGraphicsItem):
 
-    curs = {True: qt4.Qt.SizeVerCursor,
-            False: qt4.Qt.SizeHorCursor}
-    curs_zoom = {True: qt4.Qt.SplitVCursor,
-                 False: qt4.Qt.SplitHCursor}
+    curs = {True: qt.Qt.SizeVerCursor,
+            False: qt.Qt.SizeHorCursor}
+    curs_zoom = {True: qt.Qt.SplitVCursor,
+                 False: qt.Qt.SplitHCursor}
 
     def __init__(self, parent, params):
         """Line is about to be shown."""
-        qt4.QGraphicsItem.__init__(self, parent)
+        qt.QGraphicsItem.__init__(self, parent)
         self.params = params
-        self.pts = [ _ShapeCorner(self), _ShapeCorner(self),
-                     _ShapeCorner(self), _ShapeCorner(self) ]
-        self.line = _AxisGraphicsLineItem(self)
+        self.pts = [ _ShapeCorner(self, params), _ShapeCorner(self, params),
+                     _ShapeCorner(self, params), _ShapeCorner(self, params) ]
+        self.line = _AxisGraphicsLineItem(self, params)
 
         # set cursors and tooltips for items
         self.horz = (params.direction == 'horizontal')
@@ -651,6 +691,7 @@ class _GraphAxisLine(qt4.QGraphicsItem):
     def updatePos(self):
         """Set ends of line and line positions from stored values."""
         par = self.params
+        scaling = par.cgscale
         mxp = par.maxposn
 
         def _clip(*args):
@@ -660,40 +701,43 @@ class _GraphAxisLine(qt4.QGraphicsItem):
             par.axispos = max(par.axispos, mxp[args[2]])
             par.axispos = min(par.axispos, mxp[args[3]])
 
+        # distance zoom boxes offset from axis
+        offset = 15/scaling
+
         if self.horz:
             _clip(0, 2, 1, 3)
 
             # set positions
             if par.zoomed():
-                self.line.setPos(par.minzoom, par.axispos)
-                self.line.setLine(0, 0, par.maxzoom-par.minzoom, 0)
+                self.line.setScaledPos(par.minzoom, par.axispos)
+                self.line.setScaledLine(0, 0, par.maxzoom-par.minzoom, 0)
             else:
-                self.line.setPos(par.minpos, par.axispos)
-                self.line.setLine(0, 0, par.maxpos-par.minpos, 0)
-            self.pts[0].setPos(par.minpos, par.axispos)
-            self.pts[1].setPos(par.maxpos, par.axispos)
-            self.pts[2].setPos(par.minzoom, par.axispos-15)
-            self.pts[3].setPos(par.maxzoom, par.axispos-15)
+                self.line.setScaledPos(par.minpos, par.axispos)
+                self.line.setScaledLine(0, 0, par.maxpos-par.minpos, 0)
+            self.pts[0].setScaledPos(par.minpos, par.axispos)
+            self.pts[1].setScaledPos(par.maxpos, par.axispos)
+            self.pts[2].setScaledPos(par.minzoom, par.axispos-offset)
+            self.pts[3].setScaledPos(par.maxzoom, par.axispos-offset)
         else:
             _clip(1, 3, 0, 2)
 
             # set positions
             if par.zoomed():
-                self.line.setPos(par.axispos, par.minzoom)
-                self.line.setLine(0, 0, 0, par.maxzoom-par.minzoom)
+                self.line.setScaledPos(par.axispos, par.minzoom)
+                self.line.setScaledLine(0, 0, 0, par.maxzoom-par.minzoom)
             else:
-                self.line.setPos(par.axispos, par.minpos)
-                self.line.setLine(0, 0, 0, par.maxpos-par.minpos)
-            self.pts[0].setPos(par.axispos, par.minpos)
-            self.pts[1].setPos(par.axispos, par.maxpos)
-            self.pts[2].setPos(par.axispos+15, par.minzoom)
-            self.pts[3].setPos(par.axispos+15, par.maxzoom)
+                self.line.setScaledPos(par.axispos, par.minpos)
+                self.line.setScaledLine(0, 0, 0, par.maxpos-par.minpos)
+            self.pts[0].setScaledPos(par.axispos, par.minpos)
+            self.pts[1].setScaledPos(par.axispos, par.maxpos)
+            self.pts[2].setScaledPos(par.axispos+offset, par.minzoom)
+            self.pts[3].setScaledPos(par.axispos+offset, par.maxzoom)
 
     def updateFromCorner(self, corner, event):
         """Ends of axis have moved, so update values."""
 
         par = self.params
-        pt = (corner.y(), corner.x())[self.horz]
+        pt = (corner.scaledY(), corner.scaledX())[self.horz]
         # which end has moved?
         if corner is self.pts[0]:
             # horizonal or vertical axis?
@@ -714,11 +758,10 @@ class _GraphAxisLine(qt4.QGraphicsItem):
 
     def doLineUpdate(self):
         """Line has moved, so update position."""
-        pos = self.line.pos()
         if self.horz:
-            self.params.axispos = pos.y()
+            self.params.axispos = self.line.scaledY()
         else:
-            self.params.axispos = pos.x()
+            self.params.axispos = self.line.scaledX()
         self.updatePos()
 
     def updateWidget(self):
@@ -727,8 +770,7 @@ class _GraphAxisLine(qt4.QGraphicsItem):
 
     def boundingRect(self):
         """Intentionally zero bounding rect."""
-        return qt4.QRectF(0, 0, 0, 0)
+        return qt.QRectF(0, 0, 0, 0)
 
     def paint(self, painter, option, widget):
         """Intentionally empty painter."""
-

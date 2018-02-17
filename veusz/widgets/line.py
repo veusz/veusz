@@ -233,7 +233,7 @@ class Line(plotters.FreePlotter):
 
                 if isnotdataset:
                     cgi = controlgraph.ControlLine(
-                        self, x, y,
+                        self, phelper, x, y,
                         x + l*math.cos(a/180.*math.pi),
                         y + l*math.sin(a/180.*math.pi))
                     cgi.index = index

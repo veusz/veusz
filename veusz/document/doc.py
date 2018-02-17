@@ -157,13 +157,15 @@ class Document(qt4.QObject):
         """Log a message - this is emitted as a signal."""
         self.sigLog.emit(message)
 
-    def applyOperation(self, operation):
+    def applyOperation(self, operation, redoing=False):
         """Apply operation to the document.
 
         Operations represent atomic actions which can be done to the document
         and undone.
 
         Updates are suspended during the operation.
+
+        If redoing is not True, the redo stack is cleared
         """
 
         with DocSuspend(self):
@@ -176,7 +178,9 @@ class Document(qt4.QObject):
         else:
             # standard mode
             self.historyundo = self.historyundo[-9:] + [operation]
-        self.historyredo = []
+
+        if not redoing:
+            self.historyredo = []
 
         return retn
 
@@ -211,7 +215,7 @@ class Document(qt4.QObject):
     def redoOperation(self):
         """Redo undone operations."""
         operation = self.historyredo.pop()
-        return self.applyOperation(operation)
+        return self.applyOperation(operation, redoing=True)
 
     def canRedo(self):
         """Returns True if previous operation can be redone."""
@@ -507,9 +511,9 @@ class Document(qt4.QObject):
         if dpi is None:
             p = qt4.QPixmap(1, 1)
             dpi = (p.logicalDpiX(), p.logicalDpiY())
-        helper = painthelper.PaintHelper(self, (1,1), dpi=dpi, scaling=scaling)
-        w = widget.settings.get('width').convert(helper)
-        h = widget.settings.get('height').convert(helper)
+        helper = painthelper.PaintHelper(self, (1,1), dpi=dpi)
+        w = widget.settings.get('width').convert(helper) * scaling
+        h = widget.settings.get('height').convert(helper) * scaling
         if integer:
             return int(w), int(h)
         else:

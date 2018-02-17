@@ -133,8 +133,9 @@ class RenderControl(qt4.QObject):
 
         # don't process jobs which have been superseded
         if lastadded == jobid:
-            img = qt4.QImage(helper.pagesize[0], helper.pagesize[1],
-                             qt4.QImage.Format_ARGB32_Premultiplied)
+            img = qt4.QImage(
+                int(helper.rawpagesize[0]), int(helper.rawpagesize[1]),
+                qt4.QImage.Format_ARGB32_Premultiplied)
             img.fill( setting.settingdb.color('page').rgb() )
 
             painter = qt4.QPainter(img)
@@ -912,65 +913,87 @@ class PlotWindow( qt4.QGraphicsView ):
         if ismodified and self.interval == -1:
             self.checkPlotUpdate()
 
+    def getDevicePixelRatio(self):
+        """Get device pixel ratio for window."""
+        # ugly, as we have to get it from QWindow
+        widget = self
+        while widget:
+            window = widget.windowHandle()
+            if window is not None:
+                try:
+                    return window.devicePixelRatio()
+                except AttributeError:
+                    return 1
+            widget = widget.parent()
+        return 1
+
     def checkPlotUpdate(self):
         """Check whether plot needs updating."""
 
-        # print >>sys.stderr, "checking update"
         # no threads, so can't get interrupted here
         # draw data into background pixmap if modified
-        if ( self.zoomfactor != self.oldzoom or
-             self.document.changeset != self.docchangeset or
-             self.pagenumber != self.oldpagenumber ):
 
-            # print >>sys.stderr, "updating"
-            self.pickeritem.hide()
+        # is an update required?
+        if ( self.zoomfactor == self.oldzoom and
+             self.document.changeset == self.docchangeset and
+             self.pagenumber == self.oldpagenumber ):
+            return
 
-            self.pagenumber = min( self.document.getNumberPages() - 1,
-                                   self.pagenumber )
-            self.oldpagenumber = self.pagenumber
+        self.pickeritem.hide()
 
-            if self.pagenumber >= 0:
-                size = self.document.pageSize(
-                    self.pagenumber, scaling=self.zoomfactor)
+        # do we need the following line?
+        self.pagenumber = min(
+            self.document.getNumberPages()-1, self.pagenumber)
+        self.oldpagenumber = self.pagenumber
 
-                # draw the data into the buffer
-                # errors cause an exception window to pop up
-                try:
-                    phelper = document.PaintHelper(
-                        self.document, size,
-                        scaling=self.zoomfactor, dpi=self.dpi)
-                    self.document.paintTo(phelper, self.pagenumber)
+        if self.pagenumber >= 0:
+            devicepixelratio = self.getDevicePixelRatio()
+            scaling = self.zoomfactor*devicepixelratio
+            size = self.document.pageSize(
+                self.pagenumber, scaling=scaling, integer=False)
 
-                except Exception:
-                    # stop updates this time round and show exception dialog
-                    d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
-                    self.oldzoom = self.zoomfactor
-                    self.docchangeset = self.document.changeset
-                    d.exec_()
+            # draw the data into the buffer
+            # errors cause an exception window to pop up
+            try:
+                phelper = document.PaintHelper(
+                    self.document, size,
+                    scaling=scaling,
+                    dpi=self.dpi,
+                    devicepixelratio=devicepixelratio)
+                self.document.paintTo(phelper, self.pagenumber)
 
-                self.painthelper = phelper
-                self.rendercontrol.addJob(phelper)
-            else:
-                self.painthelper = None
-                self.pagenumber = 0
-                size = self.document.docSize()
-                pixmap = qt4.QPixmap(*size)
-                pixmap.fill( setting.settingdb.color('page') )
-                self.setSceneRect(0, 0, *size)
-                self.pixmapitem.setPixmap(pixmap)
+            except Exception:
+                # stop updates this time round and show exception dialog
+                d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
+                self.oldzoom = self.zoomfactor
+                self.docchangeset = self.document.changeset
+                d.exec_()
 
-            self.sigUpdatePage.emit(self.pagenumber)
-            self.updatePageToolbar()
+            self.painthelper = phelper
+            self.rendercontrol.addJob(phelper)
+        else:
+            self.painthelper = None
+            self.pagenumber = 0
+            size = self.document.docSize()
+            pixmap = qt4.QPixmap(*size)
+            pixmap.fill( setting.settingdb.color('page') )
+            self.setSceneRect(0, 0, *size)
+            self.pixmapitem.setPixmap(pixmap)
 
-            self.updateControlGraphs(self.lastwidgetsselected)
-            self.oldzoom = self.zoomfactor
-            self.docchangeset = self.document.changeset
+        self.sigUpdatePage.emit(self.pagenumber)
+        self.updatePageToolbar()
+
+        self.updateControlGraphs(self.lastwidgetsselected)
+        self.oldzoom = self.zoomfactor
+        self.docchangeset = self.document.changeset
 
     def slotRenderFinished(self, jobid, img, helper):
         """Update image on display if rendering (usually in other
         thread) finished."""
+        dpr = helper.devicepixelratio
         bufferpixmap = qt4.QPixmap.fromImage(img)
-        self.setSceneRect(0, 0, bufferpixmap.width(), bufferpixmap.height())
+        bufferpixmap.setDevicePixelRatio(dpr)
+        self.setSceneRect(0, 0, bufferpixmap.width()/dpr, bufferpixmap.height()/dpr)
         self.pixmapitem.setPixmap(bufferpixmap)
 
     def updatePlotSettings(self):
