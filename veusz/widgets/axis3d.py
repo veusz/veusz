@@ -26,7 +26,7 @@ import itertools
 
 from . import widget
 from . import axisticks
-from .axis import TickLabel, AutoRange
+from . import axis
 from ..compat import czip
 from .. import qtall as qt
 from .. import document
@@ -221,6 +221,13 @@ class AxisLabel(setting.Text):
             descr = _('Position of axis label'),
             usertext = _('Position') ) )
 
+class TickLabel(axis.TickLabel):
+    """3D axis tick label."""
+    def __init__(self, name, **args):
+        axis.TickLabel.__init__(self, name, **args)
+        self.remove('rotate')
+        self.remove('offset')
+
 class Axis3D(widget.Widget):
     """Manages and draws an axis."""
 
@@ -266,7 +273,7 @@ class Axis3D(widget.Widget):
             'log', False,
             descr = _('Whether axis is logarithmic'),
             usertext=_('Log')) )
-        s.add( AutoRange(
+        s.add( axis.AutoRange(
             'autoRange', 'next-tick') )
         s.add( setting.Choice(
             'mode',
@@ -280,17 +287,6 @@ class Axis3D(widget.Widget):
             descr = _('Place axis on opposite side of graph '
                       'if none'),
             usertext=_('Auto mirror'),
-            formatting=True) )
-        s.add( setting.Bool(
-            'reflect', False,
-            descr = _('Place axis text and ticks on other side'
-                      ' of axis'),
-            usertext=_('Reflect'),
-            formatting=True) )
-        s.add( setting.Bool(
-            'outerticks', False,
-            descr = _('Place ticks on outside of graph'),
-            usertext=_('Outer ticks'),
             formatting=True) )
 
         s.add( setting.Float(
