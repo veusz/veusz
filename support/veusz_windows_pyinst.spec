@@ -46,6 +46,11 @@ for f in ( glob.glob('icons/*.png') + glob.glob('icons/*.ico') +
            glob.glob('ui/*.ui') ):
     binaries.append( (f, f, 'DATA') )
 
+binaries += [
+    ('msvcp140.dll', r'c:\windows\system32\msvcp140.dll', 'BINARY'),
+    ('msvcrt.dll', r'c:\windows\system32\msvcrt.dll', 'BINARY'),
+    ]
+
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
