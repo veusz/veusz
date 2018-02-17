@@ -9,6 +9,7 @@ Changes in <next version>:
  * Change zoom code scale plots, rather than changing the size of elements,
    so that plots look more similar at different zoom levels
  * Hide fully transparent objects, rather than trying to draw them
+ * Fix bug report script in Python 3
 
 Changes in 2.1.1:
  * Fix dashed/dotted custom lines in EMF output
