@@ -167,13 +167,13 @@ class EMFPaintEngine(qt4.QPaintEngine):
         epix.yDest = int(r.top()*scale)
         epix.cxDest = int(r.width()*scale)
         epix.cyDest = int(r.height()*scale)
-        epix.xSrc = sr.left()
-        epix.ySrc = sr.top()
-        epix.cxSrc = sr.width()
-        epix.cySrc = sr.height()
+        epix.xSrc = int(sr.left())
+        epix.ySrc = int(sr.top())
+        epix.cxSrc = int(sr.width())
+        epix.cySrc = int(sr.height())
 
         epix.dwRop = 0xcc0020 # SRCCOPY
-        offset = epix.minstructsize + 8
+        offset = epix.format.minstructsize + 8
         epix.offBmiSrc = offset
         epix.cbBmiSrc = hdrsize
         epix.offBitsSrc = offset + dataindex - 0xe
