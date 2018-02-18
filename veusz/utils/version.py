@@ -26,9 +26,11 @@ Return Veusz' version number
 from __future__ import division
 import os.path
 import sys
+import datetime
 
 from . import utilfuncs
 from ..compat import curlrequest
+from .. import qtall as qt
 
 _errmsg = """Failed to find VERSION file.
 
@@ -76,6 +78,46 @@ def latestVersion():
         return None
 
     return latest
+
+class VersionCheckThread(qt.QThread):
+    """Asynchronously check for new version, emitting signal if found."""
+
+    newversion = qt.pyqtSignal(str)
+
+    # minimum number of days to wait between checks
+    mininterval = 7
+
+    def run(self):
+        # can't import setting above because of loops
+        from .. import setting
+
+        if ( disableVersionChecks or
+             setting.settingdb['vercheck_disabled'] or
+             not setting.settingdb['vercheck_asked_user']):
+            return
+
+        today = datetime.date.today()
+        dayssincecheck = (
+            today -
+            datetime.date(*setting.settingdb[
+                'vercheck_last_done'])).days
+
+        if dayssincecheck >= self.mininterval or dayssincecheck < 0:
+            setting.settingdb['vercheck_last_done'] = (
+                today.year, today.month, today.day)
+            #print("doing check")
+            latestver = latestVersion()
+            if latestver:
+                setting.settingdb['vercheck_latest'] = latestver
+
+        thisver = version()
+        latestver = setting.settingdb['vercheck_latest']
+        #print('latest ver', latestver, thisver)
+
+        # is newer version available?
+        if ( latestver and
+             versionToTuple(latestver) > versionToTuple(thisver)):
+            self.newversion.emit(latestver)
 
 # patch this to be True if you are packaging Veusz and want to disable
 # version checks

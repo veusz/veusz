@@ -868,41 +868,22 @@ class MainWindow(qt4.QMainWindow):
         mininterval is minimum check interval in days
         """
 
-        isupdate = False
-        if (not utils.disableVersionChecks and
-            not setting.settingdb['vercheck_disabled'] and
-            setting.settingdb['vercheck_asked_user']):
 
-            # how long was it since last check?
-            today = datetime.date.today()
-            dayssincelastcheck = (
-                today -
-                datetime.date(*setting.settingdb['vercheck_last_done'])).days
+        self.vzactions['help.update'].setVisible(False)
 
-            if dayssincelastcheck >= mininterval:
-                # check once per week
-                #print('doing version check')
-                setting.settingdb['vercheck_last_done'] = (
-                    today.year, today.month, today.day)
-                latestver = utils.latestVersion()
-                if latestver:
-                    setting.settingdb['vercheck_latest'] = latestver
+        # asynchronous version check
+        thread = utils.VersionCheckThread(self)
+        thread.newversion.connect(self.slotNewVersion)
+        thread.finished.connect(thread.deleteLater)
+        thread.start()
 
-            thisver = utils.version()
-            latestver = setting.settingdb['vercheck_latest']
-            #print('latest ver', latestver, thisver)
-            # is newer version available?
-            isupdate = (
-                latestver and
-                utils.versionToTuple(latestver)>utils.versionToTuple(thisver))
-
-            if isupdate:
-                msg = _('Veusz %s is available for download - see Help menu') % latestver
-                self.statusBar().showMessage(msg, 5000)
-                self.vzactions['help.update'].setText(
-                    _('Download new Veusz %s') % latestver)
-
-        self.vzactions['help.update'].setVisible(isupdate)
+    def slotNewVersion(self, ver):
+        """Called when there is a new version."""
+        msg = _('Veusz %s is available for download - see Help menu') % ver
+        self.statusBar().showMessage(msg, 5000)
+        self.vzactions['help.update'].setText(
+            _('Download new Veusz %s') % ver)
+        self.vzactions['help.update'].setVisible(True)
 
     def slotHelpUpdate(self):
         """Open web page to update."""
