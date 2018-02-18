@@ -415,4 +415,5 @@ class EMFPaintDevice(qt4.QPaintDevice):
             return 1
 
         else:
-            raise RuntimeError("Invalid metric parameter: %i" % m)
+            # fall back
+            return qt4.QPaintDevice.metric(self, m)

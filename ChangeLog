@@ -10,6 +10,7 @@ Changes in <next version>:
    so that plots look more similar at different zoom levels
  * Hide fully transparent objects, rather than trying to draw them
  * Fix bug report script in Python 3
+ * Fallback for paint device metrics, fixing bugs when PyQt is older than Qt
 
 Changes in 2.1.1:
  * Fix dashed/dotted custom lines in EMF output
