@@ -855,23 +855,12 @@ class MainWindow(qt4.QMainWindow):
         setting.settingdb['vercheck_disabled'] = retn==qt4.QMessageBox.No
         setting.settingdb['vercheck_asked_user'] = True
 
-    def doVersionCheck(self, mininterval=7):
+    def doVersionCheck(self):
         """Check whether there is a new version.
-
-        If there is, update status bar and enable help menu option to
-        download it.
-
-        This is disabled if the user has disabled version checks, the
-        user hasn't accepted checks or if utils.disableVersionChecks
-        has been set.
-
-        mininterval is minimum check interval in days
         """
-
-
         self.vzactions['help.update'].setVisible(False)
 
-        # asynchronous version check
+        # check is done asynchronously
         thread = utils.VersionCheckThread(self)
         thread.newversion.connect(self.slotNewVersion)
         thread.finished.connect(thread.deleteLater)

@@ -99,8 +99,7 @@ class VersionCheckThread(qt.QThread):
         today = datetime.date.today()
         dayssincecheck = (
             today -
-            datetime.date(*setting.settingdb[
-                'vercheck_last_done'])).days
+            datetime.date(*setting.settingdb['vercheck_last_done'])).days
 
         if dayssincecheck >= self.mininterval or dayssincecheck < 0:
             setting.settingdb['vercheck_last_done'] = (
