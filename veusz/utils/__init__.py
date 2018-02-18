@@ -18,7 +18,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from .version import version
+from .version import version, latestVeuszVersion, disableVeuszVersionChecks
 from .textrender import Renderer, FontMetrics, latexEscape
 from .safe_eval import compileChecked, SafeEvalException
 from .fitlm import fitLM

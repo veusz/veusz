@@ -28,6 +28,7 @@ import os.path
 import sys
 
 from . import utilfuncs
+from ..compat import curlrequest
 
 _errmsg = """Failed to find VERSION file.
 
@@ -48,3 +49,35 @@ def version():
     except EnvironmentError:
         sys.stderr.write(_errmsg)
         sys.exit(1)
+
+def latestVeuszVersion():
+    """Get latest version of Veusz from website.
+
+    Returns None if error
+
+    Returns object with elements
+    new_intver: list of version elements for new version e.g. (2,1,1),
+    new_ver: text of new version '2.1.1'
+    cur_intver and cur_ver same for current version
+    """
+
+    try:
+        p = curlrequest.urlopen(
+            'http://veusz.github.io/download/newest-version.html').read()
+        latest = p.decode('ascii').strip()
+        intver = tuple([int(i) for i in latest.split('.')])
+    except Exception:
+        return None
+
+    thisver = version()
+
+    return utilfuncs.Struct(
+        new_intver=intver,
+        new_ver=latest,
+        cur_intver=tuple([int(x) for x in thisver.split('.')]),
+        cur_ver=thisver,
+        )
+
+# patch this to be True if you are packaging Veusz and want to disable
+# the version checks
+disableVeuszVersionChecks=False
