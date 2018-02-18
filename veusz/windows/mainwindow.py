@@ -25,6 +25,7 @@ import os.path
 import sys
 import glob
 import re
+import datetime
 
 try:
     import h5py
@@ -110,6 +111,11 @@ class MainWindow(qt4.QMainWindow):
             win.askTutorial()
         # don't ask again
         setting.settingdb['ask_tutorial'] = True
+
+        # check if version check is ok
+        win.askVersionCheck()
+        # do the check
+        win.doVersionCheck()
 
         return win
 
@@ -536,6 +542,10 @@ class MainWindow(qt4.QMainWindow):
             'help.bug':
                 a(self, _('Report a bug on the internet'),
                   _('Suggestions and bugs'), self.slotHelpBug),
+            'help.update':
+                a(self, _('Download latest version'),
+                  _('Download latest version'), self.slotHelpUpdate),
+
             'help.tutorial':
                 a(self, _('An interactive Veusz tutorial'),
                   _('Tutorial'), self.slotHelpTutorial),
@@ -610,7 +620,7 @@ class MainWindow(qt4.QMainWindow):
             'data.reload',
             ]
         helpmenu = [
-            'help.home', 'help.bug',
+            'help.home', 'help.bug', 'help.update',
             '',
             'help.tutorial',
             '',
@@ -816,6 +826,88 @@ class MainWindow(qt4.QMainWindow):
         """Show about dialog."""
         from ..dialogs.aboutdialog import AboutDialog
         AboutDialog(self).exec_()
+
+    def askVersionCheck(self, mininterval=7):
+        """Check with user whether to do version checks.
+
+        This is only done after the user has been using the program
+        for mininterval days
+
+        """
+
+        dayssinceinstall = (
+            datetime.date.today() -
+            datetime.date(*setting.settingdb['install_date'])).days
+        if (dayssinceinstall<mininterval or
+            setting.settingdb['vercheck_asked_user'] or
+            setting.settingdb['vercheck_disabled'] or
+            utils.disableVersionChecks):
+            return
+
+        retn = qt4.QMessageBox.question(
+            self, _("Version check"),
+            _("Veusz will periodically check for new Veusz versions and\n"
+              "let you know if there is a new one available.\n\n"
+              "Is this ok? This choice can be changed in Preferences."),
+            qt4.QMessageBox.Yes | qt4.QMessageBox.No
+            )
+
+        setting.settingdb['vercheck_disabled'] = retn==qt4.QMessageBox.No
+        setting.settingdb['vercheck_asked_user'] = True
+
+    def doVersionCheck(self, mininterval=7):
+        """Check whether there is a new version.
+
+        If there is, update status bar and enable help menu option to
+        download it.
+
+        This is disabled if the user has disabled version checks, the
+        user hasn't accepted checks or if utils.disableVersionChecks
+        has been set.
+
+        mininterval is minimum check interval in days
+        """
+
+        isupdate = False
+        if (not utils.disableVersionChecks and
+            not setting.settingdb['vercheck_disabled'] and
+            setting.settingdb['vercheck_asked_user']):
+
+            # how long was it since last check?
+            today = datetime.date.today()
+            dayssincelastcheck = (
+                today -
+                datetime.date(*setting.settingdb['vercheck_last_done'])).days
+
+            if dayssincelastcheck >= mininterval:
+                # check once per week
+                #print('doing version check')
+                setting.settingdb['vercheck_last_done'] = (
+                    today.year, today.month, today.day)
+                latestver = utils.latestVersion()
+                if latestver:
+                    setting.settingdb['vercheck_latest'] = latestver
+
+            thisver = utils.version()
+            latestver = setting.settingdb['vercheck_latest']
+            #print('latest ver', latestver, thisver)
+            # is newer version available?
+            isupdate = (
+                latestver and
+                utils.versionToTuple(latestver)>utils.versionToTuple(thisver))
+
+            if isupdate:
+                msg = _('Veusz %s is available for download - see Help menu') % latestver
+                self.statusBar().showMessage(msg, 5000)
+                self.vzactions['help.update'].setText(
+                    _('Download new Veusz %s') % latestver)
+
+        self.vzactions['help.update'].setVisible(isupdate)
+
+    def slotHelpUpdate(self):
+        """Open web page to update."""
+        qt4.QDesktopServices.openUrl(qt4.QUrl(
+            'https://veusz.github.io/download/'))
 
     def queryOverwrite(self):
         """Do you want to overwrite the current document.

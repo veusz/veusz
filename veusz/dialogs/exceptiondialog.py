@@ -206,19 +206,23 @@ class ExceptionDialog(VeuszDialog):
         """See whether there is a later version of veusz and inform the
         user."""
 
-        ver = utils.latestVeuszVersion()
-
-        if not ver:
+        newver = utils.latestVersion()
+        thisver = utils.version()
+        if not newver:
             msg = _('Could not check the latest Veusz version')
         else:
-            if ver.cur_intver == ver.new_intver:
+            # convert to tuples for comparison
+            newver_tup = utils.versionToTuple(newver)
+            thisver_tup = utils.versionToTuple(thisver)
+
+            if thisver_tup == newver_tup:
                 msg = _('You are running the latest released Veusz version')
-            elif ver.cur_intver > ver.new_intver:
+            elif thisver_tup > newver_tup:
                 msg = _('You are running an unreleased Veusz version')
             else:
                 msg = (
                     _('<b>Your current version of Veusz is old. '
-                      'Veusz %s is available.</b>') % ver.new_ver)
+                      'Veusz %s is available.</b>') % newver)
 
         self.veuszversionlabel.setText(msg)
 

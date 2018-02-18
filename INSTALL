@@ -179,3 +179,7 @@ into your Applications directory.
 - Icons are also included in the icons directory with the names
   veusz_16.png, _32, _48, _64 and _128. A scalable icon can be found
   in veusz.svg.
+
+- Veusz will periodically (once per week) check for updates. This can
+  be disabled by patching veusz/utils/version.py to set
+  disableVersionChecks=True.
