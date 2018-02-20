@@ -520,7 +520,8 @@ class BarPlotter(GenericPlotter):
 
         # get data
         doc = self.document
-        positions = s.get('posn').getData(doc)
+        positions = s.get('posn')
+        positions = None if positions.isEmpty() else positions.getData(doc)
         lengths = s.get('lengths').getData(doc)
         if not lengths:
             return

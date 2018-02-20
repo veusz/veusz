@@ -1,17 +1,18 @@
 Changes in 2.2:
+ * Notify user updates to Veusz are available
+ * Add support for high DPI displays
+ * Change zoom code scale plots, rather than changing the size of elements,
+   so that plots look more similar at different zoom levels
  * Fix colormap sequence and randomize plugins
  * Change hyphen to minus sign when using standard C formatting in tick labels
  * Fix for Chinese and Korean characters in filenames on Windows
  * Sort DatasetPlugin arguments for diffing
  * Fix bitmap EMF export in Python 3
  * The redo operation can now be done multiple times
- * Add support for high DPI displays
- * Change zoom code scale plots, rather than changing the size of elements,
-   so that plots look more similar at different zoom levels
  * Hide fully transparent objects, rather than trying to draw them
  * Fix bug report script in Python 3
  * Fallback for paint device metrics, fixing bugs when PyQt is older than Qt
- * Notify user updates to Veusz are available
+ * If barplot positions setting is blank but set, treat as unset
 
 Changes in 2.1.1:
  * Fix dashed/dotted custom lines in EMF output
