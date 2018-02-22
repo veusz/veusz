@@ -104,7 +104,7 @@ class ExceptionSendDialog(VeuszDialog):
 
         try:
             # send the message
-            curlrequest.urlopen(_emailUrl, b'message=%s'+text)
+            curlrequest.urlopen(_emailUrl, b'message='+text)
         except:
             # something went wrong...
             qt.QMessageBox.critical(
