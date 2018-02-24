@@ -183,3 +183,8 @@ into your Applications directory.
 - Veusz will periodically (once per week) check for updates. This can
   be disabled by patching veusz/utils/version.py to set
   disableVersionChecks=True.
+
+- Veusz will automatically send anonymous feedback (after
+  confirmation) to the developers giving version information and
+  counts of feature use. This can be disabled by patching
+  veusz/utils/feedback.py to set disableFeedback=True.

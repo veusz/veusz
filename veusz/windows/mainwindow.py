@@ -114,8 +114,12 @@ class MainWindow(qt4.QMainWindow):
 
         # check if version check is ok
         win.askVersionCheck()
-        # do the check
+        # periodically do the check
         win.doVersionCheck()
+
+        # is it ok to do feedback?
+        win.askFeedbackCheck()
+        # periodically send feedback
         win.doFeedback()
 
         return win
@@ -866,6 +870,35 @@ class MainWindow(qt4.QMainWindow):
         thread.newversion.connect(self.slotNewVersion)
         thread.finished.connect(thread.deleteLater)
         thread.start()
+
+    def askFeedbackCheck(self, mininterval=3):
+        """Check with user whether to do feedback.
+
+        This is only done after the user has been using the program
+        for mininterval days
+
+        """
+
+        dayssinceinstall = (
+            datetime.date.today() -
+            datetime.date(*setting.settingdb['install_date'])).days
+        if (dayssinceinstall<mininterval or
+            setting.settingdb['feedback_asked_user'] or
+            setting.settingdb['feedback_disabled'] or
+            utils.disableFeedback):
+            return
+
+        retn = qt4.QMessageBox.question(
+            self, _("Send automatic feedback"),
+            _("Veusz will automatically send anonymous feedback to the\n"
+              "developers, with information about the version of software\n"
+              "dependencies and how often features are used.\n\n"
+              "Is this ok? This choice can be changed in Preferences."),
+            qt4.QMessageBox.Yes | qt4.QMessageBox.No
+            )
+
+        setting.settingdb['feedback_disabled'] = retn==qt4.QMessageBox.No
+        setting.settingdb['feedback_asked_user'] = True
 
     def doFeedback(self):
         """Give feedback."""

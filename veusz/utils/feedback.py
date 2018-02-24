@@ -37,7 +37,7 @@ ensure lack of traceability.
 """
 
 # patch this to disable any feedback
-disable_feedback=False
+disableFeedback=False
 
 # for QSettings
 _org='veusz.org'
@@ -94,9 +94,9 @@ class FeedbackCheckThread(qt.QThread):
 
         # exit if disabled
         if (settingdb['feedback_disabled'] or
-            disable_feedback or
+            disableFeedback or
             not settingdb['feedback_asked_user']):
-            print('disabled')
+            #print('disabled')
             return
 
         setn = qt.QSettings(_org, _app)
@@ -105,7 +105,7 @@ class FeedbackCheckThread(qt.QThread):
         # and when we last tried (lastattempt), so we don't send too
         # often
 
-        today = datetime.date.today() + datetime.timedelta(42)
+        today = datetime.date.today()
         today_tpl = (today.year, today.month, today.day)
 
         # don't try to send too often
@@ -161,7 +161,7 @@ class FeedbackCheckThread(qt.QThread):
             f.close()
 
             if retn == 'ok':
-                print("success")
+                #print("success")
                 # reset in stats file and set date last done
                 setn.setValue('counts/widget', '{}')
                 setn.setValue('counts/import', '{}')
@@ -169,5 +169,5 @@ class FeedbackCheckThread(qt.QThread):
                 setn.setValue('last-sent', repr(today_tpl))
 
         except Exception as e:
-            print("failure")
+            #print("failure")
             pass

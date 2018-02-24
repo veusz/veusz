@@ -3,6 +3,8 @@ Changes in 2.2:
  * Add support for high DPI displays
  * Change zoom code scale plots, rather than changing the size of elements,
    so that plots look more similar at different zoom levels
+ * Send automatic anonymous feedback to developers giving software version
+   information and counts of the features used.
  * Fix colormap sequence and randomize plugins
  * Change hyphen to minus sign when using standard C formatting in tick labels
  * Fix for Chinese and Korean characters in filenames on Windows
