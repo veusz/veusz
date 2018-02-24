@@ -86,6 +86,13 @@ def makeSplash(app):
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
     '''Show exception dialog if an exception occurs.'''
+
+    # current dialog doesnt work if not in main thread
+    # fixme: post error message instread of printing
+    if qt.qApp.thread() is not qt.QThread.currentThread():
+        defaultexcepthook(excepttype, exceptvalue, trackbackobj)
+        return
+
     sys.setrecursionlimit(sys.getrecursionlimit()+1000)
 
     from veusz.dialogs.exceptiondialog import ExceptionDialog
@@ -270,6 +277,8 @@ class VeuszApp(qt.QApplication):
         from veusz import setting
 
         # install exception hook after thread has finished
+        global defaultexcepthook
+        defaultexcepthook = sys.excepthook
         sys.excepthook = excepthook
 
         # for people who want to run any old script
