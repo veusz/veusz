@@ -20,6 +20,7 @@ from __future__ import division, print_function, absolute_import
 
 from .. import qtall as qt
 from .. import setting
+from .. import utils
 from ..dialogs import importdialog
 from ..compat import cstr
 
@@ -328,6 +329,9 @@ class ImportTabFITS(importdialog.ImportTab):
             # inform user
             self.fitsimportstatus.setText(
                 _("Import complete (%i datasets)") % len(op.outnames))
+
+            # feature feedback
+            utils.feedback.importcts['fits'] += 1
 
         except base.ImportingError as e:
             self.fitsimportstatus.setText(_("Error: %s") % cstr(e))

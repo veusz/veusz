@@ -37,6 +37,7 @@ if cpy3:
     import builtins as cbuiltins
     from io import StringIO as CStringIO, BytesIO as CBytesIO
     import urllib.request as curlrequest
+    from urllib.parse import urlencode as curlencode
 
     # imports
     import pickle
@@ -115,6 +116,7 @@ else:
     from StringIO import StringIO as CStringIO
     from io import BytesIO as CBytesIO
     import urllib2 as curlrequest
+    from urllib import urlencode as curlencode
 
     # range function
     crange = xrange

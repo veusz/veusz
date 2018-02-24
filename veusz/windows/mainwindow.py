@@ -116,6 +116,7 @@ class MainWindow(qt4.QMainWindow):
         win.askVersionCheck()
         # do the check
         win.doVersionCheck()
+        win.doFeedback()
 
         return win
 
@@ -864,6 +865,11 @@ class MainWindow(qt4.QMainWindow):
         thread = utils.VersionCheckThread(self)
         thread.newversion.connect(self.slotNewVersion)
         thread.finished.connect(thread.deleteLater)
+        thread.start()
+
+    def doFeedback(self):
+        """Give feedback."""
+        thread = utils.FeedbackCheckThread(self)
         thread.start()
 
     def slotNewVersion(self, ver):

@@ -440,5 +440,10 @@ class ExportDialog(VeuszDialog):
         if dirname:
             setting.settingdb['dirname_export'] = dirname
 
+        # format feedback
+        ext = os.path.splitext(export.filename)[1]
+        if ext:
+            utils.feedback.exportcts[ext] += 1
+
         if pagecount[0] > 0:
             self.showMessage(_('Exported %i page(s)') % pagecount[0])

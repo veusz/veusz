@@ -142,6 +142,9 @@ class ImportTabND(importdialog.ImportTab):
                 )
             output = "\n".join(output)
 
+            # feature feedback
+            utils.feedback.importcts['nd'] += 1
+
         except error as e:
             output = e.args[0]
 

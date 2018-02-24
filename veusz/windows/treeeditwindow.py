@@ -1014,6 +1014,9 @@ class TreeEditDock(qt4.QDockWidget):
         # select the widget
         self.selectWidget(w)
 
+        # bump the feedback statistics
+        utils.feedback.widgetcts[widgettype] += 1
+
     def slotWidgetCut(self):
         """Cut the selected widget"""
         self.slotWidgetCopy()

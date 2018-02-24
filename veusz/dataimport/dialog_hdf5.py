@@ -20,6 +20,7 @@ from __future__ import division, print_function
 
 from .. import qtall as qt
 from .. import setting
+from .. import utils
 from ..dialogs import importdialog
 from ..compat import cstr
 
@@ -399,6 +400,9 @@ class ImportTabHDF5(importdialog.ImportTab):
             # inform user
             self.hdfimportstatus.setText(_("Import complete (%i datasets)") %
                                          len(op.outnames))
+
+            # feature feedback
+            utils.feedback.importcts['hdf5'] += 1
 
         except base.ImportingError as e:
             self.hdfimportstatus.setText(_("Error: %s") % cstr(e))

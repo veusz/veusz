@@ -69,8 +69,11 @@ def latestVersion():
     """
 
     try:
-        p = curlrequest.urlopen(
-            'http://veusz.github.io/download/newest-version.html').read()
+        f = curlrequest.urlopen(
+            'http://veusz.github.io/download/newest-version.html')
+        p = f.read()
+        f.close()
+
         latest = p.decode('ascii').strip()
         # check format
         intver = versionToTuple(latest)

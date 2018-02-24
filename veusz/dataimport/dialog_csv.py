@@ -203,6 +203,9 @@ class ImportTabCSV(importdialog.ImportTab):
             # actually import the data
             doc.applyOperation(op)
 
+            # feature feedback
+            utils.feedback.importcts['csv'] += 1
+
         except (base.ImportingError, csv.Error) as e:
             qt4.QMessageBox.warning(self, _("Veusz"), cstr(e))
             return

@@ -30,6 +30,7 @@ from .dates import *
 from .formatting import *
 from .colormap import *
 from .extbrushfilling import *
+from .feedback import feedback, FeedbackCheckThread
 
 try:
     from ..helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
