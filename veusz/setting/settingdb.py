@@ -98,6 +98,11 @@ defaultValues = {
     'vercheck_asked_user': False,
     'vercheck_last_done': (2000,1,1),
     'vercheck_latest': '',
+
+    # whether to send feedback about usage
+    # (packagers, please don't disable here but in veusz/setting/feedback.py)
+    'feedback_disabled': False,
+    'feedback_asked_user': False,
     }
 
 class _SettingDB(object):
