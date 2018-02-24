@@ -827,7 +827,7 @@ class MainWindow(qt4.QMainWindow):
         from ..dialogs.aboutdialog import AboutDialog
         AboutDialog(self).exec_()
 
-    def askVersionCheck(self, mininterval=7):
+    def askVersionCheck(self, mininterval=2):
         """Check with user whether to do version checks.
 
         This is only done after the user has been using the program
