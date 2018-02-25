@@ -136,6 +136,11 @@ class FeedbackCheckThread(qt.QThread):
         importcts = setn.value('counts/import', '{}')
         exportcts = setn.value('counts/export', '{}')
 
+        try:
+            winver = str(sys.getwindowsversion())
+        except Exception:
+            winver = 'N/A'
+
         # construct post message - these are the data sent to the
         # remote server
         args = {
@@ -144,6 +149,7 @@ class FeedbackCheckThread(qt.QThread):
             'python-version': sys.version,
             'python-version_info': repr(tuple(sys.version_info)),
             'python-platform': sys.platform,
+            'windows-version': winver,
             'numpy-version': N.__version__,
             'qt-version': qt.qVersion(),
             'pyqt-version': qt.PYQT_VERSION_STR,
