@@ -152,7 +152,7 @@ class FeedbackCheckThread(qt.QThread):
             'importcts': importcts,
             'exportcts': exportcts,
         }
-        postdata = curlencode(args)
+        postdata = curlencode(args).encode('utf8')
 
         # now post the data
         try:
