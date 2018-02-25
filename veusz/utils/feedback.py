@@ -21,6 +21,7 @@ from collections import defaultdict
 import datetime
 import sys
 import atexit
+import platform
 
 import sip
 import numpy as N
@@ -149,6 +150,7 @@ class FeedbackCheckThread(qt.QThread):
             'python-version': sys.version,
             'python-version_info': repr(tuple(sys.version_info)),
             'python-platform': sys.platform,
+            'platform-machine': platform.machine(),
             'windows-version': winver,
             'numpy-version': N.__version__,
             'qt-version': qt.qVersion(),
