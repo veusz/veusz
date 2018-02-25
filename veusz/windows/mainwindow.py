@@ -854,7 +854,8 @@ class MainWindow(qt4.QMainWindow):
             _("Veusz will periodically check for new Veusz versions and\n"
               "let you know if there is a new one available.\n\n"
               "Is this ok? This choice can be changed in Preferences."),
-            qt4.QMessageBox.Yes | qt4.QMessageBox.No
+            qt4.QMessageBox.Yes | qt4.QMessageBox.No,
+            qt4.QMessageBox.Yes
             )
 
         setting.settingdb['vercheck_disabled'] = retn==qt4.QMessageBox.No
@@ -895,7 +896,8 @@ class MainWindow(qt4.QMainWindow):
               "of software dependencies, the computer language and how "
               "often features are used.\n\n"
               "Is this ok? This choice can be changed in Preferences."),
-            qt4.QMessageBox.Yes | qt4.QMessageBox.No
+            qt4.QMessageBox.Yes | qt4.QMessageBox.No,
+            qt4.QMessageBox.Yes
             )
 
         setting.settingdb['feedback_disabled'] = retn==qt4.QMessageBox.No
