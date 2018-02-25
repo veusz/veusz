@@ -157,7 +157,7 @@ class FeedbackCheckThread(qt.QThread):
         # now post the data
         try:
             f = curlrequest.urlopen(_url, postdata)
-            retn = f.readline().strip()
+            retn = f.readline().decode('utf8').strip()
             f.close()
 
             if retn == 'ok':
