@@ -889,10 +889,11 @@ class MainWindow(qt4.QMainWindow):
             return
 
         retn = qt4.QMessageBox.question(
-            self, _("Send automatic feedback"),
-            _("Veusz will automatically send anonymous feedback to the\n"
-              "developers, with information about the version of software\n"
-              "dependencies and how often features are used.\n\n"
+            self, _("Send automatic anonymous feedback"),
+            _("Veusz can automatically send anonymous feedback "
+              "to the developers, with information about the version "
+              "of software dependencies, the computer language and how "
+              "often features are used.\n\n"
               "Is this ok? This choice can be changed in Preferences."),
             qt4.QMessageBox.Yes | qt4.QMessageBox.No
             )

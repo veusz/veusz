@@ -156,6 +156,7 @@ class FeedbackCheckThread(qt.QThread):
             'qt-version': qt.qVersion(),
             'pyqt-version': qt.PYQT_VERSION_STR,
             'sip-version': sip.SIP_VERSION_STR,
+            'locale': qt.QLocale().name(),
             'widgetcts': widgetcts,
             'importcts': importcts,
             'exportcts': exportcts,
