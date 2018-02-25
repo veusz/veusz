@@ -43,7 +43,7 @@ disableFeedback=False
 # for QSettings
 _org='veusz.org'
 _app='veusz-feedback'
-_url='http://barmag.net/veusz-feedback/'
+_url='https://barmag.net/veusz-feedback/'
 
 # min send interval in days
 _mininterval = 7
@@ -178,5 +178,5 @@ class FeedbackCheckThread(qt.QThread):
                 setn.setValue('last-sent', repr(today_tpl))
 
         except Exception as e:
-            #print("failure")
+            #print("failure",e)
             pass
