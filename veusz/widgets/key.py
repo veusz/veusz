@@ -40,13 +40,14 @@ def _(text, disambiguation=None, context='Key'):
 class ControlKey(object):
     """Control the position of a key on a plot."""
 
-    def __init__( self, widget, parentposn,
+    def __init__( self, widget, phelper, parentposn,
                   boxposn, boxdims,
                   textheight ):
         """widget is widget to adjust
+        phelper: paint helper
         parentposn: posn of parent on plot
         xpos, ypos: position of key
-        width. height: size of key
+        width, height: size of key
         textheight: 
         """
         self.widget = widget
@@ -54,21 +55,22 @@ class ControlKey(object):
         self.posn = tuple(boxposn)
         self.dims = tuple(boxdims)
         self.textheight = textheight
+        self.cgscale = phelper.cgscale
 
     def createGraphicsItem(self, parent):
         return _GraphControlKey(parent, self)
 
-class _GraphControlKey(qt4.QGraphicsRectItem):
+class _GraphControlKey(qt4.QGraphicsRectItem, controlgraph._ScaledShape):
     """The graphical rectangle which is dragged around to reposition
     the key."""
 
     def __init__(self, parent, params):
-        qt4.QGraphicsRectItem.__init__(
-            self,
-            params.posn[0], params.posn[1],
-            params.dims[0], params.dims[1],
-            parent)
+        qt4.QGraphicsRectItem.__init__(self, parent)
+
         self.params = params
+        self.setScaledRect(
+            params.posn[0], params.posn[1],
+            params.dims[0], params.dims[1])
 
         self.setCursor(qt4.Qt.SizeAllCursor)
         self.setZValue(1.)
@@ -94,7 +96,8 @@ class _GraphControlKey(qt4.QGraphicsRectItem):
         self.highlightpoints = {}
         for xname, xval in citems(xposn):
             for yname, yval in citems(yposn):
-                self.highlightpoints[(xname, yname)] = qt4.QPointF(xval, yval)
+                self.highlightpoints[(xname, yname)] = qt4.QPointF(
+                    xval*params.cgscale, yval*params.cgscale)
 
         self.updatePen()
 
@@ -135,8 +138,8 @@ class _GraphControlKey(qt4.QGraphicsRectItem):
             hm, vm = 0., 0.
         else:
             # calculate the position of the box to work out Manual fractions
-            rect = self.rect()
-            rect.translate(self.pos())
+            rect = self.scaledRect()
+            rect.translate(self.scaledPos())
             pposn = self.params.parentposn
 
             hp, vp = 'manual', 'manual'
@@ -500,6 +503,7 @@ class Key(widget.Widget):
                     doc=self.document).render()
 
         phelper.setControlGraph(
-            self, [ControlKey(self, parentposn, boxposn, boxdims, height)] )
+            self,
+            [ControlKey(self, phelper, parentposn, boxposn, boxdims, height)] )
 
 document.thefactory.register( Key )
