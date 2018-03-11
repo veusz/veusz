@@ -599,7 +599,8 @@ class PlotWindow( qt4.QGraphicsView ):
             return []
 
         pos = self.mapToScene(mousepos)
-        px, py = pos.x(), pos.y()
+        px = pos.x() / self.painthelper.cgscale
+        py = pos.y() / self.painthelper.cgscale
 
         axes = []
         for widget, bounds in self.painthelper.widgetBoundsIterator(

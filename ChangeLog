@@ -1,3 +1,7 @@
+Changes in 2.2.1:
+ * Fix mouse control for Key widget
+ * Fix coordinates shown on bottom of screen for different zoom levels
+
 Changes in 2.2:
  * Notify user updates to Veusz are available
  * Add support for high DPI displays
