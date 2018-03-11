@@ -1,6 +1,9 @@
 Changes in 2.2.1:
- * Fix mouse control for Key widget
- * Fix coordinates shown on bottom of screen for different zoom levels
+ * Fix mouse control for Key widget for different zoom levels
+ * Correct coordinates shown on bottom of screen for different zoom levels
+ * Fix zoom into graph functionality for different zoom levels
+ * Fix plot picking for different zoom levels
+ * When choosing a text dataset, fix the mini dataset browser
 
 Changes in 2.2:
  * Notify user updates to Veusz are available

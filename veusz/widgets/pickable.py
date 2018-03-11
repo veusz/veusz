@@ -26,14 +26,14 @@ from ..compat import CBool
 from .. import document
 
 class PickInfo(CBool):
-    """Encapsulates the results of a Pick operation. screenpos and coords are
+    """Encapsulates the results of a Pick operation. graphpos and coords are
        numeric (x,y) tuples, labels are the textual labels for the x and y
        datasets, and index is some object that the picker can use to figure out
        what the 'next' and 'previous' points are. index must implement __str__();
        return '' if it has no user-visible meaning."""
-    def __init__(self, widget=None, screenpos=None, labels=None, coords=None, index=None):
+    def __init__(self, widget=None, graphpos=None, labels=None, coords=None, index=None):
         self.widget = widget
-        self.screenpos = screenpos
+        self.graphpos = graphpos
         self.labels = labels
         self.coords = coords
         self.index = index
@@ -41,8 +41,8 @@ class PickInfo(CBool):
         self.displaytype = ('numeric', 'numeric')
 
     def cbool(self):
-        return bool(self.widget and self.screenpos and self.labels and
-                    self.coords)
+        return bool(
+            self.widget and self.graphpos and self.labels and self.coords)
 
 class Index:
     """A class containing all the state a GenericPickable needs to find the
@@ -91,37 +91,37 @@ class GenericPickable:
     """Utility class which abstracts the math of picking the closest point out
        of a list of points"""
 
-    def __init__(self, widget, labels, vals, screenvals):
+    def __init__(self, widget, labels, vals, graphvals):
         self.widget = widget
         self.labels = labels
         self.xvals, self.yvals = vals
-        self.xscreen, self.yscreen = screenvals
+        self.xgraph, self.ygraph = graphvals
 
     def _pickSign(self, i):
-        if len(self.xscreen) <= 1:
+        if len(self.xgraph) <= 1:
             # we only have one element, so it doesn't matter anyways
             return 1
 
         # go backwards to get previous finite point
         mi = i-1
-        while mi >= 0 and not N.isfinite(self.xscreen[mi]+self.yscreen[mi]):
+        while mi >= 0 and not N.isfinite(self.xgraph[mi]+self.ygraph[mi]):
             mi -= 1
         if mi < 0:
             m = None
         else:
-            m = self.xscreen[mi], self.yscreen[mi]
+            m = self.xgraph[mi], self.ygraph[mi]
 
         # point in centre
-        c = self.xscreen[i], self.yscreen[i]
+        c = self.xgraph[i], self.ygraph[i]
 
         # find next finite point
         pi = i+1
-        while pi < len(self.xscreen) and not N.isfinite(self.xscreen[pi]+self.yscreen[pi]):
+        while pi < len(self.xgraph) and not N.isfinite(self.xgraph[pi]+self.ygraph[pi]):
             pi += 1
-        if pi == len(self.xscreen):
+        if pi == len(self.xgraph):
             p = None
         else:
-            p = self.xscreen[pi], self.yscreen[pi]
+            p = self.xgraph[pi], self.ygraph[pi]
 
         return _chooseOrderingSign(m, c, p)
 
@@ -133,31 +133,31 @@ class GenericPickable:
 
         if self.xvals is None or self.yvals is None:
             return info
-        if len(self.xscreen) == 0 or len(self.yscreen) == 0:
+        if len(self.xgraph) == 0 or len(self.ygraph) == 0:
             return info
 
         # calculate distances
         if distance_direction == 'vertical':
             # measure distance along y
-            dist = N.abs(self.yscreen - y0)
+            dist = N.abs(self.ygraph - y0)
         elif distance_direction == 'horizontal':
             # measure distance along x
-            dist = N.abs(self.xscreen - x0)
+            dist = N.abs(self.xgraph - x0)
         elif distance_direction == 'radial':
             # measure radial distance
-            dist = N.sqrt((self.xscreen - x0)**2 + (self.yscreen - y0)**2)
+            dist = N.sqrt((self.xgraph - x0)**2 + (self.ygraph - y0)**2)
         else:
             # programming error
             assert (distance_direction == 'radial' or
                     distance_direction == 'vertical' or
                     distance_direction == 'horizontal')
 
-        # ignore points which are offscreen or not finite
+        # ignore points which are offgraph or not finite
         with N.errstate(invalid='ignore'):
             outofbounds = (
-                (self.xscreen < bounds[0]) | (self.xscreen > bounds[2]) |
-                (self.yscreen < bounds[1]) | (self.yscreen > bounds[3]) |
-                ~N.isfinite(self.xscreen) | ~N.isfinite(self.yscreen) )
+                (self.xgraph < bounds[0]) | (self.xgraph > bounds[2]) |
+                (self.ygraph < bounds[1]) | (self.ygraph > bounds[3]) |
+                ~N.isfinite(self.xgraph) | ~N.isfinite(self.ygraph) )
         dist[outofbounds] = N.inf
 
         m = N.min(dist)
@@ -169,7 +169,7 @@ class GenericPickable:
         except IndexError:
             return info
 
-        info.screenpos = self.xscreen[i], self.yscreen[i]
+        info.graphpos = self.xgraph[i], self.ygraph[i]
         info.coords = self.xvals[i], self.yvals[i]
         info.distance = m
         info.index = Index(self.xvals[i], i, self._pickSign(i))
@@ -209,17 +209,17 @@ class GenericPickable:
         i += incr
 
         # skip points that are outside of the bounds or are not finite
-        while (i >= 0 and i < len(self.xscreen) and
-                ( not N.isfinite(self.xscreen[i]) or
-                  not N.isfinite(self.yscreen[i]) or
-                  (self.xscreen[i] < bounds[0] or self.xscreen[i] > bounds[2] or
-                   self.yscreen[i] < bounds[1] or self.yscreen[i] > bounds[3]) )):
+        while (i >= 0 and i < len(self.xgraph) and
+                ( not N.isfinite(self.xgraph[i]) or
+                  not N.isfinite(self.ygraph[i]) or
+                  (self.xgraph[i] < bounds[0] or self.xgraph[i] > bounds[2] or
+                   self.ygraph[i] < bounds[1] or self.ygraph[i] > bounds[3]) )):
             i += incr
 
-        if i < 0 or i >= len(self.xscreen):
+        if i < 0 or i >= len(self.xgraph):
             return info
 
-        info.screenpos = self.xscreen[i], self.yscreen[i]
+        info.graphpos = self.xgraph[i], self.ygraph[i]
         info.coords = self.xvals[i], self.yvals[i]
         info.index = Index(self.xvals[i], i, oldindex.sign)
 
