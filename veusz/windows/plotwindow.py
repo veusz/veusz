@@ -650,12 +650,14 @@ class PlotWindow( qt4.QGraphicsView ):
                 # widget isn't pickable
                 continue
 
-            # this is a pickable widget, so remember it for future key navigation
-            self.pickerwidgets.append(w)
+            if info:
+                # this is a pickable widget, so remember it for future
+                # key navigation
+                self.pickerwidgets.append(w)
 
-            if info.distance < pickinfo.distance:
-                # and remember the overall closest
-                pickinfo = info
+                if info.distance < pickinfo.distance:
+                    # and remember the overall closest
+                    pickinfo = info
 
         if not pickinfo:
             self.pickeritem.hide()

@@ -250,10 +250,10 @@ class DiscretePickable(GenericPickable):
 
     def pickPoint(self, x0, y0, bounds, distance_direction):
         info = GenericPickable.pickPoint(self, x0, y0, bounds, distance_direction)
-        info.displaytype = (self.xdata.displaytype, self.ydata.displaytype)
-
         if not info:
-            return info
+            return None
+
+        info.displaytype = (self.xdata.displaytype, self.ydata.displaytype)
 
         # indicies are persistent
         info.index.useindex = True
