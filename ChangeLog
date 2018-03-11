@@ -5,7 +5,7 @@ Changes in 2.2.1:
  * Fix plot picking for different zoom levels
  * When choosing a text dataset, fix the mini dataset browser
  * Fix crash when previewing in binary import using Python 3
- * FIx crash when picking points in certain circumstances
+ * Fix crash when picking points in certain circumstances
 
 Changes in 2.2:
  * Notify user updates to Veusz are available

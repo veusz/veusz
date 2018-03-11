@@ -1,5 +1,5 @@
-Veusz 2.2
----------
+Veusz 2.2.1
+-----------
 https://veusz.github.io
 
 Veusz is a scientific plotting package.  It is designed to produce
@@ -11,6 +11,15 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 2.2.1:
+ * Fix mouse control for Key widget for different zoom levels
+ * Correct coordinates shown on bottom of screen for different zoom levels
+ * Fix zoom into graph functionality for different zoom levels
+ * Fix plot picking for different zoom levels
+ * When choosing a text dataset, fix the mini dataset browser
+ * Fix crash when previewing in binary import using Python 3
+ * Fix crash when picking points in certain circumstances
 
 Changes in 2.2:
  * Notify user updates to Veusz are available
