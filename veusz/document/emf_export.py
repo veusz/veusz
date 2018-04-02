@@ -363,14 +363,14 @@ class EMFPaintEngine(qt4.QPaintEngine):
             self._updatePen(state.pen())
         if ss & qt4.QPaintEngine.DirtyBrush:
             self._updateBrush(state.brush())
+        if ss & qt4.QPaintEngine.DirtyTransform:
+            self._updateTransform(state.transform())
         if ss & qt4.QPaintEngine.DirtyClipPath:
             self._updateClipPath(state.clipPath(), state.clipOperation())
         if ss & qt4.QPaintEngine.DirtyClipRegion:
             path = qt4.QPainterPath()
             path.addRegion(state.clipRegion())
             self._updateClipPath(path, state.clipOperation())
-        if ss & qt4.QPaintEngine.DirtyTransform:
-            self._updateTransform(state.transform())
 
     def type(self):
         return qt4.QPaintEngine.PostScript
