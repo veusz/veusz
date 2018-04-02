@@ -541,18 +541,19 @@ def combineAddedErrors(inds, length):
 
     for d in inds:
         f = N.isfinite(d.data)
+        l = len(f)
 
         if errortype == 'symmetric' and d.serr is not None:
-            serr[f] += d.serr[f]**2
+            serr[:l][f] += d.serr[f]**2
         elif errortype == 'asymmetric':
             if d.serr is not None:
                 v = (d.serr[f])**2
-                perr[f] += v
-                nerr[f] += v
+                perr[:l][f] += v
+                nerr[:l][f] += v
             if d.perr is not None:
-                perr[f] += (d.perr[f])**2
+                perr[:l][f] += (d.perr[f])**2
             if d.nerr is not None:
-                nerr[f] += (d.nerr[f])**2
+                nerr[:l][f] += (d.nerr[f])**2
 
     if serr is not None: serr = N.sqrt(serr)
     if perr is not None: perr = N.sqrt(perr)
@@ -923,8 +924,8 @@ class MeanDatasetPlugin(_OneOutputDatasetPlugin):
         num = N.zeros(maxlength, dtype=N.int)
         for d in inds:
             f = N.isfinite(d.data)
-            tot[f] += d.data[f]
-            num[f] += 1
+            tot[:len(d.data)][f] += d.data[f]
+            num[:len(d.data)][f] += 1
         data = tot / num
 
         def averageError(errtype, fallback=None):
@@ -939,8 +940,8 @@ class MeanDatasetPlugin(_OneOutputDatasetPlugin):
                 # add values if not missing
                 if vals is not None:
                     f = N.isfinite(vals)
-                    tot[f] += (vals[f]) ** 2
-                    num[f] += 1
+                    tot[:len(f)][f] += (vals[f]) ** 2
+                    num[:len(f)][f] += 1
                 else:
                     # treat as zero errors if missing errors
                     num[:len(d.data)] += 1
@@ -974,7 +975,7 @@ class AddDatasetsPlugin(_OneOutputDatasetPlugin):
             ]
 
     def updateDatasets(self, fields, helper):
-        """Compute means of dataset."""
+        """Sum datasets."""
 
         inds = helper.getDatasets(fields['ds_in'])
         if len(inds) == 0:
@@ -986,8 +987,8 @@ class AddDatasetsPlugin(_OneOutputDatasetPlugin):
         anyfinite = N.zeros(maxlength, dtype=N.bool)
         for d in inds:
             f = N.isfinite(d.data)
-            data[f] += d.data[f]
-            anyfinite[f] = True
+            data[:len(d.data)][f] += d.data[f]
+            anyfinite[:len(d.data)][f] = True
         data[N.logical_not(anyfinite)] = N.nan
 
         # handle error bars
