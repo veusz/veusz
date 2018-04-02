@@ -583,30 +583,30 @@ void RecordPaintEngine::updateState(const QPaintEngineState& state)
   // we add a new element for each change of state
   // these are replayed later
   const int flags = state.state();
-  if( flags & QPaintEngine::DirtyBackground )
-    _pdev->addElement( new BackgroundBrushElement( state.backgroundBrush() ) );
-  if( flags & QPaintEngine::DirtyBackgroundMode )
-    _pdev->addElement( new BackgroundModeElement( state.backgroundMode() ) );
+  if( flags & QPaintEngine::DirtyPen )
+    _pdev->addElement( new PenElement( state.pen() ) );
   if( flags & QPaintEngine::DirtyBrush )
     _pdev->addElement( new BrushElement( state.brush() ) );
   if( flags & QPaintEngine::DirtyBrushOrigin )
     _pdev->addElement( new BrushOriginElement( state.brushOrigin() ) );
+  if( flags & QPaintEngine::DirtyFont )
+    _pdev->addElement( new FontElement( state.font(), _pdev->_dpiy ) );
+  if( flags & QPaintEngine::DirtyBackground )
+    _pdev->addElement( new BackgroundBrushElement( state.backgroundBrush() ) );
+  if( flags & QPaintEngine::DirtyBackgroundMode )
+    _pdev->addElement( new BackgroundModeElement( state.backgroundMode() ) );
+  if( flags & QPaintEngine::DirtyTransform )
+    _pdev->addElement( new TransformElement( state.transform() ) );
   if( flags & QPaintEngine::DirtyClipRegion )
     _pdev->addElement( new ClipRegionElement( state.clipOperation(),
 					      state.clipRegion() ) );
   if( flags & QPaintEngine::DirtyClipPath )
     _pdev->addElement( new ClipPathElement( state.clipOperation(),
 					    state.clipPath() ) );
-  if( flags & QPaintEngine::DirtyCompositionMode )
-    _pdev->addElement( new CompositionElement( state.compositionMode() ) );
-  if( flags & QPaintEngine::DirtyFont )
-    _pdev->addElement( new FontElement( state.font(), _pdev->_dpiy ) );
-  if( flags & QPaintEngine::DirtyTransform )
-    _pdev->addElement( new TransformElement( state.transform() ) );
-  if( flags & QPaintEngine::DirtyClipEnabled )
-    _pdev->addElement( new ClipEnabledElement( state.isClipEnabled() ) );
-  if( flags & QPaintEngine::DirtyPen )
-    _pdev->addElement( new PenElement( state.pen() ) );
   if( flags & QPaintEngine::DirtyHints )
     _pdev->addElement( new HintsElement( state.renderHints() ) );
+  if( flags & QPaintEngine::DirtyCompositionMode )
+    _pdev->addElement( new CompositionElement( state.compositionMode() ) );
+  if( flags & QPaintEngine::DirtyClipEnabled )
+    _pdev->addElement( new ClipEnabledElement( state.isClipEnabled() ) );
 }

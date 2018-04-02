@@ -1,3 +1,6 @@
+Changes in 2.2.2:
+ * Fix zoom for polar, ternary and broken axis plots
+
 Changes in 2.2.1:
  * Fix mouse control for Key widget for different zoom levels
  * Correct coordinates shown on bottom of screen for different zoom levels
