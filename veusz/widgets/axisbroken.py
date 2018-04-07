@@ -200,9 +200,10 @@ class AxisBroken(axis.Axis):
             lowerupper = ( self.posstarts[self.rangeswitch],
                            self.posstops[self.rangeswitch] )
 
-        axis.Axis.updateAxisLocation(self, bounds,
-                                     otherposition=otherposition,
-                                     lowerupperposition=lowerupper)
+        axis.Axis.updateAxisLocation(
+            self, bounds,
+            otherposition=otherposition,
+            lowerupperposition=lowerupper)
 
     def computePlottedRange(self):
         """Given range of data, recompute stops and start values of
@@ -260,7 +261,7 @@ class AxisBroken(axis.Axis):
         # temporarily change position of axis to other side for drawing
         self.updateAxisLocation(posn, otherposition=otheredge)
         if not s.Line.hide:
-            self._drawAxisLine(painter)
+            self._drawAxisLine(painter, posn)
 
         for i in crange(self.breakvnum):
             self.switchBreak(i, posn, otherposition=otheredge)
@@ -276,7 +277,7 @@ class AxisBroken(axis.Axis):
 
         self.switchBreak(None, posn)
 
-    def _drawAxisLine(self, painter):
+    def _drawAxisLine(self, painter, posn):
         """Draw the line of the axis, indicating broken positions.
         We currently use a triangle to mark the broken position
         """
@@ -300,18 +301,26 @@ class AxisBroken(axis.Axis):
         p2.append(0.)
 
         # scale points by length of axis and add correct origin
-        scale = self.coordParr2 - self.coordParr1
-        p1 = N.array(p1) * scale + self.coordParr1
-        p2 = N.array(p2) * scale + self.coordPerp
+        s = self.settings
 
-        if self.settings.direction == 'vertical':
+        if s.direction == 'vertical':
+            delta = posn[1]-posn[3]
+            minv = posn[3]
+        else:
+            delta = posn[2]-posn[0]
+            minv = posn[0]
+
+        p1 = N.array(p1)*delta + minv
+        p2 = N.array(p2)*delta + self.coordPerp
+
+        if s.direction == 'vertical':
             p1, p2 = p2, p1
 
         # convert to polygon and draw
         poly = qt4.QPolygonF()
         utils.addNumpyToPolygonF(poly, p1, p2)
 
-        pen = self.settings.get('Line').makeQPen(painter)
+        pen = s.get('Line').makeQPen(painter)
         pen.setCapStyle(qt4.Qt.FlatCap)
         painter.setPen(pen)
         painter.drawPolyline(poly)
@@ -372,7 +381,7 @@ class AxisBroken(axis.Axis):
 
         # plot the line along the axis
         if not s.Line.hide:
-            self._drawAxisLine(painter)
+            self._drawAxisLine(painter, posn)
 
         max_delta = 0
         for i in crange(self.breakvnum):
