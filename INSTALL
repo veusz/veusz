@@ -41,7 +41,7 @@ list a few of the possible method here:
 
 To install on linux to the standard location on the hard disk
 
-# cd veusz-2.2.1
+# cd veusz-2.2.2
 # python setup.py build
 # su
 [enter root password]
@@ -114,8 +114,8 @@ stage before build, with the parameters:
 If you don't want to install veusz fully or are doing development, it
 can currently be run from its own directory. Do
 
-# tar xzf veusz-2.2.1.tar.gz                [change version here]
-# cd veusz-2.2.1
+# tar xzf veusz-2.2.2.tar.gz                [change version here]
+# cd veusz-2.2.2
 # ./run_veusz_inplace
 
 Certain features will be disabled if you do this. You will not be able
@@ -137,8 +137,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xf veusz-2.2.1-linux-x86.tar.xz     [change version here]
-# cd veusz-2.2.1-linux-x86
+# tar xf veusz-2.2.2-linux-x86.tar.xz     [change version here]
+# cd veusz-2.2.2-linux-x86
 # ./veusz
 
 2.2 Installing in Windows

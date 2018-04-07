@@ -1,4 +1,4 @@
-Veusz 2.2.1
+Veusz 2.2.2
 -----------
 https://veusz.github.io
 
@@ -11,6 +11,15 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 2.2.2:
+ * Fix zoom for polar, ternary and broken axis plots
+ * For mean and add dataset operations, allow datasets to be different
+   lengths, expanding to the maximum
+ * Fix broken axis if the ends of the axis are not the edge of the plot
+ * Fix image embedding in Python 3
+ * Update h5py to newer version in Windows binary (supporting HDF 1.10.1)
+ * Fix 'fraction' and 'percentage' units in polar plot
 
 Changes in 2.2.1:
  * Fix mouse control for Key widget for different zoom levels
