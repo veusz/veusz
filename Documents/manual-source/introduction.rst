@@ -395,6 +395,14 @@ functions and values.
    the Veusz setting given by the full path,
    e.g. :command:`%{{SETTING('/page1/width')}}%`.
 
+#. :command:`LANG(mapping)` - mapping is a dictionary which maps
+   language names to strings. This returns the string corresponding to
+   the current language. The keys come from the locale names which are
+   the two-letter language codes (e.g. `en` or `fr`), or the full code
+   (e.g. `en_GB` or `de_AT`). The `default` key is used if the
+   language code is not found. An example is :command:`%{{
+   LANG({'de':'Druck','default':'Pressure'}) }}%`.
+
 Measurements
 ------------
 

@@ -19,7 +19,9 @@ Changes in 2.2.2:
  * Fix broken axis if the ends of the axis are not the edge of the plot
  * Fix image embedding in Python 3
  * Update h5py to newer version in Windows binary (supporting HDF 1.10.1)
- * Fix 'fraction' and 'percentage' units in polar plot
+ * Fix 'fractions' and 'percentages' units in polar plot
+ * Add LANG(mapping) function when evaluating labels, allowing translation
+   of strings in documents
 
 Changes in 2.2.1:
  * Fix mouse control for Key widget for different zoom levels

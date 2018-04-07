@@ -127,6 +127,7 @@ class Evaluate:
         c['BASENAME'] = self._evalbasename
         c['ESCAPE'] = utils.latexEscape
         c['SETTING'] = self._evalsetting
+        c['LANG'] = self._evallang
 
         for name, val in self.def_imports:
             self._updateImport(name, val)
@@ -322,6 +323,18 @@ class Evaluate:
     def _evalsetting(self, path):
         """SETTING() eval: return setting given full path."""
         return self.doc.resolveSettingPath(None, path).get()
+
+    @staticmethod
+    def _evallang(opts):
+        lang = qt.QLocale().name()
+        if lang in opts:
+            return opts[lang]
+        majorl = lang.split('_')[0]
+        if majorl in opts:
+            return opts[majorl]
+        if 'default' in opts:
+            return opts['default']
+        return utils.latexEscape('NOLANG:%s' % str(lang))
 
     def evalDatasetExpression(self, expr, part='data', datatype='numeric',
                               dimensions=1):
