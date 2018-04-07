@@ -3,6 +3,7 @@ Changes in 2.2.2:
  * For mean and add dataset operations, allow datasets to be different
    lengths, expanding to the maximum
  * Fix broken axis if the ends of the axis are not the edge of the plot
+ * Fix image embedding in Python 3
 
 Changes in 2.2.1:
  * Fix mouse control for Key widget for different zoom levels
