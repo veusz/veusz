@@ -842,7 +842,7 @@ class PointPlotter(GenericPlotter):
         yv = s.get('yData').getData(doc)
         text = s.get('labels').getData(doc, checknull=True)
         scalepoints = s.get('scalePoints').getData(doc)
-        colorpoints = s.Color.get('data').getData(doc)
+        colorpoints = s.Color.get('points').getData(doc)
 
         # if a missing dataset, make a fake dataset for the second one
         # based on a row number

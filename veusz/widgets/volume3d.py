@@ -60,7 +60,7 @@ def autoedges(data, fillfactor):
 class DataColor(setting.DataColor):
     def __init__(self, *args, **argsv):
         setting.DataColor.__init__(self, *args, **argsv)
-        self.get('data').newDefault('v')
+        self.get('points').newDefault('v')
 
 class Volume3D(plotters3d.GenericPlotter3D):
     """Plotting points in 3D."""

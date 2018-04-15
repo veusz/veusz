@@ -405,10 +405,10 @@ class DataColor(Settings):
     def __init__(self, name, dimensions=1):
         Settings.__init__(self, name, setnsmode='groupedsetting')
         self.add( setting.DatasetExtended(
-            'data', '',
-            descr = _('Use color values in dataset'),
+            'points', '',
+            descr = _('Use color value (0-1) in dataset'),
             dimensions=dimensions,
-            usertext=_('Color data')) )
+            usertext=_('Data')) )
         self.add( setting.Float(
             'min', 0.,
             descr = _('Minimum value of color dataset'),
@@ -423,7 +423,6 @@ class DataColor(Settings):
             'linear',
             descr = _('Scaling to transform numbers to color'),
             usertext=_('Scaling')))
-        self.add( setting.SettingBackwardCompat('points', 'data', None) )
 
 class Line3D(Settings):
     '''3d line properties.'''

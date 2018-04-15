@@ -174,7 +174,7 @@ class Point3D(plotters3d.GenericPlotter3D):
             markerlineprop = s.MarkerLine.makeLineProp(painter)
         if filled and not s.MarkerFill.hide:
             markerfillprop = s.MarkerFill.makeSurfaceProp(painter)
-            cvals = s.Color.get('data').getData(doc)
+            cvals = s.Color.get('points').getData(doc)
             if cvals is not None:
                 colorvals = utils.applyScaling(
                     cvals.data, s.Color.scaling, s.Color.min, s.Color.max)
