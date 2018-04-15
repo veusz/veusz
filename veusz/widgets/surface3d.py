@@ -151,7 +151,7 @@ class Surface3D(plotters3d.GenericPlotter3D):
         edges2 = axes[idxs[2]].dataToLogicalCoords(e[1])
 
         # compute colors, if set
-        colordata = s.DataColor.get('data').getData(self.document)
+        colordata = s.DataColor.get('points').getData(self.document)
         if surfprop is not None and colordata is not None:
             cmap = self.document.evaluate.getColormap(
                 s.Surface.colorMap, s.Surface.colorMapInvert)

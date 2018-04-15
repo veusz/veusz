@@ -170,7 +170,7 @@ class Volume3D(plotters3d.GenericPlotter3D):
         xv = s.get('xData').getData(doc)
         yv = s.get('yData').getData(doc)
         zv = s.get('zData').getData(doc)
-        vv = s.DataColor.get('data').getData(doc)
+        vv = s.DataColor.get('points').getData(doc)
         if not xv or not yv or not zv or not vv:
             return
         trans = s.get('transData').getData(doc)
