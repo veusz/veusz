@@ -265,8 +265,8 @@ class PlotWindow( qt4.QGraphicsView ):
         self.scene.addItem(self.controlgraphroot)
 
         # zoom rectangle for zooming into graph (not shown normally)
-        self.zoomrect = self.scene.addRect( 0, 0, 100, 100,
-                                            qt4.QPen(qt4.Qt.DotLine) )
+        self.zoomrect = self.scene.addRect(
+            0, 0, 100, 100, qt4.QPen(qt4.Qt.DotLine))
         self.zoomrect.setZValue(2.)
         self.zoomrect.hide()
 
@@ -529,6 +529,10 @@ class PlotWindow( qt4.QGraphicsView ):
         if abs((pt2-pt1).x()) < 10 or abs((pt2-pt1).y()) < 10:
             return
 
+        # scale into graph coordinates
+        pt1 /= self.painthelper.cgscale
+        pt2 /= self.painthelper.cgscale
+
         # try to work out in which widget the first point is in
         widget = self.painthelper.pointInWidgetBounds(
             pt1.x(), pt1.y(), widgets.Graph)
@@ -599,7 +603,8 @@ class PlotWindow( qt4.QGraphicsView ):
             return []
 
         pos = self.mapToScene(mousepos)
-        px, py = pos.x(), pos.y()
+        px = pos.x() / self.painthelper.cgscale
+        py = pos.y() / self.painthelper.cgscale
 
         axes = []
         for widget, bounds in self.painthelper.widgetBoundsIterator(
@@ -622,7 +627,9 @@ class PlotWindow( qt4.QGraphicsView ):
         """Report that a new point has been picked"""
 
         self.pickerinfo = pickinfo
-        self.pickeritem.setPos(pickinfo.screenpos[0], pickinfo.screenpos[1])
+        self.pickeritem.setPos(
+            pickinfo.graphpos[0] * self.painthelper.cgscale,
+            pickinfo.graphpos[1] * self.painthelper.cgscale)
         self.sigPointPicked.emit(pickinfo)
 
     def doPick(self, mousepos):
@@ -631,24 +638,26 @@ class PlotWindow( qt4.QGraphicsView ):
         self.pickerwidgets = []
 
         pickinfo = widgets.PickInfo()
+        # get scalable graph coordinates for mouse point
         pos = self.mapToScene(mousepos)
+        pos /= self.painthelper.cgscale
 
         for w, bounds in self.painthelper.widgetBoundsIterator():
+            # ask the widget for its (visually) closest point to the cursor
             try:
-                pick = w.pickPoint
+                info = w.pickPoint(pos.x(), pos.y(), bounds)
             except AttributeError:
                 # widget isn't pickable
                 continue
 
-            # ask the widget for its (visually) closest point to the cursor
-            info = pick(pos.x(), pos.y(), bounds)
+            if info:
+                # this is a pickable widget, so remember it for future
+                # key navigation
+                self.pickerwidgets.append(w)
 
-            # this is a pickable widget, so remember it for future key navigation
-            self.pickerwidgets.append(w)
-
-            if info.distance < pickinfo.distance:
-                # and remember the overall closest
-                pickinfo = info
+                if info.distance < pickinfo.distance:
+                    # and remember the overall closest
+                    pickinfo = info
 
         if not pickinfo:
             self.pickeritem.hide()
@@ -668,6 +677,8 @@ class PlotWindow( qt4.QGraphicsView ):
         """Allow user to drag window around."""
 
         qt4.QGraphicsView.mousePressEvent(self, event)
+        if self.painthelper is None:
+            return
 
         # work out whether user is clicking on a control point
         items = self.items(event.pos())
@@ -698,8 +709,9 @@ class PlotWindow( qt4.QGraphicsView ):
                     qt4.QCursor(qt4.Qt.SizeAllCursor))
 
             elif self.clickmode == 'graphzoom':
-                self.zoomrect.setRect(self.grabpos.x(), self.grabpos.y(),
-                                      0, 0)
+                self.zoomrect.setRect(
+                    self.grabpos.x(), self.grabpos.y(),
+                    0, 0)
                 self.zoomrect.show()
 
                 #self.label.drawRect(self.grabpos, self.grabpos)
@@ -711,6 +723,8 @@ class PlotWindow( qt4.QGraphicsView ):
         """Scroll window by how much the mouse has moved since last time."""
 
         qt4.QGraphicsView.mouseMoveEvent(self, event)
+        if self.painthelper is None:
+            return
 
         if self.currentclickmode == 'scroll':
             event.accept()
@@ -729,10 +743,15 @@ class PlotWindow( qt4.QGraphicsView ):
             self.winpos = qt4.QPoint(event.pos())
 
         elif self.currentclickmode == 'graphzoom' and self.grabpos is not None:
-            pos = self.mapToScene(event.pos())
-            r = self.zoomrect.rect()
-            self.zoomrect.setRect( r.x(), r.y(), pos.x()-r.x(),
-                                   pos.y()-r.y() )
+            pos2 = self.mapToScene(event.pos())
+            self.zoomrect.setRect(qt4.QRectF(
+                qt4.QPointF(
+                    min(self.grabpos.x(), pos2.x()),
+                    min(self.grabpos.y(), pos2.y())),
+                qt4.QPointF(
+                    max(self.grabpos.x(), pos2.x()),
+                    max(self.grabpos.y(), pos2.y())),
+                ))
 
         elif self.clickmode == 'select' or self.clickmode == 'pick':
             # find axes which map to this position
@@ -750,6 +769,8 @@ class PlotWindow( qt4.QGraphicsView ):
         clicked on a widget, and emit a sigWidgetClicked(widget,mode)."""
 
         qt4.QGraphicsView.mouseReleaseEvent(self, event)
+        if self.painthelper is None:
+            return
 
         if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
             event.accept()
@@ -805,13 +826,14 @@ class PlotWindow( qt4.QGraphicsView ):
 
                     # ask the widgets to pick their point which is closest horizontally
                     # to the last (screen) x value picked
-                    pi = w.pickPoint(self.pickerinfo.screenpos[0], p.y(),
-                                     self.painthelper.widgetBounds(w),
-                                     distance='horizontal')
+                    pi = w.pickPoint(
+                        self.pickerinfo.graphpos[0], p.y(),
+                        self.painthelper.widgetBounds(w),
+                        distance='horizontal')
                     if not pi:
                         continue
 
-                    dy = p.y() - pi.screenpos[1]
+                    dy = p.y() - pi.graphpos[1]
 
                     # take the new point which is closest vertically to the current
                     # one and either above or below it as appropriate
@@ -821,12 +843,12 @@ class PlotWindow( qt4.QGraphicsView ):
                         dist = abs(dy)
 
                 if pickinfo:
-                    oldx = self.pickerinfo.screenpos[0]
+                    oldx = self.pickerinfo.graphpos[0]
                     self.emitPicked(pickinfo)
 
                     # restore the previous x-position, so that vertical navigation
                     # stays repeatable
-                    pickinfo.screenpos = (oldx, pickinfo.screenpos[1])
+                    pickinfo.graphpos = (oldx, pickinfo.graphpos[1])
 
                 return
 

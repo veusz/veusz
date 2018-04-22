@@ -25,6 +25,7 @@ import os.path
 import sys
 import glob
 import re
+import datetime
 
 try:
     import h5py
@@ -110,6 +111,16 @@ class MainWindow(qt4.QMainWindow):
             win.askTutorial()
         # don't ask again
         setting.settingdb['ask_tutorial'] = True
+
+        # check if version check is ok
+        win.askVersionCheck()
+        # periodically do the check
+        win.doVersionCheck()
+
+        # is it ok to do feedback?
+        win.askFeedbackCheck()
+        # periodically send feedback
+        win.doFeedback()
 
         return win
 
@@ -536,6 +547,10 @@ class MainWindow(qt4.QMainWindow):
             'help.bug':
                 a(self, _('Report a bug on the internet'),
                   _('Suggestions and bugs'), self.slotHelpBug),
+            'help.update':
+                a(self, _('Download latest version'),
+                  _('Download latest version'), self.slotHelpUpdate),
+
             'help.tutorial':
                 a(self, _('An interactive Veusz tutorial'),
                   _('Tutorial'), self.slotHelpTutorial),
@@ -610,7 +625,7 @@ class MainWindow(qt4.QMainWindow):
             'data.reload',
             ]
         helpmenu = [
-            'help.home', 'help.bug',
+            'help.home', 'help.bug', 'help.update',
             '',
             'help.tutorial',
             '',
@@ -816,6 +831,95 @@ class MainWindow(qt4.QMainWindow):
         """Show about dialog."""
         from ..dialogs.aboutdialog import AboutDialog
         AboutDialog(self).exec_()
+
+    def askVersionCheck(self, mininterval=2):
+        """Check with user whether to do version checks.
+
+        This is only done after the user has been using the program
+        for mininterval days
+
+        """
+
+        dayssinceinstall = (
+            datetime.date.today() -
+            datetime.date(*setting.settingdb['install_date'])).days
+        if (dayssinceinstall<mininterval or
+            setting.settingdb['vercheck_asked_user'] or
+            setting.settingdb['vercheck_disabled'] or
+            utils.disableVersionChecks):
+            return
+
+        retn = qt4.QMessageBox.question(
+            self, _("Version check"),
+            _("Veusz will periodically check for new Veusz versions and\n"
+              "let you know if there is a new one available.\n\n"
+              "Is this ok? This choice can be changed in Preferences."),
+            qt4.QMessageBox.Yes | qt4.QMessageBox.No,
+            qt4.QMessageBox.Yes
+            )
+
+        setting.settingdb['vercheck_disabled'] = retn==qt4.QMessageBox.No
+        setting.settingdb['vercheck_asked_user'] = True
+
+    def doVersionCheck(self):
+        """Check whether there is a new version.
+        """
+        self.vzactions['help.update'].setVisible(False)
+
+        # check is done asynchronously
+        thread = utils.VersionCheckThread(self)
+        thread.newversion.connect(self.slotNewVersion)
+        thread.finished.connect(thread.deleteLater)
+        thread.start()
+
+    def askFeedbackCheck(self, mininterval=3):
+        """Check with user whether to do feedback.
+
+        This is only done after the user has been using the program
+        for mininterval days
+
+        """
+
+        dayssinceinstall = (
+            datetime.date.today() -
+            datetime.date(*setting.settingdb['install_date'])).days
+        if (dayssinceinstall<mininterval or
+            setting.settingdb['feedback_asked_user'] or
+            setting.settingdb['feedback_disabled'] or
+            utils.disableFeedback):
+            return
+
+        retn = qt4.QMessageBox.question(
+            self, _("Send automatic anonymous feedback"),
+            _("Veusz can automatically send anonymous feedback "
+              "to the developers, with information about the version "
+              "of software dependencies, the computer language and how "
+              "often features are used.\n\n"
+              "Is this ok? This choice can be changed in Preferences."),
+            qt4.QMessageBox.Yes | qt4.QMessageBox.No,
+            qt4.QMessageBox.Yes
+            )
+
+        setting.settingdb['feedback_disabled'] = retn==qt4.QMessageBox.No
+        setting.settingdb['feedback_asked_user'] = True
+
+    def doFeedback(self):
+        """Give feedback."""
+        thread = utils.FeedbackCheckThread(self)
+        thread.start()
+
+    def slotNewVersion(self, ver):
+        """Called when there is a new version."""
+        msg = _('Veusz %s is available for download - see Help menu') % ver
+        self.statusBar().showMessage(msg, 5000)
+        self.vzactions['help.update'].setText(
+            _('Download new Veusz %s') % ver)
+        self.vzactions['help.update'].setVisible(True)
+
+    def slotHelpUpdate(self):
+        """Open web page to update."""
+        qt4.QDesktopServices.openUrl(qt4.QUrl(
+            'https://veusz.github.io/download/'))
 
     def queryOverwrite(self):
         """Do you want to overwrite the current document.

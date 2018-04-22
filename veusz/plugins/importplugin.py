@@ -641,14 +641,17 @@ class ImportPluginBinary(ImportPlugin):
             if ord(c) <= 32 or ord(c) > 127:
                 return '.'
             else:
-                return c
+                return c.decode('ascii')
 
         # do a hex dump (like in CP/M)
         for i in crange(0, min(65536, len(data)), 16):
             hdr = '%04X  ' % i
             subset = data[i:i+16]
-            hexdata = ('%02X '*len(subset)) % tuple([ord(x) for x in subset])
-            chrdata = ''.join([filtchr(c) for c in subset])
+            # below messy due to python2/3 compatibility
+            hexdata = ('%02X '*len(subset)) % tuple(
+                [ord(subset[i:i+1]) for i in crange(len(subset))])
+            chrdata = ''.join([
+                filtchr(subset[i:i+1]) for i in crange(len(subset))])
 
             text.append(hdr+hexdata + '  ' + chrdata)
 

@@ -165,7 +165,7 @@ Set to 0 to disable threads.</string>
           <item>
            <widget class="QRadioButton" name="dirDocCWDRadio">
             <property name="text">
-             <string>Current working directory</string>
+             <string>Curren&amp;t working directory</string>
             </property>
            </widget>
           </item>
@@ -181,7 +181,7 @@ Set to 0 to disable threads.</string>
           <item>
            <widget class="QRadioButton" name="dirExportDocRadio">
             <property name="text">
-             <string>Document directory</string>
+             <string>Document director&amp;y</string>
             </property>
            </widget>
           </item>
@@ -420,6 +420,20 @@ to be loaded.</string>
         <widget class="QPushButton" name="externalGhostscriptBrowse">
          <property name="text">
           <string>Browse...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="externalNewVerCheck">
+         <property name="text">
+          <string>Disable new version checks</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QCheckBox" name="externalFeedbackCheck">
+         <property name="text">
+          <string>Disable sending automatic feedback</string>
          </property>
         </widget>
        </item>

@@ -17,9 +17,9 @@
 ##############################################################################
 
 '''Dialog to pop up if an exception occurs in Veusz.
-This allows the user to send a bug report in via email.'''
+This allows the user to send a bug report.'''
 
-from __future__ import division
+from __future__ import division, print_function
 import sys
 import time
 import traceback
@@ -30,15 +30,15 @@ import numpy
 import sip
 
 from ..compat import citems, curlrequest, cexceptionuser
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ExceptionDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
-_emailUrl ='http://barmag.net/veusz-mail.php'
+_emailUrl ='https://barmag.net/veusz-mail.php'
 
 _reportformat = \
 '''Veusz version: %s
@@ -67,16 +67,16 @@ What the user was doing before the crash
 
 def createReportText(exception):
     return _reportformat % (
-                utils.version(),
-                sys.version,
-                sys.platform,
-                numpy.__version__,
-                qt4.qVersion(),
-                qt4.PYQT_VERSION_STR,
-                sip.SIP_VERSION_STR,
-                time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
-                cexceptionuser(exception),
-            )
+        utils.version(),
+        sys.version,
+        sys.platform,
+        numpy.__version__,
+        qt.qVersion(),
+        qt.PYQT_VERSION_STR,
+        sip.SIP_VERSION_STR,
+        time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
+        cexceptionuser(exception),
+    )
 
 class ExceptionSendDialog(VeuszDialog):
     """Dialog to send debugging report."""
@@ -92,7 +92,8 @@ class ExceptionSendDialog(VeuszDialog):
     def accept(self):
         """Send text."""
         # build up the text of the message
-        text = ( _sendformat % (
+        text = (
+            _sendformat % (
                 self.emailedit.text(),
                 self.text,
                 self.detailsedit.toPlainText()
@@ -103,18 +104,18 @@ class ExceptionSendDialog(VeuszDialog):
 
         try:
             # send the message
-            curlrequest.urlopen(_emailUrl,
-                                'message=%s' % text)
+            curlrequest.urlopen(_emailUrl, b'message='+text)
         except:
             # something went wrong...
-            qt4.QMessageBox.critical(None, _("Veusz"),
-                                     _("Failed to connect to error server "
-                                       "to send report. Is your internet "
-                                       "connected?"))
+            qt.QMessageBox.critical(
+                None, _("Veusz"),
+                _("Failed to connect to error server "
+                  "to send report. Is your internet connected?"))
             return
 
-        qt4.QMessageBox.information(self, _("Submitted"),
-                                    _("Thank you for submitting an error report"))
+        qt.QMessageBox.information(
+            self, _("Submitted"),
+            _("Thank you for submitting an error report"))
         VeuszDialog.accept(self)
 
 def _raiseIgnoreException():
@@ -133,10 +134,11 @@ def formatLocals(exception):
         tb = tb.tb_next
 
         outlines.append('')
-        outlines.append('Frame %s (File %s, line %s)' %
-                        (frame.f_code.co_name,
-                         frame.f_code.co_filename,
-                         frame.f_lineno))
+        outlines.append(
+            'Frame %s (File %s, line %s)' %
+            (frame.f_code.co_name,
+             frame.f_code.co_filename,
+             frame.f_lineno))
 
         # get local variables for frame
         for key, value in citems(frame.f_locals):
@@ -188,8 +190,8 @@ class ExceptionDialog(VeuszDialog):
         self.errortextedit.setPlainText(self.backtrace)
 
         # set critical pixmap to left of dialog
-        icon = qt4.qApp.style().standardIcon(qt4.QStyle.SP_MessageBoxCritical,
-                                             None, self)
+        icon = qt.qApp.style().standardIcon(
+            qt.QStyle.SP_MessageBoxCritical, None, self)
         self.erroriconlabel.setPixmap(icon.pixmap(32))
 
         self.ignoreSessionButton.clicked.connect(self.ignoreSessionSlot)
@@ -204,33 +206,30 @@ class ExceptionDialog(VeuszDialog):
         """See whether there is a later version of veusz and inform the
         user."""
 
-        # FIXME: 
-        try:
-            p = curlrequest.urlopen(
-                'http://veusz.github.io/download/newest-version.html').read()
-            latest = p.decode('ascii').strip()
-            latestv = [int(i) for i in latest.split('.')]
-        except:
-            latestv = None
-
-        if not latestv:
+        newver = utils.latestVersion()
+        thisver = utils.version()
+        if not newver:
             msg = _('Could not check the latest Veusz version')
         else:
-            currentv = [int(i) for i in utils.version().split('.')]
-            if currentv == latestv:
+            # convert to tuples for comparison
+            newver_tup = utils.versionToTuple(newver)
+            thisver_tup = utils.versionToTuple(thisver)
+
+            if thisver_tup == newver_tup:
                 msg = _('You are running the latest released Veusz version')
-            elif currentv > latestv:
+            elif thisver_tup > newver_tup:
                 msg = _('You are running an unreleased Veusz version')
             else:
-                msg = (_('<b>Your current version of Veusz is old. '
-                         'Veusz %s is available.</b>') % latest)
+                msg = (
+                    _('<b>Your current version of Veusz is old. '
+                      'Veusz %s is available.</b>') % newver)
 
         self.veuszversionlabel.setText(msg)
 
     def accept(self):
         """Accept by opening send dialog."""
         d = ExceptionSendDialog(self.backtrace, self)
-        if d.exec_() == qt4.QDialog.Accepted:
+        if d.exec_() == qt.QDialog.Accepted:
             VeuszDialog.accept(self)
 
     def ignoreSessionSlot(self):
@@ -239,7 +238,7 @@ class ExceptionDialog(VeuszDialog):
         self.reject()
 
     def saveButtonSlot(self):
-        filename = qt4.QFileDialog.getSaveFileName(self, 'Save File')
+        filename = qt.QFileDialog.getSaveFileName(self, 'Save File')
         if filename[0]:
             f = open(filename[0], 'w')
             f.write(createReportText(self.backtrace))
@@ -254,4 +253,4 @@ class ExceptionDialog(VeuszDialog):
 
         # send another exception shortly - this clears out the current one
         # so the stack frame of the current exception is released
-        qt4.QTimer.singleShot(0, _raiseIgnoreException)
+        qt.QTimer.singleShot(0, _raiseIgnoreException)

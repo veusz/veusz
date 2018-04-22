@@ -62,8 +62,11 @@ int RecordPaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const
   case QPaintDevice::PdmDpiY:
   case QPaintDevice::PdmPhysicalDpiY:
     return _dpiy;
+  case QPaintDevice::PdmDevicePixelRatio:
+    return 1;
   default:
-    return -1;
+    // fallback
+    return QPaintDevice::metric(metric);
   }
 }
 

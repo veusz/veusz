@@ -186,6 +186,10 @@ class ImportTab2D(importdialog.ImportTab):
                 )
 
             output = '\n'.join(output)
+
+            # feature feedback
+            utils.feedback.importcts['twod'] += 1
+
         except simpleread.Read2DError as e:
             output = _('Error importing datasets:\n %s') % cstr(e)
 

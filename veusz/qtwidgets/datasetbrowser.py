@@ -239,7 +239,8 @@ class DatasetRelationModel(TreeModel):
             filterout = True
         # check type hasn't been filtered
         if ( self.filterdtype is not None and
-             ds.datatype not in self.filterdtype ):
+             ds.datatype not in self.filterdtype and
+             'all' not in self.filterdtype):
             filterout = True
 
         if filterout:

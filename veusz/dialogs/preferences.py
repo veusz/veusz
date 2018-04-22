@@ -114,6 +114,12 @@ class PreferencesDialog(VeuszDialog):
         self.externalGhostscript.setText(setdb['external_ghostscript'])
         self.externalGhostscriptBrowse.clicked.connect(
             self.externalGhostscriptBrowseClicked)
+        self.externalNewVerCheck.setChecked(setdb['vercheck_disabled'])
+        if utils.disableVersionChecks:
+            self.externalNewVerCheck.setEnabled(False)
+        self.externalNewVerCheck.setChecked(setdb['feedback_disabled'])
+        if utils.disableFeedback:
+            self.externalFeedbackCheck.setEnabled(False)
 
     def setupColorTab(self):
         """Initialise color tab
@@ -233,7 +239,12 @@ class PreferencesDialog(VeuszDialog):
 
         # python path
         setdb['external_pythonpath'] = self.externalPythonPath.text()
+        # where to find ghostscript
         setdb['external_ghostscript'] = self.externalGhostscript.text()
+        # version updates
+        setdb['vercheck_disabled'] = self.externalNewVerCheck.isChecked()
+        # feedback
+        setdb['feedback_disabled'] = self.externalFeedbackCheck.isChecked()
 
         self.plotwindow.updatePlotSettings()
 

@@ -21,6 +21,7 @@ from __future__ import division, print_function, absolute_import
 from .. import qtall as qt4
 from .. import setting
 from .. import plugins
+from .. import utils
 from ..dialogs import importdialog
 from ..compat import czip, cstr
 from . import defn_plugin
@@ -182,6 +183,9 @@ class ImportTabPlugins(importdialog.ImportTab):
         except plugins.ImportPluginException as ex:
             self.pluginPreview.setPlainText( cstr(ex) )
             return
+
+        # feature feedback
+        utils.feedback.importcts['plugin'] += 1
 
         out = [_('Imported data for datasets:')]
         for ds in op.outnames:

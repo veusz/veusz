@@ -167,13 +167,13 @@ class EMFPaintEngine(qt4.QPaintEngine):
         epix.yDest = int(r.top()*scale)
         epix.cxDest = int(r.width()*scale)
         epix.cyDest = int(r.height()*scale)
-        epix.xSrc = sr.left()
-        epix.ySrc = sr.top()
-        epix.cxSrc = sr.width()
-        epix.cySrc = sr.height()
+        epix.xSrc = int(sr.left())
+        epix.ySrc = int(sr.top())
+        epix.cxSrc = int(sr.width())
+        epix.cySrc = int(sr.height())
 
         epix.dwRop = 0xcc0020 # SRCCOPY
-        offset = epix.minstructsize + 8
+        offset = epix.format.minstructsize + 8
         epix.offBmiSrc = offset
         epix.cbBmiSrc = hdrsize
         epix.offBitsSrc = offset + dataindex - 0xe
@@ -363,14 +363,14 @@ class EMFPaintEngine(qt4.QPaintEngine):
             self._updatePen(state.pen())
         if ss & qt4.QPaintEngine.DirtyBrush:
             self._updateBrush(state.brush())
+        if ss & qt4.QPaintEngine.DirtyTransform:
+            self._updateTransform(state.transform())
         if ss & qt4.QPaintEngine.DirtyClipPath:
             self._updateClipPath(state.clipPath(), state.clipOperation())
         if ss & qt4.QPaintEngine.DirtyClipRegion:
             path = qt4.QPainterPath()
             path.addRegion(state.clipRegion())
             self._updateClipPath(path, state.clipOperation())
-        if ss & qt4.QPaintEngine.DirtyTransform:
-            self._updateTransform(state.transform())
 
     def type(self):
         return qt4.QPaintEngine.PostScript
@@ -415,4 +415,5 @@ class EMFPaintDevice(qt4.QPaintDevice):
             return 1
 
         else:
-            raise RuntimeError("Invalid metric parameter: %i" % m)
+            # fall back
+            return qt4.QPaintDevice.metric(self, m)

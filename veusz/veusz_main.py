@@ -33,13 +33,13 @@ from veusz import utils
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2017 <jeremy@jeremysanders.net>
+Copyright (C) Jeremy Sanders 2003-2018 <jeremy@jeremysanders.net>
  and contributors
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
 splashcopyr='''<b><font color="purple">Veusz %s<br></font></b>
-Copyright (C) Jeremy Sanders 2003-2017 and contributors<br>
+Copyright (C) Jeremy Sanders 2003-2018 and contributors<br>
 Licenced under the GPL (version 2 or greater)
 '''
 
@@ -86,6 +86,13 @@ def makeSplash(app):
 
 def excepthook(excepttype, exceptvalue, tracebackobj):
     '''Show exception dialog if an exception occurs.'''
+
+    # current dialog doesnt work if not in main thread
+    # fixme: post error message instread of printing
+    if qt.qApp.thread() is not qt.QThread.currentThread():
+        defaultexcepthook(excepttype, exceptvalue, trackbackobj)
+        return
+
     sys.setrecursionlimit(sys.getrecursionlimit()+1000)
 
     from veusz.dialogs.exceptiondialog import ExceptionDialog
@@ -100,15 +107,19 @@ def listen(docs, quiet):
     from veusz.veusz_listen import openWindow
     openWindow(docs, quiet=quiet)
 
-def export(exports, docs):
+def export(exports, docs, options):
     '''A shortcut to load a set of files and export them.'''
     from veusz import document
     from veusz import utils
+
+    # TODO: validate options
+    opttxt = ', '.join(options) if options else ''
+
     for expfn, vsz in czip(exports, docs):
         doc = document.Document()
         ci = document.CommandInterpreter(doc)
         ci.Load(vsz)
-        ci.run('Export(%s)' % repr(expfn))
+        ci.run('Export(%s, %s)' % (repr(expfn), opttxt))
 
 def convertArgsUnicode(args):
     '''Convert set of arguments to unicode (for Python 2).
@@ -171,6 +182,9 @@ class VeuszApp(qt.QApplication):
             '--export', action='append', metavar='FILE',
             help='export the next document to this'
             ' output image file, exiting when finished')
+        parser.add_argument(
+            '--export-option', action='append', metavar='VAL',
+            help='add option when exporting file')
         parser.add_argument(
             '--embed-remote',
             action='store_true',
@@ -270,6 +284,8 @@ class VeuszApp(qt.QApplication):
         from veusz import setting
 
         # install exception hook after thread has finished
+        global defaultexcepthook
+        defaultexcepthook = sys.excepthook
         sys.excepthook = excepthook
 
         # for people who want to run any old script
@@ -302,7 +318,7 @@ class VeuszApp(qt.QApplication):
             # listen to incoming commands
             listen(args.docs, quiet=args.quiet)
         elif args.export:
-            export(args.export, args.docs)
+            export(args.export, args.docs, args.export_option)
             self.quit()
             sys.exit(0)
         else:

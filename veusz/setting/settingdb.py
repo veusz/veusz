@@ -20,6 +20,7 @@
 
 from __future__ import division, print_function
 import sys
+import datetime
 
 import numpy as N
 from .. import qtall as qt4
@@ -89,6 +90,19 @@ defaultValues = {
 
     # translation file to load
     'translation_file': '',
+
+    # user has disabled version update checks
+    # (packagers: please don't disable here, see disableVersionChecks in
+    #  veusz/utils/version.py)
+    'vercheck_disabled': False,
+    'vercheck_asked_user': False,
+    'vercheck_last_done': (2000,1,1),
+    'vercheck_latest': '',
+
+    # whether to send feedback about usage
+    # (packagers, please don't disable here but in veusz/setting/feedback.py)
+    'feedback_disabled': False,
+    'feedback_asked_user': False,
     }
 
 class _SettingDB(object):
@@ -163,6 +177,11 @@ class _SettingDB(object):
         for key in defaultValues:
             if key not in self.database:
                 self.database[key] = defaultValues[key]
+
+        # keep install date for reminders, etc
+        if 'install_date' not in self.database:
+            today = datetime.date.today()
+            self.database['install_date'] = (today.year, today.month, today.day)
 
     def writeSettings(self):
         """Write the settings using QSettings.

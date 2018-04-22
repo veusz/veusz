@@ -767,7 +767,7 @@ class Axis(widget.Widget):
                        coordticks, coordticks*0.+self.coordPerp1,
                        coordticks, coordticks*0.+self.coordPerp2)
 
-    def _drawAxisLine(self, painter):
+    def _drawAxisLine(self, painter, posn):
         """Draw the line of the axis."""
 
         pen = self.settings.get('Line').makeQPen(painter)
@@ -1127,7 +1127,7 @@ class Axis(widget.Widget):
         # temporarily change position of axis to other side for drawing
         self.updateAxisLocation(posn, otherposition=otheredge)
         if not s.Line.hide:
-            self._drawAxisLine(painter)
+            self._drawAxisLine(painter, posn)
         if not s.MinorTicks.hide:
             self._drawMinorTicks(painter, coordminorticks)
         if not s.MajorTicks.hide:
@@ -1215,7 +1215,7 @@ class Axis(widget.Widget):
 
         # plot the line along the axis
         if not s.Line.hide:
-            self._drawAxisLine(painter)
+            self._drawAxisLine(painter, posn)
 
         # plot minor ticks
         if not s.MinorTicks.hide:

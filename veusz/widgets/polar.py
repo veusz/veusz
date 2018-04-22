@@ -212,9 +212,15 @@ class Polar(NonOrthGraph):
         """Convert one or more angles to angle on plot."""
         s = self.settings
 
-        # unit conversion
-        if s.units == 'degrees':
-            angles = angles * (math.pi/180.)
+        # unit conversions
+        mult = {
+            'degrees': math.pi/180,
+            'radians': 1,
+            'fractions': 2*math.pi,
+            'percentages': 0.02*math.pi,
+            }
+        angles = angles * mult[s.units]
+
         # change direction
         if self.settings.direction == 'anticlockwise':
             angles = -angles

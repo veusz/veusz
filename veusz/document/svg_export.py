@@ -598,4 +598,5 @@ class SVGPaintDevice(qt4.QPaintDevice):
             return 1
 
         else:
-            raise RuntimeError('Invalid metric argument '+repr(m))
+            # fall back
+            return qt4.QPaintDevice.metric(self, m)

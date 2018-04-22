@@ -9,6 +9,7 @@ import glob
 
 root = r'c:\build\veusz'
 nsisexe = r'c:\Program Files (x86)\NSIS\makensis.exe'
+verpatch = r'c:\build\verpatch\verpatch.exe'
 
 def call(args):
     print(' '.join(args))
@@ -37,5 +38,12 @@ del os.environ['VEUSZ_RESOURCE_DIR']
 call(['pyinstaller', r'support\veusz_windows_pyinst.spec'])
 
 version=open('VERSION').read().strip()
+ver4 = version
+while len(ver4.split('.'))<4:
+    ver4 += '.0'
+
+call([verpatch, os.path.join(root, 'dist', 'veusz_main', 'veusz.exe'),
+      ver4, '/va', '/pv', ver4, '/s', 'description', 'Veusz scientific plotting',
+      '/s', 'product', 'Veusz', '/s', 'copyright', 'Jeremy Sanders and contributers'])
 
 call([nsisexe, '/DPRODUCT_VERSION='+version, r'support\veusz_windows_setup.nsi'])

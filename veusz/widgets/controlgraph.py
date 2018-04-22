@@ -64,11 +64,20 @@ class _ScaledShape:
         self.setPos(x1*s, y1*s)
         self.setLine(0,0,(x2-x1)*s,(y2-y1)*s)
 
+    def setScaledRect(self, x, y, w, h):
+        s = self.params.cgscale
+        self.setRect(x*s, y*s, w*s, h*s)
+
     def scaledX(self):
         return self.x()/self.params.cgscale
 
     def scaledY(self):
         return self.y()/self.params.cgscale
+
+    def scaledRect(self):
+        r = self.rect()
+        s = self.params.cgscale
+        return qt.QRectF(r.left()/s, r.top()/s, r.width()/s, r.height()/s)
 
 ##############################################################################
 

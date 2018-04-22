@@ -1,0 +1,209 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="531.4px" height="531.4px" version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+<desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
+</clipPath>
+<clipPath id="c1">
+<path d="m230.3,132.8c0,53.8,-43.6,97.4,-97.4,97.4c-53.8,0,-97.4,-43.6,-97.4,-97.4c0,-53.8,43.6,-97.4,97.4,-97.4c53.8,0,97.4,43.6,97.4,97.4"/>
+</clipPath>
+<clipPath id="c2">
+<path d="m496,132.8c0,53.8,-43.6,97.4,-97.4,97.4c-53.8,0,-97.4,-43.6,-97.4,-97.4c0,-53.8,43.6,-97.4,97.4,-97.4c53.8,0,97.4,43.6,97.4,97.4"/>
+</clipPath>
+<clipPath id="c3">
+<path d="m230.3,398.6c0,53.8,-43.6,97.4,-97.4,97.4c-53.8,0,-97.4,-43.6,-97.4,-97.4c0,-53.8,43.6,-97.4,97.4,-97.4c53.8,0,97.4,43.6,97.4,97.4"/>
+</clipPath>
+<clipPath id="c4">
+<path d="m496,398.6c0,53.8,-43.6,97.4,-97.4,97.4c-53.8,0,-97.4,-43.6,-97.4,-97.4c0,-53.8,43.6,-97.4,97.4,-97.4c53.8,0,97.4,43.6,97.4,97.4"/>
+</clipPath>
+</defs>
+<g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m230.3,132.8c0,53.8,-43.6,97.4,-97.4,97.4c-53.8,0,-97.4,-43.6,-97.4,-97.4c0,-53.8,43.6,-97.4,97.4,-97.4c53.8,0,97.4,43.6,97.4,97.4"/>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<ellipse cx="132.8" cy="132.8" rx="19.4" ry="19.4"/>
+<ellipse cx="132.8" cy="132.8" rx="38.9" ry="38.9"/>
+<ellipse cx="132.8" cy="132.8" rx="58.4" ry="58.4"/>
+<ellipse cx="132.8" cy="132.8" rx="77.9" ry="77.9"/>
+<ellipse cx="132.8" cy="132.8" rx="97.4" ry="97.4"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="152.3" y="131.1" font-size="14pt" fill="#000000">1</text>
+<text x="171.8" y="131.1" font-size="14pt" fill="#000000">2</text>
+<text x="191.3" y="131.1" font-size="14pt" fill="#000000">3</text>
+<text x="210.8" y="131.1" font-size="14pt" fill="#000000">4</text>
+<text x="230.3" y="131.1" font-size="14pt" fill="#000000">5</text>
+<text x="230.3" y="134.6" font-size="14pt" fill="#000000">0</text>
+<text x="211.7" y="191.8" font-size="14pt" fill="#000000">0.9</text>
+<text x="162.9" y="227.2" font-size="14pt" fill="#000000">0.8</text>
+<text x="76.5" y="227.2" font-size="14pt" fill="#000000">0.7</text>
+<text x="27.7" y="191.8" font-size="14pt" fill="#000000">0.6</text>
+<text x="9.1" y="133.7" font-size="14pt" fill="#000000">0.5</text>
+<text x="27.7" y="73.8" font-size="14pt" fill="#000000">0.4</text>
+<text x="76.5" y="38.4" font-size="14pt" fill="#000000">0.3</text>
+<text x="162.9" y="38.4" font-size="14pt" fill="#000000">0.2</text>
+<text x="211.7" y="73.8" font-size="14pt" fill="#000000">0.1</text>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<path d="M132.8,132.8l97.4,0M132.8,132.8l78.8,57.2M132.8,132.8l30.1,92.6M132.8,132.8l-30.1,92.6M132.8,132.8l-78.8,57.2M132.8,132.8l-97.4,0M132.8,132.8l-78.8,-57.2M132.8,132.8l-30.1,-92.6M132.8,132.8l30.1,-92.6M132.8,132.8l78.8,-57.2"/>
+</g>
+</g>
+<g clip-path="url(#c1)">
+<g fill="none" stroke="#e41a1c" stroke-width="0.6">
+<polyline fill="none" points="138.8,114.3 120.8,95.8 85.5,98.5 54.9,132.8 162.9,225.5"/>
+</g>
+<g fill="#e41a1c" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(138.8,114.3)">
+<path d="m3.7,0c0,2,-1.6,3.7,-3.7,3.7c-2,0,-3.7,-1.6,-3.7,-3.7c0,-2,1.6,-3.7,3.7,-3.7c2,0,3.7,1.6,3.7,3.7" id="p0"/>
+</g>
+<use xlink:href="#p0" x="120.8" y="95.8"/>
+<use xlink:href="#p0" x="85.5" y="98.5"/>
+<use xlink:href="#p0" x="54.9" y="132.8"/>
+<use xlink:href="#p0" x="162.9" y="225.5"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m496,132.8c0,53.8,-43.6,97.4,-97.4,97.4c-53.8,0,-97.4,-43.6,-97.4,-97.4c0,-53.8,43.6,-97.4,97.4,-97.4c53.8,0,97.4,43.6,97.4,97.4"/>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<ellipse cx="398.6" cy="132.8" rx="19.4" ry="19.4"/>
+<ellipse cx="398.6" cy="132.8" rx="38.9" ry="38.9"/>
+<ellipse cx="398.6" cy="132.8" rx="58.4" ry="58.4"/>
+<ellipse cx="398.6" cy="132.8" rx="77.9" ry="77.9"/>
+<ellipse cx="398.6" cy="132.8" rx="97.4" ry="97.4"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="418.1" y="131.1" font-size="14pt" fill="#000000">1</text>
+<text x="437.5" y="131.1" font-size="14pt" fill="#000000">2</text>
+<text x="457" y="131.1" font-size="14pt" fill="#000000">3</text>
+<text x="476.5" y="131.1" font-size="14pt" fill="#000000">4</text>
+<text x="496" y="131.1" font-size="14pt" fill="#000000">5</text>
+<text x="496" y="134.6" font-size="14pt" fill="#000000">0</text>
+<text x="477.4" y="191.8" font-size="14pt" fill="#000000">90</text>
+<text x="428.7" y="227.2" font-size="14pt" fill="#000000">80</text>
+<text x="351" y="227.2" font-size="14pt" fill="#000000">70</text>
+<text x="302.2" y="191.8" font-size="14pt" fill="#000000">60</text>
+<text x="283.6" y="133.7" font-size="14pt" fill="#000000">50</text>
+<text x="302.2" y="73.8" font-size="14pt" fill="#000000">40</text>
+<text x="351" y="38.4" font-size="14pt" fill="#000000">30</text>
+<text x="428.7" y="38.4" font-size="14pt" fill="#000000">20</text>
+<text x="477.4" y="73.8" font-size="14pt" fill="#000000">10</text>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<path d="M398.6,132.8l97.4,0M398.6,132.8l78.8,57.2M398.6,132.8l30.1,92.6M398.6,132.8l-30.1,92.6M398.6,132.8l-78.8,57.2M398.6,132.8l-97.4,0M398.6,132.8l-78.8,-57.2M398.6,132.8l-30.1,-92.6M398.6,132.8l30.1,-92.6M398.6,132.8l78.8,-57.2"/>
+</g>
+</g>
+<g clip-path="url(#c2)">
+<g fill="none" stroke="#e41a1c" stroke-width="0.6">
+<polyline fill="none" points="404.6,114.3 367,109.9 351.3,167.2 374.5,207 428.7,225.5"/>
+</g>
+<g fill="#e41a1c" stroke-linejoin="miter" stroke-width="0.6">
+<use xlink:href="#p0" x="404.6" y="114.3"/>
+<use xlink:href="#p0" x="367" y="109.9"/>
+<use xlink:href="#p0" x="351.3" y="167.2"/>
+<use xlink:href="#p0" x="374.5" y="207"/>
+<use xlink:href="#p0" x="428.7" y="225.5"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m230.3,398.6c0,53.8,-43.6,97.4,-97.4,97.4c-53.8,0,-97.4,-43.6,-97.4,-97.4c0,-53.8,43.6,-97.4,97.4,-97.4c53.8,0,97.4,43.6,97.4,97.4"/>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<ellipse cx="132.8" cy="398.6" rx="19.4" ry="19.4"/>
+<ellipse cx="132.8" cy="398.6" rx="38.9" ry="38.9"/>
+<ellipse cx="132.8" cy="398.6" rx="58.4" ry="58.4"/>
+<ellipse cx="132.8" cy="398.6" rx="77.9" ry="77.9"/>
+<ellipse cx="132.8" cy="398.6" rx="97.4" ry="97.4"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="152.3" y="396.8" font-size="14pt" fill="#000000">1</text>
+<text x="171.8" y="396.8" font-size="14pt" fill="#000000">2</text>
+<text x="191.3" y="396.8" font-size="14pt" fill="#000000">3</text>
+<text x="210.8" y="396.8" font-size="14pt" fill="#000000">4</text>
+<text x="230.3" y="396.8" font-size="14pt" fill="#000000">5</text>
+<text x="230.3" y="400.3" font-size="14pt" fill="#000000">0</text>
+<text x="217.2" y="449" font-size="14pt" fill="#000000">&#960;/6</text>
+<text x="181.5" y="484.7" font-size="14pt" fill="#000000">5&#960;/3</text>
+<text x="93.4" y="497.8" font-size="14pt" fill="#000000">3&#960;/2</text>
+<text x="5.3" y="484.7" font-size="14pt" fill="#000000">4&#960;/3</text>
+<text x="-30.2" y="449" font-size="14pt" fill="#000000">7&#960;/6</text>
+<text x="-17" y="399.4" font-size="14pt" fill="#000000">&#960;</text>
+<text x="-30.2" y="348.1" font-size="14pt" fill="#000000">5&#960;/6</text>
+<text x="5.3" y="312.4" font-size="14pt" fill="#000000">2&#960;/3</text>
+<text x="97.8" y="299.4" font-size="14pt" fill="#000000">&#960;/2</text>
+<text x="181.5" y="312.4" font-size="14pt" fill="#000000">&#960;/3</text>
+<text x="217.2" y="348.1" font-size="14pt" fill="#000000">&#960;/6</text>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<path d="M132.8,398.6l97.4,0M132.8,398.6l84.3,48.7M132.8,398.6l48.7,84.3M132.8,398.6l0,97.4M132.8,398.6l-48.7,84.3M132.8,398.6l-84.3,48.7M132.8,398.6l-97.4,0M132.8,398.6l-84.3,-48.7M132.8,398.6l-48.7,-84.3M132.8,398.6l0,-97.4M132.8,398.6l48.7,-84.3M132.8,398.6l84.3,-48.7"/>
+</g>
+</g>
+<g clip-path="url(#c3)">
+<g fill="none" stroke="#e41a1c" stroke-width="0.6">
+<polyline fill="none" points="152.3,398.6 152.3,364.8 103.6,347.9 54.9,398.6 84.1,483"/>
+</g>
+<g fill="#e41a1c" stroke-linejoin="miter" stroke-width="0.6">
+<use xlink:href="#p0" x="152.3" y="398.6"/>
+<use xlink:href="#p0" x="152.3" y="364.8"/>
+<use xlink:href="#p0" x="103.6" y="347.9"/>
+<use xlink:href="#p0" x="54.9" y="398.6"/>
+<use xlink:href="#p0" x="84.1" y="483"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke-width="0.6">
+<path d="m496,398.6c0,53.8,-43.6,97.4,-97.4,97.4c-53.8,0,-97.4,-43.6,-97.4,-97.4c0,-53.8,43.6,-97.4,97.4,-97.4c53.8,0,97.4,43.6,97.4,97.4"/>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<ellipse cx="398.6" cy="398.6" rx="19.4" ry="19.4"/>
+<ellipse cx="398.6" cy="398.6" rx="38.9" ry="38.9"/>
+<ellipse cx="398.6" cy="398.6" rx="58.4" ry="58.4"/>
+<ellipse cx="398.6" cy="398.6" rx="77.9" ry="77.9"/>
+<ellipse cx="398.6" cy="398.6" rx="97.4" ry="97.4"/>
+</g>
+<g fill="none" stroke-width="1">
+<text x="418.1" y="396.8" font-size="14pt" fill="#000000">1</text>
+<text x="437.5" y="396.8" font-size="14pt" fill="#000000">2</text>
+<text x="457" y="396.8" font-size="14pt" fill="#000000">3</text>
+<text x="476.5" y="396.8" font-size="14pt" fill="#000000">4</text>
+<text x="496" y="396.8" font-size="14pt" fill="#000000">5</text>
+<text x="496" y="400.3" font-size="14pt" fill="#000000">0&#176;</text>
+<text x="483" y="449" font-size="14pt" fill="#000000">30&#176;</text>
+<text x="447.3" y="484.7" font-size="14pt" fill="#000000">60&#176;</text>
+<text x="363.6" y="497.8" font-size="14pt" fill="#000000">90&#176;</text>
+<text x="271.1" y="484.7" font-size="14pt" fill="#000000">120&#176;</text>
+<text x="235.4" y="449" font-size="14pt" fill="#000000">150&#176;</text>
+<text x="222.4" y="399.4" font-size="14pt" fill="#000000">180&#176;</text>
+<text x="235.4" y="348.1" font-size="14pt" fill="#000000">210&#176;</text>
+<text x="271.1" y="312.4" font-size="14pt" fill="#000000">240&#176;</text>
+<text x="359.2" y="299.4" font-size="14pt" fill="#000000">270&#176;</text>
+<text x="447.3" y="312.4" font-size="14pt" fill="#000000">300&#176;</text>
+<text x="483" y="348.1" font-size="14pt" fill="#000000">330&#176;</text>
+</g>
+<g fill="none" stroke="#808080" stroke-width="0.6">
+<path d="M398.6,398.6l97.4,0M398.6,398.6l84.3,48.7M398.6,398.6l48.7,84.3M398.6,398.6l0,97.4M398.6,398.6l-48.7,84.3M398.6,398.6l-84.3,48.7M398.6,398.6l-97.4,0M398.6,398.6l-84.3,-48.7M398.6,398.6l-48.7,-84.3M398.6,398.6l0,-97.4M398.6,398.6l48.7,-84.3M398.6,398.6l84.3,-48.7"/>
+</g>
+</g>
+<g clip-path="url(#c4)">
+<g fill="none" stroke="#e41a1c" stroke-width="0.6">
+<polyline fill="none" points="415.4,408.3 418.1,432.3 398.6,457 331.1,437.5 314.2,349.9"/>
+</g>
+<g fill="#e41a1c" stroke-linejoin="miter" stroke-width="0.6">
+<use xlink:href="#p0" x="415.4" y="408.3"/>
+<use xlink:href="#p0" x="418.1" y="432.3"/>
+<use xlink:href="#p0" x="398.6" y="457"/>
+<use xlink:href="#p0" x="331.1" y="437.5"/>
+<use xlink:href="#p0" x="314.2" y="349.9"/>
+</g>
+</g>
+</g>
+</svg>

@@ -114,4 +114,7 @@ class ImportTabStandard(importdialog.ImportTab):
 
         self.previewedit.setPlainText( '\n'.join(lines) )
 
+        # feature feedback
+        utils.feedback.importcts['std'] += 1
+
 importdialog.registerImportTab(_('&Standard'), ImportTabStandard)

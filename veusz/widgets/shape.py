@@ -320,7 +320,7 @@ class ImageFile(BoxShape):
         self.cacheimage = qt4.QImage()
 
         # convert the embedded data from base64 and load into the image
-        decoded = s.embeddedImageData.encode('ascii').decode('base64')
+        decoded = codecs.decode(s.embeddedImageData.encode('ascii'), 'base64')
         self.cacheimage.loadFromData(decoded)
 
         # we cache the data we have decoded

@@ -1,4 +1,4 @@
-Veusz 2.1.1
+Veusz 2.2.2
 -----------
 https://veusz.github.io
 
@@ -12,28 +12,43 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 2.1.1:
- * Fix dashed/dotted custom lines in EMF output
- * Fix Fields in dataset plugins
- * Fix data import plugins
- * Use deprecated sipconfig if available to find SIP files
- * Fix problems with opening files using command line arguments with
-   some encodings
- * Hide splash if program takes too long to start
+Changes in 2.2.2:
+ * Fix zoom for polar, ternary and broken axis plots
+ * For mean and add dataset operations, allow datasets to be different
+   lengths, expanding to the maximum
+ * Fix broken axis if the ends of the axis are not the edge of the plot
+ * Fix image embedding in Python 3
+ * Update h5py to newer version in Windows binary (supporting HDF 1.10.1)
+ * Fix 'fractions' and 'percentages' units in polar plot
+ * Add LANG(mapping) function when evaluating labels, allowing translation
+   of strings in documents
 
-Changes in 2.1:
- * If file cannot be imported on document load, ask user for a new filename
- * Only open HDF5 files in readonly mode
- * Do not simply log errors when loading data with ImportPlugins
- * Cleanup of stylesheet, setting and widget code
- * Fix filename chooser and embedding in ImageFile widget
- * Force C++11 compilation on Unix
- * Fix document reload, export warning and unsafe loading dialogs
- * Parameterize number of line steps in covariance widget
- * Report error line number for csv reading exceptions
- * Convert values from expressions to 1D arrays when required
- * Take account of endsize setting for bar plot error bars
- * Remove dependence on sipconfig in build and add sip build parameters
+Changes in 2.2.1:
+ * Fix mouse control for Key widget for different zoom levels
+ * Correct coordinates shown on bottom of screen for different zoom levels
+ * Fix zoom into graph functionality for different zoom levels
+ * Fix plot picking for different zoom levels
+ * When choosing a text dataset, fix the mini dataset browser
+ * Fix crash when previewing in binary import using Python 3
+ * Fix crash when picking points in certain circumstances
+
+Changes in 2.2:
+ * Notify user updates to Veusz are available
+ * Add support for high DPI displays
+ * Change zoom code scale plots, rather than changing the size of elements,
+   so that plots look more similar at different zoom levels
+ * Send automatic anonymous feedback to developers giving software version
+   information and counts of the features used.
+ * Fix colormap sequence and randomize plugins
+ * Change hyphen to minus sign when using standard C formatting in tick labels
+ * Fix for Chinese and Korean characters in filenames on Windows
+ * Sort DatasetPlugin arguments for diffing
+ * Fix bitmap EMF export in Python 3
+ * The redo operation can now be done multiple times
+ * Hide fully transparent objects, rather than trying to draw them
+ * Fix bug report script in Python 3
+ * Fallback for paint device metrics, fixing bugs when PyQt is older than Qt
+ * If barplot positions setting is blank but set, treat as unset
 
 Features of package:
  Plotting features:
@@ -111,7 +126,7 @@ Optional requirements:
  Ghostscript (for EPS/PS output)
    https://www.ghostscript.com/
 
-Veusz is Copyright (C) 2003-2017 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2018 Jeremy Sanders <jeremy@jeremysanders.net>
  and contributors.
 It is licensed under the GPL (version 2 or greater).
 
