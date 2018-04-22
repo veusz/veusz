@@ -22,13 +22,7 @@ import numpy as N
 
 from .. import qtall as qt4
 
-# use fast or slow helpers
-slowfuncs = False
-try:
-    from ..helpers.qtloops import numpyToQImage, applyImageTransparancy
-except ImportError:
-    slowfuncs = True
-    from .slowfuncs import slowNumpyToQImage
+from ..helpers.qtloops import numpyToQImage, applyImageTransparancy
 
 # Default colormaps used by widgets.
 # Each item in this dict is a colormap entry, with the key the name.
@@ -565,12 +559,9 @@ def applyColorMap(cmap, scaling, datain, minval, maxval,
     # apply scaling of data
     fracs = applyScaling(datain, scaling, minval, maxval)
 
-    if not slowfuncs:
-        img = numpyToQImage(fracs, cmap, transimg is not None)
-        if transimg is not None:
-            applyImageTransparancy(img, transimg)
-    else:
-        img = slowNumpyToQImage(fracs, cmap, transimg)
+    img = numpyToQImage(fracs, cmap, transimg is not None)
+    if transimg is not None:
+        applyImageTransparancy(img, transimg)
     return img
 
 def makeColorbarImage(minval, maxval, scaling, cmap, transparency,

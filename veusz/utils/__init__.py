@@ -33,13 +33,7 @@ from .colormap import *
 from .extbrushfilling import *
 from .feedback import feedback, FeedbackCheckThread, disableFeedback
 
-try:
-    from ..helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
-        plotLinesToPainter, plotClippedPolyline, polygonClip, \
-        plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath, \
-        resampleLinearImage, RotatedRectangle, RectangleOverlapTester
-except ImportError:
-    from .slowfuncs import addNumpyToPolygonF, plotPathsToPainter, \
-        plotLinesToPainter, plotClippedPolyline, polygonClip, \
-        plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath, \
-        resampleLinearImage, RotatedRectangle, RectangleOverlapTester
+from ..helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
+    plotLinesToPainter, plotClippedPolyline, polygonClip, \
+    plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath, \
+    resampleLinearImage, RotatedRectangle, RectangleOverlapTester

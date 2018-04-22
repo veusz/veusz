@@ -22,10 +22,7 @@ from __future__ import division
 from .. import qtall as qt4
 import numpy as N
 
-try:
-    from ..helpers.qtloops import plotPathsToPainter
-except ImportError:
-    from .slowfuncs import plotPathsToPainter
+from ..helpers.qtloops import plotPathsToPainter
 
 from . import colormap
 
@@ -467,7 +464,6 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
         colorimg = colormap.applyColorMap(
             cmap, 'linear', color2d, 0., 1., trans)
 
-    # this is the fast (C++) or slow (python) helper
     plotPathsToPainter(painter, path, xpos, ypos, scaling, clip, colorimg,
                        scaleline)
 

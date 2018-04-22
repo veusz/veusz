@@ -36,10 +36,7 @@ try:
 except ImportError:
     mmlsupport = False
 
-try:
-    from ..helpers.qtloops import RotatedRectangle
-except ImportError:
-    from .slowfuncs import RotatedRectangle
+from ..helpers.qtloops import RotatedRectangle
 
 def _(text, disambiguation=None, context='TextRender'):
     """Translate text."""

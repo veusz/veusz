@@ -26,10 +26,7 @@ import numpy as N
 from .. import qtall as qt4
 import math
 
-try:
-    from ..helpers.qtloops import plotLinesToPainter, polygonClip
-except ImportError:
-    from .slowfuncs import plotLinesToPainter, polygonClip
+from ..helpers.qtloops import plotLinesToPainter, polygonClip
 
 def dumppath(p):
     i =0
