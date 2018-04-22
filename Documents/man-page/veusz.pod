@@ -49,6 +49,20 @@ PNG, BMP, JPG and XPM. The extension of the output file is used to
 determine the output file format. There should be as many export
 options specified as input Veusz documents on the command line.
 
+=item B<--export-option>=I<OPT>
+
+Adds the option given when exporting. Supported options are dpi=I<DPI>
+giving the resolution for bitmap output files (default 100),
+color=True/False to switch to monochrome output (default True),
+page=[I<X>,...] gives a list of pages to export (default [0]), where
+the page numbers are numbered from 0, antialias=True/False enables or
+disables antialiasing in bitmap output files (default True),
+quality=I<VAL> gives the JPEG quality value (default 85),
+backcolor='I<#RRGGBBAA>' gives the background color of bitmap files
+(default '#ffffff00'), pdfdpi=I<DPI> gives the DPI when outputing to
+PDF files (default 150) and svgtextastext=True/False outputs text in
+SVG files as text, rather than as curves (default False).
+
 =item B<--plugin>=I<FILE>
 
 Loads the Veusz plugin I<FILE> when starting Veusz. This option
