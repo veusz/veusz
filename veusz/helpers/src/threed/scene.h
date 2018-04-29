@@ -50,9 +50,10 @@ public:
   void addLight(Vec3 posn, QColor col, double intensity);
 
   // render scene to painter in coordinate range given
+  // (if scale<=0 then automatic scaling)
   void render(Object* root,
               QPainter* painter, const Camera& cam,
-	      double x1, double y1, double x2, double y2);
+	      double x1, double y1, double x2, double y2, double scale);
 
 private:
   // calculate lighting norms for triangles

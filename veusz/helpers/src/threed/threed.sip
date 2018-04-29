@@ -481,5 +481,5 @@ class Scene
   void addLight(Vec3 posn, QColor col, double intensity);
   void render(Object* root,
               QPainter* painter, const Camera& cam,
-	      double x1, double y1, double x2, double y2);
+	      double x1, double y1, double x2, double y2, double scale);
 };

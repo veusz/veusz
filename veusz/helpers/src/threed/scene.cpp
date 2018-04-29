@@ -76,6 +76,16 @@ namespace
       translateM3(-0.5*(minx+maxx), -0.5*(miny+maxy));
   }
 
+  // screen matrix for a fixed view
+  Mat3 makeScreenMFixed(double x1, double y1, double x2, double y2,
+                        double scale)
+  {
+    double scaling = 0.5*std::min(x2-x1, y2-y1)*scale;
+
+    return translateM3(0.5*(x1+x2), 0.5*(y1+y2)) *
+      scaleM3(scaling);
+  }
+
   // convert (x,y,depth) -> screen coordinates
   QPointF vecToScreen(const Mat3& screenM, const Vec3& vec)
   {
@@ -410,7 +420,8 @@ void Scene::renderBSP(const Camera& cam)
 
 void Scene::render(Object* root,
                    QPainter* painter, const Camera& cam,
-		   double x1, double y1, double x2, double y2)
+		   double x1, double y1, double x2, double y2,
+                   double scale)
 {
   fragments.reserve(init_fragments_size);
   fragments.resize(0);
@@ -432,7 +443,9 @@ void Scene::render(Object* root,
     }
 
   // how to transform projected points to screen
-  const Mat3 screenM(makeScreenM(fragments, x1, y1, x2, y2));
+  const Mat3 screenM = scale<=0 ?
+    makeScreenM(fragments, x1, y1, x2, y2) :
+    makeScreenMFixed(x1, y1, x2, y2, scale);
 
   double linescale = std::max(std::abs(x2-x1), std::abs(y2-y1)) * (1./1000);
 

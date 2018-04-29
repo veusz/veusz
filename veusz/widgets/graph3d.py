@@ -125,6 +125,14 @@ class Graph3D(widget.Widget):
             descr=_(u'Viewing distance'),
             usertext=_('Distance') ))
 
+        s.add( setting.FloatOrAuto(
+            'scaling',
+            'Auto',
+            minval=0,
+            descr=_('Automatic or fixed graph size scaling value'),
+            usertext=_('Scaling'),
+            formatting=True ))
+
         s.add( setting.Choice(
             'rendermode',
             ('painters', 'bsp'),
@@ -374,10 +382,12 @@ class Graph3D(widget.Widget):
                     light.intensity*0.01)
 
         # finally render the scene
+        scale = -1 if s.scaling=='Auto' else s.scaling
+
         with painter:
             scene.render(
                 root,
                 painter, camera,
-                bounds[0], bounds[1], bounds[2], bounds[3])
+                bounds[0], bounds[1], bounds[2], bounds[3], scale)
 
 document.thefactory.register(Graph3D)
