@@ -85,7 +85,7 @@ class MainWindow(qt4.QMainWindow):
 
     windows = []
     @classmethod
-    def CreateWindow(cls, filename=None):
+    def CreateWindow(cls, filename=None, mode='graph'):
         """Window factory function.
 
         If filename is given then that file is loaded into the window.
@@ -99,18 +99,18 @@ class MainWindow(qt4.QMainWindow):
             # load document
             win.openFileInWindow(filename)
         else:
-            win.setupDefaultDoc()
+            win.setupDefaultDoc(mode)
 
         # try to select first graph of first page
         win.treeedit.doInitialWidgetSelect()
 
         cls.windows.append(win)
 
-        # check if tutorial wanted
-        if not setting.settingdb['ask_tutorial']:
+        # check if tutorial wanted (only for graph mode)
+        if not setting.settingdb['ask_tutorial'] and mode=='graph':
             win.askTutorial()
-        # don't ask again
-        setting.settingdb['ask_tutorial'] = True
+            # don't ask again
+            setting.settingdb['ask_tutorial'] = True
 
         # check if version check is ok
         win.askVersionCheck()
@@ -273,12 +273,12 @@ class MainWindow(qt4.QMainWindow):
             urls = [u for u in urls if os.path.splitext(u)[1] == '.vsz']
             return urls
 
-    def setupDefaultDoc(self):
+    def setupDefaultDoc(self, mode):
         """Setup default document."""
 
         if not self.documentsetup:
             # add page and default graph
-            self.document.makeDefaultDoc()
+            self.document.makeDefaultDoc(mode)
 
             # set color theme
             self.document.basewidget.settings.get(
@@ -423,10 +423,35 @@ class MainWindow(qt4.QMainWindow):
         # these are actions for main menu toolbars and menus
         a = utils.makeAction
         self.vzactions = {
-            'file.new':
-                a(self, _('New document'), _('&New'),
-                  self.slotFileNew,
-                  icon='kde-document-new', key='Ctrl+N'),
+            'file.new.menu':
+                a(self, _('New document'), _('New'),
+                  None,
+                  icon='kde-document-new'),
+            'file.new.graph':
+                a(self,
+                  _('New graph document'),
+                  _('&New graph document'),
+                  self.slotFileNewGraph,
+                  icon='kde-document-new-graph', key='Ctrl+N'),
+            'file.new.polar':
+                a(self,
+                  _('New polar plot document'),
+                  _('New polar document'),
+                  self.slotFileNewPolar,
+                  icon='kde-document-new-polar'),
+            'file.new.ternary':
+                a(self,
+                  _('New ternary plot document'),
+                  _('New ternary document'),
+                  self.slotFileNewTernary,
+                  icon='kde-document-new-ternary'),
+            'file.new.graph3d':
+                a(self,
+                  _('New 3D plot document'),
+                  _('New 3D document'),
+                  self.slotFileNewGraph3D,
+                  icon='kde-document-new-graph3d'),
+
             'file.open':
                 a(self, _('Open a document'), _('&Open...'),
                   self.slotFileOpen,
@@ -565,9 +590,18 @@ class MainWindow(qt4.QMainWindow):
         tb.setIconSize(qt4.QSize(iconsize, iconsize))
         tb.setObjectName('veuszmaintoolbar')
         self.addToolBar(qt4.Qt.TopToolBarArea, tb)
-        utils.addToolbarActions(tb, self.vzactions,
-                                ('file.new', 'file.open', 'file.save',
-                                 'file.print', 'file.export'))
+
+        utils.makeMenuGroupSaved(
+            'file.new.menu', self, self.vzactions, (
+                    'file.new.graph', 'file.new.graph3d',
+                    'file.new.polar', 'file.new.ternary',
+            )
+        )
+
+        utils.addToolbarActions(
+            tb, self.vzactions,
+            ('file.new.menu', 'file.open', 'file.save',
+             'file.print', 'file.export'))
 
         # data toolbar
         tb = self.datatoolbar = qt4.QToolBar(_("Data toolbar - Veusz"), self)
@@ -582,7 +616,10 @@ class MainWindow(qt4.QMainWindow):
 
         # menu structure
         filemenu = [
-            'file.new', 'file.open',
+            ['file.new', _('New'),
+             ['file.new.graph', 'file.new.graph3d', 'file.new.polar',
+              'file.new.ternary']],
+            'file.open',
             ['file.filerecent', _('Open &Recent'), []],
             'file.reload',
             '',
@@ -650,6 +687,9 @@ class MainWindow(qt4.QMainWindow):
 
         self.menus = {}
         utils.constructMenus(self.menuBar(), self.menus, menus, self.vzactions)
+
+        # set icon for File->New
+        self.menus['file.new'].setIcon(utils.getIcon('kde-document-new'))
 
         self.populateExamplesMenu()
 
@@ -993,9 +1033,21 @@ class MainWindow(qt4.QMainWindow):
                 # type can be wrong if switching between Py2/3 PyQ4/5
                 pass
 
-    def slotFileNew(self):
-        """New file."""
+    def slotFileNewGraph(self):
+        """New file (graph)."""
         self.CreateWindow()
+
+    def slotFileNewPolar(self):
+        """New file (polar)."""
+        self.CreateWindow(mode='polar')
+
+    def slotFileNewTernary(self):
+        """New file (ternary)."""
+        self.CreateWindow(mode='ternary')
+
+    def slotFileNewGraph3D(self):
+        """New file (graph3d)."""
+        self.CreateWindow(mode='graph3d')
 
     def slotFileSave(self):
         """Save file."""

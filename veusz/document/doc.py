@@ -145,10 +145,16 @@ class Document(qt4.QObject):
         """Return context manager for suspending updates."""
         return DocSuspend(self)
 
-    def makeDefaultDoc(self):
-        """Add default widgets to create document."""
-        page = widgetfactory.thefactory.makeWidget('page', self.basewidget, self)
-        widgetfactory.thefactory.makeWidget('graph', page, self)
+    def makeDefaultDoc(self, mode='graph'):
+        """Add default widgets to create document.
+
+        mode == 'graph', 'polar', 'ternary' or 'graph3d'
+        """
+        page = widgetfactory.thefactory.makeWidget(
+            'page', self.basewidget, self)
+
+        assert mode in ('graph', 'polar', 'ternary', 'graph3d')
+        widgetfactory.thefactory.makeWidget(mode, page, self)
         self.setModified()
         self.setModified(False)
         self.changeset = 0

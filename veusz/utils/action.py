@@ -17,7 +17,7 @@
 ###############################################################################
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from . import utilfuncs
 import os.path
 import textwrap
@@ -29,7 +29,7 @@ _pixmapcache = {}
 def getPixmap(pixmap):
     """Return a cached QPixmap for the filename in the icons directory."""
     if pixmap not in _pixmapcache:
-        _pixmapcache[pixmap] = qt4.QPixmap(os.path.join(imagedir, pixmap))
+        _pixmapcache[pixmap] = qt.QPixmap(os.path.join(imagedir, pixmap))
     return _pixmapcache[pixmap]
 
 def pixmapExists(pixmap):
@@ -47,13 +47,13 @@ def getIcon(icon):
         else:
             filename = os.path.join(imagedir, icon+'.png')
 
-        _iconcache[icon] = qt4.QIcon(filename)
+        _iconcache[icon] = qt.QIcon(filename)
     return _iconcache[icon]
 
 def makeAction(parent, descr, menutext, slot, icon=None, key=None,
                checkable=False):
     """A quick way to set up an QAction object."""
-    a = qt4.QAction(parent)
+    a = qt.QAction(parent)
     a.setText(menutext)
     a.setStatusTip(descr)
     a.setToolTip(textwrap.fill(descr, 25))
@@ -62,7 +62,7 @@ def makeAction(parent, descr, menutext, slot, icon=None, key=None,
     if icon:
         a.setIcon(getIcon(icon))
     if key:
-        a.setShortcut( qt4.QKeySequence(key) )
+        a.setShortcut(qt.QKeySequence(key))
     if checkable:
         a.setCheckable(True)
     return a
@@ -126,14 +126,14 @@ def populateMenuToolbars(items, toolbar, menus):
         menuid, descr, menutext, menu, slot, icon, addtool, key = item
 
         # create action
-        action = qt4.QAction(parent)
+        action = qt.QAction(parent)
         action.setText(menutext)
         action.setStatusTip(descr)
         action.setToolTip(descr)
 
         # set shortcut if set
         if key:
-            action.setShortcut( qt4.QKeySequence(key) )
+            action.setShortcut(qt.QKeySequence(key))
 
         # load icon if set
         if icon:
@@ -162,3 +162,48 @@ def populateMenuToolbars(items, toolbar, menus):
         actions[menuid] = action
 
     return actions
+
+def makeMenuGroupSaved(name, parent, actiondict, actionnames):
+    """Assign a menu and group for an action which allows the user to
+    choose from a list of other actions.
+
+    name: name of action to assign to (in actiondict)
+    parent: parent qt object
+    actiondict: map of names to actions
+    actionnames: name of actions to add to menu/action.
+    """
+
+    from .. import setting
+
+    menu = qt.QMenu(parent)
+    actgrp = qt.QActionGroup(parent)
+
+    act_to_name = {}
+
+    for actname in actionnames:
+        action = actiondict[actname]
+        act_to_name[action] = actname
+        menu.addAction(action)
+        actgrp.addAction(action)
+
+    # assign menu to action in dictionary
+    menuaction = actiondict[name]
+    menuaction.setMenu(menu)
+
+    # currently set value (per control)
+    current = [
+        setting.settingdb.get('menugrp_%s' % name, actionnames[0]) ]
+
+    def ongrptriggered(action):
+        """Update saved action when new one is chosen."""
+        actname = act_to_name[action]
+        setting.settingdb['menugrp_%s' % name] = current[0] = actname
+        menuaction.setIcon(action.icon())
+
+    def onactiontriggered():
+        """Run the action chosen from the list."""
+        actiondict[current[0]].trigger()
+
+    menuaction.triggered.connect(onactiontriggered)
+    actgrp.triggered.connect(ongrptriggered)
+    menuaction.setIcon(actiondict[current[0]].icon())
