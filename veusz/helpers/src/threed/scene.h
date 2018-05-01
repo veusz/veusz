@@ -40,6 +40,16 @@ private:
     double r, g, b;
   };
 
+  // if passed to drawing routine, this is called after drawing each
+  // fragment
+  class DrawCallback
+  {
+  public:
+    DrawCallback() {};
+    virtual void drawnFragment(const Fragment& frag) = 0;
+    virtual ~DrawCallback();
+  };
+
 public:
   Scene(RenderMode _mode)
     : mode(_mode)
@@ -53,7 +63,12 @@ public:
   // (if scale<=0 then automatic scaling)
   void render(Object* root,
               QPainter* painter, const Camera& cam,
-	      double x1, double y1, double x2, double y2, double scale);
+              double x1, double y1, double x2, double y2, double scale);
+
+  // find widget id of pixel painted by drawing scene at (x, y)
+  long idPixel(Object* root, QPainter* painter, const Camera& cam,
+               double x1, double y1, double x2, double y2, double scale,
+               double scaling, int x, int y);
 
 private:
   // calculate lighting norms for triangles
@@ -63,7 +78,7 @@ private:
   void projectFragments(const Camera& cam);
 
   void doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
-                 const Camera& cam);
+                 const Camera& cam, DrawCallback* callback=0);
 
   void drawPath(QPainter* painter, const Fragment& frag,
                 QPointF pt1, QPointF pt2, QPointF pt3,
@@ -72,6 +87,13 @@ private:
   // different rendering modes
   void renderPainters(const Camera& cam);
   void renderBSP(const Camera& cam);
+
+  // render scene to painter in coordinate range given
+  // (if scale<=0 then automatic scaling)
+  void render_internal(Object* root,
+                       QPainter* painter, const Camera& cam,
+                       double x1, double y1, double x2, double y2, double scale,
+                       DrawCallback* callback=0);
 
   // create pens/brushes
   QPen lineProp2QPen(const Fragment& frag, double linescale) const;

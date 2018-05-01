@@ -736,6 +736,7 @@ class Axis3D(widget.Widget):
             painter, cont, dirn, linecoords, s.MinorGridLines,
             self.minortickscalc)
 
+        cont.assignWidgetId(id(self))
         return cont
 
 # allow the factory to instantiate an axis

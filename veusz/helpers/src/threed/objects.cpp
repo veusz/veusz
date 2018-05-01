@@ -31,6 +31,11 @@ void Object::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector
 {
 }
 
+void Object::assignWidgetId(long id)
+{
+  widgetid = id;
+}
+
 // Triangle
 ///////////
 
@@ -704,13 +709,18 @@ ObjectContainer::~ObjectContainer()
     delete objects[i];
 }
 
-
 void ObjectContainer::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v)
 {
   const Mat4 totM(outerM*objM);
   const unsigned s=objects.size();
   for(unsigned i=0; i<s; ++i)
     objects[i]->getFragments(perspM, totM, v);
+}
+
+void ObjectContainer::assignWidgetId(long id)
+{
+  for(auto &object : objects)
+    object->assignWidgetId(id);
 }
 
 // FacingContainer

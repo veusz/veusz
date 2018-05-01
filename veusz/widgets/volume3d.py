@@ -280,6 +280,8 @@ class Volume3D(plotters3d.GenericPlotter3D):
         cuboids = threed.MultiCuboid(
             xmin, xmax, ymin, ymax, zmin, zmax, lineprop, surfprop)
         clipcont.addObject(cuboids)
+
+        clipcont.assignWidgetId(id(self))
         return clipcont
 
 document.thefactory.register(Volume3D)

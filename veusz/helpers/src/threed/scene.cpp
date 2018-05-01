@@ -23,6 +23,9 @@
 #include <QtGui/QPen>
 #include <QtGui/QBrush>
 #include <QtGui/QColor>
+#include <QtGui/QPixmap>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
 
 #include "scene.h"
 #include "fragment.h"
@@ -197,7 +200,7 @@ void Scene::drawPath(QPainter* painter, const Fragment& frag,
 }
 
 void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
-                      const Camera& cam)
+                      const Camera& cam, Scene::DrawCallback* callback)
 {
   // draw fragments
   LineProp const* lline = 0;
@@ -293,6 +296,9 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
 	default:
 	  break;
 	}
+
+      if(callback != 0)
+        callback->drawnFragment(frag);
 
       ltype = frag.type;
     }
@@ -420,8 +426,74 @@ void Scene::renderBSP(const Camera& cam)
 
 void Scene::render(Object* root,
                    QPainter* painter, const Camera& cam,
-		   double x1, double y1, double x2, double y2,
+                   double x1, double y1, double x2, double y2,
                    double scale)
+{
+  render_internal(root, painter, cam, x1, y1, x2, y2, scale);
+}
+
+Scene::DrawCallback::~DrawCallback()
+{
+}
+
+long Scene::idPixel(Object* root,
+                    QPainter* painter,
+                    const Camera& cam,
+                    double x1, double y1, double x2, double y2,
+                    double scale,
+                    double scaling, int x, int y)
+{
+  constexpr int box = 3;
+
+  // class to keep a small pixmap of the image and keep looking for
+  // changes
+  class IdDrawCallback : public Scene::DrawCallback
+  {
+  public:
+    IdDrawCallback()
+      : lastwidgetid(-1),
+        pixrender(2*box+1,2*box+1)
+    {
+      pixrender.fill(QColor(254,254,254));
+      lastimage = pixrender.toImage();
+    }
+
+    void drawnFragment(const Fragment& frag)
+    {
+      // has the image changed since the last time?
+      QImage image = pixrender.toImage();
+
+      // Should only be a relatively small number of
+      // comparisons. Alternatively, it could use a checksum.
+      if(image != lastimage)
+        {
+          if(frag.object != 0)
+            lastwidgetid = frag.object->widgetid;
+          lastimage = image;
+        }
+    }
+
+    long lastwidgetid;
+    QPixmap pixrender;
+    QImage lastimage;
+  };
+
+  IdDrawCallback callback;
+
+  painter->begin(&callback.pixrender);
+  painter->scale(scaling, scaling);
+  painter->setWindow(x-box, y-box, box*2+1, box*2+1);
+  render_internal(root, painter, cam, x1, y1, x2, y2, scale, &callback);
+  painter->end();
+
+  return callback.lastwidgetid;
+}
+
+void Scene::render_internal(Object* root,
+                            QPainter* painter, const Camera& cam,
+                            double x1, double y1, double x2, double y2,
+                            double scale,
+                            Scene::DrawCallback* callback)
 {
   fragments.reserve(init_fragments_size);
   fragments.resize(0);
@@ -450,7 +522,7 @@ void Scene::render(Object* root,
   double linescale = std::max(std::abs(x2-x1), std::abs(y2-y1)) * (1./1000);
 
   // finally draw items
-  doDrawing(painter, screenM, linescale, cam);
+  doDrawing(painter, screenM, linescale, cam, callback);
 
   // don't decrease size of fragments unnecessarily, unless it is large
   init_fragments_size = fragments.size();

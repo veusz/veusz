@@ -470,6 +470,7 @@ class Function3D(plotters3d.GenericPlotter3D):
         elif mode in ('z=fn(x,y)', 'x=fn(y,z)', 'y=fn(x,z)'):
             self.dataDrawSurface(painter, axes, clipcontainer)
 
+        clipcontainer.assignWidgetId(id(self))
         return clipcontainer
 
 document.thefactory.register(Function3D)

@@ -28,6 +28,7 @@ from .. import qtall as qt
 from .. import document
 from .. import setting
 from . import widget
+from ..helpers import threed
 
 try:
     from ..helpers import threed
@@ -298,22 +299,14 @@ class Graph3D(widget.Widget):
             root.addObject(threed.TriangleFacing(
                 threed.Vec3(*p1), threed.Vec3(*p2), threed.Vec3(*p3), prop))
 
-    def draw(self, parentposn, painthelper, outerbounds=None):
-        '''Update the margins before drawing.'''
-        bounds = self.computeBounds(parentposn, painthelper)
-        maxbounds = self.computeBounds(
-            parentposn, painthelper, withmargin=False)
-
-        # threed is not compiled
-        if threed is None:
-            sys.stderr.write('Cannot show 3D graph as support not compiled\n')
-            return bounds
+    def makeObjects(self, painter, bounds, painthelper):
+        """Make objects, returning root"""
 
         s = self.settings
 
         # do no painting if hidden
         if s.hide:
-            return bounds
+            return
 
         # do axis min-max computation
         axestodraw = {}
@@ -343,9 +336,6 @@ class Graph3D(widget.Widget):
             scaleM *
             threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
 
-        # painter is passed to below to get colors, etc
-        painter = painthelper.painter(self, bounds)
-
         # build 3d scene from children
         for c in self.children:
            obj = c.drawToObject(painter)
@@ -356,6 +346,12 @@ class Graph3D(widget.Widget):
         self.addBorder(painter, root)
         # add graph behind fill
         self.addBackSurface(painter, root)
+        return root
+
+    def makeScene(self, painter):
+        """Make Scene and Camera objects."""
+
+        s = self.settings
 
         camera = threed.Camera()
         # camera necessary to make x,y,z coordinates point in the
@@ -381,13 +377,59 @@ class Graph3D(widget.Widget):
                     light.get('color').color(painter),
                     light.intensity*0.01)
 
-        # finally render the scene
-        scale = -1 if s.scaling=='Auto' else s.scaling
+        return scene, camera
 
+    def identifyPixel(self, parentposn, painthelper, x, y):
+        pass
+
+    def draw(self, parentposn, painthelper, outerbounds=None):
+        '''Update the margins before drawing.'''
+
+        bounds = self.computeBounds(parentposn, painthelper)
+
+        painter = painthelper.painter(self, bounds)
+        root = self.makeObjects(painter, bounds, painthelper)
+        if root is None:
+            return bounds
+
+        scene, camera = self.makeScene(painter)
+
+        # finally render the scene
+        scale = self.settings.scaling
+        if scale == 'Auto':
+            scale = -1
         with painter:
             scene.render(
                 root,
                 painter, camera,
                 bounds[0], bounds[1], bounds[2], bounds[3], scale)
+
+    def identifyWidgetAtPoint(self, painthelper, bounds, scaling, x, y):
+        painter = document.PainterRoot()
+        painter.updateMetaData(painthelper)
+
+        root = self.makeObjects(painter, bounds, painthelper)
+        if root is None:
+            return self
+        scene, camera = self.makeScene(painter)
+
+        scale = self.settings.scaling
+        if scale == 'Auto':
+            scale = -1
+        widgetid = scene.idPixel(
+            root, painter, camera,
+            bounds[0], bounds[1], bounds[2], bounds[3], scale,
+            scaling, x, y)
+
+        # recursive check id of children against returned value
+        widget = [self]
+        def checkwidget(r):
+            for c in r.children:
+                if id(c) == widgetid:
+                    widget[0] = c
+                checkwidget(c)
+
+        checkwidget(self)
+        return widget[0]
 
 document.thefactory.register(Graph3D)

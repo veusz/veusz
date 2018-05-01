@@ -33,9 +33,17 @@
 class Object
 {
  public:
+  Object() : widgetid(-1) {}
+
   virtual ~Object();
 
   virtual void getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector& v);
+
+  // recursive set id of child objects
+  virtual void assignWidgetId(long id);
+
+  // id of widget which generated object
+  long widgetid;
 };
 
 class Triangle : public Object
@@ -282,6 +290,9 @@ class ObjectContainer : public Object
   {
     objects.push_back(obj);
   }
+
+  // recursive set id of child objects
+  void assignWidgetId(long id);
 
  public:
   Mat4 objM;

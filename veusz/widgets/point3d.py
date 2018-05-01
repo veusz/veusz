@@ -269,6 +269,7 @@ class Point3D(plotters3d.GenericPlotter3D):
         self.dataDrawPointsLine(painter, clipcont, coord)
         self.dataDrawErrorBars(painter, clipcont, axes, coord, [xv, yv, zv])
 
+        clipcont.assignWidgetId(id(self))
         return clipcont
 
 document.thefactory.register(Point3D)

@@ -191,6 +191,7 @@ class Surface3D(plotters3d.GenericPlotter3D):
         clipcontainer = self.makeClipContainer(axes)
         self.drawSurface(painter, clipcontainer, axes, data)
 
+        clipcontainer.assignWidgetId(id(self))
         return clipcontainer
 
 document.thefactory.register(Surface3D)

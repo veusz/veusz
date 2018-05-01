@@ -287,7 +287,17 @@ class PaintHelper(object):
                 rendernextstate(child)
 
         rendernextstate(self.rootstate)
-        return lastwidget[0]
+        widget = lastwidget[0]
+
+        # need to re-render 3d scene to look for clicks
+        if widget and widget.typename == 'graph3d':
+            bounds = [0,0,100,100]
+            for w in self.states:
+                if w[0] is widget:
+                    bounds = self.states[w].bounds
+            return widget.identifyWidgetAtPoint(self, bounds, self.scaling, x, y)
+        else:
+            return widget
 
     def pointInWidgetBounds(self, x, y, widgettype):
         """Which graph widget plots at point x,y?
