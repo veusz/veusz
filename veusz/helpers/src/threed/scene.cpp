@@ -371,8 +371,49 @@ void Scene::projectFragments(const Camera& cam)
       f.proj[pi] = calcProjVec(cam.perspM, f.points[pi]);
 }
 
+namespace
+{
+
+  // This is a bit of a hack to avoid problems with the painter's
+  // algorithm. This idea is to just break up lines with a length over
+  // the maximum into pieces smaller than maxlen.
+  void breakLongLines(FragmentVector& fragments, double maxlen)
+  {
+    const double maxlen2 = maxlen*maxlen;
+    const int size = fragments.size();
+    for(int ifrag=0; ifrag<size; ++ifrag)
+      {
+        Fragment& f=fragments[ifrag];
+        if(f.type == Fragment::FR_LINESEG)
+          {
+            const double len2 = (f.points[1]-f.points[0]).rad2();
+            if(len2 > maxlen2)
+              {
+                const int nbits = int(std::sqrt(len2/maxlen2))+1;
+                const Vec3 delta = (f.points[1]-f.points[0])*(1./nbits);
+
+                // set original to be first segment
+                f.points[1] = f.points[0]+delta;
+
+                // add nbits-1 copies for next segments
+                Fragment tempf(f);
+                for(int ic=1; ic<nbits; ++ic)
+                  {
+                    tempf.points[0] = tempf.points[1];
+                    tempf.points[1] += delta;
+                    fragments.push_back(tempf);
+                  }
+              }
+          }
+      }
+  }
+
+} // namespace
+
 void Scene::renderPainters(const Camera& cam)
 {
+  breakLongLines(fragments, 0.25);
+
   calcLighting();
   projectFragments(cam);
 
