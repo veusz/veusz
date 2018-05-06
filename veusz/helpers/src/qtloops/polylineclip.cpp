@@ -382,13 +382,13 @@ bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b)
 {
   for(auto const& poly : {a, b})
     {
-      for(int i1=0; i1<poly.count(); ++i1)
-        {
-          const int i2 = (i1+1) % poly.count();
+      QPointF prevpt(poly.constLast());
 
+      for(auto const& currpt : poly)
+        {
           // normal to line segment
-          const double normx = poly[i2].y()-poly[i1].y();
-          const double normy = poly[i1].x()-poly[i2].x();
+          const double normx = currpt.y()-prevpt.y();
+          const double normy = prevpt.x()-currpt.x();
 
           double minA = std::numeric_limits<double>::max();
           double maxA = std::numeric_limits<double>::lowest();
@@ -410,6 +410,8 @@ bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b)
 
           if(maxA<minB || maxB<minA)
             return false;
+
+          prevpt = currpt;
         }
     }
 
