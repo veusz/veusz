@@ -245,12 +245,13 @@ class NonOrthPoint(Widget):
                         pscale = scalings.data
 
                     # color point individually
-                    if cvals and not s.MarkerFill.hide:
+                    cmapname = s.MarkerFill.colorMap
+                    if cvals and not s.MarkerFill.hide and cmapname != 'none':
                         colorvals = utils.applyScaling(
                             cvals.data, s.Color.scaling,
                             s.Color.min, s.Color.max)
                         cmap = self.document.evaluate.getColormap(
-                            s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
+                            cmapname, s.MarkerFill.colorMapInvert)
 
                     painter.setBrush(s.MarkerFill.makeQBrushWHide(painter))
                     painter.setPen(s.MarkerLine.makeQPenWHide(painter))

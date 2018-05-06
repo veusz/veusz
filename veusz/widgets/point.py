@@ -947,14 +947,15 @@ class PointPlotter(GenericPlotter):
                         scaling = scaling[::s.thinfactor]
 
                 # color point individually
-                if cvals and not s.MarkerFill.hide:
+                cmapname = s.MarkerFill.colorMap
+                if cvals and not s.MarkerFill.hide and cmapname != 'none':
                     colorvals = utils.applyScaling(
                         cvals.data, s.Color.scaling,
                         s.Color.min, s.Color.max)
                     if s.thinfactor > 1:
                         colorvals = colorvals[::s.thinfactor]
                     cmap = self.document.evaluate.getColormap(
-                        s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
+                        cmapname, s.MarkerFill.colorMapInvert)
 
                 # actually plot datapoints
                 utils.plotMarkers(

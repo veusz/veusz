@@ -42,6 +42,17 @@ class PlotLine3D(setting.Line3D):
     def __init__(self, name, **args):
         setting.Line3D.__init__(self, name, **args)
         self.get('hide').newDefault(True)
+        self.add(setting.Colormap(
+            'colorMap', 'none',
+            descr = _('If color markers dataset is given, use this colormap '
+                      'for the line color'),
+            usertext=_('Color map'),
+            formatting=True) )
+        self.add( setting.Bool(
+            'colorMapInvert', False,
+            descr = _('Invert color map'),
+            usertext = _('Invert map'),
+            formatting=True) )
 
 class MarkerFill3D(setting.Surface3DWColorMap):
     """Fill for markers."""
@@ -170,17 +181,25 @@ class Point3D(plotters3d.GenericPlotter3D):
             s.marker, s.markerSize, s.MarkerLine.width)
 
         markerlineprop = markerfillprop = None
+
+        # convert color values to 0..1 quantity
+        cvals = s.Color.get('points').getData(doc)
+        if cvals is not None:
+            colorvals = utils.applyScaling(
+                cvals.data, s.Color.scaling, s.Color.min, s.Color.max)
+            color2d = colorvals.reshape(1, len(colorvals))
+        else:
+            colorvals = color2d = None
+
         if not s.MarkerLine.hide:
             markerlineprop = s.MarkerLine.makeLineProp(painter)
+
         if filled and not s.MarkerFill.hide:
             markerfillprop = s.MarkerFill.makeSurfaceProp(painter)
-            cvals = s.Color.get('points').getData(doc)
-            if cvals is not None:
-                colorvals = utils.applyScaling(
-                    cvals.data, s.Color.scaling, s.Color.min, s.Color.max)
+            cmapname = s.MarkerFill.colorMap
+            if color2d is not None and cmapname != 'none':
                 cmap = self.document.evaluate.getColormap(
-                    s.MarkerFill.colorMap, s.MarkerFill.colorMapInvert)
-                color2d = colorvals.reshape(1, len(colorvals))
+                    cmapname, s.MarkerFill.colorMapInvert)
                 colorimg = utils.applyColorMap(
                     cmap, 'linear', color2d, 0., 1., s.MarkerFill.transparency)
                 markerfillprop.setRGBs(colorimg)
@@ -196,7 +215,16 @@ class Point3D(plotters3d.GenericPlotter3D):
             cont.addObject(ptobj)
 
         if not s.PlotLine.hide:
-            lineobj = threed.PolyLine(s.PlotLine.makeLineProp(painter))
+            lineprop = s.PlotLine.makeLineProp(painter)
+            cmapname = s.PlotLine.colorMap
+            if color2d is not None and cmapname != 'none':
+                cmap = self.document.evaluate.getColormap(
+                    cmapname, s.PlotLine.colorMapInvert)
+                colorimg = utils.applyColorMap(
+                    cmap, 'linear', color2d, 0., 1., s.PlotLine.transparency)
+                lineprop.setRGBs(colorimg)
+
+            lineobj = threed.PolyLine(lineprop)
             lineobj.addPoints(*coord)
             cont.addObject(lineobj)
 

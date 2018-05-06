@@ -331,6 +331,9 @@ _defaultmaps = {
         (38,  0,   128, 255),
         ),
 
+    'none': (
+        (255, 255, 255, 255),
+    ),
     }
 
 def cubehelix(start, rots, hue, gamma, nlev=64):
