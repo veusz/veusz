@@ -591,7 +591,7 @@ class Axis3D(widget.Widget):
                 utils.formatNumber(v*scale, fmt, locale=self.document.locale)
                 for v in tickvals ]
         else:
-            tickvals = ticklabels = tickfracs = []
+            return
 
         # disable drawing of label
         if axislabelprop.hide:
@@ -605,11 +605,12 @@ class Axis3D(widget.Widget):
 
         # this is to get the z ordering of the ends of axes correct
         # where two axes join together
-        tickfracs[tickfracs == 0.] = 0.00001
-        tickfracs[tickfracs == 1.] = 0.99999
+        tf = N.array(tickfracs)
+        tf[tf==0.] = 0.00001
+        tf[tf==1.] = 0.99999
         atl = _AxisLabels(
             threed.Vec3(0,0,0), threed.Vec3(1,1,1),
-            threed.ValVector(tickfracs), ticklabels, ticklabelsprop,
+            threed.ValVector(tf), ticklabels, ticklabelsprop,
             axislabel, axislabelposn, axislabelprop)
 
         for startpos, endpos in linecoords:
