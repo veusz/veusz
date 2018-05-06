@@ -103,24 +103,33 @@ class _AxisLabels(threed.AxisLabels):
         painter.rotate(angle)
 
         if index >= 0:
-            self.drawTickLabel(painter, index, valign)
+            self.drawTickLabel(painter, pt.x(), pt.y(), angle, index, valign)
         else:
             self.drawAxisLabel(painter, valign)
 
-    def drawTickLabel(self, painter, index, valign):
+    def drawTickLabel(self, painter, x, y, angle, index, valign):
         """Draw a tick label."""
 
         font = self.ticklabelsprop.makeQFont(painter)
         painter.setFont(font)
-        pen = self.ticklabelsprop.makeQPen(painter)
-        painter.setPen(pen)
 
         label = self.ticklabels[index]
         renderer = utils.Renderer(
             painter, font, 0, 0, label,
             alignhorz=0, alignvert=valign,
             usefullheight=True)
-        renderer.render()
+
+        # get text bounds
+        rect = renderer.getTightBounds()
+        rect.rotateAboutOrigin(angle * math.pi/180)
+        rect.translate(x, y)
+
+        # draw text if it doesn't overlap with existing text
+        if not painter.textrects.willOverlap(rect):
+            pen = self.ticklabelsprop.makeQPen(painter)
+            painter.setPen(pen)
+            renderer.render()
+            painter.textrects.addRect(rect)
 
     def drawAxisLabel(self, painter, valign):
         """Draw label for axis."""
@@ -145,6 +154,7 @@ class _AxisLabels(threed.AxisLabels):
         painter.setFont(font)
         pen = self.axislabelprop.makeQPen(painter)
         painter.setPen(pen)
+
         renderer = utils.Renderer(
             painter, font, 0, deltay, self.axislabel,
             alignhorz=halign, alignvert=valign,
@@ -593,6 +603,10 @@ class Axis3D(widget.Widget):
                 'centre': 0.5,
                 'at-maximum': 1}[axislabelprop.position]
 
+        # this is to get the z ordering of the ends of axes correct
+        # where two axes join together
+        tickfracs[tickfracs == 0.] = 0.00001
+        tickfracs[tickfracs == 1.] = 0.99999
         atl = _AxisLabels(
             threed.Vec3(0,0,0), threed.Vec3(1,1,1),
             threed.ValVector(tickfracs), ticklabels, ticklabelsprop,

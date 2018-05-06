@@ -22,6 +22,7 @@
 from __future__ import division
 from .. import qtall as qt4
 from .. import setting
+from .. import utils
 
 try:
     from ..helpers.recordpaint import RecordPaintDevice
@@ -67,6 +68,7 @@ class PainterRoot(qt4.QPainter):
         self.dpi = helper.dpi[1]
         self.pagesize = helper.pagesize
         self.maxdim = max(*self.pagesize)
+        self.textrects = helper.textrects
 
     def docColor(self, name):
         """Return color from document."""
@@ -157,6 +159,9 @@ class PaintHelper(object):
         # current index for each plotter (if wanting automatic colors)
         self.autoplottercount = 0
         self.autoplottermap = {}
+
+        # to avoid overlapping text
+        self.textrects = utils.RectangleOverlapTester()
 
     @property
     def maxdim(self):
