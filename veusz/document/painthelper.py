@@ -254,6 +254,9 @@ class PaintHelper(object):
         if antialias is true, do test for antialiased drawing
         """
 
+        # reset text rectangles for painting so not to lose text
+        self.textrects.reset()
+
         # convert screen to bitmap coordinates
         x *= self.devicepixelratio
         y *= self.devicepixelratio

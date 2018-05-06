@@ -282,6 +282,7 @@ public:
   RectangleOverlapTester();
   bool willOverlap(const RotatedRectangle& rect) const;
   void addRect(const RotatedRectangle& rect);
+  void reset();
   void debug(QPainter& painter) const;
 };
 

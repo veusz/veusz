@@ -110,6 +110,7 @@ public:
   RectangleOverlapTester();
   bool willOverlap(const RotatedRectangle& rect) const;
   void addRect(const RotatedRectangle& rect) { _rects.append(rect); };
+  void reset() { _rects.clear(); };
 
   // debug by drawing all the rectangles
   void debug(QPainter& painter) const;
