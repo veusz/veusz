@@ -66,6 +66,9 @@ struct RotatedRectangle
     return *this;
   }
   bool isValid() const { return xw > 0 && yw > 0; }
+  void rotate(double dtheta) { angle += dtheta; }
+  void rotateAboutOrigin(double dtheta);
+  void translate(double dx, double dy) { cx+=dx; cy+=dy; }
 
   QPolygonF makePolygon() const;
 
@@ -105,8 +108,11 @@ class RectangleOverlapTester
 {
 public:
   RectangleOverlapTester();
-  bool willOverlap(const RotatedRectangle& rect);
+  bool willOverlap(const RotatedRectangle& rect) const;
   void addRect(const RotatedRectangle& rect) { _rects.append(rect); };
+
+  // debug by drawing all the rectangles
+  void debug(QPainter& painter) const;
 
 private:
   QVector<RotatedRectangle> _rects;

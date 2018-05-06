@@ -376,40 +376,39 @@ private:
 // Check whether polygons intersect
 // http://stackoverflow.com/questions/10962379/how-to-check-intersection-between-2-rotated-rectangles
 
+// note: requires clockwise polygons
+
 bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b)
 {
-  for(int polyi = 0; polyi < 2; ++polyi)
+  for(auto const& poly : {a, b})
     {
-      const QPolygonF& polygon = polyi == 0 ? a : b;
-
-      for(int i1 = 0; i1 < polygon.size(); ++i1)
+      for(int i1=0; i1<poly.count(); ++i1)
         {
-          const int i2 = (i1 + 1) % polygon.size();
+          const int i2 = (i1+1) % poly.count();
 
-          const double normalx = polygon[i2].y() - polygon[i1].y();
-          const double normaly = polygon[i2].x() - polygon[i1].x();
+          // normal to line segment
+          const double normx = poly[i2].y()-poly[i1].y();
+          const double normy = poly[i1].x()-poly[i2].x();
 
           double minA = std::numeric_limits<double>::max();
-          double maxA = std::numeric_limits<double>::min();
-          for(int ai = 0; ai < a.size(); ++ai)
+          double maxA = std::numeric_limits<double>::lowest();
+          for(auto const& pt : a)
             {
-              const double projected = normalx * a[ai].x() +
-                normaly * a[ai].y();
-              if( projected < minA ) minA = projected;
-              if( projected > maxA ) maxA = projected;
+              const double proj = normx*pt.x() + normy*pt.y();
+              minA = std::min(minA, proj);
+              maxA = std::max(maxA, proj);
             }
 
           double minB = std::numeric_limits<double>::max();
-          double maxB = std::numeric_limits<double>::min();
-          for(int bi = 0; bi < b.size(); ++bi)
+          double maxB = std::numeric_limits<double>::lowest();
+          for(auto const& pt : b)
             {
-              const double projected = normalx * b[bi].x() +
-                normaly * b[bi].y();
-              if( projected < minB ) minB = projected;
-              if( projected > maxB ) maxB = projected;
+              const double proj = normx*pt.x() + normy*pt.y();
+              minB = std::min(minB, proj);
+              maxB = std::max(maxB, proj);
             }
 
-          if( maxA < minB || maxB < minA )
+          if(maxA<minB || maxB<minA)
             return false;
         }
     }
@@ -417,23 +416,36 @@ bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b)
   return true;
 }
 
-
 ///////////////////////////////////////////////////////
 
+void RotatedRectangle::rotateAboutOrigin(double dtheta)
+{
+  // rotate centre as well as increasing angle to rotate about origin
+  const double c = std::cos(dtheta);
+  const double s = std::sin(dtheta);
+  const double tcx = cx;
+  const double tcy = cy;
+
+  cx = c*tcx - s*tcy;
+  cy = c*tcy + s*tcx;
+
+  angle += dtheta;
+}
+
+
+// note: output polygon is clockwise
 QPolygonF RotatedRectangle::makePolygon() const
 {
-  QPolygonF poly;
   const double c = std::cos(angle);
   const double s = std::sin(angle);
+  const double xh = 0.5*xw;
+  const double yh = 0.5*yw;
 
-  poly.append( QPointF( (-xw/2)*c - (-yw/2)*s + cx,
-                        (-xw/2)*s + (-yw/2)*c + cy ) );
-  poly.append( QPointF( (-xw/2)*c - ( yw/2)*s + cx,
-                        (-xw/2)*s + ( yw/2)*c + cy ) );
-  poly.append( QPointF( ( xw/2)*c - ( yw/2)*s + cx,
-                        ( xw/2)*s + ( yw/2)*c + cy ) );
-  poly.append( QPointF( ( xw/2)*c - (-yw/2)*s + cx,
-                        ( xw/2)*s + (-yw/2)*c + cy ) );
+  QPolygonF poly;
+  poly << QPointF(-xh*c + yh*s + cx, -xh*s - yh*c + cy);
+  poly << QPointF(-xh*c - yh*s + cx, -xh*s + yh*c + cy);
+  poly << QPointF( xh*c - yh*s + cx,  xh*s + yh*c + cy);
+  poly << QPointF( xh*c + yh*s + cx,  xh*s - yh*c + cy);
   return poly;
 }
 
@@ -441,17 +453,26 @@ RectangleOverlapTester::RectangleOverlapTester()
 {
 }
 
-bool RectangleOverlapTester::willOverlap(const RotatedRectangle& rect)
+bool RectangleOverlapTester::willOverlap(const RotatedRectangle& rect) const
 {
   const QPolygonF thispoly(rect.makePolygon());
 
-  for(int i = 0; i < _rects.size(); ++i)
+  for(auto const &ir : _rects)
     {
-      if( doPolygonsIntersect(thispoly, _rects.at(i).makePolygon()) )
+      if( doPolygonsIntersect(thispoly, ir.makePolygon()) )
         return true;
     }
 
   return false;
+}
+
+void RectangleOverlapTester::debug(QPainter& painter) const
+{
+  for(auto const &rect : _rects)
+    {
+      QPolygonF poly = rect.makePolygon();
+      painter.drawPolygon(poly);
+    }
 }
 
 ///////////////////////////////////////////////////////
