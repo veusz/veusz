@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>540</width>
-    <height>533</height>
+    <height>646</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
      <item>
       <widget class="QLineEdit" name="editFileName">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of file to export. When exporting multiple pages to multiple files %PAGENUM% is the number of the page and %PAGENAME% is the name of the page.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of file to export. When exporting multiple pages to multiple files %PAGENUM% is the number of the page and %PAGENAME% is the name of the page. %PAGENUM00% and %PAGENUM000% are the page numbers prefixed with zeros to make two or three characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -194,7 +194,7 @@
           <item row="1" column="0">
            <widget class="QRadioButton" name="radioFormatJPG">
             <property name="text">
-             <string>JPG</string>
+             <string>&amp;JPG</string>
             </property>
            </widget>
           </item>

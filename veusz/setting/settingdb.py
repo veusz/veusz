@@ -75,6 +75,10 @@ defaultValues = {
     # use document directory for export
     'dirname_export_location': 'doc',
 
+    # export templates
+    'export_template_single': '%DOCNAME%',
+    'export_template_multi': '%DOCNAME%%PAGENUM%',
+
     # ask tutorial before?
     'ask_tutorial': False,
 

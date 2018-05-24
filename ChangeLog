@@ -1,5 +1,7 @@
 Changes in *next version*:
  * Add --export-option parameter for command line exporting control
+ * Add templates in preferences for exported file names and add %PAGENUM00% and
+   %PAGENUM000% options for zero-prefixed page numbers.
 
 Changes in 2.2.2:
  * Fix zoom for polar, ternary and broken axis plots

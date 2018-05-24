@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
-    <height>341</height>
+    <width>730</width>
+    <height>353</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -148,15 +148,18 @@ Set to 0 to disable threads.</string>
       <attribute name="title">
        <string>File</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0" rowspan="2">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Default document directory</string>
+          <string>Document default directory</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <item>
            <widget class="QRadioButton" name="dirDocPrevRadio">
+            <property name="toolTip">
+             <string/>
+            </property>
             <property name="text">
              <string>Previous session</string>
             </property>
@@ -165,17 +168,54 @@ Set to 0 to disable threads.</string>
           <item>
            <widget class="QRadioButton" name="dirDocCWDRadio">
             <property name="text">
-             <string>Curren&amp;t working directory</string>
+             <string>Current working directory</string>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item>
+       <item row="0" column="1">
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>Export filename templates</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Multiple files</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="exportTemplMultiEdit">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Template filename when exorting to multiple files. This can include %DOCNAME% for the document name, %PAGENAME% for the page name and %PAGENUM% for the page number. %PAGENUM00% and %PAGENUM000% force two and three-character page numbers. An extension is automatically added.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="exportTemplSingleEdit">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Template filename when written to a single file. This can include %DOCNAME% for the document name. A filename extension is automatically added.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Single file</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="1">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
-          <string>Default export directory</string>
+          <string>Export default directory</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
@@ -195,7 +235,7 @@ Set to 0 to disable threads.</string>
           <item>
            <widget class="QRadioButton" name="dirExportCWDRadio">
             <property name="text">
-             <string>Current working directory</string>
+             <string>Curren&amp;t working directory</string>
             </property>
            </widget>
           </item>

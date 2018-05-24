@@ -31,10 +31,6 @@ def _(text, disambiguation=None, context='ExportDialog'):
     """Translate text."""
     return qt4.QCoreApplication.translate(context, text, disambiguation)
 
-# used in filename to mark page number
-PAGENUM = '%PAGENUM%'
-PAGENAME = '%PAGENAME%'
-
 # formats which can have multiple pages
 multipageformats = set(('ps', 'pdf'))
 
@@ -93,7 +89,7 @@ class ExportDialog(VeuszDialog):
         self.radioPageRange.clicked.connect(lambda: self.pageClicked('range'))
 
         # other controls
-        self.checkMultiPage.clicked.connect(self.updateFilename)
+        self.checkMultiPage.clicked.connect(self.updateSingleMulti)
         self.buttonBrowse.clicked.connect(self.browseClicked)
 
         setdb = setting.settingdb
@@ -112,13 +108,17 @@ class ExportDialog(VeuszDialog):
         ext = setdb.get('export_format', 'pdf')
         if not docfilename:
             docfilename = 'export'
+        self.docname = os.path.splitext(os.path.basename(docfilename))[0]
+
+        self.formatselected = ext
+        self.pageselected = setdb.get('export_page', 'single')
+
+        self.updateSingleMulti()
+
         filename = os.path.join(
             self.dirname,
             os.path.splitext(os.path.basename(docfilename))[0] + '.' + ext)
         self.editFileName.setText(filename)
-
-        self.formatselected = ext
-        self.pageselected = setdb.get('export_page', 'single')
 
         self.checkOverwrite.setChecked(setdb.get('export_overwrite', False))
         self.checkMultiPage.setChecked(setdb.get('export_multipage', True))
@@ -163,7 +163,6 @@ class ExportDialog(VeuszDialog):
         setting.settingdb['export_format'] = fmt
         self.formatselected = fmt
         self.checkMultiPage.setEnabled(fmt in multipageformats)
-        self.updateFilename()
 
         for c in (self.exportAntialias, self.exportDPI, self.labelDPI,
                   self.exportBackgroundButton, self.labelBackgroundButton):
@@ -179,11 +178,14 @@ class ExportDialog(VeuszDialog):
         for c in (self.exportSVGTextAsText, self.labelSVGTextAsText):
             c.setVisible(fmt == 'svg')
 
+        filename = os.path.splitext(self.editFileName.text())[0] + '.' + fmt
+        self.editFileName.setText(filename)
+
     def pageClicked(self, page):
         """If page type is set."""
         setting.settingdb['export_page'] = page
         self.pageselected = page
-        self.updateFilename()
+        self.updateSingleMulti()
 
         self.pageRangeMin.setEnabled(page=='range')
         self.pageRangeMax.setEnabled(page=='range')
@@ -250,23 +252,20 @@ class ExportDialog(VeuszDialog):
             multipage = False
         return multipage
 
-    def updateFilename(self):
-        """Change filename according to selected radio buttons."""
-        filename = self.editFileName.text()
+    def updateSingleMulti(self):
+        """Change filename according to selected single or multi button."""
         setting.settingdb['export_multipage'] = self.checkMultiPage.isChecked()
-        if filename:
-            dotpos = filename.rfind('.')
-            left = filename if dotpos==-1 else filename[:dotpos]
-            multifile = self.isMultiFile()
 
-            if multifile and (PAGENUM not in left and PAGENAME not in left):
-                left += PAGENUM
-            elif not multifile:
-                left = left.replace(PAGENUM, '')
-                left = left.replace(PAGENAME, '')
+        multifile = self.isMultiFile()
+        if multifile:
+            templ = setting.settingdb['export_template_multi']
+        else:
+            templ = setting.settingdb['export_template_single']
 
-            newfilename = left + '.' + self.formatselected
-            self.editFileName.setText(newfilename)
+        newfilename = os.path.join(
+            self.dirname,
+            templ.replace('%DOCNAME%', self.docname) + '.' + self.formatselected)
+        self.editFileName.setText(newfilename)
 
     def updatePageMinMax(self):
         """Update widgets allowing user to set page range."""
@@ -321,10 +320,13 @@ class ExportDialog(VeuszDialog):
             return
 
         filename = self.editFileName.text()
-        if (self.isMultiFile() and PAGENUM not in filename and
-            PAGENAME not in filename):
-            self.showMessage(_('Error: %s or %s not in filename') % (
-                PAGENUM, PAGENAME))
+        if (self.isMultiFile() and
+            '%PAGENAME%' not in filename and
+            '%PAGENUM%' not in filename and
+            '%PAGENUM00%' not in filename and
+            '%PAGENUM000%' not in filename):
+            self.showMessage(
+                _('Error: page name or number must be in filename'))
             return
         if self.pageselected == 'range' and (
                 self.pageRangeMin.value() > self.pageRangeMax.value()):
@@ -424,11 +426,13 @@ class ExportDialog(VeuszDialog):
             for page in pages:
                 pagename = self.document.getPage(page).name
                 export.pagenumbers = [page]
-                export.filename = os.path.join(
-                    os.path.dirname(filename),
-                    os.path.basename(filename).replace(PAGENUM, str(page+1)).
-                    replace(PAGENAME, pagename)
-                )
+
+                pg = page+1
+                fname = filename.replace('%PAGENUM%', str(pg))
+                fname = fname.replace('%PAGENUM00%', '%02i' % pg)
+                fname = fname.replace('%PAGENUM000%', '%03i' % pg)
+                fname = fname.replace('%PAGENAME%', pagename)
+                export.filename = fname
                 _checkAndExport()
         else:
             # write page/pages to single file
