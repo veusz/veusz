@@ -53,13 +53,14 @@ class PlotLine3D(setting.Line3D):
             descr = _('Invert color map'),
             usertext = _('Invert map'),
             formatting=True) )
+        self.get('color').newDefault(setting.Reference('../color'))
 
 class MarkerFill3D(setting.Surface3DWColorMap):
     """Fill for markers."""
     def __init__(self, name, **args):
         setting.Surface3DWColorMap.__init__(self, name, **args)
         self.get('reflectivity').hidden = True
-        self.get('color').newDefault('auto')
+        self.get('color').newDefault(setting.Reference('../color'))
 
 class MarkerLine3D(setting.Line3D):
     """Border around markers."""
@@ -75,7 +76,7 @@ class ErrorLine3D(setting.Line3D):
     """Error bar line."""
     def __init__(self, name, **args):
         setting.Line3D.__init__(self, name, **args)
-        self.get('color').newDefault('auto')
+        self.get('color').newDefault(setting.Reference('../color'))
 
 class Point3D(plotters3d.GenericPlotter3D):
     """Plotting points in 3D."""
@@ -120,6 +121,12 @@ class Point3D(plotters3d.GenericPlotter3D):
             minval=0, maxval=1000,
             descr=_('Size of markers (relative to plot)'),
             usertext=_('Size'),
+            formatting=True), 0 )
+        s.add( setting.Color(
+            'color',
+            'auto',
+            descr = _('Master color'),
+            usertext = _('Color'),
             formatting=True), 0 )
         s.add( setting.Marker(
             'marker', 'circle',
