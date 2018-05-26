@@ -1,4 +1,5 @@
-Changes in *next version*:
+Changes in 3.0:
+ * New 3D support for plotting points, surfaces and volumes
  * Add --export-option parameter for command line exporting control
  * Add templates in preferences for exported file names, add %PAGE00% and
    %PAGE000% options for zero-prefixed page numbers, and change %PAGENUM%

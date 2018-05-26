@@ -99,12 +99,12 @@ class smart_install_data(install_data):
 
         return install_data.run(self)
 
-descr = '''Veusz is a scientific plotting package, designed to create
-publication-ready PDF and SVG output. It features GUI, command-line,
-and scripting interfaces. Graphs are constructed from "widgets",
-allowing complex layouts to be designed. Veusz supports plotting
-functions, data with errors, keys, labels, stacked plots, multiple
-plots, and fitting data.'''
+descr = '''Veusz is a 2D and 3D scientific plotting package, designed to
+create publication-ready PDF and SVG output. It features GUI,
+command-line, and scripting interfaces. Graphs are constructed from
+"widgets", allowing complex layouts to be designed. Veusz supports
+plotting functions, data with errors, keys, labels, stacked plots,
+multiple plots, and fitting data.'''
 
 def findData(dirname, extns):
     """Return tuple for directory name and list of file extensions for data."""

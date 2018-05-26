@@ -1,54 +1,28 @@
-Veusz 2.2.2
------------
+Veusz 3.0
+---------
 https://veusz.github.io
 
-Veusz is a scientific plotting package.  It is designed to produce
-publication-ready PDF or SVG output. Graphs are built-up by combining
-plotting widgets. The user interface aims to be simple, consistent and
-powerful.
+Veusz is a 2D and 3D scientific plotting package.  It is designed to
+produce publication-ready PDF or SVG output. Graphs are built-up by
+combining plotting widgets. The user interface aims to be simple,
+consistent and powerful.
 
 Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 2.2.2:
- * Fix zoom for polar, ternary and broken axis plots
- * For mean and add dataset operations, allow datasets to be different
-   lengths, expanding to the maximum
- * Fix broken axis if the ends of the axis are not the edge of the plot
- * Fix image embedding in Python 3
- * Update h5py to newer version in Windows binary (supporting HDF 1.10.1)
- * Fix 'fractions' and 'percentages' units in polar plot
- * Add LANG(mapping) function when evaluating labels, allowing translation
-   of strings in documents
-
-Changes in 2.2.1:
- * Fix mouse control for Key widget for different zoom levels
- * Correct coordinates shown on bottom of screen for different zoom levels
- * Fix zoom into graph functionality for different zoom levels
- * Fix plot picking for different zoom levels
- * When choosing a text dataset, fix the mini dataset browser
- * Fix crash when previewing in binary import using Python 3
- * Fix crash when picking points in certain circumstances
-
-Changes in 2.2:
- * Notify user updates to Veusz are available
- * Add support for high DPI displays
- * Change zoom code scale plots, rather than changing the size of elements,
-   so that plots look more similar at different zoom levels
- * Send automatic anonymous feedback to developers giving software version
-   information and counts of the features used.
- * Fix colormap sequence and randomize plugins
- * Change hyphen to minus sign when using standard C formatting in tick labels
- * Fix for Chinese and Korean characters in filenames on Windows
- * Sort DatasetPlugin arguments for diffing
- * Fix bitmap EMF export in Python 3
- * The redo operation can now be done multiple times
- * Hide fully transparent objects, rather than trying to draw them
- * Fix bug report script in Python 3
- * Fallback for paint device metrics, fixing bugs when PyQt is older than Qt
- * If barplot positions setting is blank but set, treat as unset
+Changes in 3.0:
+ * New 3D support for plotting points, surfaces and volumes
+ * Add --export-option parameter for command line exporting control
+ * Add templates in preferences for exported file names, add %PAGE00% and
+   %PAGE000% options for zero-prefixed page numbers, and change %PAGENUM%
+   to %PAGE%
+ * In export dialog allow user to specify arbitrary pages to export
+ * Change miter limit for lines, which fixes some problems when exporting
+   arrow to PDFs
+ * Use flat cap on lines with arrows, to avoid line showing through head
+ * Support datetime64 and string/unicode characters in npy/npz import
 
 Features of package:
  Plotting features:
@@ -74,6 +48,10 @@ Features of package:
   * Axes with steps in axis scale (broken axes)
   * Axis scales using functional forms
   * Plotting functions of datasets
+  * 3D point plots
+  * 3D surface plots
+  * 3D function plots
+  * 3D volumetric plots
  Input and output:
   * PDF/EPS/PNG/SVG/EMF export
   * Dataset creation/manipulation
@@ -89,6 +67,7 @@ Features of package:
      - arbitrarily manipulate the document
   * Scripting interface
   * Control with DBUS and SAMP
+
  Other features:
   * Data filtering and manipulation
   * Data picker
@@ -104,7 +83,7 @@ Requirements for source install:
    https://www.riverbankcomputing.co.uk/software/pyqt/
  SIP >= 4.15
    https://www.riverbankcomputing.co.uk/software/sip/
- numpy >= 1.0
+ numpy >= 1.7
    http://www.numpy.org/
  argparse  (for Python 2.6 only)
    https://pypi.python.org/pypi/argparse
@@ -119,7 +98,7 @@ Optional requirements:
   https://github.com/iminuit/iminuit
  dbus-python, for dbus interface
    http://dbus.freedesktop.org/doc/dbus-python/
- astropy (optional for VO table import or FITS import)
+ astropy (optional for VO table import and FITS import)
    http://www.astropy.org/
  SAMPy or astropy >= 0.4 (optional for SAMP support)
    http://pypi.python.org/pypi/sampy/
