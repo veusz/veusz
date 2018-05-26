@@ -32,15 +32,7 @@ from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
-
-try:
-    from ..helpers import threed
-except ImportError:
-    # compatibility if threed is not compiled
-    class _dummy:
-        def __init__(self):
-            self.AxisLabels = object
-    threed = _dummy()
+from ..helpers import threed
 
 def _(text, disambiguation=None, context='Axis3D'):
     """Translate text."""

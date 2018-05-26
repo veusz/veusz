@@ -30,12 +30,6 @@ from .. import setting
 from . import widget
 from ..helpers import threed
 
-try:
-    from ..helpers import threed
-except ImportError:
-    sys.stderr.write('Cannot import threed helper modules\n')
-    threed = None
-
 def _(text, disambiguation=None, context='Graph3D'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)

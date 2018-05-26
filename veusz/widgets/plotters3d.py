@@ -24,11 +24,7 @@ import numpy as N
 
 from .. import setting
 from . import widget
-
-try:
-    from ..helpers import threed
-except ImportError:
-    threed = None
+from ..helpers import threed
 
 def _(text, disambiguation=None, context='Plotters3D'):
     """Translate text."""
