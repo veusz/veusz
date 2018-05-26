@@ -174,6 +174,9 @@ void Mesh::getLineFragments(const Mat4& perspM, const Mat4& outerM, FragmentVect
 
   for(unsigned stepindex=0; stepindex<=1; ++stepindex)
     {
+      if(hidehorzline && stepindex==0) continue;
+      if(hidevertline && stepindex==1) continue;
+
       const ValVector& vec_step = stepindex==0 ? pos1 : pos2;
       const ValVector& vec_const = stepindex==0 ? pos2 : pos1;
       const unsigned vidx_step = stepindex==0 ? vidx_1 : vidx_2;

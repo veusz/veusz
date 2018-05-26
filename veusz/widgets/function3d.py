@@ -39,7 +39,12 @@ def _(text, disambiguation=None, context='Function3D'):
 class FunctionSurface(setting.Surface3DWColorMap):
     def __init__(self, *args, **argsv):
         setting.Surface3DWColorMap.__init__(self, *args, **argsv)
-        self.get('color').newDefault('auto')
+        self.get('color').newDefault(setting.Reference('../color'))
+
+class FunctionLine(setting.Line3DWColorMap):
+    def __init__(self, *args, **argsv):
+        setting.Line3DWColorMap.__init__(self, *args, **argsv)
+        self.get('color').newDefault(setting.Reference('../color'))
 
 class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""
@@ -141,11 +146,22 @@ class Function3D(plotters3d.GenericPlotter3D):
             descr=_('Function to give color (0-1)'),
             usertext=_('Color function') ), 4)
 
-        s.add(setting.Line3DWColorMap(
+        s.add( setting.Color(
+            'color',
+            'auto',
+            descr = _('Master color'),
+            usertext = _('Color'),
+            formatting=True), 0 )
+        s.add(FunctionLine(
             'Line',
             descr = _('Line settings'),
             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
+        s.add(setting.LineGrid3D(
+            'GridLine',
+            descr = _('Grid line settings'),
+            usertext = _('Grid line')),
+               pixmap = 'settings_gridline' )
         s.add(FunctionSurface(
             'Surface',
             descr = _('Surface fill settings'),
@@ -417,8 +433,8 @@ class Function3D(plotters3d.GenericPlotter3D):
             if colors is not None:
                 self.updatePropColorMap(surfprop, s.Surface, colors)
 
-        if not s.Line.hide:
-            lineprop = s.Line.makeLineProp(painter)
+        if not s.GridLine.hide:
+            lineprop = s.GridLine.makeLineProp(painter)
 
         dirn = {'x': threed.Mesh.X_DIRN,
                 'y': threed.Mesh.Y_DIRN,
@@ -427,7 +443,8 @@ class Function3D(plotters3d.GenericPlotter3D):
         mesh = threed.Mesh(
             threed.ValVector(lsteps1), threed.ValVector(lsteps2),
             threed.ValVector(N.ravel(lheight)),
-            dirn, lineprop, surfprop)
+            dirn, lineprop, surfprop,
+            s.GridLine.hidehorz, s.GridLine.hidevert)
         container.addObject(mesh)
 
     def dataDrawLine(self, painter, axes, clipcontainer):

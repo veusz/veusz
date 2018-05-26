@@ -323,7 +323,8 @@ class Mesh : public Object /NoDefaultCtors/
        const ValVector& heights,
        Direction dir,
        const LineProp* lprop /Transfer/,
-       const SurfaceProp* sprop /Transfer/);
+       const SurfaceProp* sprop /Transfer/,
+       bool hidehorzline=0, bool hidevertline=0);
 };
 
 class DataMesh : public Object /NoDefaultCtors/

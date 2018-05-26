@@ -36,18 +36,6 @@ def _(text, disambiguation=None, context='Surface3D'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class Line3DWHide(setting.Line3D):
-    def __init__(self, name, **args):
-        setting.Line3D.__init__(self, name, **args)
-        self.add( setting.Bool(
-            'hidehorz', False,
-            descr = _('Hide horizontal lines'),
-            usertext=_('Hide horz.')) )
-        self.add( setting.Bool(
-            'hidevert', False,
-            descr = _('Hide vertical lines'),
-            usertext=_('Hide vert.')) )
-
 class Surface3D(plotters3d.GenericPlotter3D):
     """Plotting surface in 3D."""
 
@@ -95,11 +83,11 @@ class Surface3D(plotters3d.GenericPlotter3D):
             formatting=True)
           )
 
-        s.add(Line3DWHide(
+        s.add(setting.LineGrid3D(
             'Line',
-            descr = _('Line settings'),
+            descr = _('Grid line settings'),
             usertext = _('Grid line')),
-               pixmap = 'settings_plotline' )
+               pixmap = 'settings_gridline' )
         s.add(setting.Surface3DWColorMap(
             'Surface',
             descr=_('Surface fill settings'),

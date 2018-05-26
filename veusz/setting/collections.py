@@ -551,6 +551,19 @@ class Line3DWColorMap(Line3D):
             usertext = _('Invert map'),
             formatting=True) )
 
+class LineGrid3D(Line3D):
+    """Line for 3D with ability to hide horz/vert."""
+    def __init__(self, name, **args):
+        Line3D.__init__(self, name, **args)
+        self.add( setting.Bool(
+            'hidehorz', False,
+            descr = _('Hide horizontal lines'),
+            usertext=_('Hide horz.')) )
+        self.add( setting.Bool(
+            'hidevert', False,
+            descr = _('Hide vertical lines'),
+            usertext=_('Hide vert.')) )
+
 class Lighting3D(Settings):
     '''Lighting options.'''
 

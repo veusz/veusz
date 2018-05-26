@@ -127,9 +127,11 @@ public:
   Mesh(const ValVector& _pos1, const ValVector& _pos2,
        const ValVector& _heights,
        Direction _dirn,
-       const LineProp* lprop=0, const SurfaceProp* sprop=0)
+       const LineProp* lprop=0, const SurfaceProp* sprop=0,
+       bool _hidehorzline=0, bool _hidevertline=0)
     : pos1(_pos1), pos2(_pos2), heights(_heights),
-      dirn(_dirn), lineprop(lprop), surfaceprop(sprop)
+      dirn(_dirn), lineprop(lprop), surfaceprop(sprop),
+      hidehorzline(_hidehorzline), hidevertline(_hidevertline)
   {
   }
 
@@ -146,6 +148,7 @@ public:
   Direction dirn;
   PropSmartPtr<const LineProp> lineprop;
   PropSmartPtr<const SurfaceProp> surfaceprop;
+  bool hidehorzline, hidevertline;
 };
 
 // Grid of data values, where the centres of the bins are specified.
