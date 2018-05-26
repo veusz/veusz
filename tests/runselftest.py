@@ -91,7 +91,7 @@ excluded_tests = set([
         # don't expect this to work
         'mathml.vsz',
 
-        # 3d not finished
+        # 3d rendering needs more work
         '3d_function.vsz',
         '3d_points.vsz',
         '3d_surface.vsz',
@@ -181,12 +181,10 @@ class Dirs(object):
         self.testdir = os.path.join(self.thisdir, 'selftests')
         self.comparisondir = os.path.join(self.thisdir, 'comparison')
 
-        files = ( glob.glob( os.path.join(self.exampledir, '*.vsz') ) +
-                  glob.glob( os.path.join(self.testdir, '*.vsz') ) +
-                  glob.glob( os.path.join(self.testdir, '*.vszh5') ) )
-
-        self.infiles = [ f for f in files if
-                         os.path.basename(f) not in excluded_tests ]
+        self.infiles = (
+            glob.glob( os.path.join(self.exampledir, '*.vsz') ) +
+            glob.glob( os.path.join(self.testdir, '*.vsz') ) +
+            glob.glob( os.path.join(self.testdir, '*.vszh5') ) )
         self.infiles += glob.glob(os.path.join(self.testdir, '*.py'))
 
 def renderAllTests():
@@ -210,7 +208,8 @@ def runTests(test_saves=False, test_unlink=False):
 
     fails = 0
     passes = 0
-    skipped = 0
+    skipped_support = 0
+    skipped_wip = 0
 
     d = Dirs()
     for infile in sorted(d.infiles):
@@ -222,8 +221,8 @@ def runTests(test_saves=False, test_unlink=False):
         if ( (base[:5] == 'hdf5_' and h5py is None) or
              (base[:5] == 'fits_' and pyfits is None) or
              (ext == '.vszh5' and h5py is None) ):
-            print(" SKIPPED")
-            skipped += 1
+            print(" SKIPPED: missing support module")
+            skipped_support += 1
             continue
 
         outfile = os.path.join(d.thisdir, base + '.temp.selftest')
@@ -239,13 +238,16 @@ def runTests(test_saves=False, test_unlink=False):
         else:
             raise RuntimeError('Invalid input file')
 
-        comparfile = os.path.join(d.thisdir, 'comparison', base + '.selftest')
+        if base in excluded_tests:
+            print(" SKIPWIP: rendered, but comparison skipped")
+            skipped_wip += 1
+            os.unlink(outfile)
+            continue
 
-        f1 = open(outfile, 'rU')
-        f2 = open(comparfile, 'rU')
-        comp = f1.read() == f2.read()
-        f1.close()
-        f2.close()
+        comparfile = os.path.join(d.thisdir, 'comparison', base + '.selftest')
+        with open(outfile, 'rU') as f1:
+            with open(comparfile, 'rU') as f2:
+                comp = f1.read() == f2.read()
 
         if not comp:
             print(" FAIL: results differed")
@@ -256,8 +258,10 @@ def runTests(test_saves=False, test_unlink=False):
             os.unlink(outfile)
 
     print()
-    if skipped != 0:
-        print('Skipped %i tests' % skipped)
+    if skipped_support != 0:
+        print('Skipped %i tests (missing support)' % skipped_support)
+    if skipped_wip != 0:
+        print('Skipped %i comparisons (work in progress)' % skipped_wip)
     if fails == 0:
         print("All tests %i/%i PASSED" % (passes, passes))
         sys.exit(0)
