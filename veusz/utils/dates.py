@@ -39,6 +39,8 @@ $
 
 # we store dates as intervals in sec from this date as a float
 offsetdate = datetime.datetime(2009, 1, 1, 0, 0, 0, 0)
+# this is the numpy version of this
+offsetdate_np = N.datetime64('2009-01-01T00:00')
 
 def isDateTime(datestr):
     """Check date/time string looks valid."""

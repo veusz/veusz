@@ -55,18 +55,21 @@ def substituteDatasets(datasets, expression, thispart):
         if dataexpr_quote_re.match(bit):
             # quoted text, so remove backtick-"quotes"
             bit = bit[1:-1]
-
-        bitbits = bit.split('_')
-        if len(bitbits) > 1:
-            if bitbits[-1] in dataexpr_columns:
-                part = bitbits.pop(-1)
-            bit = '_'.join(bitbits)
-
-        if bit in datasets:
             # replace name with a function to call
             bits[i] = "_DS_(%s, %s)" % (crepr(bit), crepr(part))
             dslist.append(bit)
 
+        else:
+            bitbits = bit.split('_')
+            if len(bitbits) > 1:
+                if bitbits[-1] in dataexpr_columns:
+                    part = bitbits.pop(-1)
+                bit = '_'.join(bitbits)
+            if bit in datasets:
+                # replace name with a function to call
+                bits[i] = "_DS_(%s, %s)" % (crepr(bit), crepr(part))
+                dslist.append(bit)
+            
     return ''.join(bits), dslist
 
 def _evaluateDataset(datasets, dsname, dspart):
@@ -75,15 +78,17 @@ def _evaluateDataset(datasets, dsname, dspart):
     dsname is the name of the dataset
     dspart is the part to get (e.g. data, serr)
     """
-    if dspart in dataexpr_columns:
-        val = getattr(datasets[dsname], dspart)
-        if val is None:
-            raise DatasetExpressionException(
-                _("Dataset '%s' does not have part '%s'") % (dsname, dspart))
-        return val
-    else:
+    if dspart not in dataexpr_columns:
         raise DatasetExpressionException(
             'Internal error - invalid dataset part')
+    if dsname not in datasets:
+        raise DatasetExpressionException(
+            _("Dataset '%s' is not defined") % (dsname, ))
+    val = getattr(datasets[dsname], dspart)
+    if val is None:
+        raise DatasetExpressionException(
+            _("Dataset '%s' does not have part '%s'") % (dsname, dspart))
+    return val
 
 def _returnNumericDataset(doc, vals, dimensions, subdatasets):
     """Used internally to convert a set of values (which needs to be

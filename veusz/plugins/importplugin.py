@@ -22,7 +22,7 @@ from __future__ import division
 import os.path
 import numpy as N
 
-from ..compat import crange, cstr, cstrerror
+from ..compat import crange, cstr, cstrerror, cunicode
 from .. import utils
 from .. import qtall as qt4
 
@@ -451,6 +451,20 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
         val.shape
     except AttributeError:
         raise ImportPluginException(_("Not the correct format file"))
+
+    # handle datetime datatype
+    if N.issubdtype(val.dtype, N.datetime64):
+        val = N.array(val - utils.offsetdate_np, dtype='timedelta64[s]')
+        val = val.astype(N.float64)
+        return datasetplugin.DatasetDateTime(name, val)
+
+    # text dataset
+    if ( N.issubdtype(val.dtype, N.dtype('S')) or
+         N.issubdtype(val.dtype, N.dtype('U')) ):
+        # need to convert each item to proper unicode string
+        return datasetplugin.DatasetText(name, [cunicode(v) for v in val])
+
+    # check whether numeric dataset
     try:
         val + 0.
         val = val.astype(N.float64)

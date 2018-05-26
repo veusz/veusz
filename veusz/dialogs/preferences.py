@@ -82,6 +82,10 @@ class PreferencesDialog(VeuszDialog):
             'prev': self.dirExportPrevRadio,
         }[setdb.get('dirname_export_location')].click()
 
+        # templates when exporting
+        self.exportTemplSingleEdit.setText(setdb['export_template_single'])
+        self.exportTemplMultiEdit.setText(setdb['export_template_multi'])
+
         # set icon size
         self.iconSizeCombo.setCurrentIndex(
             self.iconSizeCombo.findText(
@@ -207,6 +211,10 @@ class PreferencesDialog(VeuszDialog):
                 ):
             if radio.isChecked():
                 setdb['dirname_export_location'] = val
+
+        # templates for exporting
+        setdb['export_template_single'] = self.exportTemplSingleEdit.text().strip()
+        setdb['export_template_multi'] = self.exportTemplMultiEdit.text().strip()
 
         # update icon size if necessary
         iconsize = int( self.iconSizeCombo.currentText() )
