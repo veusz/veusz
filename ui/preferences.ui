@@ -191,7 +191,7 @@ Set to 0 to disable threads.</string>
           <item row="1" column="1">
            <widget class="QLineEdit" name="exportTemplMultiEdit">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Template filename when exorting to multiple files. This can include %DOCNAME% for the document name, %PAGENAME% for the page name and %PAGENUM% for the page number. %PAGENUM00% and %PAGENUM000% force two and three-character page numbers. An extension is automatically added.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Template filename when exorting to multiple files. This can include %DOCNAME% for the document name, %PAGENAME% for the page name and %PAGE% for the page number. %PAGE00% and %PAGE000% force two and three-character page numbers. An extension is automatically added.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>

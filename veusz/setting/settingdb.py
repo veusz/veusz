@@ -77,7 +77,7 @@ defaultValues = {
 
     # export templates
     'export_template_single': '%DOCNAME%',
-    'export_template_multi': '%DOCNAME%%PAGENUM%',
+    'export_template_multi': '%DOCNAME%_%PAGE00%',
 
     # ask tutorial before?
     'ask_tutorial': False,
