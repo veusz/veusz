@@ -7,6 +7,7 @@ Changes in *next version*:
  * Change miter limit for lines, which fixes some problems when exporting
    arrow to PDFs
  * Use flat cap on lines with arrows, to avoid line showing through head
+ * Support datetime64 and string/unicode characters in npy/npz import
 
 Changes in 2.2.2:
  * Fix zoom for polar, ternary and broken axis plots
