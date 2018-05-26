@@ -337,7 +337,8 @@ class DataMesh : public Object /NoDefaultCtors/
            unsigned idxval, unsigned idxedge1, unsigned idxedge2,
            bool highres,
            const LineProp* lprop /Transfer/,
-           const SurfaceProp* sprop /Transfer/);
+           const SurfaceProp* sprop /Transfer/,
+           bool hidehorzline=0, bool hidevertline=0);
 };
 
 class MultiCuboid : public Object

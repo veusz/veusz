@@ -366,12 +366,16 @@ void DataMesh::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVect
   static const unsigned linecell_highres[8][3] = {
     {0,0,0}, {0,0,1}, {1,0,2}, {1,0,3}, {0,1,1}, {0,1,0}, {0,0,3}, {0,0,2}
   };
+  // whether lines are vertical or horizontal
+  static const unsigned dirn_lowres[4] = {0, 1, 0, 1};
+  static const unsigned dirn_highres[8] = {1, 1, 0, 0, 1, 1, 0, 0};
 
   // select list above depending on high or low resolution
-  //const unsigned (*tris)[3] = highres ? trilist_highres : trilist_lowres;
   const unsigned (*lines)[2] = highres ? linelist_highres : linelist_lowres;
   const unsigned (*linecells)[3] = highres ? linecell_highres :
     linecell_lowres;
+  const unsigned *linedirn = highres ? dirn_highres : dirn_lowres;
+
   const unsigned ntris = highres ? 8 : 2;
   const unsigned nlines = highres ? 8 : 4;
 
@@ -474,6 +478,11 @@ void DataMesh::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVect
             fl.index = i1*n2+i2;
             for(unsigned i=0; i<nlines; ++i)
               {
+                // skip lines which are in wrong direction
+                if( (hidehorzline && linedirn[i]==0) ||
+                    (hidevertline && linedirn[i]==1) )
+                  continue;
+
                 if(! linetracker.isLineSet(i1+linecells[i][0], i2+linecells[i][1],
                                            linecells[i][2]))
                   {

@@ -159,11 +159,13 @@ public:
            const ValVector& _vals,
            unsigned _idxval, unsigned _idxedge1, unsigned _idxedge2,
            bool _highres,
-           const LineProp* lprop=0, const SurfaceProp* sprop=0)
+           const LineProp* lprop=0, const SurfaceProp* sprop=0,
+           bool _hidehorzline=0, bool _hidevertline=0)
     : edges1(_edges1), edges2(_edges2), vals(_vals),
       idxval(_idxval), idxedge1(_idxedge1), idxedge2(_idxedge2),
       highres(_highres),
-      lineprop(lprop), surfaceprop(sprop)
+      lineprop(lprop), surfaceprop(sprop),
+      hidehorzline(_hidehorzline), hidevertline(_hidevertline)
   {
   }
 
@@ -176,6 +178,7 @@ public:
 
   PropSmartPtr<const LineProp> lineprop;
   PropSmartPtr<const SurfaceProp> surfaceprop;
+  bool hidehorzline, hidevertline;
 };
 
 // multiple cuboids
