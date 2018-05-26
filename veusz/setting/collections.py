@@ -70,6 +70,9 @@ class Line(Settings):
         width = self.get('width').convert(painter)
         style, dashpattern = setting.LineStyle._linecnvt[self.style]
         pen = qt4.QPen(color, width, style)
+        # this needs to be set for PDF output, otherwise arrows don't
+        # plot correctly
+        pen.setMiterLimit(4)
 
         if dashpattern:
             pen.setDashPattern(dashpattern)

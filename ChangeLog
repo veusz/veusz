@@ -4,6 +4,9 @@ Changes in *next version*:
    %PAGE000% options for zero-prefixed page numbers, and change %PAGENUM%
    to %PAGE%
  * In export dialog allow user to specify arbitrary pages to export
+ * Change miter limit for lines, which fixes some problems when exporting
+   arrow to PDFs
+ * Move arrowheads forward on lines to avoid line showing through
 
 Changes in 2.2.2:
  * Fix zoom for polar, ternary and broken axis plots
