@@ -36,6 +36,11 @@ def _(text, disambiguation=None, context='Function3D'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
+class FunctionSurface(setting.Surface3DWColorMap):
+    def __init__(self, *args, **argsv):
+        setting.Surface3DWColorMap.__init__(self, *args, **argsv)
+        self.get('color').newDefault('auto')
+
 class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""
 
@@ -141,7 +146,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             descr = _('Line settings'),
             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
-        s.add(setting.Surface3DWColorMap(
+        s.add(FunctionSurface(
             'Surface',
             descr = _('Surface fill settings'),
             usertext=_('Surface')),

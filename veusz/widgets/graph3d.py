@@ -336,6 +336,11 @@ class Graph3D(widget.Widget):
             scaleM *
             threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
 
+        # reset counter and compute automatic colors
+        painthelper.autoplottercount = 0
+        for c in self.children:
+            c.setupAutoColor(painter)
+
         # build 3d scene from children
         for c in self.children:
            obj = c.drawToObject(painter)

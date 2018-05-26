@@ -59,6 +59,7 @@ class MarkerFill3D(setting.Surface3DWColorMap):
     def __init__(self, name, **args):
         setting.Surface3DWColorMap.__init__(self, name, **args)
         self.get('reflectivity').hidden = True
+        self.get('color').newDefault('auto')
 
 class MarkerLine3D(setting.Line3D):
     """Border around markers."""
@@ -69,6 +70,12 @@ class MarkerLine3D(setting.Line3D):
             descr=_('Scale border with marker size'),
             usertext=_('Scale'),
             formatting=True), 4)
+
+class ErrorLine3D(setting.Line3D):
+    """Error bar line."""
+    def __init__(self, name, **args):
+        setting.Line3D.__init__(self, name, **args)
+        self.get('color').newDefault('auto')
 
 class Point3D(plotters3d.GenericPlotter3D):
     """Plotting points in 3D."""
@@ -93,10 +100,10 @@ class Point3D(plotters3d.GenericPlotter3D):
                 'xData', 'x',
                 descr=_('X values, given by dataset, expression or list of values'),
                 usertext=_('X data')), 0 )
-        s.add( setting.DatasetOrStr(
-            'labels', '',
-            descr=_('Dataset or string to label points'),
-            usertext=_('Labels')), 5 )
+        # s.add( setting.DatasetOrStr(
+        #     'labels', '',
+        #     descr=_('Dataset or string to label points'),
+        #     usertext=_('Labels')), 5 )
         s.add( setting.DatasetExtended(
             'scalePoints', '',
             descr = _('Scale size of markers given by dataset, expression'
@@ -135,7 +142,7 @@ class Point3D(plotters3d.GenericPlotter3D):
             descr = _('Marker border settings'),
             usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
-        s.add( setting.Line3D(
+        s.add( ErrorLine3D(
             'Error',
             descr = _('Error bar settings'),
             usertext = _('Error bar')),
