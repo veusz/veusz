@@ -505,17 +505,17 @@ def plotLineArrow(painter, xpos, ypos, length, angle,
     painter.translate(xpos, ypos)
     painter.rotate(angle)
 
-    # draw line between points
-    painter.drawLine( qt4.QPointF(0., 0.),
-                      qt4.QPointF(length, 0.) )
-
     # plot marker at one end of line
-    plotMarker(painter, length, 0., 
-               arrow_translate[arrowright], arrowsize)
+    plotMarker(painter, length, 0., arrow_translate[arrowright], arrowsize)
 
     # plot reversed marker at other end
     painter.scale(-1, 1)
-    plotMarker(painter, 0., 0., 
-               arrow_translate[arrowleft], arrowsize)
+    plotMarker(painter, 0, 0, arrow_translate[arrowleft], arrowsize)
+
+    pen = painter.pen()
+    pen.setCapStyle(qt4.Qt.FlatCap)
+    painter.setPen(pen)
+    painter.scale(-1, 1)
+    painter.drawLine(qt4.QPointF(0, 0), qt4.QPointF(length, 0))
 
     painter.restore()

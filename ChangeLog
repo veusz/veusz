@@ -6,6 +6,7 @@ Changes in *next version*:
  * In export dialog allow user to specify arbitrary pages to export
  * Change miter limit for lines, which fixes some problems when exporting
    arrow to PDFs
+ * Use flat cap on lines with arrows, to avoid line showing through head
 
 Changes in 2.2.2:
  * Fix zoom for polar, ternary and broken axis plots

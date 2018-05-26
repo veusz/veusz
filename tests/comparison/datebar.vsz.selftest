@@ -21,11 +21,6 @@
 <g fill="#f5ffcd" stroke="#005500" stroke-width="0.6">
 <path d="m56.3,74.7l460.4,0l0,314.2l-460.4,0l0,-314.2"/>
 </g>
-<g fill="#005500" stroke="#005500" stroke-width="0.6">
-<g transform="matrix(0.7013 0.7128 -0.7128 0.7013 195.9 190.8)">
-<path d="M0,0l113.9,0"/>
-</g>
-</g>
 <g fill="#005500" stroke="#005500" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="matrix(0.7013 0.7128 -0.7128 0.7013 275.8 272)">
 <path d="m0,0l-11.2,6.2l2.5,-6.2l-2.5,-6.2l11.2,6.2"/>
@@ -34,6 +29,11 @@
 <g fill="none" stroke="#005500" stroke-linejoin="miter" stroke-width="0.6">
 <g transform="matrix(-0.7013 -0.7128 -0.7128 0.7013 195.9 190.8)">
 <path d="m0,-6.2l0,12.5"/>
+</g>
+</g>
+<g fill="#005500" stroke="#005500" stroke-linecap="butt" stroke-width="0.6">
+<g transform="matrix(0.7013 0.7128 -0.7128 0.7013 195.9 190.8)">
+<path d="M0,0l113.9,0"/>
 </g>
 </g>
 <g fill="none" stroke="#00557f" stroke-width="1">
