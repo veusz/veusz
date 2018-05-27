@@ -3,7 +3,7 @@
 
 AddImportPath(u'/home/jss/code/veusz3d/examples')
 SetData2DXYFunc(u'radius', (-10.0, 10.0, 0.5), (-10.0, 10.0, 0.5), u'sqrt(x**2+y**2)', linked=True)
-SetData2DXYFunc(u'sincfn', (-10.0, 10.0, 0.5), (-10.0, 10.0, 0.5), u'sin(sqrt(x**2+y**2))/sqrt(x**2+y**2)', linked=True)
+SetData2DXYFunc(u'sincfn', (-10.0, 10.0, 0.5), (-10.0, 10.0, 0.5), u'sin(sqrt(x**2+y**2))/(sqrt(x**2+y**2)+0.2)', linked=True)
 Set('StyleSheet/Font/font', u'DejaVu Sans')
 Set('StyleSheet/axis-function/autoRange', 'next-tick')
 Add('page', name='page1', autoadd=False)

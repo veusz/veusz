@@ -67,7 +67,6 @@ Features of package:
      - arbitrarily manipulate the document
   * Scripting interface
   * Control with DBUS and SAMP
-
  Other features:
   * Data filtering and manipulation
   * Data picker
@@ -110,4 +109,4 @@ Veusz is Copyright (C) 2003-2018 Jeremy Sanders <jeremy@jeremysanders.net>
 It is licensed under the GPL (version 2 or greater).
 
 The latest source code can be found in the Git repository at
-https://github.com/veusz/veusz
+  https://github.com/veusz/veusz

@@ -5,18 +5,21 @@ Introduction
 Veusz
 =====
 
-Veusz is a scientific plotting package. It is designed to be easy to
-use, easily extensible, but powerful. The program features a graphical
-user interface (GUI), which works under Unix/Linux, Windows or Mac
-OS. It can also be easily scripted (the saved file formats are similar
-to Python scripts) or used as module inside Python. Veusz reads data
-from a number of different types of data file, it can be manually
-entered, or constructed from other datasets.
+Veusz is a 2D and 3D scientific plotting package. It is designed to be
+easy to use, easily extensible, but powerful. The program features a
+graphical user interface (GUI), which works under Unix/Linux, Windows
+or Mac OS. It can also be easily scripted (the saved file formats are
+similar to Python scripts) or used as module inside Python. Veusz
+reads data from a number of different types of data file, it can be
+manually entered, or constructed from other datasets.
 
 In Veusz the document is built in an object-oriented fashion, where a
 document is built up by a number of widgets in a hierarchy. For
 example, multiple function or xy widgets can be placed inside a graph
-widget, and many graphs can be placed in a grid widget.
+widget, and many graphs can be placed in a grid widget. The program
+also supports a variety of 3D plots inside a 3D graph widget,
+including 3D point and surface plots. The program produces vector
+rather than rastered 3D output.
 
 Veusz can be extended by the user easily by adding plugins. Support
 for different data file types can be added with import
@@ -135,7 +138,7 @@ The widget types include
       error bars. An xy plotter can also plot a stepped line, allowing
       histograms to be plotted (note that it doesn't yet do the
       binning of the data).  The settings for the xy widget are the
-      various attibutes for the points, line and error bars, the
+      various attributes for the points, line and error bars, the
       datasets to plot, and the axes to plot on.  The xy plotter can
       plot a label next to each dataset, which is either the same for
       each point or taken from a text dataset.  If you wish to leave
@@ -143,7 +146,7 @@ The widget types include
       numeric dataset.
    #. :command:`fit` - fit a function to data. This plotter is a like
       the function plotter, but allows fitting of the function to
-      data. This is achived by clicking on a "fit" button, or using
+      data. This is achieved by clicking on a "fit" button, or using
       the "fit" action of the widget. The fitter takes a function to
       fit containing the unknowns, e.g. `a*x**2 + b*x + c`, and
       initial values for the variables (here a, b and c). It then fits
@@ -219,6 +222,62 @@ The widget types include
    #. :command:`ternary` - plot data of three variables which add up
       to 100 per cent.This is a non-orthogonal plot and is placed
       directly on the page rather than in a graph.
+
+#. 3D widgets - 3D graphs can be created by adding a 3D graph widget
+   to a blank page (:command:`graph3d`). The 3D graph has settings
+   which control the angle the rotation angle of the plot, the
+   position and color of lighting and the rendering method.
+
+   To build up a 3D plot the following widgets can be placed inside
+   it:
+
+   #. :command:`axis3d` - normally a 3D graph has three axes (X, Y and
+      Z), but more axes can be added to plot multiple things on a single
+      axis direction. This works in a similar way to the 2D axis
+      widget. The widget has options for the axis label, tick labels,
+      tick marks and grid lines (which appear on the outside of the 3D
+      cube).
+   #. :command:`point3d` - for plotting points, and optionally
+      connecting lines, in 3D. The user provides three 1D datasets for
+      the x, y and z values. The markers can be scaled in size by
+      another optional dataset. The markers can also be colored
+      according to another optional dataset, according to a color map,
+      minimum and maximum. Error bars can be provided for each of the
+      x, y and z datasets. The connecting line can also be colored if a color 
+   #. :command:`function3d` - for plotting either a functional line in
+      3D space or a functional surface. The type of plot is given by
+      the mode parameter. In the case of the line, the x,y,z
+      coordinates can be specified as a function of t, where t goes
+      from 0 to 1, or by giving functions for two of the coordinates
+      as a function of the other. For a surface, the value for x, y or
+      z is given as a function of the other two. In addition, a
+      function returning 0 to 1 can be provided for the color, which
+      specifies the color map value for the surface at each position
+      or the line color. For a 2D surface, the grid lines or surface
+      fill can be hidden or shown. There are also settings giving the
+      number of function evaluations to compute in each direction for
+      a surface, or in one direction for a line.
+   #. :command:`surface3d` - for plotting a two dimensional surface
+      from data values. The user should provide a 2D dataset for the
+      height of a surface. The x, y or z axis for the height and other
+      directions can be chosen. A second 2D dataset can be provided
+      for the color of the surface at each point. Note that the
+      coordinate of the 2D dataset lies at the center of each 2D grid
+      point. The height of the grid at the edge is calculated by
+      linear interpolation. Normally the grid is surrounded by four
+      lines and the surface by two triangles. If a high resolution
+      option is enabled, the each grid point is surrounded by eight
+      lines and the surface drawn by eight triangles.
+   #. :command:`volume3d` - for plotting 3D volumes. In this widget,
+      for a volume described by A×B×C values, then the user should
+      provide four datasets, each containing A×B×C values. Three of
+      the datasets give coordinates of the centers of the 3D cells and
+      the fourth the color of the cell. An example set of datasets
+      would be X=(0,0,0,0,1,1,1,1), Y=(0,0,1,1,0,0,1,1),
+      Z=(0,1,0,1,0,1,0,1),
+      color=(0.1,0.2,0.3,0.4,0.3,0.2,0.1,0). Additionally, the user
+      can provide a transparency dataset, which can be useful for
+      showing or hiding parts of the 3D space.
 
 Settings: properties and formatting
 -----------------------------------
@@ -456,7 +515,7 @@ one of the formatting characters for strftime (see
 `<http://opengroup.org/onlinepubs/007908799/xsh/strftime.html>`_ for
 details). These include `a` for an abbreviated weekday name, `A` for
 full weekday name, `b` for abbreviated month name, `B` for full month
-name, `c` date and time representaiton, `d` day of month 01..31, `H`
+name, `c` date and time representation, `d` day of month 01..31, `H`
 hour as 00..23, `I` hour as 01..12, `j` as day of year 001..366, `m`
 as month 01..12, `M` minute as 00..59, `p` AM/PM, `S` second 00..61,
 `U` week number of year 00..53 (Sunday as first day of week), `w`
@@ -465,6 +524,69 @@ first day of week), `x` date representation, `X` time representation,
 `y` year without century 00..99 and `Y` year. `%VDVS` is a special
 Veusz addon format which shows seconds and fractions of seconds
 (e.g. 12.2).
+
+Three dimensional plots
+-----------------------
+
+When drawing in three dimensions, Veusz builds up a 3D "scene" for the
+graph from the various plotting widgets, made up of triangles, line
+segments, points and text. Veusz does not use a standard (e.g. OpenGL)
+drawing method, but renders the scene itself. The advantage of this is
+that it can produce vector rather than bitmap or raster
+output. OpenGL, for example, is based around bitmaps.
+
+Veusz applies lighting to the scene. The lighting depends on
+enabled light sources, which are set in the graph3d widget. Light
+sources have a color, intensity and position. Note that only the angle
+of the light to a surface affects its lighting, not its
+distance. Normally each solid surface has an intrinsic color, which
+can be seen without any lighting. If a light source is enabled, the
+color of the light is added to the surface color, depending on the
+reflectivity of the surface. Each surface also has a transparency
+setting.
+
+By default, Veusz uses a naive Painter's Algorithm to draw the
+scene. It draws from the back of scene to the front. The main problem
+with this algorithm is that shapes and lines overlapping in depth can
+be confused as the depth of each object is calculated at only one
+point. In addition objects may intersect, which is not properly
+treated. In the graph3d object, the user can switch to a different
+rendering mode called BSP. In this accurate BSP mode, the objects are
+split so that they never overlap from any viewing angle. The
+disadvantage of this mode is that it is slow, uses a lot of memory and
+produces large output files. We plan in future to add another mode
+which handles overlaps better and does not unnecessarily split
+objects.
+
+The plot is affected by the viewing angle (or plot rotation), which is
+specified in the graph3d widget settings. The rotation is given be
+three rotations around lines in X, Y and Z directions (note that these
+are not the same directions as the X, Y and Z axes!). The X axis runs
+horizontally on the screen, the Y axis runs vertically, and the Z axis
+runs along the line of sight.
+
+There is also a distance setting, which moves the graph closer to or
+away from the viewer. At larger distances the effect of perspective
+reduces, meaning that parts of the plot closer to the viewer are not
+larger than if they were at the farthest side. At large distances, a
+plot tends towards being isometric. At small distances, shapes are
+more distorted (note by default the size of the graph is 1 in these
+distance units). By default, Veusz enlarges the 3D rendered scene to
+fill the bounds of the 3D graph widget, so distance has no effect on
+the size of the plot. This can be switched off by modifying the Size
+setting from "Auto" to a fixed number. A fixed size is useful if the
+user wants the graph to be the same size for any rotation. With this
+setting the size of the graph is affected by its distance.
+
+By default, a 3D graph has the same dimensions in the X, Y and Z
+axes. The aspect ratio of the plot can be controlled by varying three
+settings controlling the aspect ratio in each direction. Note that
+only the ratios of these quantities matter, not their absolute values.
+
+Normally in Veusz, sizes of objects (e.g. plot markers) are given in
+physical units. This makes less sense for a 3D plot as sizes can
+depend on distance. In a 3D graph sizes are given in 1/1000 of the
+graph bounding box maximum size.
 
 The main window
 ===============
