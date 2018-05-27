@@ -488,13 +488,16 @@ class Axis3D(widget.Widget):
         self.computePlottedRange()
         return (self.plottedrange[0], self.plottedrange[1])
 
-    def dataToLogicalCoords(self, vals):
-        """Compute coordinates on graph to logical graph coordinates (0..1)"""
+    def dataToLogicalCoords(self, vals, scaling=True):
+        """Compute coordinates on graph to logical graph coordinates (0..1)
+
+        If scaling is True, apply scaling factor for data
+        """
 
         self.computePlottedRange()
         s = self.settings
 
-        svals = vals * s.datascale
+        svals = vals*s.datascale if scaling else vals
         if s.log:
             fracposns = self.logConvertToPlotter(svals)
         else:
@@ -516,11 +519,13 @@ class Axis3D(widget.Widget):
 
     def transformToAxis(self, v):
         """Return value to give equal-spaced values in transformed coordinates."""
-        return N.log(v) if self.settings.log else v
+        x = v*self.settings.datascale
+        return N.log(x) if self.settings.log else x
 
     def transformFromAxis(self, v):
         """Convert transformed values back."""
-        return N.exp(v) if self.settings.log else v
+        x = v/self.settings.datascale
+        return N.exp(x) if self.settings.log else x
 
     def getAutoMirrorCombs(self):
         """Get combinations of other position for auto mirroring."""
@@ -619,7 +624,7 @@ class Axis3D(widget.Widget):
         """
 
         ticklen = tickprops.length * 1e-3
-        tfracs = self.dataToLogicalCoords(tickvals)
+        tfracs = self.dataToLogicalCoords(tickvals, scaling=False)
 
         outstart = []
         outend = []
@@ -673,7 +678,7 @@ class Axis3D(widget.Widget):
         if gridprops.hide:
             return
 
-        tfracs = self.dataToLogicalCoords(tickvals)
+        tfracs = self.dataToLogicalCoords(tickvals, scaling=False)
         ones = N.ones(tfracs.shape)
         zeros = N.zeros(tfracs.shape)
 
