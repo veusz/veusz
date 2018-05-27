@@ -22,10 +22,12 @@ from __future__ import division, print_function
 
 import math
 import numpy as N
+
 from .. import qtall as qt
 from .. import document
 from .. import setting
 from . import widget
+from . import controlgraph
 from ..helpers import threed
 
 def _(text, disambiguation=None, context='Scene3D'):
@@ -210,15 +212,16 @@ class Scene3D(widget.Widget):
 
         return scene, camera
 
-    def identifyPixel(self, parentposn, painthelper, x, y):
-        pass
-
     def draw(self, parentposn, painthelper, outerbounds=None):
         '''Update the margins before drawing.'''
 
         bounds = self.computeBounds(parentposn, painthelper)
 
         painter = painthelper.painter(self, bounds)
+        painthelper.setControlGraph(self, [
+            controlgraph.ControlMarginBox(
+                self, bounds, outerbounds, painthelper)])
+
         root = self.makeObjects(painter, bounds, painthelper)
         if root is None:
             return bounds
@@ -262,5 +265,9 @@ class Scene3D(widget.Widget):
 
         checkwidget(self)
         return widget[0]
+
+    def updateControlItem(self, cgi):
+        """Area moved or resized - call helper routine to move self."""
+        cgi.setWidgetMargins()
 
 document.thefactory.register(Scene3D)
