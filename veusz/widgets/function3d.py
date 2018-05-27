@@ -284,6 +284,8 @@ class Function3D(plotters3d.GenericPlotter3D):
         }[mode]
 
         axes = self.fetchAxes()
+        if axes is None:
+            return None
 
         # range of other axes
         ax1, ax2 = axes[axidx[1]], axes[axidx[2]]
