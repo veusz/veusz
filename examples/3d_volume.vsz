@@ -1,0 +1,161 @@
+# Veusz saved document (version 3.0)
+# Saved at 2018-05-27T08:31:08.534252
+
+ImportString(u'vv(numeric)','''
+0.000000e+00
+1.111111e-01
+2.222222e-01
+1.111111e-01
+2.222222e-01
+3.333333e-01
+2.222222e-01
+3.333333e-01
+4.444444e-01
+1.111111e-01
+2.222222e-01
+3.333333e-01
+2.222222e-01
+3.333333e-01
+4.444444e-01
+3.333333e-01
+4.444444e-01
+5.555556e-01
+2.222222e-01
+3.333333e-01
+4.444444e-01
+3.333333e-01
+4.444444e-01
+5.555556e-01
+4.444444e-01
+5.555556e-01
+6.666667e-01
+''')
+ImportString(u'xv(numeric)','''
+0.000000e+00
+0.000000e+00
+0.000000e+00
+0.000000e+00
+0.000000e+00
+0.000000e+00
+0.000000e+00
+0.000000e+00
+0.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+''')
+ImportString(u'yv(numeric)','''
+0.000000e+00
+0.000000e+00
+0.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+0.000000e+00
+0.000000e+00
+0.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+0.000000e+00
+0.000000e+00
+0.000000e+00
+1.000000e+00
+1.000000e+00
+1.000000e+00
+2.000000e+00
+2.000000e+00
+2.000000e+00
+''')
+ImportString(u'zv(numeric)','''
+0.000000e+00
+1.000000e+00
+2.000000e+00
+0.000000e+00
+1.000000e+00
+2.000000e+00
+0.000000e+00
+1.000000e+00
+2.000000e+00
+0.000000e+00
+1.000000e+00
+2.000000e+00
+0.000000e+00
+1.000000e+00
+2.000000e+00
+0.000000e+00
+1.000000e+00
+2.000000e+00
+0.000000e+00
+1.000000e+00
+2.000000e+00
+0.000000e+00
+1.000000e+00
+2.000000e+00
+0.000000e+00
+1.000000e+00
+2.000000e+00
+''')
+Set('colorTheme', u'default-latest')
+Set('StyleSheet/Font/font', u'Courier')
+Set('StyleSheet/axis-function/autoRange', u'next-tick')
+Add('page', name=u'page1', autoadd=False)
+To(u'page1')
+Add('graph3d', name=u'graph3d1', autoadd=False)
+To(u'graph3d1')
+Set('xRotation', 35.0)
+Set('distance', 5.0)
+Set('Back/color', u'#f0f0f0')
+Set('Back/hide', False)
+Add('axis3d', name=u'x', autoadd=False)
+To(u'x')
+Set('label', u'Axis \\textbf{x}')
+Set('min', -0.5)
+Set('max', 2.5)
+To('..')
+Add('axis3d', name=u'y', autoadd=False)
+To(u'y')
+Set('label', u'Axis \\textbf{y}')
+Set('min', -0.5)
+Set('max', 2.5)
+Set('direction', u'y')
+To('..')
+Add('axis3d', name=u'z', autoadd=False)
+To(u'z')
+Set('label', u'Axis \\textbf{z}')
+Set('min', -0.5)
+Set('max', 2.5)
+Set('direction', u'z')
+To('..')
+Add('volume3d', name=u'volume3d1', autoadd=False)
+To(u'volume3d1')
+Set('colorMap', u'hot_desaturated')
+Set('fillfactor', 0.7)
+Set('DataColor/points', u'vv')
+Set('xData', u'xv')
+Set('yData', u'yv')
+Set('zData', u'zv')
+To('..')
+To('..')
+To('..')
