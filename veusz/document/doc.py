@@ -153,8 +153,12 @@ class Document(qt4.QObject):
         page = widgetfactory.thefactory.makeWidget(
             'page', self.basewidget, self)
 
-        assert mode in ('graph', 'polar', 'ternary', 'graph3d')
-        widgetfactory.thefactory.makeWidget(mode, page, self)
+        if mode == 'graph3d':
+            scene = widgetfactory.thefactory.makeWidget('scene3d', page, self)
+            widgetfactory.thefactory.makeWidget('graph3d', scene, self)
+        else:
+            assert mode in ('graph', 'polar', 'ternary')
+            widgetfactory.thefactory.makeWidget(mode, page, self)
         self.setModified()
         self.setModified(False)
         self.changeset = 0

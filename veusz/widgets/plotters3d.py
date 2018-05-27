@@ -173,7 +173,7 @@ class GenericPlotter3D(widget.Widget):
                         axes[1].settings.upperPosition,
                         axes[2].settings.upperPosition))
 
-    def drawToObject(self, painter):
+    def drawToObject(self, painter, painthelper):
         # exit if hidden or function blank
         if self.settings.hide:
             return

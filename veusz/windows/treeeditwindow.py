@@ -816,19 +816,19 @@ class TreeEditDock(qt4.QDockWidget):
 
         # exclusive widgets
         nonorth = self.vzactions['add.nonorthpoint'].isEnabled()
-        threed = self.vzactions['add.point3d'].isEnabled()
+        in3dgraph = self.vzactions['add.point3d'].isEnabled()
         self.vzactions['add.nonorthpoint'].setVisible(nonorth)
-        self.vzactions['add.point3d'].setVisible(threed)
-        self.vzactions['add.xy'].setVisible(not nonorth and not threed)
+        self.vzactions['add.point3d'].setVisible(in3dgraph)
+        self.vzactions['add.xy'].setVisible(not nonorth and not in3dgraph)
         self.vzactions['add.nonorthfunc'].setVisible(nonorth)
-        self.vzactions['add.function'].setVisible(not nonorth and not threed)
-        self.vzactions['add.function3d'].setVisible(threed)
-        self.vzactions['add.axismenu'].setVisible(not threed)
-        self.vzactions['add.axis3d'].setVisible(threed)
-        self.vzactions['add.image'].setVisible(not threed)
-        self.vzactions['add.surface3d'].setVisible(threed)
-        self.vzactions['add.contour'].setVisible(not threed)
-        self.vzactions['add.volume3d'].setVisible(threed)
+        self.vzactions['add.function'].setVisible(not nonorth and not in3dgraph)
+        self.vzactions['add.function3d'].setVisible(in3dgraph)
+        self.vzactions['add.axismenu'].setVisible(not in3dgraph)
+        self.vzactions['add.axis3d'].setVisible(in3dgraph)
+        self.vzactions['add.image'].setVisible(not in3dgraph)
+        self.vzactions['add.surface3d'].setVisible(in3dgraph)
+        self.vzactions['add.contour'].setVisible(not in3dgraph)
+        self.vzactions['add.volume3d'].setVisible(in3dgraph)
 
         # certain actions shouldn't work on root
         isnotroot = not any([isinstance(w, widgets.Root)
@@ -861,6 +861,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'line', 'polygon', 'polar', 'ternary',
                            'nonorthpoint', 'nonorthfunc',
                            'covariance',
+                           'scene3d',
                            'graph3d', 'function3d', 'point3d', 'axis3d',
                            'surface3d', 'volume3d'):
 
@@ -944,6 +945,7 @@ class TreeEditDock(qt4.QDockWidget):
             'add.colorbar',
             'add.polar',
             'add.ternary',
+            'add.scene3d',
             'add.graph3d',
             'add.covariance',
             'add.shapemenu',

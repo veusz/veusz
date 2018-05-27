@@ -726,7 +726,7 @@ class Axis3D(widget.Widget):
             face.addObject(threed.LineSegments(c1, c2, lineprop))
             cont.addObject(face)
 
-    def drawToObject(self, painter):
+    def drawToObject(self, painter, painthelper):
 
         s = self.settings
         dirn = s.direction

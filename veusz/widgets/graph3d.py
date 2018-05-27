@@ -20,7 +20,6 @@
 
 from __future__ import division, print_function
 
-import sys
 import math
 import numpy as N
 from ..compat import cvalues
@@ -42,23 +41,9 @@ class BackSurface(setting.Surface3D):
         self.get('reflectivity').newDefault(0)
         self.get('hide').newDefault(True)
 
-# define 2nd and 3rd lighting classes
-class Lighting3D_2(setting.Lighting3D):
-    def __init__(self, name, **args):
-        setting.Lighting3D.__init__(self, name, **args)
-        self.get('enable').newDefault(False)
-        self.get('color').newDefault('red')
-        self.get('x').newDefault(2)
-class Lighting3D_3(setting.Lighting3D):
-    def __init__(self, name, **args):
-        setting.Lighting3D.__init__(self, name, **args)
-        self.get('enable').newDefault(False)
-        self.get('color').newDefault('blue')
-        self.get('x').newDefault(-2)
-
 class Graph3D(widget.Widget):
-    """3D graph (orthogonal) containing other widgets."""
-    
+    """3D graph (orthogonal axes) containing other plotting widgets."""
+
     typename='graph3d'
     allowusercreation = True
     description = _('3d graph')
@@ -94,89 +79,37 @@ class Graph3D(widget.Widget):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
 
-        s.add( setting.FloatSlider(
-            'xRotation',
-            0,
-            minval=-180, maxval=180, step=15, tick=45,
-            descr=_(u'Rotation around x axis (°)'),
-            usertext=_('X rotation') ))
-        s.add( setting.FloatSlider(
-            'yRotation',
-            35.,
-            minval=-180, maxval=180, step=15, tick=45,
-            descr=_(u'Rotation around y axis (°)'),
-            usertext=_('Y rotation') ))
-        s.add( setting.FloatSlider(
-            'zRotation',
-            0,
-            minval=-180, maxval=180, step=15, tick=45,
-            descr=_(u'Rotation around z axis (°)'),
-            usertext=_('Z rotation') ))
-
-        s.add( setting.FloatSlider(
-            'distance',
-            5,
-            minval=1, maxval=50, step=0.5, tick=5, scale=0.1,
-            descr=_(u'Viewing distance'),
-            usertext=_('Distance') ))
-
-        s.add( setting.FloatOrAuto(
-            'size',
-            'Auto',
-            minval=0,
-            descr=_('Automatic or fixed graph size scaling value'),
-            usertext=_('Size'),
-            formatting=True ))
-
-        s.add( setting.Choice(
-            'rendermode',
-            ('painters', 'bsp'),
-            'painters',
-            uilist=("Fast (Painter's)",
-                    "Accurate (BSP)"),
-            usertext=_('Render method'),
-            descr=_('Method used to draw 3D plot') ))
+        s.add( setting.Float(
+            'xSize', 1.,
+            minval=0.01, maxval=100,
+            descr=_('X size'),
+            usertext=_('X size') ))
+        s.add( setting.Float(
+            'ySize', 1.,
+            minval=0.01, maxval=100,
+            descr=_('Y size'),
+            usertext=_('Y size') ))
+        s.add( setting.Float(
+            'zSize', 1.,
+            minval=0.01, maxval=100,
+            descr=_('Z size'),
+            usertext=_('Z size') ))
 
         s.add( setting.Float(
-            'xAspect', 1.,
-            minval=0.01, maxval=100,
-            descr=_('X aspect scaling'),
-            usertext=_('X aspect') ))
+            'xPos', 0.,
+            minval=-100, maxval=100,
+            descr=_('X position'),
+            usertext=_('X position') ))
         s.add( setting.Float(
-            'yAspect', 1.,
-            minval=0.01, maxval=100,
-            descr=_('Y aspect scaling'),
-            usertext=_('Y aspect') ))
+            'yPos', 0.,
+            minval=-100, maxval=100,
+            descr=_('Y position'),
+            usertext=_('Y position') ))
         s.add( setting.Float(
-            'zAspect', 1.,
-            minval=0.01, maxval=100,
-            descr=_('Z aspect scaling'),
-            usertext=_('Z aspect') ))
-
-        s.add( setting.Distance(
-                'leftMargin',
-                '1cm',
-                descr=_('Distance from left of graph to edge'),
-                usertext=_('Left margin'),
-                formatting=True) )
-        s.add( setting.Distance(
-                'rightMargin',
-                '1cm',
-                descr=_('Distance from right of graph to edge'),
-                usertext=_('Right margin'),
-                formatting=True) )
-        s.add( setting.Distance(
-                'topMargin',
-                '1cm',
-                descr=_('Distance from top of graph to edge'),
-                usertext=_('Top margin'),
-                formatting=True) )
-        s.add( setting.Distance(
-                'bottomMargin',
-                '1cm',
-                descr=_('Distance from bottom of graph to edge'),
-                usertext=_('Bottom margin'),
-                formatting=True) )
+            'zPos', 0.,
+            minval=-100, maxval=100,
+            descr=_('Z position'),
+            usertext=_('Z position') ))
 
         s.add(setting.Line3D(
             'Border',
@@ -188,26 +121,11 @@ class Graph3D(widget.Widget):
             descr = _('Graph back'),
             usertext = _('Back')),
                pixmap = 'settings_bgfill' )
-        s.add(setting.Lighting3D(
-            'Lighting1',
-            descr=_('Lighting (1)'),
-            usertext=_('Lighting (1)')),
-               pixmap = 'settings_lighting' )
-        s.add(Lighting3D_2(
-            'Lighting2',
-            descr=_('Lighting (2)'),
-            usertext=_('Lighting (2)')),
-               pixmap = 'settings_lighting' )
-        s.add(Lighting3D_3(
-            'Lighting3',
-            descr=_('Lighting (3)'),
-            usertext=_('Lighting (3)')),
-               pixmap = 'settings_lighting' )
 
     @classmethod
     def allowedParentTypes(self):
-        from . import page, grid
-        return (page.Page, grid.Grid)
+        from . import scene3d
+        return (scene3d.Scene3D,)
 
     def addDefaultSubWidgets(self):
         """Add axes automatically."""
@@ -224,7 +142,7 @@ class Graph3D(widget.Widget):
         """
 
         axes = {}
-        # recursively go back up the tree to find axes 
+        # recursively go back up the tree to find axes
         w = self
         while w is not None and len(axes) < len(axesnames):
             for c in w.children:
@@ -247,14 +165,6 @@ class Graph3D(widget.Widget):
         """Return a list of axes widgets given a list of names."""
         ad = self.getAxesDict(axesnames)
         return [ad[n] for n in axesnames]
-
-    def getMargins(self, painthelper):
-        """Use settings to compute margins."""
-        s = self.settings
-        return ( s.get('leftMargin').convert(painthelper),
-                 s.get('topMargin').convert(painthelper),
-                 s.get('rightMargin').convert(painthelper),
-                 s.get('bottomMargin').convert(painthelper) )
 
     def addBorder(self, painter, root):
         s = self.settings
@@ -293,7 +203,7 @@ class Graph3D(widget.Widget):
             root.addObject(threed.TriangleFacing(
                 threed.Vec3(*p1), threed.Vec3(*p2), threed.Vec3(*p3), prop))
 
-    def makeObjects(self, painter, bounds, painthelper):
+    def drawToObject(self, painter, painthelper):
         """Make objects, returning root"""
 
         s = self.settings
@@ -317,18 +227,23 @@ class Graph3D(widget.Widget):
         for axis in cvalues(axestodraw):
             axis.computePlottedRange()
 
-        # scale self+children according to aspect ratio
-        maxaspect = max(s.xAspect,s.yAspect,s.zAspect)
-        scaleM = threed.scaleM4(threed.Vec3(
-            s.xAspect/maxaspect, s.yAspect/maxaspect, s.zAspect/maxaspect))
+        cont = threed.ObjectContainer()
+        cont.objM = (
+            # graph size
+            threed.scaleM4(threed.Vec3(s.xSize, s.ySize, s.zSize)) *
+            # graph position
+            threed.translationM4(threed.Vec3(
+                s.xPos-0.5*s.xSize,
+                s.yPos-0.5*s.ySize,
+                s.zPos-0.5*s.zSize))
+        )
 
-        root = threed.ObjectContainer()
-        root.objM = (
-            threed.rotateM4(s.zRotation/180.*math.pi, threed.Vec3(0,0,1)) *
-            threed.rotateM4(s.yRotation/180.*math.pi, threed.Vec3(0,1,0)) *
-            threed.rotateM4(s.xRotation/180.*math.pi, threed.Vec3(1,0,0)) *
-            scaleM *
-            threed.translationM4(threed.Vec3(-0.5,-0.5,-0.5)) )
+        # add graph box
+        self.addBorder(painter, cont)
+        # add graph behind fill
+        self.addBackSurface(painter, cont)
+        # make clickable
+        cont.assignWidgetId(id(self))
 
         # reset counter and compute automatic colors
         painthelper.autoplottercount = 0
@@ -337,98 +252,10 @@ class Graph3D(widget.Widget):
 
         # build 3d scene from children
         for c in self.children:
-           obj = c.drawToObject(painter)
+           obj = c.drawToObject(painter, painthelper)
            if obj:
-               root.addObject(obj)
+               cont.addObject(obj)
 
-        # add graph box
-        self.addBorder(painter, root)
-        # add graph behind fill
-        self.addBackSurface(painter, root)
-        return root
-
-    def makeScene(self, painter):
-        """Make Scene and Camera objects."""
-
-        s = self.settings
-
-        camera = threed.Camera()
-        # camera necessary to make x,y,z coordinates point in the
-        # right direction, with the origin in the lower left towards
-        # the viewer
-        camera.setPointing(
-            threed.Vec3(0,  0, -s.distance),
-            threed.Vec3(0,  0,  0),
-            threed.Vec3(0, -1,  0))
-        camera.setPerspective(90, 1, 100)
-
-        mode = {
-            'painters': threed.Scene.RENDER_PAINTERS,
-            'bsp': threed.Scene.RENDER_BSP,
-        }[s.rendermode]
-        scene = threed.Scene(mode)
-
-        # add lighting if enabled
-        for light in s.Lighting1, s.Lighting2, s.Lighting3:
-            if light.enable:
-                scene.addLight(
-                    threed.Vec3(light.x, light.y, light.z),
-                    light.get('color').color(painter),
-                    light.intensity*0.01)
-
-        return scene, camera
-
-    def identifyPixel(self, parentposn, painthelper, x, y):
-        pass
-
-    def draw(self, parentposn, painthelper, outerbounds=None):
-        '''Update the margins before drawing.'''
-
-        bounds = self.computeBounds(parentposn, painthelper)
-
-        painter = painthelper.painter(self, bounds)
-        root = self.makeObjects(painter, bounds, painthelper)
-        if root is None:
-            return bounds
-
-        scene, camera = self.makeScene(painter)
-
-        # finally render the scene
-        scale = self.settings.size
-        if scale == 'Auto':
-            scale = -1
-        with painter:
-            scene.render(
-                root,
-                painter, camera,
-                bounds[0], bounds[1], bounds[2], bounds[3], scale)
-
-    def identifyWidgetAtPoint(self, painthelper, bounds, scaling, x, y):
-        painter = document.PainterRoot()
-        painter.updateMetaData(painthelper)
-
-        root = self.makeObjects(painter, bounds, painthelper)
-        if root is None:
-            return self
-        scene, camera = self.makeScene(painter)
-
-        sizescale = self.settings.size
-        if sizescale == 'Auto':
-            sizescale = -1
-        widgetid = scene.idPixel(
-            root, painter, camera,
-            bounds[0], bounds[1], bounds[2], bounds[3], sizescale,
-            scaling, x, y)
-
-        # recursive check id of children against returned value
-        widget = [self]
-        def checkwidget(r):
-            for c in r.children:
-                if id(c) == widgetid:
-                    widget[0] = c
-                checkwidget(c)
-
-        checkwidget(self)
-        return widget[0]
+        return cont
 
 document.thefactory.register(Graph3D)

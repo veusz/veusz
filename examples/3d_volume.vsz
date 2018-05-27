@@ -1,5 +1,5 @@
 # Veusz saved document (version 3.0)
-# Saved at 2018-05-27T08:31:08.534252
+# Saved at 2018-05-27T10:25:14.694378
 
 ImportString(u'vv(numeric)','''
 0.000000e+00
@@ -122,10 +122,12 @@ Set('StyleSheet/Font/font', u'Courier')
 Set('StyleSheet/axis-function/autoRange', u'next-tick')
 Add('page', name=u'page1', autoadd=False)
 To(u'page1')
-Add('graph3d', name=u'graph3d1', autoadd=False)
-To(u'graph3d1')
+Add('scene3d', name=u'scene3d1', autoadd=False)
+To(u'scene3d1')
 Set('xRotation', 35.0)
 Set('distance', 5.0)
+Add('graph3d', name=u'graph3d1', autoadd=False)
+To(u'graph3d1')
 Set('Back/color', u'#f0f0f0')
 Set('Back/hide', False)
 Add('axis3d', name=u'x', autoadd=False)
@@ -156,6 +158,7 @@ Set('DataColor/points', u'vv')
 Set('xData', u'xv')
 Set('yData', u'yv')
 Set('zData', u'zv')
+To('..')
 To('..')
 To('..')
 To('..')

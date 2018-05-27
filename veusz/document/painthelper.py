@@ -298,7 +298,7 @@ class PaintHelper(object):
         widget = lastwidget[0]
 
         # need to re-render 3d scene to look for clicks
-        if widget and widget.typename == 'graph3d':
+        if widget and widget.typename == 'scene3d':
             bounds = [0,0,100,100]
             for w in self.states:
                 if w[0] is widget:
