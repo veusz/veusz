@@ -121,11 +121,11 @@ class Graph3D(widget.Widget):
             usertext=_('Distance') ))
 
         s.add( setting.FloatOrAuto(
-            'scaling',
+            'size',
             'Auto',
             minval=0,
             descr=_('Automatic or fixed graph size scaling value'),
-            usertext=_('Scaling'),
+            usertext=_('Size'),
             formatting=True ))
 
         s.add( setting.Choice(
@@ -394,7 +394,7 @@ class Graph3D(widget.Widget):
         scene, camera = self.makeScene(painter)
 
         # finally render the scene
-        scale = self.settings.scaling
+        scale = self.settings.size
         if scale == 'Auto':
             scale = -1
         with painter:
@@ -412,12 +412,12 @@ class Graph3D(widget.Widget):
             return self
         scene, camera = self.makeScene(painter)
 
-        scale = self.settings.scaling
-        if scale == 'Auto':
-            scale = -1
+        sizescale = self.settings.size
+        if sizescale == 'Auto':
+            sizescale = -1
         widgetid = scene.idPixel(
             root, painter, camera,
-            bounds[0], bounds[1], bounds[2], bounds[3], scale,
+            bounds[0], bounds[1], bounds[2], bounds[3], sizescale,
             scaling, x, y)
 
         # recursive check id of children against returned value
