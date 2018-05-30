@@ -17,9 +17,8 @@ In Veusz the document is built in an object-oriented fashion, where a
 document is built up by a number of widgets in a hierarchy. For
 example, multiple function or xy widgets can be placed inside a graph
 widget, and many graphs can be placed in a grid widget. The program
-also supports a variety of 3D plots inside a 3D graph widget,
-including 3D point and surface plots. The program produces vector
-rather than rastered 3D output.
+also supports a variety of 3D plots, including 3D point and surface
+plots. The program produces vector rather than rastered 3D output.
 
 Veusz can be extended by the user easily by adding plugins. Support
 for different data file types can be added with import
@@ -223,27 +222,39 @@ The widget types include
       to 100 per cent.This is a non-orthogonal plot and is placed
       directly on the page rather than in a graph.
 
-#. 3D widgets - 3D graphs can be created by adding a 3D graph widget
-   to a blank page (:command:`graph3d`). The 3D graph has settings
-   which control the angle the rotation angle of the plot, the
-   position and color of lighting and the rendering method.
+#. 3D widgets - 3D graphs can be created by adding a 3D scene widget
+   (:command:`scene3d`) to a blank page, or by creating a new 3D
+   document. The 3D scene has settings which control the angle the
+   rotation angle of the plot, the position and color of lighting and
+   the rendering method.
 
    To build up a 3D plot the following widgets can be placed inside
    it:
 
+   #. :command:`graph3d` - this is an analogous widget to the 2D graph
+      widget, plotting a 3D plot with cartesian axes. It contains
+      three or more axis3d widgets, and plotting widgets. The graph
+      contains settings for the graph size (the default is 1 in each
+      direction) and the 3D position of the graph in the same
+      units. Multiple graph widgets can be added to a scene, though
+      the position and sizes may need to be adjusted.
    #. :command:`axis3d` - normally a 3D graph has three axes (X, Y and
       Z), but more axes can be added to plot multiple things on a single
       axis direction. This works in a similar way to the 2D axis
       widget. The widget has options for the axis label, tick labels,
       tick marks and grid lines (which appear on the outside of the 3D
-      cube).
+      cube). An axis can be swiched between linear and logorithmic
+      mode. Scalings can be applied to the data values plotted in that
+      dimension or to the axis labels.
    #. :command:`point3d` - for plotting points, and optionally
-      connecting lines, in 3D. The user provides three 1D datasets for
-      the x, y and z values. The markers can be scaled in size by
-      another optional dataset. The markers can also be colored
-      according to another optional dataset, according to a color map,
-      minimum and maximum. Error bars can be provided for each of the
-      x, y and z datasets. The connecting line can also be colored if a color 
+      connecting lines, in 3D. This, and the other plotting widgets
+      are placed in a graph3d widget. The user provides three 1D
+      datasets for the x, y and z values. The markers can be scaled in
+      size by another optional dataset. The markers can also be
+      colored according to another optional dataset, according to a
+      color map, minimum and maximum. Error bars can be provided for
+      each of the x, y and z datasets. The connecting line can also be
+      colored if a color dataset is provided and a colormap chosen.
    #. :command:`function3d` - for plotting either a functional line in
       3D space or a functional surface. The type of plot is given by
       the mode parameter. In the case of the line, the x,y,z
@@ -525,8 +536,8 @@ first day of week), `x` date representation, `X` time representation,
 Veusz addon format which shows seconds and fractions of seconds
 (e.g. 12.2).
 
-Three dimensional plots
------------------------
+Three dimensional (3D) plots
+----------------------------
 
 When drawing in three dimensions, Veusz builds up a 3D "scene" for the
 graph from the various plotting widgets, made up of triangles, line
@@ -536,7 +547,7 @@ that it can produce vector rather than bitmap or raster
 output. OpenGL, for example, is based around bitmaps.
 
 Veusz applies lighting to the scene. The lighting depends on
-enabled light sources, which are set in the graph3d widget. Light
+enabled light sources, which are set in the scene3d widget. Light
 sources have a color, intensity and position. Note that only the angle
 of the light to a surface affects its lighting, not its
 distance. Normally each solid surface has an intrinsic color, which
@@ -550,7 +561,7 @@ scene. It draws from the back of scene to the front. The main problem
 with this algorithm is that shapes and lines overlapping in depth can
 be confused as the depth of each object is calculated at only one
 point. In addition objects may intersect, which is not properly
-treated. In the graph3d object, the user can switch to a different
+treated. In the scene3d object, the user can switch to a different
 rendering mode called BSP. In this accurate BSP mode, the objects are
 split so that they never overlap from any viewing angle. The
 disadvantage of this mode is that it is slow, uses a lot of memory and
@@ -558,35 +569,41 @@ produces large output files. We plan in future to add another mode
 which handles overlaps better and does not unnecessarily split
 objects.
 
-The plot is affected by the viewing angle (or plot rotation), which is
-specified in the graph3d widget settings. The rotation is given be
-three rotations around lines in X, Y and Z directions (note that these
-are not the same directions as the X, Y and Z axes!). The X axis runs
-horizontally on the screen, the Y axis runs vertically, and the Z axis
-runs along the line of sight.
+The plot is affected by the viewing angle, which is specified in the
+scene3d widget settings. The rotation is given be three rotations
+around lines in X, Y and Z directions (note that these are not the
+same directions as the X, Y and Z axes!). The X axis runs horizontally
+on the screen, the Y axis runs vertically, and the Z axis runs along
+the line of sight.
 
-There is also a distance setting, which moves the graph closer to or
-away from the viewer. At larger distances the effect of perspective
+There is also a distance setting, which moves graphs closer to or away
+from the viewer. At larger distances the effect of perspective
 reduces, meaning that parts of the plot closer to the viewer are not
 larger than if they were at the farthest side. At large distances, a
 plot tends towards being isometric. At small distances, shapes are
 more distorted (note by default the size of the graph is 1 in these
-distance units). By default, Veusz enlarges the 3D rendered scene to
-fill the bounds of the 3D graph widget, so distance has no effect on
-the size of the plot. This can be switched off by modifying the Size
-setting from "Auto" to a fixed number. A fixed size is useful if the
-user wants the graph to be the same size for any rotation. With this
-setting the size of the graph is affected by its distance.
+distance units). It is currently possible to place graphs inside the
+camera leading to strange output.
 
-By default, a 3D graph has the same dimensions in the X, Y and Z
-axes. The aspect ratio of the plot can be controlled by varying three
-settings controlling the aspect ratio in each direction. Note that
-only the ratios of these quantities matter, not their absolute values.
+By default, Veusz enlarges the 3D rendered scene to fill the bounds of
+the 3D scene widget, so distance has no effect on the size of the
+plot. This scaling can be switched off by modifying the Size setting
+from "Auto" to a fixed number. A fixed size is useful if the user
+wants a graph to be the same size for any rotation. With this setting
+the size of the plot is affected by their distance.
+
+By default, a 3D graph has dimensions of 1 along the X, Y and Z
+axes. The size can be adjusted using the size settings in the graph3d
+widget. Care should be taken that the graph size does not lead to
+points being at negative viewing distances. The default position of
+the plot is at the origin 0,0,0. If the user wants to plot multiple
+graph3d widgets, the positions should be adjusted to prevent overlap.
 
 Normally in Veusz, sizes of objects (e.g. plot markers) are given in
 physical units. This makes less sense for a 3D plot as sizes can
-depend on distance. In a 3D graph sizes are given in 1/1000 of the
-graph bounding box maximum size.
+depend on distance. In a 3D graph sizes of plotting markers and line
+widths are given in 1/1000 of the graph bounding box maximum
+dimension.
 
 The main window
 ===============
