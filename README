@@ -13,7 +13,7 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Changes in 3.0:
- * New 3D support for plotting points, surfaces and volumes
+ * New 3D support for plotting points, functions, surfaces and volumes
  * Add --export-option parameter for command line exporting control
  * Add templates in preferences for exported file names, add %PAGE00% and
    %PAGE000% options for zero-prefixed page numbers, and change %PAGENUM%
