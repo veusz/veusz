@@ -60,7 +60,7 @@ class Surface3D(plotters3d.GenericPlotter3D):
         s.add(setting.Choice(
             'mode', klass.modes,
             'z(x,y)',
-            descr=_('Directions to plot surface'),
+            descr=_('Axes of plot surface'),
             usertext=_('Mode')),
               0)
         s.add(setting.DatasetExtended(

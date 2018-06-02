@@ -231,9 +231,9 @@ class Graph3D(widget.Widget):
         cont.objM = (
             # graph position
             threed.translationM4(threed.Vec3(
-                s.xPos-0.5*s.xSize,
-                s.yPos-0.5*s.ySize,
-                s.zPos-0.5*s.zSize)) *
+                s.xPos - 0.5*s.xSize,
+                s.yPos - 0.5*s.ySize,
+                s.zPos - 0.5*s.zSize)) *
             # graph size
             threed.scaleM4(threed.Vec3(s.xSize, s.ySize, s.zSize))
         )
