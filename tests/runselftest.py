@@ -92,9 +92,11 @@ excluded_tests = set([
         'mathml.vsz',
 
         # 3d rendering needs more work
+        '3d_errors.vsz',
         '3d_function.vsz',
         '3d_points.vsz',
         '3d_surface.vsz',
+        '3d_volume.vsz',
     ])
 
 class StupidFontMetrics(object):
