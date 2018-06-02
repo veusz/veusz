@@ -24,6 +24,7 @@ import numpy as N
 from .base import DatasetBase
 from .oned import Dataset
 from .twod import Dataset2D
+from .nd import DatasetND
 from .text import DatasetText
 
 from ..compat import cstr
@@ -35,11 +36,13 @@ def valsToDataset(vals, datatype, dimensions):
         try:
             nvals = N.array(vals, dtype=N.float64)
 
-            if nvals.ndim == dimensions:
+            if nvals.ndim==dimensions or dimensions=='all':
                 if nvals.ndim == 1:
                     return Dataset(data=nvals)
                 elif nvals.ndim == 2:
                     return Dataset2D(nvals)
+                else:
+                    return DatasetND(nvals)
         except ValueError:
             pass
 

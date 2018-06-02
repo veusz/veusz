@@ -1179,9 +1179,9 @@ class Datasets(Setting):
         out = []
         for name in self.val:
             d = doc.data.get(name)
-            if ( d is not None and
-                 d.datatype == self.datatype and
-                 d.dimensions == self.dimensions ):
+            if (d is not None and
+                d.datatype == self.datatype and
+                (d.dimensions==self.dimensions or self.dimensions=='all')):
                 out.append(d)
         return out
 
@@ -1624,6 +1624,39 @@ class LineSet(Setting):
             if hide:
                 pen.setStyle(qt4.Qt.NoPen)
             return pen
+
+class ColorSet(Setting):
+    """A setting which corresponds to a set of colors.
+    """
+
+    typename='color-multi'
+
+    def normalize(self, val):
+        """Takes a tuple/list of tuples:
+        [('color', False), ...]
+
+        These are color and hide
+        """
+
+        if type(val) not in (list, tuple):
+            raise utils.InvalidType
+
+        # check each entry in the list is appropriate
+        for colorlist in val:
+            try:
+                color, hide = colorlist
+            except ValueError:
+                raise utils.InvalidType
+
+            if ( not isinstance(color, cbasestr) or
+                 type(hide) not in (int, bool) ):
+                raise utils.InvalidType
+
+        return val
+
+    def makeControl(self, *args):
+        """Make specialised lineset control."""
+        return controls.ColorSet(self, *args)
 
 class FillSet(Setting):
     """A setting which corresponds to a set of fills.

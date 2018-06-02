@@ -829,6 +829,8 @@ class TreeEditDock(qt4.QDockWidget):
         self.vzactions['add.surface3d'].setVisible(in3dgraph)
         self.vzactions['add.contour'].setVisible(not in3dgraph)
         self.vzactions['add.volume3d'].setVisible(in3dgraph)
+        self.vzactions['add.bar'].setVisible(not in3dgraph)
+        self.vzactions['add.bar3d'].setVisible(in3dgraph)
 
         # certain actions shouldn't work on root
         isnotroot = not any([isinstance(w, widgets.Root)
@@ -863,7 +865,7 @@ class TreeEditDock(qt4.QDockWidget):
                            'covariance',
                            'scene3d',
                            'graph3d', 'function3d', 'point3d', 'axis3d',
-                           'surface3d', 'volume3d'):
+                           'surface3d', 'volume3d', 'bar3d'):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = slotklass(wc)
@@ -930,6 +932,7 @@ class TreeEditDock(qt4.QDockWidget):
             'add.nonorthpoint',
             'add.point3d',
             'add.bar',
+            'add.bar3d',
             'add.fit',
             'add.function',
             'add.nonorthfunc',

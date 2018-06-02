@@ -27,6 +27,7 @@ from .base import DatasetExpressionException
 from .oned import Dataset1DBase, Dataset
 from .twod import Dataset2DBase, Dataset2D
 from .text import DatasetText
+from .nd import DatasetND
 
 from ..compat import czip, crange, cstr, crepr
 from .. import utils
@@ -152,6 +153,7 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
                         nerr=vals[2,:])
                 else:
                     err = _('Expression has wrong dimensions')
+
         elif dimensions == 2 and vals.ndim == 2:
             # try to use dimensions of first-substituted dataset
             dsrange = {}
@@ -185,17 +187,21 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
 
     d = doc.data.get(origexpr)
 
-    if ( d is not None and
-         d.datatype == datatype and
-         d.dimensions == dimensions ):
-        return d
+    compatdim = d is not None and (
+        d.data.ndim==dimensions or dimensions=='all')
 
     # support nD datasets by converting to requested shape
-    if d is not None and d.dimensions == -1 and d.data.ndim == dimensions:
-        if dimensions == 1:
+    if compatdim and d.dimensions==-1:
+        if dimensions==1 and d.data.ndim==1:
             return Dataset(d.data)
-        elif dimensions == 2:
+        elif dimensions == 2 and d.data.ndim==2:
             return Dataset2D(d.data)
+        else:
+            return DatasetND(d.data)
+
+    # normal datasets
+    if compatdim and d.datatype==datatype:
+        return d
 
     if utils.id_re.match(origexpr):
         # if name is a python identifier, then it has to be a dataset

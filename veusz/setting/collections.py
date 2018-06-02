@@ -411,7 +411,7 @@ class DataColor(Settings):
             'points', '',
             descr = _('Use color value (0-1) in dataset'),
             dimensions=dimensions,
-            usertext=_('Color')) )
+            usertext=_('Color dataset')) )
         self.add( setting.Float(
             'min', 0.,
             descr = _('Minimum value of color dataset'),

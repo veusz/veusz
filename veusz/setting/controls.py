@@ -1328,6 +1328,25 @@ class ListSet(qt4.QFrame):
             pix.fill(qcolor)
             sender.setIcon(qt4.QIcon(pix))
 
+class ColorSet(ListSet):
+    """A list of colors. """
+
+    def __init__(self, setting, parent):
+        ListSet.__init__(
+            self, ('auto', False), setting, parent)
+
+    def populateRow(self, row):
+        """Add the widgets for the row given."""
+
+        wcolor = self.addColorButton(_('Fill color'))
+        whide = self.addToggleButton( _('Hide fill'))
+        return [wcolor, whide]
+
+    def updateRow(self, cntrls, val):
+        """Update controls with row settings."""
+        self.updateColorButton(cntrls[0], val[0])
+        self.updateToggleButton(cntrls[1], val[1])
+
 class LineSet(ListSet):
     """A list of line styles.
     """
