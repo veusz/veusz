@@ -585,16 +585,16 @@ class Lighting3D(Settings):
             usertext=_('Intensity')) )
         self.add( setting.FloatSlider(
             'x', 0.,
-            minval=-20, maxval=20, tick=5., scale=0.1, step=1.,
+            minval=-40, maxval=40, tick=10., scale=0.1, step=1.,
             descr=_('X coordinate of light (positive is right)'),
             usertext=_('X position')) )
         self.add( setting.FloatSlider(
             'y', 0.,
-            minval=-20, maxval=20, tick=5., scale=0.1, step=1.,
+            minval=-40, maxval=40, tick=10., scale=0.1, step=1.,
             descr=_('Y coordinate of light (positive is below)'),
             usertext=_('Y position')) )
         self.add( setting.FloatSlider(
-            'z', 10,
-            minval=-20, maxval=20, tick=4., scale=0.1, step=1.,
+            'z', 0.,
+            minval=-40, maxval=40, tick=10., scale=0.1, step=1.,
             descr=_('Z coordinate of light (positive is towards viewer)'),
             usertext=_('Z position')) )

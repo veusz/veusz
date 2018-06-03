@@ -1,6 +1,7 @@
-# Veusz saved document (version 3.0)
-# Saved at 2018-05-27T10:23:50.887215
+# Veusz saved document (version 2.99)
+# Saved at 2018-06-03T10:51:35.407722
 
+AddImportPath(u'/home/jss/code/veusz/examples')
 ImportString(u'x(numeric)','''
 6.575945e-01
 -4.597165e-01
@@ -3018,6 +3019,7 @@ To(u'scene3d1')
 Set('xRotation', -40.0)
 Set('yRotation', 62.0)
 Set('zRotation', -142.0)
+Set('Lighting2/x', -2.0)
 Add('graph3d', name=u'graph3d1', autoadd=False)
 To(u'graph3d1')
 Add('axis3d', name=u'x', autoadd=False)

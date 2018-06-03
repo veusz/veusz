@@ -206,7 +206,9 @@ class Scene3D(widget.Widget):
         for light in s.Lighting1, s.Lighting2, s.Lighting3:
             if light.enable:
                 scene.addLight(
-                    threed.Vec3(light.x, light.y, light.z),
+                    # FIXME: z and y negative here to make direction
+                    # correct relative to camera origin
+                    threed.Vec3(light.x, -light.y, -light.z),
                     light.get('color').color(painter),
                     light.intensity*0.01)
 

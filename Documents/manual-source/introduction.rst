@@ -546,13 +546,15 @@ drawing method, but renders the scene itself. The advantage of this is
 that it can produce vector rather than bitmap or raster
 output. OpenGL, for example, is based around bitmaps.
 
-Veusz applies lighting to the scene. The lighting depends on
-enabled light sources, which are set in the scene3d widget. Light
-sources have a color, intensity and position. Note that only the angle
-of the light to a surface affects its lighting, not its
-distance. Normally each solid surface has an intrinsic color, which
-can be seen without any lighting. If a light source is enabled, the
-color of the light is added to the surface color, depending on the
+Veusz applies lighting to the scene. The lighting depends on enabled
+light sources, which are set in the scene3d widget. Light sources have
+a color, intensity and position. Note that only the angle of the light
+to a surface affects its lighting, not its distance. The position of
+the light is relative to the viewer (camera), not the graph. Positive
+light coordinates are towards the graph (z), upwards (y) and
+rightwards (x). Normally each solid surface has an intrinsic color,
+which can be seen without any lighting. If a light source is enabled,
+the color of the light is added to the surface color, depending on the
 reflectivity of the surface. Each surface also has a transparency
 setting.
 

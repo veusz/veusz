@@ -1,5 +1,5 @@
-# Veusz saved document (version 3.0)
-# Saved at 2018-05-27T09:42:14.332171
+# Veusz saved document (version 2.99)
+# Saved at 2018-06-03T10:50:08.474574
 
 SetData2DXYFunc(u'radius', (-10.0, 10.0, 0.5), (-10.0, 10.0, 0.5), u'sqrt(x**2+y**2)', linked=True)
 SetData2DXYFunc(u'sincfn', (-10.0, 10.0, 0.5), (-10.0, 10.0, 0.5), u'sin(sqrt(x**2+y**2))/(sqrt(x**2+y**2)+0.2)', linked=True)
@@ -14,8 +14,7 @@ Set('yRotation', -166.0)
 Set('zRotation', 0.0)
 Set('Lighting1/enable', True)
 Set('Lighting1/intensity', 50.0)
-Set('Lighting1/x', 0.0)
-Set('Lighting1/z', 7.0)
+Set('Lighting1/z', -7.0)
 Add('graph3d', name=u'graph3d1', autoadd=False)
 To(u'graph3d1')
 Set('zSize', 0.7)
