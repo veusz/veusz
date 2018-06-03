@@ -18,7 +18,7 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
-%Module(name=threed, version=0)
+%Module(name=threed)
 
 %Import(name=QtCore/QtCoremod.sip)
 %Import(name=QtGui/QtGuimod.sip)
