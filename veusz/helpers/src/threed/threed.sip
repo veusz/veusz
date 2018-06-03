@@ -251,8 +251,11 @@ struct LineProp /NoDefaultCtors/
 
   LineProp(double r=0, double g=0, double b=0,
 	   double trans=0,
-	   double width=1, bool hide=0) /KeywordArgs="All"/;
+	   double width=1,
+           bool hide=0,
+           Qt::PenStyle style=Qt::SolidLine) /KeywordArgs="All"/;
   void setRGBs(const QImage& img);
+  void setDashPattern(const ValVector& vec);
 
   double r;
   double g;

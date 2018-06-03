@@ -128,7 +128,12 @@ QPen Scene::lineProp2QPen(const Fragment& frag, double linescale) const
   else
     col = p->color(frag.index);
 
-  return QPen(QBrush(col), p->width*linescale);
+  QPen pen( QPen(QBrush(col), p->width*linescale, p->style) );
+
+  if(!p->dashpattern.empty())
+    pen.setDashPattern(p->dashpattern);
+
+  return pen;
 }
 
 // calculate color, including reflection

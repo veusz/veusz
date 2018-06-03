@@ -25,6 +25,9 @@
 #include <algorithm>
 #include <QtGui/QColor>
 #include <QtGui/QImage>
+#include <QtGui/QPen>
+
+#include "mmaths.h"
 
 // These classes describe the color and properties of a surface or line
 
@@ -81,15 +84,26 @@ struct LineProp
 {
   LineProp(double _r=0, double _g=0, double _b=0,
 	   double _trans=0,
-	   double _width=1, bool _hide=0)
+	   double _width=1,
+           bool _hide=0,
+           Qt::PenStyle _style=Qt::SolidLine)
     : r(_r), g(_g), b(_b),
       trans(_trans),
-      width(_width), hide(_hide), _ref_cnt(0)
+      width(_width),
+      hide(_hide),
+      style(_style),
+      _ref_cnt(0)
   {
   }
 
   bool hasRGBs() const { return !rgbs.empty(); };
   void setRGBs(const QImage& img) { _qimage2rgbvec(img, rgbs); }
+  void setDashPattern(const ValVector& vec)
+  {
+    dashpattern.clear();
+    for(auto v : vec)
+      dashpattern << v;
+  }
 
   QColor color(unsigned idx) const
   {
@@ -106,6 +120,8 @@ struct LineProp
   double width;
   RGBVec rgbs;
   bool hide;
+  Qt::PenStyle style;
+  QVector<qreal> dashpattern;
 
   // used to reference count usages by Object() instances
   mutable unsigned _ref_cnt;

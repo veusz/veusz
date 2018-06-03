@@ -472,11 +472,13 @@ class Line3D(Settings):
 
         col = self.get('color').color(painter)
         from ..helpers import threed
-        return threed.LineProp(
+        prop = threed.LineProp(
             r=col.redF(), g=col.greenF(), b=col.blueF(),
             trans=self.transparency*0.01,
-            width=width)
-#            style=style, dashpattern=dash)
+            width=width, style=style)
+        if dash is not None:
+            prop.setDashPattern(threed.ValVector(dash))
+        return prop
 
 class Surface3D(Settings):
     '''3d surface properties.'''
