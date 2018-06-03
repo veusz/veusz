@@ -945,6 +945,31 @@ class PartBar(Part):
                                      state.y-height+penw))
         painter.restore()
 
+class PartHat(Part):
+    """Draw a hat over text."""
+
+    def render(self, state):
+        initx = state.x
+
+        # draw material under bar
+        Part.render(self, state)
+
+        # draw line over text with 0.5pt thickness
+        painter = state.painter
+        height = state.fontMetrics().ascent()
+
+        painter.save()
+        penw = state.getPixelsPerPt()*0.5
+        painter.setPen( qt4.QPen(painter.pen().brush(), penw) )
+        hatheight = min((state.x-initx)/2, height / 3.)
+        painter.drawLine(
+            qt4.QPointF(initx, state.y-height+penw),
+            qt4.QPointF((initx+state.x)/2, state.y-height+penw-hatheight))
+        painter.drawLine(
+            qt4.QPointF((initx+state.x)/2, state.y-height+penw-hatheight),
+            qt4.QPointF(state.x, state.y-height+penw))
+        painter.restore()
+
 class PartDot(Part):
     """Draw a dot over text."""
 
@@ -1031,6 +1056,7 @@ part_commands = {
     r'\frac': (PartFrac, 2),
     r'\bar': (PartBar, 1),
     r'\overline': (PartBar, 1),
+    r'\hat': (PartHat, 1),
     r'\dot': (PartDot, 1),
     r'\marker': (PartMarker, 1),
     r'\color': (PartColor, 2),

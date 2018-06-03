@@ -9,6 +9,7 @@ Changes in 3.0:
    arrow to PDFs
  * Use flat cap on lines with arrows, to avoid line showing through head
  * Support datetime64 and string/unicode characters in npy/npz import
+ * Add \hat LaTeX support
 
 Changes in 2.2.2:
  * Fix zoom for polar, ternary and broken axis plots
