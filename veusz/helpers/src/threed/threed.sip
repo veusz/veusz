@@ -42,7 +42,7 @@ struct Vec4
 
   void set(unsigned, double);
 %MethodCode
-    if(a0 < 0 || a0 > 3)
+    if(a0 > 3)
       {
 	sipIsErr = 1;
 	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=3");
@@ -52,7 +52,7 @@ struct Vec4
 %End
   double get(unsigned) const;
 %MethodCode
-    if(a0 < 0 || a0 > 3)
+    if(a0 > 3)
       {
 	sipIsErr = 1;
 	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=3");
@@ -83,7 +83,7 @@ struct Vec3
 
   void set(unsigned, double);
 %MethodCode
-    if(a0 < 0 || a0 > 2)
+    if(a0 > 2)
       {
 	sipIsErr = 1;
 	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=2");
@@ -93,7 +93,7 @@ struct Vec3
 %End
   double get(unsigned) const;
 %MethodCode
-    if(a0 < 0 || a0 > 2)
+    if(a0 > 2)
       {
 	sipIsErr = 1;
 	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=2");
@@ -122,7 +122,7 @@ struct Mat4
   Mat4();
   void set(unsigned, unsigned, double);
 %MethodCode
-    if(a0 < 0 || a0 > 3 || a1 < 0 || a1 > 3)
+    if(a0 > 3 || a1 > 3)
       {
 	sipIsErr = 1;
 	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=3");
@@ -132,7 +132,7 @@ struct Mat4
 %End
   double get(unsigned, unsigned) const;
 %MethodCode
-    if(a0 < 0 || a0 > 3 || a1 < 0 || a1 > 3)
+    if(a0 > 3 || a1 > 3)
       {
 	sipIsErr = 1;
 	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=3");
@@ -160,7 +160,7 @@ struct Mat3
   Mat3();
   void set(unsigned, unsigned, double);
 %MethodCode
-    if(a0 < 0 || a0 > 2 || a1 < 0 || a1 > 2)
+    if(a0 > 2 || a1 > 2)
       {
 	sipIsErr = 1;
 	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=2");
@@ -170,7 +170,7 @@ struct Mat3
 %End
   double get(unsigned, unsigned) const;
 %MethodCode
-    if(a0 < 0 || a0 > 2 || a1 < 0 || a1 > 2)
+    if(a0 > 2 || a1 > 2)
       {
 	sipIsErr = 1;
 	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=2");
