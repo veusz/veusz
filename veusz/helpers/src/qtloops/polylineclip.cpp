@@ -382,7 +382,7 @@ bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b)
 {
   for(auto const& poly : {a, b})
     {
-      QPointF prevpt(poly.constLast());
+      QPointF prevpt(poly.last());
 
       for(auto const& currpt : poly)
         {
