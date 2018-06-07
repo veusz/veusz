@@ -42,7 +42,7 @@ class FunctionLine(setting.Line3DWColorMap):
     def __init__(self, *args, **argsv):
         setting.Line3DWColorMap.__init__(self, *args, **argsv)
         self.get('color').newDefault(setting.Reference('../color'))
-        self.get('reflectivity').newDefault(40)
+        self.get('reflectivity').newDefault(20)
 
 class Function3D(plotters3d.GenericPlotter3D):
     """Plotting functions in 3D."""
