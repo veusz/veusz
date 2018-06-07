@@ -50,6 +50,7 @@ class PlotLine3D(setting.Line3D):
             usertext = _('Invert map'),
             formatting=True) )
         self.get('color').newDefault(setting.Reference('../color'))
+        self.get('reflectivity').newDefault(40)
 
 class MarkerFill3D(setting.Surface3DWColorMap):
     """Fill for markers."""

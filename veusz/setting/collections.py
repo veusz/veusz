@@ -447,12 +447,16 @@ class Line3D(Settings):
             'style', 'solid',
             descr = _('Line style'),
             usertext=_('Style')) )
-        self.add( setting.Int(
-            'transparency', 0,
-            descr = _('Transparency percentage'),
-            usertext = _('Transparency'),
-            minval = 0,
-            maxval = 100 ) )
+        self.add( setting.FloatSlider(
+            'transparency', 0.,
+            minval=0., maxval=100., tick=20., scale=1., step=5.,
+            descr=_('Transparency percentage'),
+            usertext=_('Transparency')) )
+        self.add( setting.FloatSlider(
+            'reflectivity', 0.,
+            minval=0., maxval=100., tick=20., scale=1., step=5.,
+            descr=_('Reflectivity percentage'),
+            usertext=_('Reflectivity')) )
         self.add( setting.Bool(
             'hide', False,
             descr = _('Hide the line'),
@@ -475,6 +479,7 @@ class Line3D(Settings):
         prop = threed.LineProp(
             r=col.redF(), g=col.greenF(), b=col.blueF(),
             trans=self.transparency*0.01,
+            refl=self.reflectivity*0.01,
             width=width, style=style)
         if dash is not None:
             prop.setDashPattern(threed.ValVector(dash))

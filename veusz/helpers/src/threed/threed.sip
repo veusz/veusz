@@ -251,6 +251,7 @@ struct LineProp /NoDefaultCtors/
 
   LineProp(double r=0, double g=0, double b=0,
 	   double trans=0,
+           double refl=0,
 	   double width=1,
            bool hide=0,
            Qt::PenStyle style=Qt::SolidLine) /KeywordArgs="All"/;
@@ -261,6 +262,7 @@ struct LineProp /NoDefaultCtors/
   double g;
   double b;
   double trans;
+  double refl;
   double width;
   bool hide;
 };

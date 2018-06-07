@@ -281,11 +281,11 @@ The widget types include
       lines and the surface drawn by eight triangles.
    #. :command:`volume3d` - for plotting 3D volumes. In this widget,
       for a volume described by A×B×C values, then the user should
-      provide four datasets, each containing A×B×C values. Three of
-      the datasets give coordinates of the centers of the 3D cells and
-      the fourth the color of the cell. An example set of datasets
-      would be X=(0,0,0,0,1,1,1,1), Y=(0,0,1,1,0,0,1,1),
-      Z=(0,1,0,1,0,1,0,1),
+      provide four datasets, each containing up to A×B×C values (there
+      can be holes in the representation). Three of the datasets give
+      coordinates of the centers of the 3D cells and the fourth the
+      color of the cell. An example set of datasets would be
+      X=(0,0,0,0,1,1,1,1), Y=(0,0,1,1,0,0,1,1), Z=(0,1,0,1,0,1,0,1),
       color=(0.1,0.2,0.3,0.4,0.3,0.2,0.1,0). Additionally, the user
       can provide a transparency dataset, which can be useful for
       showing or hiding parts of the 3D space.

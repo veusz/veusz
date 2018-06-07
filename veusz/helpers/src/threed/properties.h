@@ -84,11 +84,13 @@ struct LineProp
 {
   LineProp(double _r=0, double _g=0, double _b=0,
 	   double _trans=0,
+           double _refl=0,
 	   double _width=1,
            bool _hide=0,
            Qt::PenStyle _style=Qt::SolidLine)
     : r(_r), g(_g), b(_b),
       trans(_trans),
+      refl(_refl),
       width(_width),
       hide(_hide),
       style(_style),
@@ -117,6 +119,7 @@ struct LineProp
 
   double r, g, b;
   double trans;
+  double refl;
   double width;
   RGBVec rgbs;
   bool hide;

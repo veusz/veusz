@@ -31,9 +31,6 @@
 #include "fragment.h"
 #include "bsp.h"
 
-// gamma value used in calculating brightness for lighting
-#define GAMMA 2.2
-
 namespace
 {
   // Make scaling matrix to move points to correct output range
@@ -124,7 +121,7 @@ QPen Scene::lineProp2QPen(const Fragment& frag, double linescale) const
 
   QColor col;
   if(frag.usecalccolor)
-    col = QColor::fromRgb(frag.calccolor);
+    col = QColor::fromRgba(frag.calccolor);
   else
     col = p->color(frag.index);
 
@@ -265,7 +262,8 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
                   lsurf = 0;
                 }
               if(ltype != frag.type || lline != frag.lineprop ||
-                 ((frag.lineprop!=0 && frag.lineprop->hasRGBs())))
+                 (frag.lineprop!=0 && (frag.lineprop->hasRGBs() ||
+                                       frag.usecalccolor)))
                 {
                   lline = frag.lineprop;
                   painter->setPen(lineProp2QPen(frag, linescale));
@@ -309,6 +307,98 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
     }
 }
 
+void Scene::calcLightingTriangle(Fragment& frag)
+{
+  // Calculate triangle norm. Make sure norm points towards
+  // the viewer @ (0,0,0)
+  Vec3 tripos = (frag.points[0] + frag.points[1] +
+                 frag.points[2]) * (1./3.);
+  Vec3 norm = cross(frag.points[1] - frag.points[0],
+                    frag.points[2] - frag.points[0]);
+  if(dot(tripos, norm)<0)
+    norm = -norm;
+  norm.normalise();
+
+  // get color of surface
+  const SurfaceProp* prop = frag.surfaceprop;
+  if(prop->refl==0.)
+    return;
+
+  double r, g, b, a;
+  if(prop->hasRGBs())
+    {
+      QRgb rgb = prop->
+        rgbs[std::min(frag.index, unsigned(prop->rgbs.size())-1)];
+      r=qRed(rgb)*(1./255.); g=qGreen(rgb)*(1./255.);
+      b=qBlue(rgb)*(1./255.); a=qAlpha(rgb)*(1./255.);
+    }
+  else
+    {
+      r=prop->r; g=prop->g; b=prop->b; a=1-prop->trans;
+    }
+
+  // add lighting contributions
+  for(auto const& light : lights)
+    {
+      // Now dot vector from light source to triangle with norm
+      Vec3 light2tri = tripos-light.posn;
+      light2tri.normalise();
+
+      // add new lighting index
+      double dotprod = std::max(0., dot(light2tri, norm));
+
+      double delta = prop->refl * dotprod;
+      r += delta*light.r; g += delta*light.g; b += delta*light.b;
+    }
+
+  frag.calccolor = qRgba( clip(int(r*255), 0, 255),
+                          clip(int(g*255), 0, 255),
+                          clip(int(b*255), 0, 255),
+                          clip(int(a*255), 0, 255) );
+  frag.usecalccolor = 1;
+}
+
+void Scene::calcLightingLine(Fragment& frag)
+{
+  const LineProp* prop = frag.lineprop;
+  if(prop->refl==0.)
+    return;
+
+  double r, g, b, a;
+  if(prop->hasRGBs())
+    {
+      QRgb rgb = prop->
+        rgbs[std::min(frag.index, unsigned(prop->rgbs.size())-1)];
+      r=qRed(rgb)*(1./255.); g=qGreen(rgb)*(1./255.);
+      b=qBlue(rgb)*(1./255.); a=qAlpha(rgb)*(1./255.);
+    }
+  else
+    {
+      r=prop->r; g=prop->g; b=prop->b; a=1-prop->trans;
+    }
+
+  Vec3 pmid = (frag.points[0]+frag.points[1])*0.5;
+  Vec3 linevec(frag.points[1]-frag.points[0]);
+  linevec.normalise();
+
+  // add lighting contributions
+  for(auto const& light : lights)
+    {
+      Vec3 light_to_pmid(light.posn-pmid);
+      light_to_pmid.normalise();
+      // this is sin of angle between line segment and light
+      double sintheta = cross(linevec, light_to_pmid).rad();
+      double delta = prop->refl * sintheta;
+      r += delta*light.r; g += delta*light.g; b += delta*light.b;
+    }
+
+  frag.calccolor = qRgba( clip(int(r*255), 0, 255),
+                          clip(int(g*255), 0, 255),
+                          clip(int(b*255), 0, 255),
+                          clip(int(a*255), 0, 255) );
+  frag.usecalccolor = 1;
+}
+
 void Scene::calcLighting()
 {
   // lighting is full on
@@ -317,53 +407,18 @@ void Scene::calcLighting()
 
   for(auto &frag : fragments)
     {
-      if(frag.type == Fragment::FR_TRIANGLE && frag.surfaceprop != 0)
+      switch(frag.type)
         {
-          // Calculate triangle norm. Make sure norm points towards
-          // the viewer @ (0,0,0)
-          Vec3 tripos = (frag.points[0] + frag.points[1] +
-                         frag.points[2]) * (1./3.);
-          Vec3 norm = cross(frag.points[1] - frag.points[0],
-                            frag.points[2] - frag.points[0]);
-          if(dot(tripos, norm)<0)
-            norm = -norm;
-          norm.normalise();
-
-          // get color of surface
-          const SurfaceProp* prop = frag.surfaceprop;
-          double r, g, b, a;
-
-          if(prop->hasRGBs())
-            {
-              QRgb rgb = prop->
-                rgbs[std::min(frag.index, unsigned(prop->rgbs.size())-1)];
-              r=qRed(rgb)*(1./255.); g=qGreen(rgb)*(1./255.);
-              b=qBlue(rgb)*(1./255.); a=qAlpha(rgb)*(1./255.);
-            }
-          else
-            {
-              r=prop->r; g=prop->g; b=prop->b; a=1-prop->trans;
-            }
-
-          // add lighting contributions
-          for(auto const& light : lights)
-            {
-              // Now dot vector from light source to triangle with norm
-              Vec3 light2tri = tripos-light.posn;
-              light2tri.normalise();
-
-              // add new lighting index
-              double dotprod = std::max(0., dot(light2tri, norm));
-
-              double delta = prop->refl * dotprod;
-              r += delta*light.r; g += delta*light.g; b += delta*light.b;
-            }
-
-          frag.calccolor = qRgba( clip(int(r*255), 0, 255),
-                                  clip(int(g*255), 0, 255),
-                                  clip(int(b*255), 0, 255),
-                                  clip(int(a*255), 0, 255) );
-          frag.usecalccolor = 1;
+        case Fragment::FR_TRIANGLE:
+          if(frag.surfaceprop != 0)
+            calcLightingTriangle(frag);
+          break;
+        case Fragment::FR_LINESEG:
+          if(frag.lineprop != 0)
+            calcLightingLine(frag);
+          break;
+        default:
+          break;
         }
     }
 }

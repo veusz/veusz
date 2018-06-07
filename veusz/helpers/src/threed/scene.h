@@ -73,6 +73,8 @@ public:
 private:
   // calculate lighting norms for triangles
   void calcLighting();
+  void calcLightingTriangle(Fragment& frag);
+  void calcLightingLine(Fragment& frag);
 
   // compute projected coordinates
   void projectFragments(const Camera& cam);
