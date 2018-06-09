@@ -167,11 +167,10 @@ class Scene3D(widget.Widget):
             return
 
         root = threed.ObjectContainer()
-        root.objM = (
-            threed.rotateM4(s.zRotation/180.*math.pi, threed.Vec3(0,0,1)) *
-            threed.rotateM4(s.yRotation/180.*math.pi, threed.Vec3(0,1,0)) *
-            threed.rotateM4(s.xRotation/180.*math.pi, threed.Vec3(1,0,0))
-        )
+        root.objM = threed.rotate3M4(
+            s.xRotation/180.*math.pi,
+            s.yRotation/180.*math.pi,
+            s.zRotation/180.*math.pi)
 
         # build 3d scene from children
         for c in self.children:
@@ -230,6 +229,12 @@ class Scene3D(widget.Widget):
 
         scene, camera = self.makeScene(painter)
 
+        # def ptToScreen(pt):
+        #     pt_v = (camera.viewM*root.objM)*threed.Vec4(pt[0],pt[1],pt[2],1)
+        #     pt_proj = threed.calcProjVec(camera.perspM, pt_v)
+        #     pt_screen = threed.projVecToScreen(scene.screenM, pt_proj)
+        #     return pt_screen,qt.QPointF(pt_screen.get(0), pt_screen.get(1))
+
         # finally render the scene
         scale = self.settings.size
         if scale == 'Auto':
@@ -239,6 +244,14 @@ class Scene3D(widget.Widget):
                 root,
                 painter, camera,
                 bounds[0], bounds[1], bounds[2], bounds[3], scale)
+
+        #     painter.setPen(qt.QPen(qt.Qt.red))
+        #     origin = ptToScreen((0,0,0))[1]
+        #     for axpt in ((0.5,0,0),(0,0.5,0),(0,0,0.5)):
+        #         painter.drawLine(origin, ptToScreen(axpt)[1])
+
+        # axx = threed.Vec4(0,0.5,0,1)
+        # threed.solveInverseRotation(camera.viewM, camera.perspM, scene.screenM, axx, ptToScreen((0,0.5,0))[0])
 
     def identifyWidgetAtPoint(self, painthelper, bounds, scaling, x, y):
         painter = document.PainterRoot()

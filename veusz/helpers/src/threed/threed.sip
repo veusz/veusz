@@ -189,6 +189,7 @@ struct Mat4
 Vec4 operator*(const Vec4& v, const Mat4& o);
 Mat4 identityM4();
 Mat4 rotateM4(double angle, Vec3 vec);
+Mat4 rotate3M4(double ax, double ay, double az);
 Mat4 translationM4(Vec3 vec);
 Mat4 scaleM4(Vec3 scalevec);
 

@@ -258,6 +258,26 @@ inline Mat4 scaleM4(Vec3 s)
   return m;
 }
 
+// rotation matrix in terms of sin and cos of three angles in x,y,z
+// doing z rotation, then y, then x
+inline Mat4 rotate3M4_cs(double sx, double cx, double sy, double cy,
+                         double sz, double cz)
+{
+  Mat4 m(false);
+  m(0,0)=cy*cz; m(0,1)=cz*sx*sy-cx*sz; m(0,2)=cx*cz*sy+sx*sz; m(0,3)=0;
+  m(1,0)=cy*sz; m(1,1)=cx*cz+sx*sy*sz; m(1,2)=cx*sy*sz-cz*sx; m(1,3)=0;
+  m(2,0)=-sy;   m(2,1)=cy*sx;          m(2,2)=cx*cy;          m(2,3)=0;
+  m(3,0)=0;     m(3,1)=0;              m(3,2)=0;              m(3,3)=1;
+  return m;
+}
+
+inline Mat4 rotate3M4(double ax, double ay, double az)
+{
+  return rotate3M4_cs(std::sin(ax), std::cos(ax),
+                      std::sin(ay), std::cos(ay),
+                      std::sin(az), std::cos(az));
+}
+
 ///////////////////////////////////////////////////////////////////////
 // 3-Matrix
 

@@ -66,4 +66,3 @@ Mat4 translationM4(Vec3 vec)
 
   return m;
 }
-
