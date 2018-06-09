@@ -146,6 +146,7 @@ class ExportDialog(VeuszDialog):
 
         # set page mode
         {
+            'range': self.radioPageSingle, # compatibility
             'single': self.radioPageSingle,
             'all': self.radioPageAll,
             'pages': self.radioPagePages,
