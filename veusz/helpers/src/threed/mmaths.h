@@ -465,6 +465,15 @@ inline Vec3 calcProjVec(const Mat4& projM, const Vec3& v)
   return Vec3(nv(0)*inv, nv(1)*inv, nv(2)*inv);
 }
 
+// convert projected coordinates to screen coordinates using screen matrix
+// makes (x,y,depth) -> screen coordinates
+inline Vec2 projVecToScreen(const Mat3& screenM, const Vec3& vec)
+{
+  Vec3 mult(screenM*Vec3(vec(0), vec(1), 1));
+  double inv = 1/mult(2);
+  return Vec2(mult(0)*inv, mult(1)*inv);
+}
+
 // do 2d lines overlap?
 inline bool line2DOverlap(Vec2 A1, Vec2 A2, Vec2 B1, Vec2 B2)
 {

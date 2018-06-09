@@ -86,20 +86,46 @@ namespace
       scaleM3(scaling);
   }
 
-  // convert (x,y,depth) -> screen coordinates
-  QPointF vecToScreen(const Mat3& screenM, const Vec3& vec)
-  {
-    Vec3 mult(screenM*Vec3(vec(0), vec(1), 1));
-    double inv = 1/mult(2);
-    return QPointF(mult(0)*inv, mult(1)*inv);
-  }
-
   template<class T> T clip(const T& val, const T& minval, const T& maxval)
   {
     return std::min(std::max(val, minval), maxval);
   }
 
   unsigned init_fragments_size = 512;
+
+  // This is a bit of a hack to avoid problems with the painter's
+  // algorithm. This idea is to just break up lines with a length over
+  // the maximum into pieces smaller than maxlen.
+  void breakLongLines(FragmentVector& fragments, double maxlen)
+  {
+    const double maxlen2 = maxlen*maxlen;
+    const int size = fragments.size();
+    for(int ifrag=0; ifrag<size; ++ifrag)
+      {
+        Fragment& f=fragments[ifrag];
+        if(f.type == Fragment::FR_LINESEG)
+          {
+            const double len2 = (f.points[1]-f.points[0]).rad2();
+            if(len2 > maxlen2)
+              {
+                const int nbits = int(std::sqrt(len2/maxlen2))+1;
+                const Vec3 delta = (f.points[1]-f.points[0])*(1./nbits);
+
+                // set original to be first segment
+                f.points[1] = f.points[0]+delta;
+
+                // add nbits-1 copies for next segments
+                Fragment tempf(f);
+                for(int ic=1; ic<nbits; ++ic)
+                  {
+                    tempf.points[0] = tempf.points[1];
+                    tempf.points[1] += delta;
+                    fragments.push_back(tempf);
+                  }
+              }
+          }
+      }
+  }
 
 }; // namespace
 
@@ -225,7 +251,11 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
 
       // convert projected points to screen
       for(unsigned pi=0, s=frag.nPointsTotal(); pi<s; ++pi)
-	projpts[pi] = vecToScreen(screenM, frag.proj[pi]);
+        {
+          Vec2 p = projVecToScreen(screenM, frag.proj[pi]);
+          projpts[pi].setX(p(0));
+          projpts[pi].setY(p(1));
+        }
 
       switch(frag.type)
 	{
@@ -431,50 +461,11 @@ void Scene::projectFragments(const Camera& cam)
       f.proj[pi] = calcProjVec(cam.perspM, f.points[pi]);
 }
 
-namespace
-{
-
-  // This is a bit of a hack to avoid problems with the painter's
-  // algorithm. This idea is to just break up lines with a length over
-  // the maximum into pieces smaller than maxlen.
-  void breakLongLines(FragmentVector& fragments, double maxlen)
-  {
-    const double maxlen2 = maxlen*maxlen;
-    const int size = fragments.size();
-    for(int ifrag=0; ifrag<size; ++ifrag)
-      {
-        Fragment& f=fragments[ifrag];
-        if(f.type == Fragment::FR_LINESEG)
-          {
-            const double len2 = (f.points[1]-f.points[0]).rad2();
-            if(len2 > maxlen2)
-              {
-                const int nbits = int(std::sqrt(len2/maxlen2))+1;
-                const Vec3 delta = (f.points[1]-f.points[0])*(1./nbits);
-
-                // set original to be first segment
-                f.points[1] = f.points[0]+delta;
-
-                // add nbits-1 copies for next segments
-                Fragment tempf(f);
-                for(int ic=1; ic<nbits; ++ic)
-                  {
-                    tempf.points[0] = tempf.points[1];
-                    tempf.points[1] += delta;
-                    fragments.push_back(tempf);
-                  }
-              }
-          }
-      }
-  }
-
-} // namespace
-
 void Scene::renderPainters(const Camera& cam)
 {
-  breakLongLines(fragments, 0.25);
-
   calcLighting();
+
+  breakLongLines(fragments, 0.25);
   projectFragments(cam);
 
   // simple painter's algorithm
@@ -615,8 +606,8 @@ void Scene::render_internal(Object* root,
       break;
     }
 
-  // how to transform projected points to screen
-  const Mat3 screenM = scale<=0 ?
+  // how to transform projected points to screen (screenM is member)
+  screenM = scale<=0 ?
     makeScreenM(fragments, x1, y1, x2, y2) :
     makeScreenMFixed(x1, y1, x2, y2, scale);
 

@@ -113,6 +113,47 @@ struct Vec3
   void normalise();
 };
 
+struct Vec2
+{
+%TypeHeaderCode
+#include <mmaths.h>
+%End
+
+  Vec2();
+  Vec2(double, double);
+
+  void set(unsigned, double);
+%MethodCode
+    if(a0 > 1)
+      {
+	sipIsErr = 1;
+	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=1");
+      }
+    else
+      sipCpp->operator()(a0) = a1;
+%End
+  double get(unsigned) const;
+%MethodCode
+    if(a0 > 1)
+      {
+	sipIsErr = 1;
+	PyErr_SetString(PyExc_ValueError, "Index should be 0<=i<=1");
+      }
+    else
+      sipRes = sipCpp->operator()(a0);
+%End
+
+  void operator*=(double);
+  Vec2 operator+(const Vec2&) const;
+  Vec2 operator-(const Vec2&) const;
+  Vec2 operator*(double) const;
+  bool operator==(const Vec2&) const;
+  bool operator!=(const Vec2&) const;
+  double rad2() const;
+  double rad() const;
+  void normalise();
+};
+
 struct Mat4
 {
 %TypeHeaderCode
@@ -220,6 +261,10 @@ public:
   unsigned size() const;
   bool empty() const;
 };
+
+Vec3 calcProjVec(const Mat4& projM, const Vec3& v);
+Vec3 calcProjVec(const Mat4& projM, const Vec4& v);
+Vec2 projVecToScreen(const Mat3& screenM, const Vec3& vec);
 
 /////////////////////////////////////////////////
 // Properties
@@ -497,4 +542,7 @@ class Scene
                double x1, double y1, double x2, double y2,
                double scale,
                double scaling, int x, int y);
+
+ public:
+  Mat3 screenM;
 };

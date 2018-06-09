@@ -70,6 +70,10 @@ public:
                double x1, double y1, double x2, double y2, double scale,
                double scaling, int x, int y);
 
+public:
+  // last screen matrix
+  Mat3 screenM;
+
 private:
   // calculate lighting norms for triangles
   void calcLighting();
