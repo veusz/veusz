@@ -60,7 +60,8 @@ from distutils.command.install_data import install_data
 import pyqtdistutils
 
 # get version
-version = open('VERSION').read().strip()
+with open('VERSION') as verf:
+    version = verf.read().strip()
 
 class install(orig_install):
     user_options = orig_install.user_options + [
