@@ -17,21 +17,20 @@
 ##############################################################################
 
 from __future__ import division, print_function
-import sys
 
 from .settings import Settings
 from . import setting
 from . import collections
 
-from .. import qtall as qt4
+from .. import qtall as qt
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class StyleSheet(Settings):
     """A class for handling default values of settings.
-    
+
     Settings are registered to be added to the stylesheet."""
 
     registeredsettings = []
@@ -73,18 +72,22 @@ StyleSheet.register(StylesheetLine)
 
 def _registerFontStyleSheet():
     """Get fonts, and register default with StyleSheet and Text class."""
-    families = qt4.QFontDatabase().families()
-    
+    families = qt.QFontDatabase().families()
+
     deffont = None
     for f in ('Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
               'Serif'):
         if f in families:
             deffont = f
             break
-            
-    if deffont is None:
-        print("Warning: did not find a sensible default font. Choosing first font.", file=sys.stderr)    
-        deffont = families[0]
+
+    if len(families) == 0:
+        # testing - no fonts available
+        deffont = 'Serif'
+        families = ['Serif']
+    elif deffont is None:
+        print("Warning: did not find a default font. Choosing Qt default font.")
+        deffont = qt.QFontDatabase.systemFont(qt.QFontDatabase.GeneralFont).family()
 
     collections.Text.defaultfamily = deffont
     collections.Text.families = families
