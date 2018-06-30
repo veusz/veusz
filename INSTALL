@@ -39,11 +39,11 @@ pyemf for Python 3 can be found at https://github.com/jeremysanders/pyemf.
 There are a number of ways to install programs using distutils. I will
 list a few of the possible method here:
 
-To install on linux to the standard location on the hard disk follow
-these instructions (note python in theres commands can be replaced by
-python3 to do a python3 installation).
+To install on Linux to the standard location on the hard disk follow
+these instructions (note python in these commands should be replaced
+by python3 to do a Python 3 installation).
 
-# cd veusz-2.2.2
+# cd veusz-3.0
 # python setup.py build
 # su
 [enter root password]
@@ -74,6 +74,11 @@ graphical environment to create a hidden X11 server:
 # xvfb-run -a --server-args "-screen 0 640x480x24" \
     python tests/runselftest.py
 
+Alternatively, the Qt platform can be switched to minimal to avoid the
+use of X11:
+
+# QT_QPA_PLATFORM=minimal python tests/runselftest.py
+
 1.1.2 Separate resources directory
 ==================================
 By default, setup.py installs certain resource files (VERSION, icons,
@@ -98,6 +103,7 @@ resources directory to point to the location of the example files.
 
 1.1.3 SIP parameters
 ====================
+
 By default the location of the SIP executable, the SIP include file
 location and the SIP files are obtained from sipconfig. sipconfig is
 now deprecated. If sipconfig is not found, the build will look for the
@@ -111,6 +117,29 @@ stage before build, with the parameters:
   --sip-include-dir=DIR  SIP include directory (location of sip.h)
   --sip-dir=DIR          base directory for SIP files
 
+Alternatively, these can be given as environment variables SIP_EXE,
+SIP_INCLUDE_DIR and SIP_DIR, respectively. Environment variables have
+the advantage that the build_ext stage does not have to be done
+separately.
+
+1.1.4 Qt build parameters
+=========================
+
+By default, the qmake executable is used to find the locations of the
+Qt include and library directories. The build searches for qmake under
+the names qmake-qt5, qmake, qmake5.exe and qmake.exe. The location of
+qmake and its return values can be overriden with the following
+build_ext options:
+
+  --qmake-exe=EXE        qmake exe
+  --qt-include-dir=DIR   base Qt include directory
+  --qt-library-dir=DIR   Qt library directory
+
+Alternatively, these can be overridden with the enviroment variables
+QMAKE_EXE, QT_INCLUDE_DIR and QT_LIBRARY_DIR, respectively.
+Environment variables have the advantage that the build_ext stage does
+not have to be done separately.
+
 1.3 Running in-place
 ====================
 
@@ -119,8 +148,8 @@ can currently be run from its own directory. Before this can work, the
 helper modules must be compiled and copied into the appropriate
 location.
 
-# tar xzf veusz-2.2.2.tar.gz                [change version here]
-# cd veusz-2.2.2
+# tar xzf veusz-3.0.tar.gz                [change version here]
+# cd veusz-3.0
 # python setup.py build                     [or use python3 here]
 # cp build/*/veusz/helpers/*.so veusz/helpers/
 
@@ -141,8 +170,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xf veusz-2.2.2-linux-x86.tar.xz     [change version here]
-# cd veusz-2.2.2-linux-x86
+# tar xf veusz-3.0-linux-x86.tar.xz     [change version here]
+# cd veusz-3.0-linux-x86
 # ./veusz
 
 2.2 Installing in Windows
