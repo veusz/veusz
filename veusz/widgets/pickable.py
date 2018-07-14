@@ -123,6 +123,10 @@ class GenericPickable:
         else:
             p = self.xgraph[pi], self.ygraph[pi]
 
+        if p is None and m is None:
+            # only 1 point after removing non-finite points
+            return 1
+
         return _chooseOrderingSign(m, c, p)
 
     def pickPoint(self, x0, y0, bounds, distance_direction):
