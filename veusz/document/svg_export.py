@@ -25,9 +25,8 @@ import re
 from ..compat import crange, cbytes
 from .. import qtall as qt4
 
-# dpi runs at many times usual, and results are scaled down
-# helps fix point issues in font sizes
-dpi = 900.
+# The dpi is multiplied by this value and results are scaled down.
+# This helps fix point issues in font sizes
 scale = 0.1
 
 inch_mm = 25.4
@@ -142,21 +141,16 @@ class SVGElement(object):
 class SVGPaintEngine(qt4.QPaintEngine):
     """Paint engine class for writing to svg files."""
 
-    def __init__(self, width_in, height_in, writetextastext=False):
-        """Create the class, using width and height as size of canvas
-        in inches."""
-
-        qt4.QPaintEngine.__init__(self,
-                                  qt4.QPaintEngine.Antialiasing |
-                                  qt4.QPaintEngine.PainterPaths |
-                                  qt4.QPaintEngine.PrimitiveTransform |
-                                  qt4.QPaintEngine.PaintOutsidePaintEvent |
-                                  qt4.QPaintEngine.PixmapTransform |
-                                  qt4.QPaintEngine.AlphaBlend
-                                  )
-
-        self.width = width_in
-        self.height = height_in
+    def __init__(self, writetextastext=False):
+        qt4.QPaintEngine.__init__(
+            self,
+            qt4.QPaintEngine.Antialiasing |
+            qt4.QPaintEngine.PainterPaths |
+            qt4.QPaintEngine.PrimitiveTransform |
+            qt4.QPaintEngine.PaintOutsidePaintEvent |
+            qt4.QPaintEngine.PixmapTransform |
+            qt4.QPaintEngine.AlphaBlend
+        )
 
         self.imageformat = 'png'
         self.writetextastext = writetextastext
@@ -177,8 +171,10 @@ class SVGPaintEngine(qt4.QPaintEngine):
             None, 'svg',
             ('width="%spx" height="%spx" version="1.1"\n'
              '    xmlns="http://www.w3.org/2000/svg"\n'
-             '    xmlns:xlink="http://www.w3.org/1999/xlink"') %
-            (fltStr(self.width*dpi*scale), fltStr(self.height*dpi*scale)))
+             '    xmlns:xlink="http://www.w3.org/1999/xlink"') % (
+                 fltStr(self.device.width*self.device.sdpi*scale),
+                 fltStr(self.device.height*self.device.sdpi*scale))
+        )
         SVGElement(self.rootelement, 'desc', '', 'Veusz output document')
 
         # definitions, for clips, etc.
@@ -433,7 +429,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
             if f.pixelSize() > 0:
                 size = f.pixelSize()*scale
             else:
-                size = f.pointSizeF()*scale*dpi/inch_pt
+                size = f.pointSizeF()*scale*self.device.sdpi/inch_pt
 
             font = textitem.font()
             grpattrb = [
@@ -558,11 +554,13 @@ class SVGPaintDevice(qt4.QPaintDevice):
     """Paint device for SVG paint engine."""
 
     def __init__(self, fileobj, width_in, height_in,
-                 writetextastext=False):
+                 writetextastext=False, dpi=90):
         qt4.QPaintDevice.__init__(self)
-        self.engine = SVGPaintEngine(width_in, height_in,
-                                     writetextastext=writetextastext)
         self.fileobj = fileobj
+        self.width = width_in
+        self.height = height_in
+        self.sdpi = dpi/scale
+        self.engine = SVGPaintEngine(writetextastext=writetextastext)
 
     def paintEngine(self):
         return self.engine
@@ -571,25 +569,25 @@ class SVGPaintDevice(qt4.QPaintDevice):
         """Return the metrics of the painter."""
 
         if m == qt4.QPaintDevice.PdmWidth:
-            return int(self.engine.width * dpi)
+            return int(self.width*self.sdpi)
         elif m == qt4.QPaintDevice.PdmHeight:
-            return int(self.engine.height * dpi)
+            return int(self.height*self.sdpi)
         elif m == qt4.QPaintDevice.PdmWidthMM:
-            return int(self.engine.width * inch_mm)
+            return int(self.engine.width*inch_mm)
         elif m == qt4.QPaintDevice.PdmHeightMM:
-            return int(self.engine.height * inch_mm)
+            return int(self.engine.height*inch_mm)
         elif m == qt4.QPaintDevice.PdmNumColors:
             return 2147483647
         elif m == qt4.QPaintDevice.PdmDepth:
             return 24
         elif m == qt4.QPaintDevice.PdmDpiX:
-            return int(dpi)
+            return int(self.sdpi)
         elif m == qt4.QPaintDevice.PdmDpiY:
-            return int(dpi)
+            return int(self.sdpi)
         elif m == qt4.QPaintDevice.PdmPhysicalDpiX:
-            return int(dpi)
+            return int(self.sdpi)
         elif m == qt4.QPaintDevice.PdmPhysicalDpiY:
-            return int(dpi)
+            return int(self.sdpi)
         elif m == qt4.QPaintDevice.PdmDevicePixelRatio:
             return 1
 

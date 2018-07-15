@@ -24,11 +24,8 @@ from . import svg_export
 class SelfTestPaintEngine(svg_export.SVGPaintEngine):
     """Paint engine class for self testing output."""
 
-    def __init__(self, width_in, height_in):
-        """Create the class, using width and height as size of canvas
-        in inches."""
-
-        svg_export.SVGPaintEngine.__init__(self, width_in, height_in)
+    def __init__(self):
+        svg_export.SVGPaintEngine.__init__(self)
         # ppm images are simple and should be same on all platforms
         self.imageformat = 'ppm'
 
@@ -37,17 +34,22 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
 
         text = textitem.text().encode('ascii', 'xmlcharrefreplace').decode(
             'ascii')
-        svg_export.SVGElement(self.celement, 'text',
-                              'x="%s" y="%s" font-size="%gpt" fill="%s"' %
-                              (svg_export.fltStr(pt.x()*svg_export.scale),
-                               svg_export.fltStr(pt.y()*svg_export.scale),
-                               textitem.font().pointSize(),
-                               self.pen.color().name()),
-                              text=text)
+        svg_export.SVGElement(
+            self.celement, 'text',
+            'x="%s" y="%s" font-size="%gpt" fill="%s"' % (
+                svg_export.fltStr(pt.x()*svg_export.scale),
+                svg_export.fltStr(pt.y()*svg_export.scale),
+                textitem.font().pointSize(),
+                self.pen.color().name()
+            ),
+            text=text
+        )
 
 class SelfTestPaintDevice(svg_export.SVGPaintDevice):
      """Paint device for SVG paint engine."""
 
-     def __init__(self, fileobj, width_in, height_in):
-          svg_export.SVGPaintDevice.__init__(self, fileobj, width_in, height_in)
-          self.engine = SelfTestPaintEngine(width_in, height_in)
+     def __init__(self, fileobj, width_in, height_in, dpi=90):
+         """Initialise with output file, and dimensions in inches."""
+         svg_export.SVGPaintDevice.__init__(
+             self, fileobj, width_in, height_in, dpi=dpi)
+         self.engine = SelfTestPaintEngine()

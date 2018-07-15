@@ -29,12 +29,15 @@ This program requires the veusz module to be on the PYTHONPATH.
 
 On Unix/Linux, Qt requires the DISPLAY environment to be set to an X11
 server for the self test to run. In a non graphical environment Xvfb
-can be used to create a hidden X11 server.
+can be used to create a hidden X11 server.  Alternatively, set the
+environment variable QT_QPA_PLATFORM=minimal to avoid the X11
+dependency.
 
 The comparison files are close to being SVG files, but use XPM for any
 images and use a fixed (hacked) font metric to give the same results
 on each platform. In addition Unicode characters are expanded to their
 Unicode code to work around different font handling on platforms.
+
 """
 
 # messes up loaded files if set
@@ -171,7 +174,6 @@ def renderVszTest(invsz, outfile, test_saves=False, test_unlink=False):
 
 def renderPyTest(inpy, outfile):
     """Render py embedded script to create outfile."""
-
     retn = subprocess.call([sys.executable, inpy, outfile])
     return retn == 0
 
@@ -291,7 +293,6 @@ if __name__ == '__main__':
     del utils.textrender.part_commands[r'\underline']
 
     # dpi (use old values)
-    svg_export.dpi = 90.
     svg_export.scale = 1.
     svg_export.fltStr = fltStr
 
