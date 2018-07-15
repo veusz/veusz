@@ -37,8 +37,8 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
         svg_export.SVGElement(
             self.celement, 'text',
             'x="%s" y="%s" font-size="%gpt" fill="%s"' % (
-                svg_export.fltStr(pt.x()*svg_export.scale),
-                svg_export.fltStr(pt.y()*svg_export.scale),
+                svg_export.fltStr(pt.x()),
+                svg_export.fltStr(pt.y()),
                 textitem.font().pointSize(),
                 self.pen.color().name()
             ),
@@ -46,10 +46,14 @@ class SelfTestPaintEngine(svg_export.SVGPaintEngine):
         )
 
 class SelfTestPaintDevice(svg_export.SVGPaintDevice):
-     """Paint device for SVG paint engine."""
+     """Paint device for SVG paint engine.
+
+     Note: this device is different to SVGPaintDevice because it
+     switches scaling to 1 by default.
+     """
 
      def __init__(self, fileobj, width_in, height_in, dpi=90):
          """Initialise with output file, and dimensions in inches."""
          svg_export.SVGPaintDevice.__init__(
-             self, fileobj, width_in, height_in, dpi=dpi)
+             self, fileobj, width_in, height_in, dpi=dpi, scale=1)
          self.engine = SelfTestPaintEngine()

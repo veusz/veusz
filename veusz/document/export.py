@@ -388,14 +388,15 @@ class Export(object):
 
         page = self.getSinglePage()
 
-        sdpi = self.svgdpi/svg_export.scale
+        scale = 0.1
+        sdpi = self.svgdpi/scale
         size = self.doc.pageSize(
             page, dpi=(sdpi,sdpi), integer=False)
         with codecs.open(filename, 'w', 'utf-8') as f:
             paintdev = svg_export.SVGPaintDevice(
                 f, size[0]/sdpi, size[1]/sdpi,
                 writetextastext=self.svgtextastext,
-                dpi=self.svgdpi)
+                dpi=self.svgdpi, scale=scale)
             painter = painthelper.DirectPainter(paintdev)
             self.renderPage(page, size, (sdpi,sdpi), painter)
 
@@ -405,15 +406,14 @@ class Export(object):
         page = self.getSinglePage()
 
         dpi = 90
-        sdpi = dpi/svg_export.scale
         size = width, height = self.doc.pageSize(
-            page, dpi=(sdpi,sdpi), integer=False)
+            page, dpi=(dpi,dpi), integer=False)
 
         with open(filename, 'w') as fout:
             paintdev = selftest_export.SelfTestPaintDevice(
-                fout, width/sdpi, height/sdpi, dpi=dpi)
+                fout, width/dpi, height/dpi, dpi=dpi)
             painter = painthelper.DirectPainter(paintdev)
-            self.renderPage(page, size, (sdpi,sdpi), painter)
+            self.renderPage(page, size, (dpi,dpi), painter)
 
     def exportPIC(self, filename):
         """Export document as Qt PIC"""

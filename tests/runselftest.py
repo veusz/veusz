@@ -293,7 +293,6 @@ if __name__ == '__main__':
     del utils.textrender.part_commands[r'\underline']
 
     # dpi (use old values)
-    svg_export.scale = 1.
     svg_export.fltStr = fltStr
 
     parser = optparse.OptionParser()

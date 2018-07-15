@@ -25,10 +25,7 @@ import re
 from ..compat import crange, cbytes
 from .. import qtall as qt4
 
-# The dpi is multiplied by this value and results are scaled down.
-# This helps fix point issues in font sizes
-scale = 0.1
-
+# physical sizes
 inch_mm = 25.4
 inch_pt = 72.0
 
@@ -66,7 +63,7 @@ def escapeXML(text):
     text = text.replace(u'\ue001', '&amp;')
     return text
 
-def createPath(path):
+def createPath(path, scale):
     """Convert qt path to svg path.
 
     We use relative coordinates to make the file size smaller and help
@@ -158,6 +155,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
     def begin(self, paintdevice):
         """Start painting."""
         self.device = paintdevice
+        self.scale = paintdevice.scale
 
         self.pen = qt4.QPen()
         self.brush = qt4.QBrush()
@@ -172,8 +170,8 @@ class SVGPaintEngine(qt4.QPaintEngine):
             ('width="%spx" height="%spx" version="1.1"\n'
              '    xmlns="http://www.w3.org/2000/svg"\n'
              '    xmlns:xlink="http://www.w3.org/1999/xlink"') % (
-                 fltStr(self.device.width*self.device.sdpi*scale),
-                 fltStr(self.device.height*self.device.sdpi*scale))
+                 fltStr(self.device.width*self.device.sdpi*self.scale),
+                 fltStr(self.device.height*self.device.sdpi*self.scale))
         )
         SVGElement(self.rootelement, 'desc', '', 'Veusz output document')
 
@@ -303,7 +301,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         if self.clippath is None:
             return ()
 
-        path = createPath(self.clippath)
+        path = createPath(self.clippath, self.scale)
 
         if path in self.existingclips:
             url = 'url(#c%i)' % self.existingclips[path]
@@ -348,15 +346,15 @@ class SVGPaintEngine(qt4.QPaintEngine):
         w = p.widthF()
         # width 0 is device width for qt
         if w == 0.:
-            w = 1./scale
-        vals['stroke-width'] = fltStr(w*scale)
+            w = 1./self.scale
+        vals['stroke-width'] = fltStr(w*self.scale)
 
         # - line style
         if p.style() == qt4.Qt.NoPen:
             vals['stroke'] = 'none'
         elif p.style() not in (qt4.Qt.SolidLine, qt4.Qt.NoPen):
             # convert from pen width fractions to pts
-            nums = [fltStr(scale*w*x) for x in p.dashPattern()]
+            nums = [fltStr(self.scale*w*x) for x in p.dashPattern()]
             vals['stroke-dasharray'] = ','.join(nums)
 
         # BRUSH STYLES
@@ -377,19 +375,19 @@ class SVGPaintEngine(qt4.QPaintEngine):
             dx, dy = m.dx(), m.dy()
             if (m.m11(), m.m12(), m.m21(), m.m22()) == (1., 0., 0., 1):
                 out = ('transform="translate(%s,%s)"' % (
-                        fltStr(dx*scale), fltStr(dy*scale)) ,)
+                        fltStr(dx*self.scale), fltStr(dy*self.scale)) ,)
             else:
                 out = ('transform="matrix(%s %s %s %s %s %s)"' % (
                         fltStr(m.m11(), 4), fltStr(m.m12(), 4),
                         fltStr(m.m21(), 4), fltStr(m.m22(), 4),
-                        fltStr(dx*scale), fltStr(dy*scale) ),)
+                        fltStr(dx*self.scale), fltStr(dy*self.scale) ),)
         else:
             out = ()
         return out
 
     def drawPath(self, path):
         """Draw a path on the output."""
-        p = createPath(path)
+        p = createPath(path, self.scale)
 
         attrb = 'd="%s"' % p
         if path.fillRule() == qt4.Qt.WindingFill:
@@ -427,9 +425,9 @@ class SVGPaintEngine(qt4.QPaintEngine):
             # size
             f = textitem.font()
             if f.pixelSize() > 0:
-                size = f.pixelSize()*scale
+                size = f.pixelSize()*self.scale
             else:
-                size = f.pointSizeF()*scale*self.device.sdpi/inch_pt
+                size = f.pointSizeF()*self.scale*self.device.sdpi/inch_pt
 
             font = textitem.font()
             grpattrb = [
@@ -451,9 +449,9 @@ class SVGPaintEngine(qt4.QPaintEngine):
             text = escapeXML( textitem.text() )
 
             textattrb = [
-                'x="%s"' % fltStr(pt.x()*scale),
-                'y="%s"' % fltStr(pt.y()*scale),
-                'textLength="%s"' % fltStr(textitem.width()*scale),
+                'x="%s"' % fltStr(pt.x()*self.scale),
+                'y="%s"' % fltStr(pt.y()*self.scale),
+                'textLength="%s"' % fltStr(textitem.width()*self.scale),
                 ]
 
             # spaces get lost without this
@@ -470,7 +468,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
             # convert to a path
             path = qt4.QPainterPath()
             path.addText(pt, textitem.font(), textitem.text())
-            p = createPath(path)
+            p = createPath(path, self.scale)
             SVGElement(
                 self.celement, 'path',
                 'd="%s" fill="%s" stroke="none" fill-opacity="%.3g"' % (
@@ -481,9 +479,10 @@ class SVGPaintEngine(qt4.QPaintEngine):
         paths = []
         for line in lines:
             path = 'M%s,%sl%s,%s' % (
-                fltStr(line.x1()*scale), fltStr(line.y1()*scale),
-                fltStr((line.x2()-line.x1())*scale),
-                fltStr((line.y2()-line.y1())*scale))
+                fltStr(line.x1()*self.scale),
+                fltStr(line.y1()*self.scale),
+                fltStr((line.x2()-line.x1())*self.scale),
+                fltStr((line.y2()-line.y1())*self.scale))
             paths.append(path)
         SVGElement(self.celement, 'path', 'd="%s"' % ''.join(paths))
 
@@ -491,7 +490,7 @@ class SVGPaintEngine(qt4.QPaintEngine):
         """Draw polygon on output."""
         pts = []
         for p in points:
-            pts.append( '%s,%s' % (fltStr(p.x()*scale), fltStr(p.y()*scale)) )
+            pts.append( '%s,%s' % (fltStr(p.x()*self.scale), fltStr(p.y()*self.scale)) )
 
         if mode == qt4.QPaintEngine.PolylineMode:
             SVGElement(self.celement, 'polyline',
@@ -507,15 +506,15 @@ class SVGPaintEngine(qt4.QPaintEngine):
         """Draw an ellipse to the svg file."""
         SVGElement(self.celement, 'ellipse',
                    'cx="%s" cy="%s" rx="%s" ry="%s"' %
-                   (fltStr(rect.center().x()*scale),
-                    fltStr(rect.center().y()*scale),
-                    fltStr(rect.width()*0.5*scale),
-                    fltStr(rect.height()*0.5*scale)))
+                   (fltStr(rect.center().x()*self.scale),
+                    fltStr(rect.center().y()*self.scale),
+                    fltStr(rect.width()*0.5*self.scale),
+                    fltStr(rect.height()*0.5*self.scale)))
 
     def drawPoints(self, points):
         """Draw points."""
         for pt in points:
-            x, y = fltStr(pt.x()*scale), fltStr(pt.y()*scale)
+            x, y = fltStr(pt.x()*self.scale), fltStr(pt.y()*self.scale)
             SVGElement(self.celement, 'line',
                        ('x1="%s" y1="%s" x2="%s" y2="%s" '
                         'stroke-linecap="round"') % (x, y, x, y))
@@ -538,9 +537,9 @@ class SVGPaintEngine(qt4.QPaintEngine):
         pixmap.save(buf, self.imageformat.upper(), 0)
         buf.close()
 
-        attrb = [ 'x="%s" y="%s" ' % (fltStr(r.x()*scale), fltStr(r.y()*scale)),
-                  'width="%s" ' % fltStr(r.width()*scale),
-                  'height="%s" ' % fltStr(r.height()*scale),
+        attrb = [ 'x="%s" y="%s" ' % (fltStr(r.x()*self.scale), fltStr(r.y()*self.scale)),
+                  'width="%s" ' % fltStr(r.width()*self.scale),
+                  'height="%s" ' % fltStr(r.height()*self.scale),
                   'xlink:href="data:image/%s;base64,' % self.imageformat,
                   cbytes(data.toBase64()).decode('ascii'),
                   '" preserveAspectRatio="none"' ]
@@ -551,14 +550,19 @@ class SVGPaintEngine(qt4.QPaintEngine):
         return qt4.QPaintEngine.User + 11
 
 class SVGPaintDevice(qt4.QPaintDevice):
-    """Paint device for SVG paint engine."""
+    """Paint device for SVG paint engine.
+
+    dpi is the real output DPI (unscaled)
+    scale is a scaling value to apply to outputted values
+    """
 
     def __init__(self, fileobj, width_in, height_in,
-                 writetextastext=False, dpi=90):
+                 writetextastext=False, dpi=90, scale=0.1):
         qt4.QPaintDevice.__init__(self)
         self.fileobj = fileobj
         self.width = width_in
         self.height = height_in
+        self.scale = scale
         self.sdpi = dpi/scale
         self.engine = SVGPaintEngine(writetextastext=writetextastext)
 
