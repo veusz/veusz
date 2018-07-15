@@ -122,12 +122,12 @@ class ExportDialog(VeuszDialog):
         self.exportQuality.setValue(setdb['export_quality'])
 
         # validate and set DPIs
-        dpis = ('75', '90', '100', '150', '200', '300')
-        self.exportDPI.addItems(dpis)
-        self.exportDPIPDF.addItems(dpis)
-        self.exportDPI.setValidator(qt4.QIntValidator(10, 10000, self))
+        dpis = ('72', '75', '90', '96', '100', '150', '200', '300')
+        for cntrl in self.exportDPI, self.exportDPISVG, self.exportDPIPDF:
+            cntrl.addItems(dpis)
+            cntrl.setValidator(qt4.QIntValidator(10, 10000, self))
         self.exportDPI.setEditText(str(setdb['export_DPI']))
-        self.exportDPIPDF.setValidator(qt4.QIntValidator(10, 10000, self))
+        self.exportDPISVG.setEditText(str(setdb['export_DPI_SVG']))
         self.exportDPIPDF.setEditText(str(setdb['export_DPI_PDF']))
 
         # button to change bitmap background
@@ -177,7 +177,8 @@ class ExportDialog(VeuszDialog):
         for c in (self.exportQuality, self.labelQuality):
             c.setVisible(fmt == 'jpg')
 
-        for c in (self.exportSVGTextAsText, self.labelSVGTextAsText):
+        for c in (self.exportSVGTextAsText, self.labelSVGTextAsText,
+                  self.exportDPISVG, self.labelDPISVG):
             c.setVisible(fmt == 'svg')
 
         self.updateSingleMulti()
@@ -376,8 +377,10 @@ class ExportDialog(VeuszDialog):
 
         # update dpi if possible
         # FIXME: requires some sort of visual notification of validator
-        for cntrl, setn in ((self.exportDPI, 'export_DPI'),
-                            (self.exportDPIPDF, 'export_DPI_PDF')):
+        for cntrl, setn in (
+                (self.exportDPI, 'export_DPI'),
+                (self.exportDPIPDF, 'export_DPI_PDF'),
+                (self.exportDPISVG, 'export_DPI_SVG')):
             try:
                 text = cntrl.currentText()
                 valid = cntrl.validator().validate(text, 0)[0]
@@ -397,6 +400,7 @@ class ExportDialog(VeuszDialog):
             quality=setdb['export_quality'],
             backcolor=setdb['export_background'],
             svgtextastext=setdb['export_SVG_text_as_text'],
+            svgdpi=setdb['export_DPI_SVG'],
         )
 
         def _overwriteQuestion(filename):

@@ -748,7 +748,7 @@ class CommandInterface(qt4.QObject):
 
     def Export(self, filename, color=True, page=[0], dpi=100,
                antialias=True, quality=85, backcolor='#ffffff00',
-               pdfdpi=150, svgtextastext=False):
+               pdfdpi=150, svgdpi=96, svgtextastext=False):
         """Export plot to filename.
 
         color is True or False if color is requested in output file
@@ -759,6 +759,7 @@ class CommandInterface(qt4.QObject):
         backcolor is the background color for bitmap files, which is a name or
          a #RRGGBBAA value (red, green, blue, alpha)
         pdfdpi is the dpi to use when exporting eps or pdf files
+        svgdpi is the dpi to use when exporting svg files
         svgtextastext: write text in SVG as text, rather than curves
         """
 
@@ -772,7 +773,8 @@ class CommandInterface(qt4.QObject):
             self.document, filename, pages, color=color,
             bitmapdpi=dpi, antialias=antialias,
             quality=quality, backcolor=backcolor,
-            pdfdpi=pdfdpi, svgtextastext=svgtextastext)
+            pdfdpi=pdfdpi,
+            svgdpi=svgdpi, svgtextastext=svgtextastext)
         e.export()
 
     def Rename(self, widget, newname):

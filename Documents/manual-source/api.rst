@@ -189,7 +189,7 @@ Export
 
 :command:`Export(filename, color=True, page=0, dpi=100,
 antialias=True, quality=85, backcolor='#ffffff00', pdfdpi=150,
-svgtextastext=False)`
+svgdpi=96, svgtextastext=False)`
 
 Export the page given to the filename given. The :command:`filename`
 must end with the correct extension to get the right sort of output
@@ -204,7 +204,8 @@ True. :command:`quality` is a quality parameter for jpeg
 output. :command:`backcolor` is the background color for bitmap files,
 which is a name or a #RRGGBBAA value (red, green, blue,
 alpha). :command:`pdfdpi` is the dpi to use when exporting EPS or PDF
-files. :command:`svgtextastext` says whether to export SVG text as
+files. :command:`svgdpi` is the dpi to use when exporting to SVG files.
+:command:`svgtextastext` says whether to export SVG text as
 text, rather than curves.
 
 FilterDatasets

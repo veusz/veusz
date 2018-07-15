@@ -3,6 +3,8 @@ Changes in <next version>:
    the build inside Anaconda. Also Qt and sip parameters can now be given
    as environment variables.
  * Fix problem when picking points with too many non-finite values
+ * Change default SVG export DPI to 96 to match inkscape and provide
+   option in dialog to choose export DPI
 
 Changes in 3.0:
  * New 3D support for plotting points, functions, surfaces and volumes

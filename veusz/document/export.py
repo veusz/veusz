@@ -184,7 +184,7 @@ class Export(object):
 
     def __init__(self, doc, filename, pagenumbers, color=True, bitmapdpi=100,
                  antialias=True, quality=85, backcolor='#ffffff00',
-                 pdfdpi=150, svgdpi=90, svgtextastext=False):
+                 pdfdpi=150, svgdpi=96, svgtextastext=False):
         """Initialise export class. Parameters are:
         doc: document to write
         filename: output filename
@@ -195,6 +195,7 @@ class Export(object):
         quality: compression factor for bitmaps
         backcolor: background color default for bitmaps (default transparent).
         pdfdpi: dpi for pdf and eps files
+        svgdpi: dpi for svg files
         svgtextastext: write text in SVG as text, rather than curves
         """
 

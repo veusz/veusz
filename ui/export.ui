@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>540</width>
-    <height>646</height>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -164,7 +164,7 @@
              <string>Windows embedded metafile</string>
             </property>
             <property name="text">
-             <string>EMF</string>
+             <string>E&amp;MF</string>
             </property>
            </widget>
           </item>
@@ -227,6 +227,23 @@
       <string>Options</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelCheckOverwrite">
+        <property name="text">
+         <string>Overwrite without confirmation</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="checkOverwrite">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Overwrite any files with the same name without confirmation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="labelDPI">
         <property name="text">
@@ -273,13 +290,30 @@ This is recommended for most purposes.</string>
        </widget>
       </item>
       <item row="3" column="0">
+       <widget class="QLabel" name="labelDPISVG">
+        <property name="text">
+         <string>SVG DPI</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="exportDPISVG">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of dots per inch used for writing SVG files. Modern inkscape uses 96.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
        <widget class="QLabel" name="labelBackgroundButton">
         <property name="text">
          <string>Bitmap background</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QPushButton" name="exportBackgroundButton">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The background color for bitmap files. Use alpha channel values of 0 for transparency&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -289,14 +323,14 @@ This is recommended for most purposes.</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
+      <item row="5" column="0">
        <widget class="QLabel" name="labelQuality">
         <property name="text">
          <string>Jpeg quality</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="QSpinBox" name="exportQuality">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose Jpeg quality setting. Lower values give poorer quality results and are more compressed, but have smaller file sizes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -312,14 +346,14 @@ This is recommended for most purposes.</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="6" column="0">
        <widget class="QLabel" name="labelColor">
         <property name="text">
          <string>Color</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
+      <item row="6" column="1">
        <widget class="QComboBox" name="exportColor">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Output Postscript or PDF as full color, or convert to greyscale&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -336,37 +370,20 @@ This is recommended for most purposes.</string>
         </item>
        </widget>
       </item>
-      <item row="6" column="0">
+      <item row="7" column="0">
        <widget class="QLabel" name="labelSVGTextAsText">
         <property name="text">
          <string>Editable text in SVG</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
+      <item row="7" column="1">
        <widget class="QCheckBox" name="exportSVGTextAsText">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exports text in SVG files as text, rather than curves. Curves mean that the file will display the same on any system, but text can be edited easily in other programs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QCheckBox" name="checkOverwrite">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Overwrite any files with the same name without confirmation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="labelCheckOverwrite">
-        <property name="text">
-         <string>Overwrite without confirmation</string>
         </property>
        </widget>
       </item>
