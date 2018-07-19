@@ -5,6 +5,7 @@ Changes in <next version>:
  * Fix problem when picking points with too many non-finite values
  * Change default SVG export DPI to 96 to match inkscape and provide
    option in dialog to choose export DPI
+ * Allow %PAGE% and %PAGENAME% in export filename for single page output
 
 Changes in 3.0:
  * New 3D support for plotting points, functions, surfaces and volumes

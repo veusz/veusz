@@ -249,11 +249,11 @@ class ExportDialog(VeuszDialog):
 
     def isMultiFile(self):
         """Is output going to be multiple pages?"""
-        multipage = self.pageselected != 'single'
+        multifile = self.pageselected != 'single'
         if (self.formatselected in multipageformats and
             self.checkMultiPage.isChecked()):
-            multipage = False
-        return multipage
+            multifile = False
+        return multifile
 
     def updateSingleMulti(self, _oldmulti=[None]):
         """Change filename according to selected single or multi button."""
@@ -448,7 +448,7 @@ class ExportDialog(VeuszDialog):
             else:
                 qt4.QApplication.restoreOverrideCursor()
 
-        if self.isMultiFile():
+        if self.isMultiFile() or len(pages)==1:
             # write pages to multiple files
             for page in pages:
                 pagename = self.document.getPage(page).name
@@ -463,8 +463,13 @@ class ExportDialog(VeuszDialog):
                 _checkAndExport()
         else:
             # write page/pages to single file
+            fname = filename.replace('%PAGE%', _('none'))
+            fname = fname.replace('%PAGE00%', _('none'))
+            fname = fname.replace('%PAGE000%', _('none'))
+            fname = fname.replace('%PAGENAME%', _('none'))
+
             export.pagenumbers = pages
-            export.filename = filename
+            export.filename = fname
             _checkAndExport()
 
         dirname = os.path.dirname(filename)
