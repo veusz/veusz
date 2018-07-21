@@ -1,4 +1,4 @@
-Veusz 3.0
+Veusz 3.1
 ---------
 https://veusz.github.io
 
@@ -12,18 +12,17 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 3.0:
- * New 3D support for plotting points, functions, surfaces and volumes
- * Add --export-option parameter for command line exporting control
- * Add templates in preferences for exported file names, add %PAGE00% and
-   %PAGE000% options for zero-prefixed page numbers, and change %PAGENUM%
-   to %PAGE%
- * In export dialog allow user to specify arbitrary pages to export
- * Change miter limit for lines, which fixes some problems when exporting
-   arrow to PDFs
- * Use flat cap on lines with arrows, to avoid line showing through head
- * Support datetime64 and string/unicode characters in npy/npz import
- * Add \hat LaTeX support
+Changes in 3.1:
+ * Change in build system to use qmake to find Qt locations. This is to fix
+   the build inside Anaconda. Also Qt and sip parameters can now be given
+   as environment variables.
+ * Fix problem when picking points with too many non-finite values
+ * Change default SVG export DPI to 96 to match inkscape and provide
+   option in dialog to choose export DPI
+ * Allow %PAGE% and %PAGENAME% in export filename for single page output
+ * Fix failing fitting due to iminuit differences
+ * Fix crash if both ends of part of broken axis widget are the same for
+   EMF exporting
 
 Features of package:
  Plotting features:
