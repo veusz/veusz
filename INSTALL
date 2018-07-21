@@ -43,7 +43,7 @@ To install on Linux to the standard location on the hard disk follow
 these instructions (note python in these commands should be replaced
 by python3 to do a Python 3 installation).
 
-# cd veusz-3.1
+# cd veusz-3.0.1
 # python setup.py build
 # su
 [enter root password]
@@ -148,8 +148,8 @@ can currently be run from its own directory. Before this can work, the
 helper modules must be compiled and copied into the appropriate
 location.
 
-# tar xzf veusz-3.1.tar.gz                [change version here]
-# cd veusz-3.1
+# tar xzf veusz-3.0.1.tar.gz                [change version here]
+# cd veusz-3.0.1
 # python setup.py build                     [or use python3 here]
 # cp build/*/veusz/helpers/*.so veusz/helpers/
 
@@ -170,8 +170,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xf veusz-3.1-linux-x86.tar.xz     [change version here]
-# cd veusz-3.1-linux-x86
+# tar xf veusz-3.0.1-linux-x86.tar.xz     [change version here]
+# cd veusz-3.0.1-linux-x86
 # ./veusz
 
 2.2 Installing in Windows

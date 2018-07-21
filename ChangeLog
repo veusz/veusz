@@ -1,4 +1,4 @@
-Changes in 3.1:
+Changes in 3.0.1:
  * Change in build system to use qmake to find Qt locations. This is to fix
    the build inside Anaconda. Also Qt and sip parameters can now be given
    as environment variables.
