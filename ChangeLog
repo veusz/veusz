@@ -6,7 +6,9 @@ Changes in <next version>:
  * Change default SVG export DPI to 96 to match inkscape and provide
    option in dialog to choose export DPI
  * Allow %PAGE% and %PAGENAME% in export filename for single page output
- * Fixes for changes in new iminuit versions
+ * Fix failing fitting due to iminuit differences
+ * Fix crash if both ends of part of broken axis widget are the same for
+   EMF exporting
 
 Changes in 3.0:
  * New 3D support for plotting points, functions, surfaces and volumes

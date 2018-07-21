@@ -387,6 +387,9 @@ class AxisBroken(axis.Axis):
         for i in crange(self.breakvnum):
             self.switchBreak(i, posn)
 
+            if self.plottedrange[0]==self.plottedrange[1]:
+                continue
+
             # plot coordinates of ticks
             coordticks = self._graphToPlotter(self.majorticklist[i])
             coordminorticks = self._graphToPlotter(self.minorticklist[i])
