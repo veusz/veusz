@@ -84,7 +84,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
         have_symerr = True
         m.minos()
         have_err = True
-    except minuit.MinuitError as e:
+    except Exception as e:
         print(e)
         if str(e).startswith('Discovered a new minimum'):
             # the initial fit really failed
@@ -112,7 +112,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
 
     print("chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2))
 
-    vals = m.values
+    vals = dict(m.values)
     return vals, retchi2, dof
 
 class Fit(FunctionPlotter):
@@ -338,20 +338,20 @@ class Fit(FunctionPlotter):
             return
 
         if minuit is not None:
-            vals, chi2, dof = minuitFit(evalfunc, params, paramnames, s.values,
-                                        xvals, yvals, yserr)
+            vals, chi2, dof = minuitFit(
+                evalfunc, params, paramnames, s.values,
+                xvals, yvals, yserr)
         else:
             print(_('Minuit not available, falling back to simple L-M fitting:'))
-            retn, chi2, dof = utils.fitLM(evalfunc, params,
-                                          xvals,
-                                          yvals, yserr)
+            retn, chi2, dof = utils.fitLM(
+                evalfunc, params, xvals, yvals, yserr)
             vals = {}
             for i, v in czip(paramnames, retn):
                 vals[i] = float(v)
 
         # list of operations do we can undo the changes
         operations = []
-                                      
+
         # populate the return parameters
         operations.append( document.OperationSettingSet(s.get('values'), vals) )
 
@@ -374,15 +374,15 @@ class Fit(FunctionPlotter):
         # actually change all the settings
         d.applyOperation(
             document.OperationMultiple(operations, descr=_('fit')) )
-    
+
     def generateOutputExpr(self, vals):
         """Try to generate text form of output expression.
-        
+
         vals is a dict of variable: value pairs
         returns the expression
         """
 
-        paramvals = vals.copy()
+        paramvals = dict(vals)
         s = self.settings
 
         # also substitute in data name for variable
@@ -398,7 +398,7 @@ class Fit(FunctionPlotter):
         # replace part by things in paramvals, if they exist
         for i, p in enumerate(parts):
             if p in paramvals:
-                parts[i] = str( paramvals[p] )
+                parts[i] = str(paramvals[p])
 
         return ''.join(parts)
 
