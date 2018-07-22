@@ -3,7 +3,8 @@ import glob
 
 a = Analysis(['..\\veusz\\veusz_main.py'],
              hiddenimports=['h5py.defs', 'h5py.utils', 'h5py.h5ac', 'h5py._proxy',
-                            'iminuit', 'iminuit.latex', 'iminuit._plotting', 'iminuit.frontends'],
+                            'iminuit', 'iminuit.latex', 'iminuit._plotting', 'iminuit.frontends',
+                            'PyQt5.sip'],
              hookspath=None,
              runtime_hooks=None)
 
@@ -49,6 +50,7 @@ for f in ( glob.glob('icons/*.png') + glob.glob('icons/*.ico') +
 binaries += [
     ('msvcp140.dll', r'c:\windows\system32\msvcp140.dll', 'BINARY'),
     ('msvcrt.dll', r'c:\windows\system32\msvcrt.dll', 'BINARY'),
+    ('dcomp.dll', r'c:\windows\system32\dcomp.dll', 'BINARY'),
     ]
 
 coll = COLLECT(exe,
