@@ -9,6 +9,8 @@ Changes in 3.0.1:
  * Fix failing fitting due to iminuit differences
  * Fix crash if both ends of part of broken axis widget are the same for
    EMF exporting
+ * Update to Qt 5.11.1 and update PyQt and sip in Windows binary
+ * Build Mac and Linux binaries with EMF export
 
 Changes in 3.0:
  * New 3D support for plotting points, functions, surfaces and volumes
