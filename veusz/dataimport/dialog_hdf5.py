@@ -51,7 +51,7 @@ def computedatatype(dtype):
         datatype = 'text'
     elif k == 'O':
         # FIXME: only supporting variable length strings so far
-        typ = h5py.check_dtype(vlen=ds.dtype)
+        typ = h5py.check_dtype(vlen=dtype)
         if typ is str:
             datatype = 'text'
     return datatype
