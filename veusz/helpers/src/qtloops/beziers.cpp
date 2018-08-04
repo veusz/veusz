@@ -1013,8 +1013,8 @@ compute_hook(QPointF const &a, QPointF const &b, double const u, BezierCurve con
     return 0;
   }
 
-  // factor of 0.1 introduced by JSS to stop more hooks
-  double const allowed = L2(b - a)*0.1 + tolerance;
+  // factor of 0.2 introduced by JSS to stop more hooks
+  double const allowed = L2(b - a)*0.2 + tolerance;
   return dist / allowed;
   /** \todo 
    * effic: Hooks are very rare.  We could start by comparing 
