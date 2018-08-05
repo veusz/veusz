@@ -130,6 +130,10 @@ Section "MainSection" SEC01
   File "${PYINST_DIR}\PyQt5\Qt\plugins\printsupport\*.dll"
   SetOutPath "$INSTDIR"
 
+  SetOutPath "$INSTDIR\PyQt5\Qt\plugins\styles"
+  File "${PYINST_DIR}\PyQt5\Qt\plugins\styles\*.dll"
+  SetOutPath "$INSTDIR"
+
   WriteRegStr HKCR ".vsz" "" "Veusz.Document"
   WriteRegStr HKCR "Veusz.Document" "" "Veusz document"
   WriteRegStr HKCR "Veusz.Document\shell\open\command" "" '"$INSTDIR\veusz.exe" "%1"'
@@ -189,6 +193,7 @@ Section Uninstall
   Delete "$INSTDIR\PyQt5\Qt\plugins\imageformats\*.dll"
   Delete "$INSTDIR\PyQt5\Qt\plugins\platforms\*.dll"
   Delete "$INSTDIR\PyQt5\Qt\plugins\printsupport\*.dll"
+  Delete "$INSTDIR\PyQt5\Qt\plugins\styles\*.dll"
 
   Delete "$INSTDIR\icons\*.png"
   Delete "$INSTDIR\icons\*.ico"
@@ -203,11 +208,13 @@ Section Uninstall
 
   RMDir "$SMPROGRAMS\Veusz"
   RMDir "$INSTDIR\eggs"
-  RMDir "$INSTDIR\PyQt5\plugins\iconengines"
-  RMDIR "$INSTDIR\PyQt5\plugins\imageformats"
-  RMDir "$INSTDIR\PyQt5\plugins\platforms"
-  RMDIR "$INSTDIR\PyQt5\plugins\printsupport"
-  RMDir "$INSTDIR\PyQt5\plugins"
+  RMDir "$INSTDIR\PyQt5\Qt\plugins\iconengines"
+  RMDIR "$INSTDIR\PyQt5\Qt\plugins\imageformats"
+  RMDir "$INSTDIR\PyQt5\Qt\plugins\platforms"
+  RMDIR "$INSTDIR\PyQt5\Qt\plugins\printsupport"
+  RMDIR "$INSTDIR\PyQt5\Qt\plugins\styles"
+  RMDir "$INSTDIR\PyQt5\Qt\plugins"
+  RMDir "$INSTDIR\PyQt5\Qt"
   RMDir "$INSTDIR\PyQt5"
   RMDIR "$INSTDIR\icons"
   RMDir "$INSTDIR\ui"
