@@ -102,7 +102,7 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
     # try to convert array to a numpy array
     try:
         vals = N.array(vals, dtype=N.float64)
-    except ValueError:
+    except (ValueError, TypeError) as e:
         err = _('Could not convert to array')
 
     # if error on first time, try to sanitize input arrays
