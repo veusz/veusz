@@ -252,7 +252,12 @@ class Line(plotters.FreePlotter):
         if xpos is None or ypos is None:
             return
 
-        x, y = list(s.xPos), list(s.yPos)
+        x = s.get('xPos').getFloatArray(self.document)
+        y = s.get('yPos').getFloatArray(self.document)
+        if x is None or y is None:
+            return
+        x, y = list(x), list(y)
+
         idx = min(cgi.index, len(x)-1)
         if not N.allclose(x[idx], xpos[0]):
             x[idx] = utils.round2delt(xpos[0], xpos[1])
@@ -277,7 +282,12 @@ class Line(plotters.FreePlotter):
             ldelt, adelt = la(pt2[0]+1, pt2[1]+1)
 
             # update values
-            l, a = list(s.length), list(s.angle)
+            l = s.get('length').getFloatArray(self.document)
+            a = s.get('angle').getFloatArray(self.document)
+            if l is None or a is None:
+                return
+            l, a = list(l), list(a)
+
             idx = min(cgi.index, len(l)-1)
             if abs(l[idx]-length) > 1e-8:
                 l[idx] = utils.round2delt(length, ldelt)
@@ -293,7 +303,11 @@ class Line(plotters.FreePlotter):
             xpos2, ypos2 = self._getGraphCoords(
                 cgi.widgetposn, [pt2[0], pt2[0]+1], [pt2[1], pt2[1]+1])
             if xpos2 is not None and ypos2 is not None:
-                x2, y2 = list(s.xPos2), list(s.yPos2)
+                x2 = s.get('xPos2').getFloatArray(self.document)
+                y2 = s.get('yPos2').getFloatArray(self.document)
+                if x2 is None or y2 is None:
+                    return
+                x2, y2 = list(x2), list(y2)
 
                 idx = min(cgi.index, len(x2)-1)
                 if not N.allclose(x2[idx], xpos2[0]):
