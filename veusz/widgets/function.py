@@ -156,7 +156,7 @@ class FunctionPlotter(GenericPlotter):
                 # linear spaced steps
                 delta = (varaxrange[1] - varaxrange[0])/20.
                 points = N.arange(varaxrange[0], varaxrange[1]+delta, delta)
-        except ZeroDivisionError:
+        except (ZeroDivisionError, ValueError) as e:
             # delta is zero
             return
 
