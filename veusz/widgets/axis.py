@@ -312,6 +312,7 @@ class Axis(widget.Widget):
         # document updates change set variable when things need recalculating
         self.docchangeset = -1
         self.currentbounds = [0,0,1,1]
+        self.plottedrange = [0., 1.]
 
     @classmethod
     def addSettings(klass, s):
