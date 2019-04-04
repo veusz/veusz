@@ -66,9 +66,9 @@ public:
               double x1, double y1, double x2, double y2, double scale);
 
   // find widget id of pixel painted by drawing scene at (x, y)
-  long idPixel(Object* root, QPainter* painter, const Camera& cam,
-               double x1, double y1, double x2, double y2, double scale,
-               double scaling, int x, int y);
+  unsigned long idPixel(Object* root, QPainter* painter, const Camera& cam,
+                        double x1, double y1, double x2, double y2, double scale,
+                        double scaling, int x, int y);
 
 public:
   // last screen matrix
