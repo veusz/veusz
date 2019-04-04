@@ -528,12 +528,12 @@ Scene::DrawCallback::~DrawCallback()
 {
 }
 
-long Scene::idPixel(Object* root,
-                    QPainter* painter,
-                    const Camera& cam,
-                    double x1, double y1, double x2, double y2,
-                    double scale,
-                    double scaling, int x, int y)
+unsigned long Scene::idPixel(Object* root,
+                             QPainter* painter,
+                             const Camera& cam,
+                             double x1, double y1, double x2, double y2,
+                             double scale,
+                             double scaling, int x, int y)
 {
   constexpr int box = 3;
 
@@ -543,7 +543,7 @@ long Scene::idPixel(Object* root,
   {
   public:
     IdDrawCallback()
-      : lastwidgetid(-1),
+      : lastwidgetid(0),
         pixrender(2*box+1,2*box+1)
     {
       pixrender.fill(QColor(254,254,254));
@@ -565,7 +565,7 @@ long Scene::idPixel(Object* root,
         }
     }
 
-    long lastwidgetid;
+    unsigned long lastwidgetid;
     QPixmap pixrender;
     QImage lastimage;
   };
