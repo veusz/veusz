@@ -312,6 +312,10 @@ class AxisTicks(AxisTicksBase):
         if abs(self.minval - self.maxval) < 1e-99:
             self.maxval = self.minval + 1.
 
+            # for large numbers this may be the case
+            if self.maxval == self.minval:
+                self.minval, self.maxval = 0., 1.
+
         minval, maxval, tickvals, interval, loginterval = self._tickSelector(
             intervals )
 
