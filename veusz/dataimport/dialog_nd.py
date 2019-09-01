@@ -17,6 +17,7 @@
 ##############################################################################
 
 from __future__ import division, print_function
+import csv
 import re
 
 from .. import qtall as qt4
@@ -148,7 +149,7 @@ class ImportTabND(importdialog.ImportTab):
         except error as e:
             output = e.args[0]
 
-        except simpleread.ReadNDError as e:
+        except (simpleread.ReadNDError, csv.Error) as e:
             output = _("Error importing datasets:\n %s") % cstr(e)
 
         # show status in preview box

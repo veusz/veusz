@@ -17,6 +17,7 @@
 ##############################################################################
 
 from __future__ import division, print_function
+import csv
 import re
 
 from .. import qtall as qt4
@@ -190,7 +191,7 @@ class ImportTab2D(importdialog.ImportTab):
             # feature feedback
             utils.feedback.importcts['twod'] += 1
 
-        except simpleread.Read2DError as e:
+        except (simpleread.Read2DError, csv.Error) as e:
             output = _('Error importing datasets:\n %s') % cstr(e)
 
         # show status in preview box
