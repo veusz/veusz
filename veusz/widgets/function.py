@@ -136,14 +136,15 @@ class FunctionPlotter(GenericPlotter):
 
         # get range of that axis
         varaxrange = list(varaxis.getPlottedRange())
-        if varaxrange[0] == varaxrange[1]:
-            return
 
         # trim to range
         if s.min != 'Auto':
             varaxrange[0] = max(s.min, varaxrange[0])
         if s.max != 'Auto':
             varaxrange[1] = min(s.max, varaxrange[1])
+
+        if varaxrange[0] == varaxrange[1]:
+            return
 
         # work out function in steps
         try:
