@@ -728,6 +728,8 @@ class Axis3D(widget.Widget):
 
     def drawToObject(self, painter, painthelper):
 
+        self.computePlottedRange()
+
         s = self.settings
         dirn = s.direction
 
