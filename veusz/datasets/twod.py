@@ -117,16 +117,22 @@ class Dataset2DBase(DatasetConcreteBase):
         elif self.xedge is not None:
             xc = 0.5*(self.xedge[:-1]+self.xedge[1:])
         else:
-            xc = (N.arange(xw) + 0.5) * (
-                (self.xrange[1]-self.xrange[0])/xw) + self.xrange[0]
+            try:
+                xc = (N.arange(xw) + 0.5) * (
+                    (self.xrange[1]-self.xrange[0])/xw) + self.xrange[0]
+            except ZeroDivisionError:
+                xc = 0.
 
         if self.ycent is not None:
             yc = self.ycent
         elif self.yedge is not None:
             yc = 0.5*(self.yedge[:-1]+self.yedge[1:])
         else:
-            yc = (N.arange(yw) + 0.5) * (
-                (self.yrange[1]-self.yrange[0])/yw) + self.yrange[0]
+            try:
+                yc = (N.arange(yw) + 0.5) * (
+                    (self.yrange[1]-self.yrange[0])/yw) + self.yrange[0]
+            except ZeroDivisionError:
+                yc = 0.
 
         return xc, yc
 
