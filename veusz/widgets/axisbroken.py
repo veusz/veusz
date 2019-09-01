@@ -384,6 +384,7 @@ class AxisBroken(axis.Axis):
             self._drawAxisLine(painter, posn)
 
         max_delta = 0
+        suppresstext = False
         for i in crange(self.breakvnum):
             self.switchBreak(i, posn)
 
