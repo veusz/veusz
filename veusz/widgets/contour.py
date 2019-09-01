@@ -559,7 +559,7 @@ class Contour(plotters.GenericPlotter):
         # iterate over each level, and list of lines
         for num, linelist in enumerate(contours):
 
-            if showlabels:
+            if showlabels and num<len(s.levelsOut):
                 number = s.levelsOut[num]
                 text = utils.formatNumber(
                     number * cl.scale, cl.format,
