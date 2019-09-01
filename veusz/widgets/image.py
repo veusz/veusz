@@ -224,13 +224,13 @@ class Image(plotters.GenericPlotter):
         s = self.settings
         minval = s.min
         if minval == 'Auto':
-            if data is not None:
+            if data is not None and len(data.data) != 0:
                 minval = N.nanmin(data.data)
             else:
                 minval = 0.
         maxval = s.max
         if maxval == 'Auto':
-            if data is not None:
+            if data is not None and len(data.data) != 0:
                 maxval = N.nanmax(data.data)
             else:
                 maxval = minval + 1
