@@ -175,6 +175,11 @@ class Key(widget.Widget):
                             descr = _('Text settings'),
                             usertext=_('Text')),
                pixmap = 'settings_axislabel' )
+
+        s.add(setting.Str('exclude', '',
+                          descr=_('Exclude item from displaying'),
+                          usertext=_('Exclude item')))
+
         s.add( setting.KeyBrush('Background',
                                 descr = _('Key background fill'),
                                 usertext=_('Background')),
@@ -375,9 +380,12 @@ class Key(widget.Widget):
         # maximum width of text required
         maxwidth = 1
 
+        exclude = list(map(lambda it: it.strip(), s.exclude.split(',')))
         entries = []
         # iterate over children and find widgets which are suitable
         for c in self.parent.children:
+            if c.name in exclude:
+                continue
             try:
                 num = c.getNumberKeys()
             except AttributeError:
