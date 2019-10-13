@@ -200,7 +200,7 @@ class Setting(object):
                     rootname, self.name, crepr(self._ref.value))
             else:
                 return "Set('%s%s', %s)\n" % (
-                    rootname, self.name, crepr(self.val) )
+                    rootname, self.name, utils.rrepr(self.val))
         else:
             return ''
 
