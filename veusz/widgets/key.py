@@ -177,7 +177,7 @@ class Key(widget.Widget):
                pixmap = 'settings_axislabel' )
 
         s.add(setting.Str('exclude', '',
-                          descr=_('Exclude item from displaying'),
+                          descr=_('Exclude item from displaying (comma separated)'),
                           usertext=_('Exclude item')))
 
         s.add( setting.KeyBrush('Background',
