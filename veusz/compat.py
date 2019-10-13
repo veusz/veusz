@@ -105,6 +105,9 @@ if cpy3:
     # get current directory (as unicode)
     cgetcwd = os.getcwd
 
+    # open with universal newlines mode
+    copenuniversal = open
+
 else:
     # py2
 
@@ -196,3 +199,7 @@ else:
 
     # unicode getcwd
     cgetcwd = os.getcwdu
+
+    # open with universal newlines
+    def copenuniversal(filename, mode='r'):
+        return open(filename, mode+'U')

@@ -58,7 +58,7 @@ try:
 except ImportError:
     h5py = None
 
-from veusz.compat import cexec, cstr
+from veusz.compat import cexec, cstr, copenuniversal
 import veusz.qtall as qt4
 import veusz.utils as utils
 import veusz.document as document
@@ -249,8 +249,8 @@ def runTests(test_saves=False, test_unlink=False):
             continue
 
         comparfile = os.path.join(d.thisdir, 'comparison', base + '.selftest')
-        with open(outfile, 'rU') as f1:
-            with open(comparfile, 'rU') as f2:
+        with copenuniversal(outfile) as f1:
+            with copenuniversal(comparfile) as f2:
                 comp = f1.read() == f2.read()
 
         if not comp:

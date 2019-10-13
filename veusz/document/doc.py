@@ -345,8 +345,15 @@ class Document(qt4.QObject):
         self.basewidget.draw(painthelper, page)
 
     def getNumberPages(self):
-        """Return the number of pages in the document."""
+        """Return the number of unhidden pages in the document."""
         return len(self.basewidget.children)
+
+    def getVisiblePages(self):
+        """Return list of 0-indexed numbers of visible pages."""
+        return [
+            i for i, pg in enumerate(self.basewidget.children)
+            if not pg.settings.hide
+        ]
 
     def getPage(self, pagenumber):
         """Return widget for page."""

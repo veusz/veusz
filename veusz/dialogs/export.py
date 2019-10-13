@@ -317,6 +317,8 @@ class ExportDialog(VeuszDialog):
 
     def getPagePages(self):
         """Get list of entered pages."""
+        visible = set(self.document.getVisiblePages())
+
         txt = self.editPagePages.text()
         parts = txt.split(',')
         pages = []
@@ -325,9 +327,13 @@ class ExportDialog(VeuszDialog):
             try:
                 if p.find('-')>=0:
                     rng = p.split('-')
-                    pages += list(range(int(rng[0])-1, int(rng[1])))
+                    for pg in range(int(rng[0])-1, int(rng[1])):
+                        if pg in visible:
+                            pages.append(pg)
                 else:
-                    pages.append(int(p)-1)
+                    pg = int(p)-1
+                    if pg in visible:
+                        pages.append(pg)
             except ValueError:
                 # convertsion error
                 raise RuntimeError(_('Error: invalid list of pages'))
@@ -340,8 +346,8 @@ class ExportDialog(VeuszDialog):
     def accept(self):
         """Do the export"""
 
-        if self.document.getNumberPages() == 0:
-            self.showMessage(_('Error: no pages in document'))
+        if not self.document.getVisiblePages():
+            self.showMessage(_('Error: no visible pages in document'))
             return
 
         filename = self.editFileName.text()
@@ -357,7 +363,7 @@ class ExportDialog(VeuszDialog):
         if self.pageselected == 'single':
             pages = [self.mainwindow.plot.getPageNumber()]
         elif self.pageselected == 'all':
-            pages = list(range(self.document.getNumberPages()))
+            pages = self.document.getVisiblePages()
         elif self.pageselected == 'pages':
             try:
                 pages = self.getPagePages()

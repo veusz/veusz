@@ -79,7 +79,10 @@ def printPages(doc, printer, pages, scaling=1., antialias=False, setsizes=False)
         painter.setRenderHint(qt4.QPainter.TextAntialiasing, True)
 
     # This all assumes that only pages can go into the root widget
-    for count, page in enumerate(pages):
+    visible = set(doc.getVisiblePages())
+    filtpages = [page for page in pages if page in visible]
+
+    for count, page in enumerate(filtpages):
         painter.save()
         painter.setClipRect(qt4.QRectF(
             qt4.QPointF(0,0), qt4.QPointF(*size)))
@@ -89,7 +92,7 @@ def printPages(doc, printer, pages, scaling=1., antialias=False, setsizes=False)
         painter.restore()
 
         # start new pages between each page
-        if count < len(pages)-1:
+        if count < len(filtpages)-1:
             # set page size before newPage!
             size = getUpdateSize(pages[count+1])
             printer.newPage()
@@ -444,7 +447,7 @@ class Export(object):
 def printDialog(parentwindow, document, filename=None):
     """Open a print dialog and print document."""
 
-    if document.getNumberPages() == 0:
+    if not document.getVisiblePages():
         qt4.QMessageBox.warning(
             parentwindow, _("Error - Veusz"), _("No pages to print"))
         return
