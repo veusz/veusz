@@ -1,6 +1,26 @@
-Changes in <next release>:
- * Fix crash on importing hdf5 datasets with variable length text
- * Fix for bezier line interpolation failing in some circumstances
+Changes in 3.1:
+ Improvements:
+  * Do not print or export hidden pages
+  * Allow expressions in dataset of contour widget
+  * Allow widgets to be excluded in key (thanks to Alexander Book)
+  * Make bezier line better fit data
+
+ Bug fixes:
+  * Compilation fix for PyQt>=5.12 (thanks to Dimitry Shachnev)
+  * Ensure fit settings are sorted in output file
+  * Fix crash in contour labelling
+  * Fix 3D axis crash bug
+  * Fix problem with broken axis with null-sized regions
+  * Fix issue with 0-sized images in image widget
+  * Fix function widget crash with certain plotting range
+  * Fix for axis crash with large magnitude ranges
+  * Fix CSV importing issues for 2D and ND data
+  * Fix zero division error in 2D import
+  * Fix crash on importing HDF5 files with variable length text
+  * Catch issue with zero range axes
+  * Fix crash is using set in dataset expression
+  * Fix crash when moving line coordinates
+  * Remove deprecation warnings when compiling with recent Qt versions
 
 Changes in 3.0.1:
  * Change in build system to use qmake to find Qt locations. This is to fix

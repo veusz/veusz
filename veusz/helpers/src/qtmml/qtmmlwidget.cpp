@@ -237,8 +237,8 @@ class MmlNode : public Mml
 	int em() const;
 	int ex() const;
 
-	QString explicitAttribute(const QString &name, const QString &def = QString::null) const;
-	QString inheritAttributeFromMrow(const QString &name, const QString &def = QString::null) const;
+	QString explicitAttribute(const QString &name, const QString &def = QString()) const;
+	QString inheritAttributeFromMrow(const QString &name, const QString &def = QString()) const;
 
 	virtual QFont font() const;
 	virtual QColor color() const;
@@ -3045,7 +3045,7 @@ QString MmlDocument::fontName(QtMmlWidget::MmlFont type) const
 	    return m_doublestruck_font_name;
     };
 
-    return QString::null;
+    return QString();
 }
 
 void MmlDocument::setFontName(QtMmlWidget::MmlFont type, const QString &name)
@@ -3369,7 +3369,7 @@ MmlNode *MmlDocument::createNode(NodeType type,
 void MmlDocument::insertOperator(MmlNode *node, const QString &text)
 {
     MmlNode *text_node = createNode(TextNode, MmlAttributeMap(), text, 0);
-    MmlNode *mo_node = createNode(MoNode, MmlAttributeMap(), QString::null, 0);
+    MmlNode *mo_node = createNode(MoNode, MmlAttributeMap(), QString(), 0);
 
     bool ok = insertChild(node, mo_node, 0);
     Q_ASSERT( ok );
@@ -3473,7 +3473,7 @@ MmlNode *MmlDocument::domToMml(const QDomNode &dom_node, bool *ok, QString *erro
 		}
 
 		if (mml_type == MtableNode && mml_child->nodeType() != MtrNode) {
-		    MmlNode *mtr_node = createNode(MtrNode, MmlAttributeMap(), QString::null, 0);
+		    MmlNode *mtr_node = createNode(MtrNode, MmlAttributeMap(), QString(), 0);
 		    insertChild(mml_node, mtr_node, 0);
 		    if (!insertChild(mtr_node, mml_child, errorMsg)) {
 			delete mml_node;
@@ -3483,7 +3483,7 @@ MmlNode *MmlDocument::domToMml(const QDomNode &dom_node, bool *ok, QString *erro
 		    }
 		}
 		else if (mml_type == MtrNode && mml_child->nodeType() != MtdNode) {
-		    MmlNode *mtd_node = createNode(MtdNode, MmlAttributeMap(), QString::null, 0);
+		    MmlNode *mtd_node = createNode(MtdNode, MmlAttributeMap(), QString(), 0);
 		    insertChild(mml_node, mtd_node, 0);
 		    if (!insertChild(mtd_node, mml_child, errorMsg)) {
 			delete mml_node;
@@ -3536,7 +3536,7 @@ MmlNode *MmlDocument::createImplicitMrowNode(const QDomNode &dom_node, bool *ok,
 	return domToMml(dom_child_list.item(0), ok, errorMsg);
 
     MmlNode *mml_node = createNode(MrowNode, MmlAttributeMap(),
-				    QString::null, errorMsg);
+				    QString(), errorMsg);
     Q_ASSERT(mml_node != 0); // there is no reason in heaven or hell for this to fail
 
     for (int i = 0; i < child_cnt; ++i) {
@@ -3787,7 +3787,7 @@ QColor MmlNode::background() const
 }
 
 static void updateFontAttr(MmlAttributeMap &font_attr, const MmlNode *n,
-				const QString &name, const QString &preferred_name = QString::null)
+				const QString &name, const QString &preferred_name = QString())
 {
     if (font_attr.contains(preferred_name) || font_attr.contains(name))
 	return;
@@ -5780,7 +5780,7 @@ static QString decodeEntityValue(QString literal)
 
 	if (!literal.startsWith("&#")) {
 	    qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
-	    return QString::null;
+	    return QString();
 	}
 
 	literal = literal.right(literal.length() - 2);
@@ -5788,7 +5788,7 @@ static QString decodeEntityValue(QString literal)
 	int i = literal.indexOf(';');
 	if (i == -1) {
 	    qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
-	    return QString::null;
+	    return QString();
 	}
 
 	QString char_code = literal.left(i);
@@ -5796,7 +5796,7 @@ static QString decodeEntityValue(QString literal)
 
 	if (char_code.isEmpty()) {
 	    qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
-	    return QString::null;
+	    return QString();
 	}
 
 	if (char_code.at(0) == 'x') {
@@ -5805,7 +5805,7 @@ static QString decodeEntityValue(QString literal)
 	    unsigned c = char_code.toUInt(&ok, 16);
 	    if (!ok) {
 	        qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
-		return QString::null;
+		return QString();
 	    }
 	    result += QChar(c);
 	}
@@ -5814,7 +5814,7 @@ static QString decodeEntityValue(QString literal)
 	    unsigned c = char_code.toUInt(&ok, 10);
 	    if (!ok) {
 	        qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
-		return QString::null;
+		return QString();
 	    }
 	    result += QChar(c);
 	}
@@ -5999,7 +5999,7 @@ static QString mmlDictAttribute(const QString &name, const OperSpec *spec)
 {
     int i = attributeIndex(name);
     if (i == -1)
-	return QString::null;
+	return QString();
     else
 	return spec->attributes[i];
 }

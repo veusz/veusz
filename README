@@ -34,6 +34,7 @@ Changes in 3.1:
   * Catch issue with zero range axes
   * Fix crash is using set in dataset expression
   * Fix crash when moving line coordinates
+  * Remove deprecation warnings when compiling with recent Qt versions
 
 Changes in 3.0.1:
  * Change in build system to use qmake to find Qt locations. This is to fix
