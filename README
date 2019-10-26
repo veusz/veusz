@@ -18,6 +18,7 @@ Changes in 3.1:
   * Allow expressions in dataset of contour widget
   * Allow widgets to be excluded in key (thanks to Alexander Book)
   * Make bezier line better fit data
+  * Switch linux binary from x86 -> x86-64 for better compatibility
 
  Bug fixes:
   * Compilation fix for PyQt>=5.12 (thanks to Dimitry Shachnev)
