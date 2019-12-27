@@ -87,10 +87,10 @@ def makeSplash(app):
 def excepthook(excepttype, exceptvalue, tracebackobj):
     '''Show exception dialog if an exception occurs.'''
 
-    # current dialog doesnt work if not in main thread
-    # fixme: post error message instread of printing
+    # exception dialog doesnt work if not in main thread, so we send
+    # the exception to the application to display
     if qt.qApp.thread() is not qt.QThread.currentThread():
-        defaultexcepthook(excepttype, exceptvalue, trackbackobj)
+        qt.qApp.signalException.emit(excepttype, exceptvalue, tracebackobj)
         return
 
     sys.setrecursionlimit(sys.getrecursionlimit()+1000)
@@ -149,10 +149,13 @@ class ImportThread(qt.QThread):
 class VeuszApp(qt.QApplication):
     """Event which can open mac files."""
 
+    signalException = qt.pyqtSignal(object, object, object)
+
     def __init__(self):
         qt.QApplication.__init__(self, sys.argv)
 
         self.lastWindowClosed.connect(self.quit)
+        self.signalException.connect(self.showException)
 
         # register a signal handler to catch ctrl+C
         signal.signal(signal.SIGINT, handleIntSignal)
@@ -334,6 +337,15 @@ class VeuszApp(qt.QApplication):
         # otherwise it never gets shown
         for error in startuperrors:
             qt.QMessageBox.critical(None, "Veusz", error)
+
+    def showException(self, excepttype, exceptvalue, tracebackobj):
+        """Show an exception dialog (raised from another thread)."""
+        from veusz.dialogs.exceptiondialog import ExceptionDialog
+        if not isinstance(exceptvalue, utils.IgnoreException):
+            # next exception is ignored to clear out the stack frame of the
+            # previous exception - yuck
+            d = ExceptionDialog((excepttype, exceptvalue, tracebackobj), None)
+            d.exec_()
 
 def run():
     '''Run the main application.'''
