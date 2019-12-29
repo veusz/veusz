@@ -39,7 +39,6 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="453.4" y="411.7" font-size="14pt" fill="#000000">data</text>
 </g>
@@ -48,7 +47,6 @@
 </g>
 <g fill="none" stroke-width="1">
 <text x="453.4" y="429.2" font-size="14pt" fill="#000000">fit</text>
-</g>
 </g>
 <g clip-path="url(#c2)">
 <g fill="none" stroke-width="0.6">

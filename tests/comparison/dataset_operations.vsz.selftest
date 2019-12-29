@@ -73,10 +73,8 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="265.7" y="26.3" font-size="14pt" fill="#000000">data</text>
-</g>
 </g>
 <g clip-path="url(#c3)">
 <g fill="none" stroke="#de9578" stroke-width="0.6">
@@ -89,10 +87,8 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="265.7" y="43.8" font-size="14pt" fill="#000000">add</text>
-</g>
 </g>
 <g clip-path="url(#c4)">
 <g fill="none" stroke="#d02bf1" stroke-width="0.6">
@@ -103,10 +99,8 @@
 <use xlink:href="#p1" x="230.5" y="68.3"/>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="265.7" y="61.3" font-size="14pt" fill="#000000">plus</text>
-</g>
 </g>
 <g clip-path="url(#c5)">
 <g fill="none" stroke="#00a2b7" stroke-width="0.6">
@@ -119,10 +113,8 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="265.7" y="78.8" font-size="14pt" fill="#000000">mean</text>
-</g>
 </g>
 <g clip-path="url(#c6)">
 <g fill="none" stroke="#696b69" stroke-width="0.6">
@@ -135,10 +127,8 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="407.1" y="26.3" font-size="14pt" fill="#000000">sub</text>
-</g>
 </g>
 <g clip-path="url(#c7)">
 <g fill="none" stroke="#684f5f" stroke-width="0.6">
@@ -151,10 +141,8 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="407.1" y="43.8" font-size="14pt" fill="#000000">scale</text>
-</g>
 </g>
 <g clip-path="url(#c8)">
 <g fill="#dbe0ed" stroke="none" stroke-width="1">
@@ -174,10 +162,8 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="407.1" y="61.3" font-size="14pt" fill="#000000">extremes</text>
-</g>
 </g>
 <g clip-path="url(#c9)">
 <g fill="none" stroke-width="0.6">
@@ -188,10 +174,8 @@
 <use xlink:href="#p0" x="371.9" y="85.8"/>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="407.1" y="78.8" font-size="14pt" fill="#000000">thin</text>
-</g>
 </g>
 <g clip-path="url(#c1)">
 <g fill="#dbe0ed" stroke="none" stroke-width="1">

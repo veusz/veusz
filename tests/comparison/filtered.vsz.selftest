@@ -55,10 +55,8 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="130.6" y="420.5" font-size="14pt" fill="#000000">Filtered</text>
-</g>
 </g>
 <g clip-path="url(#c3)">
 <g fill="none" stroke-width="0.6">
@@ -71,10 +69,8 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="130.6" y="438" font-size="14pt" fill="#000000">Data</text>
-</g>
 </g>
 <g clip-path="url(#c1)">
 <g fill="none" stroke="#808080" stroke-width="1.2">

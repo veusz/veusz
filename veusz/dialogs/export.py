@@ -70,7 +70,7 @@ class ExportDialog(VeuszDialog):
 
         # get allowed types (some formats are disabled if no helper)
         docfmts = set()
-        for types, descr in document.Export.getFormats():
+        for types, descr in document.AsyncExport.getFormats():
             docfmts.update(types)
         # disable type if not allowed
         for fmt, radio in citems(self.fmtradios):
@@ -395,10 +395,8 @@ class ExportDialog(VeuszDialog):
             except ValueError:
                 pass
 
-        export = document.Export(
+        export = document.AsyncExport(
             self.document,
-            '',    # filename
-            [0],   # page numbers
             bitmapdpi=setdb['export_DPI'],
             pdfdpi=setdb['export_DPI_PDF'],
             antialias=setdb['export_antialias'],
@@ -421,52 +419,40 @@ class ExportDialog(VeuszDialog):
 
         # count exported pages (in list so can be modified in function)
         pagecount = [0]
-        def _checkAndExport():
+        def _checkAndExport(fname, pages):
             """Check whether file exists and export if ok."""
-            if os.path.exists(export.filename):
+            if os.path.exists(fname):
                 if not setdb['export_overwrite']:
-                    if not _overwriteQuestion(export.filename):
+                    if not _overwriteQuestion(fname):
                         return
 
             # show busy cursor
-            qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.WaitCursor))
+            #qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.WaitCursor))
             # delete file if already exists
             try:
-                os.unlink(export.filename)
+                os.unlink(fname)
             except EnvironmentError:
                 pass
 
-            try:
-                # actually do the export
-                export.export()
-                pagecount[0] += len(export.pagenumbers)
-            except (RuntimeError, EnvironmentError) as e:
-                # errors from the export
-                if isinstance(e, EnvironmentError):
-                    msg = cstrerror(e)
-                else:
-                    msg = cstr(e)
-                qt4.QApplication.restoreOverrideCursor()
-                qt4.QMessageBox.critical(
-                    self, _("Error - Veusz"),
-                    _("Error exporting to file '%s'\n\n%s") %
-                    (export.filename, msg))
-            else:
-                qt4.QApplication.restoreOverrideCursor()
+            # actually do the export
+            export.add(fname, pages)
+            pagecount[0] += len(pages)
+
+            ext = os.path.splitext(fname)[1]
+            if ext:
+                utils.feedback.exportcts[ext] += 1
 
         if self.isMultiFile() or len(pages)==1:
             # write pages to multiple files
             for page in pages:
                 pagename = self.document.getPage(page).name
-                export.pagenumbers = [page]
 
                 pg = page+1
                 fname = filename.replace('%PAGE%', str(pg))
                 fname = fname.replace('%PAGE00%', '%02i' % pg)
                 fname = fname.replace('%PAGE000%', '%03i' % pg)
                 fname = fname.replace('%PAGENAME%', pagename)
-                export.filename = fname
-                _checkAndExport()
+                _checkAndExport(fname, [page])
         else:
             # write page/pages to single file
             fname = filename.replace('%PAGE%', _('none'))
@@ -474,18 +460,43 @@ class ExportDialog(VeuszDialog):
             fname = fname.replace('%PAGE000%', _('none'))
             fname = fname.replace('%PAGENAME%', _('none'))
 
-            export.pagenumbers = pages
-            export.filename = fname
-            _checkAndExport()
+            _checkAndExport(fname, pages)
 
         dirname = os.path.dirname(filename)
         if dirname:
             setting.settingdb['dirname_export'] = dirname
 
         # format feedback
-        ext = os.path.splitext(export.filename)[1]
-        if ext:
-            utils.feedback.exportcts[ext] += 1
+        self.showMessage(_('Processing...'))
 
-        if pagecount[0] > 0:
-            self.showMessage(_('Exported %i page(s)') % pagecount[0])
+        self.buttonBox.button(qt4.QDialogButtonBox.Close).setEnabled(False)
+        self.buttonBox.button(qt4.QDialogButtonBox.Save).setEnabled(False)
+
+        def checkDone():
+            """Check whether exporting has finished."""
+            if not export.haveDone():
+                return
+            try:
+                export.finish()
+            except (RuntimeError, EnvironmentError) as e:
+                # errors from the export
+                if isinstance(e, EnvironmentError):
+                    msg = cstrerror(e)
+                else:
+                    msg = cstr(e)
+                #qt4.QApplication.restoreOverrideCursor()
+                qt4.QMessageBox.critical(
+                    self, _("Error - Veusz"),
+                    _("Error exporting to file '%s'\n\n%s") %
+                    (fname, msg))
+            else:
+                if pagecount[0] > 0:
+                    self.showMessage(_('Exported %i page(s)') % pagecount[0])
+
+            self.buttonBox.button(qt4.QDialogButtonBox.Close).setEnabled(True)
+            self.buttonBox.button(qt4.QDialogButtonBox.Save).setEnabled(True)
+            self.checktimer.stop()
+
+        self.checktimer = qt4.QTimer(self)
+        self.checktimer.timeout.connect(checkDone)
+        self.checktimer.start(20)

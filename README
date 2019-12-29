@@ -114,9 +114,9 @@ Features of package:
   * Multithreaded rendering
 
 Requirements for source install:
- Python 2.x (2.6 or greater required) or 3.x (3.3 or greater required)
+ Python 2.x (2.7 or greater required) or 3.x (3.3 or greater required)
    https://www.python.org/
- Qt >= 5.2 (free edition)
+ Qt >= 5.5 (free edition)
    https://www.qt.io/
  PyQt >= 5.2  (Qt and SIP is required to be installed first)
    https://www.riverbankcomputing.co.uk/software/pyqt/

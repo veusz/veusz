@@ -401,7 +401,6 @@
 <image x="150.5" y="24.5" width="283.4" height="17.5" xlink:href="data:image/ppm;base64,UDYKMTI4IDEKMjU1CgAAAAAKAAAUAAAeAAAoAAAyAAA8AABGAABQAABaAABkAABuAAB4AACDAACNAACXAAChAACrAAC1AAC/AADJAADTAADdAADnAADxAAD7AAb5BhDvEBrlGiTbJC7RLjjHOEK9QkyzTFapVmCfYGqVanSLdH6Bfol2iZNsk51inadYp7FOsbtEu8U6xc8wz9km2eMc4+0S7fcI9/8A/f8A8/8A6f8A3/8A1f8Ay/8Awf8At/8Arf8Ao/8Amf8Aj/8Ahf8Aev8AcP8AZv8AXP8AUv8ASP8APv8ANP8AKv8AIP8AFv8ADP8AAv8IAP8SAP8cAP8mAP8wAP86AP9EAP9OAP9YAP9iAP9sAP92AP+BAP+LAP+VAP+fAP+pAP+zAP+9AP/HAP/RAP/bAP/lAP/vAP/5AP//BP//Dv//GP//Iv//LP//Nv//QP//Sv//VP//Xv//aP//cv//fP//h///kf//m///pf//r///uf//w///zf//1///4f//6///9f///w==" preserveAspectRatio="none"/>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="0.6">
 <path d="m150.5,24.5l283.4,0l0,17.5l-283.4,0l0,-17.5"/>
 </g>
@@ -416,6 +415,7 @@
 <text x="281.1" y="47.3" font-size="14pt" fill="#000000">100</text>
 <text x="370" y="47.3" font-size="14pt" fill="#000000">1k</text>
 </g>
+<g clip-path="url(#c0)">
 <g fill="none" stroke-linecap="butt" stroke-width="1.2">
 <path d="M60.2,471.2l0,-464.1"/>
 </g>

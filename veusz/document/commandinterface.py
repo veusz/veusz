@@ -769,13 +769,19 @@ class CommandInterface(qt4.QObject):
         except TypeError:
             pages = [page]
 
-        e = export.Export(
-            self.document, filename, pages, color=color,
-            bitmapdpi=dpi, antialias=antialias,
-            quality=quality, backcolor=backcolor,
+        e = export.AsyncExport(
+            self.document,
+            color=color,
+            bitmapdpi=dpi,
+            antialias=antialias,
+            quality=quality,
+            backcolor=backcolor,
             pdfdpi=pdfdpi,
-            svgdpi=svgdpi, svgtextastext=svgtextastext)
-        e.export()
+            svgdpi=svgdpi,
+            svgtextastext=svgtextastext
+        )
+        e.add(filename, pages)
+        e.finish()
 
     def Rename(self, widget, newname):
         """Rename the widget with the path given to the new name.

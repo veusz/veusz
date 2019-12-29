@@ -144,10 +144,8 @@
 <use xlink:href="#p2" x="374.4" y="383.7"/>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="409.6" y="376.7" font-size="14pt" fill="#000000">Valkyries</text>
-</g>
 </g>
 <g clip-path="url(#c3)">
 <g fill="none" stroke-width="0.6">
@@ -160,10 +158,8 @@
 <use xlink:href="#p1" x="374.4" y="401.2"/>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="409.6" y="394.2" font-size="14pt" fill="#000000">Swindon</text>
-</g>
 </g>
 <g clip-path="url(#c4)">
 <g fill="none" stroke-width="0.6">
@@ -177,7 +173,6 @@
 <use xlink:href="#p0" x="374.4" y="418.7"/>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="409.6" y="411.7" font-size="14pt" fill="#000000">Discworld</text>
 </g>
@@ -187,6 +182,7 @@
 <g fill="none" stroke-width="1">
 <text x="409.6" y="429.2" font-size="14pt" fill="#000000">Model</text>
 </g>
+<g clip-path="url(#c0)">
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M60.2,471.2l0,-464.1"/>
 <path d="M60.2,471.2l3.7,0M60.2,452.6l3.7,0M60.2,434.1l3.7,0M60.2,415.5l3.7,0M60.2,396.9l3.7,0M60.2,378.4l3.7,0M60.2,359.8l3.7,0M60.2,341.2l3.7,0M60.2,322.7l3.7,0M60.2,304.1l3.7,0M60.2,285.5l3.7,0M60.2,267l3.7,0M60.2,248.4l3.7,0M60.2,229.8l3.7,0M60.2,211.3l3.7,0M60.2,192.7l3.7,0M60.2,174.1l3.7,0M60.2,155.6l3.7,0M60.2,137l3.7,0M60.2,118.4l3.7,0M60.2,99.9l3.7,0M60.2,81.3l3.7,0M60.2,62.7l3.7,0M60.2,44.2l3.7,0M60.2,25.6l3.7,0M60.2,7l3.7,0"/>

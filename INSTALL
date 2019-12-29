@@ -7,14 +7,14 @@ Veusz Installation
 Veusz uses distutils for its installation. See below for how to use it.
 
 Requirements:
- python2 >= 2.6 or python3 >= 3.3
+ python2 >= 2.7 or python3 >= 3.3
                  https://www.python.org/
  PyQt >= 5.2     https://www.riverbankcomputing.co.uk/software/pyqt/
  numpy >= 1.0    http://www.numpy.org/
  argparse        https://pypi.python.org/pypi/argparse (Python 2.6 only)
 
 PyQt requires
- Qt5 >= 5.2      https://www.qt.io/developers/
+ Qt5 >= 5.5      https://www.qt.io/developers/
                  latest version recommended
  SIP >= 4.15     https://www.riverbankcomputing.co.uk/software/sip/
 

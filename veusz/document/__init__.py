@@ -26,6 +26,6 @@ from .commandinterpreter import *
 from .operations import *
 from .mime import *
 from .painthelper import *
-from .export import Export, printDialog
+from .export import AsyncExport, printDialog
 from .dbusinterface import *
 from .loader import loadDocument, executeScript, LoadError

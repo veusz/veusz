@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #    Copyright (C) 2011 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>

@@ -32,7 +32,6 @@
 <image x="489.4" y="24.5" width="17.5" height="429.1" xlink:href="data:image/ppm;base64,UDYKMSAxMjgKMjU1CgAAAAYAAAwAABIAABcAAB0AACMAACkAAC8AADUAADsAAEAAAEYAAEwAAFIAAFgAAF4AAGQAAGkAAG8AAHUAAHsAAIEAAIcAAI0AAJIAAJgAAJ4AAKQAAKoAALAAALYAALsBAL0FAr8KBMEOBcMTB8UXCMgbCsogC8wkDc4oD9AtENIxEtU2E9c6Fdk+FttDGN1HGt9MG+JQHeRUHuZZIOhdIephI+1mJe9qJvFvKPNzKfV3K/d8LPqALvyEMP6JMf+NMv+QMf6TMP6WL/6ZLv6cLf6fLP2jK/2mKv2pKf2sKPyvJ/yyJvy2Jfy5JPy8I/u/IvvCIfvFIPvIH/rMHvrPHfrSHPrVG/rYGvnbGfneGPniF/nlFvjoFfjrFPjuE/jvGfjwIPnwJ/nxL/nxNvnyPvnyRfrzTfrzVPr0W/r0Y/v1avv1cvv2efv2gfv3iPz3kPz4l/z4nvz5pv35rf36tf36vP37xP37y/780v782v794f796f/+8P/++P///w==" preserveAspectRatio="none"/>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="0.6">
 <path d="m489.4,24.5l17.5,0l0,429.1l-17.5,0l0,-429.1"/>
 </g>
@@ -44,6 +43,9 @@
 <g fill="none" stroke-width="1">
 <text x="477.1" y="462.5" font-size="14pt" fill="#000000">1</text>
 <text x="468.4" y="132.6" font-size="14pt" fill="#000000">10</text>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke-width="1">
 <text x="123.5" y="34" font-size="30pt" fill="#000000">The Mandelbrot Set</text>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">

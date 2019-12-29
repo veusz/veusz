@@ -55,12 +55,10 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="130.6" y="403" font-size="14pt" fill="#000000">Iron </text>
 <text x="174.4" y="403" font-size="14pt" fill="#000000">Chandra</text>
 <text x="235.6" y="403" font-size="14pt" fill="#000000"> Western</text>
-</g>
 </g>
 <g clip-path="url(#c2)">
 <g fill="none" stroke-width="0.6">
@@ -74,12 +72,10 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="130.6" y="420.5" font-size="14pt" fill="#000000">Iron </text>
 <text x="174.4" y="420.5" font-size="14pt" fill="#000000">Chandra</text>
 <text x="235.6" y="420.5" font-size="14pt" fill="#000000"> Eastern</text>
-</g>
 </g>
 <g clip-path="url(#c3)">
 <g fill="none" stroke-width="0.6">
@@ -93,11 +89,9 @@
 </g>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="130.6" y="438" font-size="14pt" fill="#000000">Iron </text>
 <text x="174.4" y="438" font-size="14pt" fill="#000000">XMM</text>
-</g>
 </g>
 <g clip-path="url(#c4)">
 <g fill="none" stroke-width="0.6">

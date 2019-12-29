@@ -65,10 +65,8 @@
 <path d="M90.2,52l35.4,0"/>
 </g>
 </g>
-<g clip-path="url(#c0)">
 <g fill="none" stroke-width="1">
 <text x="140.6" y="46" font-size="12pt" fill="#000000">Histogram</text>
-</g>
 </g>
 <g clip-path="url(#c1)">
 <g fill="none" stroke="#0000ff" stroke-width="0.6">
