@@ -23,6 +23,7 @@ from .. import qtall as qt4
 from .. import utils
 from .. import document
 from .. import datasets
+from .. import setting
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="DataCreateDialog"):
@@ -288,8 +289,11 @@ class DataCreateDialog(VeuszDialog):
 
         Raises _DSException if error
         """
-        t0 = float(self.tstartedit.text())
-        t1 = float(self.tendedit.text())
+
+        t0, ok0 = setting.uilocale.toDouble(self.tstartedit.text())
+        t1, ok1 = setting.uilocale.toDouble(self.tendedit.text())
+        if not ok0 or not ok1:
+            raise _DSException()
         numsteps = int(self.tstepsedit.text())
 
         # get expressions
