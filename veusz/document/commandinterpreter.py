@@ -48,7 +48,7 @@ import traceback
 import io
 import os.path
 
-from ..compat import pickle, cexec
+from ..compat import pickle, cexec, cpy3
 from .commandinterface import CommandInterface
 from .. import utils
 
@@ -175,7 +175,8 @@ class CommandInterpreter(object):
     def Load(self, filename):
         """Replace the document with a new one from the filename."""
 
-        with io.open(filename, 'rU', encoding='utf8') as f:
+        mode = 'r' if cpy3 else 'rU'
+        with io.open(filename, mode, encoding='utf8') as f:
             self.document.wipe()
             self.interface.To('/')
             oldfile = self.globals['__file__']
