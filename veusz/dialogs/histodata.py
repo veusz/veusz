@@ -71,7 +71,7 @@ class HistoDataDialog(VeuszDialog):
         self.document = document
 
         self.minval.default = self.maxval.default = ['Auto']
-        regexp = qt.QRegExp("^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?|Auto$")
+        regexp = qt.QRegExp(r"^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?|Auto$")
         validator = qt.QRegExpValidator(regexp, self)
         self.minval.setValidator(validator)
         self.maxval.setValidator(validator)
