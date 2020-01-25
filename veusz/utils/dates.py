@@ -243,7 +243,7 @@ def dateStrToRegularExpression(instr):
         out.append( '(?:%s)?' % p )
 
     # return final expression
-    return '^\s*%s\s*$' % (''.join(out))
+    return r'^\s*%s\s*$' % (''.join(out))
 
 def dateREMatchToDate(match):
     """Take match object for above regular expression,

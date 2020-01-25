@@ -28,7 +28,7 @@ from .. import qtall as qt4
 from .. import setting
 from .. import utils
 
-from ..compat import cexec, cstrerror, cbytes, cexceptionuser
+from ..compat import cexec, cstrerror, cbytes, cexceptionuser, cpy3
 from .commandinterface import CommandInterface
 from . import datasets
 
@@ -270,7 +270,8 @@ def loadDocument(thedoc, filename, mode='vsz',
 
     if mode == 'vsz':
         try:
-            with io.open(filename, 'rU', encoding='utf-8') as f:
+            mode = 'r' if cpy3 else 'rU'
+            with io.open(filename, mode, encoding='utf-8') as f:
                 script = f.read()
         except EnvironmentError as e:
             raise LoadError( _("Cannot open document '%s'\n\n%s") %

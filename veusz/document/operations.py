@@ -32,7 +32,7 @@ import io
 
 import numpy as N
 
-from ..compat import czip, crange, citems, cbasestr
+from ..compat import czip, crange, citems, cbasestr, cpy3
 from . import widgetfactory
 
 from .. import datasets
@@ -1176,7 +1176,8 @@ class OperationLoadStyleSheet(OperationMultiple):
         # fire up interpreter to read file
         interpreter = commandinterpreter.CommandInterpreter(document)
         try:
-            interpreter.runFile( io.open(self.filename, 'rU',
+            mode = 'r' if cpy3 else 'rU'
+            interpreter.runFile( io.open(self.filename, mode,
                                          encoding='utf8') )
         except:
             document.batchHistory(None)

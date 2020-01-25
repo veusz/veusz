@@ -405,7 +405,7 @@ class SVGPaintEngine(qt.QPaintEngine):
                 element.attrb += ' id="p%i"' % num
 
             # if the parent is a translation, swallow this into the use element
-            m = re.match('transform="translate\(([-0-9.]+),([-0-9.]+)\)"',
+            m = re.match(r'transform="translate\(([-0-9.]+),([-0-9.]+)\)"',
                          self.celement.attrb)
             if m:
                 SVGElement(self.celement.parent, 'use',
