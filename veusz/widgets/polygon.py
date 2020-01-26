@@ -33,7 +33,7 @@ class Polygon(plotters.FreePlotter):
     """For plotting polygons."""
 
     typename = 'polygon'
-    allowusercreeation = True
+    allowusercreation = True
     description = _('Plot a polygon')
 
     def __init__(self, parent, name=None):

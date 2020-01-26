@@ -60,13 +60,19 @@ class Widget(object):
     # differentiate widgets, settings and setting
     nodetype = 'widget'
 
+    # text name for widget type
     typename = 'generic'
+
+    # can the widget type be created directly by a user?
     allowusercreation = False
 
+    # is this an axis widget type?
     isaxis = False
+
+    # is this a plotter widget type?
     isplotter = False
 
-    # various items in class hierarchy
+    # used by API for navigating widget->settings->setting hierarchies
     iswidget = True
     issetting = False
     issettings = False
