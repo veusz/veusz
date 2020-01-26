@@ -35,7 +35,7 @@ def _(text, disambiguation=None, context='Graph'):
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
-    
+
     typename='graph'
     allowusercreation = True
     description = _('Base graph')
@@ -45,47 +45,64 @@ class Graph(widget.Widget):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
 
-        s.add( setting.Distance( 'leftMargin',
-                                 '1.7cm',
-                                 descr=_('Distance from left of graph to edge'),
-                                 usertext=_('Left margin'),
-                                 formatting=True) )
-        s.add( setting.Distance( 'rightMargin',
-                                 '0.2cm',
-                                 descr=_('Distance from right of graph to edge'),
-                                 usertext=_('Right margin'),
-                                 formatting=True) )
-        s.add( setting.Distance( 'topMargin',
-                                 '0.2cm',
-                                 descr=_('Distance from top of graph to edge'),
-                                 usertext=_('Top margin'),
-                                 formatting=True) )
-        s.add( setting.Distance( 'bottomMargin',
-                                 '1.7cm',
-                                 descr=_('Distance from bottom of graph to edge'),
-                                 usertext=_('Bottom margin'),
-                                 formatting=True) )
-        s.add( setting.FloatOrAuto('aspect',
-                                   'Auto',
-                                   descr=_('Fix aspect ratio of graph to this value'),
-                                   usertext=_('Aspect ratio'),
-                                   minval = 0.01,
-                                   maxval = 100.,
-                                   formatting=True) )
+        s.add( setting.Distance(
+            'leftMargin',
+            '1.7cm',
+            descr=_('Distance from left of graph to edge'),
+            usertext=_('Left margin'),
+            formatting=True,
+        ) )
+        s.add( setting.Distance(
+            'rightMargin',
+            '0.2cm',
+            descr=_('Distance from right of graph to edge'),
+            usertext=_('Right margin'),
+            formatting=True,
+        ) )
+        s.add( setting.Distance(
+            'topMargin',
+            '0.2cm',
+            descr=_('Distance from top of graph to edge'),
+            usertext=_('Top margin'),
+            formatting=True,
+        ) )
+        s.add( setting.Distance(
+            'bottomMargin',
+            '1.7cm',
+            descr=_('Distance from bottom of graph to edge'),
+            usertext=_('Bottom margin'),
+            formatting=True,
+        ) )
+        s.add( setting.FloatOrAuto(
+            'aspect',
+            'Auto',
+            descr=_('Fix aspect ratio of graph to this value'),
+            usertext=_('Aspect ratio'),
+            minval = 0.01,
+            maxval = 100.,
+            formatting=True,
+        ) )
 
         s.add( setting.Notes(
-                'notes', '',
-                descr=_('User-defined notes'),
-                usertext=_('Notes')
-                ) )
+            'notes', '',
+            descr=_('User-defined notes'),
+            usertext=_('Notes')
+        ) )
 
-        s.add( setting.GraphBrush( 'Background',
-                                   descr = _('Background plot fill'),
-                                   usertext=_('Background')),
-               pixmap='settings_bgfill' )
-        s.add( setting.Line('Border', descr = _('Graph border line'),
-                            usertext=_('Border')),
-               pixmap='settings_border')
+        s.add(
+            setting.GraphBrush(
+                'Background',
+                descr = _('Background plot fill'),
+                usertext=_('Background')),
+            pixmap='settings_bgfill',
+        )
+        s.add(
+            setting.Line(
+                'Border',
+                descr = _('Graph border line'),
+                usertext=_('Border')),
+            pixmap='settings_border',
+        )
 
     @classmethod
     def allowedParentTypes(klass):
@@ -115,7 +132,7 @@ class Graph(widget.Widget):
         """
 
         axes = {}
-        # recursively go back up the tree to find axes 
+        # recursively go back up the tree to find axes
         w = self
         while w is not None and len(axes) < len(axesnames):
             for c in w.children:
@@ -168,10 +185,12 @@ class Graph(widget.Widget):
     def getMargins(self, painthelper):
         """Use settings to compute margins."""
         s = self.settings
-        return ( s.get('leftMargin').convert(painthelper),
-                 s.get('topMargin').convert(painthelper),
-                 s.get('rightMargin').convert(painthelper),
-                 s.get('bottomMargin').convert(painthelper) )
+        return (
+            s.get('leftMargin').convert(painthelper),
+            s.get('topMargin').convert(painthelper),
+            s.get('rightMargin').convert(painthelper),
+            s.get('bottomMargin').convert(painthelper),
+        )
 
     def draw(self, parentposn, painthelper, outerbounds = None):
         '''Update the margins before drawing.'''
@@ -182,7 +201,8 @@ class Graph(widget.Widget):
         s = self.settings
 
         bounds = self.computeBounds(parentposn, painthelper)
-        maxbounds = self.computeBounds(parentposn, painthelper, withmargin=False)
+        maxbounds = self.computeBounds(
+            parentposn, painthelper, withmargin=False)
 
         # do no painting if hidden
         if s.hide:
@@ -191,8 +211,7 @@ class Graph(widget.Widget):
         # controls for adjusting graph margins
         painter = painthelper.painter(self, bounds)
         painthelper.setControlGraph(self, [
-            controlgraph.ControlMarginBox(self, bounds, maxbounds,
-                                          painthelper)
+            controlgraph.ControlMarginBox(self, bounds, maxbounds, painthelper)
         ])
 
         bounds = self.adjustBoundsForAspect(bounds)
@@ -237,8 +256,8 @@ class Graph(widget.Widget):
         for aname, awidget in axisdrawlist:
             awidget.updateAxisLocation(bounds)
             awidget.computePlottedRange()
-            awidget.drawGrid(bounds, painthelper, outerbounds=outerbounds,
-                             ontop=False)
+            awidget.drawGrid(
+                bounds, painthelper, outerbounds=outerbounds, ontop=False)
 
         # broken axis handling
         brokenaxes = set()
@@ -291,8 +310,8 @@ class Graph(widget.Widget):
         # then for grid lines on top
         axiswidgets = [axis for name, axis in axisdrawlist]
         for awidget in axiswidgets:
-            awidget.drawGrid(bounds, painthelper, outerbounds=outerbounds,
-                             ontop=True)
+            awidget.drawGrid(
+                bounds, painthelper, outerbounds=outerbounds, ontop=True)
             awidget.drawAutoMirror(bounds, painthelper, axiswidgets)
 
         # draw remaining axes
@@ -308,4 +327,3 @@ class Graph(widget.Widget):
 
 # allow users to make Graph objects
 document.thefactory.register( Graph )
-
