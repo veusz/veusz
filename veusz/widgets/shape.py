@@ -24,7 +24,7 @@ import itertools
 import os
 
 from ..compat import czip, cbytes
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import document
 from .. import utils
@@ -34,7 +34,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='Shape'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class Shape(plotters.FreePlotter):
     """A shape on a page/graph."""
@@ -112,23 +112,25 @@ class BoxShape(Shape):
             return
 
         # if a dataset is used, we can't use control items
-        isnotdataset = ( not s.get('xPos').isDataset(d) and
-                         not s.get('yPos').isDataset(d) and
-                         not s.get('width').isDataset(d) and
-                         not s.get('height').isDataset(d) and
-                         not s.get('rotate').isDataset(d) )
+        isnotdataset = (
+            not s.get('xPos').isDataset(d) and
+            not s.get('yPos').isDataset(d) and
+            not s.get('width').isDataset(d) and
+            not s.get('height').isDataset(d) and
+            not s.get('rotate').isDataset(d)
+        )
 
         clip = None
         if s.clip:
-            clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
-                               qt4.QPointF(posn[2], posn[3]) )
+            clip = qt.QRectF(
+                qt.QPointF(posn[0], posn[1]), qt.QPointF(posn[2], posn[3]))
         painter = phelper.painter(self, posn, clip=clip)
         with painter:
             # drawing settings for shape
             if not s.Border.hide:
                 painter.setPen( s.get('Border').makeQPen(painter) )
             else:
-                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+                painter.setPen( qt.QPen(qt.Qt.NoPen) )
 
             # iterate over positions
             index = 0
@@ -143,7 +145,7 @@ class BoxShape(Shape):
                 painter.translate(x, y)
                 if r != 0:
                     painter.rotate(r)
-                self.drawShape(painter, qt4.QRectF(-wp*0.5, -hp*0.5, wp, hp))
+                self.drawShape(painter, qt.QRectF(-wp*0.5, -hp*0.5, wp, hp))
                 painter.restore()
 
         controlgraphitems = []
@@ -189,7 +191,7 @@ class BoxShape(Shape):
             document.OperationSettingSet(s.get('width'), w),
             document.OperationSettingSet(s.get('height'), h),
             document.OperationSettingSet(s.get('rotate'), r)
-            )
+        )
         self.document.applyOperation(
             document.OperationMultiple(operations, descr=_('adjust shape')) )
 
@@ -212,7 +214,7 @@ class Rectangle(BoxShape):
 
     def drawShape(self, painter, rect):
         s = self.settings
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         if s.rounding == 0:
             path.addRect(rect)
         else:
@@ -229,7 +231,7 @@ class Ellipse(BoxShape):
 
     def drawShape(self, painter, rect):
         s = self.settings
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         path.addEllipse(rect)
         utils.brushExtFillPath(painter, s.Fill, path, stroke=painter.pen())
 
@@ -311,13 +313,13 @@ class ImageFile(BoxShape):
         """Update cache."""
         s = self.settings
         self.cachestat = os.stat(s.filename)
-        self.cacheimage = qt4.QImage(s.filename)
+        self.cacheimage = qt.QImage(s.filename)
         self.cachefilename = s.filename
 
     def updateCachedEmbedded(self):
         """Update cached image from embedded data."""
         s = self.settings
-        self.cacheimage = qt4.QImage()
+        self.cacheimage = qt.QImage()
 
         # convert the embedded data from base64 and load into the image
         decoded = codecs.decode(s.embeddedImageData.encode('ascii'), 'base64')
@@ -355,12 +357,12 @@ class ImageFile(BoxShape):
              image.width() == 0 or image.height() == 0 ):
             # load replacement image
             fname = os.path.join(utils.imagedir, 'button_imagefile.svg')
-            r = qt4.QSvgRenderer(fname)
+            r = qt.QSvgRenderer(fname)
             r.render(painter, rect)
 
         else:
             # image rectangle
-            irect = qt4.QRectF(image.rect())
+            irect = qt.QRectF(image.rect())
 
             # preserve aspect ratio
             if s.aspect:
@@ -368,11 +370,11 @@ class ImageFile(BoxShape):
                 yr = rect.height() / irect.height()
 
                 if xr > yr:
-                    rect = qt4.QRectF(
+                    rect = qt.QRectF(
                         rect.left()+(rect.width()-irect.width()*yr)*0.5,
                         rect.top(), irect.width()*yr, rect.height())
                 else:
-                    rect = qt4.QRectF(
+                    rect = qt.QRectF(
                         rect.left(),
                         rect.top()+(rect.height()-irect.height()*xr)*0.5,
                         rect.width(), irect.height()*xr)

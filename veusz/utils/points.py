@@ -19,7 +19,7 @@
 ###############################################################################
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 import numpy as N
 
 from ..helpers.qtloops import plotPathsToPainter
@@ -119,7 +119,7 @@ linesymbols = {
 
 def getLinePainterPath(name, size):
     """Get a painter path for line like objects."""
-    path = qt4.QPainterPath()
+    path = qt.QPainterPath()
     for lines in linesymbols[name]:
         path.moveTo(lines[0][0]*size, lines[0][1]*size)
         for x, y in lines[1:]:
@@ -208,15 +208,15 @@ polygons = {
 
 def addPolyPath(path, vals):
     """Add a polygon with the list of x,y pts as tuples in vals."""
-    poly = qt4.QPolygonF()
+    poly = qt.QPolygonF()
     for x, y in vals:
-        poly.append( qt4.QPointF(x, y) )
+        poly.append( qt.QPointF(x, y) )
     path.addPolygon(poly)
     path.closeSubpath()
 
 def getPolygonPainterPath(name, size):
     """Create a poly path for a polygon."""
-    path = qt4.QPainterPath()
+    path = qt.QPainterPath()
     addPolyPath(path, N.array(polygons[name])*size)
     return path
 
@@ -225,15 +225,15 @@ def getPolygonPainterPath(name, size):
 
 def squarePath(path, size, linewidth):
     """Square path of size given."""
-    path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.addRect( qt.QRectF(-size, -size, size*2, size*2) )
 
 def circlePath(path, size, linewidth):
     """Circle path of size given."""
-    path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.addEllipse( qt.QRectF(-size, -size, size*2, size*2) )
 
 def circlePlusPath(path, size, linewidth):
     """Circle path with plus."""
-    path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.addEllipse( qt.QRectF(-size, -size, size*2, size*2) )
     path.moveTo(0, -size)
     path.lineTo(0, size)
     path.moveTo(-size, 0)
@@ -241,7 +241,7 @@ def circlePlusPath(path, size, linewidth):
 
 def circleCrossPath(path, size, linewidth):
     """Circle path with cross."""
-    path.addEllipse( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.addEllipse( qt.QRectF(-size, -size, size*2, size*2) )
     m = N.sqrt(2.)*size*0.5
     path.moveTo(-m, -m)
     path.lineTo(m, m)
@@ -250,21 +250,21 @@ def circleCrossPath(path, size, linewidth):
 
 def circlePairPathHorz(path, size, linewidth):
     """2 circles next to each other (horizontal)."""
-    path.addEllipse( qt4.QRectF(-size, -size*0.5, size, size) )
-    path.addEllipse( qt4.QRectF(0,  -size*0.5, size, size) )
+    path.addEllipse( qt.QRectF(-size, -size*0.5, size, size) )
+    path.addEllipse( qt.QRectF(0,  -size*0.5, size, size) )
 
 def circlePairPathVert(path, size, linewidth):
     """2 circles next to each other (vertical)."""
-    path.addEllipse( qt4.QRectF(-size*0.5, -size, size, size) )
-    path.addEllipse( qt4.QRectF(-size*0.5, 0, size, size) )
+    path.addEllipse( qt.QRectF(-size*0.5, -size, size, size) )
+    path.addEllipse( qt.QRectF(-size*0.5, 0, size, size) )
 
 def ellipseHorzPath(path, size, linewidth):
     """Horizontal ellipse path."""
-    path.addEllipse( qt4.QRectF(-size, -size*0.5, size*2, size) )
+    path.addEllipse( qt.QRectF(-size, -size*0.5, size*2, size) )
 
 def ellipseVertPath(path, size, linewidth):
     """Vertical ellipse path."""
-    path.addEllipse( qt4.QRectF(-size*0.5, -size, size, size*2) )
+    path.addEllipse( qt.QRectF(-size*0.5, -size, size, size*2) )
 
 def circleHolePath(path, size, linewidth):
     """Circle with centre missing."""
@@ -273,7 +273,7 @@ def circleHolePath(path, size, linewidth):
 
 def squarePlusPath(path, size, linewidth):
     """Square with plus sign."""
-    path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.addRect( qt.QRectF(-size, -size, size*2, size*2) )
     path.moveTo(0, -size)
     path.lineTo(0, size)
     path.moveTo(-size, 0)
@@ -281,7 +281,7 @@ def squarePlusPath(path, size, linewidth):
 
 def squareCrossPath(path, size, linewidth):
     """Square with cross sign."""
-    path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
+    path.addRect( qt.QRectF(-size, -size, size*2, size*2) )
     path.moveTo(-size, -size)
     path.lineTo(size, size)
     path.moveTo(-size, size)
@@ -289,8 +289,8 @@ def squareCrossPath(path, size, linewidth):
 
 def squareHolePath(path, size, linewidth):
     """Square with centre missing."""
-    path.addRect( qt4.QRectF(-size, -size, size*2, size*2) )
-    path.addRect( qt4.QRectF(-size*0.5, -size*0.5, size, size) )
+    path.addRect( qt.QRectF(-size, -size, size*2, size*2) )
+    path.addRect( qt.QRectF(-size*0.5, -size*0.5, size, size) )
 
 def diamondHolePath(path, size, linewidth):
     """Diamond with centre missing."""
@@ -307,23 +307,23 @@ def pentagonHolePath(path, size, linewidth):
 def squareRoundedPath(path, size, linewidth):
     """A square with rounded corners."""
     path.addRoundedRect(
-        qt4.QRectF(-size, -size, size*2, size*2),
-        50, 50, qt4.Qt.RelativeSize)
+        qt.QRectF(-size, -size, size*2, size*2),
+        50, 50, qt.Qt.RelativeSize)
 
 def dotPath(path, size, linewidth):
     """Draw a dot."""
-    path.addEllipse(qt4.QRectF(
+    path.addEllipse(qt.QRectF(
         -linewidth*0.5, -linewidth*0.5, linewidth, linewidth))
 
 def bullseyePath(path, size, linewidth):
     """A filled circle inside a filled circle."""
-    path.setFillRule(qt4.Qt.WindingFill)
+    path.setFillRule(qt.Qt.WindingFill)
     circlePath(path, size, linewidth)
     circlePath(path, size*0.5, linewidth)
 
 def circleDotPath(path, size, linewidth):
     """A dot inside a circle."""
-    path.setFillRule(qt4.Qt.WindingFill)
+    path.setFillRule(qt.Qt.WindingFill)
     circlePath(path, size, linewidth)
     dotPath(path, size, linewidth)
 
@@ -350,7 +350,7 @@ pathsymbols = {
 
 def getSymbolPainterPath(name, size, linewidth):
     """Get a painter path for a symbol shape."""
-    path = qt4.QPainterPath()
+    path = qt.QPainterPath()
     pathsymbols[name](path, size, linewidth)
     return path
 
@@ -385,7 +385,7 @@ def getPointPainterPath(name, size, linewidth):
     elif name in pathsymbols:
         return getSymbolPainterPath(name, size, linewidth), True
     elif name == 'none':
-        return qt4.QPainterPath(), True
+        return qt.QPainterPath(), True
     else:
         raise ValueError("Invalid marker name %s" % name)
 
@@ -445,7 +445,7 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
 
     # get sharper angles and more exact positions using these settings
     pen = painter.pen()
-    pen.setJoinStyle( qt4.Qt.MiterJoin )
+    pen.setJoinStyle( qt.Qt.MiterJoin )
     painter.setPen(pen)
 
     # get path to draw and whether to fill
@@ -453,7 +453,7 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
         markername, markersize, painter.pen().widthF())
     if not fill:
         # turn off brush
-        painter.setBrush( qt4.QBrush() )
+        painter.setBrush( qt.QBrush() )
 
     # if using colored points
     colorimg = None
@@ -527,9 +527,9 @@ def plotLineArrow(painter, xpos, ypos, length, angle,
     plotMarker(painter, 0, 0, arrow_translate[arrowleft], arrowsize)
 
     pen = painter.pen()
-    pen.setCapStyle(qt4.Qt.FlatCap)
+    pen.setCapStyle(qt.Qt.FlatCap)
     painter.setPen(pen)
     painter.scale(-1, 1)
-    painter.drawLine(qt4.QPointF(0, 0), qt4.QPointF(length, 0))
+    painter.drawLine(qt.QPointF(0, 0), qt.QPointF(length, 0))
 
     painter.restore()

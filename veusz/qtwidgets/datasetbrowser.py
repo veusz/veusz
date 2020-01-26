@@ -25,7 +25,7 @@ import numpy as N
 import textwrap
 
 from ..compat import crange, citems, czip, cbasestr, cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import document
 from .. import utils
@@ -35,7 +35,7 @@ from ..utils.treemodel import TMNode, TreeModel
 
 def _(text, disambiguation=None, context="DatasetBrowser"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def datasetLinkFile(ds):
     """Get a linked filename from a dataset."""
@@ -77,10 +77,10 @@ class DatasetNode(TMNode):
         if ds.dimensions != 1 or ds.datatype != "numeric":
             return None
 
-        pixmap = qt4.QPixmap(*size)
-        pixmap.fill(qt4.Qt.transparent)
-        p = qt4.QPainter(pixmap)
-        p.setRenderHint(qt4.QPainter.Antialiasing)
+        pixmap = qt.QPixmap(*size)
+        pixmap.fill(qt.Qt.transparent)
+        p = qt.QPainter(pixmap)
+        p.setRenderHint(qt.QPainter.Antialiasing)
 
         # calculate data points
         try:
@@ -98,13 +98,13 @@ class DatasetNode(TMNode):
             x, y = x[finite], y[finite]
             x = x * (1./len(x)) * size[0]
 
-            poly = qt4.QPolygonF()
+            poly = qt.QPolygonF()
             utils.addNumpyToPolygonF(poly, x, size[1]-y)
-            p.setPen( qt4.QPen(qt4.Qt.blue) )
+            p.setPen( qt.QPen(qt.Qt.blue) )
             p.drawPolyline(poly)
 
             # draw x axis if span 0
-            p.setPen( qt4.QPen(qt4.Qt.black) )
+            p.setPen( qt.QPen(qt.Qt.black) )
             if minval <= 0 and maxval > 0:
                 y0 = size[1] - (0-minval)/(maxval-minval)*size[1]
                 p.drawLine(x[0], y0, x[-1], y0)
@@ -345,10 +345,10 @@ class DatasetRelationModel(TreeModel):
             col = idx.column()
             if not self.readonly and col == 0:
                 # renameable dataset
-                f |= qt4.Qt.ItemIsEditable
+                f |= qt.Qt.ItemIsEditable
             elif obj.cols[col] == "check":
                 # checkable dataset
-                f |= qt4.Qt.ItemIsUserCheckable
+                f |= qt.Qt.ItemIsUserCheckable
         return f
 
     def setData(self, idx, val, role):
@@ -377,7 +377,7 @@ class DatasetRelationModel(TreeModel):
             self.refresh()
             return True
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def refresh(self):
         """Update tree of datasets when document changes."""
 
@@ -391,11 +391,11 @@ class DatasetRelationModel(TreeModel):
 
         self.syncTree(tree)
 
-class DatasetsNavigatorTree(qt4.QTreeView):
+class DatasetsNavigatorTree(qt.QTreeView):
     """Tree view for dataset names."""
 
-    updateitem = qt4.pyqtSignal()
-    selecteddatasets = qt4.pyqtSignal(list)
+    updateitem = qt.pyqtSignal()
+    selecteddatasets = qt.pyqtSignal(list)
 
     def __init__(self, doc, mainwin, grouping, parent,
                  readonly=False, filterdims=None, filterdtype=None,
@@ -410,7 +410,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         checkable: allow datasets to be selected
         """
 
-        qt4.QTreeView.__init__(self, parent)
+        qt.QTreeView.__init__(self, parent)
         self.doc = doc
         self.mainwindow = mainwin
         self.model = DatasetRelationModel(
@@ -420,10 +420,10 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             checkable=checkable)
 
         self.setModel(self.model)
-        self.setSelectionMode(qt4.QTreeView.ExtendedSelection)
-        self.setSelectionBehavior(qt4.QTreeView.SelectRows)
+        self.setSelectionMode(qt.QTreeView.ExtendedSelection)
+        self.setSelectionBehavior(qt.QTreeView.SelectRows)
         self.setUniformRowHeights(True)
-        self.setContextMenuPolicy(qt4.Qt.CustomContextMenu)
+        self.setContextMenuPolicy(qt.Qt.CustomContextMenu)
         if not readonly:
             self.customContextMenuRequested.connect(self.showContextMenu)
         self.model.refresh()
@@ -432,9 +432,9 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         # stretch of columns
         hdr = self.header()
         hdr.setStretchLastSection(False)
-        hdr.setSectionResizeMode(0, qt4.QHeaderView.Stretch)
+        hdr.setSectionResizeMode(0, qt.QHeaderView.Stretch)
         for col in crange(1, 3):
-            hdr.setSectionResizeMode(col, qt4.QHeaderView.ResizeToContents)
+            hdr.setSectionResizeMode(col, qt.QHeaderView.ResizeToContents)
 
         # when documents have finished opening, expand all nodes
         if mainwin is not None:
@@ -462,16 +462,16 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         """Find, and if possible select dataset name."""
 
         matches = self.model.match(
-            self.model.index(0, 0, qt4.QModelIndex()),
-            qt4.Qt.DisplayRole, dsname, -1,
-            qt4.Qt.MatchFixedString | qt4.Qt.MatchCaseSensitive |
-            qt4.Qt.MatchRecursive )
+            self.model.index(0, 0, qt.QModelIndex()),
+            qt.Qt.DisplayRole, dsname, -1,
+            qt.Qt.MatchFixedString | qt.Qt.MatchCaseSensitive |
+            qt.Qt.MatchRecursive )
         for idx in matches:
             if isinstance(self.model.objFromIndex(idx), DatasetNode):
                 self.selectionModel().setCurrentIndex(
-                    idx, qt4.QItemSelectionModel.SelectCurrent |
-                    qt4.QItemSelectionModel.Clear |
-                    qt4.QItemSelectionModel.Rows )
+                    idx, qt.QItemSelectionModel.SelectCurrent |
+                    qt.QItemSelectionModel.Clear |
+                    qt.QItemSelectionModel.Rows )
 
     def showContextMenu(self, pt):
         """Context menu for nodes."""
@@ -484,7 +484,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         # unique list of types of nodes
         types = set([ type(n) for n in nodes ])
 
-        menu = qt4.QMenu()
+        menu = qt.QMenu()
         # put contexts onto submenus if multiple types selected
         if DatasetNode in types:
             thismenu = menu
@@ -504,7 +504,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         def _paste():
             """Paste dataset(s)."""
             if document.isClipboardDataMime():
-                mime = qt4.QApplication.clipboard().mimeData()
+                mime = qt.QApplication.clipboard().mimeData()
                 self.doc.applyOperation(document.OperationDataPaste(mime))
 
         # if there is data to paste, add menu item
@@ -557,7 +557,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         def _copy():
             """Copy data to clipboard."""
             mime = document.generateDatasetsMime(dsnames, self.doc)
-            qt4.QApplication.clipboard().setMimeData(mime)
+            qt.QApplication.clipboard().setMimeData(mime)
 
         # editing
         recreate = [type(d) in dataeditdialog.recreate_register
@@ -595,7 +595,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
             a.setChecked( all(state) )
 
         def addtag():
-            tag, ok = qt4.QInputDialog.getText(
+            tag, ok = qt.QInputDialog.getText(
                 self, _("New tag"), _("Enter new tag"))
             if ok:
                 tag = tag.strip().replace(' ', '')
@@ -660,14 +660,14 @@ class DatasetsNavigatorTree(qt4.QTreeView):
 
     def keyPressEvent(self, event):
         """Enter key selects widget."""
-        if event.key() in (qt4.Qt.Key_Return, qt4.Qt.Key_Enter):
+        if event.key() in (qt.Qt.Key_Return, qt.Qt.Key_Enter):
             self.updateitem.emit()
             return
-        qt4.QTreeView.keyPressEvent(self, event)
+        qt.QTreeView.keyPressEvent(self, event)
 
     def mouseDoubleClickEvent(self, event):
         """Emit updateitem signal if double clicked."""
-        retn = qt4.QTreeView.mouseDoubleClickEvent(self, event)
+        retn = qt.QTreeView.mouseDoubleClickEvent(self, event)
         self.updateitem.emit()
         return retn
 
@@ -707,7 +707,7 @@ class DatasetsNavigatorTree(qt4.QTreeView):
         self.model.checked_datasets.clear()
         self.model.refresh()
 
-class DatasetBrowser(qt4.QWidget):
+class DatasetBrowser(qt.QWidget):
     """Widget which shows the document's datasets."""
 
     # how datasets can be grouped
@@ -732,18 +732,18 @@ class DatasetBrowser(qt4.QWidget):
         checkable: allow datasets to be selected
         """
 
-        qt4.QWidget.__init__(self, parent)
-        self.layout = qt4.QVBoxLayout()
+        qt.QWidget.__init__(self, parent)
+        self.layout = qt.QVBoxLayout()
         self.setLayout(self.layout)
 
         # options for navigator are in this layout
-        self.optslayout = qt4.QHBoxLayout()
+        self.optslayout = qt.QHBoxLayout()
 
         # grouping options - use a menu to choose the grouping
-        self.grpbutton = qt4.QPushButton(_("Group"))
-        self.grpmenu = qt4.QMenu()
+        self.grpbutton = qt.QPushButton(_("Group"))
+        self.grpmenu = qt.QMenu()
         self.grouping = setting.settingdb.get("navtree_grouping", "filename")
-        self.grpact = qt4.QActionGroup(self)
+        self.grpact = qt.QActionGroup(self)
         self.grpact.setExclusive(True)
         for name in self.grpnames:
             a = self.grpmenu.addAction(self.grpentries[name])
@@ -758,7 +758,7 @@ class DatasetBrowser(qt4.QWidget):
         self.optslayout.addWidget(self.grpbutton)
 
         # filtering by entering text
-        searchlabel = qt4.QLabel()
+        searchlabel = qt.QLabel()
         searchlabel.setPixmap(utils.getIcon('kde-search-jss').pixmap(18,18))
         self.optslayout.addWidget(searchlabel)
         self.filteredit = LineEditWithClear()
@@ -806,8 +806,8 @@ class DatasetBrowserPopup(DatasetBrowser):
     This is used by setting.controls.Dataset
     """
 
-    closing = qt4.pyqtSignal()
-    newdataset = qt4.pyqtSignal(cstr)
+    closing = qt.pyqtSignal()
+    newdataset = qt.pyqtSignal(cstr)
 
     def __init__(self, document, dsname, parent,
                  filterdims=None, filterdtype=None):
@@ -821,8 +821,8 @@ class DatasetBrowserPopup(DatasetBrowser):
         DatasetBrowser.__init__(
             self, document, None, parent, readonly=True,
             filterdims=filterdims, filterdtype=filterdtype)
-        self.setWindowFlags(qt4.Qt.Popup)
-        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
+        self.setWindowFlags(qt.Qt.Popup)
+        self.setAttribute(qt.Qt.WA_DeleteOnClose)
         self.spacing = self.fontMetrics().height()
 
         utils.positionFloatingPopup(self, parent)
@@ -835,9 +835,9 @@ class DatasetBrowserPopup(DatasetBrowser):
 
     def eventFilter(self, node, event):
         """Grab clicks outside this window to close it."""
-        if ( isinstance(event, qt4.QMouseEvent) and
-             event.buttons() != qt4.Qt.NoButton ):
-            frame = qt4.QRect(0, 0, self.width(), self.height())
+        if ( isinstance(event, qt.QMouseEvent) and
+             event.buttons() != qt.Qt.NoButton ):
+            frame = qt.QRect(0, 0, self.width(), self.height())
             if not frame.contains(event.pos()):
                 self.close()
                 return True
@@ -845,7 +845,7 @@ class DatasetBrowserPopup(DatasetBrowser):
 
     def sizeHint(self):
         """A reasonable size for the text editor."""
-        return qt4.QSize(self.spacing*30, self.spacing*20)
+        return qt.QSize(self.spacing*30, self.spacing*20)
 
     def closeEvent(self, event):
         """Tell the calling widget that we are closing."""

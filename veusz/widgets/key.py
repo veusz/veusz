@@ -22,7 +22,7 @@ from __future__ import division
 import math
 
 from ..compat import crange, citems
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
@@ -32,7 +32,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Key'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 #############################################################################
 # classes for controlling key position interactively
@@ -60,22 +60,22 @@ class ControlKey(object):
     def createGraphicsItem(self, parent):
         return _GraphControlKey(parent, self)
 
-class _GraphControlKey(qt4.QGraphicsRectItem, controlgraph._ScaledShape):
+class _GraphControlKey(qt.QGraphicsRectItem, controlgraph._ScaledShape):
     """The graphical rectangle which is dragged around to reposition
     the key."""
 
     def __init__(self, parent, params):
-        qt4.QGraphicsRectItem.__init__(self, parent)
+        qt.QGraphicsRectItem.__init__(self, parent)
 
         self.params = params
         self.setScaledRect(
             params.posn[0], params.posn[1],
             params.dims[0], params.dims[1])
 
-        self.setCursor(qt4.Qt.SizeAllCursor)
+        self.setCursor(qt.Qt.SizeAllCursor)
         self.setZValue(1.)
-        self.setFlag(qt4.QGraphicsItem.ItemIsMovable)
-        self.highlightpen = qt4.QPen(qt4.Qt.red, 2, qt4.Qt.DotLine)
+        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
+        self.highlightpen = qt.QPen(qt.Qt.red, 2, qt.Qt.DotLine)
 
         pposn, dims = params.parentposn, params.dims
         th = params.textheight
@@ -96,7 +96,7 @@ class _GraphControlKey(qt4.QGraphicsRectItem, controlgraph._ScaledShape):
         self.highlightpoints = {}
         for xname, xval in citems(xposn):
             for yname, yval in citems(yposn):
-                self.highlightpoints[(xname, yname)] = qt4.QPointF(
+                self.highlightpoints[(xname, yname)] = qt.QPointF(
                     xval*params.cgscale, yval*params.cgscale)
 
         self.updatePen()
@@ -109,7 +109,7 @@ class _GraphControlKey(qt4.QGraphicsRectItem, controlgraph._ScaledShape):
         rect.translate(self.pos())
 
         highlight = None
-        highlightrect = qt4.QRectF(rect.left()-10, rect.top()-10, 20, 20)
+        highlightrect = qt.QRectF(rect.left()-10, rect.top()-10, 20, 20)
         for name, point in citems(self.highlightpoints):
             if highlightrect.contains(point):
                 highlight = name
@@ -125,12 +125,12 @@ class _GraphControlKey(qt4.QGraphicsRectItem, controlgraph._ScaledShape):
 
     def mouseMoveEvent(self, event):
         """Set correct pen for box."""
-        qt4.QGraphicsRectItem.mouseMoveEvent(self, event)
+        qt.QGraphicsRectItem.mouseMoveEvent(self, event)
         self.updatePen()
 
     def mouseReleaseEvent(self, event):
         """Update widget with position."""
-        qt4.QGraphicsRectItem.mouseReleaseEvent(self, event)
+        qt.QGraphicsRectItem.mouseReleaseEvent(self, event)
         highlight = self.checkHighlight()
         if highlight:
             # in a highlight zone so use highlight zone name to set position
@@ -369,7 +369,7 @@ class Key(widget.Widget):
         # reserve space for the title
         titlewidth, titleheight = 0, 0
         if s.title != '':
-            titlefont = qt4.QFont(font)
+            titlefont = qt.QFont(font)
             titlefont.setPointSize(max(font.pointSize() * 1.2, font.pointSize() + 2))
             titlewidth, titleheight = utils.Renderer(
                 painter, titlefont,
@@ -450,8 +450,8 @@ class Key(widget.Widget):
         boxdims = (totalwidth, totalheight)
 
         # draw surrounding box
-        boxpath = qt4.QPainterPath()
-        boxpath.addRect(qt4.QRectF(x, y, totalwidth, totalheight))
+        boxpath = qt.QPainterPath()
+        boxpath.addRect(qt.QRectF(x, y, totalwidth, totalheight))
         if not s.Background.hide:
             utils.brushExtFillPath(painter, s.Background, boxpath)
         if not s.Border.hide:

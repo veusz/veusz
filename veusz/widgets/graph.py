@@ -21,7 +21,7 @@
 from __future__ import division
 import textwrap
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import utils
 from .. import document
@@ -31,7 +31,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Graph'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class Graph(widget.Widget):
     """Graph for containing other sorts of widgets"""
@@ -191,28 +191,31 @@ class Graph(widget.Widget):
         # controls for adjusting graph margins
         painter = painthelper.painter(self, bounds)
         painthelper.setControlGraph(self, [
-                controlgraph.ControlMarginBox(self, bounds, maxbounds,
-                                              painthelper) ])
+            controlgraph.ControlMarginBox(self, bounds, maxbounds,
+                                          painthelper)
+        ])
 
         bounds = self.adjustBoundsForAspect(bounds)
 
         with painter:
             # set graph rectangle attributes
-            path = qt4.QPainterPath()
-            path.addRect( qt4.QRectF(qt4.QPointF(bounds[0], bounds[1]),
-                                     qt4.QPointF(bounds[2], bounds[3])) )
-            utils.brushExtFillPath(painter, s.Background, path,
-                                   stroke=s.Border.makeQPenWHide(painter))
+            path = qt.QPainterPath()
+            path.addRect(qt.QRectF(
+                qt.QPointF(bounds[0], bounds[1]),
+                qt.QPointF(bounds[2], bounds[3]) ))
+            utils.brushExtFillPath(
+                painter, s.Background, path,
+                stroke=s.Border.makeQPenWHide(painter))
 
             # debugging positions (uncomment)
-            # painter.drawRect( qt4.QRectF(
-            #         qt4.QPointF(parentposn[0], parentposn[1]),
-            #         qt4.QPointF(parentposn[2], parentposn[3]) ))
+            # painter.drawRect( qt.QRectF(
+            #         qt.QPointF(parentposn[0], parentposn[1]),
+            #         qt.QPointF(parentposn[2], parentposn[3]) ))
 
             # if outerbounds:
-            #     painter.drawRect( qt4.QRectF(
-            #             qt4.QPointF(outerbounds[0], outerbounds[1]),
-            #             qt4.QPointF(outerbounds[2], outerbounds[3]) ))
+            #     painter.drawRect( qt.QRectF(
+            #             qt.QPointF(outerbounds[0], outerbounds[1]),
+            #             qt.QPointF(outerbounds[2], outerbounds[3]) ))
 
         # child drawing algorithm is a bit complex due to axes
         # being shared between graphs and broken axes

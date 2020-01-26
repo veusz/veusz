@@ -18,10 +18,10 @@
 ###############################################################################
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 
-class LineEditWithClear(qt4.QLineEdit):
+class LineEditWithClear(qt.QLineEdit):
     """This is a line edit widget which supplies a clear button
     to delete the text if it is clicked.
 
@@ -31,12 +31,12 @@ class LineEditWithClear(qt4.QLineEdit):
 
     def __init__(self, *args):
         """Initialise the line edit."""
-        qt4.QLineEdit.__init__(self, *args)
+        qt.QLineEdit.__init__(self, *args)
 
         # the clear button itself, with no padding
-        self.clearbutton = cb = qt4.QToolButton(self)
+        self.clearbutton = cb = qt.QToolButton(self)
         cb.setIcon( utils.getIcon('kde-edit-delete') )
-        cb.setCursor(qt4.Qt.ArrowCursor)
+        cb.setCursor(qt.Qt.ArrowCursor)
         cb.setStyleSheet('QToolButton { border: none; padding: 0px; }')
         cb.setToolTip("Clear text")
         cb.hide()
@@ -47,7 +47,7 @@ class LineEditWithClear(qt4.QLineEdit):
         self.textChanged.connect(self.updateCloseButton)
 
         # positioning of the button
-        fw = self.style().pixelMetric(qt4.QStyle.PM_DefaultFrameWidth)
+        fw = self.style().pixelMetric(qt.QStyle.PM_DefaultFrameWidth)
         self.setStyleSheet("QLineEdit { padding-right: %ipx; } " %
                            (cb.sizeHint().width() + fw + 1))
         msz = self.minimumSizeHint()
@@ -57,7 +57,7 @@ class LineEditWithClear(qt4.QLineEdit):
     def resizeEvent(self, evt):
         """Move button if widget resized."""
         sz = self.clearbutton.sizeHint()
-        fw = self.style().pixelMetric(qt4.QStyle.PM_DefaultFrameWidth)
+        fw = self.style().pixelMetric(qt.QStyle.PM_DefaultFrameWidth)
         r = self.rect()
         self.clearbutton.move( r.right() - fw - sz.width(),
                                (r.bottom() + 1 - sz.height())//2 )

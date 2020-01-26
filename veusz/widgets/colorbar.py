@@ -20,7 +20,7 @@
 the image."""
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 import numpy as N
 
 from .. import document
@@ -32,7 +32,7 @@ from . import axis
 
 def _(text, disambiguation=None, context='ColorBar'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ColorBar(axis.Axis):
     """Color bar for showing scale of image.
@@ -208,7 +208,7 @@ class ColorBar(axis.Axis):
         minpix, maxpix = self.graphToPlotterCoords(
             bounds, N.array([minval, maxval]) )
 
-        routside = qt4.QRectF(
+        routside = qt.QRectF(
             bounds[0], bounds[1],
             bounds[2]-bounds[0], bounds[3]-bounds[1] )
 
@@ -221,8 +221,8 @@ class ColorBar(axis.Axis):
             else:
                 c = [ bounds[0], maxpix, bounds[2], minpix ]
                 cl = [ bounds[0], self.coordParr1, bounds[2], self.coordParr2 ]
-            r = qt4.QRectF(c[0], c[1], c[2]-c[0], c[3]-c[1])
-            rclip = qt4.QRectF(cl[0], cl[1], cl[2]-cl[0], cl[3]-cl[1])
+            r = qt.QRectF(c[0], c[1], c[2]-c[0], c[3]-c[1])
+            rclip = qt.QRectF(cl[0], cl[1], cl[2]-cl[0], cl[3]-cl[1])
 
             painter.save()
             painter.setClipRect(rclip & routside)
@@ -232,7 +232,7 @@ class ColorBar(axis.Axis):
         # if there's a border
         if not s.Border.hide:
             painter.setPen( s.get('Border').makeQPen(painter) )
-            painter.setBrush( qt4.QBrush() )
+            painter.setBrush( qt.QBrush() )
             painter.drawRect( routside )
 
         # actually draw axis

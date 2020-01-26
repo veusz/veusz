@@ -24,7 +24,7 @@ import numpy as N
 import re
 
 from ..compat import czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
@@ -37,7 +37,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Axis'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class MajorTick(setting.Line):
     '''Major tick settings.'''
@@ -737,9 +737,9 @@ class Axis(widget.Widget):
     def swapline(self, painter, a1, b1, a2, b2):
         """Draw line, but swap x & y coordinates if vertical axis."""
         if self.settings.direction == 'horizontal':
-            painter.drawLine(qt4.QPointF(a1, b1), qt4.QPointF(a2, b2))
+            painter.drawLine(qt.QPointF(a1, b1), qt.QPointF(a2, b2))
         else:
-            painter.drawLine(qt4.QPointF(b1, a1), qt4.QPointF(b2, a2))
+            painter.drawLine(qt.QPointF(b1, a1), qt.QPointF(b2, a2))
 
     def swaplines(self, painter, a1, b1, a2, b2):
         """Multiline version of swapline where a1, b1, a2, b2 are arrays."""
@@ -772,7 +772,7 @@ class Axis(widget.Widget):
         """Draw the line of the axis."""
 
         pen = self.settings.get('Line').makeQPen(painter)
-        pen.setCapStyle(qt4.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.FlatCap)
         painter.setPen(pen)
         self.swapline( painter,
                        self.coordParr1, self.coordPerp,
@@ -784,7 +784,7 @@ class Axis(widget.Widget):
         s = self.settings
         mt = s.get('MinorTicks')
         pen = mt.makeQPen(painter)
-        pen.setCapStyle(qt4.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.FlatCap)
         painter.setPen(pen)
         delta = mt.getLength(painter)
 
@@ -806,7 +806,7 @@ class Axis(widget.Widget):
         s = self.settings
         mt = s.get('MajorTicks')
         pen = mt.makeQPen(painter)
-        pen.setCapStyle(qt4.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.FlatCap)
         painter.setPen(pen)
         startdelta = mt.getLength(painter)
         delta = startdelta
@@ -1100,9 +1100,9 @@ class Axis(widget.Widget):
 
         with painter:
             painter.save()
-            painter.setClipRect( qt4.QRectF(
-                    qt4.QPointF(parentposn[0], parentposn[1]),
-                    qt4.QPointF(parentposn[2], parentposn[3]) ) )
+            painter.setClipRect( qt.QRectF(
+                qt.QPointF(parentposn[0], parentposn[1]),
+                qt.QPointF(parentposn[2], parentposn[3]) ) )
 
             if not s.MinorGridLines.hide:
                 coordminorticks = self._graphToPlotter(self.minortickscalc)
@@ -1198,8 +1198,8 @@ class Axis(widget.Widget):
 
         # make control item for axis
         phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
-                    self, phelper, s.direction, self.coordParr1,
-                    self.coordParr2, self.coordPerp, posn) ])
+            self, phelper, s.direction, self.coordParr1,
+            self.coordParr2, self.coordPerp, posn) ])
 
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)

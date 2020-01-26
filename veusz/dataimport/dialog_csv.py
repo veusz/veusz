@@ -19,7 +19,7 @@
 from __future__ import division, print_function
 import csv
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..dialogs import importdialog, veuszdialog
 from ..compat import crange, cnext, cstr
 from .. import utils
@@ -27,7 +27,7 @@ from . import defn_csv
 from . import base
 
 def _(text, disambiguation=None, context="Import_CSV"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 csv_delimiters = [',', '{tab}', '{space}', '|', ':', ';']
 csv_text_delimiters = ['"', "'"]
@@ -40,7 +40,7 @@ csv_delimiter_map = {
 
 def csvLocaleIndexToLocale(idx):
     """Convert index to text locale."""
-    return (qt4.QLocale().name(), 'en_US', 'de_DE')[idx]
+    return (qt.QLocale().name(), 'en_US', 'de_DE')[idx]
 
 class ImportTabCSV(importdialog.ImportTab):
     """For importing data from CSV files."""
@@ -151,7 +151,7 @@ class ImportTabCSV(importdialog.ImportTab):
         for r in crange(numrows):
             for c in crange(numcols):
                 if c < len(rows[r]):
-                    item = qt4.QTableWidgetItem(rows[r][c])
+                    item = qt.QTableWidgetItem(rows[r][c])
                     t.setItem(r, c, item)
 
         return True
@@ -207,7 +207,7 @@ class ImportTabCSV(importdialog.ImportTab):
             utils.feedback.importcts['csv'] += 1
 
         except (base.ImportingError, csv.Error) as e:
-            qt4.QMessageBox.warning(self, _("Veusz"), cstr(e))
+            qt.QMessageBox.warning(self, _("Veusz"), cstr(e))
             return
 
         # update output, showing what datasets were imported
@@ -222,7 +222,7 @@ class ImportTabCSV(importdialog.ImportTab):
         t.setColumnCount(1)
         t.setRowCount(len(lines))
         for i, l in enumerate(lines):
-            item = qt4.QTableWidgetItem(l)
+            item = qt.QTableWidgetItem(l)
             t.setItem(i, 0, item)
 
 importdialog.registerImportTab(_('CS&V'), ImportTabCSV)

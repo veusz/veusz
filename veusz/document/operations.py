@@ -37,11 +37,11 @@ from . import widgetfactory
 
 from .. import datasets
 from .. import plugins
-from .. import qtall as qt4
+from .. import qtall as qt
 
 def _(text, disambiguation=None, context="Operations"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 ###############################################################################
 # Setting operations

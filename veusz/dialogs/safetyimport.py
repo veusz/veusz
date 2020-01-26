@@ -19,14 +19,14 @@
 """Ask user whether to import symbols."""
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 
 def _(text, disambiguation=None, context="SafetyImportDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class SafetyImportDialog(qt4.QMessageBox):
+class SafetyImportDialog(qt.QMessageBox):
 
     def __init__(self, parent, module, names):
         """Initialise dialog.
@@ -35,25 +35,25 @@ class SafetyImportDialog(qt4.QMessageBox):
         module is module to import symbols from
         names is a list of names to import."""
 
-        qt4.QMessageBox.__init__(self, parent)
+        qt.QMessageBox.__init__(self, parent)
 
         self.names = names
         self.module = module
 
-        self.setIcon(qt4.QMessageBox.Warning)
+        self.setIcon(qt.QMessageBox.Warning)
         self.setWindowTitle(_("Allow Python import?"))
         self.setText(_("The document has requested that the symbol(s):\n"
                        " %s\nbe loaded from Python module '%s'.\n\n"
                        "This could be unsafe if the document comes from "
                        "an untrusted source.") % (
                 ', '.join(names), module))
-        self.allow = self.addButton(_("Allow"), qt4.QMessageBox.YesRole)
+        self.allow = self.addButton(_("Allow"), qt.QMessageBox.YesRole)
         self.allow.setToolTip(_("Allow use of symbol in module during session"))
-        self.allowalways = self.addButton(_("Allow always"),
-                                          qt4.QMessageBox.YesRole)
+        self.allowalways = self.addButton(
+            _("Allow always"), qt.QMessageBox.YesRole)
         self.allowalways.setToolTip(_("Always allow use of symbol in module"))
-        self.notallow = self.addButton(_("Do not allow"),
-                                       qt4.QMessageBox.NoRole)
+        self.notallow = self.addButton(
+            _("Do not allow"), qt.QMessageBox.NoRole)
         self.notallow.setToolTip(_("Do allow use of symbol in module in session"))
 
     def exec_(self):
@@ -61,9 +61,9 @@ class SafetyImportDialog(qt4.QMessageBox):
 
         # when loading the document the busy cursor is on, this gets
         # rid of it for a while
-        qt4.qApp.setOverrideCursor(qt4.QCursor(qt4.Qt.ArrowCursor))
-        qt4.QMessageBox.exec_(self)
-        qt4.qApp.restoreOverrideCursor()
+        qt.qApp.setOverrideCursor(qt.QCursor(qt.Qt.ArrowCursor))
+        qt.QMessageBox.exec_(self)
+        qt.qApp.restoreOverrideCursor()
 
         b = self.clickedButton()
 

@@ -20,7 +20,7 @@ from __future__ import division
 import re
 import numpy as N
 
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from ..helpers.qtloops import numpyToQImage, applyImageTransparancy
 
@@ -608,7 +608,7 @@ def getColormapArray(cmap, nvals):
     img = makeColorbarImage(0, 1, 'linear', cmap, 0, barsize=nvals)
 
     # ensure data are stored in the correct order
-    fmt = qt4.QImage.Format_ARGB32
+    fmt = qt.QImage.Format_ARGB32
     if img.format() != fmt:
         img = img.convertToFormat(fmt)
 

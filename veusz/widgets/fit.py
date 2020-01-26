@@ -29,7 +29,7 @@ from ..compat import czip, cstr
 from .. import document
 from .. import setting
 from .. import utils
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from .function import FunctionPlotter
 from . import widget
@@ -45,7 +45,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='Fit'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     """Do fitting with minuit (if installed)."""

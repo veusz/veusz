@@ -25,14 +25,14 @@ from ..compat import czip
 from .. import document
 from .. import setting
 from .. import utils
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from . import plotters
 from . import controlgraph
 
 def _(text, disambiguation=None, context='TextLabel'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class BorderLine(setting.Line):
     '''Plot line around text.'''
@@ -130,8 +130,8 @@ class TextLabel(plotters.FreePlotter):
 
         clip = None
         if s.clip:
-            clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
-                               qt4.QPointF(posn[2], posn[3]) )
+            clip = qt.QRectF(
+                qt.QPointF(posn[0], posn[1]), qt.QPointF(posn[2], posn[3]))
 
         borderorfill = not s.Border.hide or not s.Background.hide
 
@@ -168,10 +168,10 @@ class TextLabel(plotters.FreePlotter):
                     tbounds = [
                         tbounds[0]-margin, tbounds[1]-margin,
                         tbounds[2]+margin, tbounds[3]+margin ]
-                    rect = qt4.QRectF(
-                        qt4.QPointF(tbounds[0], tbounds[1]),
-                        qt4.QPointF(tbounds[2], tbounds[3]))
-                    path = qt4.QPainterPath()
+                    rect = qt.QRectF(
+                        qt.QPointF(tbounds[0], tbounds[1]),
+                        qt.QPointF(tbounds[2], tbounds[3]))
+                    path = qt.QPainterPath()
                     path.addRect(rect)
                     pen = s.get('Border').makeQPenWHide(painter)
                     utils.brushExtFillPath(painter, s.Background, path,

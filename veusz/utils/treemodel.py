@@ -20,7 +20,7 @@
 
 from __future__ import division, print_function
 import bisect
-from .. import qtall as qt4
+from .. import qtall as qt
 
 class TMNode(object):
     """Object to represent nodes in TreeModel.
@@ -76,7 +76,7 @@ class TMNode(object):
         """Make a clone of self at the root given."""
         return self.__class__(self.data, newroot)
 
-class TreeModel(qt4.QAbstractItemModel):
+class TreeModel(qt.QAbstractItemModel):
     """A Qt model for storing Python nodes in a tree.
 
     The nodes are TMNode objects above."""
@@ -86,7 +86,7 @@ class TreeModel(qt4.QAbstractItemModel):
         rootdata is a tuple of data for the root node - it should have
         the same number of columns as other datasets."""
 
-        qt4.QAbstractItemModel.__init__(self, *args)
+        qt.QAbstractItemModel.__init__(self, *args)
         self.root = TMNode(rootdata, None)
 
         # the nodes are stored here when in the tree,
@@ -105,14 +105,14 @@ class TreeModel(qt4.QAbstractItemModel):
             item = self.objFromIndex(index)
             data = item.nodeData(index.column())
             if data is True:
-                if role == qt4.Qt.CheckStateRole:
-                    return qt4.Qt.Checked
+                if role == qt.Qt.CheckStateRole:
+                    return qt.Qt.Checked
             elif data is False:
-                if role == qt4.Qt.CheckStateRole:
-                    return qt4.Qt.Unchecked
-            elif role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
+                if role == qt.Qt.CheckStateRole:
+                    return qt.Qt.Unchecked
+            elif role in (qt.Qt.DisplayRole, qt.Qt.EditRole):
                 return data
-            elif role == qt4.Qt.ToolTipRole:
+            elif role == qt.Qt.ToolTipRole:
                 return item.toolTip(index.column())
 
         return None
@@ -120,12 +120,12 @@ class TreeModel(qt4.QAbstractItemModel):
     def flags(self, index):
         """Return whether node is editable."""
         if not index.isValid():
-            return qt4.Qt.NoItemFlags
-        return qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable
+            return qt.Qt.NoItemFlags
+        return qt.Qt.ItemIsEnabled | qt.Qt.ItemIsSelectable
 
     def headerData(self, section, orientation, role):
         """Use root node to get headers."""
-        if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
+        if orientation == qt.Qt.Horizontal and role == qt.Qt.DisplayRole:
             return self.root.nodeData(section)
         return None
 
@@ -141,7 +141,7 @@ class TreeModel(qt4.QAbstractItemModel):
     def index(self, row, column, parent):
         """Return index of node."""
         if not self.hasIndex(row, column, parent):
-            return qt4.QModelIndex()
+            return qt.QModelIndex()
 
         parentitem = self.objFromIndex(parent)
         if parentitem is None:
@@ -150,21 +150,21 @@ class TreeModel(qt4.QAbstractItemModel):
         childitem = parentitem.childnodes[row]
         if childitem:
             return self.createIndex(row, column, childitem._idx)
-        return qt4.QModelIndex()
+        return qt.QModelIndex()
 
     def parent(self, index):
         """Get parent index of index."""
         if not index.isValid():
-            return qt4.QModelIndex()
+            return qt.QModelIndex()
 
         childitem = self.objFromIndex(index)
         if childitem is None:
-            return qt4.QModelIndex()
+            return qt.QModelIndex()
 
         parentitem = childitem.parent
 
         if parentitem is self.root:
-            return qt4.QModelIndex()
+            return qt.QModelIndex()
 
         parentrow = parentitem.parent.childnodes.index(parentitem)
         return self.createIndex(parentrow, 0, parentitem._idx)
@@ -269,7 +269,7 @@ class TreeModel(qt4.QAbstractItemModel):
             # header changed, so do reset
             self.beginResetModel()
 
-        self._syncbranch( qt4.QModelIndex(), self.root, newroot )
+        self._syncbranch( qt.QModelIndex(), self.root, newroot )
         if toreset:
             self.root.data = newroot.data
             self.endResetModel()

@@ -20,7 +20,7 @@ from __future__ import division, print_function
 import os
 import os.path
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import utils
 from .. import document
@@ -29,7 +29,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context='ExportDialog'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # formats which can have multiple pages
 multipageformats = set(('ps', 'pdf'))
@@ -62,7 +62,7 @@ class ExportDialog(VeuszDialog):
         self.updatePagePages()
 
         # change 'Save' button to 'Export'
-        self.buttonBox.button(qt4.QDialogButtonBox.Save).setText(_('Export'))
+        self.buttonBox.button(qt.QDialogButtonBox.Save).setText(_('Export'))
 
         # these are mappings between filetypes and radio buttons
         self.fmtradios = dict([(f, getattr(self, r)) for f, r in formatradio])
@@ -102,7 +102,7 @@ class ExportDialog(VeuszDialog):
         elif eloc == 'cwd':
             self.dirname = cgetcwd()
         else: # 'prev'
-            self.dirname = setdb.get('dirname_export', qt4.QDir.homePath())
+            self.dirname = setdb.get('dirname_export', qt.QDir.homePath())
 
         # set default filename
         ext = setdb.get('export_format', 'pdf')
@@ -125,7 +125,7 @@ class ExportDialog(VeuszDialog):
         dpis = ('72', '75', '90', '96', '100', '150', '200', '300')
         for cntrl in self.exportDPI, self.exportDPISVG, self.exportDPIPDF:
             cntrl.addItems(dpis)
-            cntrl.setValidator(qt4.QIntValidator(10, 10000, self))
+            cntrl.setValidator(qt.QIntValidator(10, 10000, self))
         self.exportDPI.setEditText(str(setdb['export_DPI']))
         self.exportDPISVG.setEditText(str(setdb['export_DPI_SVG']))
         self.exportDPIPDF.setEditText(str(setdb['export_DPI_PDF']))
@@ -139,9 +139,9 @@ class ExportDialog(VeuszDialog):
         self.fmtradios[ext].click()
 
         # regexp for comma separated ranges
-        valre = qt4.QRegExp(
+        valre = qt.QRegExp(
             r'^[0-9]+(\s*-\s*[0-9]+)?(\s*,\s*[0-9]+(\s*-\s*[0-9]+)?)*$')
-        valid = qt4.QRegExpValidator(valre, self)
+        valid = qt.QRegExpValidator(valre, self)
         self.editPagePages.setValidator(valid)
 
         # set page mode
@@ -199,15 +199,15 @@ class ExportDialog(VeuszDialog):
         setdb = setting.settingdb
 
         # File types we can export to in the form ([extensions], Name)
-        fd = qt4.QFileDialog(self, _('Export page'))
+        fd = qt.QFileDialog(self, _('Export page'))
 
         filename = self.editFileName.text()
         dirname = os.path.dirname(self.editFileName.text())
         fd.setDirectory(dirname if dirname else self.dirname)
 
-        fd.setFileMode(qt4.QFileDialog.AnyFile)
-        fd.setAcceptMode(qt4.QFileDialog.AcceptSave)
-        fd.setOptions(qt4.QFileDialog.DontConfirmOverwrite)
+        fd.setFileMode(qt.QFileDialog.AnyFile)
+        fd.setAcceptMode(qt.QFileDialog.AcceptSave)
+        fd.setOptions(qt.QFileDialog.DontConfirmOverwrite)
 
         # Create a mapping between a format string and extensions
         filtertoext = {}
@@ -235,7 +235,7 @@ class ExportDialog(VeuszDialog):
         if os.path.isdir(dirname):
             fd.selectFile(filename)
 
-        if fd.exec_() == qt4.QDialog.Accepted:
+        if fd.exec_() == qt.QDialog.Accepted:
             # convert filter to extension
             filterused = str(fd.selectedNameFilter())
             chosenext = filtertoext[filterused][0]
@@ -282,7 +282,7 @@ class ExportDialog(VeuszDialog):
         text = '%i-%i' % (1, npages)
         self.editPagePages.setText(text)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def clearLabel(self):
         """Clear label.
         Defined as a slot to work around PyQt C++ object deleted bug. """
@@ -291,27 +291,27 @@ class ExportDialog(VeuszDialog):
     def showMessage(self, text):
         """Show a message in a label, clearing after a time."""
         self.labelStatus.setText(text)
-        qt4.QTimer.singleShot(3000, self.clearLabel)
+        qt.QTimer.singleShot(3000, self.clearLabel)
 
     def updateExportBackground(self, colorname):
         """Update color on export background."""
-        pixmap = qt4.QPixmap(16, 16)
+        pixmap = qt.QPixmap(16, 16)
         col = self.document.evaluate.colors.get(colorname)
         pixmap.fill(col)
 
         # update button (storing color in button itself - what fun!)
-        self.exportBackgroundButton.setIcon(qt4.QIcon(pixmap))
+        self.exportBackgroundButton.setIcon(qt.QIcon(pixmap))
         self.exportBackgroundButton.iconcolor = colorname
 
     def slotExportBackgroundClicked(self):
         """Button clicked to change background."""
         qcolor = self.document.evaluate.colors.get(
             self.exportBackgroundButton.iconcolor)
-        color = qt4.QColorDialog.getColor(
+        color = qt.QColorDialog.getColor(
             qcolor,
             self,
             "Choose color",
-            qt4.QColorDialog.ShowAlphaChannel )
+            qt.QColorDialog.ShowAlphaChannel )
         if color.isValid():
             self.updateExportBackground(utils.extendedColorFromQColor(color))
 
@@ -390,7 +390,7 @@ class ExportDialog(VeuszDialog):
             try:
                 text = cntrl.currentText()
                 valid = cntrl.validator().validate(text, 0)[0]
-                if valid == qt4.QValidator.Acceptable:
+                if valid == qt.QValidator.Acceptable:
                     setdb[setn] = int(text)
             except ValueError:
                 pass
@@ -409,13 +409,13 @@ class ExportDialog(VeuszDialog):
 
         def _overwriteQuestion(filename):
             """Ask user whether file can be overwritten."""
-            retn = qt4.QMessageBox.question(
+            retn = qt.QMessageBox.question(
                 self,
                 _("Overwrite file?"),
                 _("The file %s already exists") % os.path.basename(filename),
-                qt4.QMessageBox.Save | qt4.QMessageBox.Cancel,
-                qt4.QMessageBox.Cancel)
-            return retn == qt4.QMessageBox.Save
+                qt.QMessageBox.Save | qt.QMessageBox.Cancel,
+                qt.QMessageBox.Cancel)
+            return retn == qt.QMessageBox.Save
 
         # count exported pages (in list so can be modified in function)
         pagecount = [0]
@@ -427,7 +427,7 @@ class ExportDialog(VeuszDialog):
                         return
 
             # show busy cursor
-            #qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.WaitCursor))
+            #qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.WaitCursor))
             # delete file if already exists
             try:
                 os.unlink(fname)
@@ -469,8 +469,8 @@ class ExportDialog(VeuszDialog):
         # format feedback
         self.showMessage(_('Processing...'))
 
-        self.buttonBox.button(qt4.QDialogButtonBox.Close).setEnabled(False)
-        self.buttonBox.button(qt4.QDialogButtonBox.Save).setEnabled(False)
+        self.buttonBox.button(qt.QDialogButtonBox.Close).setEnabled(False)
+        self.buttonBox.button(qt.QDialogButtonBox.Save).setEnabled(False)
 
         def checkDone():
             """Check whether exporting has finished."""
@@ -484,8 +484,8 @@ class ExportDialog(VeuszDialog):
                     msg = cstrerror(e)
                 else:
                     msg = cstr(e)
-                #qt4.QApplication.restoreOverrideCursor()
-                qt4.QMessageBox.critical(
+                #qt.QApplication.restoreOverrideCursor()
+                qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Error exporting to file '%s'\n\n%s") %
                     (fname, msg))
@@ -493,10 +493,10 @@ class ExportDialog(VeuszDialog):
                 if pagecount[0] > 0:
                     self.showMessage(_('Exported %i page(s)') % pagecount[0])
 
-            self.buttonBox.button(qt4.QDialogButtonBox.Close).setEnabled(True)
-            self.buttonBox.button(qt4.QDialogButtonBox.Save).setEnabled(True)
+            self.buttonBox.button(qt.QDialogButtonBox.Close).setEnabled(True)
+            self.buttonBox.button(qt.QDialogButtonBox.Save).setEnabled(True)
             self.checktimer.stop()
 
-        self.checktimer = qt4.QTimer(self)
+        self.checktimer = qt.QTimer(self)
         self.checktimer.timeout.connect(checkDone)
         self.checktimer.start(20)

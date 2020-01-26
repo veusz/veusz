@@ -17,7 +17,7 @@
 ##############################################################################
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from .. import document
 from .. import dataimport
@@ -27,11 +27,11 @@ from . import plotwindow
 A simple window class for wrapping a plotwindow
 """
 
-class SimpleWindow(qt4.QMainWindow):
+class SimpleWindow(qt.QMainWindow):
     """ The main window class for the application."""
 
     def __init__(self, title, doc=None):
-        qt4.QMainWindow.__init__(self)
+        qt.QMainWindow.__init__(self)
 
         self.setWindowTitle(title)
 

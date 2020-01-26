@@ -49,7 +49,7 @@ import numpy as N
 from ..compat import crange, cnext, CStringIO
 from .. import utils
 from .. import datasets
-from .. import qtall as qt4
+from .. import qtall as qt
 from .import base
 
 # a regular expression for splitting descriptor into tokens
@@ -444,7 +444,7 @@ class CSVStream(Stream):
             quotechar=textdelim,
             encoding=encoding )
         self.localename = locale
-        self.locale = qt4.QLocale(locale)
+        self.locale = qt.QLocale(locale)
 
     def newLine(self):
         """Get next line from CSV file."""

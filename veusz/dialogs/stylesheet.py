@@ -20,7 +20,7 @@ from __future__ import division
 
 from ..compat import cstrerror
 from .. import utils
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from ..windows.treeeditwindow import TabbedFormatting, PropertyList, \
     SettingsProxySingle
@@ -28,7 +28,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="StylesheetDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class StylesheetDialog(VeuszDialog):
     """This is a dialog box to edit stylesheets.
@@ -54,7 +54,7 @@ class StylesheetDialog(VeuszDialog):
         self.stylesListWidget.setCurrentRow(0)
 
         # we disable default buttons as they keep grabbing the enter key
-        close = self.buttonBox.button(qt4.QDialogButtonBox.Close)
+        close = self.buttonBox.button(qt.QDialogButtonBox.Close)
         close.setDefault(False)
         close.setAutoDefault(False)
 
@@ -73,8 +73,8 @@ class StylesheetDialog(VeuszDialog):
     def fillStyleList(self):
         """Fill list of styles."""
         for stns in self.stylesheet.getSettingsList():
-            item = qt4.QListWidgetItem(utils.getIcon(stns.pixmap),
-                                       stns.usertext)
+            item = qt.QListWidgetItem(
+                utils.getIcon(stns.pixmap), stns.usertext)
             item.VZsettings = stns
             self.stylesListWidget.addItem(item)
 
@@ -113,7 +113,7 @@ class StylesheetDialog(VeuszDialog):
                 self.recentButton.addFile(filename)
 
             except EnvironmentError as e:
-                qt4.QMessageBox.critical(
+                qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save '%s'\n\n%s") % (
                         filename, cstrerror(e)))
@@ -126,7 +126,7 @@ class StylesheetDialog(VeuszDialog):
             try:
                 self.loadStyleSheet(filename)
             except EnvironmentError as e:
-                qt4.QMessageBox.critical(
+                qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to load '%s'\n\n%s") % (
                         filename, cstrerror(e)))

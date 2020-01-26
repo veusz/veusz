@@ -23,7 +23,7 @@ Paints solid, hatching and various qt brushes
 
 from __future__ import division, print_function
 import numpy as N
-from .. import qtall as qt4
+from .. import qtall as qt
 import math
 
 from ..helpers.qtloops import plotLinesToPainter, polygonClip
@@ -52,7 +52,7 @@ def _hatcher(painter, pen, painterpath, spacing, hatchlist):
     # debugging
     # dumppath(painterpath)
 
-    painter.setClipPath(painterpath, qt4.Qt.IntersectClip)
+    painter.setClipPath(painterpath, qt.Qt.IntersectClip)
 
     # this is the bounding box of the path
     bb = painter.clipPath().boundingRect()
@@ -167,14 +167,14 @@ _hatchmap = {
 
 # convert qt-specific fill styles into qt styles
 _fillcnvt = {
-    'solid': qt4.Qt.SolidPattern,
-    '94% dense': qt4.Qt.Dense1Pattern,
-    '88% dense': qt4.Qt.Dense2Pattern,
-    '63% dense': qt4.Qt.Dense3Pattern,
-    '50% dense': qt4.Qt.Dense4Pattern,
-    '37% dense': qt4.Qt.Dense5Pattern,
-    '12% dense': qt4.Qt.Dense6Pattern,
-    '6% dense': qt4.Qt.Dense7Pattern
+    'solid': qt.Qt.SolidPattern,
+    '94% dense': qt.Qt.Dense1Pattern,
+    '88% dense': qt.Qt.Dense2Pattern,
+    '63% dense': qt.Qt.Dense3Pattern,
+    '50% dense': qt.Qt.Dense4Pattern,
+    '37% dense': qt.Qt.Dense5Pattern,
+    '12% dense': qt.Qt.Dense6Pattern,
+    '6% dense': qt.Qt.Dense7Pattern
     }
 
 def brushExtFillPath(painter, extbrush, path, ignorehide=False,
@@ -198,7 +198,7 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
                 # skip filling fully transparent areas
                 return
             color.setAlphaF((100-extbrush.transparency) / 100.)
-        brush = qt4.QBrush(color, _fillcnvt[style])
+        brush = qt.QBrush(color, _fillcnvt[style])
         if stroke is None:
             painter.fillPath(path, brush)
         else:
@@ -217,7 +217,7 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
                 painter, dataindex=dataindex)
             if extbrush.backtransparency > 0:
                 color.setAlphaF((100-extbrush.backtransparency) / 100.)
-            brush = qt4.QBrush(color)
+            brush = qt.QBrush(color)
             painter.fillPath(path, brush)
 
         color = extbrush.get('color').color(painter, dataindex=dataindex)
@@ -226,7 +226,7 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
         width = extbrush.get('linewidth').convert(painter)
         lstyle, dashpattern = extbrush.get('linestyle')._linecnvt[
             extbrush.linestyle]
-        pen = qt4.QPen(color, width, lstyle)
+        pen = qt.QPen(color, width, lstyle)
 
         if dashpattern:
             pen.setDashPattern(dashpattern)
@@ -241,8 +241,8 @@ def brushExtFillPath(painter, extbrush, path, ignorehide=False,
 
 def brushExtFillPolygon(painter, extbrush, cliprect, polygon, ignorehide=False):
     """Fill a polygon with an extended brush."""
-    clipped = qt4.QPolygonF()
+    clipped = qt.QPolygonF()
     polygonClip(polygon, cliprect, clipped)
-    path = qt4.QPainterPath()
+    path = qt.QPainterPath()
     path.addPolygon(clipped)
     brushExtFillPath(painter, extbrush, path, ignorehide=ignorehide)

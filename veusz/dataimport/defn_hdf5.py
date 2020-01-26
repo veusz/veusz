@@ -22,7 +22,7 @@ import collections
 import re
 
 import numpy as N
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..compat import citems, cvalues, cbytes, cunicode, cpy3
 from .. import document
 from .. import datasets
@@ -31,7 +31,7 @@ from . import base
 from . import fits_hdf5_helpers
 
 def _(text, disambiguation=None, context="Import_HDF5"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 h5py = None
 def inith5py():

@@ -21,7 +21,7 @@
 from __future__ import division
 import re
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..compat import crange
 
 # match name of color
@@ -34,11 +34,11 @@ def makeColor(name):
     """Make a new color, allowing extended hex format with extra two digits."""
     m = extendedcolor_re.match(name)
     if m:
-        col = qt4.QColor(name[:7])
+        col = qt.QColor(name[:7])
         col.setAlpha( int(name[7:], 16) )
         return col
     else:
-        return qt4.QColor(name)
+        return qt.QColor(name)
 
 # Default color themes
 colorthemes = {
@@ -130,13 +130,13 @@ colorthemes = {
 # most up-to-date theme
 colorthemes['default-latest'] = colorthemes['default1']
 
-class Colors(qt4.QObject):
+class Colors(qt.QObject):
     """Document colors."""
 
-    sigColorsModified = qt4.pyqtSignal()
+    sigColorsModified = qt.pyqtSignal()
 
     def __init__(self):
-        qt4.QObject.__init__(self)
+        qt.QObject.__init__(self)
 
         self.defaultnames = [
             'auto',
@@ -264,11 +264,11 @@ class Colors(qt4.QObject):
         except (ZeroDivisionError, KeyError):
             return 'foreground'
 
-class ColorModel(qt4.QAbstractListModel):
+class ColorModel(qt.QAbstractListModel):
     """This is a Qt model to get access to the complete list of colors."""
 
     def __init__(self, parent, colors):
-        qt4.QAbstractListModel.__init__(self, parent)
+        qt.QAbstractListModel.__init__(self, parent)
         self.colors = colors
 
         # cache of icons for colors indexed by rgba value
@@ -292,22 +292,22 @@ class ColorModel(qt4.QAbstractListModel):
         qcolor = self.colors.get(color)
         if color.lower() in ('auto', 'transparent'):
             # make a checkerboard pattern for special colors
-            image = qt4.QImage(xw, yw, qt4.QImage.Format_RGB32)
+            image = qt.QImage(xw, yw, qt.QImage.Format_RGB32)
             if color.lower() == 'auto':
                 cnames = ['orange', 'skyblue', 'green']
             else:
                 cnames = ['lightgrey', 'darkgrey']
-            cols = [qt4.QColor(c).rgba() for c in cnames]
+            cols = [qt.QColor(c).rgba() for c in cnames]
             for x in crange(xw):
                 for y in crange(yw):
                     idx = (x//4 + y//4) % len(cols)
                     image.setPixel(x, y, cols[idx])
-            pixmap = qt4.QPixmap.fromImage(image)
+            pixmap = qt.QPixmap.fromImage(image)
         else:
             # solid color
-            pixmap = qt4.QPixmap(xw, yw)
+            pixmap = qt.QPixmap(xw, yw)
             pixmap.fill(qcolor)
-        icon = qt4.QIcon(pixmap)
+        icon = qt.QIcon(pixmap)
         self.iconcache[qcolor.rgba()] = icon
 
     def data(self, index, role):
@@ -316,9 +316,9 @@ class ColorModel(qt4.QAbstractListModel):
             return None
 
         color = self.colorlist[index.row()]
-        if role == qt4.Qt.DisplayRole or role == qt4.Qt.EditRole:
+        if role == qt.Qt.DisplayRole or role == qt.Qt.EditRole:
             return color
-        elif role == qt4.Qt.DecorationRole:
+        elif role == qt.Qt.DecorationRole:
             # icons are cached using rgba as index
             rgba = self.colors.get(color).rgba()
             if rgba not in self.iconcache:
@@ -329,12 +329,12 @@ class ColorModel(qt4.QAbstractListModel):
 
     def flags(self, index):
         if not index.isValid():
-            return qt4.Qt.ItemIsEnabled
+            return qt.Qt.ItemIsEnabled
         return (
-            qt4.QAbstractListModel.flags(self, index) | qt4.Qt.ItemIsEditable)
+            qt.QAbstractListModel.flags(self, index) | qt.Qt.ItemIsEditable)
 
     def setData(self, index, value, role):
-        if role == qt4.Qt.EditRole or role == qt4.Qt.DisplayRole:
+        if role == qt.Qt.EditRole or role == qt.Qt.DisplayRole:
             row = index.row()
             if row>=0 and row<len(self.colorlist):
                 self.colorlist[row] = value
@@ -351,7 +351,7 @@ class ColorModel(qt4.QAbstractListModel):
         if count<1 or row<0 or row>len(self.colorlist):
             return False
 
-        self.beginInsertRows(qt4.QModelIndex(), row, row+count-1)
+        self.beginInsertRows(qt.QModelIndex(), row, row+count-1)
         self.colorlist = (
             self.colorlist[:row] + ['']*count +
             self.colorlist[row:])
@@ -362,7 +362,7 @@ class ColorModel(qt4.QAbstractListModel):
         if count<=0 or row<0 or (row+count)>len(self.colorlist):
             return False
 
-        self.beginRemoveRows(qt4.QModelIndex(), row, row+count-1)
+        self.beginRemoveRows(qt.QModelIndex(), row, row+count-1)
         self.colorlist = (
             self.colorlist[:row] +
             self.colorlist[row+count:])
@@ -396,7 +396,7 @@ class ColorModel(qt4.QAbstractListModel):
         while i < len(curcols):
             col = curcols[i]
             if col not in newset:
-                self.beginRemoveRows(qt4.QModelIndex(), i, i)
+                self.beginRemoveRows(qt.QModelIndex(), i, i)
                 del curcols[i]
                 self.endRemoveRows()
             else:
@@ -407,18 +407,18 @@ class ColorModel(qt4.QAbstractListModel):
             if i == len(curcols) or curcols[i] != ncol:
                 # maybe swap
                 if i<len(curcols) and ncol in oldset:
-                    self.beginRemoveRows(qt4.QModelIndex(), i, i)
+                    self.beginRemoveRows(qt.QModelIndex(), i, i)
                     del curcols[i]
                     self.endRemoveRows()
 
                 # simple add
-                self.beginInsertRows(qt4.QModelIndex(), i, i)
+                self.beginInsertRows(qt.QModelIndex(), i, i)
                 curcols.insert(i, ncol)
                 self.endInsertRows()
 
         # delete any extra rows
         if len(newcols) < len(curcols):
             self.beginRemoveRows(
-                qt4.QModelIndex(), len(newcols), len(curcols)-1)
+                qt.QModelIndex(), len(newcols), len(curcols)-1)
             del curcols[len(newcols):]
             self.endRemoveRows()

@@ -29,7 +29,7 @@ import os.path
 import numpy as N
 
 from ..compat import cbasestr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import embed
 from .. import plugins
@@ -42,7 +42,7 @@ from . import export
 
 def _(text, disambiguation=None, context='CommandInterface'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def registerImportCommand(name, method, filenamearg=0):
     """Add command to command interface."""
@@ -50,7 +50,7 @@ def registerImportCommand(name, method, filenamearg=0):
     CommandInterface.import_commands.append(name)
     CommandInterface.import_filenamearg[name] = filenamearg
 
-class CommandInterface(qt4.QObject):
+class CommandInterface(qt.QObject):
     """Class provides command interface."""
 
     # commands which are safe in any script (excluding import commands)
@@ -111,7 +111,7 @@ class CommandInterface(qt4.QObject):
 
     def __init__(self, document):
         """Initialise the interface."""
-        qt4.QObject.__init__(self)
+        qt.QObject.__init__(self)
 
         self.document = document
         self.currentwidget = self.document.basewidget
@@ -122,7 +122,7 @@ class CommandInterface(qt4.QObject):
 
         self.Root = embed.WidgetNode(self, 'widget', '/')
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def slotWipedDoc(self):
         """When the document is wiped, we change to the root widget."""
         self.To('/')

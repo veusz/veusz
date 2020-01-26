@@ -19,13 +19,13 @@
 from __future__ import division, print_function
 import re
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from . import readcsv
 from . import base
 
 def _(text, disambiguation=None, context="Import_CSV"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportParamsCSV(base.ImportParamsBase):
     """CSV import parameters.

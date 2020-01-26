@@ -25,7 +25,7 @@ from __future__ import division
 import numpy as N
 
 from ..compat import cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import datasets
 from .. import setting
@@ -34,13 +34,13 @@ from .veuszdialog import VeuszDialog, recreate_register
 
 def _(text, disambiguation=None, context="DataEditDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class DatasetTableModel1D(qt4.QAbstractTableModel):
+class DatasetTableModel1D(qt.QAbstractTableModel):
     """Provides access to editing and viewing of datasets."""
 
     def __init__(self, parent, document, datasetname):
-        qt4.QAbstractTableModel.__init__(self, parent)
+        qt.QAbstractTableModel.__init__(self, parent)
 
         self.document = document
         self.dsname = datasetname
@@ -81,7 +81,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             # select correct part of dataset
             data = getattr(ds, ds.columns[index.column()])
         if ds is not None and data is not None and role in (
-            qt4.Qt.DisplayRole, qt4.Qt.EditRole):
+            qt.Qt.DisplayRole, qt.Qt.EditRole):
             # blank row at end of data
             if index.row() == len(data):
                 return None
@@ -101,8 +101,8 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
         except KeyError:
             return None
 
-        if role == qt4.Qt.DisplayRole:
-            if orientation == qt4.Qt.Horizontal:
+        if role == qt.Qt.DisplayRole:
+            if orientation == qt.Qt.Horizontal:
                 # column names
                 return ds.column_descriptions[section]
             else:
@@ -116,12 +116,12 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
     def flags(self, index):
         """Update flags to say that items are editable."""
         if index.isValid():
-            f = qt4.QAbstractTableModel.flags(self, index)
+            f = qt.QAbstractTableModel.flags(self, index)
             ds = self.document.data.get(self.dsname)
             if ds is not None and ds.editable:
-                f |= qt4.Qt.ItemIsEditable
+                f |= qt.Qt.ItemIsEditable
             return f
-        return qt4.Qt.ItemIsEnabled
+        return qt.Qt.ItemIsEnabled
 
     def removeRows(self, row, count):
         """Remove rows."""
@@ -136,7 +136,7 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
     def setData(self, index, value, role):
         """Called to set the data."""
 
-        if not index.isValid() or role != qt4.Qt.EditRole:
+        if not index.isValid() or role != qt.Qt.EditRole:
             return False
 
         row = index.row()
@@ -172,11 +172,11 @@ class DatasetTableModel1D(qt4.QAbstractTableModel):
             return False
         return True
 
-class DatasetTableModelMulti(qt4.QAbstractTableModel):
+class DatasetTableModelMulti(qt.QAbstractTableModel):
     """Edit multiple datasets simultaneously with a spreadsheet-like style."""
 
     def __init__(self, parent, document, datasetnames):
-        qt4.QAbstractTableModel.__init__(self, parent)
+        qt.QAbstractTableModel.__init__(self, parent)
 
         self.document = document
         self.dsnames = datasetnames
@@ -243,7 +243,7 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
         ds = self.document.data[dsname]
         data = getattr(ds, colname)
 
-        if role == qt4.Qt.DisplayRole:
+        if role == qt.Qt.DisplayRole:
             if index.row() < self.rowcounts[dsidx]-1:
                 # convert data to Data
                 d = data[index.row()]
@@ -255,8 +255,8 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         """Return row numbers or column names."""
 
-        if role == qt4.Qt.DisplayRole:
-            if orientation == qt4.Qt.Horizontal:
+        if role == qt.Qt.DisplayRole:
+            if orientation == qt.Qt.Horizontal:
                 # column names
                 dsname, colname, dsidx, colidx = self.colattrs[section]
                 ds = self.document.data[dsname]
@@ -274,18 +274,18 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
     def flags(self, index):
         """Update flags to say that items are editable."""
         if index.isValid():
-            f = qt4.QAbstractTableModel.flags(self, index)
+            f = qt.QAbstractTableModel.flags(self, index)
             dsname, colname, dsidx, colidx = self.colattrs[index.column()]
             ds = self.document.data.get(dsname)
             if ds is not None and ds.editable:
-                f |= qt4.Qt.ItemIsEditable
+                f |= qt.Qt.ItemIsEditable
             return f
-        return qt4.Qt.ItemIsEnabled
+        return qt.Qt.ItemIsEnabled
 
     def setData(self, index, value, role):
         """Validate and set data in dataset."""
 
-        if not index.isValid() or role != qt4.Qt.EditRole:
+        if not index.isValid() or role != qt.Qt.EditRole:
             return False
 
         row = index.row()
@@ -334,11 +334,11 @@ class DatasetTableModelMulti(qt4.QAbstractTableModel):
         self.document.applyOperation(
             document.OperationMultiple(ops, _('delete row(s)')))
 
-class DatasetTableModel2D(qt4.QAbstractTableModel):
+class DatasetTableModel2D(qt.QAbstractTableModel):
     """A 2D dataset model."""
 
     def __init__(self, parent, document, datasetname):
-        qt4.QAbstractTableModel.__init__(self, parent)
+        qt.QAbstractTableModel.__init__(self, parent)
 
         self.document = document
         self.dsname = datasetname
@@ -378,7 +378,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
             return 0
 
     def data(self, index, role):
-        if role == qt4.Qt.DisplayRole:
+        if role == qt.Qt.DisplayRole:
             # get data (note y is reversed, sigh)
             try:
                 data = self.document.data[self.dsname].data
@@ -400,16 +400,16 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         if ds.dimensions != 2:
             return None
 
-        xaxis = orientation == qt4.Qt.Horizontal
+        xaxis = orientation == qt.Qt.Horizontal
 
         # note: y coordinates are upside down (high y is at top)
-        if ds is not None and role == qt4.Qt.DisplayRole:
+        if ds is not None and role == qt.Qt.DisplayRole:
             v = self.xcent[section] if xaxis else self.ycent[
                 len(self.ycent)-section-1]
             return '%i (%s)' % (
                 len(self.ycent)-section, setting.ui_floattostring(v, maxdp=4))
 
-        elif ds is not None and role == qt4.Qt.ToolTipRole:
+        elif ds is not None and role == qt.Qt.ToolTipRole:
             v1 = self.xedge[section] if xaxis else self.yedge[
                 len(self.yedge)-section-2]
             v2 = self.xedge[section+1] if xaxis else self.yedge[
@@ -422,12 +422,12 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
     def flags(self, index):
         """Update flags to say that items are editable."""
         if not index.isValid():
-            return qt4.Qt.ItemIsEnabled
+            return qt.Qt.ItemIsEnabled
         else:
-            f = qt4.QAbstractTableModel.flags(self, index)
+            f = qt.QAbstractTableModel.flags(self, index)
             ds = self.document.data.get(self.dsname)
             if ds is not None and ds.editable:
-                f |= qt4.Qt.ItemIsEditable
+                f |= qt.Qt.ItemIsEditable
             return f
 
     def slotDocumentModified(self):
@@ -438,7 +438,7 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
     def setData(self, index, value, role):
         """Called to set the data."""
 
-        if not index.isValid() or role != qt4.Qt.EditRole:
+        if not index.isValid() or role != qt.Qt.EditRole:
             return False
 
         ds = self.document.data[self.dsname]
@@ -456,11 +456,11 @@ class DatasetTableModel2D(qt4.QAbstractTableModel):
         self.document.applyOperation(op)
         return True
 
-class DatasetTableModelND(qt4.QAbstractTableModel):
+class DatasetTableModelND(qt.QAbstractTableModel):
     """An ND dataset model."""
 
     def __init__(self, parent, document, datasetname):
-        qt4.QAbstractTableModel.__init__(self, parent)
+        qt.QAbstractTableModel.__init__(self, parent)
 
         self.document = document
         self.dsname = datasetname
@@ -486,7 +486,7 @@ class DatasetTableModelND(qt4.QAbstractTableModel):
 
     def data(self, index, role):
         """Items in array."""
-        if role == qt4.Qt.DisplayRole:
+        if role == qt.Qt.DisplayRole:
             try:
                 data = self.document.data[self.dsname].data
             except KeyError:
@@ -506,8 +506,8 @@ class DatasetTableModelND(qt4.QAbstractTableModel):
         if ds is None:
             return None
 
-        if ds is not None and role == qt4.Qt.DisplayRole:
-            if orientation == qt4.Qt.Horizontal:
+        if ds is not None and role == qt.Qt.DisplayRole:
+            if orientation == qt.Qt.Horizontal:
                 return _('Value')
             else:
                 idx = N.unravel_index(section, ds.data.shape)
@@ -519,16 +519,16 @@ class DatasetTableModelND(qt4.QAbstractTableModel):
         """Called when document modified."""
         self.layoutChanged.emit()
 
-class ViewDelegate(qt4.QStyledItemDelegate):
+class ViewDelegate(qt.QStyledItemDelegate):
     """Delegate for fixing double editing.
     Normal editing uses double spin box, which is inappropriate
     """
 
     def createEditor(self, parent, option, index):
         if type(index.data()) is float:
-            return qt4.QLineEdit(parent)
+            return qt.QLineEdit(parent)
         else:
-            return qt4.QStyledItemDelegate.createEditor(
+            return qt.QStyledItemDelegate.createEditor(
                 self, parent, option, index)
 
     def setEditorData(self, editor, index):
@@ -537,7 +537,7 @@ class ViewDelegate(qt4.QStyledItemDelegate):
             txt = setting.ui_floattostring(index.data())
             editor.setText(txt)
         else:
-            qt4.QStyledItemDelegate.setEditorData(self, editor, index)
+            qt.QStyledItemDelegate.setEditorData(self, editor, index)
 
 class DataEditDialog(VeuszDialog):
     """Dialog for editing and rearranging data sets."""
@@ -561,18 +561,18 @@ class DataEditDialog(VeuszDialog):
             (_('Delete row'), self.slotDeleteRow),
             (_('Insert row'), self.slotInsertRow),
             ):
-            act = qt4.QAction(text, self)
+            act = qt.QAction(text, self)
             act.triggered.connect(slot)
             self.datatableview.addAction(act)
-        self.datatableview.setContextMenuPolicy( qt4.Qt.ActionsContextMenu )
+        self.datatableview.setContextMenuPolicy( qt.Qt.ActionsContextMenu )
 
         # layout edit dialog improvement
         self.splitter.setStretchFactor(0, 3)
         self.splitter.setStretchFactor(1, 4)
 
         # don't want text to look editable or special
-        self.linkedlabel.setFrameShape(qt4.QFrame.NoFrame)
-        self.linkedlabel.viewport().setBackgroundRole(qt4.QPalette.Window)
+        self.linkedlabel.setFrameShape(qt.QFrame.NoFrame)
+        self.linkedlabel.viewport().setBackgroundRole(qt.QPalette.Window)
 
         # document changes
         document.signalModified.connect(self.slotDocumentModified)
@@ -597,7 +597,7 @@ class DataEditDialog(VeuszDialog):
             btn.clicked.connect(slot)
 
         # menu for new button
-        self.newmenu = qt4.QMenu()
+        self.newmenu = qt.QMenu()
         for text, slot in ( (_('Numerical dataset'), self.slotNewNumericalDataset),
                             (_('Text dataset'), self.slotNewTextDataset),
                             (_('Date/time dataset'), self.slotNewDateDataset) ):
@@ -745,7 +745,7 @@ class DataEditDialog(VeuszDialog):
         lines = '\n'.join(lines)
 
         # put text on clipboard
-        qt4.QApplication.clipboard().setText(lines)
+        qt.QApplication.clipboard().setText(lines)
 
     def slotDeleteRow(self):
         """Delete the current row."""

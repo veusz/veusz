@@ -20,14 +20,14 @@
 
 from __future__ import division, print_function
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from ..qtwidgets.datasetbrowser import DatasetBrowser
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="FilterDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class FilterDialog(VeuszDialog):
     """Preferences dialog."""
@@ -38,18 +38,18 @@ class FilterDialog(VeuszDialog):
         self.document = doc
 
         self.dsbrowser = DatasetBrowser(doc, parent, None, checkable=True)
-        grplayout = qt4.QVBoxLayout()
+        grplayout = qt.QVBoxLayout()
         grplayout.addWidget(self.dsbrowser)
         self.filtergroup.setLayout(grplayout)
 
-        self.buttonBox.button(qt4.QDialogButtonBox.Apply).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.Apply).clicked.connect(
             self.applyClicked)
-        self.buttonBox.button(qt4.QDialogButtonBox.Reset).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.Reset).clicked.connect(
             self.resetClicked)
 
     def updateStatus(self, text):
         """Show message in dialog."""
-        qt4.QTimer.singleShot(4000, self.statuslabel.clear)
+        qt.QTimer.singleShot(4000, self.statuslabel.clear)
         self.statuslabel.setText(text)
 
     def applyClicked(self):

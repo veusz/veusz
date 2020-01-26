@@ -20,14 +20,14 @@
 
 from __future__ import division, print_function
 from ..compat import crange
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from .. import utils
 from .. import document
 
 def _(text, disambiguation=None, context="WidgetTree"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class _WidgetNode:
     """Class to represent widgets in WidgetTreeModel.
@@ -60,7 +60,7 @@ class _WidgetNode:
     def __repr__(self):
         return "<_WidgetNode widget:%s>" % repr(self.widget)
 
-class WidgetTreeModel(qt4.QAbstractItemModel):
+class WidgetTreeModel(qt.QAbstractItemModel):
     """A model representing the widget tree structure.
 
     We hide the actual widgets behind a tree of _WidgetNode
@@ -80,7 +80,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
     def __init__(self, document, parent=None):
         """Initialise using document."""
 
-        qt4.QAbstractItemModel.__init__(self, parent)
+        qt.QAbstractItemModel.__init__(self, parent)
 
         self.document = document
 
@@ -223,29 +223,29 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         column = index.column()
         data = index.internalPointer().data
 
-        if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
+        if role in (qt.Qt.DisplayRole, qt.Qt.EditRole):
             # return text for columns
             if column == 0:
                 return data[0]
             elif column == 1:
                 return data[1]
 
-        elif role == qt4.Qt.DecorationRole:
+        elif role == qt.Qt.DecorationRole:
             # return icon for first column
             if column == 0:
                 filename = 'button_%s' % data[1]
                 return utils.getIcon(filename)
 
-        elif role == qt4.Qt.ToolTipRole:
+        elif role == qt.Qt.ToolTipRole:
             # provide tool tip showing description
             return data[2]
 
-        elif role == qt4.Qt.TextColorRole:
+        elif role == qt.Qt.TextColorRole:
             # show disabled looking text if object or any parent is hidden
             # return brush for hidden widget text, based on disabled text
             if data[3]:
-                return qt4.QPalette().brush(
-                    qt4.QPalette.Disabled, qt4.QPalette.Text)
+                return qt.QPalette().brush(
+                    qt.QPalette.Disabled, qt.QPalette.Text)
 
         # return nothing
         return None
@@ -277,21 +277,23 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """What we can do with the item."""
 
         if not index.isValid():
-            return qt4.Qt.ItemIsEnabled
+            return qt.Qt.ItemIsEnabled
 
-        flags = ( qt4.Qt.ItemIsEnabled | qt4.Qt.ItemIsSelectable |
-                  qt4.Qt.ItemIsDropEnabled )
+        flags = (
+            qt.Qt.ItemIsEnabled | qt.Qt.ItemIsSelectable |
+            qt.Qt.ItemIsDropEnabled
+        )
         if ( index.internalPointer().parent is not None and
              index.column() == 0 ):
             # allow items other than root to be edited and dragged
-            flags |= qt4.Qt.ItemIsEditable | qt4.Qt.ItemIsDragEnabled
+            flags |= qt.Qt.ItemIsEditable | qt.Qt.ItemIsDragEnabled
 
         return flags
 
     def headerData(self, section, orientation, role):
         """Return the header of the tree."""
 
-        if orientation == qt4.Qt.Horizontal and role == qt4.Qt.DisplayRole:
+        if orientation == qt.Qt.Horizontal and role == qt.Qt.DisplayRole:
             val = ('Name', 'Type')[section]
             return val
         return None
@@ -308,7 +310,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
             try:
                 child = parent.internalPointer().children[row]
             except IndexError:
-                return qt4.QModelIndex()
+                return qt.QModelIndex()
         else:
             # root widget
             child = self.rootnode
@@ -328,11 +330,11 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         """Find the parent of the index given."""
 
         if not index.isValid():
-            return qt4.QModelIndex()
+            return qt.QModelIndex()
 
         parent = index.internalPointer().parent
         if parent is None:
-            return qt4.QModelIndex()
+            return qt.QModelIndex()
         else:
             gparent = parent.parent
             row = 0 if gparent is None else gparent.children.index(parent)
@@ -367,7 +369,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
 
     def supportedDropActions(self):
         """Supported drag and drop actions."""
-        return qt4.Qt.MoveAction | qt4.Qt.CopyAction
+        return qt.Qt.MoveAction | qt.Qt.CopyAction
 
     def mimeData(self, indexes):
         """Get mime data for indexes."""
@@ -381,7 +383,7 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
     def dropMimeData(self, mimedata, action, row, column, parentindex):
         """User drags and drops widget."""
 
-        if action == qt4.Qt.IgnoreAction:
+        if action == qt.Qt.IgnoreAction:
             return True
 
         data = document.getWidgetMime(mimedata)
@@ -406,38 +408,38 @@ class WidgetTreeModel(qt4.QAbstractItemModel):
         self.document.applyOperation(op)
         return True
 
-class WidgetTreeView(qt4.QTreeView):
+class WidgetTreeView(qt.QTreeView):
     """A model view for viewing the widgets."""
 
     def __init__(self, model, *args):
-        qt4.QTreeView.__init__(self, *args)
+        qt.QTreeView.__init__(self, *args)
         self.setModel(model)
         self.expandAll()
 
         # stretch header
         hdr = self.header()
         hdr.setStretchLastSection(False)
-        hdr.setSectionResizeMode(0, qt4.QHeaderView.Stretch)
-        hdr.setSectionResizeMode(1, qt4.QHeaderView.Custom)
+        hdr.setSectionResizeMode(0, qt.QHeaderView.Stretch)
+        hdr.setSectionResizeMode(1, qt.QHeaderView.Custom)
 
         # setup drag and drop
-        self.setSelectionMode(qt4.QAbstractItemView.ExtendedSelection)
+        self.setSelectionMode(qt.QAbstractItemView.ExtendedSelection)
         self.setDragEnabled(True)
         self.viewport().setAcceptDrops(True)
         self.setDropIndicatorShown(True)
 
     def testModifier(self, e):
         """Look for keyboard modifier for copy or move."""
-        if e.keyboardModifiers() & qt4.Qt.ControlModifier:
-            e.setDropAction(qt4.Qt.CopyAction)
+        if e.keyboardModifiers() & qt.Qt.ControlModifier:
+            e.setDropAction(qt.Qt.CopyAction)
         else:
-            e.setDropAction(qt4.Qt.MoveAction)
+            e.setDropAction(qt.Qt.MoveAction)
 
     def handleInternalMove(self, event):
         """Handle a move inside treeview."""
 
         # make sure qt doesn't handle this
-        event.setDropAction(qt4.Qt.IgnoreAction)
+        event.setDropAction(qt.Qt.IgnoreAction)
         event.ignore()
 
         if not self.viewport().rect().contains(event.pos()):
@@ -451,10 +453,10 @@ class WidgetTreeView(qt4.QTreeView):
         # adjust according to drop indicator position
         row = -1
         posn = self.dropIndicatorPosition()
-        if posn == qt4.QAbstractItemView.AboveItem:
+        if posn == qt.QAbstractItemView.AboveItem:
             row = index.row()
             index = index.parent()
-        elif posn == qt4.QAbstractItemView.BelowItem:
+        elif posn == qt.QAbstractItemView.BelowItem:
             row = index.row() + 1
             index = index.parent()
 
@@ -481,13 +483,13 @@ class WidgetTreeView(qt4.QTreeView):
         """When an object is dropped on the view."""
         self.testModifier(e)
 
-        if e.source() is self and e.dropAction() == qt4.Qt.MoveAction:
+        if e.source() is self and e.dropAction() == qt.Qt.MoveAction:
             self.handleInternalMove(e)
 
-        qt4.QTreeView.dropEvent(self, e)
+        qt.QTreeView.dropEvent(self, e)
 
     def dragMoveEvent(self, e):
         """Make items move by default and copy if Ctrl is held down."""
         self.testModifier(e)
 
-        qt4.QTreeView.dragMoveEvent(self, e)
+        qt.QTreeView.dragMoveEvent(self, e)

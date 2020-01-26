@@ -20,7 +20,7 @@ from __future__ import division
 from itertools import count
 
 from ..compat import czip, CStringIO
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from . import doc
 from . import operations
@@ -58,8 +58,8 @@ def generateWidgetsMime(widgets):
     header.append('')
     text = ('\n'.join(header) + ''.join(savetext)).encode('utf-8')
 
-    mimedata = qt4.QMimeData()
-    mimedata.setData(widgetmime, qt4.QByteArray(text))
+    mimedata = qt.QMimeData()
+    mimedata.setData(widgetmime, qt.QByteArray(text))
     return mimedata
 
 def generateDatasetsMime(datasets, document):
@@ -71,14 +71,14 @@ def generateDatasetsMime(datasets, document):
     ...
     """
 
-    mimedata = qt4.QMimeData()
+    mimedata = qt.QMimeData()
 
     # just plain text format
     output = []
     for name in datasets:
         output.append( document.data[name].datasetAsText() )
     text = ('\n'.join(output)).encode('utf-8')
-    mimedata.setData('text/plain', qt4.QByteArray(text))
+    mimedata.setData('text/plain', qt.QByteArray(text))
 
     textfile = CStringIO()
     for name in datasets:
@@ -95,7 +95,7 @@ def generateDatasetsMime(datasets, document):
 
 def isClipboardDataMime():
     """Returns whether data available on clipboard."""
-    mimedata = qt4.QApplication.clipboard().mimeData()
+    mimedata = qt.QApplication.clipboard().mimeData()
     return datamime in mimedata.formats()
 
 def getWidgetMime(mimedata):
@@ -110,7 +110,7 @@ def getClipboardWidgetMime():
 
     If mimedata is set, use this rather than clipboard directly
     """
-    return getWidgetMime(qt4.QApplication.clipboard().mimeData())
+    return getWidgetMime(qt.QApplication.clipboard().mimeData())
 
 def getMimeWidgetTypes(data):
     """Get list of widget types in the mime data."""

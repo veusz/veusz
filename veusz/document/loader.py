@@ -24,7 +24,7 @@ import traceback
 import io
 import numpy as N
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import utils
 
@@ -37,7 +37,7 @@ h5py = None
 
 def _(text, disambiguation=None, context='DocumentLoader'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class LoadError(RuntimeError):
     """Error when loading document."""

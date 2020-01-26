@@ -22,7 +22,7 @@
 """A generic plotter widget which is inherited by function and point."""
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 import numpy as N
 
 from .. import setting
@@ -31,7 +31,7 @@ from . import widget
 
 def _(text, disambiguation=None, context='Plotters'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class GenericPlotter(widget.Widget):
     """Generic plotter."""
@@ -99,7 +99,7 @@ class GenericPlotter(widget.Widget):
             y1, y2 = y2, y1
 
         # actually clip the data
-        cliprect = qt4.QRectF(qt4.QPointF(x1, y1), qt4.QPointF(x2, y2))
+        cliprect = qt.QRectF(qt.QPointF(x1, y1), qt.QPointF(x2, y2))
         return cliprect
 
     def getAxisLabels(self, direction):

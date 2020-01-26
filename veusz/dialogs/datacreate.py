@@ -19,7 +19,7 @@
 """Dataset creation dialog."""
 
 from ..compat import cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from .. import document
 from .. import datasets
@@ -28,7 +28,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="DataCreateDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class _DSException(RuntimeError):
     """A class to handle errors while trying to create datasets."""
@@ -51,12 +51,12 @@ class DataCreateDialog(VeuszDialog):
 
         # connect create button
         self.createbutton = self.buttonBox.addButton(
-            _("C&reate"), qt4.QDialogButtonBox.ApplyRole )
+            _("C&reate"), qt.QDialogButtonBox.ApplyRole )
         self.replacebutton = self.buttonBox.addButton(
-            _("&Replace"), qt4.QDialogButtonBox.ApplyRole )
+            _("&Replace"), qt.QDialogButtonBox.ApplyRole )
 
         self.buttonBox.button(
-            qt4.QDialogButtonBox.Reset).clicked.connect(self.resetButtonClicked)
+            qt.QDialogButtonBox.Reset).clicked.connect(self.resetButtonClicked)
 
         self.createbutton.clicked.connect(self.createButtonClicked)
         self.replacebutton.clicked.connect(self.createButtonClicked)
@@ -65,10 +65,10 @@ class DataCreateDialog(VeuszDialog):
         self.document.signalModified.connect(self.modifiedDocSlot)
 
         # set validators for edit controls
-        self.numstepsedit.setValidator( qt4.QIntValidator(1, 99999999, self) )
-        self.tstartedit.setValidator( qt4.QDoubleValidator(self) )
-        self.tendedit.setValidator( qt4.QDoubleValidator(self) )
-        self.tstepsedit.setValidator( qt4.QIntValidator(1, 99999999, self) )
+        self.numstepsedit.setValidator( qt.QIntValidator(1, 99999999, self) )
+        self.tstartedit.setValidator( qt.QDoubleValidator(self) )
+        self.tendedit.setValidator( qt.QDoubleValidator(self) )
+        self.tstepsedit.setValidator( qt.QIntValidator(1, 99999999, self) )
 
         # connect up edit control to update create button status
         for edit in (self.numstepsedit, self.tstartedit, self.tendedit,
@@ -280,7 +280,7 @@ class DataCreateDialog(VeuszDialog):
                 
             vals[key] = (minval, maxval)
             
-        linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
+        linked = self.linkcheckbox.checkState() == qt.Qt.Checked
         return document.OperationDatasetCreateRange(
             name, numsteps, vals, linked=linked)
 
@@ -303,7 +303,7 @@ class DataCreateDialog(VeuszDialog):
             if text:
                 vals[key] = text
 
-        linked = self.linkcheckbox.checkState() == qt4.Qt.Checked
+        linked = self.linkcheckbox.checkState() == qt.Qt.Checked
         return document.OperationDatasetCreateParameteric(
             name, t0, t1, numsteps, vals, linked=linked)
 
@@ -317,7 +317,7 @@ class DataCreateDialog(VeuszDialog):
             if text:
                 vals[key] = text
 
-        link = self.linkcheckbox.checkState() == qt4.Qt.Checked
+        link = self.linkcheckbox.checkState() == qt.Qt.Checked
         op = document.OperationDatasetCreateExpression(name, vals, link)
         if not op.validateExpression(self.document):
             raise _DSException()

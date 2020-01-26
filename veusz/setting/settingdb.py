@@ -23,11 +23,11 @@ import sys
 import datetime
 
 import numpy as N
-from .. import qtall as qt4
+from .. import qtall as qt
 
 def _(text, disambiguation=None, context="Preferences"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # default values to some settings in case the user does not have these
 defaultValues = {
@@ -146,14 +146,14 @@ class _SettingDB(object):
         if val[0]:
             default = self.color_defaults[name]
             if default == 'LightBase':
-                base = qt4.qApp.palette().color(qt4.QPalette.Base)
+                base = qt.qApp.palette().color(qt.QPalette.Base)
                 if base.value() < 127:
-                    base = qt4.QColor(qt4.Qt.white)
+                    base = qt.QColor(qt.Qt.white)
                 return base
 
-            return qt4.QColor(default)
+            return qt.QColor(default)
         else:
-            return qt4.QColor(val[1])
+            return qt.QColor(val[1])
 
     def readSettings(self):
         """Read the settings using QSettings.
@@ -166,7 +166,7 @@ class _SettingDB(object):
         We should probably check for this
         """
 
-        s = qt4.QSettings(self.domain, self.product)
+        s = qt.QSettings(self.domain, self.product)
 
         for key in s.childKeys():
             val = s.value(key)
@@ -194,7 +194,7 @@ class _SettingDB(object):
         This is called by the mainwindow on close
         """
 
-        s = qt4.QSettings(self.domain, self.product)
+        s = qt.QSettings(self.domain, self.product)
 
         # write each entry, keeping track of which ones haven't been written
         cleankeys = []
@@ -243,12 +243,12 @@ def updateUILocale():
     global uilocale
 
     if settingdb['ui_english']:
-        uilocale = qt4.QLocale.c()
+        uilocale = qt.QLocale.c()
     else:
-        uilocale = qt4.QLocale.system()
-    uilocale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
+        uilocale = qt.QLocale.system()
+    uilocale.setNumberOptions(qt.QLocale.OmitGroupSeparator)
 
-    qt4.QLocale.setDefault(uilocale)
+    qt.QLocale.setDefault(uilocale)
 
 def ui_floattostring(f, maxdp=14):
     """Convert float to string with more precision."""

@@ -24,7 +24,7 @@ import itertools
 import numpy as N
 
 from ..compat import czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import document
 from .. import utils
@@ -34,7 +34,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='Line'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class Line(plotters.FreePlotter):
     """A line on the plot/graph."""
@@ -194,8 +194,9 @@ class Line(plotters.FreePlotter):
         # now do the drawing
         clip = None
         if s.clip:
-            clip = qt4.QRectF( qt4.QPointF(posn[0], posn[1]),
-                               qt4.QPointF(posn[2], posn[3]) )
+            clip = qt.QRectF(
+                qt.QPointF(posn[0], posn[1]),
+                qt.QPointF(posn[2], posn[3]))
         painter = phelper.painter(self, posn, clip=clip)
         with painter:
             # adjustable positions for the lines
@@ -205,13 +206,13 @@ class Line(plotters.FreePlotter):
             if not s.Line.hide:
                 painter.setPen( s.get('Line').makeQPen(painter) )
             else:
-                painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+                painter.setPen( qt.QPen(qt.Qt.NoPen) )
 
             # settings for fill
             if not s.Fill.hide:
                 painter.setBrush( s.get('Fill').makeQBrush(painter) )
             else:
-                painter.setBrush( qt4.QBrush() )
+                painter.setBrush( qt.QBrush() )
 
             # iterate over positions
             scaling = posn[2]-posn[0]
@@ -226,10 +227,11 @@ class Line(plotters.FreePlotter):
             controlgraphitems = []
             for index, (x, y, l, a) in enumerate(lines):
 
-                utils.plotLineArrow(painter, x, y, l, a,
-                                    arrowsize=arrowsize,
-                                    arrowleft=s.arrowleft,
-                                    arrowright=s.arrowright)
+                utils.plotLineArrow(
+                    painter, x, y, l, a,
+                    arrowsize=arrowsize,
+                    arrowleft=s.arrowleft,
+                    arrowright=s.arrowright)
 
                 if isnotdataset:
                     cgi = controlgraph.ControlLine(
@@ -298,7 +300,7 @@ class Line(plotters.FreePlotter):
             operations += [
                 document.OperationSettingSet(s.get('length'), l),
                 document.OperationSettingSet(s.get('angle'), a),
-                ]
+            ]
         else:
             xpos2, ypos2 = self._getGraphCoords(
                 cgi.widgetposn, [pt2[0], pt2[0]+1], [pt2[1], pt2[1]+1])
@@ -319,7 +321,7 @@ class Line(plotters.FreePlotter):
                 operations += [
                     document.OperationSettingSet(s.get('xPos2'), x2),
                     document.OperationSettingSet(s.get('yPos2'), y2)
-                    ]
+                ]
 
         self.document.applyOperation(
             document.OperationMultiple(operations, descr=_('adjust lines')) )

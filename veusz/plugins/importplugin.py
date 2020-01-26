@@ -24,14 +24,14 @@ import numpy as N
 
 from ..compat import crange, cstr, cstrerror, cunicode
 from .. import utils
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from . import field
 from . import datasetplugin
 
 def _(text, disambiguation=None, context='ImportPlugin'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # add an instance of your class to this list to get it registered
 importpluginregistry = []

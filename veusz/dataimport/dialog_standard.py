@@ -18,7 +18,7 @@
 
 from __future__ import division
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from ..dialogs import importdialog, veuszdialog
 from ..compat import citems
@@ -26,7 +26,7 @@ from . import defn_standard
 from . import simpleread
 
 def _(text, disambiguation=None, context="Import_Standard"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTabStandard(importdialog.ImportTab):
     """Standard import format tab."""
@@ -93,8 +93,8 @@ class ImportTabStandard(importdialog.ImportTab):
             op = defn_standard.OperationDataImport(params)
 
         except simpleread.DescriptorError:
-            qt4.QMessageBox.warning(self, _("Veusz"),
-                                    _("Cannot interpret descriptor"))
+            qt.QMessageBox.warning(
+                self, _("Veusz"), _("Cannot interpret descriptor"))
             return
 
         # actually import the data

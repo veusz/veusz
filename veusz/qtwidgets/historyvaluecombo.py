@@ -21,15 +21,15 @@
 
 from __future__ import division
 from ..compat import crange
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 
-class HistoryValueCombo(qt4.QComboBox):
+class HistoryValueCombo(qt.QComboBox):
     """This combobox records what value was previously saved
     """
 
     def __init__(self, *args):
-        qt4.QComboBox.__init__(self, *args)
+        qt.QComboBox.__init__(self, *args)
         self.defaultlist = []
         self.defaultval = None
         self.hasshown = False
@@ -39,7 +39,7 @@ class HistoryValueCombo(qt4.QComboBox):
 
         # get dialog for widget
         dialog = self.parent()
-        while not isinstance(dialog, qt4.QDialog):
+        while not isinstance(dialog, qt.QDialog):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
@@ -70,7 +70,7 @@ class HistoryValueCombo(qt4.QComboBox):
 
     def showEvent(self, event):
         """Show HistoryCombo and load history."""
-        qt4.QComboBox.showEvent(self, event)
+        qt.QComboBox.showEvent(self, event)
         if self.hasshown:
             return
 
@@ -88,7 +88,7 @@ class HistoryValueCombo(qt4.QComboBox):
 
     def hideEvent(self, event):
         """Save history as widget is hidden."""
-        qt4.QComboBox.hideEvent(self, event)
+        qt.QComboBox.hideEvent(self, event)
 
         if self.hasshown:
             text = self.currentText()

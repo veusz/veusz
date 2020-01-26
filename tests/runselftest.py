@@ -59,7 +59,7 @@ except ImportError:
     h5py = None
 
 from veusz.compat import cexec, cstr, copenuniversal
-import veusz.qtall as qt4
+import veusz.qtall as qt
 import veusz.utils as utils
 import veusz.document as document
 import veusz.setting as setting
@@ -125,10 +125,10 @@ class StupidFontMetrics(object):
         return 0.1*self.height()
 
     def boundingRect(self, c):
-        return qt4.QRectF(0, 0, self.height()*0.5, self.height())
+        return qt.QRectF(0, 0, self.height()*0.5, self.height())
 
     def boundingRectChar(self, c):
-        return qt4.QRectF(0, 0, self.height()*0.5, self.height())
+        return qt.QRectF(0, 0, self.height()*0.5, self.height())
 
     def lineSpacing(self):
         return 0.1*self.height()
@@ -279,7 +279,7 @@ def fltStr(v, prec=1):
     return oldflt(v, prec=prec)
 
 if __name__ == '__main__':
-    app = qt4.QApplication([])
+    app = qt.QApplication([])
 
     setting.transient_settings['unsafe_mode'] = True
 

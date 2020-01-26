@@ -20,7 +20,7 @@
 """
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import utils
 
@@ -29,7 +29,7 @@ try:
 except ImportError:
     # fallback to this if we don't get the native recorded
     def RecordPaintDevice(width, height, dpix, dpiy):
-        return qt4.QPicture()
+        return qt.QPicture()
 
 class DrawState(object):
     """Each widget plotted has a recorded state in this object."""
@@ -52,7 +52,7 @@ class DrawState(object):
         # list of child widgets states
         self.children = []
 
-class PainterRoot(qt4.QPainter):
+class PainterRoot(qt.QPainter):
     """Base class for painting of widgets."""
 
     def updateMetaData(self, helper):
@@ -207,7 +207,7 @@ class PaintHelper(object):
         if clip is not None:
             # have to clip before scaling, avoiding a qt bug where the clipping
             # seems to happen in the wrong place
-            p.setClipRect(qt4.QRectF(
+            p.setClipRect(qt.QRectF(
                 clip.topLeft()*self.scaling, clip.bottomRight()*self.scaling))
 
         # scale (used for zooming)
@@ -263,8 +263,8 @@ class PaintHelper(object):
 
         # make a small image filled with a specific color
         box = 3
-        specialcolor = qt4.QColor(254, 255, 254)
-        origpix = qt4.QPixmap(2*box+1, 2*box+1)
+        specialcolor = qt.QColor(254, 255, 254)
+        origpix = qt.QPixmap(2*box+1, 2*box+1)
         origpix.fill(specialcolor)
         origimg = origpix.toImage()
         # store most recent widget here
@@ -277,10 +277,10 @@ class PaintHelper(object):
             around the point given.
             """
 
-            pixmap = qt4.QPixmap(origpix)
-            painter = qt4.QPainter(pixmap)
-            painter.setRenderHint(qt4.QPainter.Antialiasing, antialias)
-            painter.setRenderHint(qt4.QPainter.TextAntialiasing, antialias)
+            pixmap = qt.QPixmap(origpix)
+            painter = qt.QPainter(pixmap)
+            painter.setRenderHint(qt.QPainter.Antialiasing, antialias)
+            painter.setRenderHint(qt.QPainter.TextAntialiasing, antialias)
             # this makes the small image draw from x-box->x+box, y-box->y+box
             # translate would get overriden by coordinate system playback
             painter.setWindow(x-box,y-box,box*2+1,box*2+1)

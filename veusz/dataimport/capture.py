@@ -25,12 +25,12 @@ import platform
 import signal
 
 from ..compat import cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from . import simpleread
 
 def _(text, disambiguation=None, context="Capture"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class CaptureFinishException(Exception):
     """An exception to say when a stream has been finished."""
@@ -52,7 +52,7 @@ class CaptureStream(simpleread.Stream):
     def _setTimeout(self, timeout):
         """Setter for setting timeout property."""
         if timeout:
-            self.timer = qt4.QTimer.singleShot(timeout*1000,
+            self.timer = qt.QTimer.singleShot(timeout*1000,
                                                self._timedOut)
     timeout = property(None, _setTimeout, None,
                        "Time interval to stop in (seconds) or None")

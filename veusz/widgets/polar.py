@@ -30,14 +30,14 @@ from .axisticks import AxisTicks
 from . import axis
 
 from ..compat import crange
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
 
 def _(text, disambiguation=None, context='Polar'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def radianToAlign(a):
     # fraction of circle
@@ -254,15 +254,15 @@ class Polar(NonOrthGraph):
     def drawFillPts(self, painter, extfill, cliprect,
                     ptsx, ptsy):
         '''Draw points for plotting a fill.'''
-        pts = qt4.QPolygonF()
+        pts = qt.QPolygonF()
         utils.addNumpyToPolygonF(pts, ptsx, ptsy)
 
         filltype = extfill.filltype
         if filltype == 'center':
-            pts.append( qt4.QPointF(self._xc, self._yc) )
+            pts.append( qt.QPointF(self._xc, self._yc) )
             utils.brushExtFillPolygon(painter, extfill, cliprect, pts)
         elif filltype == 'outside':
-            pp = qt4.QPainterPath()
+            pp = qt.QPainterPath()
             pp.moveTo(self._xc, self._yc)
             pp.arcTo(cliprect, 0, 360)
             pp.addPolygon(pts)
@@ -309,17 +309,19 @@ class Polar(NonOrthGraph):
         self._xc = 0.5*(bounds[0]+bounds[2])
         self._yc = 0.5*(bounds[3]+bounds[1])
 
-        path = qt4.QPainterPath()
-        path.addEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
-                                     qt4.QPointF(bounds[2], bounds[3]) ) )
-        utils.brushExtFillPath(painter, s.Background, path,
-                               stroke=s.Border.makeQPenWHide(painter))
+        path = qt.QPainterPath()
+        path.addEllipse(qt.QRectF(
+            qt.QPointF(bounds[0], bounds[1]),
+            qt.QPointF(bounds[2], bounds[3]) ))
+        utils.brushExtFillPath(
+            painter, s.Background, path, stroke=s.Border.makeQPenWHide(painter))
 
     def setClip(self, painter, bounds):
         '''Set clipping for graph.'''
-        p = qt4.QPainterPath()
-        p.addEllipse( qt4.QRectF( qt4.QPointF(bounds[0], bounds[1]),
-                                  qt4.QPointF(bounds[2], bounds[3]) ) )
+        p = qt.QPainterPath()
+        p.addEllipse(qt.QRectF(
+            qt.QPointF(bounds[0], bounds[1]),
+            qt.QPointF(bounds[2], bounds[3]) ))
         painter.setClipPath(p)
 
     def drawAxes(self, painter, bounds, datarange, outerbounds=None):
@@ -346,18 +348,18 @@ class Polar(NonOrthGraph):
 
         # pen for radii circles and axis
         painter.setPen( radiiL.makeQPenWHide(painter) )
-        painter.setBrush( qt4.QBrush() )
+        painter.setBrush( qt.QBrush() )
 
         # draw ticks as circles
         if not radiiL.hide:
             for tick in majtick:
                 radius = self.toPlotRadius(tick)
                 if radius > 0:
-                    rect = qt4.QRectF(
-                        qt4.QPointF(
+                    rect = qt.QRectF(
+                        qt.QPointF(
                             self._xc - radius*self._xscale,
                             self._yc - radius*self._yscale ),
-                        qt4.QPointF(
+                        qt.QPointF(
                             self._xc + radius*self._xscale,
                             self._yc + radius*self._yscale ) )
                     painter.drawEllipse(rect)
@@ -447,15 +449,15 @@ class Polar(NonOrthGraph):
         # draw spokes
         if not spokesL.hide:
             painter.setPen( spokesL.makeQPenWHide(painter) )
-            painter.setBrush( qt4.QBrush() )
+            painter.setBrush( qt.QBrush() )
             angle = 2 * math.pi / numspokes
             lines = []
             for i in crange(numspokes):
                 x = self._xc +  N.cos(angle*i) * self._xscale
                 y = self._yc +  N.sin(angle*i) * self._yscale
                 lines.append(
-                    qt4.QLineF(
-                        qt4.QPointF(self._xc, self._yc), qt4.QPointF(x, y)) )
+                    qt.QLineF(
+                        qt.QPointF(self._xc, self._yc), qt.QPointF(x, y)) )
             painter.drawLines(lines)
 
 document.thefactory.register(Polar)

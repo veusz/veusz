@@ -25,13 +25,13 @@ from ..compat import czip
 from .. import setting
 from .. import document
 from .. import utils
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from . import plotters
 
 def _(text, disambiguation=None, context='VectorField'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class VectorField(plotters.GenericPlotter):
     '''A plotter for plotting a vector field.'''
