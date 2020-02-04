@@ -158,7 +158,7 @@ class ImportDialog(VeuszDialog):
         fd.setFileMode( qt4.QFileDialog.ExistingFile )
 
         # collect filters from tabs
-        filters = [_('All files (*.*)')]
+        filters = [_('All files (*)')]
         for i in crange(self.methodtab.count()):
             w = self.methodtab.widget(i)
             if w.filefilter:
