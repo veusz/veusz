@@ -216,7 +216,7 @@ class ExportDialog(VeuszDialog):
         filters = []
         # a list of extensions which are allowed
         validextns = []
-        formats = document.Export.getFormats()
+        formats = document.AsyncExport.getFormats()
         for extns, name in formats:
             extensions = " ".join(["*." + item for item in extns])
             # join eveything together to make a filter string
