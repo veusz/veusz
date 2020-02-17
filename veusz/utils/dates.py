@@ -195,7 +195,7 @@ def roundDownToTimeTuple(dt,  tt):
         i -= 1
     # round to nearest interval
     if (i == 1 or i == 2): # month, day
-        timein[i] == ((timein[i]-1) // tt[i])*tt[i] + 1
+        timein[i] = ((timein[i]-1) // tt[i])*tt[i] + 1
     else:
         timein[i] = (timein[i] // tt[i])*tt[i]
         
