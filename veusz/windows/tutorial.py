@@ -275,7 +275,7 @@ tables. The options for drawing the function line are grouped under
 the flashing Line tab (%s).</p>
 
 <p class="usercmd">Click on the Line tab to continue.</p>
-''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.png')),
+''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.svg')),
             mainwin,
             flash=label,
             disablenext=True,
@@ -496,7 +496,7 @@ widget is selected.</p>
 
 <p class="usercmd">Click on the check box next to the Hide option at
 the bottom, to hide the line plotted between the data points.</p>
-''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.png')),
+''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.svg')),
             mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy1/PlotLine/hide',
@@ -511,7 +511,7 @@ class SetXYFill(TutorialStep):
 
 <p class="usercmd">Click on the "Marker fill (%s)" formatting tab.
 Change the fill color of the plotted data.</p>
-''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotmarkerfill.png')),
+''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotmarkerfill.svg')),
             mainwin,
             disablenext=True,
             nextonsetting = ('/page1/graph1/xy1/MarkerFill/color',
