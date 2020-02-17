@@ -151,7 +151,7 @@ class BarPlotter(GenericPlotter):
 
             labels = s.get('labels').getData(doc, checknull=True)
             positions = s.get('posn').getData(doc)
-            if positions is None:
+            if positions is None or len(positions.data) == 0:
                 lengths = s.get('lengths').getData(doc)
                 if not lengths:
                     return (None, None)
