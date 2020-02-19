@@ -336,4 +336,4 @@ SIP_PYOBJECT rollingAverage(SIP_PYOBJECT data, SIP_PYOBJECT weights,
 }
 %End
 
-void plotImageAsRects(QPainter& painter, const QImage& img, const QRectF& bounds);
+void plotImageAsRects(QPainter& painter, const QRectF& bounds, const QImage& img);

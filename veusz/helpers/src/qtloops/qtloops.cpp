@@ -512,7 +512,7 @@ QImage resampleLinearImage(QImage& img,
   return outimg;
 }
 
-void plotImageAsRects(QPainter& painter, const QImage& img, const QRectF& bounds)
+void plotImageAsRects(QPainter& painter, const QRectF& bounds, const QImage& img)
 {
   const int width=img.width();
   const int height=img.height();
@@ -524,7 +524,7 @@ void plotImageAsRects(QPainter& painter, const QImage& img, const QRectF& bounds
   const qreal x0 = bounds.left();
   const qreal y0 = bounds.top();
 
-  for(int y=0; y<width; ++y)
+  for(int y=0; y<height; ++y)
     for(int x=0; x<width; ++x)
       {
         painter.fillRect(QRectF(x0+x*dx, y0+y*dy, dx, dy),

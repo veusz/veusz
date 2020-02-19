@@ -76,6 +76,6 @@ QImage resampleLinearImage(QImage& img,
 			   const Numpy1DObj& xpts, const Numpy1DObj& ypts);
 
 // plot image as a set of rectangles
-void plotImageAsRects(QPainter& painter, const QImage& img, const QRectF& bounds);
+void plotImageAsRects(QPainter& painter, const QRectF& bounds, const QImage& img);
 
 #endif
