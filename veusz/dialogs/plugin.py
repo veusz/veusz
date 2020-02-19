@@ -22,7 +22,7 @@ from __future__ import division
 import sys
 
 from ..compat import czip, cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import plugins
 from . import exceptiondialog
@@ -30,7 +30,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="PluginDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def handlePlugin(mainwindow, doc, pluginkls):
     """Show plugin dialog or directly execute (if it takes no parameters)."""
@@ -65,12 +65,12 @@ class PluginDialog(VeuszDialog):
     def __init__(self, mainwindow, doc, plugininst, pluginkls):
         VeuszDialog.__init__(self, mainwindow, 'plugin.ui')
 
-        reset = self.buttonBox.button(qt4.QDialogButtonBox.Reset)
+        reset = self.buttonBox.button(qt.QDialogButtonBox.Reset)
         reset.setAutoDefault(False)
         reset.setDefault(False)
         reset.clicked.connect( self.slotReset)
         self.buttonBox.button(
-            qt4.QDialogButtonBox.Apply).clicked.connect(self.slotApply)
+            qt.QDialogButtonBox.Apply).clicked.connect(self.slotApply)
 
         self.pluginkls = pluginkls
         self.plugininst = plugininst
@@ -144,7 +144,7 @@ class PluginDialog(VeuszDialog):
 
         # show any results
         self.notifyLabel.setText(statustext)
-        qt4.QTimer.singleShot(3000, self.notifyLabel.clear)
+        qt.QTimer.singleShot(3000, self.notifyLabel.clear)
 
 def runPlugin(window, doc, plugin, fields):
     """Execute a plugin.
@@ -168,7 +168,7 @@ def runPlugin(window, doc, plugin, fields):
         op = document.OperationDatasetPlugin(plugin, fields)
 
     resultstext = ''
-    qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+    qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
     try:
         results = doc.applyOperation(op)
 
@@ -182,20 +182,20 @@ def runPlugin(window, doc, plugin, fields):
     except (plugins.ToolsPluginException, plugins.DatasetPluginException) as ex:
         # unwind operations
         op.undo(doc)
-        qt4.QApplication.restoreOverrideCursor()
+        qt.QApplication.restoreOverrideCursor()
 
-        qt4.QMessageBox.warning(
+        qt.QMessageBox.warning(
             window, _("Error in %s") % plugin.name, cstr(ex))
 
     except Exception:
         op.undo(doc)
-        qt4.QApplication.restoreOverrideCursor()
+        qt.QApplication.restoreOverrideCursor()
 
         # show exception dialog
         exceptiondialog.ExceptionDialog(sys.exc_info(), window).exec_()
 
     else:
-        qt4.QApplication.restoreOverrideCursor()
+        qt.QApplication.restoreOverrideCursor()
 
     return resultstext
 

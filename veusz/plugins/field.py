@@ -19,7 +19,7 @@
 """Data entry fields for plugins."""
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from .. import setting
 
@@ -52,8 +52,8 @@ class FieldText(Field):
     """Text entry on the dialog."""
 
     def makeControl(self, doc, currentwidget):
-        l = qt4.QLabel(self.descr)
-        e = qt4.QLineEdit()
+        l = qt.QLabel(self.descr)
+        e = qt.QLineEdit()
         if self.default:
             e.setText(self.default)
         return (l, e)
@@ -78,8 +78,8 @@ class FieldCombo(Field):
         self.editable = editable
 
     def makeControl(self, doc, currentwidget):
-        l = qt4.QLabel(self.descr)
-        c = qt4.QComboBox()
+        l = qt.QLabel(self.descr)
+        c = qt.QComboBox()
         c.addItems(self.items)
         c.setEditable(bool(self.editable))
 
@@ -98,7 +98,7 @@ class FieldCombo(Field):
     def getControlResults(self, cntrls):
         return cntrls[1].currentText()
 
-class _WidgetCombo(qt4.QComboBox):
+class _WidgetCombo(qt.QComboBox):
     """Combo box for selecting widgets."""
 
     def __init__(self, doc, widgettypes, default):
@@ -106,7 +106,7 @@ class _WidgetCombo(qt4.QComboBox):
         widgettypes: set of allowed widgettypes or empty for all
         default: default path."""
 
-        qt4.QComboBox.__init__(self)
+        qt.QComboBox.__init__(self)
         self.doc = doc
         self.widgettypes = widgettypes
         self.default = default
@@ -126,7 +126,7 @@ class _WidgetCombo(qt4.QComboBox):
         for w in widget.children:
             self._iterateWidgets(comboitems, paths, w, level+1)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def updateWidgets(self):
         """Update combo with new widgets."""
 
@@ -147,7 +147,7 @@ class _WidgetCombo(qt4.QComboBox):
 
         # set tool tip for each entry which is the path
         for i, path in enumerate(self.paths):
-            self.setItemData(i, path, qt4.Qt.ToolTipRole)
+            self.setItemData(i, path, qt.Qt.ToolTipRole)
 
     def getWidgetPath(self):
         """Get path of selected widget."""
@@ -169,7 +169,7 @@ class FieldWidget(Field):
         if default == '':
             default = currentwidget
 
-        l = qt4.QLabel(self.descr)
+        l = qt.QLabel(self.descr)
         c = _WidgetCombo(doc, self.widgettypes, default)
         return (l, c)
 
@@ -195,7 +195,7 @@ class _FieldSetting(Field):
         self.setn.set(self.default)
 
         self.document = doc
-        l = qt4.QLabel(self.descr)
+        l = qt.QLabel(self.descr)
         c = self.setn.makeControl(None)
 
         def updateval(cntrl, setn, val):

@@ -22,7 +22,7 @@ from __future__ import division
 import numpy as N
 
 from ..compat import crange, cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import document
 
@@ -30,7 +30,7 @@ from . import axis
 
 def _(text, disambiguation=None, context='FunctionAxis'):
     '''Translate text.'''
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class AxisError(RuntimeError):
     pass

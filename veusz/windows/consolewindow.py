@@ -25,7 +25,7 @@ import traceback
 import sys
 
 from ..compat import cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from .. import document
 from .. import utils
@@ -35,7 +35,7 @@ from .. import setting
 
 def _(text, disambiguation=None, context='ConsoleWindow'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class _Writer(object):
     """ Class to behave like an output stream. Pipes input back to
@@ -60,17 +60,17 @@ class _Reader(object):
     def readline(self, *args):
         raise IOError('Interactive input not supported')
 
-class _CommandEdit(qt4.QLineEdit):
+class _CommandEdit(qt.QLineEdit):
     """ A special class to allow entering of the command line.
 
     emits sigEnter if the return key is pressed, and returns command
     The edit control has a history (press up and down keys to access)
     """
 
-    sigEnter = qt4.pyqtSignal(cstr)
+    sigEnter = qt.pyqtSignal(cstr)
 
     def __init__(self, *args):
-        qt4.QLineEdit.__init__(self, *args)
+        qt.QLineEdit.__init__(self, *args)
         self.history = []
         self.history_posn = 0
         self.entered_text = ''
@@ -94,12 +94,12 @@ class _CommandEdit(qt4.QLineEdit):
         # tell the console we have a command
         self.sigEnter.emit(command)
 
-    historykeys = (qt4.Qt.Key_Up, qt4.Qt.Key_Down)
+    historykeys = (qt.Qt.Key_Up, qt.Qt.Key_Down)
 
     def keyPressEvent(self, key):
         """ Overridden to handle history. """
 
-        qt4.QLineEdit.keyPressEvent(self, key)
+        qt.QLineEdit.keyPressEvent(self, key)
         code = key.key()
 
         # check whether one of the "history keys" has been pressed
@@ -113,9 +113,9 @@ class _CommandEdit(qt4.QLineEdit):
             else:
                 text = self.entered_text
 
-            if code == qt4.Qt.Key_Up:
+            if code == qt.Qt.Key_Up:
                 step = -1
-            elif code == qt4.Qt.Key_Down:
+            elif code == qt.Qt.Key_Down:
                 step = 1
 
             newpos = self.history_posn + step
@@ -154,18 +154,18 @@ welcome to redistribute it under certain conditions. Enter "GPL()" for details.<
 This window is a Python command line console and acts as a calculator.<br>
 ''') % utils.version()
 
-class ConsoleWindow(qt4.QDockWidget):
+class ConsoleWindow(qt.QDockWidget):
     """ A python-like qt console."""
 
     def __init__(self, thedocument, *args):
-        qt4.QDockWidget.__init__(self, *args)
+        qt.QDockWidget.__init__(self, *args)
         self.setWindowTitle(_("Console - Veusz"))
         self.setObjectName("veuszconsolewindow")
 
         # arrange sub-widgets in a vbox
-        self.vbox = qt4.QWidget()
+        self.vbox = qt.QWidget()
         self.setWidget(self.vbox)
-        vlayout = qt4.QVBoxLayout(self.vbox)
+        vlayout = qt.QVBoxLayout(self.vbox)
         s = vlayout.contentsMargins().left()//4
         vlayout.setContentsMargins(s,s,s,s)
         vlayout.setSpacing(s)
@@ -185,22 +185,22 @@ class ConsoleWindow(qt4.QDockWidget):
         self.stderrbuffer = ""
 
         # (mostly) hidden notification
-        self._hiddennotify = qt4.QLabel()
+        self._hiddennotify = qt.QLabel()
         vlayout.addWidget(self._hiddennotify)
         self._hiddennotify.hide()
 
         # the output from the console goes here
-        self._outputdisplay = qt4.QTextEdit()
+        self._outputdisplay = qt.QTextEdit()
         self._outputdisplay.setReadOnly(True)
         self._outputdisplay.insertHtml( introtext )
         vlayout.addWidget(self._outputdisplay)
 
-        self._hbox = qt4.QWidget()
-        hlayout = qt4.QHBoxLayout(self._hbox)
+        self._hbox = qt.QWidget()
+        hlayout = qt.QHBoxLayout(self._hbox)
         hlayout.setContentsMargins(0,0,0,0)
         vlayout.addWidget(self._hbox)
 
-        self._prompt = qt4.QLabel(">>>")
+        self._prompt = qt.QLabel(">>>")
         hlayout.addWidget(self._prompt)
 
         # where commands are typed in
@@ -220,7 +220,7 @@ class ConsoleWindow(qt4.QDockWidget):
         fmt = cursor.charFormat()
 
         if color is not None:
-            brush = qt4.QBrush(color)
+            brush = qt.QBrush(color)
             fmt.setForeground(brush)
         else:
             # use the default foreground color
@@ -238,7 +238,7 @@ class ConsoleWindow(qt4.QDockWidget):
             color = None
 
         cursor = self._outputdisplay.textCursor()
-        cursor.movePosition(qt4.QTextCursor.End)
+        cursor.movePosition(qt.QTextCursor.End)
         cursor.insertText(text, self._makeTextFormat(cursor, color))
         self._outputdisplay.setTextCursor(cursor)
         self._outputdisplay.ensureCursorVisible()
@@ -270,11 +270,11 @@ class ConsoleWindow(qt4.QDockWidget):
         """If this window is hidden, show it, then hide it again in a few
         seconds."""
         if self.isHidden():
-            self._hiddennotify.setText(_("This window will shortly disappear. "
-                                         "You can bring it back by selecting "
-                                         "View, Windows, Console Window on the "
-                                         "menu."))
-            qt4.QTimer.singleShot(5000, self.hideConsole)
+            self._hiddennotify.setText(_(
+                "This window will shortly disappear. "
+                "You can bring it back by selecting "
+                "View, Windows, Console Window on the menu."))
+            qt.QTimer.singleShot(5000, self.hideConsole)
             self.show()
             self._hiddennotify.show()
 

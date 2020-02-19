@@ -26,13 +26,13 @@ import fnmatch
 import numpy as N
 
 from ..compat import cbasestr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from . import field
 
 def _(text, disambiguation=None, context='ToolsPlugin'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # add an instance of your class to this list to be registered
 toolspluginregistry = []
@@ -107,7 +107,7 @@ class ColorsRandomize(ToolsPlugin):
                 return random.randint(b, a)
             return random.randint(a, b)
 
-        col = qt4.QColor.fromHsv(rand(H1, H2), rand(S1, S2), rand(V1, V2))
+        col = qt.QColor.fromHsv(rand(H1, H2), rand(S1, S2), rand(V1, V2))
         return str(col.name())
 
     def apply(self, ifc, fields):
@@ -115,8 +115,8 @@ class ColorsRandomize(ToolsPlugin):
 
         fromwidget = ifc.Root.fromPath(fields['widget'])
 
-        col1 = qt4.QColor(fields['color1'])
-        col2 = qt4.QColor(fields['color2'])
+        col1 = qt.QColor(fields['color1'])
+        col2 = qt.QColor(fields['color2'])
 
         if fields['randxy']:
             for node in fromwidget.WalkWidgets(widgettype='xy'):
@@ -223,8 +223,8 @@ class ColorsSequence(ToolsPlugin):
 
         fromwidget = ifc.Root.fromPath(fields['widget'])
 
-        col1 = qt4.QColor(fields['color1'])
-        col2 = qt4.QColor(fields['color2'])
+        col1 = qt.QColor(fields['color1'])
+        col2 = qt.QColor(fields['color2'])
         H1, H2 = col1.hue(), col2.hue()
         S1, S2 = col1.saturation(), col2.saturation()
         V1, V2 = col1.value(), col2.value()
@@ -241,7 +241,7 @@ class ColorsSequence(ToolsPlugin):
             H = i * (H2-H1) / div + H1
             S = i * (S2-S1) / div + S1
             V = i * (V2-V1) / div + V1
-            return str(qt4.QColor.fromHsv(H, S, V).name())
+            return str(qt.QColor.fromHsv(H, S, V).name())
 
         idx = 0
         for node in fromwidget.WalkWidgets():
@@ -279,7 +279,7 @@ class ColorsReplace(ToolsPlugin):
     def apply(self, ifc, fields):
         """Do the color search and replace."""
 
-        fromcol = qt4.QColor(fields['color1'])
+        fromcol = qt.QColor(fields['color1'])
 
         def walkNodes(node):
             """Walk nodes, changing values."""
@@ -292,7 +292,7 @@ class ColorsReplace(ToolsPlugin):
                         return
 
                 # evaluate into qcolor to make sure is a true match
-                if qt4.QColor(node.val) == fromcol:
+                if qt.QColor(node.val) == fromcol:
                     node.val = fields['color2']
             else:
                 for c in node.children:
@@ -325,8 +325,8 @@ class ColorsSwap(ToolsPlugin):
     def apply(self, ifc, fields):
         """Do the color search and replace."""
 
-        col1 = qt4.QColor(fields['color1'])
-        col2 = qt4.QColor(fields['color2'])
+        col1 = qt.QColor(fields['color1'])
+        col2 = qt.QColor(fields['color2'])
 
         def walkNodes(node):
             """Walk nodes, changing values."""
@@ -339,9 +339,9 @@ class ColorsSwap(ToolsPlugin):
                         return
 
                 # evaluate into qcolor to make sure is a true match
-                if qt4.QColor(node.val) == col1:
+                if qt.QColor(node.val) == col1:
                     node.val = fields['color2']
-                elif qt4.QColor(node.val) == col2:
+                elif qt.QColor(node.val) == col2:
                     node.val = fields['color1']
             else:
                 for c in node.children:

@@ -21,17 +21,17 @@ from __future__ import division
 import os.path
 
 import sip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from .. import setting
 
 def _(text, disambiguation=None, context="Tutorial"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class TutorialStep(qt4.QObject):
+class TutorialStep(qt.QObject):
 
-    nextStep = qt4.pyqtSignal()
+    nextStep = qt.pyqtSignal()
 
     def __init__(self, text, mainwin,
                  nextstep=None, flash=None,
@@ -50,7 +50,7 @@ class TutorialStep(qt4.QObject):
         nextonselected: go to next if widget with name is selected
         """
 
-        qt4.QObject.__init__(self)
+        qt.QObject.__init__(self)
         self.text = text
         self.nextstep = nextstep
         self.flash = flash
@@ -265,8 +265,8 @@ class FunctionFormatLine(TutorialStep):
     def __init__(self, mainwin):
 
         tb = mainwin.formatdock.tabwidget.tabBar()
-        label = qt4.QLabel("  ", tb)
-        tb.setTabButton(1, qt4.QTabBar.LeftSide, label)
+        label = qt.QLabel("  ", tb)
+        tb.setTabButton(1, qt.QTabBar.LeftSide, label)
 
         TutorialStep.__init__(
             self, _('''
@@ -407,7 +407,7 @@ box or reopen it later.</p>
             disablenext=True,
             nextstep=DataImportDialog4)
 
-        self.timer = qt4.QTimer()
+        self.timer = qt.QTimer()
         self.timer.timeout.connect(self.slotTimeout)
         self.timer.start(200)
 
@@ -744,12 +744,12 @@ developers via the mailing list.</p>
 <p>You can try this tutorial again from the Help menu.</p>
 '''), mainwin, closestep=True, disablenext=True)
 
-class TutorialDock(qt4.QDockWidget):
+class TutorialDock(qt.QDockWidget):
     '''A dock tutorial window.'''
 
     def __init__(self, document, mainwin, *args):
-        qt4.QDockWidget.__init__(self, *args)
-        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
+        qt.QDockWidget.__init__(self, *args)
+        self.setAttribute(qt.Qt.WA_DeleteOnClose)
         self.setMinimumHeight(300)
         self.setWindowTitle('Tutorial - Veusz')
         self.setObjectName('veusztutorialwindow')
@@ -759,33 +759,33 @@ class TutorialDock(qt4.QDockWidget):
         self.document = document
         self.mainwin = mainwin
 
-        self.layout = l = qt4.QVBoxLayout()
+        self.layout = l = qt.QVBoxLayout()
 
-        txtdoc = qt4.QTextDocument(self)
+        txtdoc = qt.QTextDocument(self)
         txtdoc.setDefaultStyleSheet(
             "p.usercmd { color: blue; } "
             "h1 { font-size: x-large;} "
             "code { color: green;} "
             )
-        self.textedit = qt4.QTextEdit(readOnly=True)
+        self.textedit = qt.QTextEdit(readOnly=True)
         self.textedit.setDocument(txtdoc)
 
         l.addWidget(self.textedit)
 
-        self.buttonbox = qt4.QDialogButtonBox()
+        self.buttonbox = qt.QDialogButtonBox()
         self.nextb = self.buttonbox.addButton(
-            'Next', qt4.QDialogButtonBox.ActionRole)
+            'Next', qt.QDialogButtonBox.ActionRole)
         self.nextb.clicked.connect(self.slotNext)
 
         l.addWidget(self.buttonbox)
 
         # have to use a separate widget as dialog already has layout
-        self.widget = qt4.QWidget()
+        self.widget = qt.QWidget()
         self.widget.setLayout(l)
         self.setWidget(self.widget)
 
         # timer for controlling flashing
-        self.flashtimer = qt4.QTimer(self)
+        self.flashtimer = qt.QTimer(self)
         self.flashtimer.timeout.connect(self.slotFlashTimeout)
         self.flash = self.oldflash = None
         self.flashon = False
@@ -826,11 +826,11 @@ class TutorialDock(qt4.QDockWidget):
         # add a close button if requested
         if self.step.closestep:
             closeb = self.buttonbox.addButton(
-                'Close', qt4.QDialogButtonBox.ActionRole)
+                'Close', qt.QDialogButtonBox.ActionRole)
             closeb.clicked.connect(self.close)
 
     # work around C/C++ object deleted
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def slotFlashTimeout(self):
         '''Handle flashing of UI components.'''
 

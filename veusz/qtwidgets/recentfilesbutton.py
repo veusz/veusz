@@ -19,7 +19,7 @@
 from __future__ import division
 import os.path
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..compat import cstr
 from .. import setting
 
@@ -39,18 +39,18 @@ def removeBadRecents(itemlist):
     # trim list
     del itemlist[10:]
 
-class RecentFilesButton(qt4.QPushButton):
+class RecentFilesButton(qt.QPushButton):
     """A button for remembering recent files.
 
     emits filechosen(filename) if a file is chosen
     """
 
-    filechosen = qt4.pyqtSignal(cstr)
+    filechosen = qt.pyqtSignal(cstr)
 
     def __init__(self, *args):
-        qt4.QPushButton.__init__(self, *args)
+        qt.QPushButton.__init__(self, *args)
 
-        self.menu = qt4.QMenu()
+        self.menu = qt.QMenu()
         self.setMenu(self.menu)
         self.settingname = None
 

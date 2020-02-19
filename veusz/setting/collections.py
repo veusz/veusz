@@ -19,7 +19,7 @@
 """Collections of predefined settings for common settings."""
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from . import setting
 from .settings import Settings
@@ -27,7 +27,7 @@ from .reference import Reference
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class Line(Settings):
     '''For holding properities of a line.'''
@@ -69,7 +69,7 @@ class Line(Settings):
             color.setAlphaF((100-self.transparency) / 100.)
         width = self.get('width').convert(painter)
         style, dashpattern = setting.LineStyle._linecnvt[self.style]
-        pen = qt4.QPen(color, width, style)
+        pen = qt.QPen(color, width, style)
         # this needs to be set for PDF output, otherwise arrows don't
         # plot correctly
         pen.setMiterLimit(4)
@@ -82,7 +82,7 @@ class Line(Settings):
     def makeQPenWHide(self, painter):
         """Make a pen, taking account of hide attribute."""
         if self.hide or self.transparency == 100:
-            return qt4.QPen(qt4.Qt.NoPen)
+            return qt.QPen(qt.Qt.NoPen)
         else:
             return self.makeQPen(painter)
 
@@ -171,12 +171,12 @@ class Brush(Settings):
         color = self.get('color').color(painter)
         if self.transparency > 0:
             color.setAlphaF((100-self.transparency) / 100.)
-        return qt4.QBrush(color, self.get('style').qtStyle())
+        return qt.QBrush(color, self.get('style').qtStyle())
 
     def makeQBrushWHide(self, painter):
         """Make a brush, taking account of hide attribute."""
         if self.hide or self.transparency == 100:
-            return qt4.QBrush()
+            return qt.QBrush()
         else:
             return self.makeQBrush(painter)
 
@@ -359,24 +359,24 @@ class Text(Settings):
         return c
 
     def makeQFont(self, painthelper):
-        '''Return a qt4.QFont object corresponding to the settings.'''
+        '''Return a qt.QFont object corresponding to the settings.'''
 
         size = self.get('size').convertPts(painthelper)
-        weight = qt4.QFont.Normal
+        weight = qt.QFont.Normal
         if self.bold:
-            weight = qt4.QFont.Bold
+            weight = qt.QFont.Bold
 
-        f = qt4.QFont(self.font, size,  weight, self.italic)
+        f = qt.QFont(self.font, size,  weight, self.italic)
         if self.underline:
             f.setUnderline(True)
-        f.setStyleHint(qt4.QFont.Times)
+        f.setStyleHint(qt.QFont.Times)
 
         return f
 
     def makeQPen(self, painter):
-        """ Return a qt4.QPen object for the font pen """
+        """ Return a qt.QPen object for the font pen """
         color = self.get('color').color(painter)
-        return qt4.QPen(color)
+        return qt.QPen(color)
 
 class PointLabel(Text):
     """For labelling points on plots."""
@@ -470,7 +470,7 @@ class Line3D(Settings):
 
         width = self.width
         if self.hide or width == 0.:
-            style, dash = qt4.Qt.NoPen, None
+            style, dash = qt.Qt.NoPen, None
         else:
             style, dash = setting.LineStyle._linecnvt[self.style]
 

@@ -34,7 +34,7 @@ except ImportError:
     h5py = None
 
 from ..compat import citems, cvalues, cstr, CStringIO, cexecfile
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from . import widgetfactory
 from . import painthelper
@@ -46,7 +46,7 @@ from .. import setting
 
 def _(text, disambiguation=None, context="Document"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def getSuitableParent(widgettype, initialwidget):
     """Find the nearest relevant parent for the widgettype given."""
@@ -69,24 +69,24 @@ class DocSuspend(object):
     def __exit__(self, type, value, traceback):
         self.doc.enableUpdates()
 
-class Document(qt4.QObject):
+class Document(qt.QObject):
     """Document class for holding the graph data.
     """
 
     pluginsloaded = False
 
     # this is emitted when the document is modified
-    signalModified = qt4.pyqtSignal(int)
+    signalModified = qt.pyqtSignal(int)
     # emited to log a message
-    sigLog = qt4.pyqtSignal(cstr)
+    sigLog = qt.pyqtSignal(cstr)
     # emitted when document wiped
-    sigWiped = qt4.pyqtSignal()
+    sigWiped = qt.pyqtSignal()
     # to ask whether the import is allowed (module name and symbol list)
-    sigAllowedImports = qt4.pyqtSignal(cstr, list)
+    sigAllowedImports = qt.pyqtSignal(cstr, list)
 
     def __init__(self):
         """Initialise the document."""
-        qt4.QObject.__init__( self )
+        qt.QObject.__init__( self )
 
         if not Document.pluginsloaded:
             Document.loadPlugins()
@@ -103,7 +103,7 @@ class Document(qt4.QObject):
         self.suspendupdates = []
 
         # default document locale
-        self.locale = qt4.QLocale()
+        self.locale = qt.QLocale()
 
         # evaluation context
         self.evaluate = evaluate.Evaluate(self)
@@ -526,7 +526,7 @@ class Document(qt4.QObject):
     def _pagedocsize(self, widget, dpi, scaling, integer):
         """Helper for page or doc size."""
         if dpi is None:
-            p = qt4.QPixmap(1, 1)
+            p = qt.QPixmap(1, 1)
             dpi = (p.logicalDpiX(), p.logicalDpiY())
         helper = painthelper.PaintHelper(self, (1,1), dpi=dpi)
         w = widget.settings.get('width').convert(helper) * scaling

@@ -19,7 +19,7 @@
 """Dialog to show if there is an error loading."""
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from .veuszdialog import VeuszDialog
 
 class ErrorLoadingDialog(VeuszDialog):
@@ -38,6 +38,6 @@ class ErrorLoadingDialog(VeuszDialog):
         self.errortextedit.setPlainText(traceback)
 
         # set warning pixmap to left of dialog
-        icon = qt4.qApp.style().standardIcon(qt4.QStyle.SP_MessageBoxWarning,
-                                             None, self)
+        icon = qt.qApp.style().standardIcon(
+            qt.QStyle.SP_MessageBoxWarning, None, self)
         self.iconlabel.setPixmap(icon.pixmap(32))

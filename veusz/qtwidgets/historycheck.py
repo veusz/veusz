@@ -17,22 +17,22 @@
 ##############################################################################
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 
-class HistoryCheck(qt4.QCheckBox):
+class HistoryCheck(qt.QCheckBox):
     """Checkbox remembers its setting between calls
     """
 
     def __init__(self, *args):
-        qt4.QCheckBox.__init__(self, *args)
+        qt.QCheckBox.__init__(self, *args)
         self.default = False
 
     def getSettingName(self):
         """Get name for saving in settings."""
         # get dialog for widget
         dialog = self.parent()
-        while not isinstance(dialog, qt4.QDialog):
+        while not isinstance(dialog, qt.QDialog):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
@@ -52,13 +52,13 @@ class HistoryCheck(qt4.QCheckBox):
 
     def showEvent(self, event):
         """Show HistoryCheck and load history."""
-        qt4.QCheckBox.showEvent(self, event)
+        qt.QCheckBox.showEvent(self, event)
         # we do this now rather than in __init__ because the widget
         # has no name set at __init__
         self.loadHistory()
 
     def hideEvent(self, event):
         """Save history as widget is hidden."""
-        qt4.QCheckBox.hideEvent(self, event)
+        qt.QCheckBox.hideEvent(self, event)
         self.saveHistory()
 

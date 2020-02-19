@@ -20,7 +20,7 @@
 
 from __future__ import division
 from ..compat import crange, citems, cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from .. import document
 from .. import datasets
@@ -28,7 +28,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="DataCreate2D"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def checkGetStep(text):
     """Check step syntax is okay.
@@ -53,7 +53,7 @@ class DataCreate2DDialog(VeuszDialog):
         self.document = document
 
         self.createbutton = self.buttonBox.addButton(
-            _("C&reate"), qt4.QDialogButtonBox.ApplyRole )
+            _("C&reate"), qt.QDialogButtonBox.ApplyRole )
         self.createbutton.clicked.connect(self.createButtonClickedSlot)
 
         self.fromxyfunc.toggled.connect(self.fromxyfuncSlot)
@@ -188,7 +188,7 @@ class DataCreate2DDialog(VeuszDialog):
         for name in ('xexpr', 'yexpr', 'zexpr', 'name'):
             text[name] = getattr(self, name+'combo').currentText().strip()
 
-        link = self.linkcheckbox.checkState() == qt4.Qt.Checked
+        link = self.linkcheckbox.checkState() == qt.Qt.Checked
 
         # create and apply operation, catching evaluation errors
         try:
@@ -232,7 +232,7 @@ class DataCreate2DDialog(VeuszDialog):
             msg = _("Created dataset '%s'") % text['name']
 
         self.notifylabel.setText(msg)
-        qt4.QTimer.singleShot(4000, self.notifylabel.clear)
+        qt.QTimer.singleShot(4000, self.notifylabel.clear)
 
 def recreateDataset(mainwindow, document, dataset, datasetname):
     """Open dialog to recreate a DatasetExpression / DatasetRange."""

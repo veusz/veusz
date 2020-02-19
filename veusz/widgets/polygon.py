@@ -20,14 +20,14 @@ from __future__ import division
 from .. import document
 from .. import datasets
 from .. import setting
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 
 from . import plotters
 
 def _(text, disambiguation=None, context='Polygon'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class Polygon(plotters.FreePlotter):
     """For plotting polygons."""
@@ -70,23 +70,23 @@ class Polygon(plotters.FreePlotter):
             return
 
         x1, y1, x2, y2 = posn
-        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        cliprect = qt.QRectF( qt.QPointF(x1, y1), qt.QPointF(x2, y2) )
         painter = phelper.painter(self, posn, clip=cliprect)
         with painter:
             pen = s.Line.makeQPenWHide(painter)
             pw = pen.widthF()*2
-            lineclip = qt4.QRectF( qt4.QPointF(x1-pw, y1-pw),
-                                   qt4.QPointF(x2+pw, y2+pw) )
+            lineclip = qt.QRectF(
+                qt.QPointF(x1-pw, y1-pw), qt.QPointF(x2+pw, y2+pw))
 
             # this is a hack as we generate temporary fake datasets
-            path = qt4.QPainterPath()
+            path = qt.QPainterPath()
             for xvals, yvals in datasets.generateValidDatasetParts(
                 [datasets.Dataset(xp), datasets.Dataset(yp)]):
 
-                path = qt4.QPainterPath()
-                poly = qt4.QPolygonF()
+                path = qt.QPainterPath()
+                poly = qt.QPolygonF()
                 utils.addNumpyToPolygonF(poly, xvals.data, yvals.data)
-                clippedpoly = qt4.QPolygonF()
+                clippedpoly = qt.QPolygonF()
                 utils.polygonClip(poly, lineclip, clippedpoly)
                 path.addPolygon(clippedpoly)
                 path.closeSubpath()

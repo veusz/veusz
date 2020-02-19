@@ -23,7 +23,7 @@ and formatting properties."""
 from __future__ import division
 
 from ..compat import crange, citems
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from .. import widgets
 from .. import utils
@@ -34,7 +34,7 @@ from .widgettree import WidgetTreeModel, WidgetTreeView
 
 def _(text, disambiguation=None, context='TreeEditWindow'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class SettingsProxy(object):
     """Object to handle communication between widget/settings
@@ -295,19 +295,19 @@ class SettingsProxyMulti(SettingsProxy):
         self.document.applyOperation(
             document.OperationMultiple(ops, descr=_("reset to default")))
 
-class PropertyList(qt4.QWidget):
+class PropertyList(qt.QWidget):
     """Edit the widget properties using a set of controls."""
 
     def __init__(self, document, showformatsettings=True,
                  *args):
-        qt4.QWidget.__init__(self, *args)
+        qt.QWidget.__init__(self, *args)
         self.document = document
         self.showformatsettings = showformatsettings
 
-        self.layout = qt4.QGridLayout(self)
+        self.layout = qt.QGridLayout(self)
         self.layout.setSpacing( self.layout.spacing()//2 )
         self.layout.setContentsMargins(4,4,4,4)
-        
+
         self.childlist = []
         self.setncntrls = {}     # map setting name to controls
 
@@ -325,11 +325,11 @@ class PropertyList(qt4.QWidget):
             if action.usertext:
                 text = action.usertext
 
-            lab = qt4.QLabel(text)
+            lab = qt.QLabel(text)
             self.layout.addWidget(lab, row, 0)
             self.childlist.append(lab)
 
-            button = qt4.QPushButton(text)
+            button = qt.QPushButton(text)
             button.setToolTip(action.descr)
             button.clicked.connect(
                 lambda checked=True, a=action:
@@ -366,14 +366,14 @@ class PropertyList(qt4.QWidget):
 
         # this is a label with a + button by this side
         setnlab = SettingLabel(self.document, slist[0], grpdsetting)
-        expandbutton = qt4.QPushButton("+", checkable=True, flat=True,
-                                       maximumWidth=16)
+        expandbutton = qt.QPushButton(
+            "+", checkable=True, flat=True, maximumWidth=16)
 
-        l = qt4.QHBoxLayout(spacing=0)
+        l = qt.QHBoxLayout(spacing=0)
         l.setContentsMargins(0,0,0,0)
         l.addWidget( expandbutton )
         l.addWidget( setnlab )
-        lw = qt4.QWidget()
+        lw = qt.QWidget()
         lw.setLayout(l)
         self.layout.addWidget(lw, row, 0)
         self.childlist.append(lw)
@@ -387,7 +387,7 @@ class PropertyList(qt4.QWidget):
         row += 1
 
         # set of controls for remaining settings
-        l = qt4.QGridLayout()
+        l = qt.QGridLayout()
         grp_row = 0
         for setn in slist[1:]:
             cntrl = setn.makeControl(None)
@@ -398,9 +398,10 @@ class PropertyList(qt4.QWidget):
                 l.addWidget(cntrl, grp_row, 1)
                 grp_row += 1
 
-        grpwidget = qt4.QFrame( frameShape = qt4.QFrame.Panel,
-                                frameShadow = qt4.QFrame.Raised,
-                                visible=False )
+        grpwidget = qt.QFrame(
+            frameShape = qt.QFrame.Panel,
+            frameShadow = qt.QFrame.Raised,
+            visible=False )
         grpwidget.setLayout(l)
 
         def ontoggle(checked):
@@ -442,8 +443,11 @@ class PropertyList(qt4.QWidget):
 
         # add a title if requested
         if title is not None:
-            lab = qt4.QLabel(title[0], frameShape=qt4.QFrame.Panel,
-                             frameShadow=qt4.QFrame.Sunken, toolTip=title[1])
+            lab = qt.QLabel(
+                title[0],
+                frameShape=qt.QFrame.Panel,
+                frameShadow=qt.QFrame.Sunken,
+                toolTip=title[1] )
             self.layout.addWidget(lab, row, 0, 1, -1)
             row += 1
 
@@ -475,8 +479,8 @@ class PropertyList(qt4.QWidget):
                     row = self._addGroupedSettingsControl(setn, row)
 
         # add empty widget to take rest of space
-        w = qt4.QWidget( sizePolicy=qt4.QSizePolicy(
-                qt4.QSizePolicy.Maximum, qt4.QSizePolicy.MinimumExpanding) )
+        w = qt.QWidget( sizePolicy=qt.QSizePolicy(
+            qt.QSizePolicy.Maximum, qt.QSizePolicy.MinimumExpanding) )
         self.layout.addWidget(w, row, 0)
         self.childlist.append(w)
 
@@ -491,11 +495,11 @@ class PropertyList(qt4.QWidget):
                     for cntrl in self.setncntrls[setn]:
                         cntrl.setVisible(vis)
 
-class TabbedFormatting(qt4.QTabWidget):
+class TabbedFormatting(qt.QTabWidget):
     """Class to have tabbed set of settings."""
 
     def __init__(self, document, setnsproxy, shownames=False):
-        qt4.QTabWidget.__init__(self)
+        qt.QTabWidget.__init__(self)
         self.setUsesScrollButtons(True)
         self.document = document
 
@@ -545,7 +549,7 @@ class TabbedFormatting(qt4.QTabWidget):
                     pixmap = None
                 tabname = subset.name()
                 tooltip = title = subset.usertext()
-                
+
             # hide name in tab
             if not shownames:
                 tabname = ''
@@ -554,7 +558,7 @@ class TabbedFormatting(qt4.QTabWidget):
             self.tabtooltips.append(tooltip)
 
             # create tab
-            indx = self.addTab(qt4.QWidget(), utils.getIcon(pixmap), tabname)
+            indx = self.addTab(qt.QWidget(), utils.getIcon(pixmap), tabname)
             self.setTabToolTip(indx, tooltip)
 
     def slotCurrentChanged(self, tab):
@@ -571,30 +575,31 @@ class TabbedFormatting(qt4.QTabWidget):
 
         # add this property list to the scroll widget for tab
         plist = PropertyList(self.document, showformatsettings=not mainsettings)
-        plist.updateProperties(subsetn, title=(self.tabtitles[tab],
-                                               self.tabtooltips[tab]),
-                               onlyformatting=mainsettings)
+        plist.updateProperties(
+            subsetn,
+            title=(self.tabtitles[tab], self.tabtooltips[tab]),
+            onlyformatting=mainsettings)
 
         # create scrollable area
-        scroll = qt4.QScrollArea()
+        scroll = qt.QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(plist)
 
         # layout for tab widget
-        layout = qt4.QVBoxLayout()
+        layout = qt.QVBoxLayout()
         layout.setContentsMargins(2,2,2,2)
         layout.addWidget(scroll)
 
         # finally use layout containing items for tab
         self.widget(tab).setLayout(layout)
 
-class FormatDock(qt4.QDockWidget):
+class FormatDock(qt.QDockWidget):
     """A window for formatting the current widget.
     Provides tabbed formatting properties
     """
 
     def __init__(self, document, treeedit, *args):
-        qt4.QDockWidget.__init__(self, *args)
+        qt.QDockWidget.__init__(self, *args)
         self.setWindowTitle(_("Formatting - Veusz"))
         self.setObjectName("veuszformattingdock")
 
@@ -625,11 +630,11 @@ class FormatDock(qt4.QDockWidget):
         tab = max( min(self.tabwidget.count()-1, tab), 0 )
         self.tabwidget.setCurrentIndex(tab)
 
-class PropertiesDock(qt4.QDockWidget):
+class PropertiesDock(qt.QDockWidget):
     """A window for editing properties for widgets."""
 
     def __init__(self, document, treeedit, *args):
-        qt4.QDockWidget.__init__(self, *args)
+        qt.QDockWidget.__init__(self, *args)
         self.setWindowTitle(_("Properties - Veusz"))
         self.setObjectName("veuszpropertiesdock")
 
@@ -639,7 +644,7 @@ class PropertiesDock(qt4.QDockWidget):
         treeedit.widgetsSelected.connect(self.slotWidgetsSelected)
 
         # construct scrollable area
-        self.scroll = qt4.QScrollArea()
+        self.scroll = qt.QScrollArea()
         self.scroll.setWidgetResizable(True)
         self.setWidget(self.scroll)
 
@@ -651,15 +656,15 @@ class PropertiesDock(qt4.QDockWidget):
         """Update properties when selected widgets change."""
         self.proplist.updateProperties(setnsproxy, showformatting=False)
 
-class TreeEditDock(qt4.QDockWidget):
+class TreeEditDock(qt.QDockWidget):
     """A dock window presenting widgets as a tree."""
 
-    widgetsSelected = qt4.pyqtSignal(list, object)
-    sigPageChanged = qt4.pyqtSignal(int)
+    widgetsSelected = qt.pyqtSignal(list, object)
+    sigPageChanged = qt.pyqtSignal(int)
 
     def __init__(self, document, parentwin):
         """Initialise dock given document and parent widget."""
-        qt4.QDockWidget.__init__(self, parentwin)
+        qt.QDockWidget.__init__(self, parentwin)
         self.parentwin = parentwin
         self.setWindowTitle(_("Editing - Veusz"))
         self.setObjectName("veuszeditingwindow")
@@ -680,26 +685,26 @@ class TreeEditDock(qt4.QDockWidget):
         self.setWidget(self.treeview)
 
         # toolbar to create widgets
-        self.addtoolbar = qt4.QToolBar(_("Insert toolbar - Veusz"),
+        self.addtoolbar = qt.QToolBar(_("Insert toolbar - Veusz"),
                                        parentwin)
         # note wrong description!: backwards compatibility
         self.addtoolbar.setObjectName("veuszeditingtoolbar")
 
         # toolbar for editting widgets
-        self.edittoolbar = qt4.QToolBar(_("Edit toolbar - Veusz"),
+        self.edittoolbar = qt.QToolBar(_("Edit toolbar - Veusz"),
                                         parentwin)
         self.edittoolbar.setObjectName("veuszedittoolbar")
 
         self._constructToolbarMenu()
-        parentwin.addToolBarBreak(qt4.Qt.TopToolBarArea)
-        parentwin.addToolBar(qt4.Qt.TopToolBarArea, self.addtoolbar)
-        parentwin.addToolBar(qt4.Qt.TopToolBarArea, self.edittoolbar)
+        parentwin.addToolBarBreak(qt.Qt.TopToolBarArea)
+        parentwin.addToolBar(qt.Qt.TopToolBarArea, self.addtoolbar)
+        parentwin.addToolBar(qt.Qt.TopToolBarArea, self.edittoolbar)
 
         # this sets various things up
         self.selectWidget(document.basewidget)
 
         # update paste button when clipboard changes
-        qt4.QApplication.clipboard().dataChanged.connect(
+        qt.QApplication.clipboard().dataChanged.connect(
             self.updatePasteButton)
         self.updatePasteButton()
 
@@ -721,8 +726,8 @@ class TreeEditDock(qt4.QDockWidget):
         if len(swidget) == 0:
             setnsproxy = None
         elif len(swidget) == 1:
-            setnsproxy = SettingsProxySingle(self.document, swidget[0].settings,
-                                             actions=swidget[0].actions)
+            setnsproxy = SettingsProxySingle(
+                self.document, swidget[0].settings, actions=swidget[0].actions)
         else:
             setnsproxy = SettingsProxyMulti(self.document, swidget)
 
@@ -738,7 +743,7 @@ class TreeEditDock(qt4.QDockWidget):
         if not self.selwidgets:
             return
 
-        m = qt4.QMenu(self)
+        m = qt.QMenu(self)
 
         # selection
         m.addMenu(self.parentwin.menus['edit.select'])
@@ -764,7 +769,7 @@ class TreeEditDock(qt4.QDockWidget):
             (anyhide, 'Hide', True), (anyshow, 'Show', False) ):
             if enabled:
                 m.addSeparator()
-                act = qt4.QAction(menutext, self)
+                act = qt.QAction(menutext, self)
                 def trigfn(showorhide):
                     return lambda: self.slotWidgetHideShow(
                         self.selwidgets, showorhide)
@@ -847,23 +852,25 @@ class TreeEditDock(qt4.QDockWidget):
             return lambda: self.slotMakeWidgetButton(klass)
 
         iconsize = setting.settingdb['toolbar_size']
-        self.addtoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
-        self.edittoolbar.setIconSize( qt4.QSize(iconsize, iconsize) )
+        self.addtoolbar.setIconSize( qt.QSize(iconsize, iconsize) )
+        self.edittoolbar.setIconSize( qt.QSize(iconsize, iconsize) )
 
         self.addslots = {}
         self.vzactions = actions = self.parentwin.vzactions
-        for widgettype in ('page', 'grid', 'graph', 'axis',
-                           'axis-broken', 'axis-function',
-                           'xy', 'bar', 'fit', 'function', 'boxplot',
-                           'image', 'contour', 'vectorfield',
-                           'key', 'label', 'colorbar',
-                           'rect', 'ellipse', 'imagefile',
-                           'line', 'polygon', 'polar', 'ternary',
-                           'nonorthpoint', 'nonorthfunc',
-                           'covariance',
-                           'scene3d',
-                           'graph3d', 'function3d', 'point3d', 'axis3d',
-                           'surface3d', 'volume3d'):
+        for widgettype in (
+                'page', 'grid', 'graph', 'axis',
+                'axis-broken', 'axis-function',
+                'xy', 'bar', 'fit', 'function', 'boxplot',
+                'image', 'contour', 'vectorfield',
+                'key', 'label', 'colorbar',
+                'rect', 'ellipse', 'imagefile',
+                'line', 'polygon', 'polar', 'ternary',
+                'nonorthpoint', 'nonorthfunc',
+                'covariance',
+                'scene3d',
+                'graph3d', 'function3d', 'point3d', 'axis3d',
+                'surface3d', 'volume3d'
+        ):
 
             wc = document.thefactory.getWidgetClass(widgettype)
             slot = slotklass(wc)
@@ -952,7 +959,7 @@ class TreeEditDock(qt4.QDockWidget):
             )
 
         # separate menus for adding shapes and axis types
-        shapemenu = qt4.QMenu()
+        shapemenu = qt.QMenu()
         shapemenu.addActions( [actions[act] for act in (
                     'add.rect',
                     'add.ellipse',
@@ -962,7 +969,7 @@ class TreeEditDock(qt4.QDockWidget):
                     )])
         actions['add.shapemenu'].setMenu(shapemenu)
 
-        axismenu = qt4.QMenu()
+        axismenu = qt.QMenu()
         axismenu.addActions( [actions[act] for act in (
                     'add.axis',
                     'add.axis-broken',
@@ -1006,7 +1013,7 @@ class TreeEditDock(qt4.QDockWidget):
 
     def slotShowShapeMenu(self):
         a = self.vzactions['add.shapemenu']
-        a.menu().popup( qt4.QCursor.pos() )
+        a.menu().popup( qt.QCursor.pos() )
 
     def makeWidget(self, widgettype, autoadd=True, name=None):
         """Called when an add widget button is clicked.
@@ -1024,7 +1031,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         if name in parent.childnames:
             name = None
-        
+
         # make the new widget and update the document
         w = self.document.applyOperation(
             document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd,
@@ -1046,7 +1053,7 @@ class TreeEditDock(qt4.QDockWidget):
 
         if self.selwidgets:
             mimedata = document.generateWidgetsMime(self.selwidgets)
-            clipboard = qt4.QApplication.clipboard()
+            clipboard = qt.QApplication.clipboard()
             clipboard.setMimeData(mimedata)
 
     def updatePasteButton(self):
@@ -1093,7 +1100,7 @@ class TreeEditDock(qt4.QDockWidget):
         # get list of widgets in order
         widgetlist = []
         self.document.basewidget.buildFlatWidgetList(widgetlist)
-        
+
         # find indices of widgets to be deleted - find one to select after
         indexes = [widgetlist.index(w) for w in widgets]
         if -1 in indexes:
@@ -1140,12 +1147,12 @@ class TreeEditDock(qt4.QDockWidget):
         if index is not None:
             self.treeview.scrollTo(index)
 
-            flags = qt4.QItemSelectionModel.Rows | {
+            flags = qt.QItemSelectionModel.Rows | {
                 'new':  (
-                    qt4.QItemSelectionModel.ClearAndSelect |
-                    qt4.QItemSelectionModel.Current),
-                'add': qt4.QItemSelectionModel.Select,
-                'toggle': qt4.QItemSelectionModel.Toggle,
+                    qt.QItemSelectionModel.ClearAndSelect |
+                    qt.QItemSelectionModel.Current),
+                'add': qt.QItemSelectionModel.Select,
+                'toggle': qt.QItemSelectionModel.Toggle,
             }[mode]
 
             self.treeview.selectionModel().select(index, flags)
@@ -1161,7 +1168,7 @@ class TreeEditDock(qt4.QDockWidget):
             return
         # widget to move
         w = self.selwidgets[0]
-        
+
         # actually move the widget
         self.document.applyOperation(
             document.OperationWidgetMoveUpDown(w, direction) )
@@ -1194,8 +1201,8 @@ class TreeEditDock(qt4.QDockWidget):
                  (wname is None or w.name == wname) ):
                 idx = self.treemodel.getWidgetIndex(w)
                 self.treeview.selectionModel().select(
-                    idx, qt4.QItemSelectionModel.Select |
-                    qt4.QItemSelectionModel.Rows)
+                    idx, qt.QItemSelectionModel.Select |
+                    qt.QItemSelectionModel.Rows)
 
         self.document.walkNodes(selectwidget, nodetypes=('widget',), root=root)
 
@@ -1209,9 +1216,9 @@ class TreeEditDock(qt4.QDockWidget):
             if c is not w and c.typename == wtype:
                 idx = self.treemodel.getWidgetIndex(c)
                 self.treeview.selectionModel().select(
-                    idx, qt4.QItemSelectionModel.Select |
-                    qt4.QItemSelectionModel.Rows)
-                
+                    idx, qt.QItemSelectionModel.Select |
+                    qt.QItemSelectionModel.Rows)
+
     def updateSelectMenu(self):
         """Update edit.select menu."""
         menu = self.parentwin.menus['edit.select']
@@ -1247,21 +1254,21 @@ class TreeEditDock(qt4.QDockWidget):
                 lambda: self._selectWidgetsTypeAndOrName(
                     None, name, root=page))
 
-class SettingLabel(qt4.QWidget):
+class SettingLabel(qt.QWidget):
     """A label to describe a setting.
 
     This widget shows the name, a tooltip description, and gives
     access to the context menu
     """
-    
+
     # this is emitted when widget is clicked
-    signalClicked = qt4.pyqtSignal(qt4.QPoint)
+    signalClicked = qt.pyqtSignal(qt.QPoint)
 
     def __init__(self, document, setting, setnsproxy):
         """Initialise button, passing document, setting, and parent widget."""
-        
-        qt4.QWidget.__init__(self)
-        self.setFocusPolicy(qt4.Qt.StrongFocus)
+
+        qt.QWidget.__init__(self)
+        self.setFocusPolicy(qt.Qt.StrongFocus)
 
         self.document = document
         document.signalModified.connect(self.slotDocModified)
@@ -1269,17 +1276,17 @@ class SettingLabel(qt4.QWidget):
         self.setting = setting
         self.setnsproxy = setnsproxy
 
-        self.layout = qt4.QHBoxLayout(self)
+        self.layout = qt.QHBoxLayout(self)
         self.layout.setContentsMargins(2,2,2,2)
 
         if setting.usertext:
             text = setting.usertext
         else:
             text = setting.name
-        self.labelicon = qt4.QLabel(text)
+        self.labelicon = qt.QLabel(text)
         self.layout.addWidget(self.labelicon)
-        
-        self.iconlabel = qt4.QLabel()
+
+        self.iconlabel = qt.QLabel()
         self.layout.addWidget(self.iconlabel)
 
         self.signalClicked.connect(self.settingMenu)
@@ -1294,22 +1301,22 @@ class SettingLabel(qt4.QWidget):
     def mouseReleaseEvent(self, event):
         """Emit signalClicked(pos) on mouse release."""
         self.signalClicked.emit( self.mapToGlobal(event.pos()) )
-        return qt4.QWidget.mouseReleaseEvent(self, event)
+        return qt.QWidget.mouseReleaseEvent(self, event)
 
     def keyReleaseEvent(self, event):
         """Emit signalClicked(pos) on key release."""
-        if event.key() == qt4.Qt.Key_Space:
+        if event.key() == qt.Qt.Key_Space:
             self.signalClicked.emit(
                 self.mapToGlobal(self.iconlabel.pos()) )
             event.accept()
         else:
-            return qt4.QWidget.keyReleaseEvent(self, event)
+            return qt.QWidget.keyReleaseEvent(self, event)
 
     # Mark as a qt slot. This fixes a bug where you get C/C++ object
     # deleted messages when the document emits signalModified but this
     # widget has been deleted. This can be reproduced by dragging a
     # widget between two windows, then undoing.
-    @qt4.pyqtSlot(int)
+    @qt.pyqtSlot(int)
     def slotDocModified(self, ismodified):
         """If the document has been modified."""
 
@@ -1324,7 +1331,7 @@ class SettingLabel(qt4.QWidget):
         self.setToolTip(tooltip)
 
         # if not default, make label bold
-        f = qt4.QFont(self.labelicon.font())
+        f = qt.QFont(self.labelicon.font())
         multivalued = self.setnsproxy.multivalued(self.setting.name)
         f.setBold( (not self.setting.isDefault()) or multivalued )
         f.setItalic( multivalued )
@@ -1345,25 +1352,25 @@ class SettingLabel(qt4.QWidget):
         """Focus on mouse enter."""
         self.inmouse = True
         self.updateHighlight()
-        return qt4.QWidget.enterEvent(self, event)
+        return qt.QWidget.enterEvent(self, event)
 
     def leaveEvent(self, event):
         """Clear focus on mouse leaving."""
         self.inmouse = False
         self.updateHighlight()
-        return qt4.QWidget.leaveEvent(self, event)
+        return qt.QWidget.leaveEvent(self, event)
 
     def focusInEvent(self, event):
         """Focus if widgets gets focus."""
         self.infocus = True
         self.updateHighlight()
-        return qt4.QWidget.focusInEvent(self, event)
+        return qt.QWidget.focusInEvent(self, event)
 
     def focusOutEvent(self, event):
         """Lose focus if widget loses focus."""
         self.infocus = False
         self.updateHighlight()
-        return qt4.QWidget.focusOutEvent(self, event)
+        return qt.QWidget.focusOutEvent(self, event)
 
     def addCopyToWidgets(self, menu):
         """Make a menu with list of other widgets in it."""
@@ -1374,7 +1381,7 @@ class SettingLabel(qt4.QWidget):
                 if w.typename == widgettype:
                     widgets.append(w)
                 getWidgetsOfType(w, widgettype, widgets)
-        
+
         # get list of widget paths to copy setting to
         # this is all widgets of same type
         widgets = []
@@ -1405,7 +1412,7 @@ class SettingLabel(qt4.QWidget):
             action = menu.addAction(widget)
             action.triggered.connect(modifyfn(widget))
 
-    @qt4.pyqtSlot(qt4.QPoint)
+    @qt.pyqtSlot(qt.QPoint)
     def settingMenu(self, pos):
         """Pop up menu for each setting."""
 
@@ -1425,7 +1432,7 @@ class SettingLabel(qt4.QWidget):
         wtype = widget.typename
         name = widget.name
 
-        popup = qt4.QMenu(self)
+        popup = qt.QMenu(self)
         popup.addAction(
             _('Reset to default'),
             self.actionResetDefault)

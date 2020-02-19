@@ -29,14 +29,14 @@ import re
 import numpy as N
 
 from ..compat import crange, czip, citems, cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from .settingdb import settingdb
 from .. import utils
 
 def _(text, disambiguation=None, context="Setting"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def styleClear(widget):
     """Return widget to default"""
@@ -47,24 +47,24 @@ def styleError(widget):
     widget.setStyleSheet("background-color: " +
                          settingdb.color('error').name() )
 
-class DotDotButton(qt4.QPushButton):
+class DotDotButton(qt.QPushButton):
     """A button for opening up more complex editor."""
     def __init__(self, tooltip=None, checkable=True):
-        qt4.QPushButton.__init__(self, "..", flat=True, checkable=checkable,
+        qt.QPushButton.__init__(self, "..", flat=True, checkable=checkable,
                                  maximumWidth=16, maximumHeight=16)
         if tooltip:
             self.setToolTip(tooltip)
-        self.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
 
-class Edit(qt4.QLineEdit):
+class Edit(qt.QLineEdit):
     """Main control for editing settings which are text."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, parent):
         """Initialise the setting widget."""
 
-        qt4.QLineEdit.__init__(self, parent)
+        qt.QLineEdit.__init__(self, parent)
         self.setting = setting
 
         self.setText( setting.toUIText() )
@@ -86,25 +86,25 @@ class Edit(qt4.QLineEdit):
         except utils.InvalidType:
             styleError(self)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         self.setText( self.setting.toUIText() )
 
-class _EditBox(qt4.QTextEdit):
+class _EditBox(qt.QTextEdit):
     """A popup edit box to support editing long text sections.
 
     Emits closing(text) when the box closes
     """
 
-    closing = qt4.pyqtSignal(cstr)
+    closing = qt.pyqtSignal(cstr)
 
     def __init__(self, origtext, readonly, parent):
         """Make a popup, framed widget containing a text editor."""
 
-        qt4.QTextEdit.__init__(self, parent)
-        self.setWindowFlags(qt4.Qt.Popup)
-        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
+        qt.QTextEdit.__init__(self, parent)
+        self.setWindowFlags(qt.Qt.Popup)
+        self.setAttribute(qt.Qt.WA_DeleteOnClose)
 
         self.spacing = self.fontMetrics().height()
 
@@ -112,7 +112,7 @@ class _EditBox(qt4.QTextEdit):
         self.setPlainText(origtext)
 
         cursor = self.textCursor()
-        cursor.movePosition(qt4.QTextCursor.End)
+        cursor.movePosition(qt.QTextCursor.End)
         self.setTextCursor(cursor)
 
         if readonly:
@@ -124,30 +124,30 @@ class _EditBox(qt4.QTextEdit):
 
     def eventFilter(self, obj, event):
         """Grab clicks outside this window to close it."""
-        if ( isinstance(event, qt4.QMouseEvent) and
-             event.buttons() != qt4.Qt.NoButton ):
-            frame = qt4.QRect(0, 0, self.width(), self.height())
+        if ( isinstance(event, qt.QMouseEvent) and
+             event.buttons() != qt.Qt.NoButton ):
+            frame = qt.QRect(0, 0, self.width(), self.height())
             if not frame.contains(event.pos()):
                 self.close()
                 return True
-        return qt4.QTextEdit.eventFilter(self, obj, event)
+        return qt.QTextEdit.eventFilter(self, obj, event)
 
     def keyPressEvent(self, event):
         """Close if escape or return is pressed."""
-        qt4.QTextEdit.keyPressEvent(self, event)
+        qt.QTextEdit.keyPressEvent(self, event)
 
         key = event.key()
-        if key == qt4.Qt.Key_Escape:
+        if key == qt.Qt.Key_Escape:
             # restore original content
             self.setPlainText(self.origtext)
             self.close()
-        elif key == qt4.Qt.Key_Return:
+        elif key == qt.Qt.Key_Return:
             # keep changes
             self.close()
 
     def sizeHint(self):
         """A reasonable size for the text editor."""
-        return qt4.QSize(self.spacing*40, self.spacing*3)
+        return qt.QSize(self.spacing*40, self.spacing*3)
 
     def closeEvent(self, event):
         """Tell the calling widget that we are closing, and provide
@@ -158,27 +158,27 @@ class _EditBox(qt4.QTextEdit):
         self.closing.emit(text)
         event.accept()
 
-class String(qt4.QWidget):
+class String(qt.QWidget):
     """A line editor which allows editting in a larger popup window."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, parent):
-        qt4.QWidget.__init__(self, parent)
+        qt.QWidget.__init__(self, parent)
         self.setting = setting
 
-        layout = qt4.QHBoxLayout()
+        layout = qt.QHBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
 
-        self.edit = qt4.QLineEdit()
+        self.edit = qt.QLineEdit()
         layout.addWidget(self.edit)
 
         b = self.button = DotDotButton(tooltip="Edit text")
         layout.addWidget(b)
 
-        # set the text of the widget to the 
+        # set the text of the widget to the
         self.edit.setText( setting.toUIText() )
 
         self.edit.editingFinished.connect(self.validateAndSet)
@@ -225,18 +225,18 @@ class String(qt4.QWidget):
         except utils.InvalidType:
             styleError(self.edit)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toUIText() )
 
-class Int(qt4.QSpinBox):
+class Int(qt.QSpinBox):
     """A control for changing an integer."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, parent):
-        qt4.QSpinBox.__init__(self, parent)
+        qt.QSpinBox.__init__(self, parent)
 
         self.ignorechange = False
         self.setting = setting
@@ -248,7 +248,7 @@ class Int(qt4.QSpinBox):
         self.setting.setOnModified(self.onModified)
 
         if setting.readonly:
-            self.setEnabled(False)            
+            self.setEnabled(False)
 
     def slotChanged(self, value):
         """If check box changes."""
@@ -256,39 +256,39 @@ class Int(qt4.QSpinBox):
         if not self.ignorechange:
             self.sigSettingChanged.emit(self, self.setting, value)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         self.ignorechange = True
         self.setValue( self.setting.val )
         self.ignorechange = False
 
-class FloatSlider(qt4.QWidget):
+class FloatSlider(qt.QWidget):
     """A slider control for a numerical value.
     Note: QSlider is integer only, so dragging slider makes values integers
     """
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, parent):
-        qt4.QWidget.__init__(self, parent)
+        qt.QWidget.__init__(self, parent)
         self.setting = setting
         self.setting.setOnModified(self.onModified)
 
-        layout = qt4.QHBoxLayout()
+        layout = qt.QHBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-        s = self.slider = qt4.QSlider(qt4.Qt.Horizontal)
+        s = self.slider = qt.QSlider(qt.Qt.Horizontal)
         s.setMinimum(int(setting.minval/setting.scale))
         s.setMaximum(int(setting.maxval/setting.scale))
         s.setPageStep(int(setting.step/setting.scale))
         s.setTickInterval(int(setting.tick/setting.scale))
-        s.setTickPosition(qt4.QSlider.TicksAbove)
+        s.setTickPosition(qt.QSlider.TicksAbove)
         layout.addWidget(self.slider)
 
-        self.edit = qt4.QLineEdit()
+        self.edit = qt.QLineEdit()
         layout.addWidget(self.edit)
 
         self.edit.editingFinished.connect(self.validateAndSet)
@@ -311,22 +311,22 @@ class FloatSlider(qt4.QWidget):
         self.sigSettingChanged.emit(
             self, self.setting, float(val)*self.setting.scale)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         self.edit.setText(self.setting.toUIText())
         self.slider.setValue(int(round(
             self.setting.get()/self.setting.scale)))
 
-class Bool(qt4.QCheckBox):
+class Bool(qt.QCheckBox):
     """A check box for changing a bool setting."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, parent):
-        qt4.QCheckBox.__init__(self, parent)
+        qt.QCheckBox.__init__(self, parent)
 
-        self.setSizePolicy( qt4.QSizePolicy(
-                qt4.QSizePolicy.MinimumExpanding, qt4.QSizePolicy.Fixed) )
+        self.setSizePolicy( qt.QSizePolicy(
+            qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.Fixed) )
 
         self.ignorechange = False
         self.setting = setting
@@ -345,8 +345,8 @@ class Bool(qt4.QCheckBox):
         # this is emitted by setChecked, so ignore onModified doing this
         if not self.ignorechange:
             self.sigSettingChanged.emit(self, self.setting, state)
-        
-    @qt4.pyqtSlot()
+
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         self.ignorechange = True
@@ -375,15 +375,15 @@ class BoolSwitch(Bool):
         if hasattr(self.parent(), 'showHideSettings'):
             self.parent().showHideSettings(show, hide)
 
-class Choice(qt4.QComboBox):
+class Choice(qt.QComboBox):
     """For choosing between a set of values."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, iseditable, vallist, parent, icons=None,
                  uilist=None,
                  descriptions=None):
-        qt4.QComboBox.__init__(self, parent)
+        qt.QComboBox.__init__(self, parent)
 
         self.setting = setting
         self.vallist = vallist
@@ -392,7 +392,7 @@ class Choice(qt4.QComboBox):
 
         # stops combobox readjusting in size to fit contents
         self.setSizeAdjustPolicy(
-            qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            qt.QComboBox.AdjustToMinimumContentsLengthWithIcon)
 
         # whether to show ui text to replace some items
         toadd = uilist if uilist is not None else vallist
@@ -408,7 +408,7 @@ class Choice(qt4.QComboBox):
         # use tooltip descriptions if requested
         if descriptions is not None:
             for i, descr in enumerate(descriptions):
-                self.setItemData(i, descr, qt4.Qt.ToolTipRole)
+                self.setItemData(i, descr, qt.Qt.ToolTipRole)
 
         # choose the correct setting
         try:
@@ -430,11 +430,11 @@ class Choice(qt4.QComboBox):
 
         # make completion case sensitive (to help fix case typos)
         if self.completer():
-            self.completer().setCaseSensitivity(qt4.Qt.CaseSensitive)
+            self.completer().setCaseSensitivity(qt.Qt.CaseSensitive)
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
-        qt4.QComboBox.focusOutEvent(self, *args)
+        qt.QComboBox.focusOutEvent(self, *args)
         self.slotActivated('')
 
     def slotActivated(self, val):
@@ -456,7 +456,7 @@ class Choice(qt4.QComboBox):
         except utils.InvalidType:
             styleError(self)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         text = self.setting.toUIText()
@@ -480,7 +480,7 @@ class ChoiceSwitch(Choice):
         Choice.showEvent(self, event)
         self.updateState()
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         Choice.onModified(self)
@@ -519,38 +519,38 @@ class FillStyleExtended(ChoiceSwitch):
         size = 12
         cls._icons = icons = []
 
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         path.addRect(0, 0, size, size)
 
         doc = document.Document()
         phelper = document.PaintHelper(doc, (1,1))
 
         for f in utils.extfillstyles:
-            pix = qt4.QPixmap(size, size)
+            pix = qt.QPixmap(size, size)
             pix.fill()
             painter = document.DirectPainter(pix)
-            painter.setRenderHint(qt4.QPainter.Antialiasing)
+            painter.setRenderHint(qt.QPainter.Antialiasing)
             painter.updateMetaData(phelper)
             brush.style = f
             utils.brushExtFillPath(painter, brush, path)
             painter.end()
-            icons.append(qt4.QIcon(pix))
+            icons.append(qt.QIcon(pix))
 
-class MultiLine(qt4.QTextEdit):
+class MultiLine(qt.QTextEdit):
     """For editting multi-line settings."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, parent):
         """Initialise the widget."""
 
-        qt4.QTextEdit.__init__(self, parent)
+        qt.QTextEdit.__init__(self, parent)
         self.setting = setting
 
-        self.setWordWrapMode(qt4.QTextOption.NoWrap)
+        self.setWordWrapMode(qt.QTextOption.NoWrap)
         self.setTabChangesFocus(True)
-        
-        # set the text of the widget to the 
+
+        # set the text of the widget to the
         self.setPlainText( setting.toUIText() )
 
         self.setting.setOnModified(self.onModified)
@@ -578,7 +578,7 @@ class MultiLine(qt4.QTextEdit):
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
-        qt4.QTextEdit.focusOutEvent(self, *args)
+        qt.QTextEdit.focusOutEvent(self, *args)
 
         text = self.toPlainText()
         try:
@@ -589,7 +589,7 @@ class MultiLine(qt4.QTextEdit):
         except utils.InvalidType:
             styleError(self)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         self.setPlainText( self.setting.toUIText() )
@@ -599,7 +599,7 @@ class Notes(MultiLine):
 
     def __init__(self, setting, parent):
         MultiLine.__init__(self, setting, parent)
-        self.setWordWrapMode(qt4.QTextOption.WordWrap)
+        self.setWordWrapMode(qt.QTextOption.WordWrap)
 
 class Distance(Choice):
     """For editing distance settings."""
@@ -617,7 +617,7 @@ class Distance(Choice):
         self.allowauto = allowauto
         self.physical = physical
         self.updateComboList()
-        
+
     def updateComboList(self):
         '''Populates combo list with sensible list of other possible units.'''
 
@@ -675,15 +675,15 @@ class DistancePt(Choice):
         '18pt', '20pt', '22pt', '24pt', '26pt', '28pt', '30pt',
         '34pt', '40pt', '44pt', '50pt', '60pt', '70pt'
         )
-    
+
     def __init__(self, setting, parent, allowauto=False):
         '''Initialise with blank list, then populate with sensible units.'''
         Choice.__init__(self, setting, True, DistancePt.points, parent)
-        
-class Dataset(qt4.QWidget):
+
+class Dataset(qt.QWidget):
     """Allow the user to choose between the possible datasets."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, document, dimensions, datatype, parent):
         """Initialise the combobox. The list is populated with datasets.
@@ -691,8 +691,8 @@ class Dataset(qt4.QWidget):
         dimensions specifies the dimension of the dataset to list
 
         Changes on the document refresh the list of datasets."""
-        
-        qt4.QWidget.__init__(self, parent)
+
+        qt.QWidget.__init__(self, parent)
 
         self.choice = Choice(setting, True, [], None)
         self.choice.sigSettingChanged.connect(self.sigSettingChanged)
@@ -707,7 +707,7 @@ class Dataset(qt4.QWidget):
         self._populateEntries()
         document.signalModified.connect(self.slotModified)
 
-        layout = qt4.QHBoxLayout()
+        layout = qt.QHBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0,0,0,0)
         layout.addWidget(self.choice)
@@ -733,7 +733,7 @@ class Dataset(qt4.QWidget):
             utils.populateCombo(self.choice, datasets)
             self.lastdatasets = datasets
 
-    @qt4.pyqtSlot(int)          
+    @qt.pyqtSlot(int)
     def slotModified(self, modified):
         """Update the list of datasets if the document is modified."""
         self._populateEntries()
@@ -814,16 +814,16 @@ class FillStyle(Choice):
 
         size = 12
         icons = []
-        c = qt4.QColor('grey')
+        c = qt.QColor('grey')
         for f in cls._fills:
-            pix = qt4.QPixmap(size, size)
+            pix = qt.QPixmap(size, size)
             pix.fill()
-            painter = qt4.QPainter(pix)
-            painter.setRenderHint(qt4.QPainter.Antialiasing)
-            brush = qt4.QBrush(c, cls._fillcnvt[f])
+            painter = qt.QPainter(pix)
+            painter.setRenderHint(qt.QPainter.Antialiasing)
+            brush = qt.QBrush(c, cls._fillcnvt[f])
             painter.fillRect(0, 0, size, size, brush)
             painter.end()
-            icons.append( qt4.QIcon(pix) )
+            icons.append( qt.QIcon(pix) )
 
         cls._icons = icons
 
@@ -844,18 +844,18 @@ class Marker(Choice):
     def _generateIcons(cls):
         size = 16
         icons = []
-        brush = qt4.QBrush( qt4.QColor('darkgrey') )
-        pen = qt4.QPen( qt4.QBrush(qt4.Qt.black), 1. )
+        brush = qt.QBrush( qt.QColor('darkgrey') )
+        pen = qt.QPen( qt.QBrush(qt.Qt.black), 1. )
         for marker in utils.MarkerCodes:
-            pix = qt4.QPixmap(size, size)
+            pix = qt.QPixmap(size, size)
             pix.fill()
-            painter = qt4.QPainter(pix)
-            painter.setRenderHint(qt4.QPainter.Antialiasing)
+            painter = qt.QPainter(pix)
+            painter.setRenderHint(qt.QPainter.Antialiasing)
             painter.setBrush(brush)
             painter.setPen(pen)
             utils.plotMarker(painter, size*0.5, size*0.5, marker, size*0.33)
             painter.end()
-            icons.append( qt4.QIcon(pix) )
+            icons.append( qt.QIcon(pix) )
 
         cls._icons = icons
 
@@ -876,13 +876,13 @@ class Arrow(Choice):
     def _generateIcons(cls):
         size = 16
         icons = []
-        brush = qt4.QBrush(qt4.Qt.black)
-        pen = qt4.QPen( qt4.QBrush(qt4.Qt.black), 1. )
+        brush = qt.QBrush(qt.Qt.black)
+        pen = qt.QPen( qt.QBrush(qt.Qt.black), 1. )
         for arrow in utils.ArrowCodes:
-            pix = qt4.QPixmap(size, size)
+            pix = qt.QPixmap(size, size)
             pix.fill()
-            painter = qt4.QPainter(pix)
-            painter.setRenderHint(qt4.QPainter.Antialiasing)
+            painter = qt.QPainter(pix)
+            painter.setRenderHint(qt.QPainter.Antialiasing)
             painter.setBrush(brush)
             painter.setPen(pen)
             utils.plotLineArrow(painter, size*0.4, size*0.5,
@@ -890,7 +890,7 @@ class Arrow(Choice):
                                 arrowsize=size*0.2,
                                 arrowleft=arrow, arrowright=arrow)
             painter.end()
-            icons.append( qt4.QIcon(pix) )
+            icons.append( qt.QIcon(pix) )
 
         cls._icons = icons
 
@@ -910,7 +910,7 @@ class LineStyle(Choice):
         Choice.__init__(self, setting, False,
                         self._lines, parent,
                         icons=self._icons)
-        self.setIconSize( qt4.QSize(*self.size) )
+        self.setIconSize( qt.QSize(*self.size) )
 
     @classmethod
     def _generateIcons(cls):
@@ -925,57 +925,57 @@ class LineStyle(Choice):
         setn = collections.Line('temp')
         setn.get('color').set('black')
         setn.get('width').set('1pt')
-        
+
         doc = document.Document()
         for lstyle in cls._lines:
-            pix = qt4.QPixmap(*size)
+            pix = qt.QPixmap(*size)
             pix.fill()
 
             painter = document.DirectPainter(pix)
-            painter.setRenderHint(qt4.QPainter.Antialiasing)
+            painter.setRenderHint(qt.QPainter.Antialiasing)
 
             phelper = document.PaintHelper(doc, (1, 1))
             painter.updateMetaData(phelper)
 
             setn.get('style').set(lstyle)
-            
+
             painter.setPen( setn.makeQPen(painter) )
             painter.drawLine(
                 int(size[0]*0.1), size[1]//2,
                 int(size[0]*0.9), size[1]//2)
             painter.end()
-            icons.append( qt4.QIcon(pix) )
+            icons.append( qt.QIcon(pix) )
 
         cls._icons = icons
 
-class _ColNotifier(qt4.QObject):
-    sigNewColor = qt4.pyqtSignal(cstr)
+class _ColNotifier(qt.QObject):
+    sigNewColor = qt.pyqtSignal(cstr)
 
 
-class Color(qt4.QWidget):
+class Color(qt.QWidget):
     """A control which lets the user choose a color.
 
     A drop down list and a button to bring up a dialog are used
     """
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, parent):
-        qt4.QWidget.__init__(self, parent)
+        qt.QWidget.__init__(self, parent)
 
         self.setting = setting
         self.document = setting.getDocument()
         self.colors = self.document.evaluate.colors
 
         # combo box
-        c = self.combo = qt4.QComboBox()
+        c = self.combo = qt.QComboBox()
         c.setEditable(True)
         c.activated[str].connect(self.slotActivated)
 
         # button for selecting colors
-        b = self.button = qt4.QPushButton()
+        b = self.button = qt.QPushButton()
         b.setFlat(True)
-        b.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        b.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
         b.setMaximumHeight(24)
         b.setMaximumWidth(24)
         b.clicked.connect(self.slotButtonClicked)
@@ -987,7 +987,7 @@ class Color(qt4.QWidget):
             c.setEnabled(False)
             b.setEnabled(False)
 
-        layout = qt4.QHBoxLayout()
+        layout = qt.QHBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0,0,0,0)
         layout.addWidget(c)
@@ -1000,7 +1000,7 @@ class Color(qt4.QWidget):
     def slotButtonClicked(self):
         """Open dialog to edit color."""
 
-        col = qt4.QColorDialog.getColor(
+        col = qt.QColorDialog.getColor(
             self.colors.get(self.setting.val), self)
         if col.isValid():
             # change setting
@@ -1023,10 +1023,10 @@ class Color(qt4.QWidget):
 
         self.combo.setCurrentIndex(index)
 
-        icon = self.combo.itemData(index, qt4.Qt.DecorationRole)
+        icon = self.combo.itemData(index, qt.Qt.DecorationRole)
         self.button.setIcon(icon)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         self.setColor( self.setting.toUIText() )
@@ -1044,7 +1044,7 @@ class WidgetSelector(Choice):
     def _populateEntries(self):
         pass
 
-    @qt4.pyqtSlot(int)          
+    @qt.pyqtSlot(int)
     def slotModified(self, modified):
         """Update list of axes."""
         self._populateEntries()
@@ -1100,7 +1100,7 @@ class Axis(WidgetSelector):
         names = sorted(axes)
         utils.populateCombo(self, names)
 
-class ListSet(qt4.QFrame):
+class ListSet(qt.QFrame):
     """A widget for constructing settings which are lists of other
     properties.
 
@@ -1108,7 +1108,7 @@ class ListSet(qt4.QFrame):
     base widget
     """
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     pixsize = 12
 
@@ -1123,12 +1123,12 @@ class ListSet(qt4.QFrame):
         parent is the parent widget.
         """
 
-        qt4.QFrame.__init__(self, parent)
-        self.setFrameStyle(qt4.QFrame.Box)
+        qt.QFrame.__init__(self, parent)
+        self.setFrameStyle(qt.QFrame.Box)
         self.defaultval = defaultval
         self.setting = setting
         self.controls = []
-        self.layout = qt4.QGridLayout(self)
+        self.layout = qt.QGridLayout(self)
         s = self.layout.contentsMargins().left()//2
         self.layout.setContentsMargins(s,s,s,s)
         self.layout.setSpacing( self.layout.spacing()//4 )
@@ -1159,7 +1159,7 @@ class ListSet(qt4.QFrame):
         # delete all children in case of refresh
         self.controls = []
         for c in self.children():
-            if isinstance(c, qt4.QWidget):
+            if isinstance(c, qt.QWidget):
                 self.layout.removeWidget(c)
                 c.deleteLater()
         c = None
@@ -1176,20 +1176,20 @@ class ListSet(qt4.QFrame):
             self.controls.append(cntrls)
 
         # buttons at end
-        bbox = qt4.QWidget()
-        h = qt4.QHBoxLayout(bbox)
+        bbox = qt.QWidget()
+        h = qt.QHBoxLayout(bbox)
         h.setContentsMargins(0,0,0,0)
         bbox.setLayout(h)
         self.layout.addWidget(bbox, row+1, 0, 1, -1)
 
         # a button to add a new entry
-        b = qt4.QPushButton('Add')
+        b = qt.QPushButton('Add')
         h.addWidget(b)
         b.clicked.connect(self.onAddClicked)
         b.show()
 
         # a button to delete the last entry
-        b = qt4.QPushButton('Delete')
+        b = qt.QPushButton('Delete')
         h.addWidget(b)
         b.clicked.connect(self.onDeleteClicked)
         b.setEnabled(len(self.setting.val) > 0)
@@ -1211,7 +1211,7 @@ class ListSet(qt4.QFrame):
         rows = list(self.setting.val)[:-1]
         self.sigSettingChanged.emit(self, self.setting, rows)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         self.populate()
@@ -1232,9 +1232,9 @@ class ListSet(qt4.QFrame):
 
     def addColorButton(self, tooltip):
         """Add a color button to the list at the position specified."""
-        wcolor = qt4.QPushButton()
+        wcolor = qt.QPushButton()
         wcolor.setFlat(True)
-        wcolor.setSizePolicy(qt4.QSizePolicy.Maximum, qt4.QSizePolicy.Maximum)
+        wcolor.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
         wcolor.setMaximumHeight(24)
         wcolor.setMaximumWidth(24)
         wcolor.setToolTip(tooltip)
@@ -1244,14 +1244,14 @@ class ListSet(qt4.QFrame):
     def updateColorButton(self, cntrl, color):
         """Given color control, update color."""
 
-        pix = qt4.QPixmap(self.pixsize, self.pixsize)
+        pix = qt.QPixmap(self.pixsize, self.pixsize)
         qcolor = self.setting.getDocument().evaluate.colors.get(color)
         pix.fill(qcolor)
-        cntrl.setIcon(qt4.QIcon(pix))
+        cntrl.setIcon(qt.QIcon(pix))
 
     def addToggleButton(self, tooltip):
         """Make a toggle button."""
-        wtoggle = qt4.QCheckBox()
+        wtoggle = qt.QCheckBox()
         wtoggle.setToolTip(tooltip)
         wtoggle.toggled.connect(self.onToggled)
         return wtoggle
@@ -1263,7 +1263,7 @@ class ListSet(qt4.QFrame):
     def addCombo(self, tooltip, values, icons, texts):
         """Make an enumeration combo - choose from a set of icons."""
 
-        wcombo = qt4.QComboBox()
+        wcombo = qt.QComboBox()
         wcombo.setToolTip(tooltip)
         wcombo.activated[int].connect(self.onComboChanged)
 
@@ -1310,11 +1310,11 @@ class ListSet(qt4.QFrame):
         rows = self.setting.val
         qcolor = self.setting.getDocument().evaluate.colors.get(
             rows[row][col])
-        color = qt4.QColorDialog.getColor(
+        color = qt.QColorDialog.getColor(
             qcolor,
             self,
             "Choose color",
-            qt4.QColorDialog.ShowAlphaChannel )
+            qt.QColorDialog.ShowAlphaChannel )
         if color.isValid():
             # change setting
             # this is a bit irritating, as have to do lots of
@@ -1323,10 +1323,10 @@ class ListSet(qt4.QFrame):
             self._updateRowCol(row, col, color)
 
             # change the color
-            pix = qt4.QPixmap(self.pixsize, self.pixsize)
+            pix = qt.QPixmap(self.pixsize, self.pixsize)
             qcolor = self.setting.getDocument().evaluate.colors.get(color)
             pix.fill(qcolor)
-            sender.setIcon(qt4.QIcon(pix))
+            sender.setIcon(qt.QIcon(pix))
 
 class LineSet(ListSet):
     """A list of line styles.
@@ -1348,7 +1348,7 @@ class LineSet(ListSet):
             _('Line style'), LineStyle._lines, LineStyle._icons, None)
 
         # make line width edit box
-        wwidth = qt4.QLineEdit()
+        wwidth = qt.QLineEdit()
         wwidth.setToolTip(_('Line width'))
         wwidth.editingFinished.connect(self.onWidthChanged)
 
@@ -1384,11 +1384,11 @@ class LineSet(ListSet):
             # invalid distance
             styleError(sender)
 
-class _FillBox(qt4.QScrollArea):
+class _FillBox(qt.QScrollArea):
     """Pop up box for extended fill settings."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
-    closing = qt4.pyqtSignal(int)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
+    closing = qt.pyqtSignal(int)
 
     def __init__(self, doc, thesetting, row, button, parent):
         """Initialse widget. This is based on a PropertyList widget.
@@ -1397,9 +1397,9 @@ class _FillBox(qt4.QScrollArea):
         the inheritance here. Is using PropertyList window a hack?
         """
 
-        qt4.QScrollArea.__init__(self, parent)
-        self.setWindowFlags(qt4.Qt.Popup)
-        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
+        qt.QScrollArea.__init__(self, parent)
+        self.setWindowFlags(qt.Qt.Popup)
+        self.setAttribute(qt.Qt.WA_DeleteOnClose)
         self.parent = parent
         self.row = row
         self.setting = thesetting
@@ -1449,20 +1449,20 @@ class _FillBox(qt4.QScrollArea):
 
     def eventFilter(self, obj, event):
         """Grab clicks outside this window to close it."""
-        if ( isinstance(event, qt4.QMouseEvent) and
-             event.buttons() != qt4.Qt.NoButton ):
-            frame = qt4.QRect(0, 0, self.width(), self.height())
+        if ( isinstance(event, qt.QMouseEvent) and
+             event.buttons() != qt.Qt.NoButton ):
+            frame = qt.QRect(0, 0, self.width(), self.height())
             if not frame.contains(event.pos()):
                 self.close()
                 return True
-        return qt4.QScrollArea.eventFilter(self, obj, event)
+        return qt.QScrollArea.eventFilter(self, obj, event)
 
     def keyPressEvent(self, event):
         """Close if escape or return is pressed."""
-        qt4.QScrollArea.keyPressEvent(self, event)
+        qt.QScrollArea.keyPressEvent(self, event)
 
         key = event.key()
-        if key == qt4.Qt.Key_Escape:
+        if key == qt.Qt.Key_Escape:
             self.close()
 
     def closeEvent(self, event):
@@ -1470,7 +1470,7 @@ class _FillBox(qt4.QScrollArea):
         the new text."""
 
         self.closing.emit(self.row)
-        qt4.QScrollArea.closeEvent(self, event)
+        qt.QScrollArea.closeEvent(self, event)
 
 class FillSet(ListSet):
     """A list of fill settings."""
@@ -1485,7 +1485,7 @@ class FillSet(ListSet):
         # construct fill icons if not already done
         if FillStyleExtended._icons is None:
             FillStyleExtended._generateIcons()
-    
+
         # make fill style selector
         wfillstyle = self.addCombo(
             _("Fill style"),
@@ -1527,21 +1527,21 @@ class FillSet(ListSet):
         # uncheck the .. button
         self.buttonAtRow(row).setChecked(False)
 
-class MultiSettingWidget(qt4.QWidget):
+class MultiSettingWidget(qt.QWidget):
     """A widget for storing multiple values in a tuple,
     with + and - signs by each entry."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, doc, *args):
         """Construct widget as combination of LineEdit and PushButton
         for browsing."""
 
-        qt4.QWidget.__init__(self, *args)
+        qt.QWidget.__init__(self, *args)
         self.setting = setting
         self.document = doc
 
-        self.grid = layout = qt4.QGridLayout()
+        self.grid = layout = qt.QGridLayout()
         layout.setHorizontalSpacing(0)
         layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
@@ -1549,17 +1549,17 @@ class MultiSettingWidget(qt4.QWidget):
         self.last = ()
         self.controls = []
         self.setting.setOnModified(self.onModified)
-        
+
     def makeRow(self):
         """Make new row at end"""
         row = len(self.controls)
         cntrl = self.makeControl(row)
         cntrl.installEventFilter(self)
-        addbutton = qt4.QPushButton('+')
+        addbutton = qt.QPushButton('+')
         addbutton.setFixedWidth(24)
         addbutton.setFlat(True)
         addbutton.setToolTip('Add another item')
-        subbutton = qt4.QPushButton('-')
+        subbutton = qt.QPushButton('-')
         subbutton.setToolTip('Remove item')
         subbutton.setFixedWidth(24)
         subbutton.setFlat(True)
@@ -1582,12 +1582,12 @@ class MultiSettingWidget(qt4.QWidget):
 
     def eventFilter(self, obj, event):
         """Capture loss of focus by controls."""
-        if event.type() == qt4.QEvent.FocusOut:
+        if event.type() == qt.QEvent.FocusOut:
             for row, c in enumerate(self.controls):
                 if c[0] is obj:
                     self.dataChanged(row)
                     break
-        return qt4.QWidget.eventFilter(self, obj, event)
+        return qt.QWidget.eventFilter(self, obj, event)
 
     def deleteRow(self):
         """Remove last row"""
@@ -1612,7 +1612,7 @@ class MultiSettingWidget(qt4.QWidget):
         val.pop(row)
         self.sigSettingChanged.emit(self, self.setting, tuple(val))
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """Called when the setting is changed remotely,
         or when control is opened"""
@@ -1666,7 +1666,7 @@ class Datasets(MultiSettingWidget):
 
     def makeControl(self, row):
         """Make QComboBox edit widget."""
-        combo = qt4.QComboBox()
+        combo = qt.QComboBox()
         combo.setEditable(True)
         combo.lineEdit().editingFinished.connect(lambda: self.dataChanged(row))
         # if a different item is selected
@@ -1693,7 +1693,7 @@ class Datasets(MultiSettingWidget):
         for cntrls, val in czip(self.controls, self.setting.val):
             cntrls[0].lineEdit().setText(val)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """Called when the setting is changed remotely,
         or when control is opened"""
@@ -1722,7 +1722,7 @@ class Strings(MultiSettingWidget):
 
     def makeControl(self, row):
         """Make edit widget."""
-        lineedit = qt4.QLineEdit()
+        lineedit = qt.QLineEdit()
         lineedit.editingFinished.connect(lambda: self.dataChanged(row))
         return lineedit
 
@@ -1735,10 +1735,10 @@ class Strings(MultiSettingWidget):
         for cntrls, val in czip(self.controls, self.setting.val):
             cntrls[0].setText(val)
 
-class Filename(qt4.QWidget):
+class Filename(qt.QWidget):
     """A widget for selecting a filename with a browse button."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, mode, parent):
         """Construct widget as combination of LineEdit and PushButton
@@ -1747,20 +1747,20 @@ class Filename(qt4.QWidget):
         mode is 'image' or 'file'
         """
 
-        qt4.QWidget.__init__(self, parent)
+        qt.QWidget.__init__(self, parent)
         self.mode = mode
         self.setting = setting
 
-        layout = qt4.QHBoxLayout()
+        layout = qt.QHBoxLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
 
         # the actual edit control
-        self.edit = qt4.QLineEdit()
+        self.edit = qt.QLineEdit()
         self.edit.setText( setting.toUIText() )
         layout.addWidget(self.edit)
-        
+
         b = self.button = DotDotButton(checkable=False,
                                        tooltip=_("Browse for file"))
         layout.addWidget(b)
@@ -1770,8 +1770,8 @@ class Filename(qt4.QWidget):
         b.clicked.connect(self.buttonClicked)
 
         # completion support
-        c = self.filenamecompleter = qt4.QCompleter(self)
-        model = qt4.QDirModel(c)
+        c = self.filenamecompleter = qt.QCompleter(self)
+        model = qt.QDirModel(c)
         c.setModel(model)
         self.edit.setCompleter(c)
 
@@ -1791,7 +1791,7 @@ class Filename(qt4.QWidget):
             filefilter = ("Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
                           "*.gif *.xbm *.xpm);;" + filefilter)
 
-        retn = qt4.QFileDialog.getOpenFileName(
+        retn = qt.QFileDialog.getOpenFileName(
             self, title, self.edit.text(), filefilter)
 
         if retn:
@@ -1810,29 +1810,29 @@ class Filename(qt4.QWidget):
         except utils.InvalidType:
             styleError(self.edit)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """called when the setting is changed remotely"""
         self.edit.setText( self.setting.toUIText() )
 
-class FontFamily(qt4.QFontComboBox):
+class FontFamily(qt.QFontComboBox):
     """List the font families, showing each font."""
 
-    sigSettingChanged = qt4.pyqtSignal(qt4.QObject, object, object)
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, parent):
         """Create the combobox."""
 
-        qt4.QFontComboBox.__init__(self, parent)
+        qt.QFontComboBox.__init__(self, parent)
         self.setting = setting
-        self.setFontFilters( qt4.QFontComboBox.ScalableFonts )
-        
+        self.setFontFilters( qt.QFontComboBox.ScalableFonts )
+
         # set initial value
         self.onModified()
 
         # stops combobox readjusting in size to fit contents
         self.setSizeAdjustPolicy(
-            qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            qt.QComboBox.AdjustToMinimumContentsLengthWithIcon)
 
         self.setting.setOnModified(self.onModified)
 
@@ -1841,7 +1841,7 @@ class FontFamily(qt4.QFontComboBox):
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
-        qt4.QFontComboBox.focusOutEvent(self, *args)
+        qt.QFontComboBox.focusOutEvent(self, *args)
         self.slotActivated('')
 
     def slotActivated(self, val):
@@ -1849,17 +1849,17 @@ class FontFamily(qt4.QFontComboBox):
         newval = self.currentText()
         self.sigSettingChanged.emit(self, self.setting, newval)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def onModified(self):
         """Make control reflect chosen setting."""
-        self.setCurrentFont( qt4.QFont(self.setting.toUIText()) )
+        self.setCurrentFont( qt.QFont(self.setting.toUIText()) )
 
 class ErrorStyle(Choice):
     """Choose different error bar styles."""
-    
+
     _icons = None         # generated icons
     _errorstyles = None   # copied in by setting.py
-    
+
     def __init__(self, setting, parent):
         if self._icons is None:
             self._generateIcons()
@@ -1892,7 +1892,7 @@ class Colormap(Choice):
         Choice.__init__(self, setn, True,
                         names, parent,
                         icons=icons)
-        self.setIconSize( qt4.QSize(*self.size) )
+        self.setIconSize( qt.QSize(*self.size) )
 
     @classmethod
     def _generateIcons(kls, document, names):
@@ -1913,15 +1913,15 @@ class Colormap(Choice):
             else:
                 if val is None:
                     # empty icon
-                    pixmap = qt4.QPixmap(*size)
-                    pixmap.fill(qt4.Qt.transparent)
+                    pixmap = qt.QPixmap(*size)
+                    pixmap.fill(qt.Qt.transparent)
                 else:
                     # generate icon
                     image = utils.applyColorMap(val, 'linear',
                                                 fakedataset,
                                                 0., size[0]-1., 0)
-                    pixmap = qt4.QPixmap.fromImage(image)
-                icon = qt4.QIcon(pixmap)
+                    pixmap = qt.QPixmap.fromImage(image)
+                icon = qt.QIcon(pixmap)
                 kls._icons[name] = icon
             retn.append(icon)
         return retn
@@ -1938,7 +1938,7 @@ class AxisBound(Choice):
         modesetn = setting.parent.get('mode')
         modesetn.setOnModified(self.modeChange)
 
-    @qt4.pyqtSlot()
+    @qt.pyqtSlot()
     def modeChange(self):
         """Called if the mode of the axis changes.
         Re-set text as float or date."""

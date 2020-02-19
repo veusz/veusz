@@ -18,7 +18,7 @@
 
 from __future__ import division, print_function, absolute_import
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import plugins
 from .. import utils
@@ -27,7 +27,7 @@ from ..compat import czip, cstr
 from . import defn_plugin
 
 def _(text, disambiguation=None, context="Import_Plugin"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTabPlugins(importdialog.ImportTab):
     """Tab for importing using a plugin."""
@@ -225,7 +225,7 @@ class ImportTabPlugins(importdialog.ImportTab):
             for p in plugins.importpluginregistry:
                 if ftype in p.file_extensions:
                     plugin = p.name
-            idx = self.pluginType.findText(plugin, qt4.Qt.MatchExactly)
+            idx = self.pluginType.findText(plugin, qt.Qt.MatchExactly)
             self.pluginType.setCurrentIndex(idx)
             self.pluginChanged(-1)
 

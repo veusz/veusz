@@ -22,7 +22,7 @@ from __future__ import division
 import numpy as N
 
 from ..compat import crange, czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
@@ -31,7 +31,7 @@ from .plotters import GenericPlotter
 
 def _(text, disambiguation=None, context='BarPlotter'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class BarFill(setting.Settings):
     '''Filling of bars.'''
@@ -304,11 +304,12 @@ class BarPlotter(GenericPlotter):
         lw = pen.widthF() * 2
 
         # make clip box bigger to avoid lines showing
-        extclip = qt4.QRectF(qt4.QPointF(clip.left()-lw, clip.top()-lw),
-                             qt4.QPointF(clip.right()+lw, clip.bottom()+lw))
+        extclip = qt.QRectF(
+            qt.QPointF(clip.left()-lw, clip.top()-lw),
+            qt.QPointF(clip.right()+lw, clip.bottom()+lw) )
 
         # plot bars
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         utils.addNumpyPolygonToPath(
             path, extclip, corners[0], corners[1], corners[2], corners[1],
             corners[2], corners[3], corners[0], corners[3])
@@ -456,14 +457,14 @@ class BarPlotter(GenericPlotter):
             p2 = N.hstack( [ [posns[0]], posns, [posns[-1]] ] )
 
             # construct polygon on path, clipped
-            poly = qt4.QPolygonF()
+            poly = qt.QPolygonF()
             if ishorz:
                 utils.addNumpyToPolygonF(poly, p1, p2)
             else:
                 utils.addNumpyToPolygonF(poly, p2, p1)
-            clippoly = qt4.QPolygonF()
+            clippoly = qt.QPolygonF()
             utils.polygonClip(poly, clip, clippoly)
-            path = qt4.QPainterPath()
+            path = qt.QPainterPath()
             path.addPolygon(clippoly)
             path.closeSubpath()
 
@@ -472,7 +473,7 @@ class BarPlotter(GenericPlotter):
             utils.brushExtFillPath(painter, brush, path, dataindex=dsnum)
 
             # now draw lines
-            poly = qt4.QPolygonF()
+            poly = qt.QPolygonF()
             if ishorz:
                 utils.addNumpyToPolygonF(poly, coords, posns)
             else:
@@ -509,10 +510,11 @@ class BarPlotter(GenericPlotter):
     def drawKeySymbol(self, number, painter, x, y, width, height):
         """Draw a fill rectangle for key entry."""
 
-        self.plotBars(painter, self.settings, number,
-                      qt4.QRectF(0,0,32767,32767),
-                      ([x], [y+height*0.1],
-                       [x+width], [y+height*0.8]))
+        self.plotBars(
+            painter, self.settings, number,
+            qt.QRectF(0,0,32767,32767),
+            ([x], [y+height*0.1], [x+width], [y+height*0.8])
+        )
 
     def dataDraw(self, painter, axes, widgetposn, clip):
         """Plot the data on a plotter."""
@@ -527,8 +529,8 @@ class BarPlotter(GenericPlotter):
             return
 
         # where the bars are to be placed horizontally
-        barposns, maxwidth = self.findBarPositions(lengths, positions,
-                                                   axes, widgetposn)
+        barposns, maxwidth = self.findBarPositions(
+            lengths, positions, axes, widgetposn)
         
         # only use finite positions
         origposnlen = len(barposns)
@@ -544,14 +546,16 @@ class BarPlotter(GenericPlotter):
             for key in ('data', 'serr', 'nerr', 'perr'):
                 v = getattr(dataset, key)
                 if v is not None:
-                    vals[key] = extend1DArray(N.nan_to_num(v),
-                                              origposnlen)[validposn]
+                    vals[key] = extend1DArray(
+                        N.nan_to_num(v), origposnlen)[validposn]
             dsvals.append(vals)
 
         # actually do the drawing
-        fn = {'stacked': self.barDrawStacked,
-              'stacked-area': self.areaDrawStacked,
-              'grouped': self.barDrawGroup}[s.mode]
+        fn = {
+            'stacked': self.barDrawStacked,
+            'stacked-area': self.areaDrawStacked,
+            'grouped': self.barDrawGroup
+        }[s.mode]
         fn(painter, barposns, maxwidth, dsvals, axes, widgetposn, clip)
 
 # allow the factory to instantiate a bar plotter

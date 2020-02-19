@@ -17,21 +17,21 @@
 ##############################################################################
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 
-class HistorySpinBox(qt4.QSpinBox):
+class HistorySpinBox(qt.QSpinBox):
     """A SpinBox which remembers its setting between calls."""
 
     def __init__(self, *args):
-        qt4.QSpinBox.__init__(self, *args)
+        qt.QSpinBox.__init__(self, *args)
         self.default = 0
 
     def getSettingName(self):
         """Get name for saving in settings."""
         # get dialog for widget
         dialog = self.parent()
-        while not isinstance(dialog, qt4.QDialog):
+        while not isinstance(dialog, qt.QDialog):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
@@ -49,10 +49,10 @@ class HistorySpinBox(qt4.QSpinBox):
 
     def showEvent(self, event):
         """Show HistorySpinBox and load history."""
-        qt4.QSpinBox.showEvent(self, event)
+        qt.QSpinBox.showEvent(self, event)
         self.loadHistory()
 
     def hideEvent(self, event):
         """Save history as widget is hidden."""
-        qt4.QSpinBox.hideEvent(self, event)
+        qt.QSpinBox.hideEvent(self, event)
         self.saveHistory()

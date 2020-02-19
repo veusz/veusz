@@ -24,7 +24,7 @@ import bisect
 import numpy as N
 
 from ..compat import crange, czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import document
 from .. import utils
@@ -34,7 +34,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='BrokenAxis'):
     '''Translate text.'''
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class AxisBroken(axis.Axis):
     '''An axis widget which can have gaps in it.'''
@@ -317,11 +317,11 @@ class AxisBroken(axis.Axis):
             p1, p2 = p2, p1
 
         # convert to polygon and draw
-        poly = qt4.QPolygonF()
+        poly = qt.QPolygonF()
         utils.addNumpyToPolygonF(poly, p1, p2)
 
         pen = s.get('Line').makeQPen(painter)
-        pen.setCapStyle(qt4.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.FlatCap)
         painter.setPen(pen)
         painter.drawPolyline(poly)
 
@@ -345,9 +345,9 @@ class AxisBroken(axis.Axis):
 
         with painter:
             painter.save()
-            painter.setClipRect( qt4.QRectF(
-                    qt4.QPointF(parentposn[0], parentposn[1]),
-                    qt4.QPointF(parentposn[2], parentposn[3]) ) )
+            painter.setClipRect( qt.QRectF(
+                    qt.QPointF(parentposn[0], parentposn[1]),
+                    qt.QPointF(parentposn[2], parentposn[3]) ) )
 
             for i in crange(self.breakvnum):
                 self.switchBreak(i, parentposn)

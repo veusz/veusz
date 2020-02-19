@@ -24,7 +24,7 @@ import sys
 import traceback
 
 from ..compat import crange
-from .. import qtall as qt4
+from .. import qtall as qt
 import numpy as N
 
 from .. import setting
@@ -35,13 +35,13 @@ from .. import widgets
 
 def _(text, disambiguation=None, context='PlotWindow'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class PickerCrosshairItem( qt4.QGraphicsPathItem ):
+class PickerCrosshairItem( qt.QGraphicsPathItem ):
     """The picker cross widget: it moves from point to point and curve to curve
        with the arrow keys, and hides itself when it looses focus"""
     def __init__(self, parent=None):
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         path.addRect(-4, -4, 8, 8)
         path.addRect(-5, -5, 10, 10)
         path.moveTo(-8, 0)
@@ -49,37 +49,37 @@ class PickerCrosshairItem( qt4.QGraphicsPathItem ):
         path.moveTo(0, -8)
         path.lineTo(0, 8)
 
-        qt4.QGraphicsPathItem.__init__(self, path, parent)
-        self.setBrush(qt4.QBrush(qt4.Qt.black))
-        self.setFlags(self.flags() | qt4.QGraphicsItem.ItemIsFocusable)
+        qt.QGraphicsPathItem.__init__(self, path, parent)
+        self.setBrush(qt.QBrush(qt.Qt.black))
+        self.setFlags(self.flags() | qt.QGraphicsItem.ItemIsFocusable)
 
     def paint(self, painter, option, widget):
         """Override this to enforce the global antialiasing setting"""
         aa = setting.settingdb['plot_antialias']
         painter.save()
-        painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
-        qt4.QGraphicsPathItem.paint(self, painter, option, widget)
+        painter.setRenderHint(qt.QPainter.Antialiasing, aa)
+        qt.QGraphicsPathItem.paint(self, painter, option, widget)
         painter.restore()
 
     def focusOutEvent(self, event):
-        qt4.QGraphicsPathItem.focusOutEvent(self, event)
+        qt.QGraphicsPathItem.focusOutEvent(self, event)
         self.hide()
 
-class RenderControl(qt4.QObject):
+class RenderControl(qt.QObject):
     """Object for rendering plots in a separate thread."""
 
     # emitted when new item on plot queue
-    sigQueueChange = qt4.pyqtSignal(int)
+    sigQueueChange = qt.pyqtSignal(int)
 
     # when a rendering job is finished
-    signalRenderFinished = qt4.pyqtSignal(
-        int, qt4.QImage, document.PaintHelper)
+    signalRenderFinished = qt.pyqtSignal(
+        int, qt.QImage, document.PaintHelper)
 
     def __init__(self, plotwindow):
         """Start up numthreads rendering threads."""
-        qt4.QObject.__init__(self)
-        self.sem = qt4.QSemaphore()
-        self.mutex = qt4.QMutex()
+        qt.QObject.__init__(self)
+        self.sem = qt.QSemaphore()
+        self.mutex = qt.QMutex()
         self.threads = []
         self.exit = False
         self.latestjobs = []
@@ -92,7 +92,7 @@ class RenderControl(qt4.QObject):
     def updateNumberThreads(self, num=None):
         """Changes the number of rendering threads."""
         if num is None:
-            if qt4.QFontDatabase.supportsThreadedFontRendering():
+            if qt.QFontDatabase.supportsThreadedFontRendering():
                 # use number of threads in preference
                 num = setting.settingdb['plot_numthreads']
             else:
@@ -133,15 +133,15 @@ class RenderControl(qt4.QObject):
 
         # don't process jobs which have been superseded
         if lastadded == jobid:
-            img = qt4.QImage(
+            img = qt.QImage(
                 int(helper.rawpagesize[0]), int(helper.rawpagesize[1]),
-                qt4.QImage.Format_ARGB32_Premultiplied)
+                qt.QImage.Format_ARGB32_Premultiplied)
             img.fill( setting.settingdb.color('page').rgb() )
 
-            painter = qt4.QPainter(img)
+            painter = qt.QPainter(img)
             aa = self.plotwindow.antialias
-            painter.setRenderHint(qt4.QPainter.Antialiasing, aa)
-            painter.setRenderHint(qt4.QPainter.TextAntialiasing, aa)
+            painter.setRenderHint(qt.QPainter.Antialiasing, aa)
+            painter.setRenderHint(qt.QPainter.TextAntialiasing, aa)
             helper.renderToPainter(painter)
             painter.end()
 
@@ -174,13 +174,13 @@ class RenderControl(qt4.QObject):
             # process job in current thread if multithreading disabled
             self.processNextJob()
 
-class RenderThread( qt4.QThread ):
+class RenderThread( qt.QThread ):
     """A thread for processing rendering jobs.
     This is controlled by a RenderControl object
     """
 
     def __init__(self, rendercontrol):
-        qt4.QThread.__init__(self)
+        qt.QThread.__init__(self)
         self.rc = rendercontrol
 
     def run(self):
@@ -199,31 +199,31 @@ class RenderThread( qt4.QThread ):
                 sys.stderr.write(_("Error in rendering thread\n"))
                 traceback.print_exc(file=sys.stderr)
 
-class ControlGraphRoot(qt4.QGraphicsItem):
+class ControlGraphRoot(qt.QGraphicsItem):
     """Control graph items are connected to this root item.
     We don't use a group here as it would swallow parent events."""
     def __init__(self):
-        qt4.QGraphicsItem.__init__(self)
+        qt.QGraphicsItem.__init__(self)
     def paint(self, painter, option, widget=None):
         pass
     def boundingRect(self):
-        return qt4.QRectF()
+        return qt.QRectF()
 
-class PlotWindow( qt4.QGraphicsView ):
+class PlotWindow( qt.QGraphicsView ):
     """Class to show the plot(s) in a scrollable window."""
 
     # emitted when new item on plot queue
-    sigQueueChange = qt4.pyqtSignal(int)
+    sigQueueChange = qt.pyqtSignal(int)
     # on drawing a page
-    sigUpdatePage = qt4.pyqtSignal(int)
+    sigUpdatePage = qt.pyqtSignal(int)
     # point picked on plot
-    sigPointPicked = qt4.pyqtSignal(object)
+    sigPointPicked = qt.pyqtSignal(object)
     # picker enabled
-    sigPickerEnabled = qt4.pyqtSignal(bool)
+    sigPickerEnabled = qt.pyqtSignal(bool)
     # axis values update from moving mouse
-    sigAxisValuesFromMouse = qt4.pyqtSignal(dict)
+    sigAxisValuesFromMouse = qt.pyqtSignal(dict)
     # gives widget clicked
-    sigWidgetClicked = qt4.pyqtSignal(object, str)
+    sigWidgetClicked = qt.pyqtSignal(object, str)
 
     # how often the document can update
     updateintervals = (
@@ -244,13 +244,13 @@ class PlotWindow( qt4.QGraphicsView ):
         menu gives a menu to add any menu items to
         """
 
-        qt4.QGraphicsView.__init__(self, parent)
-        self.setBackgroundRole(qt4.QPalette.Dark)
-        self.scene = qt4.QGraphicsScene()
+        qt.QGraphicsView.__init__(self, parent)
+        self.setBackgroundRole(qt.QPalette.Dark)
+        self.scene = qt.QGraphicsScene()
         self.setScene(self.scene)
 
         # this graphics scene item is the actual graph
-        pixmap = qt4.QPixmap(1, 1)
+        pixmap = qt.QPixmap(1, 1)
         self.dpi = (pixmap.logicalDpiX(), pixmap.logicalDpiY())
         self.pixmapitem = self.scene.addPixmap(pixmap)
 
@@ -266,7 +266,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # zoom rectangle for zooming into graph (not shown normally)
         self.zoomrect = self.scene.addRect(
-            0, 0, 100, 100, qt4.QPen(qt4.Qt.DotLine))
+            0, 0, 100, 100, qt.QPen(qt.Qt.DotLine))
         self.zoomrect.setZValue(2.)
         self.zoomrect.hide()
 
@@ -312,12 +312,12 @@ class PlotWindow( qt4.QGraphicsView ):
         self.sumwheeldelta = 0
 
         # set up redrawing timer
-        self.timer = qt4.QTimer(self)
+        self.timer = qt.QTimer(self)
         self.timer.timeout.connect(self.checkPlotUpdate)
 
         # for drag scrolling
         self.grabpos = None
-        self.scrolltimer = qt4.QTimer(self)
+        self.scrolltimer = qt.QTimer(self)
         self.scrolltimer.setSingleShot(True)
 
         # for turning clicking into scrolling after a period
@@ -337,7 +337,7 @@ class PlotWindow( qt4.QGraphicsView ):
         self.antialias = setting.settingdb['plot_antialias']
 
         # allow window to get focus, to allow context menu
-        self.setFocusPolicy(qt4.Qt.StrongFocus)
+        self.setFocusPolicy(qt.Qt.StrongFocus)
 
         # get mouse move events if mouse is not pressed
         self.setMouseTracking(True)
@@ -348,14 +348,14 @@ class PlotWindow( qt4.QGraphicsView ):
     def hideEvent(self, event):
         """Window closing, so exit rendering threads."""
         self.rendercontrol.exitThreads()
-        qt4.QGraphicsView.hideEvent(self, event)
+        qt.QGraphicsView.hideEvent(self, event)
 
     def sizeHint(self):
         """Return size hint for window."""
         p = self.pixmapitem.pixmap()
         if p.width() <= 1 and p.height() <= 1:
             # if the document has been uninitialized, get the doc size
-            return qt4.QSize(*self.document.docSize())
+            return qt.QSize(*self.document.docSize())
         return p.size()
 
     def showToolbar(self, show=True):
@@ -365,13 +365,13 @@ class PlotWindow( qt4.QGraphicsView ):
     def createToolbar(self, parent, menu=None):
         """Make a view toolbar, and optionally update menu."""
 
-        self.viewtoolbar = qt4.QToolBar(_("View toolbar - Veusz"), parent)
+        self.viewtoolbar = qt.QToolBar(_("View toolbar - Veusz"), parent)
         self.viewtoolbar.setObjectName('veuszviewtoolbar')
         iconsize = setting.settingdb['toolbar_size']
-        self.viewtoolbar.setIconSize(qt4.QSize(iconsize, iconsize))
+        self.viewtoolbar.setIconSize(qt.QSize(iconsize, iconsize))
         self.viewtoolbar.hide()
         if parent:
-            parent.addToolBar(qt4.Qt.TopToolBarArea, self.viewtoolbar)
+            parent.addToolBar(qt.Qt.TopToolBarArea, self.viewtoolbar)
 
         if parent and hasattr(parent, 'vzactions'):
             # share actions with parent if possible
@@ -472,7 +472,7 @@ class PlotWindow( qt4.QGraphicsView ):
             ))
 
         # define action group for various different selection models
-        grp = self.selectactiongrp = qt4.QActionGroup(self)
+        grp = self.selectactiongrp = qt.QActionGroup(self)
         grp.setExclusive(True)
         for a in ('view.select', 'view.pick', 'view.zoomgraph'):
             actions[a].setActionGroup(grp)
@@ -648,13 +648,13 @@ class PlotWindow( qt4.QGraphicsView ):
         we turn the click into a scrolling click."""
 
         if self.currentclickmode == 'select':
-            qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.SizeAllCursor))
+            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.SizeAllCursor))
             self.currentclickmode = 'scroll'
 
     def mousePressEvent(self, event):
         """Allow user to drag window around."""
 
-        qt4.QGraphicsView.mousePressEvent(self, event)
+        qt.QGraphicsView.mousePressEvent(self, event)
         if self.painthelper is None:
             return
 
@@ -664,10 +664,10 @@ class PlotWindow( qt4.QGraphicsView ):
                              items[0] is not self.pixmapitem or
                              self.painthelper is None )
 
-        if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
+        if event.button() == qt.Qt.LeftButton and not self.ignoreclick:
 
             # need to copy position, otherwise it gets reused!
-            self.winpos = qt4.QPoint(event.pos())
+            self.winpos = qt.QPoint(event.pos())
             self.grabpos = self.mapToScene(self.winpos)
 
             if self.clickmode == 'select':
@@ -679,12 +679,12 @@ class PlotWindow( qt4.QGraphicsView ):
 
             elif self.clickmode == 'pick':
                 self.pickeritem.show()
-                self.pickeritem.setFocus(qt4.Qt.MouseFocusReason)
+                self.pickeritem.setFocus(qt.Qt.MouseFocusReason)
                 self.doPick(event.pos())
 
             elif self.clickmode == 'scroll':
-                qt4.QApplication.setOverrideCursor(
-                    qt4.QCursor(qt4.Qt.SizeAllCursor))
+                qt.QApplication.setOverrideCursor(
+                    qt.QCursor(qt.Qt.SizeAllCursor))
 
             elif self.clickmode == 'graphzoom':
                 self.zoomrect.setRect(
@@ -700,7 +700,7 @@ class PlotWindow( qt4.QGraphicsView ):
     def mouseMoveEvent(self, event):
         """Scroll window by how much the mouse has moved since last time."""
 
-        qt4.QGraphicsView.mouseMoveEvent(self, event)
+        qt.QGraphicsView.mouseMoveEvent(self, event)
         if self.painthelper is None:
             return
 
@@ -718,15 +718,15 @@ class PlotWindow( qt4.QGraphicsView ):
             scrolly.setValue( scrolly.value() + dy )
 
             # need to copy point
-            self.winpos = qt4.QPoint(event.pos())
+            self.winpos = qt.QPoint(event.pos())
 
         elif self.currentclickmode == 'graphzoom' and self.grabpos is not None:
             pos2 = self.mapToScene(event.pos())
-            self.zoomrect.setRect(qt4.QRectF(
-                qt4.QPointF(
+            self.zoomrect.setRect(qt.QRectF(
+                qt.QPointF(
                     min(self.grabpos.x(), pos2.x()),
                     min(self.grabpos.y(), pos2.y())),
-                qt4.QPointF(
+                qt.QPointF(
                     max(self.grabpos.x(), pos2.x()),
                     max(self.grabpos.y(), pos2.y())),
                 ))
@@ -746,11 +746,11 @@ class PlotWindow( qt4.QGraphicsView ):
         """If the mouse button is released, check whether the mouse
         clicked on a widget, and emit a sigWidgetClicked(widget,mode)."""
 
-        qt4.QGraphicsView.mouseReleaseEvent(self, event)
+        qt.QGraphicsView.mouseReleaseEvent(self, event)
         if self.painthelper is None:
             return
 
-        if event.button() == qt4.Qt.LeftButton and not self.ignoreclick:
+        if event.button() == qt.Qt.LeftButton and not self.ignoreclick:
             event.accept()
             self.scrolltimer.stop()
             if self.currentclickmode == 'select':
@@ -761,7 +761,7 @@ class PlotWindow( qt4.QGraphicsView ):
                 # return the cursor to normal after scrolling
                 self.clickmode = 'select'
                 self.currentclickmode = None
-                qt4.QApplication.restoreOverrideCursor()
+                qt.QApplication.restoreOverrideCursor()
             elif self.currentclickmode == 'graphzoom':
                 self.zoomrect.hide()
                 self.doZoomRect(self.mapToScene(event.pos()))
@@ -776,10 +776,10 @@ class PlotWindow( qt4.QGraphicsView ):
         if self.pickeritem.hasFocus():
 
             k = event.key()
-            if k == qt4.Qt.Key_Left or k == qt4.Qt.Key_Right:
+            if k == qt.Qt.Key_Left or k == qt.Qt.Key_Right:
                 # navigate to the previous or next point on the curve
                 event.accept()
-                dir = 'right' if k == qt4.Qt.Key_Right else 'left'
+                dir = 'right' if k == qt.Qt.Key_Right else 'left'
                 ix = self.pickerinfo.index
                 pickinfo = self.pickerinfo.widget.pickIndex(
                     ix, dir, self.painthelper.widgetBounds(
@@ -789,7 +789,7 @@ class PlotWindow( qt4.QGraphicsView ):
                     self.emitPicked(pickinfo)
                 return
 
-            elif k == qt4.Qt.Key_Up or k == qt4.Qt.Key_Down:
+            elif k == qt.Qt.Key_Up or k == qt.Qt.Key_Down:
                 # navigate to the next plot up or down on the screen
                 event.accept()
                 p = self.pickeritem.pos()
@@ -815,8 +815,9 @@ class PlotWindow( qt4.QGraphicsView ):
 
                     # take the new point which is closest vertically to the current
                     # one and either above or below it as appropriate
-                    if abs(dy) < dist and ( (k == qt4.Qt.Key_Up and dy > 0)
-                            or (k == qt4.Qt.Key_Down and dy < 0) ):
+                    if abs(dy) < dist and (
+                            (k == qt.Qt.Key_Up and dy > 0) or
+                            (k == qt.Qt.Key_Down and dy < 0) ):
                         pickinfo = pi
                         dist = abs(dy)
 
@@ -831,12 +832,12 @@ class PlotWindow( qt4.QGraphicsView ):
                 return
 
         # handle up-stream
-        qt4.QGraphicsView.keyPressEvent(self, event)
+        qt.QGraphicsView.keyPressEvent(self, event)
 
     def wheelEvent(self, event):
         """For zooming in or moving."""
 
-        if event.modifiers() & qt4.Qt.ControlModifier:
+        if event.modifiers() & qt.Qt.ControlModifier:
             # zoom in/out with ctrl held down
             d = event.angleDelta()
             delta = d.x() if d.x() != 0 else d.y()
@@ -848,7 +849,7 @@ class PlotWindow( qt4.QGraphicsView ):
                 self.slotViewZoomIn()
                 self.sumwheeldelta -= 120
             event.accept()
-        elif event.modifiers() & qt4.Qt.ShiftModifier:
+        elif event.modifiers() & qt.Qt.ShiftModifier:
             # scroll horizontally if shift is held down
             d = event.pixelDelta()
             if d.isNull():
@@ -859,7 +860,7 @@ class PlotWindow( qt4.QGraphicsView ):
             scrollx.setValue(scrollx.value() + delta)
             event.accept()
         else:
-            qt4.QGraphicsView.wheelEvent(self, event)
+            qt.QGraphicsView.wheelEvent(self, event)
 
     def identifyAndClickWidget(self, x, y, modifier):
         """Work out which widget was clicked, and if necessary send
@@ -876,9 +877,9 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # tell connected objects that widget was clicked
         if widget is not None:
-            if modifier & qt4.Qt.ControlModifier:
+            if modifier & qt.Qt.ControlModifier:
                 mode = 'toggle'
-            elif modifier & qt4.Qt.ShiftModifier:
+            elif modifier & qt.Qt.ShiftModifier:
                 mode = 'add'
             else:
                 mode = 'new'
@@ -905,7 +906,7 @@ class PlotWindow( qt4.QGraphicsView ):
         """Get the the selected page."""
         return self.pagenumber
 
-    @qt4.pyqtSlot(int)
+    @qt.pyqtSlot(int)
     def slotDocModified(self, ismodified):
         """Update plot on document being modified."""
         # only update if doc is modified and the update policy is set
@@ -975,7 +976,7 @@ class PlotWindow( qt4.QGraphicsView ):
             self.painthelper = None
             self.pagenumber = 0
             size = self.document.docSize()
-            pixmap = qt4.QPixmap(*size)
+            pixmap = qt.QPixmap(*size)
             pixmap.fill( setting.settingdb.color('page') )
             self.setSceneRect(0, 0, *size)
             self.pixmapitem.setPixmap(pixmap)
@@ -991,7 +992,7 @@ class PlotWindow( qt4.QGraphicsView ):
         """Update image on display if rendering (usually in other
         thread) finished."""
         dpr = helper.devicepixelratio
-        bufferpixmap = qt4.QPixmap.fromImage(img)
+        bufferpixmap = qt.QPixmap.fromImage(img)
         bufferpixmap.setDevicePixelRatio(dpr)
         self.setSceneRect(0, 0, bufferpixmap.width()/dpr, bufferpixmap.height()/dpr)
         self.pixmapitem.setPixmap(bufferpixmap)
@@ -1006,7 +1007,7 @@ class PlotWindow( qt4.QGraphicsView ):
     def contextMenuEvent(self, event):
         """Show context menu."""
 
-        menu = qt4.QMenu(self)
+        menu = qt.QMenu(self)
 
         # add some useful entries
         menu.addAction( self.vzactions['view.zoommenu'] )
@@ -1025,7 +1026,7 @@ class PlotWindow( qt4.QGraphicsView ):
 
         # Update policy submenu
         submenu = menu.addMenu(_('Updates'))
-        intgrp = qt4.QActionGroup(self)
+        intgrp = qt.QActionGroup(self)
 
         # bind interval options to actions
         for intv, text in self.updateintervals:
@@ -1044,7 +1045,7 @@ class PlotWindow( qt4.QGraphicsView ):
         act.setCheckable(True)
         act.setChecked(self.antialias)
 
-        menu.exec_(qt4.QCursor.pos())
+        menu.exec_(qt.QCursor.pos())
 
     def actionForceUpdate(self):
         """Force an update for the graph."""
@@ -1190,22 +1191,22 @@ class PlotWindow( qt4.QGraphicsView ):
         if self.clickmode == 'select':
             self.pixmapitem.unsetCursor()
         elif self.clickmode == 'graphzoom':
-            self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
+            self.pixmapitem.setCursor(qt.Qt.CrossCursor)
         elif self.clickmode == 'pick':
-            self.pixmapitem.setCursor(qt4.Qt.CrossCursor)
+            self.pixmapitem.setCursor(qt.Qt.CrossCursor)
             self.sigPickerEnabled.emit(True)
 
     def getClick(self):
         """Return a click point from the graph."""
 
         # wait for click from user
-        qt4.QApplication.setOverrideCursor(qt4.QCursor(qt4.Qt.CrossCursor))
+        qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.CrossCursor))
         oldmode = self.clickmode
         self.clickmode = 'viewgetclick'
         while self.clickmode == 'viewgetclick':
-            qt4.qApp.processEvents()
+            qt.qApp.processEvents()
         self.clickmode = oldmode
-        qt4.QApplication.restoreOverrideCursor()
+        qt.QApplication.restoreOverrideCursor()
 
         # take clicked point and convert to coords of scrollview
         pt = self.grabpos
@@ -1268,12 +1269,12 @@ class PlotWindow( qt4.QGraphicsView ):
                     for control in cgis:
                         control.createGraphicsItem(self.controlgraphroot)
 
-class FullScreenPlotWindow(qt4.QScrollArea):
+class FullScreenPlotWindow(qt.QScrollArea):
     """Window for showing plot in full-screen mode."""
 
     def __init__(self, document, pagenumber):
-        qt4.QScrollArea.__init__(self)
-        self.setFrameShape(qt4.QFrame.NoFrame)
+        qt.QScrollArea.__init__(self)
+        self.setFrameShape(qt.QFrame.NoFrame)
         self.setWidgetResizable(True)
 
         # window which shows plot
@@ -1286,7 +1287,7 @@ class FullScreenPlotWindow(qt4.QScrollArea):
 
         self.showFullScreen()
 
-        self.toolbar = qt4.QToolBar(_("Full screen toolbar"), self)
+        self.toolbar = qt.QToolBar(_("Full screen toolbar"), self)
         self.toolbar.addAction(utils.getIcon("kde-window-close"), _("Close"),
                                self.close)
         for a in ('view.zoom11', 'view.zoomin', 'view.zoomout',
@@ -1298,7 +1299,7 @@ class FullScreenPlotWindow(qt4.QScrollArea):
     def resizeEvent(self, event):
         """Make zoom fit screen."""
 
-        qt4.QScrollArea.resizeEvent(self, event)
+        qt.QScrollArea.resizeEvent(self, event)
 
         # size graph to fill screen
         pagesize = self.document.pageSize(self.plotwin.pagenumber,
@@ -1314,8 +1315,8 @@ class FullScreenPlotWindow(qt4.QScrollArea):
     def keyPressEvent(self, event):
 
         k = event.key()
-        if k == qt4.Qt.Key_Escape:
+        if k == qt.Qt.Key_Escape:
             event.accept()
             self.close()
             return
-        qt4.QScrollArea.keyPressEvent(self, event)
+        qt.QScrollArea.keyPressEvent(self, event)

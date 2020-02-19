@@ -24,13 +24,13 @@ from __future__ import division
 import os
 
 from ..compat import cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ReloadDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ReloadData(VeuszDialog):
     """Dialog for reloading linked datasets."""
@@ -61,16 +61,16 @@ class ReloadData(VeuszDialog):
         self.intervalTime.valueChanged[int].connect(self.intervalUpdate)
 
         # timer to reload data
-        self.intervalTimer = qt4.QTimer()
+        self.intervalTimer = qt.QTimer()
         self.intervalTimer.timeout.connect(self.reloadIfChanged)
 
         # manual reload
         self.reloadbutton = self.buttonBox.addButton(
-            "&Reload again", qt4.QDialogButtonBox.ApplyRole)
+            "&Reload again", qt.QDialogButtonBox.ApplyRole)
         self.reloadbutton.clicked.connect(self.reloadData)
 
         # close by default, not reload
-        self.buttonBox.button(qt4.QDialogButtonBox.Close).setDefault(True)
+        self.buttonBox.button(qt.QDialogButtonBox.Close).setDefault(True)
 
     def statLinkedFiles(self):
         """Stat linked files.

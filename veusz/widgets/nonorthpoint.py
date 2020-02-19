@@ -22,7 +22,7 @@ from __future__ import division
 import numpy as N
 
 from ..compat import czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import datasets
 from .. import setting
@@ -36,7 +36,7 @@ from .point import MarkerFillBrush
 
 def _(text, disambiguation=None, context='NonOrthPoint'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class NonOrthPoint(Widget):
     '''Widget for plotting points in a non-orthogonal plot.'''
@@ -207,7 +207,7 @@ class NonOrthPoint(Widget):
             return
 
         x1, y1, x2, y2 = posn
-        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        cliprect = qt.QRectF( qt.QPointF(x1, y1), qt.QPointF(x2, y2) )
         painter = phelper.painter(self, posn)
         with painter:
             self.parent.setClip(painter, posn)
@@ -230,9 +230,9 @@ class NonOrthPoint(Widget):
 
                 # plot line
                 if not s.PlotLine.hide:
-                    painter.setBrush( qt4.QBrush() )
+                    painter.setBrush( qt.QBrush() )
                     painter.setPen(s.PlotLine.makeQPen(painter))
-                    pts = qt4.QPolygonF()
+                    pts = qt.QPolygonF()
                     utils.addNumpyToPolygonF(pts, px, py)
                     utils.plotClippedPolyline(painter, cliprect, pts)
 

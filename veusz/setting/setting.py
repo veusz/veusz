@@ -33,7 +33,7 @@ import sys
 import numpy as N
 
 from ..compat import cbasestr, cstr, crepr
-from .. import qtall as qt4
+from .. import qtall as qt
 from . import controls
 from .settingdb import settingdb, uilocale, ui_floattostring, ui_stringtofloat
 from .reference import ReferenceBase, Reference
@@ -41,9 +41,9 @@ from .reference import ReferenceBase, Reference
 from .. import utils
 from .. import datasets
 
-class OnModified(qt4.QObject):
+class OnModified(qt.QObject):
     """onmodified is emitted from an object contained in each setting."""
-    onModified = qt4.pyqtSignal()
+    onModified = qt.pyqtSignal()
 
 class Setting(object):
     """A class to store a value with a particular type."""
@@ -1333,7 +1333,7 @@ class Color(ChoiceOrMore):
             while w is not None and not w.iswidget:
                 w = w.parent
             if w is None:
-                return qt4.QColor()
+                return qt.QColor()
             # get automatic color
             return painter.docColor(w.autoColor(painter, dataindex=dataindex))
         else:
@@ -1347,26 +1347,30 @@ class FillStyle(Choice):
 
     typename = 'fill-style'
 
-    _fillstyles = [ 'solid', 'horizontal', 'vertical', 'cross',
-                    'forward diagonals', 'backward diagonals',
-                    'diagonal cross',
-                    '94% dense', '88% dense', '63% dense', '50% dense',
-                    '37% dense', '12% dense', '6% dense' ]
+    _fillstyles = [
+        'solid', 'horizontal', 'vertical', 'cross',
+        'forward diagonals', 'backward diagonals',
+        'diagonal cross',
+        '94% dense', '88% dense', '63% dense', '50% dense',
+        '37% dense', '12% dense', '6% dense'
+    ]
 
-    _fillcnvt = { 'solid': qt4.Qt.SolidPattern,
-                  'horizontal': qt4.Qt.HorPattern,
-                  'vertical': qt4.Qt.VerPattern,
-                  'cross': qt4.Qt.CrossPattern,
-                  'forward diagonals': qt4.Qt.FDiagPattern,
-                  'backward diagonals': qt4.Qt.BDiagPattern,
-                  'diagonal cross': qt4.Qt.DiagCrossPattern,
-                  '94% dense': qt4.Qt.Dense1Pattern,
-                  '88% dense': qt4.Qt.Dense2Pattern,
-                  '63% dense': qt4.Qt.Dense3Pattern,
-                  '50% dense': qt4.Qt.Dense4Pattern,
-                  '37% dense': qt4.Qt.Dense5Pattern,
-                  '12% dense': qt4.Qt.Dense6Pattern,
-                  '6% dense': qt4.Qt.Dense7Pattern }
+    _fillcnvt = {
+        'solid': qt.Qt.SolidPattern,
+        'horizontal': qt.Qt.HorPattern,
+        'vertical': qt.Qt.VerPattern,
+        'cross': qt.Qt.CrossPattern,
+        'forward diagonals': qt.Qt.FDiagPattern,
+        'backward diagonals': qt.Qt.BDiagPattern,
+        'diagonal cross': qt.Qt.DiagCrossPattern,
+        '94% dense': qt.Qt.Dense1Pattern,
+        '88% dense': qt.Qt.Dense2Pattern,
+        '63% dense': qt.Qt.Dense3Pattern,
+        '50% dense': qt.Qt.Dense4Pattern,
+        '37% dense': qt.Qt.Dense5Pattern,
+        '12% dense': qt.Qt.Dense6Pattern,
+        '6% dense': qt.Qt.Dense7Pattern,
+    }
 
     controls.FillStyle._fills = _fillstyles
     controls.FillStyle._fillcnvt = _fillcnvt
@@ -1391,35 +1395,38 @@ class LineStyle(Choice):
     typename = 'line-style'
 
     # list of allowed line styles
-    _linestyles = ['solid', 'dashed', 'dotted',
-                   'dash-dot', 'dash-dot-dot', 'dotted-fine',
-                   'dashed-fine', 'dash-dot-fine',
-                   'dot1', 'dot2', 'dot3', 'dot4',
-                   'dash1', 'dash2', 'dash3', 'dash4', 'dash5',
-                   'dashdot1', 'dashdot2', 'dashdot3']
+    _linestyles = [
+        'solid', 'dashed', 'dotted',
+        'dash-dot', 'dash-dot-dot', 'dotted-fine',
+        'dashed-fine', 'dash-dot-fine',
+        'dot1', 'dot2', 'dot3', 'dot4',
+        'dash1', 'dash2', 'dash3', 'dash4', 'dash5',
+        'dashdot1', 'dashdot2', 'dashdot3'
+    ]
 
     # convert from line styles to Qt constants and a custom pattern (if any)
-    _linecnvt = { 'solid': (qt4.Qt.SolidLine, None),
-                  'dashed': (qt4.Qt.DashLine, None),
-                  'dotted': (qt4.Qt.DotLine, None),
-                  'dash-dot': (qt4.Qt.DashDotLine, None),
-                  'dash-dot-dot': (qt4.Qt.DashDotDotLine, None),
-                  'dotted-fine': (qt4.Qt.CustomDashLine, [2, 4]),
-                  'dashed-fine': (qt4.Qt.CustomDashLine, [8, 4]),
-                  'dash-dot-fine': (qt4.Qt.CustomDashLine, [8, 4, 2, 4]),
-                  'dot1': (qt4.Qt.CustomDashLine, [0.1, 2]),
-                  'dot2': (qt4.Qt.CustomDashLine, [0.1, 4]),
-                  'dot3': (qt4.Qt.CustomDashLine, [0.1, 6]),
-                  'dot4': (qt4.Qt.CustomDashLine, [0.1, 8]),
-                  'dash1': (qt4.Qt.CustomDashLine, [4, 4]),
-                  'dash2': (qt4.Qt.CustomDashLine, [4, 8]),
-                  'dash3': (qt4.Qt.CustomDashLine, [8, 8]),
-                  'dash4': (qt4.Qt.CustomDashLine, [16, 8]),
-                  'dash5': (qt4.Qt.CustomDashLine, [16, 16]),
-                  'dashdot1': (qt4.Qt.CustomDashLine, [0.1, 4, 4, 4]),
-                  'dashdot2': (qt4.Qt.CustomDashLine, [0.1, 4, 8, 4]),
-                  'dashdot3': (qt4.Qt.CustomDashLine, [0.1, 2, 4, 2]),
-                 }
+    _linecnvt = {
+        'solid': (qt.Qt.SolidLine, None),
+        'dashed': (qt.Qt.DashLine, None),
+        'dotted': (qt.Qt.DotLine, None),
+        'dash-dot': (qt.Qt.DashDotLine, None),
+        'dash-dot-dot': (qt.Qt.DashDotDotLine, None),
+        'dotted-fine': (qt.Qt.CustomDashLine, [2, 4]),
+        'dashed-fine': (qt.Qt.CustomDashLine, [8, 4]),
+        'dash-dot-fine': (qt.Qt.CustomDashLine, [8, 4, 2, 4]),
+        'dot1': (qt.Qt.CustomDashLine, [0.1, 2]),
+        'dot2': (qt.Qt.CustomDashLine, [0.1, 4]),
+        'dot3': (qt.Qt.CustomDashLine, [0.1, 6]),
+        'dot4': (qt.Qt.CustomDashLine, [0.1, 8]),
+        'dash1': (qt.Qt.CustomDashLine, [4, 4]),
+        'dash2': (qt.Qt.CustomDashLine, [4, 8]),
+        'dash3': (qt.Qt.CustomDashLine, [8, 8]),
+        'dash4': (qt.Qt.CustomDashLine, [16, 8]),
+        'dash5': (qt.Qt.CustomDashLine, [16, 16]),
+        'dashdot1': (qt.Qt.CustomDashLine, [0.1, 4, 4, 4]),
+        'dashdot2': (qt.Qt.CustomDashLine, [0.1, 4, 8, 4]),
+        'dashdot3': (qt.Qt.CustomDashLine, [0.1, 2, 4, 2]),
+    }
 
     controls.LineStyle._lines = _linestyles
 
@@ -1608,7 +1615,7 @@ class LineSet(Setting):
         """
 
         if len(self.val) == 0:
-            return qt4.QPen(qt4.Qt.NoPen)
+            return qt.QPen(qt.Qt.NoPen)
         else:
             row = row % len(self.val)
             v = self.val[row]
@@ -1616,13 +1623,13 @@ class LineSet(Setting):
             width = Distance.convertDistance(painter, width)
             style, dashpattern = LineStyle._linecnvt[style]
             col = painter.docColor(color)
-            pen = qt4.QPen(col, width, style)
+            pen = qt.QPen(col, width, style)
 
             if dashpattern:
                 pen.setDashPattern(dashpattern)
 
             if hide:
-                pen.setStyle(qt4.Qt.NoPen)
+                pen.setStyle(qt.Qt.NoPen)
             return pen
 
 class FillSet(Setting):

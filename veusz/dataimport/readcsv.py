@@ -28,7 +28,7 @@ from .base import ImportingError
 from ..compat import crange, cnext, cstr, CIterator
 from .. import datasets
 from .. import utils
-from .. import qtall as qt4
+from .. import qtall as qt
 
 class _FileReaderCols(CIterator):
     """Read a CSV file in rows. This acts as an iterator.
@@ -123,7 +123,7 @@ class ReadCSV(object):
         """
 
         self.params = params
-        self.numericlocale = qt4.QLocale(params.numericlocale)
+        self.numericlocale = qt.QLocale(params.numericlocale)
         self.datere = re.compile(
             utils.dateStrToRegularExpression(params.dateformat))
 

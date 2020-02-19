@@ -23,7 +23,7 @@ import math
 import numpy as N
 
 from ..compat import crange, czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import document
 from .. import utils
@@ -32,7 +32,7 @@ from .plotters import GenericPlotter
 
 def _(text, disambiguation=None, context='BoxPlot'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def percentile(sortedds, perc):
     """Given a sorted dataset, get the percentile perc.
@@ -51,16 +51,16 @@ def percentile(sortedds, perc):
 def swapline(painter, x1, y1, x2, y2, swap):
     """Draw line, swapping x and y coordinates if swap is True."""
     if swap:
-        painter.drawLine( qt4.QPointF(y1, x1), qt4.QPointF(y2, x2) )
+        painter.drawLine( qt.QPointF(y1, x1), qt.QPointF(y2, x2) )
     else:
-        painter.drawLine( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        painter.drawLine( qt.QPointF(x1, y1), qt.QPointF(x2, y2) )
 
 def swapbox(painter, x1, y1, x2, y2, swap):
     """Return box, swapping x and y coordinates if swap is True."""
     if swap:
-        return qt4.QRectF(qt4.QPointF(y1, x1), qt4.QPointF(y2, x2))
+        return qt.QRectF(qt.QPointF(y1, x1), qt.QPointF(y2, x2))
     else:
-        return qt4.QRectF(qt4.QPointF(x1, y1), qt4.QPointF(x2, y2))
+        return qt.QRectF(qt.QPointF(x1, y1), qt.QPointF(x2, y2))
 
 class _Stats(object):
     """Store statistics about box."""
@@ -331,7 +331,7 @@ class BoxPlot(GenericPlotter):
 
         # draw whisker top to bottom
         p = s.Whisker.makeQPenWHide(painter)
-        p.setCapStyle(qt4.Qt.FlatCap)
+        p.setCapStyle(qt.Qt.FlatCap)
         painter.setPen(p)
         swapline(painter, boxposn, topwhisplt, boxposn, botwhisplt, horz)
         # draw ends of whiskers
@@ -342,14 +342,14 @@ class BoxPlot(GenericPlotter):
                  boxposn+endsize/2, botwhisplt, horz)
 
         # draw box fill
-        boxpath = qt4.QPainterPath()
+        boxpath = qt.QPainterPath()
         boxpath.addRect( swapbox(painter, boxposn-width/2, botplt,
                                  boxposn+width/2, topplt, horz) )
         utils.brushExtFillPath(painter, s.Fill, boxpath)
 
         # draw line across box
         p = s.Whisker.makeQPenWHide(painter)
-        p.setCapStyle(qt4.Qt.FlatCap)
+        p.setCapStyle(qt.Qt.FlatCap)
         painter.setPen(p)
         swapline(painter, boxposn-width/2, medplt,
                  boxposn+width/2, medplt, horz)

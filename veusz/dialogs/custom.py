@@ -21,15 +21,15 @@ import ast
 import copy
 
 from ..compat import cstrerror
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="CustomDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class CustomItemModel(qt4.QAbstractTableModel):
+class CustomItemModel(qt.QAbstractTableModel):
     """A model for editing custom items."""
 
     # headers for type of widget
@@ -61,7 +61,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
         ctype is 'definition', 'import', 'color' or 'colormap'
         """
 
-        qt4.QAbstractTableModel.__init__(self, parent)
+        qt.QAbstractTableModel.__init__(self, parent)
         self.doc = doc
         self.ctype = ctype
         self.attr = document.OperationSetCustom.type_to_attr[ctype]
@@ -86,7 +86,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
 
     def data(self, index, role):
         """Lookup data in document.evaluate.customs list."""
-        if role in (qt4.Qt.DisplayRole, qt4.Qt.EditRole):
+        if role in (qt.Qt.DisplayRole, qt.Qt.EditRole):
             try:
                 defn = self._getCustoms()[index.row()]
             except IndexError:
@@ -97,7 +97,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
                 return repr(defn[col])
             else:
                 return defn[col]
-        elif role == qt4.Qt.ToolTipRole:
+        elif role == qt.Qt.ToolTipRole:
             # tooltip on row for new entries on last row
             if index.row() == len(self._getCustoms()):
                 return self.tooltips[self.ctype][index.column()]
@@ -107,13 +107,13 @@ class CustomItemModel(qt4.QAbstractTableModel):
     def flags(self, index):
         """Items are editable"""
         return (
-            qt4.Qt.ItemIsSelectable | qt4.Qt.ItemIsEditable |
-            qt4.Qt.ItemIsEnabled )
+            qt.Qt.ItemIsSelectable | qt.Qt.ItemIsEditable |
+            qt.Qt.ItemIsEnabled )
 
     def headerData(self, section, orientation, role):
         """Return the headers at the top of the view."""
-        if role == qt4.Qt.DisplayRole:
-            if orientation == qt4.Qt.Horizontal:
+        if role == qt.Qt.DisplayRole:
+            if orientation == qt.Qt.Horizontal:
                 # columns defined in headers
                 return self.headers[self.ctype][section]
             else:
@@ -147,7 +147,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
 
     def setData(self, index, value, role):
         """Edit an item."""
-        if index.isValid() and role == qt4.Qt.EditRole:
+        if index.isValid() and role == qt.Qt.EditRole:
             col = index.column()
             row = index.row()
 
@@ -183,7 +183,7 @@ class CustomItemModel(qt4.QAbstractTableModel):
         newcustoms = self._getCustomsCopy()
         if num >= len(newcustoms):
             return False
-        self.beginRemoveRows(qt4.QModelIndex(), num, num)
+        self.beginRemoveRows(qt.QModelIndex(), num, num)
         del newcustoms[num]
         self.moddocupignore = True
         self.doc.applyOperation(
@@ -296,7 +296,7 @@ class CustomDialog(VeuszDialog):
                     self.document.evaluate.saveCustomFile(f)
                 self.recentButton.addFile(filename)
             except EnvironmentError as e:
-                qt4.QMessageBox.critical(
+                qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save '%s'\n\n%s") % (
                         filename, cstrerror(e)))
@@ -310,7 +310,7 @@ class CustomDialog(VeuszDialog):
             try:
                 self.loadFile(filename)
             except EnvironmentError as e:
-                qt4.QMessageBox.critical(
+                qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to load '%s'\n\n%s") % (
                             filename, cstrerror(e)))

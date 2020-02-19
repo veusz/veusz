@@ -24,7 +24,7 @@ import textwrap
 import numpy as N
 
 from ..compat import crange, citems
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
@@ -34,7 +34,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Page'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 defaultrange = [1e99, -1e99]
 

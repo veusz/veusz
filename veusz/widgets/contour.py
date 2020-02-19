@@ -27,7 +27,7 @@ import sys
 import math
 
 from ..compat import czip, crange
-from .. import qtall as qt4
+from .. import qtall as qt
 import numpy as N
 
 from .. import setting
@@ -45,7 +45,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='Contour'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def finitePoly(poly):
     """Remove non-finite coordinates from numpy arrays of coordinates."""
@@ -59,7 +59,7 @@ def finitePoly(poly):
 class ContourLineLabeller(LineLabeller):
     def __init__(self, clip, rot, painter, font, doc):
         LineLabeller.__init__(self, clip, rot)
-        self.clippath = qt4.QPainterPath()
+        self.clippath = qt.QPainterPath()
         self.clippath.addRect(clip)
         self.labels = []
         self.painter = painter
@@ -85,7 +85,7 @@ class ContourLineLabeller(LineLabeller):
 
         rend.render()
         if rect.xw > 0:
-            p = qt4.QPainterPath()
+            p = qt.QPainterPath()
             p.addPolygon(rect.makePolygon())
             self.clippath -= p
 
@@ -549,7 +549,7 @@ class Contour(plotters.GenericPlotter):
         cl = s.get('ContourLabels')
         font = cl.makeQFont(painter)
         labelpen = cl.makeQPen(painter)
-        descent = qt4.QFontMetricsF(font).descent()
+        descent = qt.QFontMetricsF(font).descent()
 
         # linelabeller does clipping and labelling of contours
         linelabeller = ContourLineLabeller(
@@ -567,10 +567,10 @@ class Contour(plotters.GenericPlotter):
                 rend = utils.Renderer(
                     painter, font, 0, 0, text, alignhorz=0,
                     alignvert=0, angle=0, doc=self.document)
-                textdims = qt4.QSizeF(*rend.getDimensions())
-                textdims += qt4.QSizeF(descent*2, descent*2)
+                textdims = qt.QSizeF(*rend.getDimensions())
+                textdims += qt.QSizeF(descent*2, descent*2)
             else:
-                textdims = qt4.QSizeF(0, 0)
+                textdims = qt.QSizeF(0, 0)
 
             # iterate over each complete line of the contour
             for curve in linelist:
@@ -578,7 +578,7 @@ class Contour(plotters.GenericPlotter):
                 xplt = axes[0].dataToPlotterCoords(posn, curve[:,0])
                 yplt = axes[1].dataToPlotterCoords(posn, curve[:,1])
 
-                pts = qt4.QPolygonF()
+                pts = qt.QPolygonF()
                 utils.addNumpyToPolygonF(pts, xplt, yplt)
                 linelabeller.addLine(pts, textdims)
 
@@ -628,16 +628,16 @@ class Contour(plotters.GenericPlotter):
         for num, polylist in enumerate(self._cachedpolygons):
 
             # iterate over each complete line of the contour
-            path = qt4.QPainterPath()
+            path = qt.QPainterPath()
             for poly in polylist:
                 # convert coordinates from graph to plotter
                 xplt = axes[0].dataToPlotterCoords(posn, poly[:,0])
                 yplt = axes[1].dataToPlotterCoords(posn, poly[:,1])
 
-                pts = qt4.QPolygonF()
+                pts = qt.QPolygonF()
                 utils.addNumpyToPolygonF(pts, xplt, yplt)
 
-                clippedpoly = qt4.QPolygonF()
+                clippedpoly = qt.QPolygonF()
                 utils.polygonClip(pts, clip, clippedpoly)
                 path.addPolygon(clippedpoly)
 

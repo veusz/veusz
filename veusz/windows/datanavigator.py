@@ -18,18 +18,18 @@
 ###############################################################################
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..qtwidgets.datasetbrowser import DatasetBrowser
 
 def _(text, disambiguation=None, context="DataNavigator"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class DataNavigatorWindow(qt4.QDockWidget):
+class DataNavigatorWindow(qt.QDockWidget):
     """A dock window containing a dataset browsing widget."""
 
     def __init__(self, thedocument, mainwin, *args):
-        qt4.QDockWidget.__init__(self, *args)
+        qt.QDockWidget.__init__(self, *args)
         self.setWindowTitle(_("Data - Veusz"))
         self.setObjectName("veuszdatawindow")
 

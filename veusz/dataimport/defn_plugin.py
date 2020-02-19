@@ -21,11 +21,11 @@ import traceback
 
 from .. import document
 from .. import plugins
-from .. import qtall as qt4
+from .. import qtall as qt
 from . import base
 
 def _(text, disambiguation=None, context="Import_Plugin"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportParamsPlugin(base.ImportParamsBase):
     """Parameters for import plugins.

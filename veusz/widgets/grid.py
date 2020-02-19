@@ -24,7 +24,7 @@ from __future__ import division
 from ..compat import crange
 from .. import document
 from .. import setting
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from . import widget
 from . import graph
@@ -32,7 +32,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Grid'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class _gridengine:
     """Internal class to build up grid of widgets."""

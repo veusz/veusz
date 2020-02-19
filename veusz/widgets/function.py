@@ -22,7 +22,7 @@ from __future__ import division
 import numpy as N
 
 from ..compat import czip, cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
@@ -32,7 +32,7 @@ from .plotters import GenericPlotter
 
 def _(text, disambiguation=None, context='Function'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class FunctionPlotter(GenericPlotter):
     """Function plotting class."""
@@ -189,7 +189,7 @@ class FunctionPlotter(GenericPlotter):
 
         # idea is to collect points until we go out of the bounds
         # or reach the end, then plot them
-        pts = qt4.QPolygonF()
+        pts = qt.QPolygonF()
         lastx = lasty = -65536
         for x, y in czip(xpts, ypts):
 
@@ -201,13 +201,13 @@ class FunctionPlotter(GenericPlotter):
             else:
                 # if the jump wasn't too large, add the point to the points
                 if abs(x-lastx) < maxdeltax and abs(y-lasty) < maxdeltay:
-                    pts.append( qt4.QPointF(x, y) )
+                    pts.append( qt.QPointF(x, y) )
                 else:
                     # draw what we have until now, and start a new line
                     if len(pts) >= 2:
                         utils.plotClippedPolyline(painter, clip, pts)
                     pts.clear()
-                    pts.append( qt4.QPointF(x, y) )
+                    pts.append( qt.QPointF(x, y) )
 
             lastx = x
             lasty = y
@@ -230,21 +230,21 @@ class FunctionPlotter(GenericPlotter):
         if len(pxpts) < 2 or len(pypts) < 2:
             return
 
-        pts = qt4.QPolygonF()
+        pts = qt.QPolygonF()
         if self.settings.variable == 'x':
             if belowleft:
-                pts.append(qt4.QPointF(pxpts[0], y2))
-                endpt = qt4.QPointF(pxpts[-1], y2)
+                pts.append(qt.QPointF(pxpts[0], y2))
+                endpt = qt.QPointF(pxpts[-1], y2)
             else:
-                pts.append(qt4.QPointF(pxpts[0], y1))
-                endpt = qt4.QPointF(pxpts[-1], y1)
+                pts.append(qt.QPointF(pxpts[0], y1))
+                endpt = qt.QPointF(pxpts[-1], y1)
         else:
             if belowleft:
-                pts.append(qt4.QPointF(x1, pypts[0]))
-                endpt = qt4.QPointF(x1, pypts[-1])
+                pts.append(qt.QPointF(x1, pypts[0]))
+                endpt = qt.QPointF(x1, pypts[-1])
             else:
-                pts.append(qt4.QPointF(x2, pypts[0]))
-                endpt = qt4.QPointF(x2, pypts[-1])
+                pts.append(qt.QPointF(x2, pypts[0]))
+                endpt = qt.QPointF(x2, pypts[-1])
 
         # add the points between
         utils.addNumpyToPolygonF(pts, pxpts, pypts)
@@ -253,9 +253,9 @@ class FunctionPlotter(GenericPlotter):
         pts.append(endpt)
 
         # draw the clipped polygon
-        clipped = qt4.QPolygonF()
+        clipped = qt.QPolygonF()
         utils.polygonClip(pts, clip, clipped)
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         path.addPolygon(clipped)
         utils.brushExtFillPath(painter, brush, path)
 
@@ -267,9 +267,9 @@ class FunctionPlotter(GenericPlotter):
 
         # draw line
         if not s.Line.hide:
-            painter.setBrush( qt4.QBrush() )
+            painter.setBrush( qt.QBrush() )
             painter.setPen( s.Line.makeQPen(painter) )
-            painter.drawLine( qt4.QPointF(x, yp), qt4.QPointF(x+width, yp) )
+            painter.drawLine( qt.QPointF(x, yp), qt.QPointF(x+width, yp) )
 
     def initEnviron(self):
         """Set up function environment."""
@@ -388,12 +388,13 @@ class FunctionPlotter(GenericPlotter):
              pxpts.ndim != 1 or pypts.ndim != 1 ):
             # not sure how to deal with errors here
             painter.setPen( setting.settingdb.color('error') )
-            f = qt4.QFont()
+            f = qt.QFont()
             f.setPointSize(20)
             painter.setFont(f)
-            painter.drawText( cliprect,
-                              qt4.Qt.AlignCenter,
-                              "Cannot evaluate '%s'" % s.function )
+            painter.drawText(
+                cliprect,
+                qt.Qt.AlignCenter,
+                "Cannot evaluate '%s'" % s.function)
         else:
             if not s.FillBelow.hide:
                 self._fillRegion(painter, pxpts, pypts, posn, True, cliprect,
@@ -404,7 +405,7 @@ class FunctionPlotter(GenericPlotter):
                                  s.FillAbove)
 
             if not s.Line.hide:
-                painter.setBrush( qt4.QBrush() )
+                painter.setBrush( qt.QBrush() )
                 painter.setPen( s.Line.makeQPen(painter) )
                 self._plotLine(painter, pxpts, pypts, posn, cliprect)
 

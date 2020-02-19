@@ -22,7 +22,7 @@ from __future__ import division
 import numpy as N
 
 from ..compat import cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
@@ -33,7 +33,7 @@ from .widget import Widget
 
 def _(text, disambiguation=None, context='NonOrthFunction'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class NonOrthFunction(Widget):
     '''Widget for plotting a function on a non-orthogonal plot.'''
@@ -173,13 +173,13 @@ class NonOrthFunction(Widget):
         px, py = self.parent.graphToPlotCoords(apts, bpts)
 
         x1, y1, x2, y2 = posn
-        cliprect = qt4.QRectF( qt4.QPointF(x1, y1), qt4.QPointF(x2, y2) )
+        cliprect = qt.QRectF( qt.QPointF(x1, y1), qt.QPointF(x2, y2) )
         painter = phelper.painter(self, posn)
         with painter:
             self.parent.setClip(painter, posn)
 
             # plot line
-            painter.setBrush(qt4.QBrush())
+            painter.setBrush(qt.QBrush())
             painter.setPen( s.PlotLine.makeQPenWHide(painter) )
             for x, y in utils.validLinePoints(px, py):
                 if not s.Fill1.hide:
@@ -187,9 +187,9 @@ class NonOrthFunction(Widget):
                 if not s.Fill2.hide:
                     self.parent.drawFillPts(painter, s.Fill2, cliprect, x, y)
                 if not s.PlotLine.hide:
-                    p = qt4.QPolygonF()
+                    p = qt.QPolygonF()
                     utils.addNumpyToPolygonF(p, x, y)
-                    painter.setBrush(qt4.QBrush())
+                    painter.setBrush(qt.QBrush())
                     painter.setPen( s.PlotLine.makeQPen(painter) )
                     utils.plotClippedPolyline(painter, cliprect, p)
 

@@ -23,10 +23,10 @@ The history is stored in the Veusz settings database.
 
 from __future__ import division
 from ..compat import crange
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 
-class HistoryCombo(qt4.QComboBox):
+class HistoryCombo(qt.QComboBox):
     """This combobox records what items have been entered into it so the
     user can choose them again.
 
@@ -34,19 +34,19 @@ class HistoryCombo(qt4.QComboBox):
     """
 
     def __init__(self, *args):
-        qt4.QComboBox.__init__(self, *args)
+        qt.QComboBox.__init__(self, *args)
 
         # sane defaults
         self.setEditable(True)
         self.setMaxCount(50)
-        self.setInsertPolicy(qt4.QComboBox.InsertAtTop)
+        self.setInsertPolicy(qt.QComboBox.InsertAtTop)
         self.setDuplicatesEnabled(False)
-        self.setSizePolicy( qt4.QSizePolicy(qt4.QSizePolicy.MinimumExpanding,
-                                            qt4.QSizePolicy.Fixed) )
+        self.setSizePolicy( qt.QSizePolicy(
+            qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.Fixed) )
 
         # stops combobox readjusting in size to fit contents
         self.setSizeAdjustPolicy(
-            qt4.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            qt.QComboBox.AdjustToMinimumContentsLengthWithIcon)
 
         self.default = []
         self.hasshown = False
@@ -85,7 +85,7 @@ class HistoryCombo(qt4.QComboBox):
 
         # get dialog for widget
         dialog = self.parent()
-        while not isinstance(dialog, qt4.QDialog):
+        while not isinstance(dialog, qt.QDialog):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
@@ -124,7 +124,7 @@ class HistoryCombo(qt4.QComboBox):
 
     def showEvent(self, event):
         """Show HistoryCombo and load history."""
-        qt4.QComboBox.showEvent(self, event)
+        qt.QComboBox.showEvent(self, event)
         # we do this now rather than in __init__ because the widget
         # has no name set at __init__
         if not self.hasshown:
@@ -132,5 +132,5 @@ class HistoryCombo(qt4.QComboBox):
 
     def hideEvent(self, event):
         """Save history as widget is hidden."""
-        qt4.QComboBox.hideEvent(self, event)
+        qt.QComboBox.hideEvent(self, event)
         self.saveHistory()

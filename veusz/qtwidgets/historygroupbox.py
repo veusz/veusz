@@ -19,22 +19,22 @@
 from __future__ import division
 
 from ..compat import cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 
-class HistoryGroupBox(qt4.QGroupBox):
+class HistoryGroupBox(qt.QGroupBox):
     """Group box remembers settings of radio buttons inside it.
 
     emits radioClicked(radiowidget) when clicked
     """
 
-    radioClicked = qt4.pyqtSignal(qt4.QObject)
+    radioClicked = qt.pyqtSignal(qt.QObject)
 
     def getSettingName(self):
         """Get name for saving in settings."""
         # get dialog for widget
         dialog = self.parent()
-        while not isinstance(dialog, qt4.QDialog):
+        while not isinstance(dialog, qt.QDialog):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
@@ -45,7 +45,7 @@ class HistoryGroupBox(qt4.QGroupBox):
         """Load from settings."""
         # connect up radio buttons to emit clicked signal
         for w in self.children():
-            if isinstance(w, qt4.QRadioButton):
+            if isinstance(w, qt.QRadioButton):
                 def doemit(widget):
                     return lambda: self.radioClicked.emit(widget)
                 w.clicked.connect(doemit(w))
@@ -53,7 +53,7 @@ class HistoryGroupBox(qt4.QGroupBox):
         # set item to be checked
         checked = setting.settingdb.get(self.getSettingName(), "")
         for w in self.children():
-            if isinstance(w, qt4.QRadioButton) and (
+            if isinstance(w, qt.QRadioButton) and (
                 w.objectName() == checked or checked == ""):
                 w.click()
                 return
@@ -61,7 +61,7 @@ class HistoryGroupBox(qt4.QGroupBox):
     def getRadioChecked(self):
         """Get name of radio button checked."""
         for w in self.children():
-            if isinstance(w, qt4.QRadioButton) and w.isChecked():
+            if isinstance(w, qt.QRadioButton) and w.isChecked():
                 return w
         return None
 
@@ -72,10 +72,10 @@ class HistoryGroupBox(qt4.QGroupBox):
 
     def showEvent(self, event):
         """Show and load history."""
-        qt4.QGroupBox.showEvent(self, event)
+        qt.QGroupBox.showEvent(self, event)
         self.loadHistory()
 
     def hideEvent(self, event):
         """Save history as widget is hidden."""
-        qt4.QGroupBox.hideEvent(self, event)
+        qt.QGroupBox.hideEvent(self, event)
         self.saveHistory()

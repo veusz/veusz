@@ -20,7 +20,7 @@ from __future__ import division, print_function
 import csv
 import re
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..compat import cstr
 from .. import utils
 from ..dialogs import importdialog
@@ -29,7 +29,7 @@ from . import simpleread
 from . import dialog_csv
 
 def _(text, disambiguation=None, context="Import_ND"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTabND(importdialog.ImportTab):
     """Tab for importing from a ND data file."""

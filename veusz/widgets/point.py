@@ -22,7 +22,7 @@ from __future__ import division
 import numpy as N
 
 from ..compat import czip
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import datasets
 from .. import document
 from .. import setting
@@ -39,7 +39,7 @@ except ImportError:
 
 def _(text, disambiguation=None, context='XY'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # functions for plotting error bars
 # different styles are made up of combinations of these functions
@@ -81,7 +81,7 @@ def _errorBarsBox(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                   s, painter, clip):
     """Draw box around error region."""
     if utils.allNotNone(xmin, xmax, ymin, ymax):
-        painter.setBrush( qt4.QBrush() )
+        painter.setBrush( qt.QBrush() )
         utils.plotBoxesToPainter(painter, xmin, ymin, xmax, ymax, clip)
 
 def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
@@ -90,7 +90,7 @@ def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
     if utils.allNotNone(xmin, xmax, ymin, ymax):
         # filled region below
         if not s.FillBelow.hideerror:
-            path = qt4.QPainterPath()
+            path = qt.QPainterPath()
             utils.addNumpyPolygonToPath(
                 path, clip,
                 xmin, ymin, xmin, yplotter,
@@ -99,7 +99,7 @@ def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 
         # filled region above
         if not s.FillAbove.hideerror:
-            path = qt4.QPainterPath()
+            path = qt.QPainterPath()
             utils.addNumpyPolygonToPath(
                 path, clip,
                 xmin, yplotter, xmax, yplotter,
@@ -113,16 +113,16 @@ def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
 
         # expand clip by pen width (urgh)
         pw = painter.pen().widthF()*2
-        clip = qt4.QRectF(
-            qt4.QPointF(clip.left()-pw,clip.top()-pw),
-            qt4.QPointF(clip.right()+pw,clip.bottom()+pw))
+        clip = qt.QRectF(
+            qt.QPointF(clip.left()-pw,clip.top()-pw),
+            qt.QPointF(clip.right()+pw,clip.bottom()+pw))
 
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         utils.addNumpyPolygonToPath(
             path, clip,
             xmin, yplotter, xplotter, ymax,
             xmax, yplotter, xplotter, ymin)
-        painter.setBrush( qt4.QBrush() )
+        painter.setBrush( qt.QBrush() )
         painter.drawPath(path)
 
 def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
@@ -130,7 +130,7 @@ def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
     """Draw diamond filled region inside error bars."""
     if utils.allNotNone(xmin, xmax, ymin, ymax):
         if not s.FillBelow.hideerror:
-            path = qt4.QPainterPath()
+            path = qt.QPainterPath()
             utils.addNumpyPolygonToPath(
                 path, clip,
                 xmin, yplotter, xplotter, ymin,
@@ -138,7 +138,7 @@ def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
             utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
 
         if not s.FillAbove.hideerror:
-            path = qt4.QPainterPath()
+            path = qt.QPainterPath()
             utils.addNumpyPolygonToPath(
                 path, clip,
                 xmin, yplotter, xplotter, ymax,
@@ -150,23 +150,23 @@ def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
     """Draw curve around error region."""
     if utils.allNotNone(xmin, xmax, ymin, ymax):
         # non-filling brush
-        painter.setBrush( qt4.QBrush() )
+        painter.setBrush( qt.QBrush() )
 
         for xp, yp, xmn, ymn, xmx, ymx in czip(
             xplotter, yplotter, xmin, ymin, xmax, ymax):
 
-            p = qt4.QPainterPath()
+            p = qt.QPainterPath()
             p.moveTo(xp + (xmx-xp), yp)
-            p.arcTo(qt4.QRectF(
+            p.arcTo(qt.QRectF(
                 xp - (xmx-xp), yp - (yp-ymx),
                 (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
-            p.arcTo(qt4.QRectF(
+            p.arcTo(qt.QRectF(
                 xp - (xp-xmn), yp - (yp-ymx),
                 (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
-            p.arcTo(qt4.QRectF(
+            p.arcTo(qt.QRectF(
                 xp - (xp-xmn), yp - (ymn-yp),
                 (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
-            p.arcTo(qt4.QRectF(
+            p.arcTo(qt.QRectF(
                 xp - (xmx-xp), yp - (ymn-yp),
                 (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
             painter.drawPath(p)
@@ -180,23 +180,23 @@ def _errorBarsCurveFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
             xplotter, yplotter, xmin, ymin, xmax, ymax):
 
             if not s.FillAbove.hideerror:
-                p = qt4.QPainterPath()
+                p = qt.QPainterPath()
                 p.moveTo(xp + (xmx-xp), yp)
-                p.arcTo(qt4.QRectF(
+                p.arcTo(qt.QRectF(
                     xp - (xmx-xp), yp - (yp-ymx),
                     (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
-                p.arcTo(qt4.QRectF(
+                p.arcTo(qt.QRectF(
                     xp - (xp-xmn), yp - (yp-ymx),
                     (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
                 utils.brushExtFillPath(painter, s.FillAbove, p, ignorehide=True)
 
             if not s.FillBelow.hideerror:
-                p = qt4.QPainterPath()
+                p = qt.QPainterPath()
                 p.moveTo(xp + (xp-xmn), yp)
-                p.arcTo(qt4.QRectF(
+                p.arcTo(qt.QRectF(
                     xp - (xp-xmn), yp - (ymn-yp),
                     (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
-                p.arcTo(qt4.QRectF(
+                p.arcTo(qt.QRectF(
                     xp - (xmx-xp), yp - (ymn-yp),
                     (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
                 utils.brushExtFillPath(painter, s.FillBelow, p, ignorehide=True)
@@ -205,8 +205,8 @@ def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
                      s, painter, clip):
     """Draw filled region as error region."""
 
-    ptsabove = qt4.QPolygonF()
-    ptsbelow = qt4.QPolygonF()
+    ptsabove = qt.QPolygonF()
+    ptsbelow = qt.QPolygonF()
 
     hidevert = True  # keep track of what's shown
     hidehorz = True
@@ -229,7 +229,7 @@ def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
     # draw filled regions above/left and below/right
     if 'fill' in style and not (hidehorz and hidevert):
         # construct points for error bar regions
-        retnpts = qt4.QPolygonF()
+        retnpts = qt.QPolygonF()
         utils.addNumpyToPolygonF(retnpts, xplotter[::-1], yplotter[::-1])
 
         # polygons consist of lines joining the points and continuing
@@ -287,9 +287,9 @@ def fillPtsToEdge(painter, pts, posn, cliprect, fillstyle):
     else:
         raise RuntimeError('Invalid fillto mode')
 
-    polypts = qt4.QPolygonF([qt4.QPointF(x1, y1)])
+    polypts = qt.QPolygonF([qt.QPointF(x1, y1)])
     polypts += pts
-    polypts.append(qt4.QPointF(x2, y2))
+    polypts.append(qt.QPointF(x2, y2))
 
     utils.brushExtFillPolygon(painter, fillstyle, cliprect, polypts)
 
@@ -474,7 +474,7 @@ class PointPlotter(GenericPlotter):
 
         # iterate to call the error bars functions required to draw style
         pen = s.ErrorBarLine.makeQPenWHide(painter)
-        pen.setCapStyle(qt4.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.FlatCap)
 
         painter.setPen(pen)
         for function in _errorBarFunctionMap[style]:
@@ -522,7 +522,7 @@ class PointPlotter(GenericPlotter):
     def _getLinePoints( self, xvals, yvals, posn, xdata, ydata ):
         """Get the points corresponding to the line connecting the points."""
 
-        pts = qt4.QPolygonF()
+        pts = qt.QPolygonF()
 
         s = self.settings
         steps = s.PlotLine.steps
@@ -575,7 +575,7 @@ class PointPlotter(GenericPlotter):
                 utils.addNumpyToPolygonF(pts, x1, y1, xc, y1, xc, y2)
 
                 if len(xvals) > 0:
-                    pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
+                    pts.append( qt.QPointF(xvals[-1], yvals[-1]) )
 
         elif steps[:7] == 'vcentre':
             axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
@@ -602,7 +602,7 @@ class PointPlotter(GenericPlotter):
                 utils.addNumpyToPolygonF(pts, x1, y1, x1, yc, x2, yc)
 
                 if len(yvals) > 0:
-                    pts.append( qt4.QPointF(xvals[-1], yvals[-1]) )
+                    pts.append( qt.QPointF(xvals[-1], yvals[-1]) )
 
         else:
             assert False
@@ -613,7 +613,7 @@ class PointPlotter(GenericPlotter):
         """Try to draw a bezier line connecting the points."""
 
         # clip to a larger box to help the lines get right angle
-        bigclip = qt4.QRectF(
+        bigclip = qt.QRectF(
             cliprect.left()-cliprect.width()*0.5,
             cliprect.top()-cliprect.height()*0.5,
             cliprect.width()*2, cliprect.height()*2)
@@ -622,7 +622,7 @@ class PointPlotter(GenericPlotter):
         polys = qtloops.clipPolyline(bigclip, poly)
 
         # add each part as a bezier
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         for lpoly in polys:
             if len(lpoly) >= 2:
                 npts = qtloops.bezier_fit_cubic_multi(lpoly, 0.1, len(lpoly)+1)
@@ -649,7 +649,7 @@ class PointPlotter(GenericPlotter):
                     'right': (posn[2], pts[0].y(), posn[2], pts[-1].y())
                 }[fillstyle.fillto]
 
-                temppath = qt4.QPainterPath(path)
+                temppath = qt.QPainterPath(path)
                 temppath.lineTo(x2, y2)
                 temppath.lineTo(x1, y1)
                 utils.brushExtFillPath(painter, fillstyle, temppath)
@@ -702,19 +702,19 @@ class PointPlotter(GenericPlotter):
 
         # start drawing
         painter.save()
-        cliprect = qt4.QRectF(qt4.QPointF(x,y), qt4.QPointF(x+width,y+height))
+        cliprect = qt.QRectF(qt.QPointF(x,y), qt.QPointF(x+width,y+height))
         painter.setClipRect(cliprect)
 
         # draw fill setting
         if not s.FillBelow.hide:
-            path = qt4.QPainterPath()
-            path.addRect(qt4.QRectF(
-                    qt4.QPointF(x, yp), qt4.QPointF(x+width, yp+height*0.45)))
+            path = qt.QPainterPath()
+            path.addRect(qt.QRectF(
+                qt.QPointF(x, yp), qt.QPointF(x+width, yp+height*0.45)))
             utils.brushExtFillPath(painter, s.FillBelow, path)
         if not s.FillAbove.hide:
-            path = qt4.QPainterPath()
-            path.addRect(qt4.QRectF(
-                    qt4.QPointF(x, yp), qt4.QPointF(x+width, yp-height*0.45)))
+            path = qt.QPainterPath()
+            path.addRect(qt.QRectF(
+                qt.QPointF(x, yp), qt.QPointF(x+width, yp-height*0.45)))
             utils.brushExtFillPath(painter, s.FillAbove, path)
 
         # make points for error bars (if any)
@@ -739,7 +739,7 @@ class PointPlotter(GenericPlotter):
         # draw line
         if not s.PlotLine.hide:
             painter.setPen( s.PlotLine.makeQPen(painter) )
-            painter.drawLine( qt4.QPointF(x, yp), qt4.QPointF(x+width, yp) )
+            painter.drawLine( qt.QPointF(x, yp), qt.QPointF(x+width, yp) )
 
         # draw marker
         if not s.MarkerLine.hide or not s.MarkerFill.hide:
@@ -749,7 +749,7 @@ class PointPlotter(GenericPlotter):
             if not s.MarkerLine.hide:
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
             else:
-                painter.setPen( qt4.QPen( qt4.Qt.NoPen ) )
+                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
 
             size = s.get('markerSize').convert(painter)
             utils.plotMarker(painter, x+width/2, yp, s.marker, size)
@@ -921,7 +921,7 @@ class PointPlotter(GenericPlotter):
                     painter.setBrush( s.MarkerFill.makeQBrush(painter) )
                 else:
                     # no-filling brush
-                    painter.setBrush( qt4.QBrush() )
+                    painter.setBrush( qt.QBrush() )
 
                 #print "Painting marker lines"
                 if not s.MarkerLine.hide:
@@ -929,7 +929,7 @@ class PointPlotter(GenericPlotter):
                     painter.setPen( s.MarkerLine.makeQPen(painter) )
                 else:
                     # invisible pen
-                    painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+                    painter.setPen( qt.QPen(qt.Qt.NoPen) )
 
                 # thin datapoints as required
                 if s.thinfactor <= 1:

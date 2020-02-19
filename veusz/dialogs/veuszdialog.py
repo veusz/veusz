@@ -21,37 +21,37 @@
 from __future__ import division
 import os.path
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 
 # register functions to open up dialogs to recreate a dataset
 recreate_register = {}
 
-class VeuszDialog(qt4.QDialog):
+class VeuszDialog(qt.QDialog):
     """Base dialog class.
     - Loads self from ui file.
     - Deletes self on closing.
     - Emits dialogFinished when dialog is done
     """
 
-    dialogFinished = qt4.pyqtSignal(qt4.QDialog)
+    dialogFinished = qt.pyqtSignal(qt.QDialog)
 
     def __init__(self, mainwindow, uifile, modal=False):
         """Initialise dialog given Veusz mainwindow and uifile for dialog.
         If modal is False, base on a top level window instead
         """
 
-        flag = qt4.Qt.Dialog
+        flag = qt.Qt.Dialog
         if not modal:
             flag |= (
-                qt4.Qt.CustomizeWindowHint | qt4.Qt.WindowMinimizeButtonHint |
-                qt4.Qt.WindowMaximizeButtonHint | qt4.Qt.WindowCloseButtonHint |
-                qt4.Qt.WindowTitleHint | qt4.Qt.WindowSystemMenuHint )
+                qt.Qt.CustomizeWindowHint | qt.Qt.WindowMinimizeButtonHint |
+                qt.Qt.WindowMaximizeButtonHint | qt.Qt.WindowCloseButtonHint |
+                qt.Qt.WindowTitleHint | qt.Qt.WindowSystemMenuHint )
 
-        qt4.QDialog.__init__(self, mainwindow, flag)
-        self.setAttribute(qt4.Qt.WA_DeleteOnClose)
+        qt.QDialog.__init__(self, mainwindow, flag)
+        self.setAttribute(qt.Qt.WA_DeleteOnClose)
 
-        qt4.loadUi(os.path.join(utils.resourceDirectory, 'ui', uifile), self)
+        qt.loadUi(os.path.join(utils.resourceDirectory, 'ui', uifile), self)
 
         self.mainwindow = mainwindow
 
@@ -59,4 +59,4 @@ class VeuszDialog(qt4.QDialog):
         """Emits dialogFinished if hidden."""
         if not event.spontaneous():
             self.dialogFinished.emit(self)
-        return qt4.QDialog.hideEvent(self, event)
+        return qt.QDialog.hideEvent(self, event)

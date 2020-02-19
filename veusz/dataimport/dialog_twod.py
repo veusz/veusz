@@ -20,7 +20,7 @@ from __future__ import division, print_function
 import csv
 import re
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..compat import cstr
 from .. import utils
 from ..dialogs import importdialog
@@ -29,7 +29,7 @@ from . import simpleread
 from . import dialog_csv
 
 def _(text, disambiguation=None, context="Import_2D"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportTab2D(importdialog.ImportTab):
     """Tab for importing from a 2D data file."""
@@ -44,7 +44,7 @@ class ImportTab2D(importdialog.ImportTab):
                             self.twod_yminedit, self.twod_ymaxedit ]
 
         # set up some validators for 2d edits
-        dval = qt4.QDoubleValidator(self)
+        dval = qt.QDoubleValidator(self)
         for w in self.rangeedits:
             w.setValidator(dval)
 
@@ -65,7 +65,7 @@ class ImportTab2D(importdialog.ImportTab):
 
     def slotGridAtEdgeChanged(self, state):
         """Enable/disable widgets depending on grid at edge."""
-        nogridatedge = state == qt4.Qt.Unchecked
+        nogridatedge = state == qt.Qt.Unchecked
         for w in self.rangeedits:
             w.setEnabled(nogridatedge)
             if not nogridatedge:

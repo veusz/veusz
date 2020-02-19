@@ -25,7 +25,7 @@ import os.path
 import sys
 
 from ..compat import crange
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import utils
 from .. import plugins
@@ -34,9 +34,9 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ImportDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class ImportTab(qt4.QWidget):
+class ImportTab(qt.QWidget):
     """Tab for a particular import type."""
 
     resource = ''
@@ -45,14 +45,14 @@ class ImportTab(qt4.QWidget):
 
     def __init__(self, importdialog, *args):
         """Initialise dialog. importdialog is the import dialog itself."""
-        qt4.QWidget.__init__(self, *args)
+        qt.QWidget.__init__(self, *args)
         self.dialog = importdialog
         self.uiloaded = False
 
     def loadUi(self):
         """Load up UI file."""
-        qt4.loadUi(os.path.join(utils.resourceDirectory, 'ui',
-                                self.resource), self)
+        qt.loadUi(os.path.join(
+            utils.resourceDirectory, 'ui', self.resource), self)
         self.uiloaded = True
 
     def reset(self):
@@ -119,15 +119,15 @@ class ImportDialog(VeuszDialog):
         self.filenameedit.editTextChanged.connect(self.slotUpdatePreview)
 
         self.importbutton = self.buttonBox.addButton(
-            _("&Import"), qt4.QDialogButtonBox.ApplyRole)
+            _("&Import"), qt.QDialogButtonBox.ApplyRole)
         self.importbutton.clicked.connect(self.slotImport)
 
-        self.buttonBox.button(qt4.QDialogButtonBox.Reset).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.Reset).clicked.connect(
             self.slotReset)
         self.encodingcombo.currentIndexChanged.connect(self.slotUpdatePreview)
 
         # add completion for filename
-        c = self.filenamecompleter = qt4.QCompleter(self)
+        c = self.filenamecompleter = qt.QCompleter(self)
         self.filenameedit.setCompleter(c)
 
         # change to tab last used
@@ -146,7 +146,7 @@ class ImportDialog(VeuszDialog):
 
         # load icon for clipboard
         self.clipbutton.setIcon( utils.getIcon('kde-clipboard') )
-        qt4.QApplication.clipboard().dataChanged.connect(
+        qt.QApplication.clipboard().dataChanged.connect(
             self.updateClipPreview)
         self.clipbutton.clicked.connect(self.slotClipButtonClicked)
         self.updateClipPreview()
@@ -154,8 +154,8 @@ class ImportDialog(VeuszDialog):
     def slotBrowseClicked(self):
         """Browse for a data file."""
 
-        fd = qt4.QFileDialog(self, _('Browse data file'))
-        fd.setFileMode( qt4.QFileDialog.ExistingFile )
+        fd = qt.QFileDialog(self, _('Browse data file'))
+        fd.setFileMode( qt.QFileDialog.ExistingFile )
 
         # collect filters from tabs
         filters = [_('All files (*)')]
@@ -181,7 +181,7 @@ class ImportDialog(VeuszDialog):
         fd.setDirectory(ImportDialog.dirname)
 
         # update filename if changed
-        if fd.exec_() == qt4.QDialog.Accepted:
+        if fd.exec_() == qt.QDialog.Accepted:
             ImportDialog.dirname = fd.directory().absolutePath()
             self.filenameedit.replaceAndAddHistory( fd.selectedFiles()[0] )
             setting.settingdb['import_filterbrowse'] = fd.selectedNameFilter()
@@ -240,8 +240,8 @@ class ImportDialog(VeuszDialog):
             filters = ['*.*']
         else:
             filters = ['*'+t for t in w.filetypes]
-        model = qt4.QDirModel(filters, qt4.QDir.AllDirs | qt4.QDir.Files,
-                              qt4.QDir.Name)
+        model = qt.QDirModel(
+            filters, qt.QDir.AllDirs | qt.QDir.Files, qt.QDir.Name)
         self.filenamecompleter.setModel(model)
 
     def enableDisableImport(self, *args):
@@ -271,18 +271,18 @@ class ImportDialog(VeuszDialog):
         tags = self.tagcombo.currentText().split()
 
         try:
-            qt4.QApplication.setOverrideCursor( qt4.QCursor(qt4.Qt.WaitCursor) )
+            qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
             with self.document.suspend():
                 importtab.doImport(self.document, filename, linked, encoding,
                                    prefix, suffix, tags)
-            qt4.QApplication.restoreOverrideCursor()
+            qt.QApplication.restoreOverrideCursor()
         except IOError:
-            qt4.QApplication.restoreOverrideCursor()
-            qt4.QMessageBox.warning(
+            qt.QApplication.restoreOverrideCursor()
+            qt.QMessageBox.warning(
                 self, _("Veusz"),
                 _("Could not read file"))
         except Exception:
-            qt4.QApplication.restoreOverrideCursor()
+            qt.QApplication.restoreOverrideCursor()
 
             # show exception dialog
             d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)

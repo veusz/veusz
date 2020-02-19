@@ -22,7 +22,7 @@ from __future__ import division
 from . import controlgraph
 from .widget import Widget
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 
 filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
@@ -30,7 +30,7 @@ filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
 
 def _(text, disambiguation=None, context='NonOrthGraph'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class FillBrush(setting.BrushExtended):
     '''Brush for filling point region.'''

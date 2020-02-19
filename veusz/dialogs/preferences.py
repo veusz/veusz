@@ -17,7 +17,7 @@
 ##############################################################################
 
 from __future__ import division
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from .. import utils
 from .. import document
@@ -25,7 +25,7 @@ from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="PrefsDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # names for display of colors and a longer description
 color_names = {
@@ -67,7 +67,7 @@ class PreferencesDialog(VeuszDialog):
             self.translationBrowseClicked)
 
         # disable thread option if not supported
-        if not qt4.QFontDatabase.supportsThreadedFontRendering():
+        if not qt.QFontDatabase.supportsThreadedFontRendering():
             self.threadSpinBox.setEnabled(False)
             self.threadSpinBox.setToolTip(_("Disabled because of lack of "
                                             "threaded drawing support"))
@@ -101,7 +101,7 @@ class PreferencesDialog(VeuszDialog):
 
         # for plugins
         plugins = list( setdb.get('plugins', []) )
-        self.pluginmodel = qt4.QStringListModel(plugins)
+        self.pluginmodel = qt.QStringListModel(plugins)
         self.pluginList.setModel(self.pluginmodel)
         self.pluginAddButton.clicked.connect(self.pluginAddClicked)
         self.pluginRemoveButton.clicked.connect(self.pluginRemoveClicked)
@@ -142,19 +142,19 @@ class PreferencesDialog(VeuszDialog):
         self.chosencolors = {}
         self.colorbutton = {}
         self.colordefaultcheck = {}
-        layout = qt4.QGridLayout()
+        layout = qt.QGridLayout()
         for row, colname in enumerate(setdb.colors):
             isdefault, colval = setting.settingdb['color_%s' % colname]
-            self.chosencolors[colname] = qt4.QColor(colval)
+            self.chosencolors[colname] = qt.QColor(colval)
 
             # label
             name, tooltip = color_names[colname]
-            label = qt4.QLabel(name)
+            label = qt.QLabel(name)
             label.setToolTip(tooltip)
             layout.addWidget(label, row, 0)
 
             # is default check
-            defcheck = qt4.QCheckBox(_("Default"))
+            defcheck = qt.QCheckBox(_("Default"))
             defcheck.setToolTip(
                 _("Use the default color instead of the one chosen here"))
             layout.addWidget(defcheck, row, 1)
@@ -162,7 +162,7 @@ class PreferencesDialog(VeuszDialog):
             defcheck.setChecked(isdefault)
 
             # connect button to method to change color
-            button = self.colorbutton[colname] = qt4.QPushButton()
+            button = self.colorbutton[colname] = qt.QPushButton()
             def getcolclick(cname):
                 # double function to get around colname changing
                 return lambda: self.colorButtonClicked(cname)
@@ -175,7 +175,7 @@ class PreferencesDialog(VeuszDialog):
 
     def colorButtonClicked(self, cname):
         """Open color dialog if color button clicked."""
-        retcolor = qt4.QColorDialog.getColor( self.chosencolors[cname], self )
+        retcolor = qt.QColorDialog.getColor( self.chosencolors[cname], self )
         if retcolor.isValid():
             self.chosencolors[cname] = retcolor
             self.updateButtonColors()
@@ -183,14 +183,14 @@ class PreferencesDialog(VeuszDialog):
     def updateButtonColors(self):
         """Update color icons on color buttons."""
         for name, val in self.chosencolors.items():
-            pixmap = qt4.QPixmap(16, 16)
+            pixmap = qt.QPixmap(16, 16)
             pixmap.fill(val)
-            self.colorbutton[name].setIcon( qt4.QIcon(pixmap) )
+            self.colorbutton[name].setIcon( qt.QIcon(pixmap) )
 
     def accept(self):
         """Keep settings if okay pressed."""
 
-        qt4.QDialog.accept(self)
+        qt.QDialog.accept(self)
 
         # view settings
         setdb = setting.settingdb
@@ -221,8 +221,8 @@ class PreferencesDialog(VeuszDialog):
         if iconsize != setdb['toolbar_size']:
             setdb['toolbar_size'] = iconsize
             for widget in self.parent().children(): # find toolbars
-                if isinstance(widget, qt4.QToolBar):
-                    widget.setIconSize( qt4.QSize(iconsize, iconsize) )
+                if isinstance(widget, qt.QToolBar):
+                    widget.setIconSize( qt.QSize(iconsize, iconsize) )
 
         # new document settings
         setdb['stylesheet_default'] = self.styleLineEdit.text()

@@ -30,14 +30,14 @@ from .axisticks import AxisTicks
 from .axis import MajorTick, MinorTick, GridLine, MinorGridLine, AxisLabel, \
     TickLabel
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
 
 def _(text, disambiguation=None, context='Ternary'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def rotatePts(x, y, theta):
     '''Rotate points by theta degrees.'''
@@ -207,24 +207,24 @@ class Ternary(NonOrthGraph):
 
     def drawFillPts(self, painter, brushext, cliprect, ptsx, ptsy):
         '''Draw points for plotting a fill.'''
-        pts = qt4.QPolygonF()
+        pts = qt.QPolygonF()
         utils.addNumpyToPolygonF(pts, ptsx, ptsy)
 
         filltype = brushext.filltype
         # this is broken: FIXME
         if filltype == 'left':
             dyend = ptsy[-1]-self._box[1]
-            pts.append( qt4.QPointF(ptsx[-1]-dyend*tan30, self._box[1]) )
+            pts.append( qt.QPointF(ptsx[-1]-dyend*tan30, self._box[1]) )
             dystart = ptsy[0]-self._box[1]
-            pts.append( qt4.QPointF(ptsx[0]-dystart*tan30, self._box[1]) )
+            pts.append( qt.QPointF(ptsx[0]-dystart*tan30, self._box[1]) )
         elif filltype == 'right':
-            pts.append( qt4.QPointF(self._box[2], ptsy[-1]) )
-            pts.append( qt4.QPointF(self._box[2], ptsy[0]) )
+            pts.append( qt.QPointF(self._box[2], ptsy[-1]) )
+            pts.append( qt.QPointF(self._box[2], ptsy[0]) )
         elif filltype == 'bottom':
             dyend = self._box[3]-ptsy[-1]
-            pts.append( qt4.QPointF(ptsx[-1]-dyend*tan30, self._box[3]) )
+            pts.append( qt.QPointF(ptsx[-1]-dyend*tan30, self._box[3]) )
             dystart = self._box[3]-ptsy[0]
-            pts.append( qt4.QPointF(ptsx[0]-dystart*tan30, self._box[3]) )
+            pts.append( qt.QPointF(ptsx[0]-dystart*tan30, self._box[3]) )
         elif filltype == 'polygon':
             pass
         else:
@@ -260,12 +260,12 @@ class Ternary(NonOrthGraph):
         self._height = height
 
         # triangle shaped polygon for graph
-        self._tripoly = p = qt4.QPolygonF()
-        p.append( qt4.QPointF(self._box[0], self._box[3]) )
-        p.append( qt4.QPointF(self._box[0]+widthh, self._box[1]) )
-        p.append( qt4.QPointF(self._box[2], self._box[3]) )
+        self._tripoly = p = qt.QPolygonF()
+        p.append( qt.QPointF(self._box[0], self._box[3]) )
+        p.append( qt.QPointF(self._box[0]+widthh, self._box[1]) )
+        p.append( qt.QPointF(self._box[2], self._box[3]) )
 
-        path = qt4.QPainterPath()
+        path = qt.QPainterPath()
         path.addPolygon(p)
         path.closeSubpath()
         utils.brushExtFillPath(painter, s.Background, path,
@@ -312,7 +312,7 @@ class Ternary(NonOrthGraph):
 
     def setClip(self, painter, bounds):
         '''Set clipping for graph.'''
-        p = qt4.QPainterPath()
+        p = qt.QPainterPath()
         p.addPolygon( self._tripoly )
         painter.setClipPath(p)
 
@@ -416,7 +416,7 @@ class Ternary(NonOrthGraph):
         if not tickSetn.hide:
             # draw ticks themselves
             pen = tickSetn.makeQPen(painter)
-            pen.setCapStyle(qt4.Qt.FlatCap)
+            pen.setCapStyle(qt.Qt.FlatCap)
             painter.setPen(pen)
             utils.plotLinesToPainter(painter, *tickbotline)
             utils.plotLinesToPainter(painter, *tickleftline)

@@ -32,11 +32,11 @@ try:
     from ..helpers import qtloops
 except ImportError:
     pass
-from .. import qtall as qt4
+from .. import qtall as qt
 
 def _(text, disambiguation=None, context='DatasetPlugin'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # add an instance of your class to this list to be registered
 datasetpluginregistry = []

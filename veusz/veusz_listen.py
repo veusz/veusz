@@ -30,20 +30,20 @@ Zoom x: Change the zoom factor of the plot to x
 from __future__ import division
 import sys
 
-from . import qtall as qt4
+from . import qtall as qt
 from .compat import cstr
 
 from .windows.simplewindow import SimpleWindow
 from . import document
 
-class ReadingThread(qt4.QThread):
+class ReadingThread(qt.QThread):
     """Stdin reading thread. Emits newline signals with new data.
 
     We could use a QSocketNotifier on Unix, but this doesn't work on
     Windows as its stdin is a weird object
     """
 
-    newline = qt4.pyqtSignal(cstr)
+    newline = qt.pyqtSignal(cstr)
 
     def run(self):
         """Emit lines read from stdin."""
@@ -53,14 +53,14 @@ class ReadingThread(qt4.QThread):
                 break
             self.newline.emit(line)
 
-class InputListener(qt4.QObject):
+class InputListener(qt.QObject):
     """Class reads text from stdin, in order to send commands to a document."""
 
     def __init__(self, window):
         """Initialse the listening object to send commands to the
         document given by window."""
         
-        qt4.QObject.__init__(self)
+        qt.QObject.__init__(self)
 
         self.window = window
         self.document = window.document
@@ -150,7 +150,7 @@ def openWindow(args, quiet=False):
 
 def run():
     '''Actually run the program.'''
-    app = qt4.QApplication(sys.argv)
+    app = qt.QApplication(sys.argv)
     openWindow(sys.argv)
     app.exec_()
 

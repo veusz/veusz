@@ -21,7 +21,7 @@
 from __future__ import division
 import numpy as N
 
-from .. import qtall as qt4
+from .. import qtall as qt
 from ..compat import czip
 from . import plotters
 from .. import document
@@ -30,7 +30,7 @@ from .. import utils
 
 def _(text, disambiguation=None, context='Covariance'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class CovarianceLine(setting.Line):
     def __init__(self, name, **args):
@@ -241,14 +241,14 @@ class Covariance(plotters.GenericPlotter):
         pen = s.Line.makeQPenWHide(painter)
         pw = pen.widthF()*2
         x1, y1, x2, y2 = posn
-        lineclip = qt4.QRectF(
-            qt4.QPointF(x1-pw, y1-pw), qt4.QPointF(x2+pw, y2+pw))
+        lineclip = qt.QRectF(
+            qt.QPointF(x1-pw, y1-pw), qt.QPointF(x2+pw, y2+pw))
 
         for xvals, yvals in czip(ptsx, ptsy):
-            path = qt4.QPainterPath()
-            poly = qt4.QPolygonF()
+            path = qt.QPainterPath()
+            poly = qt.QPolygonF()
             utils.addNumpyToPolygonF(poly, xvals, yvals)
-            clippedpoly = qt4.QPolygonF()
+            clippedpoly = qt.QPolygonF()
             utils.polygonClip(poly, lineclip, clippedpoly)
             path.addPolygon(clippedpoly)
             path.closeSubpath()

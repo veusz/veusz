@@ -20,11 +20,11 @@ from __future__ import division
 import re
 
 import numpy as N
-from .. import qtall as qt4
+from .. import qtall as qt
 
 def _(text, disambiguation=None, context="Datasets"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def convertNumpy(a, dims=1):
     """Convert to a numpy double if possible.

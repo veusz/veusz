@@ -20,7 +20,7 @@
 
 from __future__ import division
 
-from .. import qtall as qt4
+from .. import qtall as qt
 import numpy as N
 
 from .. import setting
@@ -31,7 +31,7 @@ from . import plotters
 
 def _(text, disambiguation=None, context='Image'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 def cropLinearImageToBox(image, pltx, plty, posn):
     """Given a plotting range pltx[0]->pltx[1], plty[0]->plty[1] and
@@ -334,7 +334,7 @@ class Image(plotters.GenericPlotter):
         if s.smooth:
             image = image.scaled(
                 pltrangex[1]-pltrangex[0], pltrangey[0]-pltrangey[1],
-                qt4.Qt.IgnoreAspectRatio, qt4.Qt.SmoothTransformation)
+                qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
 
         # get position and size of output image
         xp, yp = pltrangex[0], pltrangey[1]
@@ -353,8 +353,8 @@ class Image(plotters.GenericPlotter):
             painter.scale(xscale, yscale)
 
         # draw image
-        #image = image.copy(qt4.QRect(qt4.QPoint(0, 0), qt4.QPoint(20, 20)))
-        painter.drawImage(qt4.QRectF(xp, yp, abs(xw), abs(yw)), image)
+        #image = image.copy(qt.QRect(qt.QPoint(0, 0), qt.QPoint(20, 20)))
+        painter.drawImage(qt.QRectF(xp, yp, abs(xw), abs(yw)), image)
 
         # restore painter if image was inverted
         if xscale != 1 or yscale != 1:

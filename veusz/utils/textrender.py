@@ -26,7 +26,7 @@ import re
 import numpy as N
 
 from ..compat import cbasestr, cstr
-from .. import qtall as qt4
+from .. import qtall as qt
 from . import points
 
 mmlsupport = True
@@ -40,11 +40,11 @@ from ..helpers.qtloops import RotatedRectangle
 
 def _(text, disambiguation=None, context='TextRender'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 # this definition is monkey-patched when veusz is running in self-test
 # mode as we need to hack the metrics - urgh
-FontMetrics = qt4.QFontMetricsF
+FontMetrics = qt.QFontMetricsF
 
 # lookup table for special symbols
 symbols = {
@@ -639,7 +639,7 @@ class PartText(Part):
 
         # actually write the text if requested
         if state.actually_render:
-            state.painter.drawText( qt4.QPointF(state.x, state.y), self.text )
+            state.painter.drawText( qt.QPointF(state.x, state.y), self.text )
 
         # move along, nothing to see
         state.x += width
@@ -777,14 +777,13 @@ class PartFrac(Part):
         # draw line between lines with 0.5pt thickness
         painter.save()
         pen = painter.pen()
-        painter.setPen( qt4.QPen(painter.pen().brush(),
-                                 state.getPixelsPerPt()*0.5) )
+        painter.setPen( qt.QPen(
+            painter.pen().brush(), state.getPixelsPerPt()*0.5) )
         painter.setPen(pen)
 
-        painter.drawLine(qt4.QPointF(initx,
-                                     inity-height/2.),
-                         qt4.QPointF(initx+max(self.widths),
-                                     inity-height/2.))
+        painter.drawLine(
+            qt.QPointF(initx, inity-height/2.),
+            qt.QPointF(initx+max(self.widths), inity-height/2.) )
 
         painter.restore()
 
@@ -938,11 +937,10 @@ class PartBar(Part):
 
         painter.save()
         penw = state.getPixelsPerPt()*0.5
-        painter.setPen( qt4.QPen(painter.pen().brush(), penw) )
-        painter.drawLine(qt4.QPointF(initx,
-                                     state.y-height+penw),
-                         qt4.QPointF(state.x,
-                                     state.y-height+penw))
+        painter.setPen( qt.QPen(painter.pen().brush(), penw) )
+        painter.drawLine(
+            qt.QPointF(initx, state.y-height+penw),
+            qt.QPointF(state.x, state.y-height+penw))
         painter.restore()
 
 class PartHat(Part):
@@ -960,14 +958,14 @@ class PartHat(Part):
 
         painter.save()
         penw = state.getPixelsPerPt()*0.5
-        painter.setPen( qt4.QPen(painter.pen().brush(), penw) )
+        painter.setPen( qt.QPen(painter.pen().brush(), penw) )
         hatheight = min((state.x-initx)/2, height / 3.)
         painter.drawLine(
-            qt4.QPointF(initx, state.y-height+penw),
-            qt4.QPointF((initx+state.x)/2, state.y-height+penw-hatheight))
+            qt.QPointF(initx, state.y-height+penw),
+            qt.QPointF((initx+state.x)/2, state.y-height+penw-hatheight))
         painter.drawLine(
-            qt4.QPointF((initx+state.x)/2, state.y-height+penw-hatheight),
-            qt4.QPointF(state.x, state.y-height+penw))
+            qt.QPointF((initx+state.x)/2, state.y-height+penw-hatheight),
+            qt.QPointF(state.x, state.y-height+penw))
         painter.restore()
 
 class PartDot(Part):
@@ -985,14 +983,14 @@ class PartDot(Part):
 
         painter.save()
         circsize = state.getPixelsPerPt()
-        painter.setBrush( qt4.QBrush(painter.pen().color()) )
-        painter.setPen( qt4.QPen(qt4.Qt.NoPen) )
+        painter.setBrush( qt.QBrush(painter.pen().color()) )
+        painter.setPen( qt.QPen(qt.Qt.NoPen) )
 
         x = 0.5*(initx + state.x)
         y = state.y-height + circsize
-        painter.drawEllipse( qt4.QRectF(
-                qt4.QPointF(x-circsize,y-circsize),
-                qt4.QPointF(x+circsize,y+circsize)) )
+        painter.drawEllipse( qt.QRectF(
+            qt.QPointF(x-circsize,y-circsize),
+            qt.QPointF(x+circsize,y+circsize)) )
         painter.restore()
 
 class PartMarker(Part):
@@ -1060,7 +1058,7 @@ part_commands = {
     r'\dot': (PartDot, 1),
     r'\marker': (PartMarker, 1),
     r'\color': (PartColor, 2),
-    }
+}
 
 # split up latex expression into bits
 splitter_re = re.compile(r'''
@@ -1424,7 +1422,7 @@ class _StdRenderer(_Renderer):
         # if the text is rotated, change the coordinate frame
         if self.angle != 0:
             self.painter.save()
-            self.painter.translate( qt4.QPointF(state.x, state.y) )
+            self.painter.translate( qt.QPointF(state.x, state.y) )
             self.painter.rotate(self.angle)
             state.x = 0
             state.y = 0
@@ -1447,7 +1445,7 @@ class _MmlRenderer(_Renderer):
         """Setup MML document and draw it in recording paint device."""
 
         self.error = ''
-        self.size = qt4.QSize(1, 1)
+        self.size = qt.QSize(1, 1)
         if not mmlsupport:
             self.mmldoc = None
             self.error = _('Error: MathML support not built\n')
@@ -1468,11 +1466,11 @@ class _MmlRenderer(_Renderer):
         # for other DPIs. We then repaint the output to the real
         # device, scaling to make the size correct.
 
-        screendev = qt4.QApplication.desktop()
+        screendev = qt.QApplication.desktop()
         self.record = recordpaint.RecordPaintDevice(
             1024, 1024, screendev.logicalDpiX(), screendev.logicalDpiY())
 
-        rpaint = qt4.QPainter(self.record)
+        rpaint = qt.QPainter(self.record)
         # painting code relies on these attributes of the painter
         rpaint.pixperpt = screendev.logicalDpiY() / 72.
         rpaint.scaling = 1.0
@@ -1496,7 +1494,7 @@ class _MmlRenderer(_Renderer):
             / upscale )
         self.size = doc.size() * self.drawscale
 
-        doc.paint(rpaint, qt4.QPoint(0, 0))
+        doc.paint(rpaint, qt.QPoint(0, 0))
         rpaint.end()
 
     def _getWidthHeight(self):
@@ -1519,12 +1517,12 @@ class _MmlRenderer(_Renderer):
             self.record.play(p)
         else:
             # display an error - must be a better way to do this
-            p.setFont(qt4.QFont())
-            p.setPen(qt4.QPen(qt4.QColor("red")))
-            p.drawText( qt4.QRectF(self.xi, self.yi, 200, 200),
-                        qt4.Qt.AlignLeft | qt4.Qt.AlignTop |
-                        qt4.Qt.TextWordWrap,
-                        self.error )
+            p.setFont(qt.QFont())
+            p.setPen(qt.QPen(qt.QColor("red")))
+            p.drawText(
+                qt.QRectF(self.xi, self.yi, 200, 200),
+                qt.Qt.AlignLeft | qt.Qt.AlignTop | qt.Qt.TextWordWrap,
+                self.error )
         p.restore()
 
         return self.calcbounds

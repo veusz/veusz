@@ -21,7 +21,7 @@
 
 from __future__ import division
 import textwrap
-from .. import qtall as qt4
+from .. import qtall as qt
 
 from .. import document
 from .. import setting
@@ -31,7 +31,7 @@ from . import controlgraph
 
 def _(text, disambiguation=None, context='Root'):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class Root(widget.Widget):
     """Root widget class for plotting the document."""
@@ -108,10 +108,10 @@ class Root(widget.Widget):
         """Update locale of document if changed by user."""
 
         if self.settings.englishlocale:
-            self.document.locale = qt4.QLocale.c()
+            self.document.locale = qt.QLocale.c()
         else:
-            self.document.locale = qt4.QLocale()
-        self.document.locale.setNumberOptions(qt4.QLocale.OmitGroupSeparator)
+            self.document.locale = qt.QLocale()
+        self.document.locale.setNumberOptions(qt.QLocale.OmitGroupSeparator)
 
     def changeColorTheme(self):
         """Change color theme used by document."""

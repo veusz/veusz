@@ -20,14 +20,14 @@
 
 from __future__ import division
 from ..compat import citems, cstr, cstrerror
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import setting
 from ..dataimport import capture, simpleread
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="CaptureDialog"):
     """Translate text."""
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class CaptureDialog(VeuszDialog):
     """Capture dialog.
@@ -42,25 +42,25 @@ class CaptureDialog(VeuszDialog):
         d = setting.settingdb
 
         # Validate edit controls
-        validator = qt4.QIntValidator(1, 65535, self)
+        validator = qt.QIntValidator(1, 65535, self)
         self.portEdit.setValidator(validator)
-        validator = qt4.QIntValidator(1, 1000000000, self)
+        validator = qt.QIntValidator(1, 1000000000, self)
         self.numLinesStopEdit.setValidator(validator)
         self.timeStopEdit.setValidator(validator)
         self.tailEdit.setValidator(validator)
 
         # floating point values for interval
         self.updateIntervalsEdit.setValidator(
-            qt4.QDoubleValidator(1e-2, 10000000, 2, self))
+            qt.QDoubleValidator(1e-2, 10000000, 2, self))
 
         # add completion for filenames
-        c = self.filenamecompleter = qt4.QCompleter(self)
-        model = qt4.QDirModel(c)
+        c = self.filenamecompleter = qt.QCompleter(self)
+        model = qt.QDirModel(c)
         c.setModel(model)
         self.filenameEdit.setCompleter(c)
 
         # get notification of change of capture method
-        self.methodBG = qt4.QButtonGroup(self)
+        self.methodBG = qt.QButtonGroup(self)
         self.methodBG.addButton( self.captureFileButton, 0 )
         self.methodBG.addButton( self.captureInternetButton, 1 )
         self.methodBG.addButton( self.captureProgramButton, 2 )
@@ -69,7 +69,7 @@ class CaptureDialog(VeuszDialog):
         self.methodBG.button( d.get('CaptureDialog_method', 0) ).click()
 
         # get notification of change of stop method
-        self.stopBG = qt4.QButtonGroup(self)
+        self.stopBG = qt.QButtonGroup(self)
         self.stopBG.addButton( self.clickingStopButton, 0 )
         self.stopBG.addButton( self.numLinesStopButton, 1 )
         self.stopBG.addButton( self.timeStopButton, 2 )
@@ -85,7 +85,7 @@ class CaptureDialog(VeuszDialog):
 
         # user starts capture
         self.captureButton = self.buttonBox.addButton(
-            _("Ca&pture"), qt4.QDialogButtonBox.ApplyRole )
+            _("Ca&pture"), qt.QDialogButtonBox.ApplyRole )
 
         self.captureButton.clicked.connect(self.slotCaptureClicked)
 
@@ -127,11 +127,11 @@ class CaptureDialog(VeuszDialog):
     def slotBrowseClicked(self):
         """Browse for a data file."""
 
-        fd = qt4.QFileDialog(self, 'Browse data file or socket')
-        fd.setFileMode( qt4.QFileDialog.ExistingFile )
+        fd = qt.QFileDialog(self, 'Browse data file or socket')
+        fd.setFileMode( qt.QFileDialog.ExistingFile )
 
         # update filename if changed
-        if fd.exec_() == qt4.QDialog.Accepted:
+        if fd.exec_() == qt.QDialog.Accepted:
             self.filenameEdit.replaceAndAddHistory( fd.selectedFiles()[0] )
 
     def slotCaptureClicked(self):
@@ -163,7 +163,7 @@ class CaptureDialog(VeuszDialog):
                 tail = int( self.tailEdit.text() )
 
         except ValueError:
-            qt4.QMessageBox.critical(self, _("Invalid number"), _("Invalid number"))
+            qt.QMessageBox.critical(self, _("Invalid number"), _("Invalid number"))
             return
             
         # get method of getting data
@@ -184,10 +184,11 @@ class CaptureDialog(VeuszDialog):
                     self.commandLineEdit.text())
         except EnvironmentError as e:
             # problem opening stream
-            qt4.QMessageBox.critical(self, _("Cannot open input"),
-                                     _("Cannot open input:\n"
-                                       " %s (error %i)") % (
-                    cstrerror(e), e.errno))
+            qt.QMessageBox.critical(
+                self, _("Cannot open input"),
+                _("Cannot open input:\n %s (error %i)") % (
+                    cstrerror(e), e.errno)
+            )
             return
 
         stream.maxlines = maxlines
@@ -224,18 +225,18 @@ class CapturingDialog(VeuszDialog):
         self.cancelButton.clicked.connect(self.slotCancel)
 
         # timer which governs reading from source
-        self.readtimer = qt4.QTimer(self)
+        self.readtimer = qt.QTimer(self)
         self.readtimer.timeout.connect(self.slotReadTimer)
 
         # record time capture started
-        self.starttime = qt4.QTime()
+        self.starttime = qt.QTime()
         self.starttime.start()
 
         # sort tree by dataset name
-        self.datasetTreeWidget.sortItems(0, qt4.Qt.AscendingOrder)
+        self.datasetTreeWidget.sortItems(0, qt.Qt.AscendingOrder)
 
         # timer for updating display
-        self.displaytimer = qt4.QTimer(self)
+        self.displaytimer = qt.QTimer(self)
         self.displaytimer.timeout.connect(self.slotDisplayTimer)
         self.sourceLabel.setText( self.sourceLabel.text() %
                                   stream.name )
@@ -243,7 +244,7 @@ class CapturingDialog(VeuszDialog):
         self.slotDisplayTimer() # initialise label
 
         # timer to update document
-        self.updatetimer = qt4.QTimer(self)
+        self.updatetimer = qt.QTimer(self)
         self.updateoperation = None
         if updateinterval:
             self.updatetimer.timeout.connect(self.slotUpdateTimer)
@@ -272,13 +273,13 @@ class CapturingDialog(VeuszDialog):
 
         # iterate over each dataset
         for name, length in citems(cts):
-            find = tree.findItems(name, qt4.Qt.MatchExactly, 0)
+            find = tree.findItems(name, qt.Qt.MatchExactly, 0)
             if find:
                 # if already in tree, update number of counts
                 find[0].setText(1, str(length))
             else:
                 # add new item
-                tree.addTopLevelItem( qt4.QTreeWidgetItem([name, str(length)]))
+                tree.addTopLevelItem( qt.QTreeWidgetItem([name, str(length)]))
 
     def slotUpdateTimer(self):
         """Called to update document while data is being captured."""

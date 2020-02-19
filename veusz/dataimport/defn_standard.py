@@ -18,14 +18,14 @@
 
 from __future__ import division, print_function
 from ..compat import citems
-from .. import qtall as qt4
+from .. import qtall as qt
 from .. import utils
 from .. import document
 from . import simpleread
 from . import base
 
 def _(text, disambiguation=None, context="Import_Standard"):
-    return qt4.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation)
 
 class ImportParamsSimple(base.ImportParamsBase):
     """simpleread import parameters.

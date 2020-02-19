@@ -25,7 +25,7 @@ from .compat import citems, pickle
 from .windows.simplewindow import SimpleWindow
 from . import document
 from . import setting
-from . import qtall as qt4
+from . import qtall as qt
 
 """Program to be run by embedding interface to run Veusz commands."""
 
@@ -164,7 +164,7 @@ class EmbeddedClient(object):
         """Wipe the current document."""
         self.document.wipe()
 
-class EmbedApplication(qt4.QApplication):
+class EmbedApplication(qt.QApplication):
     """Application to run remote end of embed connection.
 
     Commands are sent over stdin, with responses sent to stdout
@@ -174,12 +174,12 @@ class EmbedApplication(qt4.QApplication):
     cmdlenlen = struct.calcsize('<I')
 
     def __init__(self, thesocket, args):
-        qt4.QApplication.__init__(self, args)
+        qt.QApplication.__init__(self, args)
         self.socket = thesocket
 
         # listen to commands on the socket
-        self.notifier = qt4.QSocketNotifier(
-            self.socket.fileno(), qt4.QSocketNotifier.Read)
+        self.notifier = qt.QSocketNotifier(
+            self.socket.fileno(), qt.QSocketNotifier.Read)
         self.notifier.activated.connect(self.slotDataToRead)
         self.notifier.setEnabled(True)
 
