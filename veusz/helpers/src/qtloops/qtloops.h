@@ -75,4 +75,7 @@ void applyImageTransparancy(QImage& img, const Numpy2DObj& data);
 QImage resampleLinearImage(QImage& img,
 			   const Numpy1DObj& xpts, const Numpy1DObj& ypts);
 
+// plot image as a set of rectangles
+void plotImageAsRects(QPainter& painter, const QImage& img, const QRectF& bounds);
+
 #endif
