@@ -72,10 +72,17 @@ QImage numpyToQImage(const Numpy2DObj& data, const Numpy2DIntObj &colors,
 
 void applyImageTransparancy(QImage& img, const Numpy2DObj& data);
 
-QImage resampleLinearImage(QImage& img,
+QImage resampleLinearImage(const QImage& img,
 			   const Numpy1DObj& xpts, const Numpy1DObj& ypts);
 
 // plot image as a set of rectangles
 void plotImageAsRects(QPainter& painter, const QRectF& bounds, const QImage& img);
+
+// plot a non linear image as a set of boxes
+// the coordinates for each edge are given in xedges/yedges
+void plotNonlinearImageAsBoxes(QPainter& painter,
+                               const QImage& img,
+                               const Numpy1DObj& xedges,
+                               const Numpy1DObj& yedges);
 
 #endif

@@ -184,7 +184,7 @@ void applyImageTransparancy(QImage& img, SIP_PYOBJECT);
   }
 %End
 
-QImage resampleLinearImage(QImage& img, SIP_PYOBJECT, SIP_PYOBJECT);
+QImage resampleLinearImage(const QImage& img, SIP_PYOBJECT, SIP_PYOBJECT);
 %MethodCode
    {
    try
@@ -337,3 +337,21 @@ SIP_PYOBJECT rollingAverage(SIP_PYOBJECT data, SIP_PYOBJECT weights,
 %End
 
 void plotImageAsRects(QPainter& painter, const QRectF& bounds, const QImage& img);
+
+void plotNonlinearImageAsBoxes(QPainter& painter, const QImage& img, SIP_PYOBJECT, SIP_PYOBJECT);
+%MethodCode
+   {
+   try
+     {
+       Numpy1DObj xpts(a2);
+       Numpy1DObj ypts(a3);
+
+       plotNonlinearImageAsBoxes(*a0, *a1, xpts, ypts);
+       //sipRes = oimg;
+     }
+   catch( const char *msg )
+     {
+       sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+     }
+   }
+%End

@@ -58,8 +58,6 @@
 # define isFinite(_a) (std::isfinite(_a))
 #endif
 /* If the above doesn't work, then try (finite(_a) && !isNaN(_a)) or (!isNaN((_a) - (_a))).
- * Also, please report a bug as per http://www.inkscape.org/report_bugs.php,
- * giving information about what platform and compiler version you're using.
  */
 
 

@@ -21,14 +21,13 @@
 #include "polylineclip.h"
 #include "polygonclip.h"
 
-#include <math.h>
-
-#include <QPointF>
-#include <QVector>
+#include <QBrush>
+#include <QColor>
 #include <QLineF>
 #include <QPen>
+#include <QPointF>
 #include <QTransform>
-#include <QColor>
+#include <QVector>
 
 namespace
 {
@@ -446,7 +445,7 @@ void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
     }
 }
 
-QImage resampleLinearImage(QImage& img,
+QImage resampleLinearImage(const QImage& img,
 			   const Numpy1DObj& xpts, const Numpy1DObj& ypts)
 {
   // reversed mode
@@ -493,7 +492,7 @@ QImage resampleLinearImage(QImage& img,
 	     iy < ypts.dim-2 )
 	++iy;
 
-      QRgb* iscanline = reinterpret_cast<QRgb*>(img.scanLine(iy));
+      const QRgb* iscanline = reinterpret_cast<const QRgb*>(img.scanLine(iy));
       QRgb* oscanline = reinterpret_cast<QRgb*>(outimg.scanLine(oy));
 
       int ix = 0;
@@ -524,10 +523,89 @@ void plotImageAsRects(QPainter& painter, const QRectF& bounds, const QImage& img
   const qreal x0 = bounds.left();
   const qreal y0 = bounds.top();
 
+  const QRectF cliprect = painter.clipBoundingRect();
+  const bool clipped = ! cliprect.isEmpty();
+
+  painter.save();
   for(int y=0; y<height; ++y)
     for(int x=0; x<width; ++x)
       {
-        painter.fillRect(QRectF(x0+x*dx, y0+y*dy, dx, dy),
-                         img.pixelColor(x, y));
+        QColor col(img.pixelColor(x, y));
+        QRectF r(x0+x*dx, y0+y*dy, dx, dy);
+
+        if(clipped)
+          r &= cliprect;
+
+        if(r.isValid())
+          {
+            const int alpha = col.alpha();
+            if(alpha == 0)
+              {
+                // transparent
+              }
+            else if(alpha == 255)
+              {
+                // opaque, so draw line to avoid antialiasing gaps round
+                // boxes
+                painter.setPen(QPen(col));
+                painter.setBrush(QBrush(col));
+                painter.drawRect(r);
+              }
+            else
+              {
+                painter.fillRect(r, col);
+              }
+          }
       }
+  painter.restore();
+}
+
+void plotNonlinearImageAsBoxes(QPainter& painter,
+                               const QImage& img,
+                               const Numpy1DObj& xedges,
+                               const Numpy1DObj& yedges)
+{
+  const int width=img.width();
+  const int height=img.height();
+
+  // safety
+  if( xedges.dim != width+1 || yedges.dim != height+1 )
+    throw "Number of edges did not match image size";
+
+  const QRectF cliprect = painter.clipBoundingRect();
+  const bool clipped = ! cliprect.isEmpty();
+
+  painter.save();
+  for(int y=0; y<height; ++y)
+    for(int x=0; x<width; ++x)
+      {
+        QColor col(img.pixelColor(x, y));
+        QRectF r(xedges(x), yedges(y),
+                 xedges(x+1)-xedges(x), yedges(y+1)-yedges(y));
+
+        if(clipped)
+          r &= cliprect;
+
+        if(r.isValid())
+          {
+            const int alpha = col.alpha();
+            if(alpha == 0)
+              {
+                // transparent
+              }
+            else if(alpha == 255)
+              {
+                // opaque, so draw line to avoid antialiasing gaps round
+                // boxes
+                painter.setPen(QPen(col));
+                painter.setBrush(QBrush(col));
+                painter.drawRect(r);
+              }
+            else
+              {
+                painter.fillRect(r, col);
+              }
+          }
+      }
+  painter.restore();
 }
