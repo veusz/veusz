@@ -79,8 +79,56 @@
 </g>
 </g>
 <g clip-path="url(#c2)">
-<g fill="none" stroke-width="1">
-<image x="325.9" y="7" width="198.4" height="464.1" xlink:href="data:image/ppm;base64,UDYKNSA1CjI1NQqZmZnMzMzMzMz///////+ZmZmZmZmZmZnMzMzMzMxmZmZmZmaZmZmZmZmZmZkzMzMzMzNmZmZmZmaZmZkAAAAAAAAzMzMzMzNmZmY=" preserveAspectRatio="none"/>
+<g fill="#999999" stroke="#999999" stroke-width="1">
+<path d="m325.9,7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#cccccc" stroke="#cccccc" stroke-width="1">
+<path d="m365.6,7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m405.3,7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#ffffff" stroke="#ffffff" stroke-width="1">
+<path d="m445,7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m484.7,7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#999999" stroke="#999999" stroke-width="1">
+<path d="m325.9,99.9l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m365.6,99.9l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m405.3,99.9l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#cccccc" stroke="#cccccc" stroke-width="1">
+<path d="m445,99.9l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m484.7,99.9l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#666666" stroke="#666666" stroke-width="1">
+<path d="m325.9,192.7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m365.6,192.7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#999999" stroke="#999999" stroke-width="1">
+<path d="m405.3,192.7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m445,192.7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m484.7,192.7l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#333333" stroke="#333333" stroke-width="1">
+<path d="m325.9,285.5l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m365.6,285.5l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#666666" stroke="#666666" stroke-width="1">
+<path d="m405.3,285.5l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m445,285.5l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#999999" stroke="#999999" stroke-width="1">
+<path d="m484.7,285.5l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#000000" stroke-width="1">
+<path d="m325.9,378.4l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m365.6,378.4l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#333333" stroke="#333333" stroke-width="1">
+<path d="m405.3,378.4l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+<path d="m445,378.4l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
+</g>
+<g fill="#666666" stroke="#666666" stroke-width="1">
+<path d="m484.7,378.4l39.6,0l0,92.8l-39.6,0l0,-92.8"/>
 </g>
 </g>
 <g clip-path="url(#c0)">

@@ -26,6 +26,7 @@ import numpy as N
 from .. import document
 from .. import setting
 from .. import utils
+from ..helpers import qtloops
 
 from . import widget
 from . import axis
@@ -227,6 +228,7 @@ class ColorBar(axis.Axis):
             painter.save()
             painter.setClipRect(rclip & routside)
             painter.drawImage(r, img)
+            #qtloops.plotImageAsRects(painter, r, img)
             painter.restore()
 
         # if there's a border

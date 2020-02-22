@@ -305,6 +305,9 @@ class AxisFunction(axis.Axis):
             return None
         return linked
 
+    def isLinear(self):
+        return False
+
     def computePlottedRange(self, force=False):
         '''Use other axis to compute range.'''
 

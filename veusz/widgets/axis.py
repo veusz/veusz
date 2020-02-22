@@ -540,6 +540,10 @@ class Axis(widget.Widget):
         return (self.settings.log and
                 self.settings.mode in ('numeric', 'labels'))
 
+    def isLinear(self):
+        """Is this a linear axis?"""
+        return not self.settings.log
+
     def computeTicks(self, allowauto=True):
         """Update ticks given plotted range.
         if allowauto is False, then do not allow ticks to be

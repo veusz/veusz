@@ -26,6 +26,7 @@ import numpy as N
 from .. import setting
 from .. import document
 from .. import utils
+from ..helpers import qtloops
 
 from . import plotters
 
@@ -150,63 +151,87 @@ class Image(plotters.GenericPlotter):
         plotters.GenericPlotter.addSettings(s)
 
         s.add( setting.DatasetExtended(
-                'data', '',
-                dimensions = 2,
-                descr = _('Dataset to plot'),
-                usertext=_('Dataset')),
+            'data', '',
+            dimensions = 2,
+            descr = _('Dataset to plot'),
+            usertext=_('Dataset')),
                0 )
         s.add( setting.FloatOrAuto(
-                'min', 'Auto',
-                descr = _('Minimum value of image scale'),
-                usertext=_('Min. value')),
+            'min', 'Auto',
+            descr = _('Minimum value of image scale'),
+            usertext=_('Min. value')),
                1 )
         s.add( setting.FloatOrAuto(
-                'max', 'Auto',
-                descr = _('Maximum value of image scale'),
-                usertext=_('Max. value')),
+            'max', 'Auto',
+            descr = _('Maximum value of image scale'),
+            usertext=_('Max. value')),
                2 )
         s.add( setting.Choice(
-                'colorScaling',
-                ['linear', 'sqrt', 'log', 'squared'],
-                'linear',
-                descr = _('Scaling to transform numbers to color'),
-                usertext=_('Scaling')),
+            'colorScaling',
+            ['linear', 'sqrt', 'log', 'squared'],
+            'linear',
+            descr = _('Scaling to transform numbers to color'),
+            usertext=_('Scaling')),
                3 )
 
         s.add( setting.DatasetExtended(
-                'transparencyData', '',
-                dimensions = 2,
-                descr = _('Dataset to use for transparency (0 to 1)'),
-                usertext=_('Trans. data')),
+            'transparencyData', '',
+            dimensions = 2,
+            descr = _('Dataset to use for transparency (0 to 1)'),
+            usertext=_('Trans. data')),
                4 )
 
+        s.add( setting.Choice(
+            'mapping',
+            ('pixels', 'bounds'),
+            'pixels',
+            descr = _('Map image using pixels or bound coordinates'),
+            usertext=_('Mapping')),
+               5 )
+
         s.add( setting.Colormap(
-                'colorMap',
-                'grey',
-                descr = _('Set of colors to plot data with'),
-                usertext=_('Colormap'),
-                formatting=True),
+            'colorMap',
+            'grey',
+            descr = _('Set of colors to plot data with'),
+            usertext=_('Colormap'),
+            formatting=True),
                5 )
         s.add( setting.Bool(
-                'colorInvert', False,
-                descr = _('Invert color map'),
-                usertext=_('Invert colormap'),
-                formatting=True),
+            'colorInvert', False,
+            descr = _('Invert color map'),
+            usertext=_('Invert colormap'),
+            formatting=True),
                6 )
         s.add( setting.Int(
-                'transparency', 0,
-                descr = _('Transparency percentage'),
-                usertext = _('Transparency'),
-                minval = 0,
-                maxval = 100,
-                formatting=True),
+            'transparency', 0,
+            descr = _('Transparency percentage'),
+            usertext = _('Transparency'),
+            minval = 0,
+            maxval = 100,
+            formatting=True),
                7 )
 
-        s.add( setting.Bool(
-                'smooth', False,
-                descr = _('Smooth image to display resolution'),
-                usertext = _('Smooth'),
-                formatting = True ) )
+        s.add( setting.Choice(
+            'drawMode',
+            ['default', 'upscale-pixels', 'upscale-smooth', 'rectangles'],
+            'default',
+            descr = _('Method for drawing output'),
+            usertext=_('Draw Mode'),
+            formatting = True )
+        )
+
+        # translate smooth to drawMode
+        s.add( setting.SettingBackwardCompat(
+            'smooth',
+            'drawMode',
+            False,
+            translatefn=lambda x: {
+                True: 'upscale-smooth',
+                False: 'default'
+                }[x],
+            formatting=True,
+            )
+        )
 
     @property
     def userdescription(self):
@@ -271,8 +296,71 @@ class Image(plotters.GenericPlotter):
         data = s.get('data').getData(d)
         minval, maxval = self.getDataValueRange(data)
 
-        return (minval, maxval, s.colorScaling, s.colorMap,
-                s.transparency, s.colorInvert)
+        return (
+            minval, maxval,
+            s.colorScaling,
+            s.colorMap,
+            s.transparency,
+            s.colorInvert,
+        )
+
+    def drawNonlinearImage(self, painter, axes, posn, data, image):
+        """Draw an image where the image data are non-linear, or the
+        axes are non-linear."""
+
+        drawmode = self.settings.drawMode
+        # get pixel edges, converted to plotter coordinates
+        xedgep, yedgep = data.getPixelEdges(
+            scalefnx=lambda v: axes[0].dataToPlotterCoords(posn, v),
+            scalefny=lambda v: axes[1].dataToPlotterCoords(posn, v))
+
+        if drawmode == 'default' or drawmode == 'rectangles':
+            # simply draw everything as boxes
+            qtloops.plotNonlinearImageAsBoxes(
+                painter, image,
+                xedgep, yedgep)
+        else:
+            # map image to a linear QImage
+            # crop any pixels completely outside posn
+            xedgep, yedgep, image = cropGridImageToBox(
+                image, xedgep, yedgep, posn)
+            x0 = int(min(xedgep[0], xedgep[-1]))
+            x1 = int(max(xedgep[0], xedgep[-1]))
+            y0 = int(min(yedgep[0], yedgep[-1]))
+            y1 = int(max(yedgep[0], yedgep[-1]))
+
+            if drawmode == 'upscale-pixels':
+                # resample image to a flat bitmap
+                image = qtloops.resampleNonlinearImage(
+                    image, x0, y0, x1, y1, xedgep, yedgep)
+
+            elif drawmode == 'upscale-smooth':
+                # render smaller and scale up to smooth
+                s = 4
+                x0, x1, y0, y1 = x0//s, x1//s, y0//s, y1//s
+                image = qtloops.resampleNonlinearImage(
+                    image, x0, y0, x1, y1,
+                    xedgep/s, yedgep/s)
+                x0, x1, y0, y1 = x0*s, x1*s, y0*s, y1*s
+                image = image.scaled(
+                    x1-x0, y1-y0,
+                    qt.Qt.IgnoreAspectRatio,
+                    qt.Qt.SmoothTransformation
+                )
+            else:
+                raise RuntimeError('Invalid draw mode')
+
+            imgposn = qt.QRectF(x0, y0, x1-x0, y1-y0)
+            painter.drawImage(imgposn, image)
+
+        # Debug position of pixels
+        # painter.setPen(qt.QPen(qt.QBrush(qt.QColor("black")), 0.125))
+        # for x in range(len(xedgep)-1):
+        #     for y in range(len(yedgep)-1):
+        #         painter.drawRect(qt.QRectF(
+        #             xedgep[x], yedgep[y],
+        #             xedgep[x+1]-xedgep[x],
+        #             yedgep[y+1]-yedgep[y]))
 
     def dataDraw(self, painter, axes, posn, clip):
         """Draw image."""
@@ -301,64 +389,74 @@ class Image(plotters.GenericPlotter):
         cmap = d.evaluate.getColormap(s.colorMap, s.colorInvert)
         datavaluerange = self.getDataValueRange(data)
         image = utils.applyColorMap(
-            cmap, s.colorScaling, data.data,
+            cmap,
+            s.colorScaling,
+            data.data,
             datavaluerange[0], datavaluerange[1],
-            s.transparency, transimg=transimg)
+            s.transparency, transimg=transimg,
+        )
 
-        if data.isLinearImage():
-            # linearly spaced grid
+        drawmode = s.drawMode
 
-            if ( pltrangex[0] < posn[0] or pltrangex[1] > posn[2] or
-                 pltrangey[0] < posn[1] or pltrangey[1] > posn[3] ):
-                # need to crop image
-                pltrangex, pltrangey, image = cropLinearImageToBox(
-                    image, pltrangex, pltrangey, posn)
+        # if data are non linear, or axes are non linear in pixel
+        # mode, switch to non linear drawing
+        if not data.isLinearImage() or ((
+                not axes[0].isLinear() or not axes[1].isLinear()) and
+                s.mapping == 'pixels'):
+            self.drawNonlinearImage(painter, axes, posn, data, image)
+            return
 
-        else:
-            # get pixel edges, converted to plotter coordinates
-            xedgep, yedgep = data.getPixelEdges(
-                scalefnx=lambda v: axes[0].dataToPlotterCoords(posn, v),
-                scalefny=lambda v: axes[1].dataToPlotterCoords(posn, v))
+        # linearly spaced grid
 
-            # crop any pixels completely outside posn
-            xedgep, yedgep, image = cropGridImageToBox(
-                image, xedgep, yedgep, posn)
-
-            # make image on linear grid
-            image = utils.resampleLinearImage(image, xedgep, yedgep)
-
-            pltrangex = xedgep[0], xedgep[-1]
-            pltrangey = yedgep[0], yedgep[-1]
-
-        # optionally smooth images before displaying
-        if s.smooth:
-            image = image.scaled(
-                pltrangex[1]-pltrangex[0], pltrangey[0]-pltrangey[1],
-                qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
-
-        # get position and size of output image
-        xp, yp = pltrangex[0], pltrangey[1]
-        xw = pltrangex[1]-pltrangex[0]
-        yw = pltrangey[0]-pltrangey[1]
+        # avoid drawing pixels outside of axis range
+        if ( pltrangex[0]<posn[0] or pltrangex[1]>posn[2] or
+             pltrangey[0]<posn[1] or pltrangey[1]>posn[3] ):
+            # need to crop image
+            pltrangex, pltrangey, image = cropLinearImageToBox(
+                image, pltrangex, pltrangey, posn)
 
         # invert output drawing if axes go from positive->negative
         # we only translate the coordinate system if this is the case
-        xscale = 1 if xw > 0 else -1
-        yscale = 1 if yw > 0 else -1
+        xw = pltrangex[1]-pltrangex[0]
+        yw = pltrangey[0]-pltrangey[1]
+        xscale = 1 if xw>0 else -1
+        yscale = 1 if yw>0 else -1
 
+        painter.save()
+
+        xp = pltrangex[0]
+        yp = pltrangey[1]
         if xscale != 1 or yscale != 1:
-            painter.save()
             painter.translate(xp, yp)
             xp = yp = 0
             painter.scale(xscale, yscale)
 
-        # draw image
-        #image = image.copy(qt.QRect(qt.QPoint(0, 0), qt.QPoint(20, 20)))
-        painter.drawImage(qt.QRectF(xp, yp, abs(xw), abs(yw)), image)
+        imgposn = qt.QRectF(
+            xp, yp, abs(pltrangex[0]-pltrangex[1]),
+            abs(pltrangey[0]-pltrangey[1]))
 
-        # restore painter if image was inverted
-        if xscale != 1 or yscale != 1:
-            painter.restore()
+        drawmode = s.drawMode
+        if drawmode == 'rectangles' or (drawmode =='default' and (
+                image.width()<30 or image.height()<30)):
+            # draw low res images as rectangles
+            qtloops.plotImageAsRects(painter, imgposn, image)
+
+        else:
+            # upscale if requested
+            if drawmode == 'upscale-pixels':
+                image = image.scaled(
+                    int(pltrangex[1]-pltrangex[0]),
+                    int(pltrangey[0]-pltrangey[1]),
+                    qt.Qt.IgnoreAspectRatio, qt.Qt.FastTransformation)
+            elif drawmode == 'upscale-smooth':
+                image = image.scaled(
+                    int(pltrangex[1]-pltrangex[0]),
+                    int(pltrangey[0]-pltrangey[1]),
+                    qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
+
+            painter.drawImage(imgposn, image)
+
+        painter.restore()
 
 # allow the factory to instantiate an image
 document.thefactory.register(Image)

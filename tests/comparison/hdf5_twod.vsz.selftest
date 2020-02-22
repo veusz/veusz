@@ -20,8 +20,49 @@
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g fill="none" stroke-width="1">
-<image x="60.2" y="7" width="464.1" height="464.1" xlink:href="data:image/ppm;base64,UDYKNSA0CjI1NQqZmZnMzMzMzMz///////9mZmaZmZmZmZnMzMzMzMwzMzMzMzNmZmaZmZmZmZkAAAAAAAAzMzMzMzNmZmY=" preserveAspectRatio="none"/>
+<g fill="#999999" stroke="#999999" stroke-width="1">
+<path d="m60.2,7l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#cccccc" stroke="#cccccc" stroke-width="1">
+<path d="m153,7l92.8,0l0,116l-92.8,0l0,-116"/>
+<path d="m245.9,7l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#ffffff" stroke="#ffffff" stroke-width="1">
+<path d="m338.7,7l92.8,0l0,116l-92.8,0l0,-116"/>
+<path d="m431.5,7l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#666666" stroke="#666666" stroke-width="1">
+<path d="m60.2,123.1l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#999999" stroke="#999999" stroke-width="1">
+<path d="m153,123.1l92.8,0l0,116l-92.8,0l0,-116"/>
+<path d="m245.9,123.1l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#cccccc" stroke="#cccccc" stroke-width="1">
+<path d="m338.7,123.1l92.8,0l0,116l-92.8,0l0,-116"/>
+<path d="m431.5,123.1l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#333333" stroke="#333333" stroke-width="1">
+<path d="m60.2,239.1l92.8,0l0,116l-92.8,0l0,-116"/>
+<path d="m153,239.1l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#666666" stroke="#666666" stroke-width="1">
+<path d="m245.9,239.1l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#999999" stroke="#999999" stroke-width="1">
+<path d="m338.7,239.1l92.8,0l0,116l-92.8,0l0,-116"/>
+<path d="m431.5,239.1l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#000000" stroke-width="1">
+<path d="m60.2,355.2l92.8,0l0,116l-92.8,0l0,-116"/>
+<path d="m153,355.2l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#333333" stroke="#333333" stroke-width="1">
+<path d="m245.9,355.2l92.8,0l0,116l-92.8,0l0,-116"/>
+<path d="m338.7,355.2l92.8,0l0,116l-92.8,0l0,-116"/>
+</g>
+<g fill="#666666" stroke="#666666" stroke-width="1">
+<path d="m431.5,355.2l92.8,0l0,116l-92.8,0l0,-116"/>
 </g>
 <g fill="none" stroke-width="1.2">
 <polyline fill="none" points="199.4,424.8 292.3,378.4 385.1,332 477.9,285.5"/>

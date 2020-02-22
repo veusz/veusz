@@ -36,4 +36,4 @@ from .feedback import feedback, FeedbackCheckThread, disableFeedback
 from ..helpers.qtloops import addNumpyToPolygonF, plotPathsToPainter, \
     plotLinesToPainter, plotClippedPolyline, polygonClip, \
     plotClippedPolygon, plotBoxesToPainter, addNumpyPolygonToPath, \
-    resampleLinearImage, RotatedRectangle, RectangleOverlapTester
+    RotatedRectangle, RectangleOverlapTester

@@ -16,6 +16,8 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
+#include <algorithm>
+
 #include "qtloops.h"
 #include "isnan.h"
 #include "polylineclip.h"
@@ -38,14 +40,9 @@ namespace
       fabs(pt1.y()- pt2.y()) < 0.01;
   }
 
-  template <class T> inline T min(T a, T b)
-  {
-    return (a<b) ? a : b;
-  }
-
   template <class T> inline T min(T a, T b, T c, T d)
   {
-    return min( min(a, b), min(c, d) );
+    return std::min( std::min(a, b), std::min(c, d) );
   }
 
   template <class T> inline T clipval(T val, T minv, T maxv)
@@ -53,6 +50,11 @@ namespace
     if( val < minv ) return minv;
     if( val > maxv ) return maxv;
     return val;
+  }
+
+  template <class T> void putinorder(T& a, T& b)
+  {
+    if(a>b) std::swap(a, b);
   }
 }
 
@@ -183,14 +185,14 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
   QTransform origtrans(painter.worldTransform());
 
   // number of iterations
-  int size = min(x.dim, y.dim);
+  int size = std::min(x.dim, y.dim);
 
   // if few color points, trim down number of paths
   if( colorimg != 0 )
-    size = min(size, colorimg->width());
+    size = std::min(size, colorimg->width());
   // too few scaling points
   if( scaling != 0 )
-    size = min(size, scaling->dim);
+    size = std::min(size, scaling->dim);
 
   // draw each path
   for(int i = 0; i < size; ++i)
@@ -383,7 +385,7 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 		  const double delta = val*numbands - band;
 
 		  // ensure we don't read beyond where we should
-		  const int band2 = min(band + 1, numbands);
+		  const int band2 = std::min(band + 1, numbands);
 		  const double delta1 = 1.-delta;
 
                   // we add 0.5 before truncating to round to nearest int
@@ -425,8 +427,8 @@ QImage numpyToQImage(const Numpy2DObj& imgdata, const Numpy2DIntObj &colors,
 
 void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
 {
-  const int xw = min(data.dims[1], img.width());
-  const int yw = min(data.dims[0], img.height());
+  const int xw = std::min(data.dims[1], img.width());
+  const int yw = std::min(data.dims[0], img.height());
   
   for(int y=0; y<yw; ++y)
     {
@@ -445,67 +447,37 @@ void applyImageTransparancy(QImage& img, const Numpy2DObj& data)
     }
 }
 
-QImage resampleLinearImage(const QImage& img,
-			   const Numpy1DObj& xpts, const Numpy1DObj& ypts)
+QImage resampleNonlinearImage(const QImage& img,
+                              int x0, int y0,
+                              int x1, int y1,
+                              const Numpy1DObj& xedge,
+                              const Numpy1DObj& yedge)
 {
-  // reversed mode
-  const int revx = xpts(0) > xpts(xpts.dim-1);
-  const int revy = ypts(0) > ypts(ypts.dim-1);
+  putinorder(x0, x1);
+  putinorder(y0, y1);
 
-  // get smallest spacing
-  double mindeltax = 1e99;
-  for(int i=0; i<(xpts.dim-1); ++i)
+  const int xw = x1-x0;
+  const int yw = y1-y0;
+
+  QImage outimg(xw, yw, img.format());
+
+  int iy=0;
+  for(int oy=0; oy<yw; ++oy)
     {
-      mindeltax = std::min(mindeltax, fabs(xpts(i+1)-xpts(i)));
-    }
-  double mindeltay = 1e99;
-  for(int i=0; i<(ypts.dim-1); ++i)
-    {
-      mindeltay = std::min(mindeltay, fabs(ypts(i+1)-ypts(i)));
-    }
+      while( yedge(yedge.dim-2-iy)<=oy+y0+0.5 && iy<yedge.dim-1 )
+        ++iy;
 
-  // get bounds
-  const double minx = revx ? xpts(xpts.dim-1) : xpts(0);
-  const double maxx = revx ? xpts(0) : xpts(xpts.dim-1);
-  const double miny = revy ? ypts(ypts.dim-1) : ypts(0);
-  const double maxy = revy ? ypts(0) : ypts(ypts.dim-1);
-
-  // output size (trimmed to 1024)
-  const int sizex = std::min(1024, int((maxx-minx) / (mindeltax*0.25) + 0.01) );
-  const int sizey = std::min(1024, int((maxy-miny) / (mindeltay*0.25) + 0.01) );
-  const double deltax = (maxx-minx) / sizex;
-  const double deltay = (maxy-miny) / sizey;
-
-  QImage outimg(sizex, sizey, img.format());
-
-  // need to account for reverse direction, so count backwards
-  const int xptsbase = revx ? xpts.dim-1 : 0;
-  const int xptsdir = revx ? -1 : 1;
-  const int yptsbase = revy ? ypts.dim-1 : 0;
-  const int yptsdir = revy ? -1 : 1;
-
-  int iy = 0;
-  for(int oy = 0; oy < sizey; ++oy)
-    {
-      // do we move to the next pixel in y?
-      while( miny+(oy+0.5)*deltay > ypts(yptsbase+yptsdir*(iy+1)) &&
-	     iy < ypts.dim-2 )
-	++iy;
-
-      const QRgb* iscanline = reinterpret_cast<const QRgb*>(img.scanLine(iy));
       QRgb* oscanline = reinterpret_cast<QRgb*>(outimg.scanLine(oy));
+      const QRgb* iscanline = reinterpret_cast<const QRgb*>(img.scanLine(iy));
 
-      int ix = 0;
-      for(int ox = 0; ox < sizex; ++ox)
-	{
-	  // do we move to the next pixel in x?
-	  while( minx+(ox+0.5)*deltax > xpts(xptsbase+xptsdir*(ix+1)) &&
-		 ix < xpts.dim-2 )
-	    ++ix;
+      int ix=0;
+      for(int ox=0; ox<xw; ++ox)
+        {
+          while( xedge(ix+1)<=ox+x0+0.5 && ix<xedge.dim-1 )
+            ++ix;
 
-	  // copy pixel
-	  *(oscanline+ox) = *(iscanline+ix);
-	}
+          oscanline[ox] = iscanline[ix];
+        }
     }
 
   return outimg;
@@ -530,14 +502,13 @@ void plotImageAsRects(QPainter& painter, const QRectF& bounds, const QImage& img
   for(int y=0; y<height; ++y)
     for(int x=0; x<width; ++x)
       {
-        QColor col(img.pixelColor(x, y));
         QRectF r(x0+x*dx, y0+y*dy, dx, dy);
-
         if(clipped)
           r &= cliprect;
 
         if(r.isValid())
           {
+            const QColor col(img.pixelColor(x, y));
             const int alpha = col.alpha();
             if(alpha == 0)
               {
@@ -547,7 +518,7 @@ void plotImageAsRects(QPainter& painter, const QRectF& bounds, const QImage& img
               {
                 // opaque, so draw line to avoid antialiasing gaps round
                 // boxes
-                painter.setPen(QPen(col));
+                painter.setPen(QPen(QBrush(col), 0.));
                 painter.setBrush(QBrush(col));
                 painter.drawRect(r);
               }
@@ -579,15 +550,20 @@ void plotNonlinearImageAsBoxes(QPainter& painter,
   for(int y=0; y<height; ++y)
     for(int x=0; x<width; ++x)
       {
-        QColor col(img.pixelColor(x, y));
-        QRectF r(xedges(x), yedges(y),
-                 xedges(x+1)-xedges(x), yedges(y+1)-yedges(y));
+        const qreal x0 = std::min(xedges(x), xedges(x+1));
+        const qreal x1 = std::max(xedges(x), xedges(x+1));
+        const qreal y0 = std::min(yedges(y), yedges(y+1));
+        const qreal y1 = std::max(yedges(y), yedges(y+1));
 
+        QRectF r(x0, y0, x1-x0, y1-y0);
         if(clipped)
           r &= cliprect;
 
         if(r.isValid())
           {
+            // note: axis coordinates are reversed wrt to image
+            const QColor col(img.pixelColor(x, height-1-y));
+
             const int alpha = col.alpha();
             if(alpha == 0)
               {
@@ -597,7 +573,7 @@ void plotNonlinearImageAsBoxes(QPainter& painter,
               {
                 // opaque, so draw line to avoid antialiasing gaps round
                 // boxes
-                painter.setPen(QPen(col));
+                painter.setPen(QPen(QBrush(col), 0.));
                 painter.setBrush(QBrush(col));
                 painter.drawRect(r);
               }

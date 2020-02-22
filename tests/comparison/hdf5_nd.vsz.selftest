@@ -103,8 +103,51 @@
 </g>
 </g>
 <g clip-path="url(#c2)">
-<g fill="none" stroke-width="1">
-<image x="325.9" y="14.1" width="191.3" height="450" xlink:href="data:image/ppm;base64,UDYKNCA0CjI1NQrb29vt7e3///////+SkpKkpKS2trbIyMhJSUlbW1ttbW2AgIAAAAASEhIkJCQ3Nzc=" preserveAspectRatio="none"/>
+<g fill="#dbdbdb" stroke="#dbdbdb" stroke-width="1">
+<path d="m325.9,14.1l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#ededed" stroke="#ededed" stroke-width="1">
+<path d="m373.8,14.1l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#ffffff" stroke="#ffffff" stroke-width="1">
+<path d="m421.6,14.1l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+<path d="m469.4,14.1l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#929292" stroke="#929292" stroke-width="1">
+<path d="m325.9,126.6l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#a4a4a4" stroke="#a4a4a4" stroke-width="1">
+<path d="m373.8,126.6l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#b6b6b6" stroke="#b6b6b6" stroke-width="1">
+<path d="m421.6,126.6l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#c8c8c8" stroke="#c8c8c8" stroke-width="1">
+<path d="m469.4,126.6l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#494949" stroke="#494949" stroke-width="1">
+<path d="m325.9,239.1l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#5b5b5b" stroke="#5b5b5b" stroke-width="1">
+<path d="m373.8,239.1l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#6d6d6d" stroke="#6d6d6d" stroke-width="1">
+<path d="m421.6,239.1l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#808080" stroke="#808080" stroke-width="1">
+<path d="m469.4,239.1l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#000000" stroke-width="1">
+<path d="m325.9,351.6l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#121212" stroke="#121212" stroke-width="1">
+<path d="m373.8,351.6l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#242424" stroke="#242424" stroke-width="1">
+<path d="m421.6,351.6l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
+</g>
+<g fill="#373737" stroke="#373737" stroke-width="1">
+<path d="m469.4,351.6l47.8,0l0,112.5l-47.8,0l0,-112.5"/>
 </g>
 </g>
 <g clip-path="url(#c0)">
