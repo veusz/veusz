@@ -213,7 +213,7 @@ class Image(plotters.GenericPlotter):
 
         s.add( setting.Choice(
             'drawMode',
-            ['default', 'upscale-pixels', 'upscale-smooth', 'rectangles'],
+            ['default', 'resample-pixels', 'resample-smooth', 'rectangles'],
             'default',
             descr = _('Method for drawing output'),
             usertext=_('Draw Mode'),
@@ -226,7 +226,7 @@ class Image(plotters.GenericPlotter):
             'drawMode',
             False,
             translatefn=lambda x: {
-                True: 'upscale-smooth',
+                True: 'resample-smooth',
                 False: 'default'
                 }[x],
             formatting=True,
@@ -329,19 +329,18 @@ class Image(plotters.GenericPlotter):
             y0 = int(min(yedgep[0], yedgep[-1]))
             y1 = int(max(yedgep[0], yedgep[-1]))
 
-            if drawmode == 'upscale-pixels':
+            print(painter.device().logicalDpiY())
+            if drawmode == 'resample-pixels':
                 # resample image to a flat bitmap
                 image = qtloops.resampleNonlinearImage(
                     image, x0, y0, x1, y1, xedgep, yedgep)
 
-            elif drawmode == 'upscale-smooth':
+            elif drawmode == 'resample-smooth':
                 # render smaller and scale up to smooth
                 s = 4
-                x0, x1, y0, y1 = x0//s, x1//s, y0//s, y1//s
                 image = qtloops.resampleNonlinearImage(
-                    image, x0, y0, x1, y1,
+                    image, x0//s, y0//s, x1//s, y1//s,
                     xedgep/s, yedgep/s)
-                x0, x1, y0, y1 = x0*s, x1*s, y0*s, y1*s
                 image = image.scaled(
                     x1-x0, y1-y0,
                     qt.Qt.IgnoreAspectRatio,
@@ -443,12 +442,12 @@ class Image(plotters.GenericPlotter):
 
         else:
             # upscale if requested
-            if drawmode == 'upscale-pixels':
+            if drawmode == 'resample-pixels':
                 image = image.scaled(
                     int(pltrangex[1]-pltrangex[0]),
                     int(pltrangey[0]-pltrangey[1]),
                     qt.Qt.IgnoreAspectRatio, qt.Qt.FastTransformation)
-            elif drawmode == 'upscale-smooth':
+            elif drawmode == 'resample-smooth':
                 image = image.scaled(
                     int(pltrangex[1]-pltrangex[0]),
                     int(pltrangey[0]-pltrangey[1]),
