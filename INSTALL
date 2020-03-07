@@ -28,7 +28,7 @@ Optional requirements:
  Ghostscript     https://www.ghostscript.com/ (for EPS/PS output)
  Sphinx          http://www.sphinx-doc.org/en/stable/ (to rebuild manual)
 
-Note that the source code is compatible with both python 2.6+ and
+Note that the source code is compatible with both python 2.7+ and
 3.3+. It does not need translation with 2to3. The optional dependency
 pyemf does not have Python 3 support, but an in-development version of
 pyemf for Python 3 can be found at https://github.com/jeremysanders/pyemf.
