@@ -22,13 +22,13 @@ Changes in 3.2:
 
  Minor changes:
   * Show exception dialog if crash occurs outside main thread
-  * Added Brazillian Portuguese description for desktop file
+  * Added Brazilian Portuguese description for desktop file
   * Use python3 by default for in-place run
 
  Bug fixes:
   * Fix icons in tutorial
   * Fix case when positions in bar widget are set, then removed
-  * Truely all files are shown in import dialog, if requested
+  * Truly all files are shown in import dialog, if requested
   * Fix browse button in export dialog
   * Fix stylesheet for polygon widget
   * Fix invalid escape sequences warnings
