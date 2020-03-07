@@ -1,22 +1,13 @@
 # -*- mode: python -*-
 import glob
+import os.path
+
+icon = os.path.abspath('icons\\veusz.ico')
 
 a = Analysis(['..\\veusz\\veusz_main.py'],
-             hiddenimports=['h5py.defs', 'h5py.utils', 'h5py.h5ac', 'h5py._proxy',
-                            'iminuit', 'iminuit.latex', 'iminuit._plotting', 'iminuit.frontends',
-                            'PyQt5.sip'],
-             hookspath=None,
-             runtime_hooks=None)
-
-# get rid of debugging binaries
-#a.binaries = [b for b in a.binaries if b[0][-6:] != 'd4.dll']
-# this doesn't work - have to go and delete the debugging libraries from Qt
-# otherwise, we get sxs errors
-
-# don't want kernel32, etc
-# a.binaries = [b for b in a.binaries if not (os.path.basename(b[0]) in
-#               ('kernel32.dll', 'Qt3Support4.dll',
-#                'QtNetwork4.dll', 'QtOpenGL4.dll', 'QtSql4.dll'))]
+             hiddenimports=['iminuit.iminuit_warnings','iminuit.latex','iminiuit._libiminuit','iminuit._minuit_methods'],
+             hookspath=[],
+             runtime_hooks=[])
 
 # remove unnedded plugins
 # for pdir in ('accessible', 'codecs', 'graphicssystems'):
@@ -31,7 +22,7 @@ exe = EXE(pyz,
           strip=None,
           upx=False,
           console=False,
-          icon='icons\\veusz.ico')
+          icon=icon)
 
 # add necessary documentation, licence
 binaries = a.binaries
