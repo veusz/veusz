@@ -48,7 +48,7 @@ class ControlKey(object):
         parentposn: posn of parent on plot
         xpos, ypos: position of key
         width, height: size of key
-        textheight: 
+        textheight: height of text
         """
         self.widget = widget
         self.parentposn = tuple(parentposn)
@@ -171,76 +171,94 @@ class Key(widget.Widget):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
 
-        s.add( setting.Text('Text',
-                            descr = _('Text settings'),
-                            usertext=_('Text')),
+        s.add( setting.Text(
+            'Text',
+            descr = _('Text settings'),
+            usertext=_('Text')),
                pixmap = 'settings_axislabel' )
 
-        s.add(setting.Str('exclude', '',
-                          descr=_('Exclude item from displaying (comma separated)'),
-                          usertext=_('Exclude item')))
+        s.add( setting.Str(
+            'order', '',
+            descr=_('Override default item order (comma separated names)'),
+            usertext=_('Order')))
 
-        s.add( setting.KeyBrush('Background',
-                                descr = _('Key background fill'),
-                                usertext=_('Background')),
+        s.add( setting.Str(
+            'exclude', '',
+            descr=_('Exclude item from displaying (comma separated names)'),
+            usertext=_('Exclude')))
+
+        s.add( setting.Str(
+            'title', '',
+            descr=_('Key title text'),
+            usertext=_('Title')), 0 )
+
+        s.add( setting.KeyBrush(
+            'Background',
+            descr = _('Key background fill'),
+            usertext=_('Background')),
                pixmap = 'settings_bgfill' )
-        s.add( setting.Line('Border',
-                            descr = _('Key border line'),
-                            usertext=_('Border')),
+        s.add( setting.Line(
+            'Border',
+            descr = _('Key border line'),
+            usertext=_('Border')),
                pixmap = 'settings_border' )
 
-        s.add( setting.Str('title', '',
-                           descr=_('Key title text'),
-                           usertext=_('Title')) )
+        s.add( setting.AlignHorzWManual(
+            'horzPosn',
+            'right',
+            descr = _('Horizontal key position'),
+            usertext=_('Horz posn'),
+            formatting=True) )
+        s.add( setting.AlignVertWManual(
+            'vertPosn',
+            'bottom',
+            descr = _('Vertical key position'),
+            usertext=_('Vert posn'),
+            formatting=True) )
 
-        s.add( setting.AlignHorzWManual( 'horzPosn',
-                                         'right',
-                                         descr = _('Horizontal key position'),
-                                         usertext=_('Horz posn'),
-                                         formatting=True) )
-        s.add( setting.AlignVertWManual( 'vertPosn',
-                                         'bottom',
-                                         descr = _('Vertical key position'),
-                                         usertext=_('Vert posn'),
-                                         formatting=True) )
-                               
-        s.add( setting.Distance('keyLength',
-                                '1cm',
-                                descr = _('Length of line to show in sample'),
-                                usertext=_('Key length'),
-                                formatting=True) )
-        
-        s.add( setting.AlignVert( 'keyAlign',
-                                  'top',
-                                  descr = _('Alignment of key symbols relative to text'),
-                                  usertext = _('Key alignment'),
-                                  formatting = True) )
+        s.add( setting.Distance(
+            'keyLength',
+            '1cm',
+            descr = _('Length of line to show in sample'),
+            usertext=_('Key length'),
+            formatting=True) )
 
-        s.add( setting.Float( 'horzManual',
-                              0.,
-                              descr = _('Manual horizontal fractional position'),
-                              usertext=_('Horz manual'),
-                              formatting=True) )
-        s.add( setting.Float( 'vertManual',
-                              0.,
-                              descr = _('Manual vertical fractional position'),
-                              usertext=_('Vert manual'),
-                              formatting=True) )
+        s.add( setting.AlignVert(
+            'keyAlign',
+            'top',
+            descr = _('Alignment of key symbols relative to text'),
+            usertext = _('Key alignment'),
+            formatting=True) )
 
-        s.add( setting.Float( 'marginSize',
-                              1.,
-                              minval = 0.,
-                              descr = _('Width of margin in characters'),
-                              usertext=_('Margin size'),
-                              formatting=True) )
+        s.add( setting.Float(
+            'horzManual',
+            0.,
+            descr = _('Manual horizontal fractional position'),
+            usertext=_('Horz manual'),
+            formatting=True) )
+        s.add( setting.Float(
+            'vertManual',
+            0.,
+            descr = _('Manual vertical fractional position'),
+            usertext=_('Vert manual'),
+            formatting=True) )
 
-        s.add( setting.Int( 'columns',
-                            1,
-                            descr = _('Number of columns in key'),
-                            usertext = _('Columns'),
-                            minval = 1,
-                            maxval = 100,
-                            formatting = True) )
+        s.add( setting.Float(
+            'marginSize',
+            1.,
+            minval = 0.,
+            descr = _('Width of margin in characters'),
+            usertext=_('Margin size'),
+            formatting=True) )
+
+        s.add( setting.Int(
+            'columns',
+            1,
+            descr = _('Number of columns in key'),
+            usertext = _('Columns'),
+            minval = 1,
+            maxval = 100,
+            formatting = True) )
 
         s.add( setting.Bool(
             'symbolswap',
@@ -272,42 +290,42 @@ class Key(widget.Widget):
             if lines > numrows:
                 # this layout failed, suggest expanding the box to |lines|
                 return ([], [], lines)
-            
+
             # col -> yp, row -> xp
             layout.append( (plotter, num, col, row, lines) )
             row += lines
             colstats[col] += 1
-        
+
         return (layout, colstats, numrows)
-    
+
     def _layout(self, entries, totallines):
         """Layout the items, trying to keep the box as small as possible
         while still filling the columns"""
-        
+
         maxcols = self.settings.columns
         numcols = min(maxcols, max(len(entries), 1))
-        
+
         if not entries:
             return (list(), (0, 0))
-        
+
         # start with evenly-sized rows and expand to fit
         numrows = totallines // numcols
         layout = []
-        
+
         while not layout:
             # try to do a first cut of the layout, and expand the box until
             # everything fits
             (layout, colstats, newrows) = self._layoutChunk(entries, (0, 0), (numrows, numcols))
             if not layout:
                 numrows = newrows
-            
+
         # ok, we've got a layout where everything fits, now pull items right
         # to fill the remaining columns, if need be
         while colstats[-1] == 0:
             # shift 1 item to the right, up to the first column that has
             # excess items
             meanoccupation = max(1, sum(colstats)/numcols)
-            
+
             # loop until we find a victim item which can be safely moved
             victimcol = numcols
             while True:
@@ -316,14 +334,14 @@ class Key(widget.Widget):
                     if colstats[i] > meanoccupation:
                         victimcol = i
                         break
-                
+
                 # find the last item in the victim column
                 victim = 0
                 for i in reversed(crange(len(layout))):
                     if layout[i][2] == victimcol:
                         victim = i
                         break
-                
+
                 # try to relayout with the victim item shoved to the next column
                 (newlayout, newcolstats, newrows) = self._layoutChunk(entries[victim:],
                                                         (0, victimcol+1), (numrows, numcols))
@@ -334,13 +352,13 @@ class Key(widget.Widget):
                     del colstats[victimcol+1:]
                     colstats += newcolstats[victimcol+1:]
                     break
-                
+
                 # if we've run out of potential victims, just return what we have
                 if victimcol == 0:
                     return (layout, (numrows, numcols))
-        
+
         return (layout, (numrows, numcols))
-    
+
     def draw(self, parentposn, phelper, outerbounds = None):
         """Plot the key on a plotter."""
 
@@ -380,30 +398,40 @@ class Key(widget.Widget):
         # maximum width of text required
         maxwidth = 1
 
-        exclude = list(map(lambda it: it.strip(), s.exclude.split(',')))
+        if s.order:
+            # user specified list if widgets
+            namemap = { c.name: c for c in self.parent.children }
+            orderlist = [x.strip() for x in s.order.split(',')]
+            widgets = [namemap[n] for n in orderlist if n in namemap]
+        else:
+            # default order
+            widgets = [c for c in self.parent.children]
+
+        # which widgets to exclude
+        exclude = { x.strip() for x in s.exclude.split(',') }
+
         entries = []
-        # iterate over children and find widgets which are suitable
-        for c in self.parent.children:
-            if c.name in exclude:
+        for c in widgets:
+            if c.name in exclude or c.settings.hide:
                 continue
             try:
                 num = c.getNumberKeys()
             except AttributeError:
                 continue
-            if not c.settings.hide:
-                # add an entry for each key entry for each widget
-                for i in crange(num):
-                    lines = 1
-                    if showtext:
-                        w, h = utils.Renderer(
-                            painter, font, 0, 0,
-                            c.getKeyText(i),
-                            doc=self.document).getDimensions()
-                        maxwidth = max(maxwidth, w)
-                        lines = max(1, math.ceil(h/height))
 
-                    totallines += lines
-                    entries.append( (c, i, lines) )
+            # add an entry for each key entry for each widget
+            for i in crange(num):
+                lines = 1
+                if showtext:
+                    w, h = utils.Renderer(
+                        painter, font, 0, 0,
+                        c.getKeyText(i),
+                        doc=self.document).getDimensions()
+                    maxwidth = max(maxwidth, w)
+                    lines = max(1, math.ceil(h/height))
+
+                totallines += lines
+                entries.append( (c, i, lines) )
 
         # layout the box
         layout, (numrows, numcols) = self._layout(entries, totallines)
