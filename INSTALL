@@ -169,7 +169,7 @@ executable:
 
 # tar xf veusz-3.2-linux-x86_64.tar.xz     [change version here]
 # cd veusz-3.2-linux-x86_64
-# ./veusz
+# ./veusz.exe                    [note, it's not a windows exe!]
 
 2.2 Installing in Windows
 =========================
