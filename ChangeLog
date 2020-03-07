@@ -1,3 +1,25 @@
+Changes in 3.2:
+ Improvements:
+  * Add ability to plot image widget using boxes rather than a bitmap,
+    with new drawing mode option
+  * Add widget order option in key widget
+  * Export dialog now uses multiple threads
+  * Python 3.9 compatibility fixes
+
+ Minor changes:
+  * Show exception dialog if crash occurs outside main thread
+  * Added Brazillian Portuguese description for desktop file
+  * Use python3 by default for in-place run
+
+ Bug fixes:
+  * Fix icons in tutorial
+  * Fix case when positions in bar widget are set, then removed
+  * Truely all files are shown in import dialog, if requested
+  * Fix browse button in export dialog
+  * Fix stylesheet for polygon widget
+  * Fix invalid escape sequences warnings
+  * Fix parametric date creation for non-English locales
+
 Changes in 3.1:
  Improvements:
   * Do not print or export hidden pages
