@@ -240,6 +240,7 @@ Section Uninstall
   RMDir "$INSTDIR\numpy\fft"
   RMDir "$INSTDIR\numpy\linalg"
   RMDir "$INSTDIR\numpy\random"
+  RMDir "$INSTDIR\numpy"
   RMDir "$INSTDIR\PyQt5\Qt\plugins\iconengines"
   RMDir "$INSTDIR\PyQt5\Qt\plugins\imageformats"
   RMDir "$INSTDIR\PyQt5\Qt\plugins\platforms"
@@ -249,7 +250,9 @@ Section Uninstall
   RMDir "$INSTDIR\PyQt5\Qt"
   RMDir "$INSTDIR\PyQt5"
   RMDir "$INSTDIR\ui"
+  RMDir "$INSTDIR\veusz\helpers"
   RMDir "$INSTDIR\veusz"
+  RMDir "$INSTDIR\win32com\shell"
   RMDir "$INSTDIR\win32com"
   RMDir "$INSTDIR"
 
