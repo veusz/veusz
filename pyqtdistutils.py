@@ -83,6 +83,8 @@ class build_ext(distutils.command.build_ext.build_ext):
          'override Qt include directory'),
         ('qt-library-dir=', None,
          'override Qt library directory'),
+        ('qt-libinfix=', None,
+         'override Qt infix setting'),
         ]
 
     def initialize_options(self):
@@ -93,6 +95,7 @@ class build_ext(distutils.command.build_ext.build_ext):
         self.qmake_exe = None
         self.qt_include_dir = None
         self.qt_library_dir = None
+        self.qt_libinfix = None
 
     def _get_sip_output_list(self, sbf):
         '''
@@ -166,6 +169,32 @@ class build_ext(distutils.command.build_ext.build_ext):
                 [self._get_qmake(build_cmd), '-query', 'QT_INSTALL_LIBS'])
             )
 
+    def _get_qt_libinfix(self, build_cmd):
+        """Get QT_LIBINFIX setting.
+
+        This is not much fun, as we have to try to find qconfig.pri,
+        and parse it.
+        """
+
+        infix = build_cmd.qt_libinfix
+        if infix is not None:
+            return infix
+        if 'QT_LIBINFIX' in os.environ:
+            return os.environ['QT_LIBINFIX']
+
+        # use this to find location of qconfig file
+        archdir = read_command_output(
+            [self._get_qmake(build_cmd), '-query', 'QT_INSTALL_ARCHDATA'])
+        qconfig = os.path.join(archdir, 'mkspecs', 'qconfig.pri')
+
+        libinfix = ''
+        for line in open(qconfig):
+            p = [x.strip() for x in line.split('=')]
+            if p[0] == 'QT_LIBINFIX':
+                libinfix = p[1]
+
+        return libinfix
+
     def _is_qt_framework(self, build_cmd):
         """Is the Qt a framework?"""
         return os.path.exists(
@@ -207,6 +236,8 @@ class build_ext(distutils.command.build_ext.build_ext):
         # Add the SIP and Qt include directories to the include path
         extension.include_dirs += [sip_inc_dir] + indirs
 
+        libinfix = self._get_qt_libinfix(build_cmd)
+
         # link against libraries
         if extension.language == 'c++':
             extension.include_dirs += self._get_cpp_includes(build_cmd)
@@ -215,10 +246,10 @@ class build_ext(distutils.command.build_ext.build_ext):
                 # Mac OS framework
                 extension.extra_link_args = [
                     '-F', os.path.join(lib_dir),
-                    '-framework', 'QtGui',
-                    '-framework', 'QtCore',
-                    '-framework', 'QtXml',
-                    '-framework', 'QtWidgets',
+                    '-framework', 'QtGui'+libinfix,
+                    '-framework', 'QtCore'+libinfix,
+                    '-framework', 'QtXml'+libinfix,
+                    '-framework', 'QtWidgets'+libinfix,
                     '-Wl,-rpath,@executable_path/Frameworks',
                     '-Wl,-rpath,' + lib_dir
                     ]
@@ -227,7 +258,11 @@ class build_ext(distutils.command.build_ext.build_ext):
                     ]
             else:
                 extension.libraries = [
-                    'Qt5Gui', 'Qt5Core', 'Qt5Xml', 'Qt5Widgets']
+                    'Qt5Gui'+libinfix,
+                    'Qt5Core'+libinfix,
+                    'Qt5Xml'+libinfix,
+                    'Qt5Widgets'+libinfix,
+                ]
             extension.library_dirs = [lib_dir]
 
             # may cause problems with compilers which don't allow this
