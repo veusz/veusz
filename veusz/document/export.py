@@ -132,18 +132,20 @@ class ExportBitmapRunnable(ExportRunnable):
         writer.setFormat(fmt.encode('ascii'))
         writer.setFileName(self.filename)
 
-        # enable LZW compression for TIFFs
-        writer.setCompression(1)
-
-        # enable optimal JPEG compression using new Qt 5.5 options
-        writer.setOptimizedWrite(True)
-        writer.setProgressiveScanWrite(True)
-
         if fmt == 'png':
-            # min quality for png as it makes no difference to output
-            # and makes file size smaller
+            # max compression for PNGs (this number comes from the
+            # source code)
+            writer.setCompression(100)
             writer.setQuality(0)
-        else:
+        elif fmt == 'tiff':
+            # enable LZW compression for TIFFs
+            writer.setCompression(1)
+        elif fmt == 'jpg':
+            # enable optimal JPEG compression using new Qt 5.5 options
+            writer.setOptimizedWrite(True)
+            writer.setProgressiveScanWrite(True)
+
+        if fmt != 'png':
             writer.setQuality(self.aexport.quality)
 
         writer.write(image)
