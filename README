@@ -1,5 +1,5 @@
-Veusz 3.2
----------
+Veusz 3.2.1
+-----------
 https://veusz.github.io
 
 Veusz is a 2D and 3D scientific plotting package.  It is designed to
@@ -11,6 +11,18 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 3.2.1:
+ Bug fixes:
+  * Fix too large page size in SVG export
+  * Reenable compression for PNG export
+  * Fix crash in HDF5 import dialog
+  * If filename extension is missing in export dialog, add it
+    and avoid crash
+  * Take account of QT_LIBINFIX setting for unusual Qt installs
+
+ Improvements:
+  * Add \wtilde text command to place a tilde over text
 
 Changes in 3.2:
  Improvements:

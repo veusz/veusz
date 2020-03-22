@@ -1,3 +1,15 @@
+Changes in 3.2.1:
+ Bug fixes:
+  * Fix too large page size in SVG export
+  * Reenable compression for PNG export
+  * Fix crash in HDF5 import dialog
+  * If filename extension is missing in export dialog, add it
+    and avoid crash
+  * Take account of QT_LIBINFIX setting for unusual Qt installs
+
+ Improvements:
+  * Add \wtilde text command to place a tilde over text
+
 Changes in 3.2:
  Improvements:
   * Add ability to plot image widget using boxes rather than a bitmap,
