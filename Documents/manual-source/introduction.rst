@@ -377,7 +377,7 @@ Supported LaTeX symbols include: \\AA, \\Alpha, \\Beta,
 \\rightarrow, \\sigma, \\sim, \\simeq, \\sqrt, \\sqsubset, \\sqsubseteq,
 \\sqsupset, \\sqsupseteq, \\star, \\stigma, \\subset, \\subseteq, \\succ,
 \\succeq, \\supset, \\supseteq, \\tau, \\theta, \\times, \\umid, \\unlhd,
-\\unrhd, \\uparrow, \\uplus, \\upsilon, \\vdash, \\vee, \\wedge, \\xi, \\zeta.
+\\unrhd, \\uparrow, \\uplus, \\upsilon, \\vdash, \\vee, \\wedge, \\wtilde, \\xi, \\zeta.
 Please request additional characters if they are required (and exist
 in the unicode character set). Special symbols can be included
 directly from a character map.

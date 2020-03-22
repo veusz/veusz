@@ -993,6 +993,39 @@ class PartDot(Part):
             qt.QPointF(x+circsize,y+circsize)) )
         painter.restore()
 
+class PartTilde(Part):
+    """Draw a tilde ~ over text."""
+
+    def render(self, state):
+
+        initx = state.x
+
+        # draw material under tilde
+        Part.render(self, state)
+
+        # change text height
+        font = state.font
+        size = font.pointSizeF()
+        height = state.fontMetrics().capHeight()
+        linewidth = state.fontMetrics().lineWidth()
+
+        font.setPointSizeF(size*0.7)
+        state.painter.setFont(font)
+
+        # set x and y positions for tilde
+        tildew = state.fontMetrics().width('~')
+
+        if not font.italic() or (state.x-initx) >= 2*tildew:
+            over_pos = state.x - (state.x - initx)*0.5 - tildew*0.5
+        else:
+            over_pos = state.x - tildew
+
+        # paint tilde over a text
+        state.painter.drawText(qt.QPointF(over_pos, state.y - height), '~')
+
+        font.setPointSizeF(size)
+        state.painter.setFont(font)
+
 class PartMarker(Part):
     """Draw a marker symbol."""
 
@@ -1056,6 +1089,7 @@ part_commands = {
     r'\overline': (PartBar, 1),
     r'\hat': (PartHat, 1),
     r'\dot': (PartDot, 1),
+    r'\wtilde': (PartTilde, 1),
     r'\marker': (PartMarker, 1),
     r'\color': (PartColor, 2),
 }
