@@ -360,6 +360,10 @@ class ExportDialog(VeuszDialog):
                 _('Error: page name or number must be in filename'))
             return
 
+        # add extension to filename if missing
+        if not os.path.splitext(filename)[1]:
+            filename += '.' + self.formatselected
+
         if self.pageselected == 'single':
             pages = [self.mainwindow.plot.getPageNumber()]
         elif self.pageselected == 'all':
