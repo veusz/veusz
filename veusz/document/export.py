@@ -291,7 +291,7 @@ class ExportSVGRunnable(ExportRunnable):
                 f,
                 size[0]/sdpi[0], size[1]/sdpi[1],
                 writetextastext=self.aexport.svgtextastext,
-                dpi=sdpi[1],
+                dpi=sdpi[1]*svg_dpi_scale,
                 scale=svg_dpi_scale)
             self.renderPage(paintdev, self.phelpers[0])
 
