@@ -142,6 +142,10 @@ class ImportTabHDF5(importdialog.ImportTab):
     filetypes = ('.hdf', '.hdf5', '.h5', '.he5')
     filefilter = _('HDF5 files')
 
+    def __init__(self, *args):
+        importdialog.ImportTab.__init__(self, *args)
+        self.oldselection = (None, None)
+
     def showError(self, err):
         node = fits_hdf5_tree.ErrorNode(None, err)
         model = fits_hdf5_tree.GenericTreeModel(self, node, [''])
