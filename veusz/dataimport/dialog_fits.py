@@ -100,7 +100,7 @@ def constructTree(fitsfile):
             for col in hdu.columns:
                 cname = col.name.lower()
                 cdatatype, clen = fits_hdf5_helpers.convertFITSDataFormat(
-                    col.format)
+                    col.format.strip())
                 cshape = tabshape if clen==1 else tuple(list(tabshape)+[clen])
                 # attributes specific to column
                 cattrs = colattrs.get(cname, {})
