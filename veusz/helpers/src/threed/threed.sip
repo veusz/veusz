@@ -324,8 +324,8 @@ class Object /NoDefaultCtors/
 %End
   public:
    virtual ~Object();
-   virtual void assignWidgetId(unsigned long id);
-   unsigned long widgetid;
+   virtual void assignWidgetId(unsigned long long id);
+   unsigned long long widgetid;
 };
 
 class Triangle : public Object /NoDefaultCtors/
@@ -446,7 +446,7 @@ class ObjectContainer : public Object
  public:
   ObjectContainer();
   void addObject(Object* obj /Transfer/);
-  void assignWidgetId(unsigned long id);
+  void assignWidgetId(unsigned long long id);
 
   Mat4 objM;
 };
@@ -538,11 +538,11 @@ class Scene
   void render(Object* root,
               QPainter* painter, const Camera& cam,
 	      double x1, double y1, double x2, double y2, double scale);
-  unsigned long idPixel(Object* root,
-                        QPainter* painter, const Camera& cam,
-                        double x1, double y1, double x2, double y2,
-                        double scale,
-                        double scaling, int x, int y);
+  unsigned long long idPixel(Object* root,
+                             QPainter* painter, const Camera& cam,
+                             double x1, double y1, double x2, double y2,
+                             double scale,
+                             double scaling, int x, int y);
 
  public:
   Mat3 screenM;

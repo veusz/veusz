@@ -31,7 +31,7 @@ void Object::getFragments(const Mat4& perspM, const Mat4& outerM, FragmentVector
 {
 }
 
-void Object::assignWidgetId(unsigned long id)
+void Object::assignWidgetId(unsigned long long id)
 {
   widgetid = id;
 }
@@ -729,7 +729,7 @@ void ObjectContainer::getFragments(const Mat4& perspM, const Mat4& outerM, Fragm
     objects[i]->getFragments(perspM, totM, v);
 }
 
-void ObjectContainer::assignWidgetId(unsigned long id)
+void ObjectContainer::assignWidgetId(unsigned long long id)
 {
   for(auto &object : objects)
     object->assignWidgetId(id);
