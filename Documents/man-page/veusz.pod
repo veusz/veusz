@@ -59,7 +59,7 @@ the page numbers are numbered from 0, antialias=True/False enables or
 disables antialiasing in bitmap output files (default True),
 quality=I<VAL> gives the JPEG quality value (default 85),
 backcolor='I<#RRGGBBAA>' gives the background color of bitmap files
-(default '#ffffff00'), pdfdpi=I<DPI> gives the DPI when outputing to
+(default '#ffffff00'), pdfdpi=I<DPI> gives the DPI when outputting to
 PDF files (default 150) and svgtextastext=True/False outputs text in
 SVG files as text, rather than as curves (default False).
 
