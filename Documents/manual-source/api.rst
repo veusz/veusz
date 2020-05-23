@@ -342,10 +342,7 @@ ImportFile
 
 .. _Command.ImportFile:
 
-:command:`ImportFile('filename', 'descriptor',
-linked=False, prefix='', suffix='',
-encoding='utf_8',
-renames={})`
+:command:`ImportFile(comm, filename, descriptor, useblocks=False, linked=False, prefix='', suffix='', ignoretext=False, encoding='utf_8', renames=None)`
 
 Imports data from a file. The arguments are the filename to load data
 from and the descriptor.
@@ -359,6 +356,12 @@ data imported will not be saved with the document, but will be reread
 from the filename given the next time the document is opened. The
 linked parameter is optional.
 
+If useblocks is set, then blank lines or the word 'no' are used to
+split the data into blocks. Dataset names are appended with an
+underscore and the block number (starting from 1). encoding is the
+name of the text file encoding. renames is a dict mapping existing to
+new names after import.
+
 If prefix and/or suffix are set, then the prefix and suffix are added
 to each dataset name. If set, renames maps imported dataset names to
 final dataset names after import.
@@ -366,51 +369,46 @@ final dataset names after import.
 Returns: A tuple containing a list of the imported datasets and the
 number of conversions which failed for a dataset.
 
-Changed in version 0.5: A tuple is returned rather than just the
-number of imported variables.
-
 ImportFile2D
 ------------
 
 .. _Command.ImportFile2D:
 
-:command:`ImportFile2D('filename', datasets,
-xrange=None, yrange=None, invertrows=False,
-invertcols=False, transpose=False,
-prefix='', suffix='', linked=False,
-encoding='utf8', renames={})`
+:command:`ImportFile2D(filename, datasetnames, xrange=None, yrange=None, invertrows=None, invertcols=None, transpose=None, gridatedge=None, mode='text', csvdelimiter=',', csvtextdelimiter='"', csvlocale='en_US', prefix="", suffix="", encoding='utf_8', linked=False)`
 
 Imports two-dimensional data from a file. The required arguments are
 the filename to load data from and the dataset name, or a list of
 names to use.
 
-filename is a string which contains the filename to use. datasets is
-either a string (for a single dataset), or a list of strings (for
-multiple datasets).
+In text mode, the file format this command accepts is a
+two-dimensional matrix of numbers, with the columns separated by
+spaces or tabs, and the rows separated by new lines.  The X-coordinate
+is taken to be in the direction of the columns. Comments are supported
+(use `#`, `!` or `%`), as are continuation characters (`\\`). Separate
+datasets are deliminated by using blank lines. In csv mode, the csv
+parameters give the type of CSV file sypported.
 
-The xrange parameter is a tuple which contains the range of the X-axis
-along the two-dimensional dataset, for example (-1., 1.) represents an
-inclusive range of -1 to 1. The yrange parameter specifies the range
-of the Y-axis similarly. If they are not specified, (0, N) is the
-default, where N is the number of datapoints along a particular axis.
+::
 
-invertrows and invertcols if set to True, invert the rows and columns
-respectively after they are read by Veusz. transpose swaps the rows
-and columns.
+    xrange is a tuple containing the range of data in x coordinates
+    yrange is a tuple containing the range of data in y coordinates
+    if invertrows=True, then rows are inverted when read
+    if invertcols=True, then cols are inverted when read
+    if transpose=True, then rows and columns are swapped
+    if gridatedge=True, use top row and left column for pixel positions
 
-If prefix and/or suffix are set, they are prepended or appended to
-imported dataset names. If set, renames maps imported dataset names to
-final dataset names after import.
+    mode is either 'text' or 'csv'
+    csvdelimiter is the csv delimiter for csv
+    csvtextdelimiter is the csv text delimiter for csv
+    csvlocale is locale to use when reading csv data
 
-If the linked parameter is True, then the datasets are linked to the
-imported file, and are not saved within a saved document.
+    prefix and suffix are prepended and appended to dataset names
 
-The file format this command accepts is a two-dimensional matrix of
-numbers, with the columns separated by spaces or tabs, and the rows
-separated by new lines. The X-coordinate is taken to be in the
-direction of the columns. Comments are supported (use `#`, `!` or
-`%`), as are continuation characters (`\\`). Separate datasets are
-deliminated by using blank lines.
+    encoding is encoding character set
+
+    if linked=True then the dataset is linked to the file
+
+    Returns: list of imported datasets
 
 In addition to the matrix of numbers, the various optional parameters
 this command takes can also be specified in the data file. These
@@ -433,17 +431,48 @@ ImportFileCSV
 .. _Command.ImportFileCSV:
 
 :command:`ImportFileCSV('filename', readrows=False,
-dsprefix='', dssuffix='', linked=False, encoding='utf_8',
-renames={})`
+delimiter=',', skipwhitespace=False, textdelimiter='"',
+encoding='utf_8',
+headerignore=0, rowsignore=0,
+blanksaredata=False,
+numericlocale='en_US',
+dateformat='YYYY-MM-DD|T|hh:mm:ss',
+headermode='multi',
+dsprefix='', dssuffix='', prefix=None,
+renames=None,
+linked=False)`
 
 This command imports data from a CSV format file. Data are read from
 the file using the dataset names given at the top of the files in
 columns. Please see the reading data section of this manual for more
-information. dsprefix is prepended to each dataset name and dssuffix
-is added (the prefix option is deprecated and also addeds an
-underscore to the dataset name). linked specifies whether the data
-will be linked to the file. renames, if set, provides new names for
-datasets after import.
+information. The options are explained below.
+
+::
+
+    readrows: if true, data are read across rather than down
+    delimiter: character for delimiting data (usually ',')
+    skipwhitespace: if true, white space following delimiter is ignored
+    textdelimiter: character surrounding text (usually '"')
+    encoding: encoding used in file
+    headerignore: number of lines to ignore after header text
+    rowsignore: number of rows to ignore at top of file
+    blanksaredata: treats blank lines in csv files as blank data values
+    numericlocale: format to use for reading numbers
+    dateformat: format for interpreting dates
+    headermode: 'multi': multiple headers allowed in file
+                '1st': first text found are headers
+                'none': no headers, guess data and use default names
+
+    Dataset names are prepended and appended, by dsprefix and dssuffix,
+    respectively
+     (prefix is backware compatibility only, it adds an underscore
+      relative to dsprefix)
+
+    renames is a map of old names to new names to rename on import
+
+    If linked is True the data are linked with the file.
+
+    Returns: list of imported datasets
 
 ImportFileFITS
 --------------
@@ -1137,49 +1166,49 @@ Older path-based interface
 
     """An example embedding program. Veusz needs to be installed into
     the Python path for this to work (use setup.py)
-    
+
     This animates a sin plot, then finishes
     """
-    
+
     import time
     import numpy
     import veusz.embed as veusz
-    
+
     # construct a Veusz embedded window
     # many of these can be opened at any time
     g = veusz.Embedded('window title')
     g.EnableToolbar()
-    
+
     # construct the plot
     g.To( g.Add('page') )
     g.To( g.Add('graph') )
     g.Add('xy', marker='tiehorz', MarkerFill__color='green')
-    
+
     # this stops intelligent axis extending
     g.Set('x/autoExtend', False)
     g.Set('x/autoExtendZero', False)
-    
+
     # zoom out
     g.Zoom(0.8)
-    
+
     # loop, changing the values of the x and y datasets
     for i in range(10):
         x = numpy.arange(0+i/2., 7.+i/2., 0.05)
         y = numpy.sin(x)
         g.SetData('x', x)
         g.SetData('y', y)
-    
+
         # wait to animate the graph
         time.sleep(2)
-    
+
     # let the user see the final result
     print "Waiting for 10 seconds"
     time.sleep(10)
     print "Done!"
-    
+
     # close the window (this is not strictly necessary)
     g.Close()
-    
+
 The embed interface has the methods listed in the command line
 interface listed in the Veusz manual
 https://veusz.github.io/docs/manual.html
@@ -1256,7 +1285,7 @@ An example tree for a document (not complete) might look like this
                 \-- contour1      (contour widget)
                 \-- x             (axis widget)
                 \-- y             (axis widget)
-    
+
 Here the user could access the xData setting node of the
 xy1 widget using ``Root.page1.graph2.xy1.xData``. To
 actually read or modify the value of a setting, you should get
@@ -1324,53 +1353,53 @@ operations of Nodes:
         childnames_settinggroups - return a list of the names of the setting groups
         childnames_settings - return a list of the names of the settings
         parent - return the Node corresponding to the parent widget of this Node
-    
+
         __getattr__ - get a child Node with name given, e.g. Root.page1
         __getitem__ - get a child Node with name given, e.g. Root['page1']
       """
-    
+
       def fromPath(self, path):
          """Returns a new Node corresponding to the path given, e.g. '/page1/graph1'"""
-    
+
     class SettingNode(Node):
         """A node which corresponds to a setting. Extra properties:
         val - get or set the setting value corresponding to this value, e.g.
          Root.page1.graph1.leftMargin.val = '2cm'
         """
-    
+
     class SettingGroupNode(Node):
         """A node corresponding to a setting group. No extra properties."""
-    
+
     class WidgetNode(Node):
         """A node corresponding to a widget.
-    
+
            property:
              widgettype - get Veusz type of widget
-    
+
            Methods are below."""
-    
+
         def WalkWidgets(self, widgettype=None):
             """Generator to walk widget tree and get widgets below this
             WidgetNode of type given.
-    
+
             widgettype is a Veusz widget type name or None to get all
             widgets."""
-    
+
         def Add(self, widgettype, *args, **args_opt):
             """Add a widget of the type given, returning the Node instance.
             """
-    
+
         def Rename(self, newname):
             """Renames widget to name given.
             Existing Nodes corresponding to children are no longer valid."""
-    
+
         def Action(self, action):
             """Applies action on widget."""
-    
+
         def Remove(self):
             """Removes a widget and its children.
             Existing Nodes corresponding to children are no longer valid."""
-    
+
 Note that Nodes are temporary objects which are created on
 the fly. A real widget in Veusz can have several different
 WidgetNode objects. The operators == and != can test whether
