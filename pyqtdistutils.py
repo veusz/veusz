@@ -10,7 +10,7 @@ import sys
 import sysconfig
 import subprocess
 
-from distutils.sysconfig import customize_compiler
+from distutils.sysconfig import customize_compiler, get_python_lib
 import distutils.command.build_ext
 
 import PyQt5.QtCore
@@ -290,12 +290,17 @@ class build_ext(distutils.command.build_ext.build_ext):
 
     def _sip_compile(self, sip_exe, sip_dir, source, sip_builddir):
         """Compile sip file to sources."""
+        if 'sip5' in sip_exe:
+            pyqt5_include_dir = os.path.join(get_python_lib(plat_specific=1),
+                                             'PyQt5', 'bindings')
+        else:
+            pyqt5_include_dir = os.path.join(sip_dir, 'PyQt5')
         self.spawn(
             [
                 sip_exe,
                 '-c', sip_builddir
             ] + SIP_FLAGS.split() + [
-                '-I', os.path.join(sip_dir, 'PyQt5'),
+                '-I', pyqt5_include_dir,
                 source
             ]
         )
