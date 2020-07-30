@@ -293,6 +293,8 @@ class build_ext(distutils.command.build_ext.build_ext):
         if 'sip5' in sip_exe:
             pyqt5_include_dir = os.path.join(get_python_lib(plat_specific=1),
                                              'PyQt5', 'bindings')
+            self.spawn(['sip-module', '--target-dir', sip_builddir,
+                        '--sip-h', 'PyQt5.sip'])
         else:
             pyqt5_include_dir = os.path.join(sip_dir, 'PyQt5')
         self.spawn(
