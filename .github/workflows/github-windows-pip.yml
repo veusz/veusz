@@ -26,10 +26,10 @@ jobs:
         path: ../Qt
         key: ${{ runner.os }}-QtCache
     - name: Install Qt
-        uses: jurplel/install-qt-action@v2
-        with:
-          cached: ${{ steps.cache-qt.outputs.cache-hit }}
-          modules: 'qtsvg'       
+      uses: jurplel/install-qt-action@v2
+      with:
+        cached: ${{ steps.cache-qt.outputs.cache-hit }}
+        modules: 'qtsvg'       
     - name: Install Python dependencies
       run: |
         pip install PyQt5 sip numpy h5py astropy
