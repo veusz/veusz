@@ -24,6 +24,7 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
+    apt-get -y install qt5-default qt5-qmake
     python -m pip install --upgrade pip
     pip install PyQt5 sip numpy
     # pip install -r requirements.txt
