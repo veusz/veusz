@@ -4,11 +4,6 @@
 # https://aka.ms/yaml
 
 trigger:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.7'
-    addToPath: true
-    architecture: 'x64'
 - master
 
 parameters:
@@ -25,6 +20,11 @@ pool:
   vmImage: 'vs2017-win2016'
 
 steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.7'
+    addToPath: true
+    architecture: 'x64'
 
 - script: |
     python -m pip install --upgrade pip
