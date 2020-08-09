@@ -1,0 +1,24 @@
+# pipeline to build on ubuntu using standard packages
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+steps:
+
+- script: |
+    sudo apt-get -y install libqt5core5a, libqt5dbus5, libqt5gui5, libqt5svg5, libqt5widgets5, \
+      libqt5xml5, python3-all, python3-astropy, python3-h5py, python3-pyqt5, python3-pyqt5.qtsvg, \
+      python3-setuptools, python3-all-dev, python3-numpy, pyqt5-dev, \
+      pyqt5-dev-tools, qt5-qmake, qtbase5-dev, sip5-tools
+  displayName: 'Install dependencies'
+
+- script: |
+    python3 setup.py build_ext --inplace
+  displayName: 'Build extensions'
+
+- script: |
+    QT_QPA_PLATFORM=minimal VEUSZ_RESOURCE_DIR=$(pwd) PYTHONPATH=$(pwd) python3 tests/runselftest.py
+  displayName: 'tests'
