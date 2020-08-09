@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-18.04'
 strategy:
   matrix:
     Python35:
@@ -36,6 +36,4 @@ steps:
 
 - script: |
     QT_QPA_PLATFORM=minimal VEUSZ_RESOURCE_DIR=$(pwd) PYTHONPATH=$(pwd) tests/runselftest.py
-    # pip install pytest pytest-azurepipelines
-    # pytest
   displayName: 'tests'
