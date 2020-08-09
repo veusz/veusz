@@ -27,4 +27,4 @@ jobs:
         python3 setup.py build_ext --inplace
     - name: Run tests
       run: |
-        QT_QPA_PLATFORM=minimal VEUSZ_RESOURCE_DIR=$(pwd) PYTHONPATH=$(pwd) python3 tests/runselftest.py
+        QT_QPA_PLATFORM=minimal VEUSZ_INPLACE_TEST=1 python3 tests/runselftest.py

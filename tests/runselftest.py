@@ -38,6 +38,8 @@ images and use a fixed (hacked) font metric to give the same results
 on each platform. In addition Unicode characters are expanded to their
 Unicode code to work around different font handling on platforms.
 
+If VEUSZ_INPLACE_TEST is set then tests are run assuming that we are
+running from the source directory.
 """
 
 # messes up loaded files if set
@@ -57,6 +59,12 @@ try:
     import h5py
 except ImportError:
     h5py = None
+
+if 'VEUSZ_INPLACE_TEST' in os.environ:
+    sys.path.append(os.getcwd())
+    os.environ['VEUSZ_RESOURCE_DIR'] = os.getcwd()
+    os.environ['PYTHONPATH'] = ('%s:%s' % (
+        os.getcwd(), os.environ.get('PYTHONPATH', ''))).rstrip(':')
 
 from veusz.compat import cexec, cstr, copenuniversal
 import veusz.qtall as qt

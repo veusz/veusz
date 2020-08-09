@@ -39,6 +39,5 @@ jobs:
     - name: Run tests
       run: |
         set QT_QPA_PLATFORM=minimal
-        set VEUSZ_RESOURCE_DIR=%cd%
-        set PYTHONPATH=%cd%
+        set VEUSZ_INPLACE_TEST=1
         python tests/runselftest.py
