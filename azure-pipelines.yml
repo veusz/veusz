@@ -26,7 +26,7 @@ steps:
 - script: |
     sudo apt-get -y install qt5-default qt5-qmake
     python -m pip install --upgrade pip
-    pip install PyQt5 numpy h5py astropy
+    pip install PyQt5 sip numpy h5py astropy
     # pip install -r requirements.txt
   displayName: 'Install dependencies'
 
