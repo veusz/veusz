@@ -37,7 +37,7 @@ try:
     from setuptools import setup, Extension
     from setuptools.command.install import install as orig_install
 
-    extraoptions['install_requires'] = ['numpy']
+    extraoptions['install_requires'] = ['numpy', 'PyQt5', 'sip']
     extraoptions['extras_require'] = {
         "optional": ['astropy', 'pyemf', 'sampy', 'iminuit', 'h5py']
     }
