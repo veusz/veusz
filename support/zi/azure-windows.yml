@@ -4,7 +4,7 @@
 # https://aka.ms/yaml
 
 parameters:
-  name: Windows_x64
+- name: 'Windows_x64'
   architecture: 'x64'
   qt_version: '5.12.6'
   qt_spec: 'msvc2017_64'
