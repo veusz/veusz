@@ -24,7 +24,7 @@ jobs:
           pyqt5-dev pyqt5-dev-tools qt5-qmake qtbase5-dev
     - name: Build extensions
       run: |
-        python setup.py build_ext --inplace
+        python3 setup.py build_ext --inplace
     - name: Run tests
       run: |
-        QT_QPA_PLATFORM=minimal VEUSZ_RESOURCE_DIR=$(pwd) PYTHONPATH=$(pwd) tests/runselftest.py
+        QT_QPA_PLATFORM=minimal VEUSZ_RESOURCE_DIR=$(pwd) PYTHONPATH=$(pwd) python3 tests/runselftest.py
