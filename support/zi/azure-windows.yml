@@ -3,8 +3,8 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-parameters:
-- name: 'Windows_x64'
+variables:
+  name: 'Windows_x64'
   architecture: 'x64'
   qt_version: '5.12.6'
   qt_spec: 'msvc2017_64'
@@ -30,20 +30,20 @@ steps:
     python -m pip install --upgrade pip
     pip install aqtinstall
     mkdir C:\Qt
-    python -m aqt install -O c:\Qt ${{ parameters.qt_version }} windows desktop ${{ parameters.qt_aqt_spec }} -m qtscript
-    dir C:\Qt\${{ parameters.qt_version }}\${{ parameters.qt_spec }}\bin
-    wget "${{ parameters.vc_redist_url }}" -O $(Build.SourcesDirectory)\${{ parameters.vc_redist_file_name }}
+    python -m aqt install -O c:\Qt ${{ variables.qt_version }} windows desktop ${{ variables.qt_aqt_spec }} -m qtscript
+    dir C:\Qt\${{ variables.qt_version }}\${{ variables.qt_spec }}\bin
+    wget "${{ variables.vc_redist_url }}" -O $(Build.SourcesDirectory)\${{ variables.vc_redist_file_name }}
   displayName: 'Install Qt'
 
 - script: |
-    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\${{ parameters.vc_vars }}"
-    set PATH=C:\Qt\${{ parameters.qt_version }}\${{ parameters.qt_spec }}\bin;%PATH%
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\${{ variables.vc_vars }}"
+    set PATH=C:\Qt\${{ variables.qt_version }}\${{ variables.qt_spec }}\bin;%PATH%
     pip install PyQt5 sip numpy h5py astropy
   displayName: 'Install Python dependencies'
 
 - script: |
-    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\${{ parameters.vc_vars }}"
-    set PATH=C:\Qt\${{ parameters.qt_version }}\${{ parameters.qt_spec }}\bin;%PATH%
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\${{ variables.vc_vars }}"
+    set PATH=C:\Qt\${{ variables.qt_version }}\${{ variables.qt_spec }}\bin;%PATH%
     python setup.py build_ext --inplace
   displayName: 'Build'
 
