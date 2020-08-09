@@ -42,5 +42,4 @@ jobs:
         set VEUSZ_INPLACE_TEST=1
         python tests/runselftest.py
       env:
-        QT_QPA_PLATFORM: minimal
         VEUSZ_INPLACE_TEST: '1'
