@@ -1,7 +1,4 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Windows pipeline
 
 variables:
   name: 'Windows_x64'
@@ -30,7 +27,7 @@ steps:
     python -m pip install --upgrade pip
     pip install aqtinstall
     mkdir C:\Qt
-    python -m aqt install -O c:\Qt ${{ variables.qt_version }} windows desktop ${{ variables.qt_aqt_spec }} -m qtscript
+    python -m aqt install -O c:\Qt ${{ variables.qt_version }} windows desktop ${{ variables.qt_aqt_spec }} -m qtsvg
     dir C:\Qt\${{ variables.qt_version }}\${{ variables.qt_spec }}\bin
     wget "${{ variables.vc_redist_url }}" -O $(Build.SourcesDirectory)\${{ variables.vc_redist_file_name }}
   displayName: 'Install Qt'
