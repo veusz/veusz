@@ -36,7 +36,7 @@ SetCompressor /solid lzma
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
 !define MUI_FINISHPAGE_RUN "$INSTDIR\veusz.exe"
-!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README"
+!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.md"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION ShowReadme
 !insertmacro MUI_PAGE_FINISH
 
@@ -95,7 +95,7 @@ Section "MainSection" SEC01
   CreateShortCut "$DESKTOP\Veusz.lnk" "$INSTDIR\veusz.exe"
   SetOverwrite ifnewer
 
-  File "${PYINST_DIR}\README"
+  File "${PYINST_DIR}\README.md"
   File "${PYINST_DIR}\COPYING"
   File "${PYINST_DIR}\VERSION"
 
@@ -184,7 +184,7 @@ Function un.onInit
 FunctionEnd
 
 Function ShowReadme
-  Exec "notepad.exe $INSTDIR\README"
+  Exec "notepad.exe $INSTDIR\README.md"
 FunctionEnd
 
 Section Uninstall
@@ -192,7 +192,7 @@ Section Uninstall
   Delete "$INSTDIR\uninst.exe"
 
   Delete "$INSTDIR\COPYING"
-  Delete "$INSTDIR\README"
+  Delete "$INSTDIR\README.md"
   Delete "$INSTDIR\VERSION"
 
   Delete "$INSTDIR\*.pyd"

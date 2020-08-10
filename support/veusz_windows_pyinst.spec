@@ -26,7 +26,7 @@ exe = EXE(pyz,
 
 # add necessary documentation, licence
 binaries = a.binaries
-for bin in ('VERSION', 'ChangeLog', 'AUTHORS', 'README', 'INSTALL', 'COPYING'):
+for bin in ('VERSION', 'ChangeLog', 'AUTHORS', 'README.md', 'INSTALL', 'COPYING'):
     binaries += [ (bin, bin, 'DATA') ]
 
 # add various required files to distribution
