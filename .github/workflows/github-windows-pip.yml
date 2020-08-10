@@ -43,3 +43,4 @@ jobs:
         python tests/runselftest.py
       env:
         VEUSZ_INPLACE_TEST: '1'
+        VEUSZ_REMOVE_FROM_ENV: 'QT_PLUGIN_PATH QML2_IMPORT_PATH'

@@ -66,6 +66,11 @@ if 'VEUSZ_INPLACE_TEST' in os.environ:
     os.environ['PYTHONPATH'] = ('%s:%s' % (
         os.getcwd(), os.environ.get('PYTHONPATH', ''))).rstrip(':')
 
+# workaround for CI tests - delete environment variable
+removeenv = os.environ.get('VEUSZ_REMOVE_FROM_ENV', '')
+for remove in removeenv.split():
+    del os.environ[remove]
+
 from veusz.compat import cexec, cstr, copenuniversal
 import veusz.qtall as qt
 import veusz.utils as utils
