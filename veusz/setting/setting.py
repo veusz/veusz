@@ -1738,7 +1738,10 @@ class ErrorStyle(Choice):
         'boxfill', 'diamondfill', 'curvefill',
         'fillvert', 'fillhorz',
         'linevert', 'linehorz',
-        'linevertbar', 'linehorzbar'
+        'linevertbar', 'linehorzbar',
+        'barhi', 'barlo',
+        'barendshi', 'barendslo',
+        'linehorzlo', 'linehorzhi', 'linevertlo', 'lineverthi',
         )
 
     controls.ErrorStyle._errorstyles  = _errorstyles

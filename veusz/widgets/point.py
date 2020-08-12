@@ -65,6 +65,20 @@ class ErrorBarDraw:
         if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
             qtloops.plotLinesToPainter(painter, xmin, yplt, xmax, yplt, clip)
 
+    def errorsBarHi(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw bar style error lines (top half only)."""
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(painter, xplt, yplt, xplt, ymax, clip)
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(painter, xplt, yplt, xmax, yplt, clip)
+
+    def errorsBarLo(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw bar style error lines (bottom half only)."""
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(painter, xplt, yplt, xplt, ymin, clip)
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(painter, xplt, yplt, xmin, yplt, clip)
+
     def errorsEnds(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
         """Draw perpendiclar ends on error bars."""
         size = self.markersize * self.linestyle.endsize
@@ -80,6 +94,26 @@ class ErrorBarDraw:
                 painter, xmin, yplt-size, xmin, yplt+size, clip)
             qtloops.plotLinesToPainter(
                 painter, xmax, yplt-size, xmax, yplt+size, clip)
+
+    def errorsEndsHi(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw perpendiclar ends on error bars (top half only)."""
+        size = self.markersize * self.linestyle.endsize
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(
+                painter, xplt-size, ymax, xplt+size, ymax, clip)
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(
+                painter, xmax, yplt-size, xmax, yplt+size, clip)
+
+    def errorsEndsLo(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw perpendiclar ends on error bars (bottom half only)."""
+        size = self.markersize * self.linestyle.endsize
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(
+                painter, xplt-size, ymin, xplt+size, ymin, clip)
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(
+                painter, xmin, yplt-size, xmin, yplt+size, clip)
 
     def errorsBox(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
         """Draw box around error region."""
@@ -200,16 +234,20 @@ class ErrorBarDraw:
              not self.linestyle.hideVert ):
             hidevert = False
             # lines above/below points
-            qtloops.addNumpyToPolygonF(ptsbelow, xplt, ymin)
-            qtloops.addNumpyToPolygonF(ptsabove, xplt, ymax)
+            if self.style[-2:] != 'hi':
+                qtloops.addNumpyToPolygonF(ptsbelow, xplt, ymin)
+            if self.style[-2:] != 'lo':
+                qtloops.addNumpyToPolygonF(ptsabove, xplt, ymax)
 
         elif ( 'horz' in self.style and
                (xmin is not None and xmax is not None) and
                not self.linestyle.hideHorz ):
             hidehorz = False
             # lines left/right points
-            qtloops.addNumpyToPolygonF(ptsbelow, xmin, yplt)
-            qtloops.addNumpyToPolygonF(ptsabove, xmax, yplt)
+            if self.style[-2:] != 'hi':
+                qtloops.addNumpyToPolygonF(ptsbelow, xmin, yplt)
+            if self.style[-2:] != 'lo':
+                qtloops.addNumpyToPolygonF(ptsabove, xmax, yplt)
 
         # draw filled regions above/left and below/right
         if 'fill' in self.style and not (hidehorz and hidevert):
@@ -219,16 +257,18 @@ class ErrorBarDraw:
 
             # polygons consist of lines joining the points and continuing
             # back along the plot line (retnpts)
-            if not self.fillbelow.hideerror:
+            if not self.fillbelow.hideerror and ptsbelow:
                 utils.brushExtFillPolygon(
                     painter, self.fillbelow, clip, ptsbelow+retnpts, ignorehide=True)
-            if not self.fillabove.hideerror:
+            if not self.fillabove.hideerror and ptsabove:
                 utils.brushExtFillPolygon(
                     painter, self.fillabove, clip, ptsabove+retnpts, ignorehide=True)
 
         # draw optional line (on top of fill)
-        qtloops.plotClippedPolyline(painter, clip, ptsabove)
-        qtloops.plotClippedPolyline(painter, clip, ptsbelow)
+        if ptsabove:
+            qtloops.plotClippedPolyline(painter, clip, ptsabove)
+        if ptsbelow:
+            qtloops.plotClippedPolyline(painter, clip, ptsbelow)
 
     # map error bar names to lists of functions (above)
     error_functions = {
@@ -250,6 +290,14 @@ class ErrorBarDraw:
         'linevert': (errorsFilled,),
         'linehorzbar': (errorsBar, errorsFilled),
         'linevertbar': (errorsBar, errorsFilled),
+        'barhi': (errorsBarHi,),
+        'barlo': (errorsBarLo,),
+        'barendshi': (errorsBarHi, errorsEndsHi,),
+        'barendslo': (errorsBarLo, errorsEndsLo,),
+        'linehorzlo': (errorsFilled,),
+        'linehorzhi': (errorsFilled,),
+        'linevertlo': (errorsFilled,),
+        'lineverthi': (errorsFilled,),
     }
 
 def fillPtsToEdge(painter, pts, posn, cliprect, fillstyle):
