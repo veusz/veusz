@@ -519,6 +519,11 @@ def plotLineArrow(painter, xpos, ypos, length, angle,
     painter.translate(xpos, ypos)
     painter.rotate(angle)
 
+    linepen = qt.QPen(painter.pen())
+    arrowpen = painter.pen()
+    arrowpen.setStyle(qt.Qt.SolidLine)
+    painter.setPen(arrowpen)
+
     # plot marker at one end of line
     plotMarker(painter, length, 0., arrow_translate[arrowright], arrowsize)
 
@@ -526,9 +531,8 @@ def plotLineArrow(painter, xpos, ypos, length, angle,
     painter.scale(-1, 1)
     plotMarker(painter, 0, 0, arrow_translate[arrowleft], arrowsize)
 
-    pen = painter.pen()
-    pen.setCapStyle(qt.Qt.FlatCap)
-    painter.setPen(pen)
+    linepen.setCapStyle(qt.Qt.FlatCap)
+    painter.setPen(linepen)
     painter.scale(-1, 1)
     painter.drawLine(qt.QPointF(0, 0), qt.QPointF(length, 0))
 
