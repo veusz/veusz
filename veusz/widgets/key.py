@@ -375,6 +375,8 @@ class Key(widget.Widget):
 
         s = self.settings
         font = s.get('Text').makeQFont(painter)
+        textpen = s.get('Text').makeQPen(painter)
+
         painter.setFont(font)
         height = utils.FontMetrics(font, painter.device()).height()
         margin = s.marginSize * height
@@ -388,6 +390,7 @@ class Key(widget.Widget):
         titlewidth, titleheight = 0, 0
         if s.title != '':
             titlefont = qt.QFont(font)
+            painter.setPen(textpen)
             titlefont.setPointSize(max(font.pointSize() * 1.2, font.pointSize() + 2))
             titlewidth, titleheight = utils.Renderer(
                 painter, titlefont,
@@ -496,8 +499,6 @@ class Key(widget.Widget):
 
         # centres key below title
         x += (totalwidth-keyswidth)/2
-
-        textpen = s.get('Text').makeQPen(painter)
 
         swap = s.symbolswap
 
