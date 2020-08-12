@@ -69,9 +69,31 @@ def _calcerrs(data, errmode):
     else:
         raise RuntimeError('Unknown error mode')
 
+def _specialbin(mode, data, edges):
+    """Special binning modes."""
+    func = {
+        'stddev': N.std,
+        'variance': N.var,
+        'mean': N.mean,
+        'median': N.median,
+        'min': N.amin,
+        'max': N.amax,
+    }[mode]
+
+    data = data[N.isfinite(data)]
+    idxs = N.searchsorted(edges, data)-1
+    out = N.empty(len(edges)-1)
+    for i in range(len(edges)-1):
+        dbin = data[idxs==i]
+        if len(dbin)==0:
+            out[i] = N.nan
+        else:
+            out[i] = func(dbin)
+    return out
+
 def doBinning(data, weights=None,
               scaling='linear', minval='Auto', maxval='Auto',
-              mode='fixed', numbins=10, manualbins=None,
+              mode='constant', numbins=10, manualbins=None,
               calcmode='counts', errormode='gehrels',
 ):
 
@@ -102,12 +124,14 @@ def doBinning(data, weights=None,
     # non finite bins should be included in fractions, etc.
     sdata[~N.isfinite(sdata)] = N.inf
 
-    if mode == 'fixed':
+    if mode == 'constant':
         bins = numbins
     elif mode == 'manual':
         bins = N.unique(manualbins)
         if len(bins)<2:
             return
+        bins = sfwd(bins)
+        bins = bins[N.isfinite(bins)]
     else:
         bins = mode
 
@@ -115,17 +139,29 @@ def doBinning(data, weights=None,
         sdata,
         weights=weights,
         range=(minval, maxval),
-        bins=bins,
-        density=calcmode=='density',
+        bins=bins
     )
 
     # scale edges back after transformation
     sedges = sbkd(edges)
 
-    if calcmode in ('counts', 'fraction') and weights is None:
+    # special calculation modes
+    perr = nerr = None
+    if calcmode in {'stddev', 'variance', 'mean', 'median', 'min', 'max'}:
+        hist = _specialbin(calcmode, sdata, edges)
+    elif calcmode in {
+            'counts', 'fraction', 'density', 'density_scaled'
+    } and weights is None:
         perr, nerr = _calcerrs(hist, errormode)
-    else:
-        perr = nerr = None
+
+    if calcmode == 'density' or calcmode == 'density_scaled':
+        e = sedges if calcmode=='density' else edges
+        histscale = (1/hist.sum()) / (e[1:]-e[:-1])
+        hist = hist * histscale
+        if perr is not None:
+            perr = perr * histscale
+        if nerr is not None:
+            nerr = nerr * histscale
 
     if calcmode == 'fraction':
         invcts = 1/len(data)
@@ -189,7 +225,7 @@ class Histo(GenericPlotter):
     @staticmethod
     def _showmode(mode):
         # which bins to show depending on mode
-        if mode == 'fixed':
+        if mode == 'constant':
             return ('numbins',), ('manual',)
         elif mode == 'manual':
             return ('manual',), ('numbins',),
@@ -201,52 +237,59 @@ class Histo(GenericPlotter):
     def addSettings(klass, s):
         GenericPlotter.addSettings(s)
 
+        s.add( setting.Choice(
+            'mode',
+            ('histogram', 'weighted-histogram', 'bin-statistics'),
+            'histogram',
+            descr=_('Mode'),
+            usertext=_('Mode')), 0)
+
         s.add( setting.DatasetExtended(
             'data', '',
-            descr=_('Dataset'),
-            usertext=_('Data')), 1 )
+            descr=_('Dataset to apply binning to'),
+            usertext=_('Bin dataset')), 1 )
+
+        s.add( setting.DatasetExtended(
+            'statds', '',
+            descr=_('Optional dataset to calculate statistics for'),
+            usertext=_('Statistic dataset')), 2 )
+
         s.add( setting.DatasetExtended(
             'weights', '',
             descr=_('Optional weight applied to counts of data'),
-            usertext=_('Weights')), 2 )
+            usertext=_('Weights')), 3 )
+
+
+        s.add( setting.ChoiceSwitch(
+            'binning',
+            ('constant', 'manual', 'auto',
+             'fd', 'doane', 'scott', 'stone', 'rice',
+             'sturges', 'sqrt'),
+            'constant',
+            showfn=klass._showmode,
+            descr=_('Binning mode'),
+            usertext=_('Binning')), 4 )
 
         s.add( setting.FloatOrAuto(
             'minval', 'Auto',
             descr=_('Minimum of range'),
-            usertext=_('Minimum')), 3 )
+            usertext=_('Minimum')), 5 )
         s.add( setting.FloatOrAuto(
             'maxval', 'Auto',
             descr=_('Maximum of range'),
-            usertext=_('Maximum')), 4 )
+            usertext=_('Maximum')), 6 )
+
         s.add( setting.ChoiceSwitch(
             'scaling',
             ('linear', 'log', 'sqrt', 'arcsinh', 'exp', 'sqr', 'sinh'),
             'linear',
-            descr=_('Data scaling before binning'),
-            usertext=_('Scaling')), 5 )
-
-        s.add( setting.Choice(
-            'calcmode',
-            ('counts', 'fraction', 'density'),
-            'counts',
-            descr=_('Calculate when binning'),
-            usertext=_('Calculate')), 6 )
-
-        s.add( setting.ChoiceSwitch(
-            'mode',
-            ('fixed', 'manual', 'auto',
-             'fd', 'doane', 'scott', 'stone', 'rice',
-             'sturges', 'sqrt'),
-            'fixed',
-            showfn=klass._showmode,
-            descr=_('Binning mode'),
-            usertext=_('Mode')), 7 )
-
+            descr=_('Data scaling before creating bins'),
+            usertext=_('Bin scaling')), 7 )
         s.add( setting.Int(
             'numbins', 10,
             minval=1, maxval=100000,
             descr=_('Number of bins'),
-            usertext=_('Number')), 8)
+            usertext=_('Number')), 8 )
         s.add( setting.FloatList(
             'manual',
             [],
@@ -254,18 +297,25 @@ class Histo(GenericPlotter):
             usertext=_('Manual')), 9)
 
         s.add( setting.Choice(
+            'calcmode',
+            ('counts', 'fraction', 'density'),
+            'counts',
+            descr=_('Calculate when binning'),
+            usertext=_('Calculate')), 10 )
+
+        s.add( setting.Choice(
             'errormode',
             ('none', 'sqrt', 'gehrels'),
             'gehrels',
             descr=_('Error estimation'),
-            usertext=_('Uncertainty')), 10 )
+            usertext=_('Uncertainty')), 11 )
 
         s.add( setting.Choice(
             'direction',
             ('horizontal', 'vertical'),
             'vertical',
             descr=_('Bars direction'),
-            usertext=_('Direction')), 11 )
+            usertext=_('Direction')), 12 )
 
         s.add( setting.Color(
             'color',
@@ -359,7 +409,7 @@ class Histo(GenericPlotter):
         retn = doBinning(
             data, weights=weights,
             scaling=s.scaling, minval=s.minval, maxval=s.maxval,
-            mode=s.mode, numbins=s.numbins,
+            mode=s.binning, numbins=s.numbins,
             manualbins=s.manual,
             calcmode=s.calcmode, errormode=s.errormode)
         if retn is None:
