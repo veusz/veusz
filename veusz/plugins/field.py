@@ -64,6 +64,23 @@ class FieldText(Field):
     def getControlResults(self, cntrls):
         return cntrls[1].text()
 
+class FieldTextEdit(Field):
+    """Text entry on the dialog."""
+
+    def makeControl(self, doc, currentwidget):
+        l = qt.QLabel(self.descr)
+        e = qt.QTextEdit()
+        e.setTabStopWidth(20) #for tab positions
+        if self.default:
+            e.setText(self.default)
+        return (l, e)
+
+    def setControlVal(self, controls, val):
+        controls[1].setText(val)
+
+    def getControlResults(self, cntrls):
+        return cntrls[1].toPlainText()
+
 class FieldCombo(Field):
     """Drop-down combobox on dialog."""
     def __init__(self, name, descr=None, default=None, items=(),
