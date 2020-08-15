@@ -29,12 +29,14 @@
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g fill="none" stroke="#e41a1c" stroke-width="0.6">
+<g fill="none" stroke="#e41a1c" stroke-linecap="butt" stroke-width="0.6">
 <path d="M391.9,420.5l0,14"/>
 <path d="M391.9,427.5l0,0"/>
 <path d="M388.1,420.5l7.5,0"/>
 <path d="M388.1,434.5l7.5,0"/>
 <path d="M391.9,423.7l0,7.5"/>
+</g>
+<g fill="none" stroke="#e41a1c" stroke-width="0.6">
 <path d="M374.2,427.5l35.4,0"/>
 </g>
 <g fill="#e41a1c" stroke-linejoin="miter" stroke-width="0.6">
@@ -50,9 +52,11 @@
 <g fill="#add8e6" stroke="none" stroke-width="1">
 <path d="m374.2,445l35.4,0l0,7.8l-35.4,0l0,-7.8"/>
 </g>
-<g fill="none" stroke="#377eb8" stroke-width="0.6">
+<g fill="none" stroke="#377eb8" stroke-linecap="butt" stroke-width="0.6">
 <path d="M391.9,438l0,14"/>
 <path d="M391.9,445l0,0"/>
+</g>
+<g fill="none" stroke="#377eb8" stroke-width="0.6">
 <path d="M374.2,445l35.4,0"/>
 </g>
 <g fill="#377eb8" stroke-linejoin="miter" stroke-width="0.6">

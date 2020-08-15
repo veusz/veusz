@@ -46,7 +46,7 @@
 </g>
 </g>
 <g clip-path="url(#c2)">
-<g fill="none" stroke="#ffaa00" stroke-width="0.6">
+<g fill="none" stroke="#ffaa00" stroke-linecap="butt" stroke-width="0.6">
 <path d="M95.4,427.5l0,0"/>
 </g>
 <g fill="#ffaa00" stroke-linejoin="miter" stroke-width="0.6">
@@ -59,8 +59,10 @@
 <text x="130.6" y="420.5" font-size="14pt" fill="#000000">Filtered</text>
 </g>
 <g clip-path="url(#c3)">
-<g fill="none" stroke-width="0.6">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M95.4,445l0,0"/>
+</g>
+<g fill="none" stroke-width="0.6">
 <path d="M77.7,445l35.4,0"/>
 </g>
 <g fill="#000000" stroke-linejoin="miter" stroke-width="0.6">

@@ -63,8 +63,10 @@
 </g>
 </g>
 <g clip-path="url(#c2)">
-<g fill="none" stroke="#659f23" stroke-width="0.6">
+<g fill="none" stroke="#659f23" stroke-linecap="butt" stroke-width="0.6">
 <path d="M230.5,33.3l0,0"/>
+</g>
+<g fill="none" stroke="#659f23" stroke-width="0.6">
 <path d="M212.7,33.3l35.4,0"/>
 </g>
 <g fill="#659f23" stroke-linejoin="miter" stroke-width="0.6">
@@ -77,8 +79,10 @@
 <text x="265.7" y="26.3" font-size="14pt" fill="#000000">data</text>
 </g>
 <g clip-path="url(#c3)">
-<g fill="none" stroke="#de9578" stroke-width="0.6">
+<g fill="none" stroke="#de9578" stroke-linecap="butt" stroke-width="0.6">
 <path d="M230.5,50.8l0,0"/>
+</g>
+<g fill="none" stroke="#de9578" stroke-width="0.6">
 <path d="M212.7,50.8l35.4,0"/>
 </g>
 <g fill="#de9578" stroke-linejoin="miter" stroke-width="0.6">
@@ -91,8 +95,10 @@
 <text x="265.7" y="43.8" font-size="14pt" fill="#000000">add</text>
 </g>
 <g clip-path="url(#c4)">
-<g fill="none" stroke="#d02bf1" stroke-width="0.6">
+<g fill="none" stroke="#d02bf1" stroke-linecap="butt" stroke-width="0.6">
 <path d="M230.5,68.3l0,0"/>
+</g>
+<g fill="none" stroke="#d02bf1" stroke-width="0.6">
 <path d="M212.7,68.3l35.4,0"/>
 </g>
 <g fill="#d02bf1" stroke-linejoin="miter" stroke-width="0.6">
@@ -103,8 +109,10 @@
 <text x="265.7" y="61.3" font-size="14pt" fill="#000000">plus</text>
 </g>
 <g clip-path="url(#c5)">
-<g fill="none" stroke="#00a2b7" stroke-width="0.6">
+<g fill="none" stroke="#00a2b7" stroke-linecap="butt" stroke-width="0.6">
 <path d="M230.5,85.8l0,0"/>
+</g>
+<g fill="none" stroke="#00a2b7" stroke-width="0.6">
 <path d="M212.7,85.8l35.4,0"/>
 </g>
 <g fill="#00a2b7" stroke-linejoin="miter" stroke-width="0.6">
@@ -117,8 +125,10 @@
 <text x="265.7" y="78.8" font-size="14pt" fill="#000000">mean</text>
 </g>
 <g clip-path="url(#c6)">
-<g fill="none" stroke="#696b69" stroke-width="0.6">
+<g fill="none" stroke="#696b69" stroke-linecap="butt" stroke-width="0.6">
 <path d="M371.9,33.3l0,0"/>
+</g>
+<g fill="none" stroke="#696b69" stroke-width="0.6">
 <path d="M354.2,33.3l35.4,0"/>
 </g>
 <g fill="#696b69" stroke-linejoin="miter" stroke-width="0.6">
@@ -131,8 +141,10 @@
 <text x="407.1" y="26.3" font-size="14pt" fill="#000000">sub</text>
 </g>
 <g clip-path="url(#c7)">
-<g fill="none" stroke="#684f5f" stroke-width="0.6">
+<g fill="none" stroke="#684f5f" stroke-linecap="butt" stroke-width="0.6">
 <path d="M371.9,50.8l0,0"/>
+</g>
+<g fill="none" stroke="#684f5f" stroke-width="0.6">
 <path d="M354.2,50.8l35.4,0"/>
 </g>
 <g fill="#cf9ebe" stroke-linejoin="miter" stroke-width="0.6">
@@ -149,7 +161,7 @@
 <path d="m389.6,68.3l-17.7,0l-17.7,0l0,-7l17.7,0l17.7,0"/>
 <path d="m389.6,68.3l-17.7,0l-17.7,0l0,7l17.7,0l17.7,0"/>
 </g>
-<g fill="none" stroke="#808080" stroke-width="0.6">
+<g fill="none" stroke="#808080" stroke-linecap="butt" stroke-width="0.6">
 <polyline fill="none" points="353.5,75.3 371.9,75.3 390.2,75.3"/>
 <polyline fill="none" points="353.5,61.3 371.9,61.3 390.2,61.3"/>
 </g>
@@ -166,8 +178,10 @@
 <text x="407.1" y="61.3" font-size="14pt" fill="#000000">extremes</text>
 </g>
 <g clip-path="url(#c9)">
-<g fill="none" stroke-width="0.6">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M371.9,85.8l0,0"/>
+</g>
+<g fill="none" stroke-width="0.6">
 <path d="M354.2,85.8l35.4,0"/>
 </g>
 <g fill="#c7b266" stroke-linejoin="miter" stroke-width="0.6">

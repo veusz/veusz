@@ -35,7 +35,7 @@
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g fill="none" stroke="#808080" stroke-width="0.6">
+<g fill="none" stroke="#808080" stroke-linecap="butt" stroke-width="0.6">
 <path d="m260.4,144.6l6,6l6,-6l-6,-6l-6,6"/>
 </g>
 <g fill="#ff00ff" stroke="none" stroke-linejoin="miter" stroke-width="1">
@@ -48,7 +48,7 @@
 <text x="290.3" y="138.6" font-size="12pt" fill="#000000">Chandra deprojected</text>
 </g>
 <g clip-path="url(#c2)">
-<g fill="none" stroke="#0000ff" stroke-width="0.6">
+<g fill="none" stroke="#0000ff" stroke-linecap="butt" stroke-width="0.6">
 <path d="M266.4,153.6l0,12"/>
 <path d="M260.4,159.6l12,0"/>
 <path d="M263.3,153.6l6.2,0"/>
@@ -66,7 +66,7 @@
 <text x="290.3" y="153.6" font-size="12pt" fill="#000000">Chandra projected</text>
 </g>
 <g clip-path="url(#c3)">
-<g fill="none" stroke="#ff0000" stroke-width="0.6">
+<g fill="none" stroke="#ff0000" stroke-linecap="butt" stroke-width="0.6">
 <path d="m239.9,174.6c0,3.3,0,6,0,6c0,0,0,-2.6,0,-6c0,-3.3,0,-6,0,-6c0,0,0,2.6,0,6"/>
 <path d="m272.4,174.6c0,3.3,-2.6,6,-6,6c-3.3,0,-6,-2.6,-6,-6c0,-3.3,2.6,-6,6,-6c3.3,0,6,2.6,6,6"/>
 <path d="m293,174.6c0,3.3,0,6,0,6c0,0,0,-2.6,0,-6c0,-3.3,0,-6,0,-6c0,0,0,2.6,0,6"/>

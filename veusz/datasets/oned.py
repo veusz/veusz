@@ -101,6 +101,23 @@ class Dataset1DBase(DatasetConcreteBase):
         else:
             return None
 
+    def updateRangeAuto(self, axrange, noneg):
+        val = pos = neg = self.data
+        if self.serr is not None:
+            pos = pos + self.serr
+            neg = neg - self.serr
+        if self.perr is not None:
+            pos = pos + self.perr
+        if self.nerr is not None:
+            neg = neg + self.nerr
+
+        for v in val, pos, neg:
+            if noneg:
+                v = v[v>0]
+            if len(v) > 0:
+                axrange[0] = min(axrange[0], N.nanmin(v))
+                axrange[1] = max(axrange[1], N.nanmax(v))
+
     def rangeVisit(self, fn):
         '''Call fn on data points and error values, in order to get range.'''
         fn(self.data)

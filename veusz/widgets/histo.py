@@ -145,12 +145,19 @@ def doBinning(data, weights=None,
     # scale edges back after transformation
     sedges = sbkd(edges)
 
+    if calcmode in {'counts-cumulative', 'fraction-cumulative'}:
+        hist = N.cumsum(hist)
+    elif calcmode in {'counts-cumulative-reverse', 'fraction-cumulative-reverse'}:
+        hist = N.cumsum(hist[::-1])[::-1]
+
     # special calculation modes
     perr = nerr = None
     if calcmode in {'stddev', 'variance', 'mean', 'median', 'min', 'max'}:
         hist = _specialbin(calcmode, sdata, edges)
     elif calcmode in {
-            'counts', 'fraction', 'density', 'density_scaled'
+            'counts', 'fraction', 'density', 'density_scaled',
+            'counts-cumulative', 'counts-cumulative-reverse',
+            'fraction-cumulative', 'fraction-cumulative-reverse',
     } and weights is None:
         perr, nerr = _calcerrs(hist, errormode)
 
@@ -163,7 +170,8 @@ def doBinning(data, weights=None,
         if nerr is not None:
             nerr = nerr * histscale
 
-    if calcmode == 'fraction':
+    if calcmode in {
+            'fraction', 'fraction-cumulative', 'fraction-cumulative-reverse'}:
         invcts = 1/len(data)
         hist = hist * invcts
         if perr is not None:
@@ -223,8 +231,8 @@ class Histo(GenericPlotter):
         self.hist = self.edges = self.perrs = self.nerrs = None
 
     @staticmethod
-    def _showmode(mode):
-        # which bins to show depending on mode
+    def _showbinning(mode):
+        # which bins to show depending on binning mode
         if mode == 'constant':
             return ('numbins',), ('manual',)
         elif mode == 'manual':
@@ -237,28 +245,26 @@ class Histo(GenericPlotter):
     def addSettings(klass, s):
         GenericPlotter.addSettings(s)
 
-        s.add( setting.Choice(
-            'mode',
-            ('histogram', 'weighted-histogram', 'bin-statistics'),
-            'histogram',
-            descr=_('Mode'),
-            usertext=_('Mode')), 0)
-
         s.add( setting.DatasetExtended(
             'data', '',
             descr=_('Dataset to apply binning to'),
             usertext=_('Bin dataset')), 1 )
 
         s.add( setting.DatasetExtended(
-            'statds', '',
-            descr=_('Optional dataset to calculate statistics for'),
-            usertext=_('Statistic dataset')), 2 )
-
-        s.add( setting.DatasetExtended(
             'weights', '',
             descr=_('Optional weight applied to counts of data'),
             usertext=_('Weights')), 3 )
 
+        s.add( setting.Choice(
+            'calcmode',
+            (
+                'counts', 'fraction', 'density',
+                'counts-cumulative', 'counts-cumulative-reverse',
+                'fraction-cumulative', 'fraction-cumulative-reverse',
+            ),
+            'counts',
+            descr=_('Calculate when binning'),
+            usertext=_('Calculate')), 4 )
 
         s.add( setting.ChoiceSwitch(
             'binning',
@@ -266,18 +272,18 @@ class Histo(GenericPlotter):
              'fd', 'doane', 'scott', 'stone', 'rice',
              'sturges', 'sqrt'),
             'constant',
-            showfn=klass._showmode,
+            showfn=klass._showbinning,
             descr=_('Binning mode'),
-            usertext=_('Binning')), 4 )
+            usertext=_('Binning')), 5 )
 
         s.add( setting.FloatOrAuto(
             'minval', 'Auto',
             descr=_('Minimum of range'),
-            usertext=_('Minimum')), 5 )
+            usertext=_('Minimum')), 6 )
         s.add( setting.FloatOrAuto(
             'maxval', 'Auto',
             descr=_('Maximum of range'),
-            usertext=_('Maximum')), 6 )
+            usertext=_('Maximum')), 7 )
 
         s.add( setting.ChoiceSwitch(
             'scaling',
@@ -297,25 +303,18 @@ class Histo(GenericPlotter):
             usertext=_('Manual')), 9)
 
         s.add( setting.Choice(
-            'calcmode',
-            ('counts', 'fraction', 'density'),
-            'counts',
-            descr=_('Calculate when binning'),
-            usertext=_('Calculate')), 10 )
-
-        s.add( setting.Choice(
             'errormode',
             ('none', 'sqrt', 'gehrels'),
             'gehrels',
             descr=_('Error estimation'),
-            usertext=_('Uncertainty')), 11 )
+            usertext=_('Uncertainty')), 12 )
 
         s.add( setting.Choice(
             'direction',
             ('horizontal', 'vertical'),
             'vertical',
             descr=_('Bars direction'),
-            usertext=_('Direction')), 12 )
+            usertext=_('Direction')), 13 )
 
         s.add( setting.Color(
             'color',

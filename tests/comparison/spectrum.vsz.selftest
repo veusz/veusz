@@ -123,7 +123,7 @@
 </g>
 </g>
 <g clip-path="url(#c2)">
-<g fill="none" stroke="#808080" stroke-width="0.6">
+<g fill="none" stroke="#808080" stroke-linecap="butt" stroke-width="0.6">
 <path d="M735.6,26.3l0,14"/>
 <path d="M735.6,33.3l0,0"/>
 </g>
@@ -135,7 +135,7 @@
 <text x="770.8" y="26.3" font-size="14pt" fill="#000000">99% PSF</text>
 </g>
 <g clip-path="url(#c3)">
-<g fill="none" stroke="#55aa7f" stroke-width="0.6">
+<g fill="none" stroke="#55aa7f" stroke-linecap="butt" stroke-width="0.6">
 <path d="M735.6,43.8l0,14"/>
 <path d="M735.6,50.8l0,0"/>
 </g>
@@ -147,7 +147,7 @@
 <text x="770.8" y="43.8" font-size="14pt" fill="#000000">90% PSF</text>
 </g>
 <g clip-path="url(#c4)">
-<g fill="none" stroke="#ff557f" stroke-width="0.6">
+<g fill="none" stroke="#ff557f" stroke-linecap="butt" stroke-width="0.6">
 <path d="M735.6,68.3l0,0"/>
 </g>
 <g fill="none" stroke="#ff007f" stroke-width="1.2">
@@ -247,7 +247,7 @@
 </g>
 </g>
 <g clip-path="url(#c5)">
-<g fill="none" stroke="none" stroke-width="1">
+<g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
 <path d="M621.8,375.8l0,0"/>
 <path d="M614.8,375.8l14,0"/>
 </g>
@@ -259,7 +259,7 @@
 <text x="657.1" y="368.8" font-size="14pt" fill="#000000">0.5 keV model spectrum</text>
 </g>
 <g clip-path="url(#c6)">
-<g fill="none" stroke="none" stroke-width="1">
+<g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
 <path d="M621.8,393.3l0,0"/>
 <path d="M614.8,393.3l14,0"/>
 </g>
@@ -271,7 +271,7 @@
 <text x="657.1" y="386.3" font-size="14pt" fill="#000000">0.7 keV model spectrum</text>
 </g>
 <g clip-path="url(#c7)">
-<g fill="none" stroke="none" stroke-width="1">
+<g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
 <path d="M621.8,410.8l0,0"/>
 <path d="M614.8,410.8l14,0"/>
 </g>
