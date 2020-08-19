@@ -584,6 +584,10 @@ def allNotNone(*items):
     """Are all the items not None."""
     return not any((x is None for x in items))
 
+def anyNone(*items):
+    """Are any items None."""
+    return any((x is None for x in items))
+
 def findOnPath(cmd):
     """Find a command on the system path, or None if does not exist."""
     path = os.getenv('PATH', os.path.defpath)

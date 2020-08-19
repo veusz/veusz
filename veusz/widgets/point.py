@@ -31,85 +31,119 @@ from .. import utils
 from . import pickable
 from .plotters import GenericPlotter
 
-try:
-    from ..helpers import qtloops
-    hasqtloops = True
-except ImportError:
-    hasqtloops = False
+from ..helpers import qtloops
 
 def _(text, disambiguation=None, context='XY'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
-# functions for plotting error bars
-# different styles are made up of combinations of these functions
-# each function takes the same arguments
-def _errorBarsBar(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                  s, painter, clip):
-    """Draw bar style error lines."""
-    # vertical error bars
-    if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
-        utils.plotLinesToPainter(painter, xplotter, ymin, xplotter, ymax, clip)
+class ErrorBarDraw:
+    """For plotting error bars."""
 
-    # horizontal error bars
-    if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
-        utils.plotLinesToPainter(painter, xmin, yplotter, xmax, yplotter, clip)
+    def __init__(self, style, linestyle, fillabove, fillbelow, markersize):
+        self.style = style
+        self.linestyle = linestyle
+        self.fillabove = fillabove
+        self.fillbelow = fillbelow
+        self.markersize = markersize
 
-def _errorBarsEnds(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                   s, painter, clip):
-    """Draw perpendiclar ends on error bars."""
-    size = ( s.get('markerSize').convert(painter) *
-             s.ErrorBarLine.endsize )
+    def plot(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        pen = self.linestyle.makeQPenWHide(painter)
+        pen.setCapStyle(qt.Qt.FlatCap)
 
-    if ymin is not None and ymax is not None and not s.ErrorBarLine.hideVert:
-        utils.plotLinesToPainter(
-            painter, xplotter-size, ymin,
-            xplotter+size, ymin, clip)
-        utils.plotLinesToPainter(
-            painter, xplotter-size, ymax,
-            xplotter+size, ymax, clip)
+        painter.setPen(pen)
+        for function in self.error_functions[self.style]:
+            function(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip)
 
-    if xmin is not None and xmax is not None and not s.ErrorBarLine.hideHorz:
-        utils.plotLinesToPainter(
-            painter, xmin, yplotter-size,
-            xmin, yplotter+size, clip)
-        utils.plotLinesToPainter(
-            painter, xmax, yplotter-size,
-            xmax, yplotter+size, clip)
+    def errorsBar(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw bar style error lines."""
+        # vertical error bars
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(painter, xplt, ymin, xplt, ymax, clip)
 
-def _errorBarsBox(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                  s, painter, clip):
-    """Draw box around error region."""
-    if utils.allNotNone(xmin, xmax, ymin, ymax):
-        painter.setBrush( qt.QBrush() )
-        utils.plotBoxesToPainter(painter, xmin, ymin, xmax, ymax, clip)
+        # horizontal error bars
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(painter, xmin, yplt, xmax, yplt, clip)
 
-def _errorBarsBoxFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                        s, painter, clip):
-    """Draw box filled region inside error bars."""
-    if utils.allNotNone(xmin, xmax, ymin, ymax):
+    def errorsBarHi(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw bar style error lines (top half only)."""
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(painter, xplt, yplt, xplt, ymax, clip)
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(painter, xplt, yplt, xmax, yplt, clip)
+
+    def errorsBarLo(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw bar style error lines (bottom half only)."""
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(painter, xplt, yplt, xplt, ymin, clip)
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(painter, xplt, yplt, xmin, yplt, clip)
+
+    def errorsEnds(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw perpendiclar ends on error bars."""
+        size = self.markersize * self.linestyle.endsize
+
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(
+                painter, xplt-size, ymin, xplt+size, ymin, clip)
+            qtloops.plotLinesToPainter(
+                painter, xplt-size, ymax, xplt+size, ymax, clip)
+
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(
+                painter, xmin, yplt-size, xmin, yplt+size, clip)
+            qtloops.plotLinesToPainter(
+                painter, xmax, yplt-size, xmax, yplt+size, clip)
+
+    def errorsEndsHi(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw perpendiclar ends on error bars (top half only)."""
+        size = self.markersize * self.linestyle.endsize
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(
+                painter, xplt-size, ymax, xplt+size, ymax, clip)
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(
+                painter, xmax, yplt-size, xmax, yplt+size, clip)
+
+    def errorsEndsLo(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw perpendiclar ends on error bars (bottom half only)."""
+        size = self.markersize * self.linestyle.endsize
+        if ymin is not None and ymax is not None and not self.linestyle.hideVert:
+            qtloops.plotLinesToPainter(
+                painter, xplt-size, ymin, xplt+size, ymin, clip)
+        if xmin is not None and xmax is not None and not self.linestyle.hideHorz:
+            qtloops.plotLinesToPainter(
+                painter, xmin, yplt-size, xmin, yplt+size, clip)
+
+    def errorsBox(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw box around error region."""
+        if utils.allNotNone(xmin, xmax, ymin, ymax):
+            painter.setBrush(qt.QBrush())
+            qtloops.plotBoxesToPainter(painter, xmin, ymin, xmax, ymax, clip)
+
+    def errorsBoxFilled(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw box filled region inside error bars."""
+        if utils.anyNone(xmin, xmax, ymin, ymax):
+            return
+
         # filled region below
-        if not s.FillBelow.hideerror:
+        if not self.fillbelow.hideerror:
             path = qt.QPainterPath()
-            utils.addNumpyPolygonToPath(
-                path, clip,
-                xmin, ymin, xmin, yplotter,
-                xmax, yplotter, xmax, ymin)
-            utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
+            qtloops.addNumpyPolygonToPath(
+                path, clip, xmin, ymin, xmin, yplt, xmax, yplt, xmax, ymin)
+            utils.brushExtFillPath(painter, self.fillbelow, path, ignorehide=True)
 
         # filled region above
-        if not s.FillAbove.hideerror:
+        if not self.fillabove.hideerror:
             path = qt.QPainterPath()
-            utils.addNumpyPolygonToPath(
-                path, clip,
-                xmin, yplotter, xmax, yplotter,
-                xmax, ymax, xmin, ymax)
-            utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
+            qtloops.addNumpyPolygonToPath(
+                path, clip, xmin, yplt, xmax, yplt, xmax, ymax, xmin, ymax)
+            utils.brushExtFillPath(painter, self.fillabove, path, ignorehide=True)
 
-def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                      s, painter, clip):
-    """Draw diamond around error region."""
-    if utils.allNotNone(xmin, xmax, ymin, ymax):
+    def errorsDiamond(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw diamond around error region."""
+        if utils.anyNone(xmin, xmax, ymin, ymax):
+            return
 
         # expand clip by pen width (urgh)
         pw = painter.pen().widthF()*2
@@ -118,155 +152,152 @@ def _errorBarsDiamond(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
             qt.QPointF(clip.right()+pw,clip.bottom()+pw))
 
         path = qt.QPainterPath()
-        utils.addNumpyPolygonToPath(
-            path, clip,
-            xmin, yplotter, xplotter, ymax,
-            xmax, yplotter, xplotter, ymin)
+        qtloops.addNumpyPolygonToPath(
+            path, clip, xmin, yplt, xplt, ymax, xmax, yplt, xplt, ymin)
         painter.setBrush( qt.QBrush() )
         painter.drawPath(path)
 
-def _errorBarsDiamondFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                            s, painter, clip):
-    """Draw diamond filled region inside error bars."""
-    if utils.allNotNone(xmin, xmax, ymin, ymax):
-        if not s.FillBelow.hideerror:
-            path = qt.QPainterPath()
-            utils.addNumpyPolygonToPath(
-                path, clip,
-                xmin, yplotter, xplotter, ymin,
-                xmax, yplotter)
-            utils.brushExtFillPath(painter, s.FillBelow, path, ignorehide=True)
+    def errorsDiamondFilled(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw diamond filled region inside error bars."""
+        if utils.anyNone(xmin, xmax, ymin, ymax):
+            return
 
-        if not s.FillAbove.hideerror:
+        if not self.fillbelow.hideerror:
             path = qt.QPainterPath()
-            utils.addNumpyPolygonToPath(
-                path, clip,
-                xmin, yplotter, xplotter, ymax,
-                xmax, yplotter)
-            utils.brushExtFillPath(painter, s.FillAbove, path, ignorehide=True)
+            qtloops.addNumpyPolygonToPath(
+                path, clip, xmin, yplt, xplt, ymin, xmax, yplt)
+            utils.brushExtFillPath(painter, self.fillbelow, path, ignorehide=True)
 
-def _errorBarsCurve(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                    s, painter, clip):
-    """Draw curve around error region."""
-    if utils.allNotNone(xmin, xmax, ymin, ymax):
+        if not self.fillabove.hideerror:
+            path = qt.QPainterPath()
+            qtloops.addNumpyPolygonToPath(
+                path, clip, xmin, yplt, xplt, ymax, xmax, yplt)
+            utils.brushExtFillPath(painter, self.fillabove, path, ignorehide=True)
+
+    def errorsCurve(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw curve around error region."""
+        if utils.anyNone(xmin, xmax, ymin, ymax):
+            return
+
         # non-filling brush
         painter.setBrush( qt.QBrush() )
 
-        for xp, yp, xmn, ymn, xmx, ymx in czip(
-            xplotter, yplotter, xmin, ymin, xmax, ymax):
-
+        for xp, yp, xmn, ymn, xmx, ymx in czip(xplt, yplt, xmin, ymin, xmax, ymax):
             p = qt.QPainterPath()
             p.moveTo(xp + (xmx-xp), yp)
             p.arcTo(qt.QRectF(
-                xp - (xmx-xp), yp - (yp-ymx),
-                (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
+                xp - (xmx-xp), yp - (yp-ymx), (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
             p.arcTo(qt.QRectF(
-                xp - (xp-xmn), yp - (yp-ymx),
-                (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
+                xp - (xp-xmn), yp - (yp-ymx), (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
             p.arcTo(qt.QRectF(
-                xp - (xp-xmn), yp - (ymn-yp),
-                (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
+                xp - (xp-xmn), yp - (ymn-yp), (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
             p.arcTo(qt.QRectF(
-                xp - (xmx-xp), yp - (ymn-yp),
-                (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
+                xp - (xmx-xp), yp - (ymn-yp), (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
             painter.drawPath(p)
 
-def _errorBarsCurveFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                          s, painter, clip):
-    """Fill area around error region."""
+    def errorsCurveFilled(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Fill area around error region."""
 
-    if utils.allNotNone(xmin, xmax, ymin, ymax):
-        for xp, yp, xmn, ymn, xmx, ymx in czip(
-            xplotter, yplotter, xmin, ymin, xmax, ymax):
+        if utils.anyNone(xmin, xmax, ymin, ymax):
+            return
 
-            if not s.FillAbove.hideerror:
+        for xp, yp, xmn, ymn, xmx, ymx in czip(xplt, yplt, xmin, ymin, xmax, ymax):
+
+            if not self.fillabove.hideerror:
                 p = qt.QPainterPath()
                 p.moveTo(xp + (xmx-xp), yp)
                 p.arcTo(qt.QRectF(
-                    xp - (xmx-xp), yp - (yp-ymx),
-                    (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
+                    xp - (xmx-xp), yp - (yp-ymx), (xmx-xp)*2, (yp-ymx)*2), 0., 90.)
                 p.arcTo(qt.QRectF(
-                    xp - (xp-xmn), yp - (yp-ymx),
-                    (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
-                utils.brushExtFillPath(painter, s.FillAbove, p, ignorehide=True)
+                    xp - (xp-xmn), yp - (yp-ymx), (xp-xmn)*2, (yp-ymx)*2), 90., 90.)
+                utils.brushExtFillPath(painter, self.fillabove, p, ignorehide=True)
 
-            if not s.FillBelow.hideerror:
+            if not self.fillbelow.hideerror:
                 p = qt.QPainterPath()
                 p.moveTo(xp + (xp-xmn), yp)
                 p.arcTo(qt.QRectF(
-                    xp - (xp-xmn), yp - (ymn-yp),
-                    (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
+                    xp - (xp-xmn), yp - (ymn-yp), (xp-xmn)*2, (ymn-yp)*2), 180., 90.)
                 p.arcTo(qt.QRectF(
-                    xp - (xmx-xp), yp - (ymn-yp),
-                    (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
-                utils.brushExtFillPath(painter, s.FillBelow, p, ignorehide=True)
+                    xp - (xmx-xp), yp - (ymn-yp), (xmx-xp)*2, (ymn-yp)*2), 270., 90.)
+                utils.brushExtFillPath(painter, self.fillbelow, p, ignorehide=True)
 
-def _errorBarsFilled(style, xmin, xmax, ymin, ymax, xplotter, yplotter,
-                     s, painter, clip):
-    """Draw filled region as error region."""
+    def errorsFilled(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
+        """Draw filled region as error region."""
 
-    ptsabove = qt.QPolygonF()
-    ptsbelow = qt.QPolygonF()
+        ptsabove = qt.QPolygonF()
+        ptsbelow = qt.QPolygonF()
 
-    hidevert = True  # keep track of what's shown
-    hidehorz = True
-    if ( 'vert' in style and
-         (ymin is not None and ymax is not None) and
-         not s.ErrorBarLine.hideVert ):
-        hidevert = False
-        # lines above/below points
-        utils.addNumpyToPolygonF(ptsbelow, xplotter, ymin)
-        utils.addNumpyToPolygonF(ptsabove, xplotter, ymax)
+        hidevert = True  # keep track of what's shown
+        hidehorz = True
+        if ( 'vert' in self.style and
+             (ymin is not None and ymax is not None) and
+             not self.linestyle.hideVert ):
+            hidevert = False
+            # lines above/below points
+            if self.style[-2:] != 'hi':
+                qtloops.addNumpyToPolygonF(ptsbelow, xplt, ymin)
+            if self.style[-2:] != 'lo':
+                qtloops.addNumpyToPolygonF(ptsabove, xplt, ymax)
 
-    elif ( 'horz' in style and
-           (xmin is not None and xmax is not None) and
-           not s.ErrorBarLine.hideHorz ):
-        hidehorz = False
-        # lines left/right points
-        utils.addNumpyToPolygonF(ptsbelow, xmin, yplotter)
-        utils.addNumpyToPolygonF(ptsabove, xmax, yplotter)
+        elif ( 'horz' in self.style and
+               (xmin is not None and xmax is not None) and
+               not self.linestyle.hideHorz ):
+            hidehorz = False
+            # lines left/right points
+            if self.style[-2:] != 'hi':
+                qtloops.addNumpyToPolygonF(ptsbelow, xmin, yplt)
+            if self.style[-2:] != 'lo':
+                qtloops.addNumpyToPolygonF(ptsabove, xmax, yplt)
 
-    # draw filled regions above/left and below/right
-    if 'fill' in style and not (hidehorz and hidevert):
-        # construct points for error bar regions
-        retnpts = qt.QPolygonF()
-        utils.addNumpyToPolygonF(retnpts, xplotter[::-1], yplotter[::-1])
+        # draw filled regions above/left and below/right
+        if 'fill' in self.style and not (hidehorz and hidevert):
+            # construct points for error bar regions
+            retnpts = qt.QPolygonF()
+            qtloops.addNumpyToPolygonF(retnpts, xplt[::-1], yplt[::-1])
 
-        # polygons consist of lines joining the points and continuing
-        # back along the plot line (retnpts)
-        if not s.FillBelow.hideerror:
-            utils.brushExtFillPolygon(
-                painter, s.FillBelow, clip,
-                ptsbelow+retnpts, ignorehide=True)
-        if not s.FillAbove.hideerror:
-            utils.brushExtFillPolygon(
-                painter, s.FillAbove, clip,
-                ptsabove+retnpts, ignorehide=True)
+            # polygons consist of lines joining the points and continuing
+            # back along the plot line (retnpts)
+            if not self.fillbelow.hideerror and ptsbelow:
+                utils.brushExtFillPolygon(
+                    painter, self.fillbelow, clip, ptsbelow+retnpts, ignorehide=True)
+            if not self.fillabove.hideerror and ptsabove:
+                utils.brushExtFillPolygon(
+                    painter, self.fillabove, clip, ptsabove+retnpts, ignorehide=True)
 
-    # draw optional line (on top of fill)
-    utils.plotClippedPolyline(painter, clip, ptsabove)
-    utils.plotClippedPolyline(painter, clip, ptsbelow)
+        # draw optional line (on top of fill)
+        if ptsabove:
+            qtloops.plotClippedPolyline(painter, clip, ptsabove)
+        if ptsbelow:
+            qtloops.plotClippedPolyline(painter, clip, ptsbelow)
 
-# map error bar names to lists of functions (above)
-_errorBarFunctionMap = {
-    'none': (),
-    'bar': (_errorBarsBar,),
-    'bardiamond': (_errorBarsBar, _errorBarsDiamond,),
-    'barcurve': (_errorBarsBar, _errorBarsCurve,),
-    'barbox': (_errorBarsBar, _errorBarsBox,),
-    'barends': (_errorBarsBar, _errorBarsEnds,),
-    'box':  (_errorBarsBox,),
-    'boxfill': (_errorBarsBoxFilled, _errorBarsBox,),
-    'diamond':  (_errorBarsDiamond,),
-    'diamondfill':  (_errorBarsDiamond, _errorBarsDiamondFilled),
-    'curve': (_errorBarsCurve,),
-    'curvefill': (_errorBarsCurveFilled, _errorBarsCurve,),
-    'fillhorz': (_errorBarsFilled,),
-    'fillvert': (_errorBarsFilled,),
-    'linehorz': (_errorBarsFilled,),
-    'linevert': (_errorBarsFilled,),
-    'linehorzbar': (_errorBarsBar, _errorBarsFilled),
-    'linevertbar': (_errorBarsBar, _errorBarsFilled),
+    # map error bar names to lists of functions (above)
+    error_functions = {
+        'none': (),
+        'bar': (errorsBar,),
+        'bardiamond': (errorsBar, errorsDiamond,),
+        'barcurve': (errorsBar, errorsCurve,),
+        'barbox': (errorsBar, errorsBox,),
+        'barends': (errorsBar, errorsEnds,),
+        'box':  (errorsBox,),
+        'boxfill': (errorsBoxFilled, errorsBox,),
+        'diamond':  (errorsDiamond,),
+        'diamondfill':  (errorsDiamond, errorsDiamondFilled),
+        'curve': (errorsCurve,),
+        'curvefill': (errorsCurveFilled, errorsCurve,),
+        'fillhorz': (errorsFilled,),
+        'fillvert': (errorsFilled,),
+        'linehorz': (errorsFilled,),
+        'linevert': (errorsFilled,),
+        'linehorzbar': (errorsBar, errorsFilled),
+        'linevertbar': (errorsBar, errorsFilled),
+        'barhi': (errorsBarHi,),
+        'barlo': (errorsBarLo,),
+        'barendshi': (errorsBarHi, errorsEndsHi,),
+        'barendslo': (errorsBarLo, errorsEndsLo,),
+        'linehorzlo': (errorsFilled,),
+        'linehorzhi': (errorsFilled,),
+        'linevertlo': (errorsFilled,),
+        'lineverthi': (errorsFilled,),
     }
 
 def fillPtsToEdge(painter, pts, posn, cliprect, fillstyle):
@@ -382,24 +413,24 @@ class PointPlotter(GenericPlotter):
 
         s.add( setting.XYPlotLine(
             'PlotLine',
-            descr = _('Plot line settings'),
+            descr = _('Plot line'),
             usertext = _('Plot line')),
                pixmap = 'settings_plotline' )
 
         s.add( setting.MarkerLine(
             'MarkerLine',
-            descr = _('Line around the marker settings'),
+            descr = _('Line around marker'),
             usertext = _('Marker border')),
                pixmap = 'settings_plotmarkerline' )
         s.add( MarkerFillBrush(
             'MarkerFill',
-            descr = _('Marker fill settings'),
+            descr = _('Marker fill'),
             usertext = _('Marker fill')),
                pixmap = 'settings_plotmarkerfill' )
 
         s.add( setting.ErrorBarLine(
             'ErrorBarLine',
-            descr = _('Error bar line settings'),
+            descr = _('Error bar line'),
             usertext = _('Error bar line')),
                pixmap = 'settings_ploterrorline' )
         s.ErrorBarLine.get('color').newDefault( setting.Reference('../color') )
@@ -412,7 +443,7 @@ class PointPlotter(GenericPlotter):
         s.FillBelow.get('fillto').newDefault('bottom')
         s.add( setting.PointFill(
             'FillAbove',
-            descr = _('Fill mode 2'),
+            descr = _('Fill 2'),
             usertext = _('Fill 2')),
                pixmap = 'settings_plotfillabove' )
         s.add( setting.PointLabel(
@@ -472,14 +503,10 @@ class PointPlotter(GenericPlotter):
         if thin>1:
             xplotter, yplotter = xplotter[::thin], yplotter[::thin]
 
-        # iterate to call the error bars functions required to draw style
-        pen = s.ErrorBarLine.makeQPenWHide(painter)
-        pen.setCapStyle(qt.Qt.FlatCap)
-
-        painter.setPen(pen)
-        for function in _errorBarFunctionMap[style]:
-            function(style, xmin, xmax, ymin, ymax,
-                     xplotter, yplotter, s, painter, cliprect)
+        markersize = s.get('markerSize').convert(painter)
+        ebp = ErrorBarDraw(
+            s.errorStyle, s.ErrorBarLine, s.FillAbove, s.FillBelow, markersize)
+        ebp.plot(painter, xmin, xmax, ymin, ymax, xplotter, yplotter, cliprect)
 
     def affectsAxisRange(self):
         """This widget provides range information about these axes."""
@@ -492,22 +519,8 @@ class PointPlotter(GenericPlotter):
         dsetn = self.settings.get(dataname)
         data = dsetn.getData(self.document)
 
-        if axis.settings.log:
-            def updateRange(v):
-                with N.errstate(invalid='ignore'):
-                    chopzero = v[(v>0) & N.isfinite(v)]
-                if len(chopzero) > 0:
-                    axrange[0] = min(axrange[0], chopzero.min())
-                    axrange[1] = max(axrange[1], chopzero.max())
-        else:
-            def updateRange(v):
-                fvals = v[N.isfinite(v)]
-                if len(fvals) > 0:
-                    axrange[0] = min(axrange[0], fvals.min())
-                    axrange[1] = max(axrange[1], fvals.max())
-
         if data:
-            data.rangeVisit(updateRange)
+            data.updateRangeAuto(axrange, axis.settings.log)
         elif dsetn.isEmpty():
             # no valid dataset.
             # check if there a valid dataset for the other axis.
@@ -731,10 +744,10 @@ class PointPlotter(GenericPlotter):
             yneg = ypos = ypts
 
         # plot error bar
-        painter.setPen( s.ErrorBarLine.makeQPenWHide(painter) )
-        for function in _errorBarFunctionMap[errstyle]:
-            function(errstyle, xneg, xpos, yneg, ypos, xpts, ypts, s,
-                     painter, cliprect)
+        markersize = s.get('markerSize').convert(painter)
+        ebp = ErrorBarDraw(
+            errstyle, s.ErrorBarLine, s.FillAbove, s.FillBelow, markersize)
+        ebp.plot(painter, xneg, xpos, yneg, ypos, xpts, ypts, cliprect)
 
         # draw line
         if not s.PlotLine.hide:
@@ -751,8 +764,7 @@ class PointPlotter(GenericPlotter):
             else:
                 painter.setPen( qt.QPen( qt.Qt.NoPen ) )
 
-            size = s.get('markerSize').convert(painter)
-            utils.plotMarker(painter, x+width/2, yp, s.marker, size)
+            utils.plotMarker(painter, x+width/2, yp, s.marker, markersize)
 
         painter.restore()
 
@@ -895,7 +907,7 @@ class PointPlotter(GenericPlotter):
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                if s.PlotLine.bezierJoin and hasqtloops:
+                if s.PlotLine.bezierJoin:
                     self._drawBezierLine(
                         painter, xplotter, yplotter, posn,
                         xvals, yvals, cliprect )

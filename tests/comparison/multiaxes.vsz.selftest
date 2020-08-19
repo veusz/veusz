@@ -44,9 +44,11 @@
 </g>
 </g>
 <g clip-path="url(#c1)">
-<g fill="none" stroke-width="0.6">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M95.4,403l0,14"/>
 <path d="M88.4,410l14,0"/>
+</g>
+<g fill="none" stroke-width="0.6">
 <path d="M77.7,410l35.4,0"/>
 </g>
 <g fill="#0000ff" stroke-linejoin="miter" stroke-width="0.6">
@@ -61,9 +63,11 @@
 <text x="235.6" y="403" font-size="14pt" fill="#000000"> Western</text>
 </g>
 <g clip-path="url(#c2)">
-<g fill="none" stroke-width="0.6">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M95.4,420.5l0,14"/>
 <path d="M88.4,427.5l14,0"/>
+</g>
+<g fill="none" stroke-width="0.6">
 <path d="M77.7,427.5l35.4,0"/>
 </g>
 <g fill="#808080" stroke-linejoin="miter" stroke-width="0.6">
@@ -78,9 +82,11 @@
 <text x="235.6" y="420.5" font-size="14pt" fill="#000000"> Eastern</text>
 </g>
 <g clip-path="url(#c3)">
-<g fill="none" stroke-width="0.6">
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
 <path d="M95.4,438l0,14"/>
 <path d="M88.4,445l14,0"/>
+</g>
+<g fill="none" stroke-width="0.6">
 <path d="M77.7,445l35.4,0"/>
 </g>
 <g fill="#ffffff" stroke-linejoin="miter" stroke-width="0.6">

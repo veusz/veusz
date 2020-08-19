@@ -860,7 +860,7 @@ class TreeEditDock(qt.QDockWidget):
         for widgettype in (
                 'page', 'grid', 'graph', 'axis',
                 'axis-broken', 'axis-function',
-                'xy', 'bar', 'fit', 'function', 'boxplot',
+                'xy', 'bar', 'histo', 'fit', 'function', 'boxplot',
                 'image', 'contour', 'vectorfield',
                 'key', 'label', 'colorbar',
                 'rect', 'ellipse', 'imagefile',
@@ -937,6 +937,7 @@ class TreeEditDock(qt.QDockWidget):
             'add.nonorthpoint',
             'add.point3d',
             'add.bar',
+            'add.histo',
             'add.fit',
             'add.function',
             'add.nonorthfunc',

@@ -28,6 +28,7 @@ from .plotters import GenericPlotter, FreePlotter
 from .pickable import PickInfo
 from .point import PointPlotter
 from .function import FunctionPlotter
+from .histo import Histo
 from .textlabel import TextLabel
 from .page import Page
 from .root import Root

@@ -57,7 +57,7 @@
 <g fill="#90ee90" stroke="none" stroke-width="1">
 <path d="m90.2,52l35.4,0l0,6.7l-35.4,0l0,-6.7"/>
 </g>
-<g fill="none" stroke="none" stroke-width="1">
+<g fill="none" stroke="none" stroke-linecap="butt" stroke-width="1">
 <path d="M107.9,46l0,12"/>
 <path d="M107.9,52l0,0"/>
 </g>
