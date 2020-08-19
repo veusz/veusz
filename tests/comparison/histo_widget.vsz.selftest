@@ -1,0 +1,356 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="531.4px" height="531.4px" version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+<desc>Veusz output document</desc>
+<defs>
+<clipPath id="c0">
+<path d="m0,0l531.4,0l0,531.4l-531.4,0l0,-531.4"/>
+</clipPath>
+<clipPath id="c1">
+<path d="m35.4,7l138.1,0l0,347.2l-138.1,0l0,-347.2"/>
+</clipPath>
+<clipPath id="c2">
+<path d="m177.1,357.8l347.2,0l0,138.1l-347.2,0l0,-138.1"/>
+</clipPath>
+<clipPath id="c3">
+<path d="m177.1,7l347.2,0l0,347.2l-347.2,0l0,-347.2"/>
+</clipPath>
+</defs>
+<g stroke-linejoin="bevel" stroke-linecap="square" stroke="#000000" fill-rule="evenodd">
+<g clip-path="url(#c0)">
+<g fill="#ffffff" stroke="#800000" stroke-width="0.6">
+<path d="m35.4,7l138.1,0l0,347.2l-138.1,0l0,-347.2"/>
+</g>
+</g>
+<g clip-path="url(#c1)">
+<g fill="#e41a1c" stroke="none" stroke-width="1">
+<path d="m146.4,296.4l0,-28.9l-29.6,0l0,-28.9l-4.9,0l0,-28.9l-46.8,0l0,-28.9l19.7,0l0,-28.9l22.2,0l0,-28.9l17.2,0l0,-28.9l29.6,0l0,-28.9l12.3,0l0,-28.9l7.4,0l0,-28.9l0,347.2l0,-28.9l-7.4,0l0,-28.9"/>
+</g>
+<g fill="none" stroke="#ffffff" stroke-width="0.6">
+<path d="M173.6,354.3l0,0M166.2,325.3l7.4,0M146.4,296.4l27.1,0M116.8,267.5l56.7,0M111.9,238.5l61.6,0M65,209.6l108.5,0M84.7,180.7l88.8,0M106.9,151.7l66.6,0M124.2,122.8l49.3,0M153.8,93.8l19.7,0M166.2,64.9l7.4,0M173.6,36l0,0"/>
+</g>
+<g fill="none" stroke="#e41a1c" stroke-width="0.6">
+<polyline fill="none" points="173.6,354.3 173.6,325.3 166.2,325.3 166.2,296.4 146.4,296.4 146.4,267.5 116.8,267.5 116.8,238.5 111.9,238.5 111.9,209.6 65,209.6 65,180.7 84.7,180.7 84.7,151.7 106.9,151.7 106.9,122.8 124.2,122.8 124.2,93.8 153.8,93.8 153.8,64.9 166.2,64.9 166.2,36 173.6,36 173.6,7"/>
+</g>
+<g fill="none" stroke="#e41a1c" stroke-linecap="butt" stroke-width="0.6">
+<path d="M173.6,339.8l-4.6,0M166.2,310.9l-7.2,0M146.4,281.9l-10.9,0M116.8,253l-14.4,0M111.9,224.1l-14.9,0M65,195.1l-18.9,0M84.7,166.2l-17.4,0M106.9,137.3l-15.4,0M124.2,108.3l-13.7,0M153.8,79.4l-9.7,0M166.2,50.4l-7.2,0M173.6,21.5l-4.6,0"/>
+<path d="M169,336.1l0,7.5M158.9,307.1l0,7.5M135.5,278.2l0,7.5M102.3,249.3l0,7.5M96.9,220.3l0,7.5M46,191.4l0,7.5M67.3,162.4l0,7.5M91.5,133.5l0,7.5M110.5,104.6l0,7.5M144.1,75.6l0,7.5M158.9,46.7l0,7.5M169,17.8l0,7.5"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke="#800000" stroke-linecap="butt" stroke-width="0.6">
+<path d="M35.4,354.3l0,-347.2"/>
+<path d="M35.4,354.3l3.7,0M35.4,325.3l3.7,0M35.4,296.4l3.7,0M35.4,267.5l3.7,0M35.4,238.5l3.7,0M35.4,209.6l3.7,0M35.4,180.7l3.7,0M35.4,151.7l3.7,0M35.4,122.8l3.7,0M35.4,93.8l3.7,0M35.4,64.9l3.7,0M35.4,36l3.7,0M35.4,7l3.7,0"/>
+<path d="M35.4,354.3l7.5,0M35.4,296.4l7.5,0M35.4,238.5l7.5,0M35.4,180.7l7.5,0M35.4,122.8l7.5,0M35.4,64.9l7.5,0M35.4,7l7.5,0"/>
+</g>
+<g fill="none" stroke="#800000" stroke-width="1">
+<text x="23.1" y="363" font-size="14pt" fill="#800000">2</text>
+<text x="23.1" y="305.2" font-size="14pt" fill="#800000">3</text>
+<text x="23.1" y="247.3" font-size="14pt" fill="#800000">4</text>
+<text x="23.1" y="189.4" font-size="14pt" fill="#800000">5</text>
+<text x="23.1" y="131.5" font-size="14pt" fill="#800000">6</text>
+<text x="23.1" y="73.7" font-size="14pt" fill="#800000">7</text>
+<text x="23.1" y="21" font-size="14pt" fill="#800000">8</text>
+</g>
+<g fill="none" stroke="#800000" stroke-linecap="butt" stroke-width="0.6">
+<path d="M35.4,354.3l138.1,0"/>
+<path d="M173.6,354.3l0,-3.7M161.2,354.3l0,-3.7M148.9,354.3l0,-3.7M136.6,354.3l0,-3.7M124.2,354.3l0,-3.7M111.9,354.3l0,-3.7M99.5,354.3l0,-3.7M87.2,354.3l0,-3.7M74.9,354.3l0,-3.7M62.5,354.3l0,-3.7M50.2,354.3l0,-3.7M37.9,354.3l0,-3.7"/>
+<path d="M50.2,354.3l0,-7.5M99.5,354.3l0,-7.5M148.9,354.3l0,-7.5"/>
+</g>
+<g fill="none" stroke="#800000" stroke-width="1">
+<text x="32.7" y="359.5" font-size="14pt" fill="#800000">0.25</text>
+<text x="82" y="359.5" font-size="14pt" fill="#800000">0.15</text>
+<text x="131.4" y="359.5" font-size="14pt" fill="#800000">0.05</text>
+</g>
+<g fill="none" stroke="#800000" stroke-linecap="butt" stroke-width="0.6">
+<path d="M173.6,354.3l0,-347.2"/>
+<path d="M173.6,354.3l-3.7,0M173.6,325.3l-3.7,0M173.6,296.4l-3.7,0M173.6,267.5l-3.7,0M173.6,238.5l-3.7,0M173.6,209.6l-3.7,0M173.6,180.7l-3.7,0M173.6,151.7l-3.7,0M173.6,122.8l-3.7,0M173.6,93.8l-3.7,0M173.6,64.9l-3.7,0M173.6,36l-3.7,0M173.6,7l-3.7,0"/>
+<path d="M173.6,354.3l-7.5,0M173.6,296.4l-7.5,0M173.6,238.5l-7.5,0M173.6,180.7l-7.5,0M173.6,122.8l-7.5,0M173.6,64.9l-7.5,0M173.6,7l-7.5,0"/>
+<path d="M35.4,7l138.1,0"/>
+<path d="M173.6,7l0,3.7M161.2,7l0,3.7M148.9,7l0,3.7M136.6,7l0,3.7M124.2,7l0,3.7M111.9,7l0,3.7M99.5,7l0,3.7M87.2,7l0,3.7M74.9,7l0,3.7M62.5,7l0,3.7M50.2,7l0,3.7M37.9,7l0,3.7"/>
+<path d="M50.2,7l0,7.5M99.5,7l0,7.5M148.9,7l0,7.5"/>
+</g>
+<g fill="#ffffff" stroke="#800000" stroke-width="0.6">
+<path d="m177.1,357.8l347.2,0l0,138.1l-347.2,0l0,-138.1"/>
+</g>
+</g>
+<g clip-path="url(#c2)">
+<g fill="#e41a1c" stroke="none" stroke-width="1">
+<path d="m273.7,467.2l0,-23l25,0l0,-11.5l25,0l0,-40.3l25,0l0,5.7l25,0l0,11.5l25,0l0,31.6l25,0l0,8.6l25,0l0,37.4l25,0l0,-2.8l25,0l0,11.5l-300.6,0l0,-11.5l25,0l25,0l0,-17.2"/>
+</g>
+<g fill="none" stroke="#ffffff" stroke-width="0.6">
+<path d="M198.5,484.5l0,11.5M223.6,484.5l0,11.5M248.6,467.2l0,28.7M273.7,444.2l0,51.8M298.7,432.7l0,63.3M323.8,392.4l0,103.6M348.8,398.1l0,97.8M373.9,409.6l0,86.3M398.9,441.3l0,54.7M424,450l0,46M449.1,487.4l0,8.6M474.1,484.5l0,11.5"/>
+</g>
+<g fill="none" stroke="#e41a1c" stroke-width="0.6">
+<polyline fill="none" points="198.5,484.5 223.6,484.5 248.6,484.5 248.6,467.2 273.7,467.2 273.7,444.2 298.7,444.2 298.7,432.7 323.8,432.7 323.8,392.4 348.8,392.4 348.8,398.1 373.9,398.1 373.9,409.6 398.9,409.6 398.9,441.3 424,441.3 424,450 449.1,450 449.1,487.4 474.1,487.4 474.1,484.5 499.2,484.5"/>
+</g>
+<g fill="none" stroke="#e41a1c" stroke-linecap="butt" stroke-width="0.6">
+<path d="M211,484.5l0,-9.1M236.1,484.5l0,-9.1M261.1,467.2l0,-12.3M286.2,444.2l0,-15.3M311.2,432.7l0,-16.6M336.3,392.4l0,-20.3M361.4,398.1l0,-19.8M386.4,409.6l0,-18.8M411.5,441.3l0,-15.6M436.5,450l0,-14.6M461.6,487.4l0,-8.4M486.6,484.5l0,-9.1"/>
+<path d="M207.3,475.3l7.5,0M232.3,475.3l7.5,0M257.4,454.9l7.5,0M282.4,428.8l7.5,0M307.5,416.1l7.5,0M332.6,372l7.5,0M357.6,378.3l7.5,0M382.7,390.8l7.5,0M407.7,425.6l7.5,0M432.8,435.3l7.5,0M457.8,478.9l7.5,0M482.9,475.3l7.5,0"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke="#800000" stroke-linecap="butt" stroke-width="0.6">
+<path d="M177.1,496l0,-138.1"/>
+<path d="M177.1,496l3.7,0M177.1,490.3l3.7,0M177.1,484.5l3.7,0M177.1,478.7l3.7,0M177.1,473l3.7,0M177.1,467.2l3.7,0M177.1,461.5l3.7,0M177.1,455.7l3.7,0M177.1,450l3.7,0M177.1,444.2l3.7,0M177.1,438.4l3.7,0M177.1,432.7l3.7,0M177.1,426.9l3.7,0M177.1,421.2l3.7,0M177.1,415.4l3.7,0M177.1,409.6l3.7,0M177.1,403.9l3.7,0M177.1,398.1l3.7,0M177.1,392.4l3.7,0M177.1,386.6l3.7,0M177.1,380.9l3.7,0M177.1,375.1l3.7,0M177.1,369.3l3.7,0M177.1,363.6l3.7,0M177.1,357.8l3.7,0"/>
+<path d="M177.1,496l7.5,0M177.1,467.2l7.5,0M177.1,438.4l7.5,0M177.1,409.6l7.5,0"/>
+</g>
+<g fill="none" stroke="#800000" stroke-width="1">
+<text x="164.9" y="504.8" font-size="14pt" fill="#800000">0</text>
+<text x="138.6" y="476" font-size="14pt" fill="#800000">0.05</text>
+<text x="147.4" y="447.2" font-size="14pt" fill="#800000">0.1</text>
+<text x="138.6" y="418.4" font-size="14pt" fill="#800000">0.15</text>
+</g>
+<g fill="none" stroke="#800000" stroke-linecap="butt" stroke-width="0.6">
+<path d="M177.1,496l347.2,0"/>
+<path d="M177.1,496l0,-3.7M206.1,496l0,-3.7M235,496l0,-3.7M263.9,496l0,-3.7M292.9,496l0,-3.7M321.8,496l0,-3.7M350.7,496l0,-3.7M379.7,496l0,-3.7M408.6,496l0,-3.7M437.5,496l0,-3.7M466.5,496l0,-3.7M495.4,496l0,-3.7M524.4,496l0,-3.7"/>
+<path d="M177.1,496l0,-7.5M235,496l0,-7.5M292.9,496l0,-7.5M350.7,496l0,-7.5M408.6,496l0,-7.5M466.5,496l0,-7.5M524.4,496l0,-7.5"/>
+</g>
+<g fill="none" stroke="#800000" stroke-width="1">
+<text x="172.7" y="501.3" font-size="14pt" fill="#800000">1</text>
+<text x="230.6" y="501.3" font-size="14pt" fill="#800000">2</text>
+<text x="288.5" y="501.3" font-size="14pt" fill="#800000">3</text>
+<text x="346.4" y="501.3" font-size="14pt" fill="#800000">4</text>
+<text x="404.2" y="501.3" font-size="14pt" fill="#800000">5</text>
+<text x="462.1" y="501.3" font-size="14pt" fill="#800000">6</text>
+<text x="520" y="501.3" font-size="14pt" fill="#800000">7</text>
+</g>
+<g fill="none" stroke="#800000" stroke-linecap="butt" stroke-width="0.6">
+<path d="M524.4,496l0,-138.1"/>
+<path d="M524.4,496l-3.7,0M524.4,490.3l-3.7,0M524.4,484.5l-3.7,0M524.4,478.7l-3.7,0M524.4,473l-3.7,0M524.4,467.2l-3.7,0M524.4,461.5l-3.7,0M524.4,455.7l-3.7,0M524.4,450l-3.7,0M524.4,444.2l-3.7,0M524.4,438.4l-3.7,0M524.4,432.7l-3.7,0M524.4,426.9l-3.7,0M524.4,421.2l-3.7,0M524.4,415.4l-3.7,0M524.4,409.6l-3.7,0M524.4,403.9l-3.7,0M524.4,398.1l-3.7,0M524.4,392.4l-3.7,0M524.4,386.6l-3.7,0M524.4,380.9l-3.7,0M524.4,375.1l-3.7,0M524.4,369.3l-3.7,0M524.4,363.6l-3.7,0M524.4,357.8l-3.7,0"/>
+<path d="M524.4,496l-7.5,0M524.4,467.2l-7.5,0M524.4,438.4l-7.5,0M524.4,409.6l-7.5,0"/>
+<path d="M177.1,357.8l347.2,0"/>
+<path d="M177.1,357.8l0,3.7M206.1,357.8l0,3.7M235,357.8l0,3.7M263.9,357.8l0,3.7M292.9,357.8l0,3.7M321.8,357.8l0,3.7M350.7,357.8l0,3.7M379.7,357.8l0,3.7M408.6,357.8l0,3.7M437.5,357.8l0,3.7M466.5,357.8l0,3.7M495.4,357.8l0,3.7M524.4,357.8l0,3.7"/>
+<path d="M177.1,357.8l0,7.5M235,357.8l0,7.5M292.9,357.8l0,7.5M350.7,357.8l0,7.5M408.6,357.8l0,7.5M466.5,357.8l0,7.5M524.4,357.8l0,7.5"/>
+</g>
+<g fill="#ffffff" stroke="#800000" stroke-width="0.6">
+<path d="m177.1,7l347.2,0l0,347.2l-347.2,0l0,-347.2"/>
+</g>
+</g>
+<g clip-path="url(#c3)">
+<g fill="#e41a1c" stroke="#800000" stroke-linejoin="miter" stroke-width="0.6">
+<g transform="translate(385.6,176.5)">
+<path d="m-3.7,-3.7l7.5,0l0,7.5l-7.5,0l0,-7.5" id="p0"/>
+</g>
+<use xlink:href="#p0" x="299.3" y="250.7"/>
+<use xlink:href="#p0" x="351.7" y="190.1"/>
+<use xlink:href="#p0" x="373.1" y="155.4"/>
+<use xlink:href="#p0" x="321.9" y="202.1"/>
+<use xlink:href="#p0" x="342" y="245.9"/>
+<use xlink:href="#p0" x="432" y="240.8"/>
+<use xlink:href="#p0" x="372.9" y="222.6"/>
+<use xlink:href="#p0" x="208.2" y="125.5"/>
+<use xlink:href="#p0" x="411.5" y="179.5"/>
+<use xlink:href="#p0" x="327.7" y="270.4"/>
+<use xlink:href="#p0" x="397.7" y="173.3"/>
+<use xlink:href="#p0" x="418.8" y="159.5"/>
+<use xlink:href="#p0" x="349.5" y="200"/>
+<use xlink:href="#p0" x="245" y="219.2"/>
+<use xlink:href="#p0" x="345.6" y="134.1"/>
+<use xlink:href="#p0" x="327.1" y="259.7"/>
+<use xlink:href="#p0" x="337.5" y="229.8"/>
+<use xlink:href="#p0" x="285.2" y="212.4"/>
+<use xlink:href="#p0" x="277" y="143.5"/>
+<use xlink:href="#p0" x="252.5" y="86.4"/>
+<use xlink:href="#p0" x="397.4" y="227"/>
+<use xlink:href="#p0" x="360.1" y="295.8"/>
+<use xlink:href="#p0" x="255.2" y="130.3"/>
+<use xlink:href="#p0" x="408.1" y="113.6"/>
+<use xlink:href="#p0" x="346.5" y="240.8"/>
+<use xlink:href="#p0" x="345.9" y="187.7"/>
+<use xlink:href="#p0" x="325.6" y="110.8"/>
+<use xlink:href="#p0" x="382.5" y="116"/>
+<use xlink:href="#p0" x="408.4" y="168"/>
+<use xlink:href="#p0" x="360.8" y="178.3"/>
+<use xlink:href="#p0" x="246.7" y="224.8"/>
+<use xlink:href="#p0" x="345" y="146"/>
+<use xlink:href="#p0" x="351.7" y="110.1"/>
+<use xlink:href="#p0" x="446.4" y="183.1"/>
+<use xlink:href="#p0" x="344.5" y="183.4"/>
+<use xlink:href="#p0" x="387" y="181.1"/>
+<use xlink:href="#p0" x="453.2" y="135"/>
+<use xlink:href="#p0" x="336.1" y="201.8"/>
+<use xlink:href="#p0" x="376.1" y="121.4"/>
+<use xlink:href="#p0" x="306.3" y="235.9"/>
+<use xlink:href="#p0" x="312.1" y="211.9"/>
+<use xlink:href="#p0" x="341.5" y="113.4"/>
+<use xlink:href="#p0" x="468.9" y="196"/>
+<use xlink:href="#p0" x="394.1" y="147"/>
+<use xlink:href="#p0" x="368.7" y="193.2"/>
+<use xlink:href="#p0" x="401.6" y="262.4"/>
+<use xlink:href="#p0" x="432.3" y="159.4"/>
+<use xlink:href="#p0" x="250.4" y="193.2"/>
+<use xlink:href="#p0" x="395.9" y="265.4"/>
+<use xlink:href="#p0" x="355.1" y="92.1"/>
+<use xlink:href="#p0" x="376.6" y="156.8"/>
+<use xlink:href="#p0" x="297.6" y="240.4"/>
+<use xlink:href="#p0" x="439.7" y="214.6"/>
+<use xlink:href="#p0" x="328.5" y="249"/>
+<use xlink:href="#p0" x="374.5" y="153.7"/>
+<use xlink:href="#p0" x="356.7" y="161.9"/>
+<use xlink:href="#p0" x="304.2" y="227.9"/>
+<use xlink:href="#p0" x="387.3" y="159.7"/>
+<use xlink:href="#p0" x="433.9" y="102.5"/>
+<use xlink:href="#p0" x="294.2" y="102.2"/>
+<use xlink:href="#p0" x="266.4" y="263.8"/>
+<use xlink:href="#p0" x="302.7" y="222.5"/>
+<use xlink:href="#p0" x="334.2" y="234.7"/>
+<use xlink:href="#p0" x="311.9" y="252.4"/>
+<use xlink:href="#p0" x="308.4" y="190.2"/>
+<use xlink:href="#p0" x="361.3" y="275.8"/>
+<use xlink:href="#p0" x="395.2" y="72.1"/>
+<use xlink:href="#p0" x="409.9" y="202.9"/>
+<use xlink:href="#p0" x="396.6" y="253.7"/>
+<use xlink:href="#p0" x="441.2" y="249"/>
+<use xlink:href="#p0" x="323.4" y="177.5"/>
+<use xlink:href="#p0" x="345.9" y="168.1"/>
+<use xlink:href="#p0" x="432.1" y="223.3"/>
+<use xlink:href="#p0" x="349.1" y="150.2"/>
+<use xlink:href="#p0" x="406" y="276.1"/>
+<use xlink:href="#p0" x="475.6" y="270.1"/>
+<use xlink:href="#p0" x="445.7" y="234.9"/>
+<use xlink:href="#p0" x="336.3" y="201.7"/>
+<use xlink:href="#p0" x="349.6" y="181.3"/>
+<use xlink:href="#p0" x="312.2" y="154.3"/>
+<use xlink:href="#p0" x="460.4" y="160.3"/>
+<use xlink:href="#p0" x="302.8" y="192.5"/>
+<use xlink:href="#p0" x="432.1" y="100.9"/>
+<use xlink:href="#p0" x="275.7" y="180.5"/>
+<use xlink:href="#p0" x="390.1" y="115.1"/>
+<use xlink:href="#p0" x="357.2" y="209.8"/>
+<use xlink:href="#p0" x="405" y="310.4"/>
+<use xlink:href="#p0" x="387.2" y="144.3"/>
+<use xlink:href="#p0" x="351.6" y="192.7"/>
+<use xlink:href="#p0" x="204.9" y="181.8"/>
+<use xlink:href="#p0" x="404.9" y="154.8"/>
+<use xlink:href="#p0" x="390" y="146.4"/>
+<use xlink:href="#p0" x="347.7" y="240.3"/>
+<use xlink:href="#p0" x="350" y="83.1"/>
+<use xlink:href="#p0" x="335.9" y="269.4"/>
+<use xlink:href="#p0" x="322.7" y="56.9"/>
+<use xlink:href="#p0" x="268.1" y="211.9"/>
+<use xlink:href="#p0" x="340.9" y="197.7"/>
+<use xlink:href="#p0" x="396.7" y="162.7"/>
+<use xlink:href="#p0" x="271.3" y="169.2"/>
+<use xlink:href="#p0" x="338.5" y="209.3"/>
+<use xlink:href="#p0" x="316.3" y="109.9"/>
+<use xlink:href="#p0" x="298.3" y="283.2"/>
+<use xlink:href="#p0" x="363.6" y="146.2"/>
+<use xlink:href="#p0" x="238.1" y="154.5"/>
+<use xlink:href="#p0" x="294.2" y="233.2"/>
+<use xlink:href="#p0" x="380.5" y="120.7"/>
+<use xlink:href="#p0" x="345.2" y="180.9"/>
+<use xlink:href="#p0" x="401.9" y="127.1"/>
+<use xlink:href="#p0" x="398.7" y="160.9"/>
+<use xlink:href="#p0" x="402.7" y="262.7"/>
+<use xlink:href="#p0" x="402.7" y="172.1"/>
+<use xlink:href="#p0" x="403.6" y="205.6"/>
+<use xlink:href="#p0" x="416.8" y="191"/>
+<use xlink:href="#p0" x="499.2" y="181.2"/>
+<use xlink:href="#p0" x="347.1" y="170.3"/>
+<use xlink:href="#p0" x="396.6" y="163.6"/>
+<use xlink:href="#p0" x="429.5" y="280"/>
+<use xlink:href="#p0" x="314.9" y="118.2"/>
+<use xlink:href="#p0" x="390.4" y="136.2"/>
+<use xlink:href="#p0" x="346.5" y="191.8"/>
+<use xlink:href="#p0" x="259.6" y="185.3"/>
+<use xlink:href="#p0" x="373.6" y="123.9"/>
+<use xlink:href="#p0" x="298.5" y="259.5"/>
+<use xlink:href="#p0" x="366.1" y="194"/>
+<use xlink:href="#p0" x="351.2" y="170"/>
+<use xlink:href="#p0" x="374.4" y="201.9"/>
+<use xlink:href="#p0" x="278.3" y="134"/>
+<use xlink:href="#p0" x="277.9" y="185.3"/>
+<use xlink:href="#p0" x="314.6" y="205.4"/>
+<use xlink:href="#p0" x="291.6" y="236.3"/>
+<use xlink:href="#p0" x="288.1" y="118.4"/>
+<use xlink:href="#p0" x="285.9" y="142"/>
+<use xlink:href="#p0" x="317.3" y="179.4"/>
+<use xlink:href="#p0" x="386.3" y="109.2"/>
+<use xlink:href="#p0" x="360.6" y="184.3"/>
+<use xlink:href="#p0" x="364.8" y="85"/>
+<use xlink:href="#p0" x="415.1" y="126.5"/>
+<use xlink:href="#p0" x="365.8" y="127.2"/>
+<use xlink:href="#p0" x="447.4" y="92.6"/>
+<use xlink:href="#p0" x="402.1" y="155.2"/>
+<use xlink:href="#p0" x="326.7" y="121.1"/>
+<use xlink:href="#p0" x="320.9" y="229.7"/>
+<use xlink:href="#p0" x="345.4" y="217"/>
+<use xlink:href="#p0" x="255.4" y="137.1"/>
+<use xlink:href="#p0" x="438.3" y="289.5"/>
+<use xlink:href="#p0" x="372.6" y="57.4"/>
+<use xlink:href="#p0" x="330.1" y="257.9"/>
+<use xlink:href="#p0" x="332.6" y="268"/>
+<use xlink:href="#p0" x="474.5" y="139.7"/>
+<use xlink:href="#p0" x="291.5" y="204.6"/>
+<use xlink:href="#p0" x="366.5" y="203.9"/>
+<use xlink:href="#p0" x="440.6" y="109.8"/>
+<use xlink:href="#p0" x="327.2" y="235.9"/>
+<use xlink:href="#p0" x="299.5" y="171"/>
+<use xlink:href="#p0" x="332.4" y="238.3"/>
+<use xlink:href="#p0" x="333.4" y="164.4"/>
+<use xlink:href="#p0" x="391.6" y="183.8"/>
+<use xlink:href="#p0" x="361.2" y="179.8"/>
+<use xlink:href="#p0" x="366.6" y="264.7"/>
+<use xlink:href="#p0" x="357.4" y="161.1"/>
+<use xlink:href="#p0" x="279.1" y="166.8"/>
+<use xlink:href="#p0" x="386.4" y="102.3"/>
+<use xlink:href="#p0" x="312.9" y="161.7"/>
+<use xlink:href="#p0" x="276.4" y="152.9"/>
+<use xlink:href="#p0" x="314.1" y="145.9"/>
+<use xlink:href="#p0" x="477.6" y="290.3"/>
+<use xlink:href="#p0" x="397.6" y="252.9"/>
+<use xlink:href="#p0" x="357.5" y="252.1"/>
+<use xlink:href="#p0" x="442.9" y="181.3"/>
+<use xlink:href="#p0" x="353.3" y="199.2"/>
+<use xlink:href="#p0" x="278.9" y="129.3"/>
+<use xlink:href="#p0" x="344.6" y="57.3"/>
+<use xlink:href="#p0" x="383" y="186.5"/>
+<use xlink:href="#p0" x="291.9" y="147.3"/>
+<use xlink:href="#p0" x="392.1" y="224.4"/>
+<use xlink:href="#p0" x="334.6" y="89.3"/>
+<use xlink:href="#p0" x="198.5" y="143.9"/>
+<use xlink:href="#p0" x="301.1" y="169.2"/>
+<use xlink:href="#p0" x="403.9" y="251.5"/>
+<use xlink:href="#p0" x="395.4" y="191.4"/>
+<use xlink:href="#p0" x="237.5" y="251.1"/>
+<use xlink:href="#p0" x="343.5" y="205.4"/>
+<use xlink:href="#p0" x="324.1" y="188.6"/>
+<use xlink:href="#p0" x="258.4" y="93"/>
+<use xlink:href="#p0" x="273" y="99.2"/>
+<use xlink:href="#p0" x="364.1" y="132.6"/>
+<use xlink:href="#p0" x="442.3" y="237.2"/>
+<use xlink:href="#p0" x="393.8" y="190.4"/>
+<use xlink:href="#p0" x="427.9" y="186.1"/>
+<use xlink:href="#p0" x="348.1" y="151.6"/>
+<use xlink:href="#p0" x="314.6" y="214.8"/>
+<use xlink:href="#p0" x="401.6" y="192.1"/>
+<use xlink:href="#p0" x="354.5" y="127"/>
+<use xlink:href="#p0" x="328.3" y="108.1"/>
+<use xlink:href="#p0" x="211.8" y="316.3"/>
+<use xlink:href="#p0" x="422.7" y="264.1"/>
+<use xlink:href="#p0" x="370.3" y="305.9"/>
+<use xlink:href="#p0" x="361.3" y="191.1"/>
+</g>
+</g>
+<g clip-path="url(#c0)">
+<g fill="none" stroke="#800000" stroke-linecap="butt" stroke-width="0.6">
+<path d="M177.1,354.3l0,-347.2"/>
+<path d="M177.1,354.3l3.7,0M177.1,325.3l3.7,0M177.1,296.4l3.7,0M177.1,267.5l3.7,0M177.1,238.5l3.7,0M177.1,209.6l3.7,0M177.1,180.7l3.7,0M177.1,151.7l3.7,0M177.1,122.8l3.7,0M177.1,93.8l3.7,0M177.1,64.9l3.7,0M177.1,36l3.7,0M177.1,7l3.7,0"/>
+<path d="M177.1,354.3l7.5,0M177.1,296.4l7.5,0M177.1,238.5l7.5,0M177.1,180.7l7.5,0M177.1,122.8l7.5,0M177.1,64.9l7.5,0M177.1,7l7.5,0"/>
+<path d="M177.1,354.3l347.2,0"/>
+<path d="M177.1,354.3l0,-3.7M206.1,354.3l0,-3.7M235,354.3l0,-3.7M263.9,354.3l0,-3.7M292.9,354.3l0,-3.7M321.8,354.3l0,-3.7M350.7,354.3l0,-3.7M379.7,354.3l0,-3.7M408.6,354.3l0,-3.7M437.5,354.3l0,-3.7M466.5,354.3l0,-3.7M495.4,354.3l0,-3.7M524.4,354.3l0,-3.7"/>
+<path d="M177.1,354.3l0,-7.5M235,354.3l0,-7.5M292.9,354.3l0,-7.5M350.7,354.3l0,-7.5M408.6,354.3l0,-7.5M466.5,354.3l0,-7.5M524.4,354.3l0,-7.5"/>
+<path d="M524.4,354.3l0,-347.2"/>
+<path d="M524.4,354.3l-3.7,0M524.4,325.3l-3.7,0M524.4,296.4l-3.7,0M524.4,267.5l-3.7,0M524.4,238.5l-3.7,0M524.4,209.6l-3.7,0M524.4,180.7l-3.7,0M524.4,151.7l-3.7,0M524.4,122.8l-3.7,0M524.4,93.8l-3.7,0M524.4,64.9l-3.7,0M524.4,36l-3.7,0M524.4,7l-3.7,0"/>
+<path d="M524.4,354.3l-7.5,0M524.4,296.4l-7.5,0M524.4,238.5l-7.5,0M524.4,180.7l-7.5,0M524.4,122.8l-7.5,0M524.4,64.9l-7.5,0M524.4,7l-7.5,0"/>
+<path d="M177.1,7l347.2,0"/>
+<path d="M177.1,7l0,3.7M206.1,7l0,3.7M235,7l0,3.7M263.9,7l0,3.7M292.9,7l0,3.7M321.8,7l0,3.7M350.7,7l0,3.7M379.7,7l0,3.7M408.6,7l0,3.7M437.5,7l0,3.7M466.5,7l0,3.7M495.4,7l0,3.7M524.4,7l0,3.7"/>
+<path d="M177.1,7l0,7.5M235,7l0,7.5M292.9,7l0,7.5M350.7,7l0,7.5M408.6,7l0,7.5M466.5,7l0,7.5M524.4,7l0,7.5"/>
+</g>
+</g>
+</g>
+</svg>

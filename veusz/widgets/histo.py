@@ -290,31 +290,31 @@ class Histo(GenericPlotter):
             ('linear', 'log', 'sqrt', 'arcsinh', 'exp', 'sqr', 'sinh'),
             'linear',
             descr=_('Data scaling before creating bins'),
-            usertext=_('Bin scaling')), 7 )
+            usertext=_('Bin scaling')), 9 )
         s.add( setting.Int(
             'numbins', 10,
             minval=1, maxval=100000,
             descr=_('Number of bins'),
-            usertext=_('Number')), 8 )
+            usertext=_('Number')), 9 )
         s.add( setting.FloatList(
             'manual',
             [],
             descr=_('Manual binning edges'),
-            usertext=_('Manual')), 9)
+            usertext=_('Manual')), 10 )
 
         s.add( setting.Choice(
             'errormode',
             ('none', 'sqrt', 'gehrels'),
             'gehrels',
             descr=_('Error estimation'),
-            usertext=_('Uncertainty')), 12 )
+            usertext=_('Uncertainty')), 11 )
 
         s.add( setting.Choice(
             'direction',
             ('horizontal', 'vertical'),
             'vertical',
             descr=_('Bars direction'),
-            usertext=_('Direction')), 13 )
+            usertext=_('Direction')), 12 )
 
         s.add( setting.Color(
             'color',
@@ -560,7 +560,7 @@ class Histo(GenericPlotter):
         if vert:
             xplt, yplt = midplot, ctsplot
         else:
-            yplt, xplt = ctsplot, midplot
+            xplt, yplt = ctsplot, midplot
 
         # any error bars
         markersize = s.get('markerSize').convert(painter)
