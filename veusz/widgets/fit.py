@@ -153,12 +153,11 @@ class Fit(FunctionPlotter):
                descr = 'Default relative error for y data',
                usertext=_('Default Y error')))
         s.add(setting.FloatOrAuto(
-            'fit_min', 'Auto',
+            'fitMin', 'Auto',
             descr=_('Minimum value at which to fit function'),
             usertext=_('Min. fit range')))
-
         s.add(setting.FloatOrAuto(
-            'fit_max', 'Auto',
+            'fitMax', 'Auto',
             descr=_('Maximum value at which to fit function'),
             usertext=_('Max. fit range')))
 
@@ -308,23 +307,25 @@ class Fit(FunctionPlotter):
                 return N.nan
 
         # minimum set for fitting
-        if s.fit_min != 'Auto':
+        if s.fitMin != 'Auto':
             if s.variable == 'x':
-                mask = xvals >= s.fit_min
+                mask = xvals >= s.fitMin
             else:
-                mask = yvals >= s.fit_min
+                mask = yvals >= s.fitMin
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
 
         # maximum set for fitting
-        if s.fit_max != 'Auto':
+        if s.fitMax != 'Auto':
             if s.variable == 'x':
-                mask = xvals <= s.fit_max
+                mask = xvals <= s.fitMax
             else:
-                mask = yvals <= s.fit_max
+                mask = yvals <= s.fitMax
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
 
-        if s.fit_min != 'Auto' or s.fit_max != 'Auto':
-            print("Fitting %s between %s and %s" % (s.variable, s.fit_min, s.fit_max))
+        if s.fitMin != 'Auto' or s.fitMax != 'Auto':
+            print(
+                "Fitting %s between %s and %s"
+                % (s.variable, s.fitMin, s.fitMax))
 
         # various error checks
         if len(xvals) != len(yvals) or len(xvals) != len(yserr):
