@@ -1,4 +1,3 @@
-# fit.py
 # fitting plotter
 
 #    Copyright (C) 2005 Jeremy S. Sanders
@@ -149,7 +148,10 @@ class Fit(FunctionPlotter):
                 descr = _('Y data to fit (dataset name, list of values '
                           'or expression)'),
                 usertext=_('Y data')), 3 )
-
+        s.add( setting.Float(
+               'yDefErr', 0.05,
+               descr = 'Default relative error for y data',
+               usertext=_('Default Y error')))
         s.add(setting.FloatOrAuto(
             'fit_min', 'Auto',
             descr=_('Minimum value at which to fit function'),
@@ -159,7 +161,7 @@ class Fit(FunctionPlotter):
             'fit_max', 'Auto',
             descr=_('Maximum value at which to fit function'),
             usertext=_('Max. fit range')))
- 
+
         s.add( setting.Bool(
                 'fitRange', False,
                 descr = _('Fit only the data between the '
@@ -272,8 +274,12 @@ class Fit(FunctionPlotter):
                 print("Warning: Symmeterising positive and negative errors")
                 yserr = N.sqrt( 0.5*(ydata.perr**2 + ydata.nerr**2) )
             else:
-                print("Warning: No errors on y values.")
-                yserr = N.ones(yvals.size)
+                perr = s.yDefErr
+                print(
+                    "Warning: No errors on y values. Assuming %d%% errors."
+                    % int(perr*100.0))
+                yserr = yvals*perr
+                yserr[yserr < 1e-8] = 1e-8
 
         # if the fitRange parameter is on, we chop out data outside the
         # range of the axis
