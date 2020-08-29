@@ -206,6 +206,7 @@ class PreferencesDialog(VeuszDialog):
 
         # use cwd
         setdb['dirname_usecwd'] = self.dirDocCWDRadio.isChecked()
+        setdb['docfile_addimportpaths'] = self.docFileAddImportPaths.isChecked()
         
         # add import paths
         setdb['docfile_addimportpaths'] = self.docFileAddImportPaths.isChecked()
