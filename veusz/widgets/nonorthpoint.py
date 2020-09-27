@@ -51,65 +51,68 @@ class NonOrthPoint(Widget):
         Widget.addSettings(s)
 
         s.add( setting.DatasetExtended(
-                'data1', 'x',
-                descr=_('Dataset containing 1st dataset, list of values '
-                        'or expression'),
-                usertext=_('Dataset 1')) )
+            'data1', 'x',
+            descr=_('Dataset containing 1st dataset, list of values '
+                    'or expression'),
+            usertext=_('Dataset 1')) )
         s.add( setting.DatasetExtended(
-                'data2', 'y',
-                descr=_('Dataset containing 2nd dataset, list of values '
-                        'or expression'),
-                usertext=_('Dataset 2')) )
+            'data2', 'y',
+            descr=_('Dataset containing 2nd dataset, list of values '
+                    'or expression'),
+            usertext=_('Dataset 2')) )
         s.add( setting.DatasetOrStr(
-                'labels', '',
-                descr=_('Dataset or string to label points'),
-                usertext=_('Labels')) )
+            'labels', '',
+            descr=_('Dataset or string to label points'),
+            usertext=_('Labels')) )
         s.add( setting.DatasetExtended(
-                'scalePoints', '',
-                descr = _('Scale size of plotted markers by this dataset, '
-                          ' list of values or expression'),
-                usertext=_('Scale markers')) )
+            'scalePoints', '',
+            descr = _('Scale size of plotted markers by this dataset, '
+                      ' list of values or expression'),
+            usertext=_('Scale markers')) )
         s.add( setting.DataColor('Color') )
 
-        s.add( setting.Color('color',
-                             'auto',
-                             descr = _('Master color'),
-                             usertext = _('Color'),
-                             formatting=True), 0 )
-        s.add( setting.DistancePt('markerSize',
-                                  '3pt',
-                                  descr = _('Size of marker to plot'),
-                                  usertext=_('Marker size'), formatting=True), 0 )
-        s.add( setting.Marker('marker',
-                              'circle',
-                              descr = _('Type of marker to plot'),
-                              usertext=_('Marker'), formatting=True), 0 )
-        s.add( setting.Line('PlotLine',
-                            descr = _('Plot line settings'),
-                            usertext = _('Plot line')),
-               pixmap = 'settings_plotline' )
+        s.add( setting.Color(
+            'color',
+            'auto',
+            descr = _('Master color'),
+            usertext = _('Color'),
+            formatting=True), 0 )
+        s.add( setting.DistancePt(
+            'markerSize',
+            '3pt',
+            descr = _('Size of marker to plot'),
+            usertext=_('Marker size'), formatting=True), 0 )
+        s.add( setting.Marker(
+            'marker',
+            'circle',
+            descr = _('Type of marker to plot'),
+            usertext=_('Marker'), formatting=True), 0 )
+        s.add( setting.Line(
+            'PlotLine',
+            descr = _('Plot line settings'),
+            usertext = _('Plot line')), pixmap='settings_plotline' )
         s.PlotLine.get('color').newDefault( setting.Reference('../color') )
 
-        s.add( setting.MarkerLine('MarkerLine',
-                                  descr = _('Line around the marker settings'),
-                                  usertext = _('Marker border')),
-               pixmap = 'settings_plotmarkerline' )
-        s.add( MarkerFillBrush('MarkerFill',
-                               descr = _('Marker fill settings'),
-                               usertext = _('Marker fill')),
-               pixmap = 'settings_plotmarkerfill' )
-        s.add( FillBrush('Fill1',
-                         descr = _('Fill settings (1)'),
-                         usertext = _('Area fill 1')),
-               pixmap = 'settings_plotfillbelow' )
-        s.add( FillBrush('Fill2',
-                         descr = _('Fill settings (2)'),
-                         usertext = _('Area fill 2')),
-               pixmap = 'settings_plotfillbelow' )
-        s.add( setting.PointLabel('Label',
-                                  descr = _('Label settings'),
-                                  usertext=_('Label')),
-               pixmap = 'settings_axislabel' )
+        s.add( setting.MarkerLine(
+            'MarkerLine',
+            descr = _('Line around the marker settings'),
+            usertext = _('Marker border')), pixmap='settings_plotmarkerline' )
+        s.add( MarkerFillBrush(
+            'MarkerFill',
+            descr = _('Marker fill settings'),
+            usertext = _('Marker fill')), pixmap='settings_plotmarkerfill' )
+        s.add( FillBrush(
+            'Fill1',
+            descr = _('Fill settings (1)'),
+            usertext = _('Area fill 1')), pixmap='settings_plotfillbelow' )
+        s.add( FillBrush(
+            'Fill2',
+            descr = _('Fill settings (2)'),
+            usertext = _('Area fill 2')), pixmap='settings_plotfillbelow' )
+        s.add( setting.PointLabel(
+            'Label',
+            descr = _('Label settings'),
+            usertext=_('Label')), pixmap='settings_axislabel' )
 
     @classmethod
     def allowedParentTypes(klass):
@@ -232,9 +235,11 @@ class NonOrthPoint(Widget):
                 if not s.PlotLine.hide:
                     painter.setBrush( qt.QBrush() )
                     painter.setPen(s.PlotLine.makeQPen(painter))
-                    pts = qt.QPolygonF()
-                    utils.addNumpyToPolygonF(pts, px, py)
-                    utils.plotClippedPolyline(painter, cliprect, pts)
+                    for pxi, pyi in self.parent.breakLines(parentposn, px, py):
+                        if len(pxi) > 1:
+                            pts = qt.QPolygonF()
+                            utils.addNumpyToPolygonF(pts, pxi, pyi)
+                            utils.plotClippedPolyline(painter, cliprect, pts)
 
                 # plot markers
                 markersize = s.get('markerSize').convert(painter)
@@ -256,10 +261,12 @@ class NonOrthPoint(Widget):
                     painter.setBrush(s.MarkerFill.makeQBrushWHide(painter))
                     painter.setPen(s.MarkerLine.makeQPenWHide(painter))
 
-                    utils.plotMarkers(painter, px, py, s.marker, markersize,
-                                      scaling=pscale, clip=cliprect,
-                                      cmap=cmap, colorvals=colorvals,
-                                      scaleline=s.MarkerLine.scaleLine)
+                    utils.plotMarkers(
+                        painter, px, py, s.marker, markersize,
+                        scaling=pscale, clip=cliprect,
+                        cmap=cmap, colorvals=colorvals,
+                        scaleline=s.MarkerLine.scaleLine,
+                    )
 
                 # finally plot any labels
                 if textitems and not s.Label.hide:

@@ -45,6 +45,7 @@ from .vectorfield import VectorField
 from .boxplot import BoxPlot
 from .polar import Polar
 from .ternary import Ternary
+from .project import Project
 from .nonorthpoint import NonOrthPoint
 from .nonorthfunction import NonOrthFunction
 from .scene3d import Scene3D

@@ -25,8 +25,10 @@ from .widget import Widget
 from .. import qtall as qt
 from .. import setting
 
-filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
-               'polygon')
+filloptions = (
+    'center', 'outside', 'top', 'bottom', 'left', 'right',
+    'polygon'
+)
 
 def _(text, disambiguation=None, context='NonOrthGraph'):
     """Translate text."""
@@ -124,6 +126,17 @@ class NonOrthGraph(Widget):
             drange = None
 
         return drange
+
+    def breakLines(self, posn, px, py):
+        """Compute line breaks if plotting datasets.
+
+        This is useful, for example, if a line jumps from one side of
+        the globe to the other, for a projection. Otherwise a line
+        will be drawn across the face of the globe.
+
+        Return a list of lines to draw
+        """
+        return ((px, py),)
 
     def getMargins(self, painthelper):
         """Use settings to compute margins."""
