@@ -642,3 +642,37 @@ class SvgWidgetFixedAspect(qt.QWidget):
             top = 0
 
         self.renderer.render(painter, qt.QRectF(left, top, outw, outh))
+
+def breakCoordsOnNans(x, y):
+    """Split x and y values where either is not finite.
+    x and y are numpy arrays
+
+    Returns [(x1, y1), (x2, y2), ...]
+    """
+    notfin = N.where(~N.isfinite(x+y))[0]
+    if len(notfin) == 0:
+        return ((x, y),)
+    last = 0
+    out = []
+    for brk in notfin:
+        if brk>last:
+            out.append((x[last:brk], y[last:brk]))
+        last = brk+1
+    out.append((x[last:], y[last:]))
+    return out
+
+def breakCoordsOnJump(x, y, xj, yj):
+    """Break coordinates if x or y jump by more than dx, dy."""
+    dx = N.abs(x[1:]-x[:-1])
+    dy = N.abs(y[1:]-y[:-1])
+
+    breakpos = N.where((dx>xj) | (dy>yj))[0]
+    if len(breakpos) == 0:
+        return ((x, y),)
+    out = []
+    last = 0
+    for brk in breakpos:
+        out.append((x[last:brk+1], y[last:brk+1]))
+        last = brk+1
+    out.append((x[last:], y[last:]))
+    return out

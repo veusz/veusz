@@ -88,4 +88,7 @@ void plotNonlinearImageAsBoxes(QPainter& painter,
                                const Numpy1DObj& xedges,
                                const Numpy1DObj& yedges);
 
+// trace edge of mask and convert this to a region
+void traceBitmap(const Numpy2DIntObj& mask, QVector<QPolygon> &polys);
+
 #endif

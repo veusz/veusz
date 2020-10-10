@@ -16,6 +16,7 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 /////////////////////////////////////////////////////////////////////////////
 
+#include <vector>
 #include <algorithm>
 
 #include "qtloops.h"
@@ -30,6 +31,8 @@
 #include <QPointF>
 #include <QTransform>
 #include <QVector>
+#include <QPoint>
+#include <QPolygon>
 
 namespace
 {
@@ -584,4 +587,122 @@ void plotNonlinearImageAsBoxes(QPainter& painter,
           }
       }
   painter.restore();
+}
+
+namespace
+{
+  // quick helper
+  class Bool2D
+  {
+    public:
+    Bool2D(int _xw, int _yw) : xw(_xw), yw(_yw), vals(xw*yw, 0) {}
+    char operator()(int x, int y) const { return vals[x+y*xw]; }
+    char& operator()(int x, int y) { return vals[x+y*xw]; }
+
+    int xw, yw;
+    std::vector<char> vals;
+  };
+}
+
+void traceBitmap(const Numpy2DIntObj& mask, QVector<QPolygon>& polys)
+{
+  const int yw = mask.dims[0];
+  const int xw = mask.dims[1];
+
+  // work out where there are edges horizontally and vertically in mask
+  Bool2D hedge(xw,yw+1);
+  for(int x=0;x<xw;++x)
+    {
+      hedge(x,0) = bool(mask(x,0));
+      hedge(x,yw) = bool(mask(x,yw-1));
+    }
+  for(int y=0;y<(yw-1);++y)
+    for(int x=0;x<xw;++x)
+      hedge(x,y+1) = bool(mask(x,y)) != bool(mask(x,y+1));
+
+  Bool2D vedge(xw+1,yw);
+  for(int y=0;y<yw;++y)
+    {
+      vedge(0,y) = bool(mask(0,y));
+      vedge(xw,y) = bool(mask(xw-1,y));
+      for(int x=0;x<xw-1;++x)
+        vedge(x+1,y) = bool(mask(x,y)) != bool(mask(x+1,y));
+    }
+
+  for(int yi=0; yi<yw;++yi)
+    for(int xi=0; xi<xw;++xi)
+      {
+        // skip until we find an edge
+        if(not hedge(xi,yi))
+          continue;
+
+        int x=xi, y=yi;
+        QPolygon poly;
+        poly << QPoint(x, y);
+
+        int dirn = 0;
+        int lastdirn = -1;
+        //bool hole = not mask(x, y); // is this a hole?
+
+        for(;;)
+          {
+            bool turn = true;
+            switch(dirn)
+              {
+              case 0: // horizontal (right)
+                if( x<xw and hedge(x,y) )
+                  {
+                    hedge(x,y) = false;
+                    x++;
+                    turn = false;
+                  }
+                break;
+              case 1: // vertical (down)
+                if( y<yw and vedge(x,y) )
+                  {
+                    vedge(x,y) = false;
+                    y++;
+                    turn = false;
+                  }
+                break;
+              case 2: // horizontal (left)
+                if( x>0 and hedge(x-1,y) )
+                  {
+                    hedge(x-1,y) = false;
+                    x--;
+                    turn = false;
+                  }
+                break;
+              default: // vertical (up)
+                if( y>0 and vedge(x,y-1) )
+                  {
+                    vedge(x,y-1) = false;
+                    y--;
+                    turn = false;
+                  }
+                break;
+              }
+
+            if( turn )
+              {
+                dirn = (dirn+1) % 4;
+              }
+            else
+              {
+                QPoint pt(x,y);
+                if(pt==poly.first())
+                  break;
+
+                if(lastdirn == dirn)
+                  // if the direction we're moving on is constant,
+                  // then we can just replace the previous point
+                  poly.last() = pt;
+                else
+                  poly << pt;
+                lastdirn = dirn;
+              }
+          }
+
+        polys << poly;
+      }
 }

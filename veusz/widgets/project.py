@@ -22,7 +22,9 @@ import numpy as N
 from .. import qtall as qt
 from .. import document
 from .. import setting
+from .. import utils
 from .nonorthgraph import NonOrthGraph
+from ..helpers import qtloops
 
 try:
     from astropy import wcs
@@ -35,34 +37,47 @@ def _(text, disambiguation=None, context='Project'):
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
 projections = {
-    'AZP': 'azimuthal perspective (AZP)',
+    'AZP': 'zenithal/azimuthal perspective (AZP)',
     'SZP': 'slant zenithal perspective (SZP)',
     'TAN': 'gnomonic (TAN)',
     'STG': 'stereographic (STG)',
-    'SIN': 'orthographic (SIN)',
+    'SIN': '(slant) orthographic (SIN)',
     'ARC': 'azimuthal equidistant (ARC)',
-    'ZPN': 'azimuthal polynomial (ZPN)',
+#    'ZPN': 'azimuthal polynomial (ZPN)', # doesn't work
     'ZEA': 'azimuthal equal area (ZEA)',
     'AIR': 'Airy (AIR)',
     'CYP': 'cylindrical perspective (CYP)',
     'CEA': 'cylindrical equal area (CEA)',
     'CAR': 'equirectangular (CAR)',
     'MER': 'Mercator (MER)',
-    'COP': 'conic perspective (COP)',
-    'COE': 'conic equal area (COE)',
-    'COD': 'conic equidistant (COD)',
-    'COO': 'conic orthomorphic (COO)',
+    'COP': 'conic perspective (COP)', # doesn't work
+    'COE': 'conic equal area (COE)', # doesn't work
+    'COD': 'conic equidistant (COD)', # doesn't work
+    'COO': 'conic orthomorphic (COO)', # doesn't work
     'SFL': 'sanson-flamsteed (SFL)',
     'PAR': 'parabolic (PAR)',
     'MOL': 'Mollweide (MOL)',
     'AIT': 'Hammer-Aitoff (AIT)',
-    'BON': 'Bonne (BON)',
+    'BON': 'Bonne (BON)', # doesn't work
     'PCO': 'polyconic (PCO)',
     'TSC': 'tangential spherical cube (TSC)',
     'CSC': 'COBE quad spherical cube (CSC)',
     'QSC': 'quad spherical cube (QSC)',
     'HPX': 'HEALPix (HPX)',
     'XPH': 'HEALPix polar (XPH)',
+}
+
+params = {
+    'AZP': [('Distance (µ)', 0), ('Tilt (γ; deg)',0)],
+    'SZP': [('Distance (µ)', 0), ('Longitude (φ_c; deg)', 0), ('Latitude (θ_c; deg)', 90)],
+    'TAN': [],
+    'STG': [],
+    'SIN': [('Slant η' ,0), ('Slant ξ', 0)],
+    'ARC': [],
+    'ZEA': [],
+    'AIR': [('Latitude (θ_b; deg)', 90)],
+    'CYP': [('Distance (µ)', 1), ('Cylinder radius (λ)', 1)],
+
 }
 
 
@@ -121,6 +136,11 @@ class Project(NonOrthGraph):
             90.,
             descr=_('Vertical field of view (deg)'),
             usertext=_('FoV')) )
+        s.add( setting.Float(
+            'projparam',
+            0,
+            descr=_('Projection parameter angle (deg)'),
+            usertext=_('Parameter')) )
 
         s.add( GridLine(
             'SpokeLine',
@@ -133,14 +153,16 @@ class Project(NonOrthGraph):
         self._cache_wcs = None
         self._scale = 0
         self._ox = self._oy = 0
+        self._valid_mask = None
 
     def _checkWCSCache(self):
         s = self.settings
         proj = s.projection
         refpos = (s.ref_lon, s.ref_lat)
         fov = s.fov
+        param = s.projparam
 
-        k = (proj, refpos, fov)
+        k = (proj, refpos, fov, param)
         if self._cache_key == k or not havewcs:
             return
         self._cache_key = k
@@ -157,6 +179,7 @@ class Project(NonOrthGraph):
         hdr['CDELT2'] = fov/100
         hdr['CUNIT1'] = 'deg'
         hdr['CUNIT2'] = 'deg'
+        hdr['PV2_1'] = param
         hdr['EQUINOX'] = 2000.0
 
         try:
@@ -184,23 +207,74 @@ class Project(NonOrthGraph):
         half the graph width."""
         xw = posn[2]-posn[0]
         yw = posn[3]-posn[1]
-        breakpos = N.where(
-            (N.abs(px[1:]-px[:-1]) > 0.5*xw) |
-            (N.abs(py[1:]-py[:-1]) > 0.5*yw))[0]
-        if len(breakpos) == 0:
-            # no breaks
-            out = ((px, py),)
-        else:
-            # split
-            out = []
-            last = 0
-            for brk in breakpos:
-                out.append((px[last:brk+1], py[last:brk+1]))
-                last = brk+1
-            out.append((px[last:], py[last:]))
-        return out
+        return utils.breakCoordsOnJump(px, py, 0.5*xw, 0.5*yw)
+
+    def computeMask(self, bounds):
+        if self._cache_wcs is None:
+            self._valid_mask = None
+            return
+
+        yg, xg = N.meshgrid(
+            N.arange(int(bounds[1]), int(bounds[3])+1),
+            N.arange(int(bounds[0]), int(bounds[2])+1),
+        )
+        ys = (yg-self._oy)*(1/(-0.01*self._scale))
+        xs = (xg-self._ox)*(1/( 0.01*self._scale))
+        lon, lat = self._cache_wcs.wcs_pix2world(xs.ravel(), ys.ravel(), 0)
+
+        valid = N.reshape(N.isfinite(lat+lon), yg.shape)
+        self._valid_mask = valid
 
     def drawGrid(self, painter, bounds):
+        if self._cache_wcs is None:
+            return
+
+        maskpolys = qtloops.traceBitmap(self._valid_mask.T.astype(N.intc))
+        for poly in maskpolys:
+            polyf = qt.QPolygonF(poly)
+            polyf.translate(int(bounds[0]), int(bounds[1]))
+            painter.drawPolygon(polyf)
+
+        clip = qt.QRectF(
+            bounds[0], bounds[1], bounds[2]-bounds[0], bounds[3]-bounds[1])
+        painter.save()
+        painter.setClipRect(clip)
+        xj = 0.25*(bounds[2]-bounds[0])
+        yj = 0.25*(bounds[3]-bounds[1])
+
+        def drawlines(x, y):
+            for xr, yr in zip(x, y):
+                for xn, yn in utils.breakCoordsOnNans(xr, yr):
+                    for xs, ys in utils.breakCoordsOnJump(xn, yn, xj, yj):
+                        poly = qt.QPolygonF()
+                        qtloops.addNumpyToPolygonF(poly, xs, ys)
+                        qtloops.plotClippedPolyline(painter, clip, poly)
+
+        # draw lines of latitude
+        lons = N.arange(-180,180+1,5, dtype=N.float64)
+        lons[0] = -179.99
+        lons[-1] = 179.99
+        lats = N.array([-89.999, -60, -30, 0, 30, 60, 89.999])
+        mlon, mlat = N.meshgrid(lons, lats)
+        x, y = self.graphToPlotCoords(mlon.ravel(), mlat.ravel())
+        x = x.reshape(mlon.shape)
+        y = y.reshape(mlat.shape)
+        drawlines(x, y)
+
+        # draw lines of longitude
+        lons = N.arange(-180,180+1,30, dtype=N.float64)
+        lons[0] = -179.999
+        lons[-1] = 179.999
+        lats = N.linspace(-90, 90, 90+1, dtype=N.float64)
+        lats[0] = -89.999
+        lats[-1] = 89.999
+        mlon, mlat = N.meshgrid(lons, lats)
+        x, y = self.graphToPlotCoords(mlon.ravel(), mlat.ravel())
+        x = x.reshape(mlon.shape)
+        y = y.reshape(mlat.shape)
+        drawlines(x.T, y.T)
+
+        painter.restore()
 
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area and axes.'''
@@ -210,8 +284,9 @@ class Project(NonOrthGraph):
         self._oy = 0.5*(bounds[1]+bounds[3])
 
         self._checkWCSCache()
+        self.computeMask(bounds)
 
-
+        self.drawGrid(painter, bounds)
 
 
 document.thefactory.register(Project)

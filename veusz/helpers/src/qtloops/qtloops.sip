@@ -356,3 +356,21 @@ void plotNonlinearImageAsBoxes(QPainter& painter, const QImage& img, SIP_PYOBJEC
      }
    }
 %End
+
+QVector<QPolygon> traceBitmap(SIP_PYOBJECT);
+%MethodCode
+{
+  QVector<QPolygon> *polys = new QVector<QPolygon>;
+  try
+    {
+      Numpy2DIntObj arr(a0);
+      traceBitmap(arr, *polys);
+    }
+  catch( const char *msg )
+    {
+      delete polys;
+      sipIsErr = 1; PyErr_SetString(PyExc_TypeError, msg);
+    }
+  sipRes = polys;
+}
+%End
