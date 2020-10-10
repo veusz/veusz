@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <cstdlib>
 
 #include "qtloops.h"
 #include "isnan.h"
@@ -604,6 +605,71 @@ namespace
   };
 }
 
+void curveSimplify(QPolygon& pin)
+{
+  if(pin.length() <= 2)
+    return;
+
+  QPolygon pout;
+  pout << pin[0];
+
+  int lastdx=-999, lastdy=-999;
+
+  const int len = pin.length();
+  for(int i=1; i<len; )
+    {
+      int x = pin[i].x();
+      int y = pin[i].y();
+      int dx = x-pin[i-1].x();
+      int dy = y-pin[i-1].y();
+
+      if(i<len-1)
+        {
+          int stepdx[2], stepdy[2];
+          stepdx[0] = dx;
+          stepdx[1] = pin[i+1].x() - x;
+          stepdy[0] = dy;
+          stepdy[1] = pin[i+1].y() - y;
+
+          // is this a step, e.g. _| or |_
+          if( ((abs(stepdx[0])==1 && stepdy[0]==0) && (stepdx[1]==0 && abs(stepdy[1])==1)) ||
+              ((abs(stepdy[0])==1 && stepdx[0]==0) && (stepdy[1]==0 && abs(stepdx[1])==1)) )
+            {
+              int j = i+2;
+              while(j<len)
+                {
+                  int delx = pin[j].x() - pin[j-1].x();
+                  int dely = pin[j].y() - pin[j-1].y();
+                  int compar = (j-i) % 2;
+                  if(delx==stepdx[compar] && dely==stepdy[compar])
+                    ++j;
+                  else
+                    break;
+                }
+              pout << pin[j-1];
+              // move to next point
+              i = j;
+              lastdx = lastdy = -999;
+              continue;
+            }
+        }
+      if(dx==lastdx && dy==lastdy)
+        {
+          // if the step is the same we just replace the last point
+          pout.last() = pin[i];
+        }
+      else
+        {
+          // add new point
+          pout << pin[i];
+        }
+      lastdx = dx;
+      lastdy = dy;
+      ++i;
+    }
+  pin = pout;
+}
+
 void traceBitmap(const Numpy2DIntObj& mask, QVector<QPolygon>& polys)
 {
   const int yw = mask.dims[0];
@@ -641,7 +707,6 @@ void traceBitmap(const Numpy2DIntObj& mask, QVector<QPolygon>& polys)
         poly << QPoint(x, y);
 
         int dirn = 0;
-        int lastdirn = -1;
         //bool hole = not mask(x, y); // is this a hole?
 
         for(;;)
@@ -693,16 +758,11 @@ void traceBitmap(const Numpy2DIntObj& mask, QVector<QPolygon>& polys)
                 if(pt==poly.first())
                   break;
 
-                if(lastdirn == dirn)
-                  // if the direction we're moving on is constant,
-                  // then we can just replace the previous point
-                  poly.last() = pt;
-                else
-                  poly << pt;
-                lastdirn = dirn;
+                poly << pt;
               }
           }
 
+        curveSimplify(poly);
         polys << poly;
       }
 }
