@@ -87,7 +87,7 @@ class _Stats(object):
             iqr = self.topquart - self.botquart
             eltop = N.searchsorted(cleaned, self.topquart+1.5*iqr)-1
             self.topwhisker = cleaned[eltop]
-            elbot = max(N.searchsorted(cleaned, self.botquart-1.5*iqr)-1, 0)
+            elbot = max(N.searchsorted(cleaned, self.botquart-1.5*iqr), 0)
             self.botwhisker = cleaned[elbot]
         elif whiskermode == '1 stddev':
             stddev = N.std(cleaned)
