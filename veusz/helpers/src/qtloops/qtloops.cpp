@@ -623,18 +623,19 @@ void curveSimplify(QPolygon& pin)
       int dx = x-pin[i-1].x();
       int dy = y-pin[i-1].y();
 
-      if(i<len-1)
+      if(i<len)
         {
           int stepdx[2], stepdy[2];
           stepdx[0] = dx;
-          stepdx[1] = pin[i+1].x() - x;
+          stepdx[1] = pin[(i+1)%len].x() - x;
           stepdy[0] = dy;
-          stepdy[1] = pin[i+1].y() - y;
+          stepdy[1] = pin[(i+1)%len].y() - y;
 
           // is this a step, e.g. _| or |_
           if( ((abs(stepdx[0])==1 && stepdy[0]==0) && (stepdx[1]==0 && abs(stepdy[1])==1)) ||
               ((abs(stepdy[0])==1 && stepdx[0]==0) && (stepdy[1]==0 && abs(stepdx[1])==1)) )
             {
+              // find where steps stop
               int j = i+2;
               while(j<len)
                 {
@@ -646,7 +647,8 @@ void curveSimplify(QPolygon& pin)
                   else
                     break;
                 }
-              pout << pin[j-1];
+              // convert all step segments to a straight line
+              pout << pin[(j-1)%len];
               // move to next point
               i = j;
               lastdx = lastdy = -999;
@@ -667,6 +669,7 @@ void curveSimplify(QPolygon& pin)
       lastdy = dy;
       ++i;
     }
+
   pin = pout;
 }
 

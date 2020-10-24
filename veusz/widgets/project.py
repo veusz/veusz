@@ -143,7 +143,7 @@ class Project(NonOrthGraph):
             usertext=_('Parameter')) )
 
         s.add( GridLine(
-            'SpokeLine',
+            'GridLine',
             descr=_('Grid line'),
             usertext=_('Grid line')), pixmap='settings_axisgridlines')
 
@@ -214,12 +214,13 @@ class Project(NonOrthGraph):
             self._valid_mask = None
             return
 
+        s = 1
         yg, xg = N.meshgrid(
-            N.arange(int(bounds[1]), int(bounds[3])+1),
-            N.arange(int(bounds[0]), int(bounds[2])+1),
+            N.arange(int(bounds[1]*s), int(bounds[3]*s)+1),
+            N.arange(int(bounds[0]*s), int(bounds[2]*s)+1),
         )
-        ys = (yg-self._oy)*(1/(-0.01*self._scale))
-        xs = (xg-self._ox)*(1/( 0.01*self._scale))
+        ys = (yg*(1/s)-self._oy)*(1/(-0.01*self._scale))
+        xs = (xg*(1/s)-self._ox)*(1/( 0.01*self._scale))
         lon, lat = self._cache_wcs.wcs_pix2world(xs.ravel(), ys.ravel(), 0)
 
         valid = N.reshape(N.isfinite(lat+lon), yg.shape)
@@ -228,12 +229,19 @@ class Project(NonOrthGraph):
     def drawGrid(self, painter, bounds):
         if self._cache_wcs is None:
             return
+        s = self.settings
 
+        # bounds
+        painter.save()
+        pen = s.Border.makeQPenWHide(painter)
+        path = qt.QPainterPath()
         maskpolys = qtloops.traceBitmap(self._valid_mask.T.astype(N.intc))
         for poly in maskpolys:
             polyf = qt.QPolygonF(poly)
             polyf.translate(int(bounds[0]), int(bounds[1]))
-            painter.drawPolygon(polyf)
+            path.addPolygon(polyf)
+        utils.brushExtFillPath(painter, s.Background, path, stroke=pen)
+        painter.restore()
 
         clip = qt.QRectF(
             bounds[0], bounds[1], bounds[2]-bounds[0], bounds[3]-bounds[1])
@@ -250,6 +258,7 @@ class Project(NonOrthGraph):
                         qtloops.addNumpyToPolygonF(poly, xs, ys)
                         qtloops.plotClippedPolyline(painter, clip, poly)
 
+        painter.setPen(s.GridLine.makeQPenWHide(painter))
         # draw lines of latitude
         lons = N.arange(-180,180+1,5, dtype=N.float64)
         lons[0] = -179.99
