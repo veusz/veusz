@@ -59,6 +59,7 @@ class CommandInterface(qt.QObject):
         'Add',
         'AddCustom',
         'AddImportPath',
+        'CurrentPath',
         'CloneWidget',
         'CreateHistogram',
         'DatasetPlugin',
@@ -95,7 +96,7 @@ class CommandInterface(qt.QObject):
         'TagDatasets',
         'To',
         'WidgetType',
-        ]
+    ]
 
     # commands for importing data
     import_commands = []
@@ -107,7 +108,7 @@ class CommandInterface(qt.QObject):
         'Export',
         'Print',
         'Save',
-        ]
+    ]
 
     def __init__(self, document):
         """Initialise the interface."""
@@ -277,6 +278,10 @@ class CommandInterface(qt.QObject):
         if self.verbose:
             print(_('Constructed histogram of "%s", creating datasets'
                     ' "%s" and "%s"') % (inexpr, outbinsds, outvalsds))
+
+    def CurrentPath(self):
+        """Return the current path (set by To())."""
+        return self.currentwidget.path
 
     def DatasetPlugin(self, pluginname, fields, datasetnames={}):
         """Use a dataset plugin.
