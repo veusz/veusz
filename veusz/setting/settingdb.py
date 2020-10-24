@@ -89,6 +89,7 @@ defaultValues = {
     # log picked points to clipboard or to console
     'picker_to_clipboard': False,
     'picker_to_console': True,
+    'picker_sig_figs': 5,
 
     # add these directories to the python path (colon-separated)
     'external_pythonpath': '',

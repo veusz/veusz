@@ -1431,7 +1431,8 @@ class MainWindow(qt.QMainWindow):
             if dtype == 'date':
                 return utils.dateFloatToString(val)
             elif dtype == 'numeric':
-                return '%0.5g' % val
+                fmt = '%.'+str(setting.settingdb['picker_sig_figs'])+'g'
+                return fmt % val
             elif dtype == 'text':
                 return val
             else:

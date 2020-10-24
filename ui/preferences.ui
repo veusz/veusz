@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>730</width>
-    <height>353</height>
+    <height>354</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -363,7 +363,7 @@ to be loaded.</string>
       <attribute name="title">
        <string>Picker</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <widget class="QCheckBox" name="pickerToConsoleCheck">
          <property name="text">
@@ -377,6 +377,27 @@ to be loaded.</string>
           <string>Copy picked points to clipboard</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Number of significant figures to show</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="pickerSigFigs">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>20</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>

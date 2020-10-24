@@ -115,6 +115,7 @@ class PreferencesDialog(VeuszDialog):
         # for point picker
         self.pickerToConsoleCheck.setChecked( setdb['picker_to_console'] )
         self.pickerToClipboardCheck.setChecked( setdb['picker_to_clipboard'] )
+        self.pickerSigFigs.setValue( setdb['picker_sig_figs'] )
 
         # python path
         self.externalPythonPath.setText(setdb['external_pythonpath'])
@@ -251,6 +252,7 @@ class PreferencesDialog(VeuszDialog):
         # picker
         setdb['picker_to_clipboard'] = self.pickerToClipboardCheck.isChecked()
         setdb['picker_to_console'] = self.pickerToConsoleCheck.isChecked()
+        setdb['picker_sig_figs'] = self.pickerSigFigs.value()
 
         # python path
         setdb['external_pythonpath'] = self.externalPythonPath.text()
