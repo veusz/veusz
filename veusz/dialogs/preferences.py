@@ -129,6 +129,14 @@ class PreferencesDialog(VeuszDialog):
         if utils.disableFeedback:
             self.externalFeedbackCheck.setEnabled(False)
 
+        # security
+        self.securityDirList.addItems(setdb['secure_dirs'])
+        self.securityDirList.itemSelectionChanged.connect(
+            self.securityDirListSelection)
+        self.securityTrustUnsaved.setChecked(setdb['secure_unsaved'])
+        self.securityDirAdd.clicked.connect(self.securityDirAddClicked)
+        self.securityDirRemove.clicked.connect(self.securityDirRemoveClicked)
+
     def setupColorTab(self):
         """Initialise color tab
         this makes a grid of controls for each color
@@ -263,6 +271,13 @@ class PreferencesDialog(VeuszDialog):
         # feedback
         setdb['feedback_disabled'] = self.externalFeedbackCheck.isChecked()
 
+        # security
+        setdb['secure_dirs'] = [
+            self.securityDirList.item(i).text()
+            for i in range(self.securityDirList.count())
+        ]
+        setdb['secure_unsaved'] = self.securityTrustUnsaved.isChecked()
+
         self.plotwindow.updatePlotSettings()
 
         # write settings out now, rather than wait until the end
@@ -311,3 +326,22 @@ class PreferencesDialog(VeuszDialog):
             [_('All files (*)')], _('Choose ghostscript executable'))
         if filename:
             self.externalGhostscript.setText(filename)
+
+    def securityDirListSelection(self):
+        """Hide or show remove button."""
+        self.securityDirRemove.setEnabled(
+            len(self.securityDirList.selectedItems())>0)
+
+    def securityDirAddClicked(self):
+        """Add a secure directory."""
+
+        dirname = qt.QFileDialog.getExistingDirectory(
+            self, _('Choose secure directory to add'))
+        if dirname:
+            self.securityDirList.addItem(dirname)
+
+    def securityDirRemoveClicked(self):
+        """Remove a secure directory."""
+
+        for item in self.securityDirList.selectedItems():
+            self.securityDirList.takeItem(self.securityDirList.row(item))

@@ -16,6 +16,25 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
+"""
+Security thoughts:
+
+   Document considered secure:
+    * In safe list of locations
+    * Empty document (with setting)
+
+   Secure means:
+    * Importing symbols
+    * Evaluating expressions
+    * Containing arbitrary Python when loading
+
+   Idea:
+    * Drop dialogs, but add icon to bottom right to override security
+      setting / add path
+
+
+"""
+
 from __future__ import division
 from collections import defaultdict
 import os.path
@@ -97,6 +116,9 @@ class Evaluate:
         self.exprdscache = {}
         self.exprdscachechangeset = None
 
+        # whether we hit security tests
+        self.secure_document = False
+
     def update(self):
         """To be called after custom constants or functions are changed.
         This sets up a safe environment where things can be evaluated
@@ -143,6 +165,26 @@ class Evaluate:
         self.colormaps.wipe()
         for name, val in self.def_colormaps:
             self._updateColormap(name, val)
+
+    def inSecureMode(self):
+        """Is the document in a safe location?"""
+
+        if ( setting.transient_settings['unsafe_mode'] or
+             self.secure_document ):
+            return True
+
+        filename = self.doc.filename
+        if not filename:
+            return setting.settingdb['secure_unsaved']
+
+        absfilename = os.path.abspath(filename)
+        for dirname in setting.settingdb['secure_dirs']:
+            absdirname = os.path.abspath(dirname)
+            if absfilename[:len(absdirname)] == absdirname:
+                self.secure_document = True
+                return True
+
+        return False
 
     def _updateImport(self, module, val):
         """Add an import statement to the eval function context."""
@@ -270,7 +312,8 @@ class Evaluate:
         try:
             checked = utils.compileChecked(
                 expr,
-                ignoresecurity=setting.transient_settings['unsafe_mode'])
+                ignoresecurity=self.inSecureMode(),
+            )
         except utils.SafeEvalException as e:
             if log:
                 self.doc.log(
@@ -364,7 +407,7 @@ class Evaluate:
             return symbols
 
         # do import anyway
-        if setting.transient_settings['unsafe_mode']:
+        if self.inSecureMode():
             return symbols
 
         # two-pass to ask user whether they want to import symbol
