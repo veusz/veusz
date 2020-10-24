@@ -70,7 +70,8 @@ class _GraphControlKey(qt.QGraphicsRectItem, controlgraph._ScaledShape):
         self.params = params
         self.setScaledRect(
             params.posn[0], params.posn[1],
-            params.dims[0], params.dims[1])
+            params.dims[0], params.dims[1]
+        )
 
         self.setCursor(qt.Qt.SizeAllCursor)
         self.setZValue(1.)
@@ -85,12 +86,12 @@ class _GraphControlKey(qt.QGraphicsRectItem, controlgraph._ScaledShape):
             'left':   pposn[0] + th,
             'centre': pposn[0] + 0.5*(pposn[2]-pposn[0]-dims[0]),
             'right':  pposn[2] - th - dims[0]
-            }
+        }
         yposn = {
             'top':    pposn[1] + th,
             'centre': pposn[1] + 0.5*(pposn[3]-pposn[1]-dims[1]),
             'bottom': pposn[3] - th - dims[1]
-            }
+        }
 
         # these are special places where the key is aligned
         self.highlightpoints = {}
@@ -153,7 +154,7 @@ class _GraphControlKey(qt.QGraphicsRectItem, controlgraph._ScaledShape):
             document.OperationSettingSet(s.get('vertPosn'), vp),
             document.OperationSettingSet(s.get('horzManual'), hm),
             document.OperationSettingSet(s.get('vertManual'), vm),
-            )
+        )
         self.params.widget.document.applyOperation(
             document.OperationMultiple(operations, descr=_('move key')))
 
@@ -267,6 +268,13 @@ class Key(widget.Widget):
             usertext=_('Swap symbol'),
             formatting=True) )
 
+        s.add( setting.Bool(
+            'orderswap',
+            False,
+            descr=_('Reverse order of entries'),
+            usertext=_('Reverse order'),
+            formatting=True) )
+
     @classmethod
     def allowedParentTypes(klass):
         from . import graph
@@ -315,7 +323,8 @@ class Key(widget.Widget):
         while not layout:
             # try to do a first cut of the layout, and expand the box until
             # everything fits
-            (layout, colstats, newrows) = self._layoutChunk(entries, (0, 0), (numrows, numcols))
+            (layout, colstats, newrows) = self._layoutChunk(
+                entries, (0, 0), (numrows, numcols))
             if not layout:
                 numrows = newrows
 
@@ -343,8 +352,10 @@ class Key(widget.Widget):
                         break
 
                 # try to relayout with the victim item shoved to the next column
-                (newlayout, newcolstats, newrows) = self._layoutChunk(entries[victim:],
-                                                        (0, victimcol+1), (numrows, numcols))
+                newlayout, newcolstats, newrows = self._layoutChunk(
+                    entries[victim:],
+                    (0, victimcol+1), (numrows, numcols)
+                )
                 if newlayout:
                     # the relayout worked, so accept it
                     layout = layout[0:victim] + newlayout
@@ -391,7 +402,8 @@ class Key(widget.Widget):
         if s.title != '':
             titlefont = qt.QFont(font)
             painter.setPen(textpen)
-            titlefont.setPointSize(max(font.pointSize() * 1.2, font.pointSize() + 2))
+            titlefont.setPointSize(
+                max(font.pointSize() * 1.2, font.pointSize() + 2))
             titlewidth, titleheight = utils.Renderer(
                 painter, titlefont,
                 0, 0, s.title,
@@ -409,6 +421,9 @@ class Key(widget.Widget):
         else:
             # default order
             widgets = [c for c in self.parent.children]
+
+        if s.orderswap:
+            widgets = widgets[::-1]
 
         # which widgets to exclude
         exclude = { x.strip() for x in s.exclude.split(',') }
@@ -441,8 +456,10 @@ class Key(widget.Widget):
 
         # width of key part of key
         symbolwidth = s.get('keyLength').convert(painter)
-        keyswidth = ( (maxwidth + height + symbolwidth)*numcols +
-                      height*(numcols-1) )
+        keyswidth = (
+            (maxwidth + height + symbolwidth)*numcols +
+            height*(numcols-1)
+        )
         # total width of box
         totalwidth = max(keyswidth, titlewidth)
 
@@ -518,8 +535,9 @@ class Key(widget.Widget):
             sx = xpos
             if swap:
                 sx += maxwidth + height
-            plotter.drawKeySymbol(num, painter, sx, ypos+keyoffset,
-                                  symbolwidth, height)
+            plotter.drawKeySymbol(
+                num, painter, sx, ypos+keyoffset,
+                symbolwidth, height)
             painter.restore()
 
             # write key text
@@ -541,6 +559,7 @@ class Key(widget.Widget):
 
         phelper.setControlGraph(
             self,
-            [ControlKey(self, phelper, parentposn, boxposn, boxdims, height)] )
+            [ControlKey(self, phelper, parentposn, boxposn, boxdims, height)]
+        )
 
 document.thefactory.register( Key )
