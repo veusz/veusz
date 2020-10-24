@@ -159,6 +159,15 @@ values.  method is 'counts', 'density', or 'fractions'.  cumulative is
 to calculate cumulative distributions which is 'none', 'smalltolarge'
 or 'largetosmall'.  errors is to calculate Poisson error bars.
 
+CurrentPath
+-----------
+
+.. _Command.CurrentPath
+
+:command:`CurrentPath()`
+
+Returns current widget path, as set by :ref:`To<Command.To>`.
+
 DatasetPlugin
 -------------
 
