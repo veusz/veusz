@@ -16,25 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-"""
-Security thoughts:
-
-   Document considered secure:
-    * In safe list of locations
-    * Empty document (with setting)
-
-   Secure means:
-    * Importing symbols
-    * Evaluating expressions
-    * Containing arbitrary Python when loading
-
-   Idea:
-    * Drop dialogs, but add icon to bottom right to override security
-      setting / add path
-
-
-"""
-
 from __future__ import division
 from collections import defaultdict
 import os.path
@@ -72,6 +53,21 @@ function_re = re.compile(r'''
 def _(text, disambiguation=None, context="Evaluate"):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
+
+# Notes on Security
+# -----------------
+
+# Security states:
+#  * Secure
+#    - if new document
+#    - if loaded from secure location
+#    - or allow set in dialog
+#  * Insecure (skip in dialog)
+
+# Security context:
+#  * Executing statements when loading
+#  * Importing functions
+#  * Evaluating expressions (non checking Python)
 
 class Evaluate:
     """Class to manage evaluation of expressions in a special environment."""
@@ -117,7 +113,7 @@ class Evaluate:
         self.exprdscachechangeset = None
 
         # whether we hit security tests
-        self.secure_document = False
+        self.setSecurity(False)
 
     def update(self):
         """To be called after custom constants or functions are changed.
@@ -166,45 +162,69 @@ class Evaluate:
         for name, val in self.def_colormaps:
             self._updateColormap(name, val)
 
-    def inSecureMode(self):
-        """Is the document in a safe location?"""
+    def setSecurity(self, secure):
+        """Updated the security context."""
+        oldsecure = getattr(self, 'secure_document', False)
 
-        if ( setting.transient_settings['unsafe_mode'] or
-             self.secure_document ):
-            return True
+        self.secure_document = secure
+        self.doc.sigSecuritySet.emit(secure)
 
+        if not oldsecure and secure:
+            # if we're now secure, and were not previously, update
+            # context
+            self.exprdscache = {}
+            self.exprdscachechangeset = None
+            self.update()
+
+    def updateSecurityFromPath(self):
+        """Make document secure if in a secure location."""
         filename = self.doc.filename
-        if not filename:
-            return setting.settingdb['secure_unsaved']
-
         absfilename = os.path.abspath(filename)
-        for dirname in setting.settingdb['secure_dirs']:
+        paths = setting.settingdb['secure_dirs'] + [
+            utils.exampleDirectory]
+        for dirname in paths:
             absdirname = os.path.abspath(dirname)
             if absfilename.startswith(absdirname + os.sep):
-                self.secure_document = True
-                return True
+                self.setSecurity(True)
 
-        return False
+    def inSecureMode(self):
+        """Is the document in a safe location?"""
+        return (
+            setting.transient_settings['unsafe_mode'] or
+            self.secure_document
+        )
 
     def _updateImport(self, module, val):
         """Add an import statement to the eval function context."""
         if module_re.match(module):
             # work out what is safe to import
             symbols = identifier_split_re.findall(val)
-            if not symbols or self._checkImportsSafe():
-                defn = 'from %s import %s' % (
-                    module, ', '.join(symbols))
-                try:
-                    cexec(defn, self.context)
-                except Exception:
+            if self._checkImportsSafe():
+                if symbols:
+                    defn = 'from %s import %s' % (
+                        module, ', '.join(symbols))
+                    try:
+                        cexec(defn, self.context)
+                    except Exception:
+                        self.doc.log(_(
+                            "Failed to import '%s' from module '%s'") % (
+                                ', '.join(toimport), module))
+                        return
+                else:
+                    defn = 'import %s' % module
+                    try:
+                        cexec(defn, self.context)
+                    except Exception:
+                        self.doc.log(_(
+                            "Failed to import module '%s'") % module)
+                        return
+            else:
+                if not symbols:
+                    self.doc.log(_("Did not import module '%s'") % module)
+                else:
                     self.doc.log(_(
-                        "Failed to import '%s' from module '%s'") % (
-                            ', '.join(toimport), module))
-                    return
-            elif symbols:
-                self.doc.log(_(
-                    "Did not import '%s' from module '%s'") % (
-                        ', '.join(list(symbols)), module))
+                        "Did not import '%s' from module '%s'") % (
+                            ', '.join(list(symbols)), module))
 
         else:
             self.doc.log( _("Invalid module name '%s'") % module )

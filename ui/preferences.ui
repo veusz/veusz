@@ -560,13 +560,6 @@ to be loaded.</string>
            </property>
           </spacer>
          </item>
-         <item>
-          <widget class="QCheckBox" name="securityTrustUnsaved">
-           <property name="text">
-            <string>No restrictions on unsaved files</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
       </layout>

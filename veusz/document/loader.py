@@ -116,7 +116,7 @@ def executeScript(thedoc, filename, script,
             if callbackunsafe is None or not callbackunsafe():
                 raise LoadError(_("Unsafe command in script"))
             # repeat with unsafe mode switched on
-            thedoc.evaluate.secure_document = True
+            thedoc.evaluate.setSecurity(True)
         except Exception as e:
             raise genexception(e)
 
@@ -136,7 +136,7 @@ def executeScript(thedoc, filename, script,
             if not thedoc.evaluate.inSecureMode():
                 if callbackunsafe is None or not callbackunsafe():
                     raise LoadError(_("Unsafe command in script"))
-                thedoc.evaluate.secure_document = True
+                thedoc.evaluate.setSecurity(True)
             func(*args, **argsk)
         return wrapped
     for name in interface.unsafe_commands:
@@ -228,6 +228,8 @@ def loadHDF5Doc(thedoc, filename,
     with thedoc.suspend():
         thedoc.wipe()
         thedoc.filename = filename
+        thedoc.evaluate.updateSecurityFromPath()
+
         hdffile = h5py.File(filename, 'r')
 
         try:
@@ -282,6 +284,7 @@ def loadDocument(thedoc, filename, mode='vsz',
 
         thedoc.wipe()
         thedoc.filename = filename
+        thedoc.evaluate.updateSecurityFromPath()
         executeScript(
             thedoc, filename, script,
             callbackunsafe=callbackunsafe,

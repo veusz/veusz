@@ -199,6 +199,12 @@ class MainWindow(qt.QMainWindow):
         statusbar.addPermanentWidget(self.pagelabel)
         self.pagelabel.show()
 
+        # security label
+        self.securitybutton = qt.QLabel(_("Untrusted mode"), statusbar)
+        statusbar.addPermanentWidget(self.securitybutton)
+        self.securitybutton.show()
+        self.document.sigSecuritySet.connect(self.slotUpdateSecurity)
+
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt.QDir.homePath())
         if setdb['dirname_usecwd']:
@@ -467,6 +473,9 @@ class MainWindow(qt.QMainWindow):
                 a(self, _('Save the current document under a new name'),
                   _('Save &As...'), self.slotFileSaveAs,
                   icon='kde-document-save-as'),
+            'file.trust':
+                a(self, _('Trust document contents'), _('Trust...'),
+                  self.slotFileTrust),
             'file.print':
                 a(self, _('Print the document'), _('&Print...'),
                   self.slotFilePrint,
@@ -623,7 +632,7 @@ class MainWindow(qt.QMainWindow):
             ['file.filerecent', _('Open &Recent'), []],
             'file.reload',
             '',
-            'file.save', 'file.saveas',
+            'file.save', 'file.saveas', 'file.trust',
             '',
             'file.print', 'file.export',
             '',
@@ -1437,9 +1446,13 @@ class MainWindow(qt.QMainWindow):
             qt.QStandardPaths.standardLocations(qt.QStandardPaths.DownloadLocation) +
             qt.QStandardPaths.standardLocations(qt.QStandardPaths.TempLocation)
         )
-        absfile = os.path.abspath(self.document.filename)
-        filedir = os.path.dirname(absfile)
+        fname = self.document.filename
+        absfile = os.path.abspath(fname)
+        filedir = '' if not fname else os.path.dirname(absfile)
         isbadloc = False
+        if not filedir:
+            # shouldn't get here, but don't allow empty dir to be added
+            isbadloc = True
         for path in badlocs:
             if absfile.startswith(os.path.abspath(path) + os.sep):
                 isbadloc = True
@@ -1457,8 +1470,8 @@ class MainWindow(qt.QMainWindow):
               "as it can contain arbitrary code. "
               "Please check "
               "that the file was made by you or a trusted source.</p>") % (
-                  os.path.basename(absfile),
-                  filedir,
+                  os.path.basename(absfile) if fname else "",
+                  filedir if fname else "",
               ),
             qt.QMessageBox.NoButton,
             self,
@@ -1493,7 +1506,27 @@ class MainWindow(qt.QMainWindow):
 
         return clicked is allow
 
+    def slotUpdateSecurity(self, secure):
+        """Show or hide security label and trust menu based on security"""
+        self.securitybutton.setVisible(not secure)
+        self.vzactions['file.trust'].setVisible(not secure)
+
     def slotAllowedImportsDoc(self):
         """Are allowed imports?"""
         if self.checkUnsafe():
-            self.document.evaluate.secure_document = True
+            self.document.evaluate.setSecurity(True)
+
+    def slotFileTrust(self):
+        """User requests that document should be trusted."""
+        button = qt.QMessageBox.warning(
+            self, _("Are you sure?"),
+            _("Are you sure that you want to trust the document contents, "
+              "including any potentially dangerous code? Only trust "
+              "documents with a trusted source."),
+            qt.QMessageBox.Yes | qt.QMessageBox.No,
+            qt.QMessageBox.No,
+        )
+        if button == qt.QMessageBox.Yes:
+            self.document.evaluate.setSecurity(True)
+            # force redraw of document
+            self.plot.actionForceUpdate()

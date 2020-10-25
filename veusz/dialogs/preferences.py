@@ -133,7 +133,6 @@ class PreferencesDialog(VeuszDialog):
         self.securityDirList.addItems(setdb['secure_dirs'])
         self.securityDirList.itemSelectionChanged.connect(
             self.securityDirListSelection)
-        self.securityTrustUnsaved.setChecked(setdb['secure_unsaved'])
         self.securityDirAdd.clicked.connect(self.securityDirAddClicked)
         self.securityDirRemove.clicked.connect(self.securityDirRemoveClicked)
 
@@ -276,7 +275,6 @@ class PreferencesDialog(VeuszDialog):
             self.securityDirList.item(i).text()
             for i in range(self.securityDirList.count())
         ]
-        setdb['secure_unsaved'] = self.securityTrustUnsaved.isChecked()
 
         self.plotwindow.updatePlotSettings()
 
