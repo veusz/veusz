@@ -105,18 +105,18 @@ def executeScript(thedoc, filename, script,
         return LoadError(cexceptionuser(exc), backtrace=backtrace)
 
     # compile script and check for security (if reqd)
-    unsafe = [setting.transient_settings['unsafe_mode']]
     while True:
         try:
             compiled = utils.compileChecked(
                 script, mode='exec', filename=filename,
-                ignoresecurity=unsafe[0])
+                ignoresecurity=thedoc.evaluate.inSecureMode(),
+            )
             break
         except utils.SafeEvalException:
             if callbackunsafe is None or not callbackunsafe():
                 raise LoadError(_("Unsafe command in script"))
             # repeat with unsafe mode switched on
-            unsafe[0] = True
+            thedoc.evaluate.secure_document = True
         except Exception as e:
             raise genexception(e)
 
@@ -133,10 +133,10 @@ def executeScript(thedoc, filename, script,
     # wrap unsafe calls with a function to check whether ok
     def _unsafecaller(func):
         def wrapped(*args, **argsk):
-            if not unsafe[0]:
+            if not thedoc.evaluate.inSecureMode():
                 if callbackunsafe is None or not callbackunsafe():
                     raise LoadError(_("Unsafe command in script"))
-                unsafe[0] = True
+                thedoc.evaluate.secure_document = True
             func(*args, **argsk)
         return wrapped
     for name in interface.unsafe_commands:

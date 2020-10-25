@@ -180,7 +180,7 @@ class Evaluate:
         absfilename = os.path.abspath(filename)
         for dirname in setting.settingdb['secure_dirs']:
             absdirname = os.path.abspath(dirname)
-            if absfilename[:len(absdirname)] == absdirname:
+            if absfilename.startswith(absdirname + os.sep):
                 self.secure_document = True
                 return True
 
@@ -191,10 +191,9 @@ class Evaluate:
         if module_re.match(module):
             # work out what is safe to import
             symbols = identifier_split_re.findall(val)
-            toimport = self._processSafeImports(module, symbols)
-            if toimport:
+            if not symbols or self._checkImportsSafe():
                 defn = 'from %s import %s' % (
-                    module, ', '.join(toimport))
+                    module, ', '.join(symbols))
                 try:
                     cexec(defn, self.context)
                 except Exception:
@@ -202,12 +201,10 @@ class Evaluate:
                         "Failed to import '%s' from module '%s'") % (
                             ', '.join(toimport), module))
                     return
-
-            delta = set(symbols)-set(toimport)
-            if delta:
+            elif symbols:
                 self.doc.log(_(
                     "Did not import '%s' from module '%s'") % (
-                        ', '.join(list(delta)), module))
+                        ', '.join(list(symbols)), module))
 
         else:
             self.doc.log( _("Invalid module name '%s'") % module )
@@ -399,57 +396,15 @@ class Evaluate:
             self.doc, expr, part=part, datatype=datatype, dimensions=dimensions)
         return ds
 
-    def _processSafeImports(self, module, symbols):
-        """Check what symbols are safe to import."""
-
-        # empty list
-        if not symbols:
-            return symbols
+    def _checkImportsSafe(self):
+        """Check whether symbols are safe to import."""
 
         # do import anyway
         if self.inSecureMode():
-            return symbols
+            return True
 
-        # two-pass to ask user whether they want to import symbol
-        for thepass in range(2):
-            # remembered during session
-            a = 'import_allowed'
-            if a not in setting.transient_settings:
-                setting.transient_settings[a] = defaultdict(set)
-            allowed = setting.transient_settings[a][module]
-
-            # not allowed during session
-            a = 'import_notallowed'
-            if a not in setting.transient_settings:
-                setting.transient_settings[a] = defaultdict(set)
-            notallowed = setting.transient_settings[a][module]
-
-            # remembered in setting file
-            a = 'import_allowed'
-            if a not in setting.settingdb:
-                setting.settingdb[a] = {}
-            if module not in setting.settingdb[a]:
-                setting.settingdb[a][module] = {}
-            allowed_always = setting.settingdb[a][module]
-
-            # collect up
-            toimport = []
-            possibleimport = []
-            for symbol in symbols:
-                if symbol in allowed or symbol in allowed_always:
-                    toimport.append(symbol)
-                elif symbol not in notallowed:
-                    possibleimport.append(symbol)
-
-            # nothing to do, so leave
-            if not possibleimport:
-                break
-
-            # only ask the user the first time
-            if thepass == 0:
-                self.doc.sigAllowedImports.emit(module, possibleimport)
-
-        return toimport
+        self.doc.sigAllowedImports.emit()
+        return self.inSecureMode()
 
     def getColormap(self, name, invert):
         """Get colormap with name given (returning grey if does not exist)."""

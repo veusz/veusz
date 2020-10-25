@@ -81,8 +81,8 @@ class Document(qt.QObject):
     sigLog = qt.pyqtSignal(cstr)
     # emitted when document wiped
     sigWiped = qt.pyqtSignal()
-    # to ask whether the import is allowed (module name and symbol list)
-    sigAllowedImports = qt.pyqtSignal(cstr, list)
+    # to ask whether an import is allowed
+    sigAllowedImports = qt.pyqtSignal()
 
     def __init__(self):
         """Initialise the document."""
