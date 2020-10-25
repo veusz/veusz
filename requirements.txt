@@ -1,5 +1,5 @@
 numpy >= 1.10
 PyQt5 >= 5.5.1
-sip >= 4.17
+PyQt5-sip >= 4.17
 astropy >= 2.0
 h5py >= 2.6.0
