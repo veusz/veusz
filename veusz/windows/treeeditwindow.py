@@ -708,6 +708,28 @@ class TreeEditDock(qt.QDockWidget):
             self.updatePasteButton)
         self.updatePasteButton()
 
+        # make context menu
+        self.makeContextMenu()
+
+    def makeContextMenu(self):
+        m = self.contextmenu = qt.QMenu(self)
+
+        # selection
+        m.addMenu(self.parentwin.menus['edit.select'])
+        m.addSeparator()
+
+        # actions on widget(s)
+        for act in (
+                'edit.cut', 'edit.copy', 'edit.paste',
+                'edit.moveup', 'edit.movedown', 'edit.delete',
+                'edit.rename'
+        ):
+            m.addAction(self.vzactions[act])
+
+        m.addSeparator()
+        m.addAction(self.vzactions['edit.show'])
+        m.addAction(self.vzactions['edit.hide'])
+
     def slotDocumentWiped(self):
         """If the document is wiped, reselect root widget."""
         self.selectWidget(self.document.basewidget)
@@ -738,46 +760,9 @@ class TreeEditDock(qt.QDockWidget):
 
     def contextMenuEvent(self, event):
         """Bring up context menu."""
-
-        # no widgets selected
-        if not self.selwidgets:
-            return
-
-        m = qt.QMenu(self)
-
-        # selection
-        m.addMenu(self.parentwin.menus['edit.select'])
-        m.addSeparator()
-
-        # actions on widget(s)
-        for act in ('edit.cut', 'edit.copy', 'edit.paste',
-                    'edit.moveup', 'edit.movedown', 'edit.delete',
-                    'edit.rename'):
-            m.addAction(self.vzactions[act])
-
-        # allow show or hides of selected widget
-        anyhide = False
-        anyshow = False
-        for w in self.selwidgets:
-            if 'hide' in w.settings:
-                if w.settings.hide:
-                    anyshow = True
-                else:
-                    anyhide = True
-
-        for (enabled, menutext, showhide) in (
-            (anyhide, 'Hide', True), (anyshow, 'Show', False) ):
-            if enabled:
-                m.addSeparator()
-                act = qt.QAction(menutext, self)
-                def trigfn(showorhide):
-                    return lambda: self.slotWidgetHideShow(
-                        self.selwidgets, showorhide)
-                act.triggered.connect(trigfn(showhide))
-                m.addAction(act)
-
-        m.exec_(self.mapToGlobal(event.pos()))
-        event.accept()
+        if self.selwidgets:
+            self.contextmenu.exec_(self.mapToGlobal(event.pos()))
+            event.accept()
 
     def _checkPageChange(self):
         """Check to see whether page has changed."""
@@ -843,6 +828,15 @@ class TreeEditDock(qt.QDockWidget):
                     'edit.moveup', 'edit.movedown', 'edit.rename'):
             self.vzactions[act].setEnabled(isnotroot)
 
+        # show or hide widgets
+        hidden = [
+            w.settings.hide
+            for w in self.selwidgets if 'hide' in w.settings
+        ]
+        self.vzactions['edit.show'].setEnabled(any(hidden))
+        self.vzactions['edit.hide'].setEnabled(
+            len(hidden)>0 and not all(hidden))
+
         self.updatePasteButton()
 
     def _constructToolbarMenu(self):
@@ -900,11 +894,11 @@ class TreeEditDock(qt.QDockWidget):
                 'edit.moveup':
                     a(self, _('Move the selected widget up'), _('Move &up'),
                       lambda: self.slotWidgetMove(-1),
-                      icon='kde-go-up'),
+                      icon='kde-go-up', key='Ctrl+PgUp'),
                 'edit.movedown':
                     a(self, _('Move the selected widget down'), _('Move d&own'),
                       lambda: self.slotWidgetMove(1),
-                      icon='kde-go-down'),
+                      icon='kde-go-down', key='Ctrl+PgDown'),
                 'edit.delete':
                     a(self, _('Remove the selected widget'), _('&Delete'),
                       self.slotWidgetDelete,
@@ -913,6 +907,14 @@ class TreeEditDock(qt.QDockWidget):
                     a(self, _('Renames the selected widget'), _('&Rename'),
                       self.slotWidgetRename,
                       icon='kde-edit-rename'),
+                'edit.show':
+                    a(self, _('Show selected widget(s)'), _('Show'),
+                      self.slotWidgetShow,
+                      key='Ctrl+]'),
+                'edit.hide':
+                    a(self, _('Hide selected widget(s)'), _('Hide'),
+                      self.slotWidgetHide,
+                      key='Ctrl+['),
 
                 'add.shapemenu':
                     a(self, _('Add a shape to the plot'), _('Shape'),
@@ -985,10 +987,12 @@ class TreeEditDock(qt.QDockWidget):
                     'edit.cut',
                     'edit.copy',
                     'edit.paste',
+                    'edit.delete',
+                    'edit.rename',
                     'edit.moveup',
                     'edit.movedown',
-                    'edit.delete',
-                    'edit.rename'
+                    'edit.show',
+                    'edit.hide',
                     )),
             )
         utils.constructMenus( self.parentwin.menuBar(),
@@ -1177,16 +1181,29 @@ class TreeEditDock(qt.QDockWidget):
         # re-highlight moved widget
         self.selectWidget(w)
 
-    def slotWidgetHideShow(self, widgets, hideshow):
-        """Hide or show selected widgets.
-        hideshow is True for hiding, False for showing
-        """
-        ops = [ document.OperationSettingSet(w.settings.get('hide'), hideshow)
-                for w in widgets
-                if 'hide' in w.settings ]
-        descr = ('show', 'hide')[hideshow]
+    def slotWidgetHide(self):
+        """Hide selected widgets."""
+        ops = [
+            document.OperationSettingSet(w.settings.get('hide'), True)
+            for w in self.selwidgets
+            if 'hide' in w.settings
+        ]
         self.document.applyOperation(
-            document.OperationMultiple(ops, descr=descr))
+            document.OperationMultiple(ops, descr=_('hide widget(s)')))
+        # update state of action after hiding
+        self._enableCorrectButtons()
+
+    def slotWidgetShow(self):
+        """Hide selected widgets."""
+        ops = [
+            document.OperationSettingSet(w.settings.get('hide'), False)
+            for w in self.selwidgets
+            if 'hide' in w.settings
+        ]
+        self.document.applyOperation(
+            document.OperationMultiple(ops, descr=_('show widget(s)')))
+        # update state of action after hiding
+        self._enableCorrectButtons()
 
     def checkWidgetSelected(self):
         """Check widget is selected."""
