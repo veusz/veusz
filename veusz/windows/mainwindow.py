@@ -40,6 +40,7 @@ from .. import utils
 from ..utils import vzdbus
 from .. import setting
 from .. import plugins
+from ..qtwidgets.clicklabel import ClickLabel
 
 from . import consolewindow
 from . import plotwindow
@@ -200,10 +201,11 @@ class MainWindow(qt.QMainWindow):
         self.pagelabel.show()
 
         # security label
-        self.securitybutton = qt.QLabel(_("Untrusted mode"), statusbar)
-        statusbar.addPermanentWidget(self.securitybutton)
-        self.securitybutton.show()
+        self.securitylabel = ClickLabel(_("Untrusted mode"), statusbar)
+        statusbar.addPermanentWidget(self.securitylabel)
+        self.securitylabel.show()
         self.document.sigSecuritySet.connect(self.slotUpdateSecurity)
+        self.securitylabel.clicked.connect(self.slotFileTrust)
 
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt.QDir.homePath())
@@ -1508,7 +1510,7 @@ class MainWindow(qt.QMainWindow):
 
     def slotUpdateSecurity(self, secure):
         """Show or hide security label and trust menu based on security"""
-        self.securitybutton.setVisible(not secure)
+        self.securitylabel.setVisible(not secure)
         self.vzactions['file.trust'].setVisible(not secure)
 
     def slotAllowedImportsDoc(self):
