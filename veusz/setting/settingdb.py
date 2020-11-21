@@ -112,7 +112,11 @@ defaultValues = {
     # (packagers, please don't disable here but in veusz/setting/feedback.py)
     'feedback_disabled': False,
     'feedback_asked_user': False,
-    }
+
+    # locations considered secure to load
+    'secure_dirs': [],
+    'secure_unsaved': True,
+}
 
 class _SettingDB(object):
     """A class which provides access to a persistant settings database.

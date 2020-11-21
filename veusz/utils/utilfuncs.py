@@ -642,3 +642,15 @@ class SvgWidgetFixedAspect(qt.QWidget):
             top = 0
 
         self.renderer.render(painter, qt.QRectF(left, top, outw, outh))
+
+class OverrideCursor:
+    """A context manager to handle changing the mouse cursor temporarily."""
+
+    def __init__(self, cursor=qt.Qt.WaitCursor):
+        self.cursor = cursor
+
+    def __enter__(self):
+        qt.QApplication.setOverrideCursor(qt.QCursor(self.cursor))
+
+    def __exit__(self, typ, value, traceback):
+        qt.QApplication.restoreOverrideCursor()

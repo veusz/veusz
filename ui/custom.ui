@@ -57,7 +57,7 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Add external Python functions and constants using an import. Enter a module name and list of symbols to import (comma-separated or &quot;*&quot; for all symbols).</string>
+          <string>Add external Python functions and constants using an import. Enter a module name and list of symbols to import (comma-separated or &quot;*&quot; for all symbols). A blank list of symbols will import the module with its name.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

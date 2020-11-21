@@ -1,4 +1,4 @@
-#    Copyright (C) 2011 Jeremy S. Sanders
+#    Copyright (C) 2020 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -16,25 +16,12 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-"""Veusz qtwidgets module."""
+from .. import qtall as qt
 
-import sys
-from . import historycombo
-from . import historycheck
-from . import historyvaluecombo
-from . import historygroupbox
-from . import historyspinbox
-from . import recentfilesbutton
-from . import lineeditwithclear
-from . import clicklabel
+class ClickLabel(qt.QLabel):
+    """A QLabel which emits click events."""
 
-# insert widgets into the list of modules so that it can be found
-# by loadUi (any better way to do this?)
-sys.modules['historycombo'] = historycombo
-sys.modules['historycheck'] = historycheck
-sys.modules['historyvaluecombo'] = historyvaluecombo
-sys.modules['historygroupbox'] = historygroupbox
-sys.modules['historyspinbox'] = historyspinbox
-sys.modules['recentfilesbutton'] = recentfilesbutton
-sys.modules['lineeditwithclear'] = lineeditwithclear
-sys.modules['clicklabel'] = clicklabel
+    clicked = qt.pyqtSignal()
+
+    def mouseReleaseEvent(self, event):
+        self.clicked.emit()

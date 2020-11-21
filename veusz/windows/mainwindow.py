@@ -40,6 +40,7 @@ from .. import utils
 from ..utils import vzdbus
 from .. import setting
 from .. import plugins
+from ..qtwidgets.clicklabel import ClickLabel
 
 from . import consolewindow
 from . import plotwindow
@@ -198,6 +199,13 @@ class MainWindow(qt.QMainWindow):
         self.pagelabel = qt.QLabel(statusbar)
         statusbar.addPermanentWidget(self.pagelabel)
         self.pagelabel.show()
+
+        # security label
+        self.securitylabel = ClickLabel(_("Untrusted mode"), statusbar)
+        statusbar.addPermanentWidget(self.securitylabel)
+        self.securitylabel.show()
+        self.document.sigSecuritySet.connect(self.slotUpdateSecurity)
+        self.securitylabel.clicked.connect(self.slotFileTrust)
 
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt.QDir.homePath())
@@ -467,6 +475,9 @@ class MainWindow(qt.QMainWindow):
                 a(self, _('Save the current document under a new name'),
                   _('Save &As...'), self.slotFileSaveAs,
                   icon='kde-document-save-as'),
+            'file.trust':
+                a(self, _('Trust document contents'), _('Trust...'),
+                  self.slotFileTrust),
             'file.print':
                 a(self, _('Print the document'), _('&Print...'),
                   self.slotFilePrint,
@@ -623,7 +634,7 @@ class MainWindow(qt.QMainWindow):
             ['file.filerecent', _('Open &Recent'), []],
             'file.reload',
             '',
-            'file.save', 'file.saveas',
+            'file.save', 'file.saveas', 'file.trust',
             '',
             'file.print', 'file.export',
             '',
@@ -1055,22 +1066,17 @@ class MainWindow(qt.QMainWindow):
         if self.filename == '':
             self.slotFileSaveAs()
         else:
-            # show busy cursor
-            qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
             try:
-                ext = os.path.splitext(self.filename)[1]
-                mode = 'hdf5' if ext == '.vszh5' else 'vsz'
-                self.document.save(self.filename, mode)
-                self.updateStatusbar(_("Saved to %s") % self.filename)
+                with utils.OverrideCursor():
+                    ext = os.path.splitext(self.filename)[1]
+                    mode = 'hdf5' if ext == '.vszh5' else 'vsz'
+                    self.document.save(self.filename, mode)
+                    self.updateStatusbar(_("Saved to %s") % self.filename)
             except EnvironmentError as e:
-                qt.QApplication.restoreOverrideCursor()
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save document as '%s'\n\n%s") %
                     (self.filename, cstrerror(e)))
-            else:
-                # restore the cursor
-                qt.QApplication.restoreOverrideCursor()
 
     def updateTitlebar(self):
         """Put the filename into the title bar."""
@@ -1183,47 +1189,30 @@ class MainWindow(qt.QMainWindow):
         def _callbackunsafe():
             """Callback when loading document to ask whether ok to continue loading
             if unsafe commands are found."""
-            qt.QApplication.restoreOverrideCursor()
-            msgbox = qt.QMessageBox(
-                qt.QMessageBox.Warning,
-                _("Unsafe code in document"),
-                _("The document '%s' contains potentially unsafe code "
-                  "which may damage your computer or data. Please check "
-                  "that the file comes from a trusted source.") % filename,
-                qt.QMessageBox.NoButton,
-                self)
-            cont = msgbox.addButton(_("C&ontinue anyway"), qt.QMessageBox.AcceptRole)
-            stop = msgbox.addButton(_("&Stop loading"), qt.QMessageBox.RejectRole)
-            msgbox.setDefaultButton(stop)
-            msgbox.exec_()
-            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.WaitCursor))
-            return msgbox.clickedButton() is cont
+            return self.checkUnsafe()
 
         def _callbackimporterror(filename, error):
             """Ask user if they want to give a new filename in case of import
             error.
             """
-            qt.QApplication.restoreOverrideCursor()
-            msgbox = qt.QMessageBox(self)
-            msgbox.setWindowTitle(_("Import error"))
-            msgbox.setText(
-                _("Could not import data from file '%s':\n\n %s") % (
-                    filename, error))
-            msgbox.setInformativeText(_("Do you want to look for another file?"))
-            msgbox.setStandardButtons(qt.QMessageBox.Yes | qt.QMessageBox.Cancel)
-            filename = None
-            if msgbox.exec_() == qt.QMessageBox.Yes:
-                filename = qt.QFileDialog.getOpenFileName(self, "Choose data file")
-                filename = filename[0] if filename else None
-            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.WaitCursor))
+            with utils.OverrideCursor(qt.Qt.ArrowCursor):
+                msgbox = qt.QMessageBox(self)
+                msgbox.setWindowTitle(_("Import error"))
+                msgbox.setText(
+                    _("Could not import data from file '%s':\n\n %s") % (
+                        filename, error))
+                msgbox.setInformativeText(_("Do you want to look for another file?"))
+                msgbox.setStandardButtons(qt.QMessageBox.Yes | qt.QMessageBox.Cancel)
+                filename = None
+                if msgbox.exec_() == qt.QMessageBox.Yes:
+                    filename = qt.QFileDialog.getOpenFileName(self, "Choose data file")
+                    filename = filename[0] if filename else None
             return filename
 
         # save stdout and stderr, then redirect to console
         stdout, stderr = sys.stdout, sys.stderr
         sys.stdout = self.console.con_stdout
         sys.stderr = self.console.con_stderr
-
-        qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
 
         try:
             # get loading mode
@@ -1236,16 +1225,16 @@ class MainWindow(qt.QMainWindow):
                 raise document.LoadError(
                     _("Did not recognise file type '%s'") % ext)
 
-            # do the actual loading
-            self.document.load(
-                filename,
-                mode=mode,
-                callbackunsafe=_callbackunsafe,
-                callbackimporterror=_callbackimporterror)
+            with utils.OverrideCursor():
+                # do the actual loading
+                self.document.load(
+                    filename,
+                    mode=mode,
+                    callbackunsafe=_callbackunsafe,
+                    callbackimporterror=_callbackimporterror)
 
         except document.LoadError as e:
             from ..dialogs.errorloading import ErrorLoadingDialog
-            qt.QApplication.restoreOverrideCursor()
             if e.backtrace:
                 d = ErrorLoadingDialog(self, filename, cstr(e), e.backtrace)
                 d.exec_()
@@ -1254,8 +1243,6 @@ class MainWindow(qt.QMainWindow):
                     self, _("Error opening %s - Veusz") % filename,
                     cstr(e))
             return False
-
-        qt.QApplication.restoreOverrideCursor()
 
         # need to remember to restore stdout, stderr
         sys.stdout, sys.stderr = stdout, stderr
@@ -1453,8 +1440,95 @@ class MainWindow(qt.QMainWindow):
             else:
                 qt.QApplication.clipboard().setText(t)
 
-    def slotAllowedImportsDoc(self, module, names):
+    def checkUnsafe(self):
+        """Ask user if code should be unsafe."""
+
+        # we shouldn't allow these places to be added to allowed safe directories
+        badlocs = (
+            qt.QStandardPaths.standardLocations(qt.QStandardPaths.DownloadLocation) +
+            qt.QStandardPaths.standardLocations(qt.QStandardPaths.TempLocation)
+        )
+        fname = self.document.filename
+        absfile = os.path.abspath(fname)
+        filedir = '' if not fname else os.path.dirname(absfile)
+        isbadloc = False
+        if not filedir:
+            # shouldn't get here, but don't allow empty dir to be added
+            isbadloc = True
+        for path in badlocs:
+            if absfile.startswith(os.path.abspath(path) + os.sep):
+                isbadloc = True
+        # don't allow plain home directory
+        if filedir == qt.QStandardPaths.standardLocations(
+                qt.QStandardPaths.HomeLocation)[0]:
+            isbadloc = True
+
+        msgbox = qt.QMessageBox(
+            qt.QMessageBox.Warning,
+            _("Potentially unsafe code in document"),
+            _("<p><b>The document '%s' contains potentially unsafe code</b></p>"
+              "<p>Directory: '%s'</p>"
+              "<p>This file could damage your computer or data "
+              "as it can contain arbitrary code. "
+              "Please check "
+              "that the file was made by you or a trusted source.</p>") % (
+                  os.path.basename(absfile) if fname else "",
+                  filedir if fname else "",
+              ),
+            qt.QMessageBox.NoButton,
+            self,
+        )
+        allow = msgbox.addButton(_("Allow"), qt.QMessageBox.AcceptRole)
+        addloc = msgbox.addButton(_("Add to trusted locations"), qt.QMessageBox.AcceptRole)
+        addloc.setEnabled(not isbadloc)
+        stop = msgbox.addButton(_("Skip"), qt.QMessageBox.RejectRole)
+
+        msgbox.setDefaultButton(stop)
+
+        # we enter here with a busy cursor often, so set back to arrow temporarily
+        with utils.OverrideCursor(qt.Qt.ArrowCursor):
+            msgbox.exec_()
+
+        clicked = msgbox.clickedButton()
+        if clicked is addloc:
+            with utils.OverrideCursor(qt.Qt.ArrowCursor):
+                button = qt.QMessageBox.warning(
+                    self, _("Are you sure?"),
+                    _("Are you really sure that you want to add directory '%s' to the "
+                      "list of trusted locations. Any file loaded from this directory "
+                      "will be trusted.") % filedir,
+                    qt.QMessageBox.Yes | qt.QMessageBox.No,
+                    qt.QMessageBox.No,
+                )
+            if button == qt.QMessageBox.Yes:
+                setting.settingdb['secure_dirs'].append(filedir)
+                return True
+            else:
+                return False
+
+        return clicked is allow
+
+    def slotUpdateSecurity(self, secure):
+        """Show or hide security label and trust menu based on security"""
+        self.securitylabel.setVisible(not secure)
+        self.vzactions['file.trust'].setVisible(not secure)
+
+    def slotAllowedImportsDoc(self):
         """Are allowed imports?"""
-        from ..dialogs.safetyimport import SafetyImportDialog
-        d = SafetyImportDialog(self, module, names)
-        d.exec_()
+        if self.checkUnsafe():
+            self.document.evaluate.setSecurity(True)
+
+    def slotFileTrust(self):
+        """User requests that document should be trusted."""
+        button = qt.QMessageBox.warning(
+            self, _("Are you sure?"),
+            _("Are you sure that you want to trust the document contents, "
+              "including any potentially dangerous code? Only trust "
+              "documents with a trusted source."),
+            qt.QMessageBox.Yes | qt.QMessageBox.No,
+            qt.QMessageBox.No,
+        )
+        if button == qt.QMessageBox.Yes:
+            self.document.evaluate.setSecurity(True)
+            # force redraw of document
+            self.plot.actionForceUpdate()

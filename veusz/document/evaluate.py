@@ -54,6 +54,21 @@ def _(text, disambiguation=None, context="Evaluate"):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
+# Notes on Security
+# -----------------
+
+# Security states:
+#  * Secure
+#    - if new document
+#    - if loaded from secure location
+#    - or allow set in dialog
+#  * Insecure (skip in dialog)
+
+# Security context:
+#  * Executing statements when loading
+#  * Importing functions
+#  * Evaluating expressions (non checking Python)
+
 class Evaluate:
     """Class to manage evaluation of expressions in a special environment."""
 
@@ -96,6 +111,9 @@ class Evaluate:
         # cached expressions which have been already evaluated as datasets
         self.exprdscache = {}
         self.exprdscachechangeset = None
+
+        # whether we hit security tests
+        self.setSecurity(False)
 
     def update(self):
         """To be called after custom constants or functions are changed.
@@ -144,28 +162,69 @@ class Evaluate:
         for name, val in self.def_colormaps:
             self._updateColormap(name, val)
 
+    def setSecurity(self, secure):
+        """Updated the security context."""
+        oldsecure = getattr(self, 'secure_document', False)
+
+        self.secure_document = secure
+        self.doc.sigSecuritySet.emit(secure)
+
+        if not oldsecure and secure:
+            # if we're now secure, and were not previously, update
+            # context
+            self.exprdscache = {}
+            self.exprdscachechangeset = None
+            self.update()
+
+    def updateSecurityFromPath(self):
+        """Make document secure if in a secure location."""
+        filename = self.doc.filename
+        absfilename = os.path.abspath(filename)
+        paths = setting.settingdb['secure_dirs'] + [
+            utils.exampleDirectory]
+        for dirname in paths:
+            absdirname = os.path.abspath(dirname)
+            if absfilename.startswith(absdirname + os.sep):
+                self.setSecurity(True)
+
+    def inSecureMode(self):
+        """Is the document in a safe location?"""
+        return (
+            setting.transient_settings['unsafe_mode'] or
+            self.secure_document
+        )
+
     def _updateImport(self, module, val):
         """Add an import statement to the eval function context."""
         if module_re.match(module):
             # work out what is safe to import
             symbols = identifier_split_re.findall(val)
-            toimport = self._processSafeImports(module, symbols)
-            if toimport:
-                defn = 'from %s import %s' % (
-                    module, ', '.join(toimport))
-                try:
-                    cexec(defn, self.context)
-                except Exception:
+            if self._checkImportsSafe():
+                if symbols:
+                    defn = 'from %s import %s' % (
+                        module, ', '.join(symbols))
+                    try:
+                        cexec(defn, self.context)
+                    except Exception:
+                        self.doc.log(_(
+                            "Failed to import '%s' from module '%s'") % (
+                                ', '.join(toimport), module))
+                        return
+                else:
+                    defn = 'import %s' % module
+                    try:
+                        cexec(defn, self.context)
+                    except Exception:
+                        self.doc.log(_(
+                            "Failed to import module '%s'") % module)
+                        return
+            else:
+                if not symbols:
+                    self.doc.log(_("Did not import module '%s'") % module)
+                else:
                     self.doc.log(_(
-                        "Failed to import '%s' from module '%s'") % (
-                            ', '.join(toimport), module))
-                    return
-
-            delta = set(symbols)-set(toimport)
-            if delta:
-                self.doc.log(_(
-                    "Did not import '%s' from module '%s'") % (
-                        ', '.join(list(delta)), module))
+                        "Did not import '%s' from module '%s'") % (
+                            ', '.join(list(symbols)), module))
 
         else:
             self.doc.log( _("Invalid module name '%s'") % module )
@@ -270,7 +329,8 @@ class Evaluate:
         try:
             checked = utils.compileChecked(
                 expr,
-                ignoresecurity=setting.transient_settings['unsafe_mode'])
+                ignoresecurity=self.inSecureMode(),
+            )
         except utils.SafeEvalException as e:
             if log:
                 self.doc.log(
@@ -356,57 +416,15 @@ class Evaluate:
             self.doc, expr, part=part, datatype=datatype, dimensions=dimensions)
         return ds
 
-    def _processSafeImports(self, module, symbols):
-        """Check what symbols are safe to import."""
-
-        # empty list
-        if not symbols:
-            return symbols
+    def _checkImportsSafe(self):
+        """Check whether symbols are safe to import."""
 
         # do import anyway
-        if setting.transient_settings['unsafe_mode']:
-            return symbols
+        if self.inSecureMode():
+            return True
 
-        # two-pass to ask user whether they want to import symbol
-        for thepass in range(2):
-            # remembered during session
-            a = 'import_allowed'
-            if a not in setting.transient_settings:
-                setting.transient_settings[a] = defaultdict(set)
-            allowed = setting.transient_settings[a][module]
-
-            # not allowed during session
-            a = 'import_notallowed'
-            if a not in setting.transient_settings:
-                setting.transient_settings[a] = defaultdict(set)
-            notallowed = setting.transient_settings[a][module]
-
-            # remembered in setting file
-            a = 'import_allowed'
-            if a not in setting.settingdb:
-                setting.settingdb[a] = {}
-            if module not in setting.settingdb[a]:
-                setting.settingdb[a][module] = {}
-            allowed_always = setting.settingdb[a][module]
-
-            # collect up
-            toimport = []
-            possibleimport = []
-            for symbol in symbols:
-                if symbol in allowed or symbol in allowed_always:
-                    toimport.append(symbol)
-                elif symbol not in notallowed:
-                    possibleimport.append(symbol)
-
-            # nothing to do, so leave
-            if not possibleimport:
-                break
-
-            # only ask the user the first time
-            if thepass == 0:
-                self.doc.sigAllowedImports.emit(module, possibleimport)
-
-        return toimport
+        self.doc.sigAllowedImports.emit()
+        return self.inSecureMode()
 
     def getColormap(self, name, invert):
         """Get colormap with name given (returning grey if does not exist)."""
