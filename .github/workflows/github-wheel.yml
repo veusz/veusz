@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-18.04]
     env:
       CIBW_BEFORE_ALL_LINUX: "pip install aqtinstall; aqt install --outputdir=Qt 5.15.1 linux desktop"
-      CIBW_ENVIRONMENT: "PATH=Qt/bin/5.15.1/gcc_64/bin:$PATH"
+      CIBW_ENVIRONMENT: "PATH=Qt/5.15.1/gcc_64/bin:$PATH"
       CIBW_BEFORE_BUILD: "pip install --upgrade pip setuptools; pip install -r requirements.txt"
       CIBW_SKIP: "cp27-* cp35-* cp36-* pp*"
 
