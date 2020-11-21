@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-18.04, windows-latest, macos-latest]
     env:
       CIBW_BEFORE_BUILD: "pip install --upgrade pip; pip install -r requirements.txt"
-      CIBW_SKIP: "cp27-* cp35-* pp*"
+      CIBW_SKIP: "cp27-* cp35-* cp36-* pp*"
 
     steps:
       - uses: actions/checkout@v2
