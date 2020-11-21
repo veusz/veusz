@@ -18,7 +18,7 @@ jobs:
       matrix:
         os: [ubuntu-18.04, windows-latest, macos-latest]
     env:
-      CIBW_BEFORE_BUILD: "python3 -m pip install -r requirements.txt"
+      CIBW_BEFORE_BUILD: "pip install -r requirements.txt"
 
     steps:
       - uses: actions/checkout@v2
