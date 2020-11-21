@@ -1,3 +1,24 @@
+Changes in 3.3:
+  * New histogramming widget (histo)
+  * Add keyboard shortcut for showing/hiding widgets (Ctrl+[ and Ctrl+])
+  * New security model allows running arbitrary code for documents in
+    allowed locations
+  * Allow Python-level module imports
+  * New separate lo and hi error bar styles (#428)
+  * Use same colour for key title as key text (#414)
+  * Add preferences for number of significant figures in picker
+  * New colormaps: inferno, magma, moreland, parula, plasma and viridis
+  * Add CurrentPath() API command to get current widget path
+  * Add dataset operations for reversing and subtracting dataset maximum
+  * Now supports building using sip5
+  * Bugfix for values in boxplots (#455)
+  * Add setting to optionally omit paths in document files
+  * New flight-recorder and histogram examples
+  * Make sure line around arrows is solid (#429)
+  * README is now renamed to README.md
+  * Switch to unsigned long long for widget IDs to fix build
+  * Add multiline FieldTextEdit (#392) field
+
 Changes in 3.2.1:
  Bug fixes:
   * Fix too large page size in SVG export
@@ -791,4 +812,3 @@ Minor bug fixes:
  * Disable data edit dialog context menu when no datasets
  * Loading files with unicode filenames on command line
  * Do not allow non finite float settings
-

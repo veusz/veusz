@@ -1,4 +1,4 @@
-# [Veusz 3.2.1](https://veusz.github.io)
+# [Veusz 3.3](https://veusz.github.io)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -10,29 +10,25 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-## Changes in 3.2.1
-  * Fix too large page size in SVG export
-  * Reenable compression for PNG export
-  * Fix crash in HDF5 import dialog
-  * If filename extension is missing in export dialog, add it and avoid crash
-  * Take account of QT_LIBINFIX setting for unusual Qt installs
-  * Add \wtilde text command to place a tilde over text
-
-## Changes in 3.2
-  * Add ability to plot image widget using boxes rather than a bitmap, with new drawing mode option
-  * Add widget order option in key widget
-  * Export dialog now uses multiple threads
-  * Python 3.9 compatibility fixes
-  * Show exception dialog if crash occurs outside main thread
-  * Added Brazilian Portuguese description for desktop file
-  * Use python3 by default for in-place run
-  * Fix icons in tutorial
-  * Fix case when positions in bar widget are set, then removed
-  * Truly all files are shown in import dialog, if requested
-  * Fix browse button in export dialog
-  * Fix stylesheet for polygon widget
-  * Fix invalid escape sequences warnings
-  * Fix parametric date creation for non-English locales
+## Changes in 3.3
+  * New histogramming widget (histo)
+  * Add keyboard shortcut for showing/hiding widgets (Ctrl+[ and Ctrl+])
+  * New security model allows running arbitrary code for documents in allowed locations
+  * Allow Python-level module imports
+  * New separate lo and hi error bar styles (#428)
+  * Use same colour for key title as key text (#414)
+  * Add preferences for number of significant figures in picker
+  * New colormaps: inferno, magma, moreland, parula, plasma and viridis
+  * Add CurrentPath() API command to get current widget path
+  * Add dataset operations for reversing and subtracting dataset maximum
+  * Now supports building using sip5
+  * Bugfix for values in boxplots (#455)
+  * Add setting to optionally omit paths in document files
+  * New flight-recorder and histogram examples
+  * Make sure line around arrows is solid (#429)
+  * README is now renamed to README.md
+  * Switch to unsigned long long for widget IDs to fix build
+  * Add multiline FieldTextEdit (#392) field
 
 ## Features of package:
 
@@ -105,7 +101,7 @@ external sources such as Internet sockets or other programs.
 * [Ghostscript](https://www.ghostscript.com/) (for EPS/PS output)
 
 ## License
-Veusz is Copyright (C) 2003-2020 Jeremy Sanders <jeremy@jeremysanders.net>
+Veusz is Copyright (C) 2003-2020 Jeremy Sanders
  and contributors. It is licensed under the [GPL version 2 or greater](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
 
 The latest source code can be found in [this GitHub repository](https://github.com/veusz/veusz).
