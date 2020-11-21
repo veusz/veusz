@@ -36,7 +36,7 @@ SetCompressor /solid lzma
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
 !define MUI_FINISHPAGE_RUN "$INSTDIR\veusz.exe"
-!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.md"
+!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION ShowReadme
 !insertmacro MUI_PAGE_FINISH
 
@@ -48,9 +48,19 @@ SetCompressor /solid lzma
 
 ; MUI end ------
 
+!include "x64.nsh"
+
+Function .onInit
+  ${IfNot} ${RunningX64}
+    MessageBox MB_OK|MB_ICONINFORMATION "This installer is for 64 bit (x64) Windows only. Exiting."
+    Abort
+  ${EndIf}
+  SetRegView 64
+FunctionEnd
+
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "veusz-${PRODUCT_VERSION}-windows-setup.exe"
-InstallDir "$PROGRAMFILES\Veusz"
+OutFile "veusz-${PRODUCT_VERSION}-x64-windows-setup.exe"
+InstallDir "$PROGRAMFILES64\Veusz"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
@@ -62,6 +72,21 @@ Section "" SecUninstallPrevious
 SectionEnd
 
 Function UninstallPrevious
+    SetRegView 32
+
+    ; Check for uninstaller.
+    ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
+    ${If} $R0 == ""
+        Goto Next
+    ${EndIf}
+
+    DetailPrint "Removing previous installation (32 bit)."
+
+    ; Run the uninstaller
+    ExecWait '"$R0" _?=$INSTDIR'
+
+    Next:
+    SetRegView 64
 
     ; Check for uninstaller.
     ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString"
@@ -69,7 +94,7 @@ Function UninstallPrevious
         Goto Done
     ${EndIf}
 
-    DetailPrint "Removing previous installation."
+    DetailPrint "Removing previous installation (64 bit)."
 
     ; Run the uninstaller
     ExecWait '"$R0" _?=$INSTDIR'
@@ -79,6 +104,8 @@ Function UninstallPrevious
 FunctionEnd
 
 Section "MainSection" SEC01
+  SetRegView 64
+
   SetOutPath "$INSTDIR"
   SetOverwrite try
   File "${PYINST_DIR}\*.exe"
@@ -156,12 +183,16 @@ Section "MainSection" SEC01
 SectionEnd
 
 Section -AdditionalIcons
+  SetRegView 64
+
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\Veusz\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
   CreateShortCut "$SMPROGRAMS\Veusz\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 Section -Post
+  SetRegView 64
+
   WriteUninstaller "$INSTDIR\uninst.exe"
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\veusz.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
@@ -188,6 +219,8 @@ Function ShowReadme
 FunctionEnd
 
 Section Uninstall
+  SetRegView 64
+
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
 

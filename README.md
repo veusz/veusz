@@ -29,6 +29,8 @@ external sources such as Internet sockets or other programs.
   * README is now renamed to README.md
   * Switch to unsigned long long for widget IDs to fix build
   * Add multiline FieldTextEdit (#392) field
+  * Windows binary now built only for 64 bit
+  * MacOS binary now built for High Sierra (10.13) or later
 
 ## Features of package:
 

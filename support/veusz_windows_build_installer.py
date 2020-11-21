@@ -24,7 +24,7 @@ for d in ('build', 'dist'):
 
 call(['python', 'setup.py', 'build'])
 
-for ext in glob.glob('build/lib.win32-*/veusz/helpers/*.pyd'):
+for ext in glob.glob('build/lib.win-amd64-*/veusz/helpers/*.pyd'):
     print('copying', ext)
     shutil.copy2(ext, 'veusz/helpers/')
 
