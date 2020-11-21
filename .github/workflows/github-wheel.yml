@@ -28,16 +28,20 @@ jobs:
 
       - name: Install cibuildwheel
         run: |
-          python -m pip install cibuildwheel==1.6.4
+          python3 -m pip install cibuildwheel==1.6.4
 
       - name: Install Visual C++ for Python 2.7
         if: runner.os == 'Windows'
         run: |
           choco install vcpython27 -f -y
 
+      - name: Install requirements
+        run: |
+          python3 -m pip install -r requirements.txt
+
       - name: Build wheels
         run: |
-          python -m cibuildwheel --output-dir wheelhouse
+          python3 -m cibuildwheel --output-dir wheelhouse
 
       - uses: actions/upload-artifact@v2
         with:
@@ -54,8 +58,12 @@ jobs:
         with:
           python-version: '3.7'
 
+      - name: Install cibuildwheel
+        run: |
+          python3 -m pip install numpy
+
       - name: Build sdist
-        run: python setup.py sdist
+        run: python3 setup.py sdist
 
       - uses: actions/upload-artifact@v2
         with:
