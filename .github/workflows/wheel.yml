@@ -18,7 +18,8 @@ jobs:
       matrix:
         os: [ubuntu-18.04]
     env:
-      CIBW_BEFORE_ALL_LINUX: "PYBIN=/opt/python/cp38-cp38/bin && $PYBIN/pip install aqtinstall && $PYBIN/aqt install --outputdir=Qt 5.15.1 linux desktop && ln -s Qt/*/*/bin/qmake /usr/local/bin"
+      CIBW_BEFORE_ALL_LINUX: "PYBIN=/opt/python/cp38-cp38/bin && $PYBIN/pip install aqtinstall && $PYBIN/aqt install --outputdir=Qt 5.15.1 linux desktop"
+      CIBW_ENVINRONMENT: "PATH=Qt/5.15.1/gcc_64/bin:$PATH"
       CIBW_BEFORE_BUILD: "python -m pip install --upgrade pip setuptools; python -m pip install -r requirements.txt"
       CIBW_SKIP: "cp27-* cp35-* cp36-* pp*"
 
