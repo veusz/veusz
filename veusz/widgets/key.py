@@ -402,7 +402,7 @@ class Key(widget.Widget):
         if s.title != '':
             titlefont = qt.QFont(font)
             painter.setPen(textpen)
-            titlefont.setPointSize(
+            titlefont.setPointSizeF(
                 max(font.pointSize() * 1.2, font.pointSize() + 2))
             titlewidth, titleheight = utils.Renderer(
                 painter, titlefont,
