@@ -366,7 +366,7 @@ class Text(Settings):
         if self.bold:
             weight = qt.QFont.Bold
 
-        f = qt.QFont(self.font, size,  weight, self.italic)
+        f = qt.QFont(self.font, int(size), weight, self.italic)
         if self.underline:
             f.setUnderline(True)
         f.setStyleHint(qt.QFont.Times)
