@@ -41,8 +41,8 @@ class DrawState(object):
 
         self.widget = widget
         self.record = RecordPaintDevice(
-            helper.pagesize[0], helper.pagesize[1],
-            helper.dpi[0], helper.dpi[1])
+            int(helper.pagesize[0]), int(helper.pagesize[1]),
+            int(helper.dpi[0]), int(helper.dpi[1]))
         self.bounds = bounds
         self.clip = clip
 
