@@ -461,6 +461,29 @@ class Histo(GenericPlotter):
         if maxv is not None:
             axrange[1] = max(axrange[1], maxv)
 
+    def drawKeySymbol(self, number, painter, x, y, width, height):
+        """Draw the line fill for the key."""
+
+        s = self.settings
+
+        # draw fill setting
+        yp = y + height/2
+        for fill in s.Fill1, s.Fill2:
+            if not fill.hide:
+                if fill.mode =='over':
+                    y2 = yp-height*0.45
+                else:
+                    y2 = yp+height*0.45
+                path = qt.QPainterPath()
+                path.addRect(qt.QRectF(
+                    qt.QPointF(x, yp), qt.QPointF(x+width, y2)))
+                utils.brushExtFillPath(painter, fill, path)
+
+        # draw line
+        if not s.Line.hide:
+            painter.setPen( s.Line.makeQPen(painter) )
+            painter.drawLine( qt.QPointF(x, yp), qt.QPointF(x+width, yp) )
+
     def dataDraw(self, painter, axes, posn, cliprect):
         """Draw the histogram."""
 
