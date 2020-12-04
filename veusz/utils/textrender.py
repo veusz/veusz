@@ -1520,7 +1520,7 @@ class _MmlRenderer(_Renderer):
         if ptsize < 0:
             ptsize = self.font.pixelSize() / self.painter.pixperpt
 
-        doc.setBaseFontPointSize(ptsize * upscale)
+        doc.setBaseFontPointSize(int(ptsize * upscale))
 
         # the output will be painted finally scaled
         self.drawscale = (
