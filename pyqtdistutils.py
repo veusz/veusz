@@ -281,7 +281,7 @@ class build_ext(distutils.command.build_ext.build_ext):
                 self._sip_compile(sip_exe, sip_dir, sip, sip_builddir)
             out = [
                 os.path.join(sip_builddir, fn)
-                for fn in os.listdir(sip_builddir)
+                for fn in sorted(os.listdir(sip_builddir))
                 if fn.endswith(".cpp")
             ]
             generated_sources.extend(out)
