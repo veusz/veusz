@@ -641,6 +641,8 @@ class _AxisGraphicsLineItem(qt.QGraphicsLineItem, _ScaledShape):
         qt.QGraphicsLineItem.mouseMoveEvent(self, event)
         self.parent.doLineUpdate()
 
+
+
 class ControlAxisLine(object):
     """Controlling position of an axis."""
 
@@ -655,6 +657,10 @@ class ControlAxisLine(object):
         self.axisorigpos = self.axispos = axispos
         self.maxposn = maxposn
         self.cgscale = painthelper.cgscale
+        self.reset = None
+
+    def done_reset(self):
+        return self.reset is not None
 
     def zoomed(self):
         """Is this a zoom?"""
@@ -662,25 +668,41 @@ class ControlAxisLine(object):
 
     def moved(self):
         """Has axis moved?"""
-        return ( self.minpos != self.minorig or self.maxpos != self.maxorig or
-                 self.axisorigpos != self.axispos )
+        return (
+            self.minpos != self.minorig or self.maxpos != self.maxorig or
+            self.axisorigpos != self.axispos
+        )
 
     def createGraphicsItem(self, parent):
         return _GraphAxisLine(parent, self)
 
+class _AxisRange(_ShapeCorner):
+    """A control item which allows double click for a reset."""
+
+    def mouseDoubleClickEvent(self, event):
+        qt.QGraphicsRectItem.mouseDoubleClickEvent(self, event)
+        self.parentItem().resetRange(self)
+
 class _GraphAxisLine(qt.QGraphicsItem):
 
-    curs = {True: qt.Qt.SizeVerCursor,
-            False: qt.Qt.SizeHorCursor}
-    curs_zoom = {True: qt.Qt.SplitVCursor,
-                 False: qt.Qt.SplitHCursor}
+    # cursors to use
+    curs = {
+        True: qt.Qt.SizeVerCursor,
+        False: qt.Qt.SizeHorCursor
+    }
+    curs_zoom = {
+        True: qt.Qt.SplitVCursor,
+        False: qt.Qt.SplitHCursor
+    }
 
     def __init__(self, parent, params):
         """Line is about to be shown."""
         qt.QGraphicsItem.__init__(self, parent)
         self.params = params
-        self.pts = [ _ShapeCorner(self, params), _ShapeCorner(self, params),
-                     _ShapeCorner(self, params), _ShapeCorner(self, params) ]
+        self.pts = [
+            _ShapeCorner(self, params), _ShapeCorner(self, params),
+            _AxisRange(self, params), _AxisRange(self, params)
+        ]
         self.line = _AxisGraphicsLineItem(self, params)
 
         # set cursors and tooltips for items
@@ -690,7 +712,7 @@ class _GraphAxisLine(qt.QGraphicsItem):
             p.setToolTip("Move axis ends")
         for p in self.pts[2:]:
             p.setCursor(self.curs_zoom[not self.horz])
-            p.setToolTip("Change axis scale")
+            p.setToolTip("Change axis scale. Double click to reset end.")
         self.line.setCursor( self.curs[self.horz] )
         self.line.setToolTip("Move axis position")
         self.setZValue(2.)
@@ -783,3 +805,12 @@ class _GraphAxisLine(qt.QGraphicsItem):
 
     def paint(self, painter, option, widget):
         """Intentionally empty painter."""
+
+    def resetRange(self, corner):
+        """User wants to reset range."""
+
+        if corner is self.pts[2]:
+            self.params.reset = 0
+        else:
+            self.params.reset = 1
+        self.updateWidget()

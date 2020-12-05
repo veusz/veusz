@@ -1201,9 +1201,11 @@ class Axis(widget.Widget):
         s = self.settings
 
         # make control item for axis
-        phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
-            self, phelper, s.direction, self.coordParr1,
-            self.coordParr2, self.coordPerp, posn) ])
+        phelper.setControlGraph(self, [
+            controlgraph.ControlAxisLine(
+                self, phelper, s.direction, self.coordParr1,
+                self.coordParr2, self.coordPerp, posn)
+        ])
 
         # get tick vals
         coordticks = self._graphToPlotter(self.majortickscalc)
@@ -1251,13 +1253,36 @@ class Axis(widget.Widget):
         s = self.settings
         p = cgi.maxposn
 
-        if cgi.zoomed():
+        if cgi.done_reset():
+            c1, c2, c1delt, c2delt = self.plotterToGraphCoords(
+                cgi.maxposn, N.array([
+                    cgi.minzoom, cgi.maxzoom,
+                    cgi.minzoom+1, cgi.maxzoom-1
+                ]))
+            reset = cgi.reset
+            if c1 > c2:
+                reset = 1 - reset
+
+            ops = []
+            if reset == 0:
+                ops.append( document.OperationSettingSet(
+                    s.get('min'), 'Auto') )
+            elif reset == 1:
+                ops.append( document.OperationSettingSet(
+                    s.get('max'), 'Auto') )
+
+            self.document.applyOperation(
+                document.OperationMultiple(ops, descr=_('reset axis')))
+
+        elif cgi.zoomed():
             # zoom axis scale
             # we convert a neighbouring pixel to see how we should
             # round the text
             c1, c2, c1delt, c2delt = self.plotterToGraphCoords(
-                cgi.maxposn, N.array([cgi.minzoom, cgi.maxzoom,
-                                      cgi.minzoom+1, cgi.maxzoom-1]))
+                cgi.maxposn, N.array([
+                    cgi.minzoom, cgi.maxzoom,
+                    cgi.minzoom+1, cgi.maxzoom-1
+                ]))
             if c1 > c2:
                 c1, c2 = c2, c1
                 c1delt, c2delt = c2delt, c1delt
