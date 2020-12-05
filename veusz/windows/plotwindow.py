@@ -482,6 +482,33 @@ class PlotWindow( qt.QGraphicsView ):
 
         return self.viewtoolbar
 
+    def getAxesForPosition(self, pt):
+        """Given QPoint(pt), get axes associated with position.
+
+        This is not very nice. This should be abstracted somewhere else.
+        """
+
+        # try to work out in which widget the first point is in
+        widget = self.painthelper.pointInWidgetBounds(
+            pt.x(), pt.y(), widgets.Graph)
+        if widget is None:
+            return
+
+        axes = set()
+
+        # iterate over children, to look for plotters
+        for c in widget.children:
+            if isinstance(c, widgets.GenericPlotter):
+                # get axes associated with plotter
+                caxes = c.parent.getAxes(
+                    (c.settings.xAxis, c.settings.yAxis) )
+
+                for a in caxes:
+                    if a:
+                        axes.add(a)
+
+        return axes
+
     def doZoomRect(self, endpos):
         """Take the zoom rectangle drawn by the user and do the zooming.
         endpos is a QPoint end point
@@ -511,10 +538,8 @@ class PlotWindow( qt.QGraphicsView ):
         pt1 /= self.painthelper.cgscale
         pt2 /= self.painthelper.cgscale
 
-        # try to work out in which widget the first point is in
-        widget = self.painthelper.pointInWidgetBounds(
-            pt1.x(), pt1.y(), widgets.Graph)
-        if widget is None:
+        axes = self.getAxesForPosition(pt1)
+        if not axes:
             return
 
         # convert points on plotter to points on axis for each axis
@@ -524,19 +549,6 @@ class PlotWindow( qt.QGraphicsView ):
 
         # build up operation list to do zoom
         operations = []
-
-        axes = {}
-        # iterate over children, to look for plotters
-        for c in [i for i in widget.children if
-                  isinstance(i, widgets.GenericPlotter)]:
-
-            # get axes associated with plotter
-            caxes = c.parent.getAxes( (c.settings.xAxis,
-                                      c.settings.yAxis) )
-
-            for a in caxes:
-                if a:
-                    axes[a] = True
 
         # iterate over each axis, and update the ranges
         for axis in axes:
@@ -562,20 +574,23 @@ class PlotWindow( qt.QGraphicsView ):
             # build up operations to change axis
             if s.min != r[0]:
                 operations.append( document.OperationSettingSet(
-                        s.get('min'),
-                        utils.round2delt(r[0], r[2])) )
+                    s.get('min'),
+                    utils.round2delt(r[0], r[2])) )
 
             if s.max != r[1]:
                 operations.append( document.OperationSettingSet(
-                        s.get('max'),
-                        utils.round2delt(r[1], r[3])) )
+                    s.get('max'),
+                    utils.round2delt(r[1], r[3])) )
 
         # finally change the axes
         self.document.applyOperation(
             document.OperationMultiple(operations,descr=_('zoom axes')) )
 
     def axesForPoint(self, mousepos):
-        """Find all the axes which contain the given mouse position"""
+        """Find all the axes which contain the given mouse position.
+
+        Returns a list of (axis, coordinate)
+        """
 
         if self.painthelper is None:
             return []
