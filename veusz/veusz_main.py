@@ -234,7 +234,7 @@ class VeuszApp(qt.QApplication):
             for filename in docs:
                 if not emptywins:
                     MainWindow.CreateWindow(filename)
-                else:
+                elif filename:
                     emptywins[0].openFile(filename)
         else:
             # create blank window

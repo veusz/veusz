@@ -75,5 +75,35 @@ app = BUNDLE(
         'CFBundleShortVersionString': version,
         'NSPrincipalClass': 'NSApplication',
         'NSHighResolutionCapable': 'True',
+
+        'CFBundleDocumentTypes': [{
+                'CFBundleTypeIconFile': 'veusz.icns',
+                'CFBundleTypeName': 'Veusz document',
+                'CFBundleTypeRole': 'Editor',
+                'LSItemContentTypes': ['org.veusz.document', 'org.veusz.document_hdf5'],
+                'LSHandlerRank': 'Owner',
+            }],
+        'UTExportedTypeDeclarations': [
+            {
+                'UTTypeConformsTo': ['public.data'],
+                'UTTypeDescription': 'Veusz document',
+                'UTTypeIconFile': 'veusz.icns',
+                'UTTypeIdentifier': 'org.veusz.document',
+                'UTTypeTagSpecification': {
+                    'public.filename-extension': 'vsz',
+                    'public.mime-type': 'application/vnd.veusz.document',
+                }
+            },
+            {
+                'UTTypeConformsTo': ['public.data'],
+                'UTTypeDescription': 'Veusz HDF5 document',
+                'UTTypeIconFile': 'veusz.icns',
+                'UTTypeIdentifier': 'org.veusz.document_hdf5',
+                'UTTypeTagSpecification': {
+                    'public.filename-extension': 'vszh5',
+                    'public.mime-type': 'application/vnd.veusz.document_hdf5',
+                }
+            },
+        ]
     }
 )
