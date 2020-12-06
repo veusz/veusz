@@ -1,4 +1,4 @@
-# [Veusz 3.3](https://veusz.github.io)
+# [Veusz 3.3.1](https://veusz.github.io)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -9,6 +9,16 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+## Changes in 3.3.1
+  * New tools for zooming into plot on click, zooming out, moving plot center and resetting plot axes
+  * Double clicking on axis range resets endpoint to Auto
+  * Add key entries for histo widget
+  * MacOS improvements
+    * Big Sur compatibility fix
+    * Fix file associations
+  * Python 3.10 prerelease fixes
+  * Fix for reproducible builds
 
 ## Changes in 3.3
   * New histogramming widget (histo)

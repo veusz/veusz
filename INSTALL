@@ -42,7 +42,7 @@ To install on Linux to the standard location on the hard disk follow
 these instructions (note python in these commands should be replaced
 by python3 to do a Python 3 installation).
 
-# cd veusz-3.3
+# cd veusz-3.3.1
 # python setup.py build
 # su
 [enter root password]
@@ -147,8 +147,8 @@ can currently be run from its own directory. Before this can work, the
 helper modules must be compiled and copied into the appropriate
 location.
 
-# tar xzf veusz-3.3.tar.gz                [change version here]
-# cd veusz-3.3
+# tar xzf veusz-3.3.1.tar.gz                [change version here]
+# cd veusz-3.3.1
 # python setup.py build                     [or use python3 here]
 # cp build/*/veusz/helpers/*.so veusz/helpers/
 
@@ -167,8 +167,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xf veusz-3.3-linux-x86_64.tar.xz   [change version here]
-# cd veusz-3.3-linux-x86_64
+# tar xf veusz-3.3.1-linux-x86_64.tar.xz   [change version here]
+# cd veusz-3.3.1-linux-x86_64
 # ./veusz.exe                    [note, it's not a windows exe!]
 
 2.2 Installing in Windows
@@ -177,9 +177,9 @@ Simply run the setup.exe binary installer. Add the location of the
 embed.py file to your PYTHONPATH if you want to use the embedding
 module.
 
-2.3 Installing on Mac OS X
-==========================
-A binary is available for Mac OS X. Simply drag the Veusz application
+2.3 Installing on MacOS
+=======================
+A binary is available for MacOS. Simply drag the Veusz application
 into your Applications directory.
 
 3. NOTES FOR PACKAGERS
