@@ -121,7 +121,8 @@ class Widget(object):
         s.add( setting.Bool('hide', False,
                             descr = _('Hide object'),
                             usertext = _('Hide'),
-                            formatting = True) )
+                            formatting = True),
+               hidebox = True )
 
     def getDocument(self):
         """Return document.

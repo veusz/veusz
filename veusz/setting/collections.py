@@ -58,7 +58,8 @@ class Line(Settings):
         self.add( setting.Bool(
             'hide', False,
             descr = _('Hide the line'),
-            usertext = _('Hide')) )
+            usertext = _('Hide')),
+            hidebox = True )
 
     def makeQPen(self, painter):
         '''Make a QPen from the settings (ignoring hide).
@@ -135,11 +136,13 @@ class ErrorBarLine(Line):
         self.add( setting.Bool(
             'hideHorz', False,
             descr = _('Hide horizontal errors'),
-            usertext = _('Hide horz.')) )
+            usertext = _('Hide horz.')),
+            hidebox = True )
         self.add( setting.Bool(
             'hideVert', False,
             descr = _('Hide vertical errors'),
-            usertext=_('Hide vert.')) )
+            usertext=_('Hide vert.')),
+            hidebox = True )
 
 class Brush(Settings):
     '''Settings of a fill.'''
@@ -164,7 +167,8 @@ class Brush(Settings):
         self.add( setting.Bool(
             'hide', False,
             descr = _('Hide the fill'),
-            usertext = _('Hide')) )
+            usertext = _('Hide')),
+            hidebox = True )
 
     def makeQBrush(self, painter):
         '''Make a QBrush from the settings.'''
@@ -198,7 +202,8 @@ class BrushExtended(Settings):
         self.add( setting.Bool(
                 'hide', False,
                 descr = _('Hide the fill'),
-                usertext=_('Hide')) )
+                usertext=_('Hide')),
+                hidebox = True )
 
         self.add( setting.Int(
                 'transparency', 0,
@@ -231,7 +236,8 @@ class BrushExtended(Settings):
         self.add( setting.Bool(
                 'backhide', True,
                 descr = _('Hide hatch or pattern background'),
-                usertext=_('Back hide')) )
+                usertext=_('Back hide')),
+                hidebox = True )
 
 class KeyBrush(BrushExtended):
     '''Fill used for back of key.'''
@@ -289,7 +295,8 @@ class PointFill(BrushExtended):
         self.add( setting.Bool(
             'hideerror', False,
             descr = _('Hide the filled region inside the error bars'),
-            usertext=_('Hide error fill')) )
+            usertext=_('Hide error fill')),
+            hidebox = True )
 
 class ShapeFill(BrushExtended):
     '''Filling used for filling shapes.'''
@@ -349,7 +356,8 @@ class Text(Settings):
         self.add( setting.Bool(
             'hide', False,
             descr = _('Hide the text'),
-            usertext = _('Hide')) )
+            usertext = _('Hide')),
+            hidebox = True )
 
     def copy(self):
         """Make copy of settings."""
@@ -460,7 +468,8 @@ class Line3D(Settings):
         self.add( setting.Bool(
             'hide', False,
             descr = _('Hide the line'),
-            usertext=_('Hide')) )
+            usertext=_('Hide')),
+            hidebox = True )
 
     def makeLineProp(self, painter):
         """Construct line properties object for assigning to 3D object."""
@@ -509,7 +518,8 @@ class Surface3D(Settings):
         self.add( setting.Bool(
             'hide', False,
             descr = _('Hide surface'),
-            usertext=_('Hide')) )
+            usertext=_('Hide')),
+            hidebox = True )
 
     def makeSurfaceProp(self, painter):
         """Properties to assign to surface."""
@@ -565,11 +575,13 @@ class LineGrid3D(Line3D):
         self.add( setting.Bool(
             'hidehorz', False,
             descr = _('Hide horizontal lines'),
-            usertext=_('Hide horz.')) )
+            usertext=_('Hide horz.')),
+            hidebox = True )
         self.add( setting.Bool(
             'hidevert', False,
             descr = _('Hide vertical lines'),
-            usertext=_('Hide vert.')) )
+            usertext=_('Hide vert.')),
+            hidebox = True )
 
 class Lighting3D(Settings):
     '''Lighting options.'''

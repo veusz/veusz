@@ -113,11 +113,13 @@ class TickLabel(axis.TickLabel):
         self.add( setting.Bool(
             'hideradial', False,
             descr = _('Hide radial labels'),
-            usertext=_('Hide radial') ) )
+            usertext=_('Hide radial') ),
+            hidebox = True )
         self.add( setting.Bool(
             'hidetangential', False,
             descr = _('Hide spoke labels'),
-            usertext=_('Hide spokes') ) )
+            usertext=_('Hide spokes') ),
+            hidebox = True )
 
 class Polar(NonOrthGraph):
     '''Polar plotter.'''

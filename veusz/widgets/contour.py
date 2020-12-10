@@ -102,7 +102,8 @@ class ContourFills(setting.Settings):
             'hide', False,
             descr = _('Hide fills'),
             usertext = _('Hide'),
-            formatting = True) )
+            formatting = True),
+            hidebox = True )
 
 class ContourLines(setting.Settings):
     """Settings for contour lines."""
@@ -118,7 +119,8 @@ class ContourLines(setting.Settings):
             'hide', False,
             descr = _('Hide lines'),
             usertext = _('Hide'),
-            formatting = True) )
+            formatting = True),
+            hidebox = True )
 
 class SubContourLines(setting.Settings):
     """Sub-dividing contour line settings."""
@@ -140,7 +142,8 @@ class SubContourLines(setting.Settings):
             'hide', True,
             descr=_('Hide lines'),
             usertext=_('Hide'),
-            formatting=True) )
+            formatting=True),
+            hidebox = True )
 
 class ContourLabel(setting.Text):
     """For tick labels on axes."""

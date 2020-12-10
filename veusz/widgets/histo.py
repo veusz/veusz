@@ -194,7 +194,8 @@ class FillBrush1(setting.BrushExtended):
         self.add( setting.Bool(
             'hideerror', False,
             descr = _('Hide the filled region inside the error bars'),
-            usertext=_('Hide error fill')) )
+            usertext=_('Hide error fill')),
+            hidebox = True )
 
 class FillBrush2(FillBrush1):
     def __init__(self, name, **args):
