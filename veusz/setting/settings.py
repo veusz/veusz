@@ -53,6 +53,7 @@ class Settings(object):
         self.pixmap = pixmap
         self.setnsmode = setnsmode
         self.setnames = []  # a list of names
+        self.hideboxnames = []  # a list of names (hide boxes)
         self.parent = None
 
     def copy(self):
@@ -61,52 +62,56 @@ class Settings(object):
         s = Settings(
             self.name, descr=self.descr, usertext=self.usertext,
             pixmap=self.pixmap, setnsmode=self.setnsmode )
-        for name in self.setnames:
+        for name in self.getNames():
             s.add( self.setdict[name].copy() )
         return s
 
     def getList(self):
         """Get a list of setting or settings types."""
-        return [self.setdict[n] for n in self.setnames]
+        return [self.setdict[n] for n in self.getNames()]
 
     def getSettingList(self):
         """Get a list of setting types."""
-        return [self.setdict[n] for n in self.setnames
-                if not isinstance(self.setdict[n], Settings)]
+        return [self.setdict[n] for n in self.getSettingNames()]
 
     def getSettingsList(self):
         """Get a list of settings types."""
-        return [self.setdict[n] for n in self.setnames
-                if isinstance(self.setdict[n], Settings)]
+        return [self.setdict[n] for n in self.getSettingsNames()]
 
     def getNames(self):
         """Return list of names."""
-        return self.setnames
+        return self.hideboxnames + self.setnames
 
     def getSettingNames(self):
         """Get list of setting names."""
-        return [n for n in self.setnames
+        return [n for n in self.getNames()
                 if not isinstance(self.setdict[n], Settings)]
 
     def getSettingsNames(self):
         """Get list of settings names."""
-        return [n for n in self.setnames
+        return [n for n in self.getNames()
                 if isinstance(self.setdict[n], Settings)]
 
     def isSetting(self, name):
         """Is the name a supported setting?"""
         return name in self.setdict
 
-    def add(self, setting, posn = -1, readonly = False, pixmap=None):
+    def add(self, setting, posn = -1, readonly = False, pixmap=None, hidebox=False):
         """Add a new setting with the name, or a set of subsettings."""
         name = setting.name
         if name in self.setdict:
             raise RuntimeError("Name already in settings dictionary")
         self.setdict[name] = setting
         if posn < 0:
-            self.setnames.append(name)
+            if hidebox:
+                self.hideboxnames.append(name)
+            else:
+                self.setnames.append(name)
         else:
-            self.setnames.insert(posn, name)
+            if hidebox:
+                self.hideboxnames.insert(posn, name)
+            else:
+                self.setnames.insert(posn, name)
         setting.parent = self
 
         if pixmap:
@@ -118,8 +123,15 @@ class Settings(object):
     def remove(self, name):
         """Remove name from the list of settings."""
 
-        del self.setnames[ self.setnames.index( name ) ]
         del self.setdict[ name ]
+        try:
+            self.setnames.remove( name )
+        except ValueError:
+            pass
+        try:
+            self.hideboxnames.remove( name )
+        except ValueError:
+            pass
 
     def __setattr__(self, name, val):
         """Allow us to do
@@ -195,7 +207,7 @@ class Settings(object):
             rootname += self.name + '/'
 
         text = ''.join( [self.setdict[name].saveText(saveall, rootname)
-                         for name in self.setnames] )
+                         for name in self.getNames()] )
         return text
 
     def linkToStylesheet(self, _root=None):
