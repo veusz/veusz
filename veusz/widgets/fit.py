@@ -138,47 +138,47 @@ class Fit(FunctionPlotter):
                 'values',
                 {'a': 0.0, 'b': 1.0},
                 descr = _('Variables and fit values'),
-                usertext=_('Parameters')), 1 )
+                usertext=_('Parameters')), posn = 1 )
         s.add( setting.DatasetExtended(
                 'xData', 'x',
                 descr = _('X data to fit (dataset name, list of values '
                           'or expression)'),
-                usertext=_('X data')), 2 )
+                usertext=_('X data')), posn = 2 )
         s.add( setting.DatasetExtended(
                 'yData', 'y',
                 descr = _('Y data to fit (dataset name, list of values '
                           'or expression)'),
-                usertext=_('Y data')), 3 )
+                usertext=_('Y data')), posn = 3 )
         s.add( setting.Bool(
                 'fitRange', False,
                 descr = _('Fit only the data between the '
                           'minimum and maximum of the axis for '
                           'the function variable'),
                 usertext=_('Fit only range')),
-               4 )
+               posn = 4 )
         s.add( setting.WidgetChoice(
                 'outLabel', '',
                 descr=_('Write best fit parameters to this text label '
                         'after fitting'),
                 widgettypes=('label',),
                 usertext=_('Output label')),
-               5 )
+               posn = 5 )
         s.add( setting.Str('outExpr', '',
                            descr = _('Output best fitting expression'),
                            usertext=_('Output expression')),
-               6, readonly=True )
+               posn = 6, readonly=True )
         s.add( setting.Float('chi2', -1,
                              descr = 'Output chi^2 from fitting',
                              usertext=_('Fit &chi;<sup>2</sup>')),
-               7, readonly=True )
+               posn = 7, readonly=True )
         s.add( setting.Int('dof', -1,
                            descr = _('Output degrees of freedom from fitting'),
                            usertext=_('Fit d.o.f.')),
-               8, readonly=True )
+               posn = 8, readonly=True )
         s.add( setting.Float('redchi2', -1,
                              descr = _('Output reduced-chi-squared from fitting'),
                              usertext=_('Fit reduced &chi;<sup>2</sup>')),
-               9, readonly=True )
+               posn = 9, readonly=True )
 
         f = s.get('function')
         f.newDefault('a + b*x')

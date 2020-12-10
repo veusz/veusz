@@ -62,16 +62,16 @@ class Surface3D(plotters3d.GenericPlotter3D):
             'z(x,y)',
             descr=_('Axes of plot surface'),
             usertext=_('Mode')),
-              0)
+              posn = 0)
         s.add(setting.DatasetExtended(
             'data', '',
             dimensions=2,
             descr=_('Dataset to plot'),
             usertext=_('Dataset')),
-              1)
+              posn = 1)
         s.add(setting.DataColor(
             'DataColor', dimensions=2),
-              2)
+              posn = 2)
 
         s.add(setting.Bool(
             'highres', False,

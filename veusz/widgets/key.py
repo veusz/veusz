@@ -191,7 +191,7 @@ class Key(widget.Widget):
         s.add( setting.Str(
             'title', '',
             descr=_('Key title text'),
-            usertext=_('Title')), 0 )
+            usertext=_('Title')), posn = 0 )
 
         s.add( setting.KeyBrush(
             'Background',

@@ -54,7 +54,7 @@ class ColorBar(axis.Axis):
         s.add( setting.WidgetChoice('widgetName', '',
                                     descr=_('Corresponding widget'),
                                     widgettypes=('image', 'xy', 'nonorthpoint'),
-                                    usertext = _('Widget')), 0 )
+                                    usertext = _('Widget')), posn = 0 )
 
         s.get('log').readonly = True
         s.get('datascale').readonly = True
@@ -77,7 +77,7 @@ class ColorBar(axis.Axis):
                                       descr = _('Height of colorbar'),
                                       usertext=_('Height'),
                                       formatting=True) )
-        
+
         s.add( setting.Float( 'horzManual',
                               0.,
                               descr = _('Manual horizontal fractional position'),

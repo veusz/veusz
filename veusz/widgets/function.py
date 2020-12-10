@@ -52,16 +52,16 @@ class FunctionPlotter(GenericPlotter):
             minval = 3,
             descr = _('Number of steps to evaluate the function'
                       ' over'),
-            usertext=_('Steps'), formatting=True), 0 )
+            usertext=_('Steps'), formatting=True), posn = 0 )
         s.add( setting.Choice(
             'variable', ['x', 'y'], 'x',
             descr=_('Variable the function is a function of'),
             usertext=_('Variable')),
-               0 )
+               posn = 0 )
         s.add( setting.Str(
             'function', 'x',
             descr=_('Function expression'),
-            usertext=_('Function')), 0 )
+            usertext=_('Function')), posn = 0 )
 
         s.add(setting.FloatOrAuto(
             'min', 'Auto',

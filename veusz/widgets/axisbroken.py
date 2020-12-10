@@ -58,7 +58,7 @@ class AxisBroken(axis.Axis):
                 [],
                 descr = _('Pairs of values to start and stop breaks'),
                 usertext = _('Break pairs'),
-                ), 4 )
+                ), posn = 4 )
         s.add( setting.FloatList(
                 'breakPosns',
                 [],

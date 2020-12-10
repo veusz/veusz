@@ -67,7 +67,7 @@ class MarkerLine3D(setting.Line3D):
             'scale', True,
             descr=_('Scale border with marker size'),
             usertext=_('Scale'),
-            formatting=True), 4)
+            formatting=True), posn = 4)
 
 class ErrorLine3D(setting.Line3D):
     """Error bar line."""
@@ -89,46 +89,46 @@ class Point3D(plotters3d.GenericPlotter3D):
         s.add( setting.DatasetExtended(
                 'zData', 'z',
                 descr=_('Z values, given by dataset, expression or list of values'),
-                usertext=_('Z data')), 0 )
+                usertext=_('Z data')), posn = 0 )
         s.add( setting.DatasetExtended(
                'yData', 'y',
                 descr=_('Y values, given by dataset, expression or list of values'),
-                usertext=_('Y data')), 0 )
+                usertext=_('Y data')), posn = 0 )
         s.add( setting.DatasetExtended(
                 'xData', 'x',
                 descr=_('X values, given by dataset, expression or list of values'),
-                usertext=_('X data')), 0 )
+                usertext=_('X data')), posn = 0 )
         # s.add( setting.DatasetOrStr(
         #     'labels', '',
         #     descr=_('Dataset or string to label points'),
-        #     usertext=_('Labels')), 5 )
+        #     usertext=_('Labels')), posn = 5 )
         s.add( setting.DatasetExtended(
             'scalePoints', '',
             descr = _('Scale size of markers given by dataset, expression'
                       ' or list of values'),
-            usertext=_('Scale markers')), 6 )
+            usertext=_('Scale markers')), posn = 6 )
 
         s.add( setting.Bool(
             'scalePersp', True,
             descr=_('Scale marker size using perspective'),
             usertext=_('Perspective'),
-            formatting=True), 0)
+            formatting=True), posn = 0)
         s.add( setting.Float(
             'markerSize', 10,
             minval=0, maxval=1000,
             descr=_('Size of markers (relative to plot)'),
             usertext=_('Size'),
-            formatting=True), 0 )
+            formatting=True), posn = 0 )
         s.add( setting.Color(
             'color',
             'auto',
             descr = _('Master color'),
             usertext = _('Color'),
-            formatting=True), 0 )
+            formatting=True), posn = 0 )
         s.add( setting.Marker(
             'marker', 'circle',
             descr = _('Type of marker to plot'),
-            usertext=_('Marker'), formatting=True), 0 )
+            usertext=_('Marker'), formatting=True), posn = 0 )
         s.add( setting.DataColor('Color') )
 
         s.add( PlotLine3D(

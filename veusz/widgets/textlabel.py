@@ -56,35 +56,35 @@ class TextLabel(plotters.FreePlotter):
 
         s.add( setting.DatasetOrStr('label', '',
                                     descr=_('Text to show or text dataset'),
-                                    usertext=_('Label')), 0 )
+                                    usertext=_('Label')), posn = 0 )
 
         s.add( setting.AlignHorz('alignHorz',
                                  'left',
                                  descr=_('Horizontal alignment of label'),
                                  usertext=_('Horz alignment'),
-                                 formatting=True), 7)
+                                 formatting=True), posn = 7)
         s.add( setting.AlignVert('alignVert',
                                  'bottom',
                                  descr=_('Vertical alignment of label'),
                                  usertext=_('Vert alignment'),
-                                 formatting=True), 8)
+                                 formatting=True), posn = 8)
 
         s.add( setting.Float('angle', 0.,
                              descr=_('Angle of the label in degrees'),
                              usertext=_('Angle'),
-                             formatting=True), 9 )
+                             formatting=True), posn = 9 )
 
         s.add( setting.DistancePt(
                 'margin',
                 '4pt',
                 descr = _('Margin of fill/border'),
                 usertext=_('Margin'),
-                formatting=True), 10 )
+                formatting=True), posn = 10 )
 
         s.add( setting.Bool('clip', False,
                             descr=_('Clip text to its container'),
                             usertext=_('Clip'),
-                            formatting=True), 11 )
+                            formatting=True), posn = 11 )
 
         s.add( setting.Text('Text',
                             descr = _('Text settings'),

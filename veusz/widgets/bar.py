@@ -47,7 +47,7 @@ class BarLine(setting.Settings):
         setting.Settings.__init__(self, name, **args)
         self.add( setting.LineSet('lines',
                                   [('solid', '0.5pt', 'black', False)],
-                                  descr = _('Line styles for dataset bars'), 
+                                  descr = _('Line styles for dataset bars'),
                                   usertext=_('Line styles')) )
 
 def extend1DArray(array, length, missing=0.):
@@ -77,28 +77,28 @@ class BarPlotter(GenericPlotter):
 
         s.add( setting.Strings('keys', ('',),
                                descr=_('Key text for each dataset'),
-                               usertext=_('Key text')), 0)
+                               usertext=_('Key text')), posn = 0)
 
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label bars'),
-                                    usertext=_('Labels')), 5 )
+                                    usertext=_('Labels')), posn = 5 )
 
         s.add( setting.Choice('mode', ('grouped', 'stacked', 'stacked-area'),
                               'grouped',
                               descr=_('Show datasets grouped '
                                       'together or as a single bar'),
-                              usertext=_('Mode')), 0)
+                              usertext=_('Mode')), posn = 0)
         s.add( setting.Choice('direction',
-                              ('horizontal', 'vertical'), 'vertical', 
+                              ('horizontal', 'vertical'), 'vertical',
                               descr = _('Horizontal or vertical bar chart'),
-                              usertext=_('Direction')), 0 )
+                              usertext=_('Direction')), posn = 0 )
         s.add( setting.DatasetExtended('posn', '',
                                        descr = _('Position of bars, dataset '
                                                  ' or expression (optional)'),
-                                       usertext=_('Positions')), 0 )
+                                       usertext=_('Positions')), posn = 0 )
         s.add( setting.Datasets('lengths', ('y',),
                                 descr = _('Datasets containing lengths of bars'),
-                                usertext=_('Lengths')), 0 )
+                                usertext=_('Lengths')), posn = 0 )
 
         s.add( setting.Float('barfill', 0.75,
                              minval = 0., maxval = 1.,
@@ -134,7 +134,7 @@ class BarPlotter(GenericPlotter):
         """User-friendly description."""
 
         s = self.settings
-        return _("lengths='%s', position='%s'") % (', '.join(s.lengths), 
+        return _("lengths='%s', position='%s'") % (', '.join(s.lengths),
                                                    s.posn)
 
     def affectsAxisRange(self):
@@ -158,7 +158,7 @@ class BarPlotter(GenericPlotter):
                 p = N.arange( max([len(d.data) for d in lengths]) )+1.
             else:
                 p = positions.data
-            
+
             return (labels, p)
 
         else:
@@ -171,7 +171,7 @@ class BarPlotter(GenericPlotter):
         for data in czip(*[ds.data for ds in datasets]):
             totpos = sum( [d for d in data if d > 0] )
             totneg = sum( [d for d in data if d < 0] )
-            
+
             minv = min(minv, totneg)
             maxv = max(maxv, totpos)
         return minv,  maxv
@@ -340,7 +340,7 @@ class BarPlotter(GenericPlotter):
             # convert bar length to plotter coords
             lengthcoord = axes[not ishorz].dataToPlotterCoords(
                 widgetposn, dataset['data'])
- 
+
             # these are the coordinates perpendicular to the bar
             posns1 = posns + (-usablewidth*0.5 + bardelta*dsnum +
                               (bardelta-barwidth)*0.5)
@@ -531,7 +531,7 @@ class BarPlotter(GenericPlotter):
         # where the bars are to be placed horizontally
         barposns, maxwidth = self.findBarPositions(
             lengths, positions, axes, widgetposn)
-        
+
         # only use finite positions
         origposnlen = len(barposns)
         validposn = N.isfinite(barposns)

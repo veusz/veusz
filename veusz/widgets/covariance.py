@@ -68,28 +68,28 @@ class Covariance(plotters.GenericPlotter):
         s.add( setting.DatasetExtended(
             'covyy', '',
             descr=_('Covariance matrix entry (Y,Y) [computed from data if blank]'),
-            usertext=_('Cov(Y,Y)')), 0 )
+            usertext=_('Cov(Y,Y)')), posn = 0 )
         s.add( setting.DatasetExtended(
             'covxy', '',
             descr=_('Covariance matrix entry (X,Y) [computed from data if blank]'),
-            usertext=_('Cov(X,Y)')), 0 )
+            usertext=_('Cov(X,Y)')), posn = 0 )
         s.add( setting.DatasetExtended(
             'covyx', '',
             descr=_('Covariance matrix entry (Y,X) [computed from data if blank]'),
-            usertext=_('Cov(Y,X)')), 0 )
+            usertext=_('Cov(Y,X)')), posn = 0 )
         s.add( setting.DatasetExtended(
             'covxx', '',
             descr=_('Covariance matrix entry (X,X) [computed from data if blank]'),
-            usertext=_('Cov(X,X)')), 0 )
+            usertext=_('Cov(X,X)')), posn = 0 )
 
         s.add( setting.DatasetExtended(
             'yData', 'y',
             descr=_('Y values, given by dataset, expression or list of values'),
-            usertext=_('Y data')), 0 )
+            usertext=_('Y data')), posn = 0 )
         s.add( setting.DatasetExtended(
             'xData', 'x',
             descr=_('X values, given by dataset, expression or list of values'),
-            usertext=_('X data')), 0 )
+            usertext=_('X data')), posn = 0 )
 
         s.add( CovarianceLine(
             'Line',

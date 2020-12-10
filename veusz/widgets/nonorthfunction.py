@@ -56,7 +56,7 @@ class NonOrthFunction(Widget):
         s.add(setting.FloatOrAuto('min', 'Auto',
                                   descr=_('Minimum value at which to plot function'),
                                   usertext=_('Min')))
-        
+
         s.add(setting.FloatOrAuto('max', 'Auto',
                                   descr=_('Maximum value at which to plot function'),
                                   usertext=_('Max')))
@@ -79,7 +79,7 @@ class NonOrthFunction(Widget):
         s.add( setting.Int('steps', 50,
                            descr = _('Number of steps to evaluate the function'
                                      ' over'),
-                           usertext=_('Steps'), formatting=True), 0 )
+                           usertext=_('Steps'), formatting=True), posn = 0 )
 
     @classmethod
     def allowedParentTypes(klass):

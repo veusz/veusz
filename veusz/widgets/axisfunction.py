@@ -191,21 +191,21 @@ class AxisFunction(axis.Axis):
                 settingsfalse=('min', 'max'),
                 settingstrue=('linkedaxis',),
                 descr=_('Link axis to another axis'),
-                usertext=_('Linked') ), 0 )
+                usertext=_('Linked') ), posn = 0 )
 
         s.add( setting.Str('function', 't',
                            descr=_('Monotonic function (use t as variable)'),
-                           usertext=_('Function')), 1 )
+                           usertext=_('Function')), posn = 1 )
         s.add( setting.Axis('linkedaxis', '', 'both',
                             descr =
                             _('Axis which this axis is based on'),
-                            usertext=_('Linked axis')), 6 )
+                            usertext=_('Linked axis')), posn = 6 )
         s.add( setting.FloatOrAuto('mint', 'Auto',
                                    descr=_('Minimum value of t or Auto'),
-                                   usertext=('Min t')), 7 )
+                                   usertext=('Min t')), posn = 7 )
         s.add( setting.FloatOrAuto('maxt', 'Auto',
                                    descr=_('Maximum value of t or Auto'),
-                                   usertext=('Max t')), 8 )
+                                   usertext=('Max t')), posn = 8 )
 
         s.get('autoRange').hidden = True
         s.get('autoRange').newDefault('exact')

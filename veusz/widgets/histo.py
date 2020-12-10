@@ -190,7 +190,7 @@ class FillBrush1(setting.BrushExtended):
             ('under', 'over', 'tozero'),
             'tozero',
             descr=_('Mode'),
-            usertext=_('Mode')), 0)
+            usertext=_('Mode')), posn = 0)
         self.add( setting.Bool(
             'hideerror', False,
             descr = _('Hide the filled region inside the error bars'),
@@ -248,12 +248,12 @@ class Histo(GenericPlotter):
         s.add( setting.DatasetExtended(
             'data', '',
             descr=_('Dataset to apply binning to'),
-            usertext=_('Bin dataset')), 1 )
+            usertext=_('Bin dataset')), posn = 1 )
 
         s.add( setting.DatasetExtended(
             'weights', '',
             descr=_('Optional weight applied to counts of data'),
-            usertext=_('Weights')), 3 )
+            usertext=_('Weights')), posn = 3 )
 
         s.add( setting.Choice(
             'calcmode',
@@ -264,7 +264,7 @@ class Histo(GenericPlotter):
             ),
             'counts',
             descr=_('Calculate when binning'),
-            usertext=_('Calculate')), 4 )
+            usertext=_('Calculate')), posn = 4 )
 
         s.add( setting.ChoiceSwitch(
             'binning',
@@ -274,76 +274,76 @@ class Histo(GenericPlotter):
             'constant',
             showfn=klass._showbinning,
             descr=_('Binning mode'),
-            usertext=_('Binning')), 5 )
+            usertext=_('Binning')), posn = 5 )
 
         s.add( setting.FloatOrAuto(
             'minval', 'Auto',
             descr=_('Minimum of range'),
-            usertext=_('Minimum')), 6 )
+            usertext=_('Minimum')), posn = 6 )
         s.add( setting.FloatOrAuto(
             'maxval', 'Auto',
             descr=_('Maximum of range'),
-            usertext=_('Maximum')), 7 )
+            usertext=_('Maximum')), posn = 7 )
 
         s.add( setting.ChoiceSwitch(
             'scaling',
             ('linear', 'log', 'sqrt', 'arcsinh', 'exp', 'sqr', 'sinh'),
             'linear',
             descr=_('Data scaling before creating bins'),
-            usertext=_('Bin scaling')), 9 )
+            usertext=_('Bin scaling')), posn = 9 )
         s.add( setting.Int(
             'numbins', 10,
             minval=1, maxval=100000,
             descr=_('Number of bins'),
-            usertext=_('Number')), 9 )
+            usertext=_('Number')), posn = 9 )
         s.add( setting.FloatList(
             'manual',
             [],
             descr=_('Manual binning edges'),
-            usertext=_('Manual')), 10 )
+            usertext=_('Manual')), posn = 10 )
 
         s.add( setting.Choice(
             'errormode',
             ('none', 'sqrt', 'gehrels'),
             'gehrels',
             descr=_('Error estimation'),
-            usertext=_('Uncertainty')), 11 )
+            usertext=_('Uncertainty')), posn = 11 )
 
         s.add( setting.Choice(
             'direction',
             ('horizontal', 'vertical'),
             'vertical',
             descr=_('Bars direction'),
-            usertext=_('Direction')), 12 )
+            usertext=_('Direction')), posn = 12 )
 
         s.add( setting.Color(
             'color',
             'auto',
             descr = _('Master color'),
             usertext = _('Color'),
-            formatting=True), 0 )
+            formatting=True), posn = 0 )
         s.add( setting.Choice(
             'style',
             ('step', 'join'),
             'step',
             descr = _('Drawing style'),
             usertext = _('Style'),
-            formatting=True), 1 )
+            formatting=True), posn = 1 )
         s.add( setting.Marker(
             'marker',
             'none',
             descr = _('Type of marker to plot'),
-            usertext=_('Marker'), formatting=True), 2 )
+            usertext=_('Marker'), formatting=True), posn = 2 )
         s.add( setting.DistancePt(
             'markerSize',
             '3pt',
             descr = _('Size of marker to plot'),
-            usertext=_('Marker size'), formatting=True), 3 )
+            usertext=_('Marker size'), formatting=True), posn = 3 )
         s.add( setting.ErrorStyle(
             'errorStyle',
             'none',
             descr=_('Style of error bars to plot'),
-            usertext=_('Error style'), formatting=True), 4 )
+            usertext=_('Error style'), formatting=True), posn = 4 )
 
         s.add( PlotLine(
             'Line',

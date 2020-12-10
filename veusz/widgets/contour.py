@@ -200,50 +200,50 @@ class Contour(plotters.GenericPlotter):
             dimensions = 2,
             descr = _('Dataset to plot'),
             usertext=_('Dataset')),
-               0 )
+               posn = 0 )
         s.add( setting.FloatOrAuto(
             'min', 'Auto',
             descr = _('Minimum value of contour scale'),
             usertext=_('Min. value')),
-               1 )
+               posn = 1 )
         s.add( setting.FloatOrAuto(
             'max', 'Auto',
             descr = _('Maximum value of contour scale'),
             usertext=_('Max. value')),
-               2 )
+               posn = 2 )
         s.add( setting.Int(
             'numLevels', 5,
             minval = 1,
             descr = _('Number of contour levels to plot'),
             usertext=_('Number levels')),
-               3 )
+               posn = 3 )
         s.add( setting.Choice(
             'scaling',
             ['linear', 'sqrt', 'log', 'squared', 'manual'],
             'linear',
             descr = _('Scaling between contour levels'),
             usertext=_('Scaling')),
-               4 )
+               posn = 4 )
         s.add( setting.FloatList(
             'manualLevels',
             [],
             descr = _('Levels to use for manual scaling'),
             usertext=_('Manual levels')),
-               5 )
+               posn = 5 )
 
         s.add( setting.Bool(
             'keyLevels',
             False,
             descr=_('Show levels in key'),
             usertext=_('Levels in key')),
-               6 )
+               posn = 6 )
 
         s.add( setting.FloatList(
             'levelsOut',
             [],
             descr = _('Levels used in the plot'),
             usertext=_('Output levels')),
-               7, readonly=True )
+               posn = 7, readonly=True )
 
         s.add( ContourLabel(
             'ContourLabels',

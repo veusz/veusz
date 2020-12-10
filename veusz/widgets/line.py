@@ -62,40 +62,40 @@ class Line(plotters.FreePlotter):
                     'first and second points'),
             usertext=_('Mode'),
             formatting=False,
-            showfn=klass.showOrHideSetn), 0)
+            showfn=klass.showOrHideSetn), posn = 0)
 
         s.add( setting.DatasetExtended(
             'length',
             [0.2],
             descr=_('List of fractional lengths, dataset or expression'),
             usertext=_('Lengths'),
-            formatting=False), 4 )
+            formatting=False), posn = 4 )
         s.add( setting.DatasetExtended(
             'angle',
             [0.],
             descr=_('List of angle of lines, dataset or expression '
                     '(degrees)'),
             usertext=_('Angles'),
-            formatting=False), 5 )
+            formatting=False), posn = 5 )
         s.add( setting.DatasetExtended(
             'xPos2',
             [1.],
             descr=_('List of fractional X coordinates, dataset or '
                     'expression for point 2'),
             usertext=_('X positions 2'),
-            formatting=False), 6 )
+            formatting=False), posn = 6 )
         s.add( setting.DatasetExtended(
             'yPos2',
             [1.],
             descr=_('List of fractional Y coordinates, dataset or '
                     'expression for point 2'),
             usertext=_('Y positions 2'),
-            formatting=False), 7 )
+            formatting=False), posn = 7 )
 
         s.add( setting.Bool('clip', False,
                             descr=_('Clip line to its container'),
                             usertext=_('Clip'),
-                            formatting=True), 0 )
+                            formatting=True), posn = 0 )
 
         s.add( setting.Line('Line',
                             descr = _('Line style'),
@@ -108,13 +108,13 @@ class Line(plotters.FreePlotter):
 
         s.add( setting.DistancePt('arrowSize', '5pt',
                                   descr = _('Size of arrow to plot'),
-                                  usertext=_('Arrow size'), formatting=True), 0)
+                                  usertext=_('Arrow size'), formatting=True), posn = 0)
         s.add( setting.Arrow('arrowright', 'none',
                              descr = _('Arrow to plot on right side'),
-                             usertext=_('Arrow right'), formatting=True), 0)
+                             usertext=_('Arrow right'), formatting=True), posn = 0)
         s.add( setting.Arrow('arrowleft', 'none',
                              descr = _('Arrow to plot on left side'),
-                             usertext=_('Arrow left'), formatting=True), 0)
+                             usertext=_('Arrow left'), formatting=True), posn = 0)
 
     def _computeLinesLengthAngle(self, posn, lengthscaling):
         """Return set of lines to plot for length-angle."""
@@ -179,7 +179,7 @@ class Line(plotters.FreePlotter):
             return
 
         # if a dataset is used, we can't use control items
-        isnotdataset = ( not s.get('xPos').isDataset(d) and 
+        isnotdataset = ( not s.get('xPos').isDataset(d) and
                          not s.get('yPos').isDataset(d) )
 
         if s.mode == 'length-angle':

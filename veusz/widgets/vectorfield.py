@@ -51,61 +51,61 @@ class VectorField(plotters.GenericPlotter):
                 dimensions = 2,
                 descr = _('X coordinate length or vector magnitude'),
                 usertext = _('dx or r')),
-               0 )
+               posn = 0 )
         s.add( setting.DatasetExtended(
                 'data2', '',
                 dimensions = 2,
                 descr = _('Y coordinate length or vector angle'),
                 usertext = _('dy or theta')),
-               1 )
+               posn = 1 )
         s.add( setting.Choice('mode',
                               ['cartesian', 'polar'],
                               'cartesian',
                               descr = _('Cartesian (dx,dy) or polar (r,theta)'),
                               usertext = _('Mode')),
-               2 )
+               posn = 2 )
         s.add( setting.FloatChoice(
             'rotate',
             [0., 45., 90., 135., 180., -135., -90., -45.],
             0.,
             descr = _('Rotate vector clockwise by this angle in degrees'),
             usertext = _('Rotate')),
-               3 )
+               posn = 3 )
         s.add( setting.Bool(
             'reflectx', False,
             descr = _('Reflect vector in X direction'),
             usertext = _('Reflect X')),
-               4 )
+               posn = 4 )
         s.add( setting.Bool(
             'reflecty', False,
             descr = _('Reflect vector in Y direction'),
             usertext = _('Reflect Y')),
-               5 )
+               posn = 5 )
 
         # formatting
         s.add( setting.DistancePt('baselength', '10pt',
                                   descr = _('Base length of unit vector'),
                                   usertext = _('Base length'),
                                   formatting=True),
-               0 )
+               posn = 0 )
         s.add( setting.DistancePt('arrowsize', '2pt',
                                   descr = _('Size of any arrows'),
                                   usertext = _('Arrow size'),
                                   formatting=True),
-               1 )
+               posn = 1 )
         s.add( setting.Bool('scalearrow', True,
                             descr = _('Scale arrow head by length'),
                             usertext = _('Scale arrow'),
                             formatting=True),
-               2 )
+               posn = 2 )
         s.add( setting.Arrow('arrowfront', 'none',
                              descr = _('Arrow in front direction'),
                              usertext=_('Arrow front'), formatting=True),
-               3)
+               posn = 3)
         s.add( setting.Arrow('arrowback', 'none',
                              descr = _('Arrow in back direction'),
                              usertext=_('Arrow back'), formatting=True),
-               4)
+               posn = 4)
 
         s.add( setting.Line('Line',
                             descr = _('Line style'),
@@ -226,7 +226,7 @@ class VectorField(plotters.GenericPlotter):
             # this is backward - have to convert from dx, dy to angle, length
             angles = 180 - N.arctan2(dy, dx) * (180./N.pi)
             lengths = N.sqrt(dx**2+dy**2) * 2
-            
+
             # scale arrow heads by arrow length if requested
             if s.scalearrow:
                 arrowsizes = (arrowsize/baselength/2) * lengths
@@ -238,6 +238,6 @@ class VectorField(plotters.GenericPlotter):
                     utils.plotLineArrow(painter, x, y, l, a, asize,
                                         arrowleft=s.arrowfront,
                                         arrowright=s.arrowback)
-                
+
 # allow the factory to instantiate a vector field
 document.thefactory.register( VectorField )

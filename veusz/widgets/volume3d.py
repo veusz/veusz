@@ -72,22 +72,22 @@ class Volume3D(plotters3d.GenericPlotter3D):
         s.add( setting.DatasetExtended(
             'transData', '',
             descr=_('Transparency dataset, optional, 0-1'),
-            usertext=_('Transparency')), 0 )
+            usertext=_('Transparency')), posn = 0 )
         s.add( setting.DatasetExtended(
             'zData', 'z',
             descr=_('Z dataset'),
-            usertext=_('Z data')), 0 )
+            usertext=_('Z data')), posn = 0 )
         s.add( setting.DatasetExtended(
             'yData', 'y',
             descr=_('Y dataset'),
-            usertext=_('Y data')), 0 )
+            usertext=_('Y data')), posn = 0 )
         s.add( setting.DatasetExtended(
             'xData', 'x',
             descr=_('X dataset'),
-            usertext=_('X data')), 0 )
+            usertext=_('X data')), posn = 0 )
         s.add(DataColor(
             'DataColor', dimensions=1),
-              0)
+              posn = 0)
 
         s.add(setting.Colormap(
             'colorMap',
@@ -95,13 +95,13 @@ class Volume3D(plotters3d.GenericPlotter3D):
             descr = _('Set of colors to plot data with'),
             usertext=_('Colormap'),
             formatting=True),
-            0)
+            posn = 0)
         s.add(setting.Bool(
             'colorInvert', False,
             descr = _('Invert color map'),
             usertext=_('Invert colormap'),
             formatting=True),
-            1)
+            posn = 1)
         s.add(setting.Int(
             'transparency', 50,
             descr = _('Transparency percentage'),
@@ -109,21 +109,21 @@ class Volume3D(plotters3d.GenericPlotter3D):
             minval = 0,
             maxval = 100,
             formatting=True),
-            2)
+            posn = 2)
         s.add(setting.Int(
             'reflectivity', 0,
             minval=0, maxval=100,
             descr=_('Reflectivity percentage'),
             usertext=_('Reflectivity'),
             formatting=True),
-            3)
+            posn = 3)
         s.add(setting.Float(
             'fillfactor', 1,
             minval=0, maxval=1,
             descr=_('Filling factor (0-1)'),
             usertext=_('Fill factor'),
             formatting=True),
-            4)
+            posn = 4)
 
         s.add(setting.Line3D(
             'Line',

@@ -155,31 +155,31 @@ class Image(plotters.GenericPlotter):
             dimensions = 2,
             descr = _('Dataset to plot'),
             usertext=_('Dataset')),
-               0 )
+               posn = 0 )
         s.add( setting.FloatOrAuto(
             'min', 'Auto',
             descr = _('Minimum value of image scale'),
             usertext=_('Min. value')),
-               1 )
+               posn = 1 )
         s.add( setting.FloatOrAuto(
             'max', 'Auto',
             descr = _('Maximum value of image scale'),
             usertext=_('Max. value')),
-               2 )
+               posn = 2 )
         s.add( setting.Choice(
             'colorScaling',
             ['linear', 'sqrt', 'log', 'squared'],
             'linear',
             descr = _('Scaling to transform numbers to color'),
             usertext=_('Scaling')),
-               3 )
+               posn = 3 )
 
         s.add( setting.DatasetExtended(
             'transparencyData', '',
             dimensions = 2,
             descr = _('Dataset to use for transparency (0 to 1)'),
             usertext=_('Trans. data')),
-               4 )
+               posn = 4 )
 
         s.add( setting.Choice(
             'mapping',
@@ -187,7 +187,7 @@ class Image(plotters.GenericPlotter):
             'pixels',
             descr = _('Map image using pixels or bound coordinates'),
             usertext=_('Mapping')),
-               5 )
+               posn = 5 )
 
         s.add( setting.Colormap(
             'colorMap',
@@ -195,13 +195,13 @@ class Image(plotters.GenericPlotter):
             descr = _('Set of colors to plot data with'),
             usertext=_('Colormap'),
             formatting=True),
-               5 )
+               posn = 5 )
         s.add( setting.Bool(
             'colorInvert', False,
             descr = _('Invert color map'),
             usertext=_('Invert colormap'),
             formatting=True),
-               6 )
+               posn = 6 )
         s.add( setting.Int(
             'transparency', 0,
             descr = _('Transparency percentage'),
@@ -209,7 +209,7 @@ class Image(plotters.GenericPlotter):
             minval = 0,
             maxval = 100,
             formatting=True),
-               7 )
+               posn = 7 )
 
         s.add( setting.Choice(
             'drawMode',

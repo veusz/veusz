@@ -75,15 +75,15 @@ class NonOrthPoint(Widget):
                              'auto',
                              descr = _('Master color'),
                              usertext = _('Color'),
-                             formatting=True), 0 )
+                             formatting=True), posn = 0 )
         s.add( setting.DistancePt('markerSize',
                                   '3pt',
                                   descr = _('Size of marker to plot'),
-                                  usertext=_('Marker size'), formatting=True), 0 )
+                                  usertext=_('Marker size'), formatting=True), posn = 0 )
         s.add( setting.Marker('marker',
                               'circle',
                               descr = _('Type of marker to plot'),
-                              usertext=_('Marker'), formatting=True), 0 )
+                              usertext=_('Marker'), formatting=True), posn = 0 )
         s.add( setting.Line('PlotLine',
                             descr = _('Plot line settings'),
                             usertext = _('Plot line')),

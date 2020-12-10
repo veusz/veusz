@@ -75,17 +75,17 @@ class BoxShape(Shape):
                 'width', [0.1],
                 descr=_('List of fractional widths, dataset or expression'),
                 usertext=_('Widths'),
-                formatting=False), 3 )
+                formatting=False), posn = 3 )
         s.add( setting.DatasetExtended(
                 'height', [0.1],
                 descr=_('List of fractional heights, dataset or expression'),
                 usertext=_('Heights'),
-                formatting=False), 4 )
+                formatting=False), posn = 4 )
         s.add( setting.DatasetExtended(
                 'rotate', [0.],
                 descr=_('Rotation angles of shape, dataset or expression'),
                 usertext=_('Rotate'),
-                formatting=False), 5 )
+                formatting=False), posn = 5 )
 
     def drawShape(self, painter, rect):
         pass

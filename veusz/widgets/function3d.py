@@ -125,31 +125,31 @@ class Function3D(plotters3d.GenericPlotter3D):
             'x,y,z=fns(t)',
             descr=_('Type of function to plot'),
             usertext=_('Mode'),
-            showfn=klass._fnsetnshowhide), 0)
+            showfn=klass._fnsetnshowhide), posn = 0)
 
         s.add(setting.Str(
             'fnx', '',
             descr=_('Function for x coordinate'),
-            usertext=_('X function') ), 1)
+            usertext=_('X function') ), posn = 1)
         s.add(setting.Str(
             'fny', '',
             descr=_('Function for y coordinate'),
-            usertext=_('Y function') ), 2)
+            usertext=_('Y function') ), posn = 2)
         s.add(setting.Str(
             'fnz', '',
             descr=_('Function for z coordinate'),
-            usertext=_('Z function') ), 3)
+            usertext=_('Z function') ), posn = 3)
         s.add(setting.Str(
             'fncolor', '',
             descr=_('Function to give color (0-1)'),
-            usertext=_('Color function') ), 4)
+            usertext=_('Color function') ), posn = 4)
 
         s.add( setting.Color(
             'color',
             'auto',
             descr = _('Master color'),
             usertext = _('Color'),
-            formatting=True), 0 )
+            formatting=True), posn = 0 )
         s.add(FunctionLine(
             'Line',
             descr = _('Line settings'),

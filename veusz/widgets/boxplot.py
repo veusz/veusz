@@ -79,7 +79,7 @@ class _Stats(object):
         self.botquart = percentile(cleaned, 25)
         self.topquart = percentile(cleaned, 75)
         self.mean = N.mean(cleaned)
-        
+
         if whiskermode == 'min/max':
             self.botwhisker = cleaned.min()
             self.topwhisker = cleaned.max()
@@ -118,60 +118,60 @@ class BoxPlot(GenericPlotter):
         GenericPlotter.addSettings(s)
 
         s.remove('key')
-        s.add( setting.Choice('whiskermode', 
+        s.add( setting.Choice('whiskermode',
                               ('min/max',
                                '1.5IQR',
                                '1 stddev',
                                '9/91 percentile',
                                '2/98 percentile'),
-                              '1.5IQR', 
-                              descr = _('Whisker mode'), 
-                              usertext=_('Whisker mode')), 0 )
+                              '1.5IQR',
+                              descr = _('Whisker mode'),
+                              usertext=_('Whisker mode')), posn = 0 )
 
-        s.add( setting.Choice('direction', 
-                              ('horizontal', 'vertical'), 'vertical', 
-                              descr = _('Horizontal or vertical boxes'), 
-                              usertext=_('Direction')), 0 )
+        s.add( setting.Choice('direction',
+                              ('horizontal', 'vertical'), 'vertical',
+                              descr = _('Horizontal or vertical boxes'),
+                              usertext=_('Direction')), posn = 0 )
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label bars'),
-                                    usertext=_('Labels')), 0 )
+                                    usertext=_('Labels')), posn = 0 )
         s.add( setting.DatasetExtended(
                 'posn', '',
                 descr = _('Dataset or list of values giving '
                           'positions of boxes (optional)'),
-                usertext=_('Positions')), 0 )
+                usertext=_('Positions')), posn = 0 )
 
         # calculate statistics from these datasets
         s.add( setting.Datasets('values', ('data',),
                                 descr = _('Datasets containing values to '
                                           'calculate statistics for'),
-                                usertext=_('Datasets')), 0 )
+                                usertext=_('Datasets')), posn = 0 )
 
         # alternate mode where data are provided for boxes
         s.add( setting.DatasetExtended(
                 'whiskermax', '',
                 descr=_('Dataset with whisker maxima or list of values'),
-                usertext=_('Whisker max')), 0 )
+                usertext=_('Whisker max')), posn = 0 )
         s.add( setting.DatasetExtended(
                 'whiskermin', '',
                 descr=_('Dataset with whisker minima or list of values'),
-                usertext=_('Whisker min')), 0 )
+                usertext=_('Whisker min')), posn = 0 )
         s.add( setting.DatasetExtended(
                 'boxmax', '',
                 descr=_('Dataset with box maxima or list of values'),
-                usertext=_('Box max')), 0 )
+                usertext=_('Box max')), posn = 0 )
         s.add( setting.DatasetExtended(
                 'boxmin', '',
                 descr=_('Dataset with box minima or list of values'),
-                usertext=_('Box min')), 0 )
+                usertext=_('Box min')), posn = 0 )
         s.add( setting.DatasetExtended(
                 'median', '',
                 descr=_('Dataset with medians or list of values'),
-                usertext=_('Median')), 0 )
+                usertext=_('Median')), posn = 0 )
         s.add( setting.DatasetExtended(
                 'mean', '',
                 descr=_('Dataset with means or list of values'),
-                usertext=_('Mean')), 0 )
+                usertext=_('Mean')), posn = 0 )
 
         # switch between different modes
         s.add( setting.BoolSwitch('calculate', True,
@@ -181,7 +181,7 @@ class BoxPlot(GenericPlotter):
                                   settingstrue=('whiskermode', 'values'),
                                   settingsfalse=('boxmin', 'whiskermin',
                                                  'boxmax', 'whiskermax',
-                                                 'mean', 'median')), 0 )
+                                                 'mean', 'median')), posn = 0 )
 
         # formatting options
         s.add( setting.Float('fillfraction', 0.75,
