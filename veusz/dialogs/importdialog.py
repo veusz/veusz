@@ -271,19 +271,15 @@ class ImportDialog(VeuszDialog):
         tags = self.tagcombo.currentText().split()
 
         try:
-            qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
-            with self.document.suspend():
-                importtab.doImport(self.document, filename, linked, encoding,
-                                   prefix, suffix, tags)
-            qt.QApplication.restoreOverrideCursor()
+            with utils.OverrideCursor():
+                with self.document.suspend():
+                    importtab.doImport(
+                        self.document, filename, linked, encoding,
+                        prefix, suffix, tags)
         except IOError:
-            qt.QApplication.restoreOverrideCursor()
             qt.QMessageBox.warning(
-                self, _("Veusz"),
-                _("Could not read file"))
+                self, _("Veusz"), _("Could not read file"))
         except Exception:
-            qt.QApplication.restoreOverrideCursor()
-
             # show exception dialog
             d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
             d.exec_()

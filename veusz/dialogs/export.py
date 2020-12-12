@@ -430,8 +430,6 @@ class ExportDialog(VeuszDialog):
                     if not _overwriteQuestion(fname):
                         return
 
-            # show busy cursor
-            #qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.WaitCursor))
             # delete file if already exists
             try:
                 os.unlink(fname)
@@ -488,7 +486,6 @@ class ExportDialog(VeuszDialog):
                     msg = cstrerror(e)
                 else:
                     msg = cstr(e)
-                #qt.QApplication.restoreOverrideCursor()
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Error exporting to file '%s'\n\n%s") %
