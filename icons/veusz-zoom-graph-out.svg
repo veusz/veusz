@@ -29,8 +29,8 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="50.25"
-     inkscape:cx="4.3880597"
+     inkscape:zoom="35.532116"
+     inkscape:cx="8"
      inkscape:cy="8"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -70,6 +70,31 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;fill-rule:evenodd;stroke:#e5e5e5;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 1.1168043,0.65608601 V 14.98031 H 15.004017"
+       id="path3530-7"
+       sodipodi:nodetypes="ccc" />
+    <rect
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#e5e5e5;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2394-2-7"
+       width="7.3806105"
+       height="6.3123684"
+       x="4.4688993"
+       y="4.4259043" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#e5e5e5;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 8.1243793,1.711443 6.3532353,5.910448 8.1243793,5.353234 9.875622,5.910448 Z"
+       id="path8539-0"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#e5e5e5;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 8.1243793,13.502488 6.3532353,9.3034826 8.1243793,9.8606966 9.875621,9.3034826 Z"
+       id="path8539-9-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
     <path
        inkscape:connector-curvature="0"
        style="fill:none;fill-rule:evenodd;stroke:#2c5aa0;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"

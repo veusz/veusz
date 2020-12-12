@@ -29,9 +29,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="50.25"
-     inkscape:cx="8"
-     inkscape:cy="8"
+     inkscape:zoom="25.125"
+     inkscape:cx="0.77611941"
+     inkscape:cy="12.776119"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -69,6 +69,31 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#e0e0e0;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 1.1168043,0.6560858 V 14.98031 H 15.004017"
+       id="path3530-2"
+       sodipodi:nodetypes="ccc" />
+    <rect
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#e0e0e0;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect2394-2-3"
+       width="7.3806105"
+       height="6.3123684"
+       x="5.3047194"
+       y="4.2667017" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#e0e0e0;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 9.1044788,9.3631838 7.3333343,13.56219 9.1044788,13.004976 10.855721,13.56219 Z"
+       id="path8539-9-0"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#e0e0e0;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 6.9751243,7.3333324 2.7761193,9.1044768 3.3333333,7.3333324 2.7761193,5.5820903 Z"
+       id="path8539-9-3-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#2c5aa0;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="M 1.0987124,14.695279 L 13.184549,1.9914163 L 13.184549,1.9914163 L 13.184549,1.9914163"

@@ -51,7 +51,7 @@ def makeSplash(app):
     '''Make a splash screen logo.'''
 
     splash = qt.QSplashScreen()
-    splash.setStyleSheet("background-color:white;")
+    splash.setStyleSheet("background-color:white; color: black;")
 
     # draw logo on pixmap
     layout = qt.QVBoxLayout(splash)

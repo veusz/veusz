@@ -757,7 +757,7 @@ class TutorialDock(qt.QDockWidget):
         self.setWindowTitle('Tutorial - Veusz')
         self.setObjectName('veusztutorialwindow')
 
-        self.setStyleSheet('background: lightyellow;')
+        self.setStyleSheet('background: lightyellow; color: black;')
 
         self.document = document
         self.mainwin = mainwin
@@ -767,7 +767,7 @@ class TutorialDock(qt.QDockWidget):
         txtdoc = qt.QTextDocument(self)
         txtdoc.setDefaultStyleSheet(
             "p.usercmd { color: blue; } "
-            "h1 { font-size: x-large;} "
+            "h1 { font-size: x-large; color: darkblue; } "
             "code { color: green;} "
             )
         self.textedit = qt.QTextEdit(readOnly=True)
