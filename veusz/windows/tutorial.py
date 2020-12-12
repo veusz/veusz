@@ -20,7 +20,10 @@
 from __future__ import division
 import os.path
 
-import sip
+try:
+    from PyQt5 import sip
+except ImportError:
+    import sip
 from .. import qtall as qt
 from .. import utils
 from .. import setting

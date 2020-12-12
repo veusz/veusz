@@ -23,7 +23,10 @@ import sys
 import atexit
 import platform
 
-import sip
+try:
+    from PyQt5 import sip
+except ImportError:
+    import sip
 import numpy as N
 from .. import qtall as qt
 

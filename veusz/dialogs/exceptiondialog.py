@@ -27,7 +27,10 @@ import re
 import base64
 
 import numpy
-import sip
+try:
+    from PyQt5 import sip
+except ImportError:
+    import sip
 
 from ..compat import citems, curlrequest, cexceptionuser
 from .. import qtall as qt
