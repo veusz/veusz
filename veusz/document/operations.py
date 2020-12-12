@@ -1217,12 +1217,13 @@ class OperationToolsPlugin(OperationMultiple):
 class OperationDatasetPlugin(Operation):
     """An operation to activate a dataset plugin."""
 
-    def __init__(self, plugin, fields, datasetnames={}):
+    def __init__(self, plugin, fields, datasetnames={}, raiseerrors=False):
         """Use dataset plugin, passing fields."""
         self.plugin = plugin
         self.fields = fields
         self.descr = plugin.name
         self.names = datasetnames
+        self.raiseerrors = raiseerrors
 
     def do(self, document):
         """Use the plugin.
@@ -1232,7 +1233,7 @@ class OperationDatasetPlugin(Operation):
         self.olddata = {}
 
         manager = self.manager = plugins.DatasetPluginManager(
-            self.plugin, document, self.fields)
+            self.plugin, document, self.fields, raiseerrors=self.raiseerrors)
 
         names = self.datasetnames = list(manager.datasetnames)
 

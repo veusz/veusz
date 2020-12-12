@@ -25,6 +25,7 @@ from ..compat import czip, cstr
 from .. import qtall as qt
 from .. import document
 from .. import plugins
+from .. import utils
 from . import exceptiondialog
 from .veuszdialog import VeuszDialog
 
@@ -159,43 +160,39 @@ def runPlugin(window, doc, plugin, fields):
     else:
         raise RuntimeError("Invalid plugin class")
 
-    # use correct operation class for different plugin types
-    if mode == 'tools':
-        op = document.OperationToolsPlugin(plugin, fields)
-    elif mode == 'dataset':
-        # a bit of a hack as we don't give currentwidget to this plugin
-        del fields['currentwidget']
-        op = document.OperationDatasetPlugin(plugin, fields)
-
     resultstext = ''
-    qt.QApplication.setOverrideCursor( qt.QCursor(qt.Qt.WaitCursor) )
     try:
-        results = doc.applyOperation(op)
+        with utils.OverrideCursor():
+            # use correct operation class for different plugin types
+            if mode == 'tools':
+                op = document.OperationToolsPlugin(plugin, fields)
+            elif mode == 'dataset':
+                # a bit of a hack as we don't give currentwidget to this plugin
+                del fields['currentwidget']
+                op = document.OperationDatasetPlugin(
+                    plugin, fields, raiseerrors=True)
 
-        # evaluate datasets using plugin to check it works
-        if mode == 'dataset':
-            op.validate()
-            resultstext = _('Created datasets: ') + ', '.join(results)
-        else:
-            resultstext = _('Done')
+            results = doc.applyOperation(op)
+
+            # evaluate datasets using plugin to check it works
+            if mode == 'dataset':
+                op.validate()
+                resultstext = _('Created datasets: ') + ', '.join(results)
+            else:
+                resultstext = _('Done')
 
     except (plugins.ToolsPluginException, plugins.DatasetPluginException) as ex:
         # unwind operations
         op.undo(doc)
-        qt.QApplication.restoreOverrideCursor()
 
         qt.QMessageBox.warning(
             window, _("Error in %s") % plugin.name, cstr(ex))
 
     except Exception:
         op.undo(doc)
-        qt.QApplication.restoreOverrideCursor()
 
         # show exception dialog
         exceptiondialog.ExceptionDialog(sys.exc_info(), window).exec_()
-
-    else:
-        qt.QApplication.restoreOverrideCursor()
 
     return resultstext
 
