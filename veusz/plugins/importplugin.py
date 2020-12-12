@@ -243,7 +243,10 @@ class QdpFile(object):
         for num, r1, c1, r2, c2 in self.datagroup2d:
             arr = []
             for c in crange(c1-1,c2-1+1):
-                arr.append( self.data[c][r1-1:r2-1+1] )
+                try:
+                    arr.append( self.data[c][r1-1:r2-1+1] )
+                except IndexError:
+                    raise ImportPluginException(_("Invalid 2D data in file"))
                 # make data as "used"
                 self.data[c] = None
             arr = N.array(arr)
@@ -262,8 +265,8 @@ class QdpFile(object):
                 rangey = (minval - pixsize*0.5,
                           minval+(arr.shape[0]-0.5)*pixsize )
 
-            ds = datasetplugin.Dataset2D(name, data=arr,
-                                         rangex=rangex, rangey=rangey)
+            ds = datasetplugin.Dataset2D(
+                name, data=arr, rangex=rangex, rangey=rangey)
             self.retndata.append(ds)
 
     def pushData(self):
