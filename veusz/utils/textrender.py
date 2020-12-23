@@ -993,6 +993,33 @@ class PartDot(Part):
             qt.QPointF(x+circsize,y+circsize)) )
         painter.restore()
 
+class PartDDot(Part):
+    """Draw a double dot over text."""
+
+    def render(self, state):
+        initx = state.x
+
+        # draw material under bar
+        Part.render(self, state)
+
+        # draw circle over text with 1pt radius
+        painter = state.painter
+        height = state.fontMetrics().ascent()
+
+        painter.save()
+        circsize = state.getPixelsPerPt()
+        painter.setBrush( qt.QBrush(painter.pen().color()) )
+        painter.setPen( qt.QPen(qt.Qt.NoPen) )
+
+        x1 = initx + 0.25*(state.x-initx)
+        x2 = initx + 0.75*(state.x-initx)
+        y = state.y-height + circsize
+        for x in x1, x2:
+            painter.drawEllipse( qt.QRectF(
+                qt.QPointF(x-circsize,y-circsize),
+                qt.QPointF(x+circsize,y+circsize)) )
+        painter.restore()
+
 class PartTilde(Part):
     """Draw a tilde ~ over text."""
 
@@ -1089,6 +1116,7 @@ part_commands = {
     r'\overline': (PartBar, 1),
     r'\hat': (PartHat, 1),
     r'\dot': (PartDot, 1),
+    r'\ddot': (PartDDot, 1),
     r'\wtilde': (PartTilde, 1),
     r'\marker': (PartMarker, 1),
     r'\color': (PartColor, 2),
