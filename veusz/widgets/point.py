@@ -341,6 +341,11 @@ class MarkerFillBrush(setting.Brush):
             descr = _('Invert color map'),
             usertext = _('Invert map'),
             formatting=True) )
+        self.add( setting.Bool(
+            'newMarkerSizes', False,
+            descr=_('Use new marker sizes with equal area'),
+            usertext=_('New marker sizes'),
+            formatting=True) )
 
 class PointPlotter(GenericPlotter):
     """A class for plotting points and their errors."""
@@ -451,6 +456,13 @@ class PointPlotter(GenericPlotter):
             descr = _('Label settings'),
             usertext=_('Label')),
                pixmap = 'settings_axislabel' )
+
+    @classmethod
+    def onNewCompatLevel(klass, stylesheet, level):
+        """Called to adjust new defaults if there is a level change."""
+
+        # we use the new scaled marker sizes for levels >= 1
+        stylesheet.xy.MarkerFill.get('newMarkerSizes').set(level>=1)
 
     @property
     def userdescription(self):
@@ -974,7 +986,9 @@ class PointPlotter(GenericPlotter):
                     painter, xplt, yplt, s.marker, markersize,
                     scaling=scaling, clip=cliprect,
                     cmap=cmap, colorvals=colorvals,
-                    scaleline=s.MarkerLine.scaleLine)
+                    scaleline=s.MarkerLine.scaleLine,
+                    equalarea=s.MarkerFill.newMarkerSizes,
+                )
 
             # finally plot any labels
             if tvals and not s.Label.hide:

@@ -19,10 +19,11 @@
 ###############################################################################
 
 from __future__ import division
+import sys
 from .. import qtall as qt
 import numpy as N
 
-from ..helpers.qtloops import plotPathsToPainter
+from ..helpers.qtloops import plotPathsToPainter, scalePath
 
 from . import colormap
 
@@ -43,24 +44,34 @@ QPainterPaths
 ## draw symbols which are sets of line segments
 
 linesymbols = {
-    'asterisk': ( ((-0.707, -0.707), (0.707,  0.707)),
-                  ((-0.707,  0.707), (0.707, -0.707)),
-                  ((-1, 0), (1, 0)), ((0, -1), (0, 1)) ),
+    'asterisk': (
+        ((-0.707, -0.707), (0.707,  0.707)),
+        ((-0.707,  0.707), (0.707, -0.707)),
+        ((-1, 0), (1, 0)), ((0, -1), (0, 1))
+    ),
     'lineplus': ( ((-1, 0), (1, 0)), ((0, -1), (0, 1)) ),
-    'linecross': ( ((-0.707, -0.707), (0.707,  0.707)),
-                   ((-0.707,  0.707), (0.707, -0.707)) ),
-    'plushair': ( ((-1, 0), (-0.5, 0)), ((1, 0), (0.5, 0)),
-                  ((0, -1), (0, -0.5)), ((0, 1), (0, 0.5)) ),
-    'crosshair': ( ((-0.707, -0.707), (-0.354, -0.354)),
-                   (( 0.707,  0.707), ( 0.354,  0.354)),
-                   (( 0.707, -0.707), ( 0.354, -0.354)),
-                   ((-0.707,  0.707), (-0.354,  0.354)) ),
-    'asteriskhair': ( ((-1, 0), (-0.5, 0)), ((1, 0), (0.5, 0)),
-                      ((0, -1), (0, -0.5)), ((0, 1), (0, 0.5)),
-                      ((-0.707, -0.707), (-0.354, -0.354)),
-                      (( 0.707,  0.707), ( 0.354,  0.354)),
-                      (( 0.707, -0.707), ( 0.354, -0.354)),
-                      ((-0.707,  0.707), (-0.354,  0.354)) ),
+    'linecross': (
+        ((-0.707, -0.707), (0.707,  0.707)),
+        ((-0.707,  0.707), (0.707, -0.707))
+    ),
+    'plushair': (
+        ((-1, 0), (-0.5, 0)), ((1, 0), (0.5, 0)),
+        ((0, -1), (0, -0.5)), ((0, 1), (0, 0.5))
+    ),
+    'crosshair': (
+        ((-0.707, -0.707), (-0.354, -0.354)),
+        (( 0.707,  0.707), ( 0.354,  0.354)),
+        (( 0.707, -0.707), ( 0.354, -0.354)),
+        ((-0.707,  0.707), (-0.354,  0.354))
+    ),
+    'asteriskhair': (
+        ((-1, 0), (-0.5, 0)), ((1, 0), (0.5, 0)),
+        ((0, -1), (0, -0.5)), ((0, 1), (0, 0.5)),
+        ((-0.707, -0.707), (-0.354, -0.354)),
+        (( 0.707,  0.707), ( 0.354,  0.354)),
+        (( 0.707, -0.707), ( 0.354, -0.354)),
+        ((-0.707,  0.707), (-0.354,  0.354))
+    ),
     'linehorz': ( ((-1, 0), (1, 0)), ),
     'linevert': ( ((0, -1), (0, 1)), ),
     'linehorzgap': ( ((-1, 0), (-0.5, 0)), ((1, 0), (0.5, 0)) ),
@@ -77,35 +88,59 @@ linesymbols = {
     'arrowdownaway': ( ((-0.8, 1), (0, 2), (0.8, 1)), ((0, 0), (0, 2)) ),
 
     # limits
-    'limitlower': ( ((-0.8, -1), (0, 0), (0.8, -1)), ((0, -2), (0, 0)),
-                    ((-1, 0), (1, 0)) ),
-    'limitupper': ( ((-0.8, 1), (0, 0), (0.8, 1)), ((0, 2), (0, 0)),
-                    ((-1, 0), (1, 0)) ),
-    'limitleft': ( ((1, -0.8), (0, 0), (1, 0.8)), ((2, 0), (0, 0)),
-                   ((0, -1), (0, 1)) ),
-    'limitright': ( ((-1, -0.8), (0, 0), (-1, 0.8)), ((-2, 0), (0, 0)),
-                    ((0, -1), (0, 1)) ),
-    'limitupperaway': ( ((-0.8, -1), (0, -2), (0.8, -1)), ((0, 0), (0, -2)),
-                        ((-1, 0), (1, 0)) ),
-    'limitloweraway': ( ((-0.8, 1), (0, 2), (0.8, 1)), ((0, 0), (0, 2)),
-                        ((-1, 0), (1, 0)) ),
-    'limitleftaway': ( ((-1, -0.8), (-2, 0), (-1, 0.8)), ((-2, 0), (0, 0)),
-                       ((0, -1), (0, 1)) ),
-    'limitrightaway': ( ((1, -0.8), (2, 0), (1, 0.8)), ((2, 0), (0, 0)),
-                        ((0, -1), (0, 1)) ),
+    'limitlower': (
+        ((-0.8, -1), (0, 0), (0.8, -1)), ((0, -2), (0, 0)),
+        ((-1, 0), (1, 0))
+    ),
+    'limitupper': (
+        ((-0.8, 1), (0, 0), (0.8, 1)), ((0, 2), (0, 0)),
+        ((-1, 0), (1, 0))
+    ),
+    'limitleft': (
+        ((1, -0.8), (0, 0), (1, 0.8)), ((2, 0), (0, 0)),
+        ((0, -1), (0, 1))
+    ),
+    'limitright': (
+        ((-1, -0.8), (0, 0), (-1, 0.8)), ((-2, 0), (0, 0)),
+        ((0, -1), (0, 1))
+    ),
+    'limitupperaway': (
+        ((-0.8, -1), (0, -2), (0.8, -1)), ((0, 0), (0, -2)),
+        ((-1, 0), (1, 0))
+    ),
+    'limitloweraway': (
+        ((-0.8, 1), (0, 2), (0.8, 1)), ((0, 0), (0, 2)),
+        ((-1, 0), (1, 0))
+    ),
+    'limitleftaway': (
+        ((-1, -0.8), (-2, 0), (-1, 0.8)), ((-2, 0), (0, 0)),
+        ((0, -1), (0, 1))
+    ),
+    'limitrightaway': (
+        ((1, -0.8), (2, 0), (1, 0.8)), ((2, 0), (0, 0)),
+        ((0, -1), (0, 1))
+    ),
 
-    'arrowlowerleftaway':( ((-0.8, 1), (0, 2), (0.8, 1)),
-                           ((0, 2), (0, 0), (-2, 0)),
-                           ((-1, -0.8), (-2, 0), (-1, 0.8)) ),
-    'arrowlowerrightaway': ( ((1, -0.8), (2, 0), (1, 0.8)),
-                             ((2, 0), (0, 0), (0, 2)),
-                             ((-0.8, 1), (0, 2), (0.8, 1)) ),
-    'arrowupperleftaway':( ((-0.8, -1), (0, -2), (0.8, -1)),
-                           ((0, -2), (0, 0), (-2, 0)),
-                           ((-1, -0.8), (-2, 0), (-1, 0.8)) ),
-    'arrowupperrightaway': ( ((-0.8, -1), (0, -2), (0.8, -1)),
-                             ((2, 0), (0, 0), (0, -2)),
-                             ((1, -0.8), (2, 0), (1, 0.8)) ),
+    'arrowlowerleftaway': (
+        ((-0.8, 1), (0, 2), (0.8, 1)),
+        ((0, 2), (0, 0), (-2, 0)),
+        ((-1, -0.8), (-2, 0), (-1, 0.8))
+    ),
+    'arrowlowerrightaway': (
+        ((1, -0.8), (2, 0), (1, 0.8)),
+        ((2, 0), (0, 0), (0, 2)),
+        ((-0.8, 1), (0, 2), (0.8, 1))
+    ),
+    'arrowupperleftaway':(
+        ((-0.8, -1), (0, -2), (0.8, -1)),
+        ((0, -2), (0, 0), (-2, 0)),
+        ((-1, -0.8), (-2, 0), (-1, 0.8))
+    ),
+    'arrowupperrightaway': (
+        ((-0.8, -1), (0, -2), (0.8, -1)),
+        ((2, 0), (0, 0), (0, -2)),
+        ((1, -0.8), (2, 0), (1, 0.8))
+    ),
 
     'lineup': ( ((0, 0), (0, -1)), ),
     'linedown': ( ((0, 0), (0, 1)), ),
@@ -115,7 +150,7 @@ linesymbols = {
     # for arrows
     '_linearrow': ( ((-1.8, -1), (0, 0), (-1.8, 1)), ),
     '_linearrowreverse': ( ((1.8, -1), (0, 0), (1.8, 1)), ),
-    }
+}
 
 def getLinePainterPath(name, size):
     """Get a painter path for line like objects."""
@@ -131,80 +166,206 @@ def getLinePainterPath(name, size):
 
 # X and Y pts for corners of polygons
 polygons = {
+
     # make the diamond the same area as the square
     'diamond': ( (0., 1.414), (1.414, 0.), (0., -1.414), (-1.414, 0.) ),
     'barhorz': ( (-1, -0.5), (1, -0.5), (1, 0.5), (-1, 0.5) ),
     'barvert': ( (-0.5, -1), (0.5, -1), (0.5, 1), (-0.5, 1) ),
-    'plus': ( (0.4, 1), (0.4, 0.4), (1, 0.4), (1, -0.4),
-              (0.4, -0.4), (0.4, -1), (-0.4, -1), (-0.4, -0.4),
-              (-1, -0.4), (-1, 0.4), (-0.4, 0.4), (-0.4, 1) ),
-    'octogon': ( (0.414, 1), (1, 0.414), (1, -0.414), (0.414, -1),
-                 (-0.414, -1), (-1, -0.414), (-1, 0.414), (-0.414, 1) ),
+    'plus': (
+        (0.4, 1), (0.4, 0.4), (1, 0.4), (1, -0.4),
+        (0.4, -0.4), (0.4, -1), (-0.4, -1), (-0.4, -0.4),
+        (-1, -0.4), (-1, 0.4), (-0.4, 0.4), (-0.4, 1)
+    ),
+    'octogon': (
+        (0.414, 1), (1, 0.414), (1, -0.414), (0.414, -1),
+        (-0.414, -1), (-1, -0.414), (-1, 0.414), (-0.414, 1)
+    ),
     'triangle': ( (0, -1.2), (1.0392, 0.6), (-1.0392, 0.6) ),
     'triangledown': ( (0, 1.2), (1.0392, -0.6), (-1.0392, -0.6) ),
     'triangleleft': ( (-1.2, 0), (0.6, 1.0392), (0.6, -1.0392) ),
     'triangleright': ( (1.2, 0), (-0.6, 1.0392), (-0.6, -1.0392) ),
-    'cross': ( (-0.594, 1.1028), (0, 0.5088), (0.594, 1.1028),
-               (1.1028, 0.594), (0.5088, -0), (1.1028, -0.594),
-               (0.594, -1.1028), (-0, -0.5088), (-0.594, -1.1028),
-               (-1.1028, -0.594), (-0.5088, 0), (-1.1028, 0.594) ),
-    'star': ( (0, -1.2), (-0.27, -0.3708), (-1.1412, -0.3708),
-              (-0.4356, 0.1416), (-0.7056, 0.9708), (-0, 0.4584),
-              (0.7056, 0.9708), (0.4356, 0.1416), (1.1412, -0.3708),
-              (0.27, -0.3708) ),
-    'pentagon': ((0, -1.2), (1.1412, -0.3708), (0.6936, 0.9708),
-                 (-0.6936, 0.9708), (-1.1412, -0.3708)),
+    'cross': (
+        (-0.594, 1.1028), (0, 0.5088), (0.594, 1.1028),
+        (1.1028, 0.594), (0.5088, -0), (1.1028, -0.594),
+        (0.594, -1.1028), (-0, -0.5088), (-0.594, -1.1028),
+        (-1.1028, -0.594), (-0.5088, 0), (-1.1028, 0.594)
+    ),
+    'star': (
+        (0, -1.2), (-0.27, -0.3708), (-1.1412, -0.3708),
+        (-0.4356, 0.1416), (-0.7056, 0.9708), (-0, 0.4584),
+        (0.7056, 0.9708), (0.4356, 0.1416), (1.1412, -0.3708),
+        (0.27, -0.3708)
+    ),
+    'pentagon': (
+        (0, -1.2), (1.1412, -0.3708), (0.6936, 0.9708),
+        (-0.6936, 0.9708), (-1.1412, -0.3708)
+    ),
     'tievert': ( (-1, -1), (1, -1), (-1, 1), (1, 1) ),
     'tiehorz': ( (-1, -1), (-1, 1), (1, -1), (1, 1) ),
     'lozengehorz': ( (0, 0.707), (1.414, 0), (0, -0.707), (-1.414, 0) ),
     'lozengevert': ( (0, 1.414), (0.707, 0), (0, -1.414), (-0.707, 0) ),
 
-    'star3': ( (0., -1.), (0.173, -0.1), (0.866, 0.5), (0, 0.2),
-               (-0.866, 0.5), (-0.173, -0.1) ),
-    'star4': ( (0.000, 1.000), (-0.354, 0.354), (-1.000, 0.000),
-               (-0.354, -0.354), (0.000, -1.000), (0.354, -0.354),
-               (1.000, -0.000), (0.354, 0.354), ),
-    'star6': ( (0.000, 1.000), (-0.250, 0.433), (-0.866, 0.500),
-               (-0.500, 0.000), (-0.866, -0.500), (-0.250, -0.433),
-               (-0.000, -1.000), (0.250, -0.433), (0.866, -0.500),
-               (0.500, 0.000), (0.866, 0.500), (0.250, 0.433), ),
-    'star8': ( (0.000, 1.000), (-0.191, 0.462), (-0.707, 0.707),
-               (-0.462, 0.191), (-1.000, 0.000), (-0.462, -0.191),
-               (-0.707, -0.707), (-0.191, -0.462), (0.000, -1.000),
-               (0.191, -0.462), (0.707, -0.707), (0.462, -0.191),
-               (1.000, -0.000), (0.462, 0.191), (0.707, 0.707),
-               (0.191, 0.462), ),
-    'hexagon': ( (0, 1), (0.866, 0.5), (0.866, -0.5),
-                 (0, -1), (-0.866, -0.5), (-0.866, 0.5), ),
-    'starinvert': ( (0, 1.2), (-0.27, 0.3708), (-1.1412, 0.3708),
-                    (-0.4356, -0.1416), (-0.7056, -0.9708), (0, -0.4584),
-                    (0.7056, -0.9708), (0.4356, -0.1416), (1.1412, 0.3708),
-                    (0.27, 0.3708) ),
-    'squashbox': ( (-1, 1), (0, 0.5), (1, 1), (0.5, 0),
-                   (1, -1), (0, -0.5), (-1, -1), (-0.5, 0) ),
-    'plusnarrow': ( (0.2, 1), (0.2, 0.2), (1, 0.2), (1, -0.2),
-                    (0.2, -0.2), (0.2, -1), (-0.2, -1), (-0.2, -0.2),
-                    (-1, -0.2), (-1, 0.2), (-0.2, 0.2), (-0.2, 1) ),
-    'crossnarrow': ( (-0.566, 0.849), (0, 0.283), (0.566, 0.849),
-                     (0.849, 0.566), (0.283, 0), (0.849, -0.566),
-                     (0.566, -0.849), (0, -0.283), (-0.566, -0.849),
-                     (-0.849, -0.566), (-0.283, 0), (-0.849, 0.566) ),
+    'star3': (
+        (0., -1.), (0.173, -0.1), (0.866, 0.5), (0, 0.2),
+        (-0.866, 0.5), (-0.173, -0.1)
+    ),
+    'star4': (
+        (0.000, 1.000), (-0.354, 0.354), (-1.000, 0.000),
+        (-0.354, -0.354), (0.000, -1.000), (0.354, -0.354),
+        (1.000, -0.000), (0.354, 0.354),
+    ),
+    'star6': (
+        (0.000, 1.000), (-0.250, 0.433), (-0.866, 0.500),
+        (-0.500, 0.000), (-0.866, -0.500), (-0.250, -0.433),
+        (-0.000, -1.000), (0.250, -0.433), (0.866, -0.500),
+        (0.500, 0.000), (0.866, 0.500), (0.250, 0.433),
+    ),
+    'star8': (
+        (0.000, 1.000), (-0.191, 0.462), (-0.707, 0.707),
+        (-0.462, 0.191), (-1.000, 0.000), (-0.462, -0.191),
+        (-0.707, -0.707), (-0.191, -0.462), (0.000, -1.000),
+        (0.191, -0.462), (0.707, -0.707), (0.462, -0.191),
+        (1.000, -0.000), (0.462, 0.191), (0.707, 0.707),
+        (0.191, 0.462),
+    ),
+    'hexagon': (
+        (0, 1), (0.866, 0.5), (0.866, -0.5),
+        (0, -1), (-0.866, -0.5), (-0.866, 0.5),
+    ),
+    'starinvert': (
+        (0, 1.2), (-0.27, 0.3708), (-1.1412, 0.3708),
+        (-0.4356, -0.1416), (-0.7056, -0.9708), (0, -0.4584),
+        (0.7056, -0.9708), (0.4356, -0.1416), (1.1412, 0.3708),
+        (0.27, 0.3708)
+    ),
+    'squashbox': (
+        (-1, 1), (0, 0.5), (1, 1), (0.5, 0),
+        (1, -1), (0, -0.5), (-1, -1), (-0.5, 0)
+    ),
+    'plusnarrow': (
+        (0.2, 1), (0.2, 0.2), (1, 0.2), (1, -0.2),
+        (0.2, -0.2), (0.2, -1), (-0.2, -1), (-0.2, -0.2),
+        (-1, -0.2), (-1, 0.2), (-0.2, 0.2), (-0.2, 1)
+    ),
+    'crossnarrow': (
+        (-0.566, 0.849), (0, 0.283), (0.566, 0.849),
+        (0.849, 0.566), (0.283, 0), (0.849, -0.566),
+        (0.566, -0.849), (0, -0.283), (-0.566, -0.849),
+        (-0.849, -0.566), (-0.283, 0), (-0.849, 0.566)
+    ),
 
-    'limitupperaway2': ( (-1, 0), (0, 0), (0, -1), (-1, -1), (0, -2),
-                         (1, -1), (0, -1), (0, 0), (1, 0) ),
-    'limitloweraway2': ( (-1, 0), (0, 0), (0, 1), (-1, 1), (0, 2),
-                         (1, 1), (0, 1), (0, 0), (1, 0) ),
-    'limitleftaway2':  ( (0, -1), (0, 0) , (-1, 0), (-1, -1), (-2, 0),
-                         (-1, 1), (-1, 0), (0, 0), (0, 1) ),
-    'limitrightaway2': ( (0, -1), (0, 0), (1, 0), (1, -1), (2, 0),
-                         (1, 1), (1, 0), (0, 0), (0, 1) ),
+    'limitupperaway2': (
+        (-1, 0), (0, 0), (0, -1), (-1, -1), (0, -2),
+        (1, -1), (0, -1), (0, 0), (1, 0)
+    ),
+    'limitloweraway2': (
+        (-1, 0), (0, 0), (0, 1), (-1, 1), (0, 2),
+        (1, 1), (0, 1), (0, 0), (1, 0)
+    ),
+    'limitleftaway2': (
+        (0, -1), (0, 0) , (-1, 0), (-1, -1), (-2, 0),
+        (-1, 1), (-1, 0), (0, 0), (0, 1)
+    ),
+    'limitrightaway2': (
+        (0, -1), (0, 0), (1, 0), (1, -1), (2, 0),
+        (1, 1), (1, 0), (0, 0), (0, 1)
+    ),
 
     # special arrow symbols
     '_arrow': ( (0, 0), (-1.8, 1), (-1.4, 0), (-1.8, -1) ),
     '_arrowtriangle': ( (0, 0), (-1.8, 1), (-1.8, -1) ),
     '_arrownarrow': ( (0, 0), (-1.8, 0.5), (-1.8, -0.5) ),
     '_arrowreverse': ( (0, 0), (1.8, 1), (1.4, 0), (1.8, -1) ),
-    }
+
+}
+
+def _calcAreaScales():
+    """Calculate polygon areas for normalization.
+
+    This is run separately to get the values to put in the below scaling
+    array
+    """
+
+    app = qt.QApplication(sys.argv)
+    scale = 600
+    c = scale*4
+    w = c*2
+    pix = qt.QPixmap(w,w)
+
+    areas = {}
+    white = qt.QColor(255,255,255)
+    for poly in MarkerCodes:
+        pix.fill(white)
+        path, tofill = getPointPainterPath(poly, scale, 1)
+        if not tofill or poly in ('none', 'dot'):
+            #areas[poly] = 1
+            continue
+
+        # draw marker with large size
+        painter = qt.QPainter(pix)
+        painter.setRenderHint(qt.QPainter.Antialiasing, False)
+        painter.translate(c,c)
+        painter.fillPath(path, qt.QBrush(qt.Qt.SolidPattern))
+        painter.end()
+
+        # count pixels
+        img = pix.toImage()
+        assert img.depth() == 32
+        ptr = img.constBits()
+        ptr.setsize(w*w*4)
+        arr = N.ndarray(shape=(w,w), buffer=ptr, dtype=N.uint32)
+        tot = N.sum(arr != 0xffffffff)
+        # scale area
+        factor = N.sqrt( (N.pi*scale**2) / tot )
+        if abs(factor-1) > 1e-3:
+            areas[poly] = round(factor, 3)
+            print(poly, areas[poly])
+    return areas
+
+# calculated using above function
+area_scales = {
+    'diamond': 0.886,
+    'square': 0.886,
+    'cross': 1.034,
+    'plus': 1.108,
+    'star': 1.395,
+    'barhorz': 1.253,
+    'barvert': 1.253,
+    'pentagon': 0.96,
+    'hexagon': 1.099,
+    'octogon': 0.974,
+    'tievert': 1.253,
+    'tiehorz': 1.253,
+    'triangle': 1.296,
+    'triangledown': 1.296,
+    'triangleleft': 1.296,
+    'triangleright': 1.296,
+    'circlehole': 1.155,
+    'squarehole': 1.023,
+    'diamondhole': 1.024,
+    'pentagonhole': 1.109,
+    'squarerounded': 0.911,
+    'squashbox': 1.253,
+    'ellipsehorz': 1.414,
+    'ellipsevert': 1.414,
+    'lozengehorz': 1.254,
+    'lozengevert': 1.254,
+    'plusnarrow': 1.477,
+    'crossnarrow': 1.477,
+    'squareplus': 0.886,
+    'squarecross': 0.886,
+    'star3': 2.46,
+    'star4': 1.489,
+    'star6': 1.447,
+    'star8': 1.433,
+    'starinvert': 1.395,
+    'circlepairhorz': 1.414,
+    'circlepairvert': 1.414,
+    'limitupperaway2': 1.772,
+    'limitloweraway2': 1.772,
+    'limitleftaway2': 1.774,
+    'limitrightaway2': 1.771,
+}
 
 def addPolyPath(path, vals):
     """Add a polygon with the list of x,y pts as tuples in vals."""
@@ -346,7 +507,7 @@ pathsymbols = {
     'dot': dotPath,
     'bullseye': bullseyePath,
     'circledot': circleDotPath,
-    }
+}
 
 def getSymbolPainterPath(name, size, linewidth):
     """Get a painter path for a symbol shape."""
@@ -420,10 +581,11 @@ MarkerCodes = (
     'arrowupperleftaway', 'arrowupperrightaway',
     'arrowlowerrightaway', 'arrowlowerleftaway',
     'lineup', 'linedown', 'lineleft', 'lineright',
-    )
+)
 
 def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
-                clip=None, cmap=None, colorvals=None, scaleline=False):
+                clip=None, cmap=None, colorvals=None, scaleline=False,
+                equalarea=False):
     """Funtion to plot an array of markers on a painter.
 
     painter: QPainter
@@ -435,12 +597,13 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
     cmap: colormap to use if colorvals is set
     colorvals: color values 0-1 of each point if used
     scaleline: if scaling, scale border line width with scaling
+    equalarea: apply scaling factor for marker area (for filled markers)
     """
 
     # minor optimization
     if markername == 'none':
         return
-    
+
     painter.save()
 
     # get sharper angles and more exact positions using these settings
@@ -451,9 +614,13 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
     # get path to draw and whether to fill
     path, fill = getPointPainterPath(
         markername, markersize, painter.pen().widthF())
+
     if not fill:
         # turn off brush
         painter.setBrush( qt.QBrush() )
+
+    if equalarea and markername in area_scales:
+        path = scalePath(path, area_scales[markername])
 
     # if using colored points
     colorimg = None
@@ -464,8 +631,8 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
         colorimg = colormap.applyColorMap(
             cmap, 'linear', color2d, 0., 1., trans)
 
-    plotPathsToPainter(painter, path, xpos, ypos, scaling, clip, colorimg,
-                       scaleline)
+    plotPathsToPainter(
+        painter, path, xpos, ypos, scaling, clip, colorimg, scaleline)
 
     painter.restore()
 
@@ -495,22 +662,23 @@ arrow_translate = {
 }
 
 # codes of allowable arrows
-ArrowCodes = ( 'none', 'arrow', 'arrownarrow',
-               'arrowtriangle',
-               'arrowreverse',
-               'linearrow', 'linearrowreverse',
-               'bar', 'linecross',
-               'asterisk',
-               'circle', 'square', 'diamond',
-               'lineup', 'linedown',
-               'lineextend',
-               )
+ArrowCodes = (
+    'none', 'arrow', 'arrownarrow',
+    'arrowtriangle',
+    'arrowreverse',
+    'linearrow', 'linearrowreverse',
+    'bar', 'linecross',
+    'asterisk',
+    'circle', 'square', 'diamond',
+    'lineup', 'linedown',
+    'lineextend',
+)
 
 def plotLineArrow(painter, xpos, ypos, length, angle,
                   arrowsize=0,
                   arrowleft='none', arrowright='none'):
     """Plot a line or arrow.
-    
+
     xpos, ypos is the starting point of the line
     angle is the angle to the horizontal (degrees)
     arrowleft and arrowright are arrow codes."""

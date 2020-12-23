@@ -74,6 +74,7 @@ void addNumpyPolygonToPath(QPainterPath&, const QRectF*, ...);
    }
 %End
 
+QPainterPath scalePath(const QPainterPath& path, qreal scale);
 
 void plotPathsToPainter(QPainter&, QPainterPath&, SIP_PYOBJECT, SIP_PYOBJECT,
 			SIP_PYOBJECT,

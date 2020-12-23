@@ -42,6 +42,9 @@ void addNumpyToPolygonF(QPolygonF& poly,
 void addNumpyPolygonToPath(QPainterPath &path, const Tuple2Ptrs& d,
 			   const QRectF* clip = 0);
 
+// Scale path by scale given. Puts output in out.
+QPainterPath scalePath(const QPainterPath& path, qreal scale);
+
 // plot paths to painter
 // x and y locations are given in x and y
 // if scaling is not 0, is an array to scale the data points by

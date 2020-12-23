@@ -36,8 +36,11 @@ def _(text, disambiguation=None, context='Root'):
 class Root(widget.Widget):
     """Root widget class for plotting the document."""
 
-    typename='document'
+    typename = 'document'
     allowusercreation = False
+
+    # maximum compatibility version (increase as needed)
+    max_compat_level = 1
 
     def __init__(self, parent, name=None, document=None):
         """Initialise object."""
@@ -55,6 +58,7 @@ class Root(widget.Widget):
 
         s.get('englishlocale').setOnModified(self.changeLocale)
         s.get('colorTheme').setOnModified(self.changeColorTheme)
+        s.get('compatLevel').setOnModified(self.changeCompatLevel)
 
     @classmethod
     def addSettings(klass, s):
@@ -62,23 +66,25 @@ class Root(widget.Widget):
         s.remove('hide')
 
         s.add( setting.DistancePhysical(
-                'width',
-                '15cm',
-                descr=_('Width of the pages'),
-                usertext=_('Page width'),
-                formatting=True) )
+            'width',
+            '15cm',
+            descr=_('Width of the pages'),
+            usertext=_('Page width'),
+            formatting=True
+        ) )
         s.add( setting.DistancePhysical(
-                'height',
-                '15cm',
-                descr=_('Height of the pages'),
-                usertext=_('Page height'),
-                formatting=True) )
+            'height',
+            '15cm',
+            descr=_('Height of the pages'),
+            usertext=_('Page height'),
+            formatting=True
+        ) )
         s.add( setting.Bool(
-                'englishlocale', False,
-                descr=_('Use US/English number formatting for '
-                        'document'),
-                usertext=_('English locale'),
-                formatting=True) )
+            'englishlocale', False,
+            descr=_('Use US/English number formatting for document'),
+            usertext=_('English locale'),
+            formatting=True
+        ) )
 
         themes = sorted(list(document.colors.colorthemes))
         s.add( setting.Choice(
@@ -87,13 +93,21 @@ class Root(widget.Widget):
             'black',
             descr=_('Color theme'),
             usertext=_('Color theme'),
-            formatting=True) )
+            formatting=True
+        ) )
 
         s.add( setting.Notes(
-                'notes', '',
-                descr=_('User-defined notes'),
-                usertext=_('Notes')
-                ) )
+            'notes', '',
+            descr=_('User-defined notes'),
+            usertext=_('Notes')
+        ) )
+
+        s.add( setting.Int(
+            'compatLevel', 0,
+            descr=_('Document compatibility level'),
+            usertext=_('Compatibility'),
+            minval=0, maxval=klass.max_compat_level
+        ) )
 
     @classmethod
     def allowedParentTypes(klass):
@@ -118,6 +132,13 @@ class Root(widget.Widget):
         self.document.evaluate.colors.setColorTheme(
             self.settings.colorTheme)
 
+    def changeCompatLevel(self):
+        """Update compatibility level for all registered widget types."""
+        compatlevel = self.settings.compatLevel
+        stylesheet = self.settings.StyleSheet
+        for klass in document.thefactory.listWidgetClasses():
+            klass.onNewCompatLevel(stylesheet, compatlevel)
+
     def getPage(self, pagenum):
         """Get page widget."""
         try:
@@ -139,12 +160,13 @@ class Root(widget.Widget):
         w = self.settings.get('width').convert(painter)
         h = self.settings.get('height').convert(painter)
         painthelper.setControlGraph(self, [
-                controlgraph.ControlMarginBox(self, [0, 0, w, h],
-                                              [-10000, -10000,
-                                                10000,  10000],
-                                              painthelper,
-                                              ismovable = False)
-                ] )
+                controlgraph.ControlMarginBox(
+                    self, [0, 0, w, h],
+                    [-10000, -10000, 10000,  10000],
+                    painthelper,
+                    ismovable=False,
+                )
+        ])
 
     def updateControlItem(self, cgi):
         """Call helper to set page size."""
@@ -156,9 +178,10 @@ class Root(widget.Widget):
         for widgetname in document.thefactory.listWidgets():
             klass = document.thefactory.getWidgetClass(widgetname)
             if klass.allowusercreation or klass == Root:
-                newsett = setting.Settings(name=klass.typename,
-                                           usertext = klass.typename,
-                                           pixmap="button_%s" % klass.typename)
+                newsett = setting.Settings(
+                    name=klass.typename,
+                    usertext = klass.typename,
+                    pixmap="button_%s" % klass.typename)
                 classset = setting.Settings('temp')
                 klass.addSettings(classset)
 

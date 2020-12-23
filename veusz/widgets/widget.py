@@ -98,7 +98,7 @@ class Widget(object):
 
         # store child widgets
         self.children = []
-        
+
         # settings for widget
         self.settings = setting.Settings(
             'Widget_' + self.typename,
@@ -122,6 +122,10 @@ class Widget(object):
                             descr = _('Hide object'),
                             usertext = _('Hide'),
                             formatting = True) )
+
+    @classmethod
+    def onNewCompatLevel(klass, stylesheet, level):
+        """Called to adjust new defaults if there is a level change."""
 
     def getDocument(self):
         """Return document.
@@ -184,7 +188,7 @@ class Widget(object):
 
     def addChild(self, child, index=9999999):
         """Add child to list.
-        
+
         index is a position to place the new child
         """
         self.children.insert(index, child)
@@ -292,7 +296,7 @@ class Widget(object):
             # iterate over children in reverse order
             for c in reversed(self.children):
                 c.draw(bounds, painthelper, outerbounds=outerbounds)
- 
+
         # return our final bounds
         return bounds
 
@@ -395,7 +399,7 @@ class Widget(object):
 
     def updateControlItem(self, controlitem, pos):
         """Update the widget's control point.
-        
+
         controlitem is the control item in question."""
 
         pass

@@ -131,35 +131,32 @@ void addNumpyPolygonToPath(QPainterPath &path, const Tuple2Ptrs& d,
     }
 }
 
-namespace
+// Scale path by scale given. Puts output in out.
+QPainterPath scalePath(const QPainterPath& path, qreal scale)
 {
-
-  // Scale path by scale given. Puts output in out.
-  void scalePath(const QPainterPath& path, qreal scale, QPainterPath& out)
-  {
-    const int count = path.elementCount();
-    for(int i=0; i<count; ++i)
-      {
-	const QPainterPath::Element& el = path.elementAt(i);
-	if(el.isMoveTo())
-	  {
-	    out.moveTo(el*scale);
-	  }
-	else if(el.isLineTo())
-	  {
-	    out.lineTo(el*scale);
-	  }
-	else if(el.isCurveTo())
-	  {
-	    out.cubicTo(el*scale,
-			path.elementAt(i+1)*scale,
-			path.elementAt(i+2)*scale);
-	    i += 2;
-	  }
-      }
-  }
-
-} // namespace
+  QPainterPath out;
+  const int count = path.elementCount();
+  for(int i=0; i<count; ++i)
+    {
+      const QPainterPath::Element& el = path.elementAt(i);
+      if(el.isMoveTo())
+        {
+          out.moveTo(el*scale);
+        }
+      else if(el.isLineTo())
+        {
+          out.lineTo(el*scale);
+        }
+      else if(el.isCurveTo())
+        {
+          out.cubicTo(el*scale,
+                      path.elementAt(i+1)*scale,
+                      path.elementAt(i+2)*scale);
+          i += 2;
+        }
+    }
+  return out;
+}
 
 void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 			const Numpy1DObj& x, const Numpy1DObj& y,
@@ -224,9 +221,7 @@ void plotPathsToPainter(QPainter& painter, QPainterPath& path,
 		}
 	      else
 		{
-		  QPainterPath scaled;
-		  scalePath(path, s, scaled);
-		  painter.drawPath(scaled);
+		  painter.drawPath( scalePath(path, s) );
 		}
 	    }
 
