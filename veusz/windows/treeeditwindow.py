@@ -97,8 +97,10 @@ class SettingsProxySingle(SettingsProxy):
 
     def settingsProxyList(self):
         """Return list of SettingsProxy objects."""
-        return [ SettingsProxySingle(self.document, s)
-                 for s in self.settings.getSettingsList() ]
+        return [
+            SettingsProxySingle(self.document, s)
+            for s in self.settings.getSettingsList()
+        ]
 
     def settingList(self):
         """Return list of Setting objects."""
@@ -194,8 +196,8 @@ class SettingsProxyMulti(SettingsProxy):
                 newroot = n
                 if self._root:
                     newroot = self._root + '/' + newroot
-                v = SettingsProxyMulti(self.document, self.widgets,
-                                       _root=newroot)
+                v = SettingsProxyMulti(
+                    self.document, self.widgets, _root=newroot)
             else:
                 # use setting from first settings as template
                 v = o
@@ -206,8 +208,8 @@ class SettingsProxyMulti(SettingsProxy):
     def childProxyList(self):
         """Make a list of proxy settings."""
         if self._cachechild is None:
-            self._cachechild = self._objList( (setting.Settings,
-                                               setting.Setting) )
+            self._cachechild = self._objList(
+                (setting.Settings, setting.Setting) )
         return self._cachechild
 
     def settingsProxyList(self):
@@ -507,8 +509,8 @@ class TabbedFormatting(qt.QTabWidget):
         setnslist = setnsproxy.settingsProxyList()
 
         # add formatting settings if necessary
-        numformat = len( [setn for setn in setnsproxy.settingList()
-                          if setn.formatting] )
+        numformat = len(
+            [setn for setn in setnsproxy.settingList() if setn.formatting] )
         if numformat > 0:
             # add on a formatting tab
             setnslist.insert(0, setnsproxy)
@@ -681,14 +683,14 @@ class TreeEditDock(qt.QDockWidget):
         self.setWidget(self.treeview)
 
         # toolbar to create widgets
-        self.addtoolbar = qt.QToolBar(_("Insert toolbar - Veusz"),
-                                       parentwin)
+        self.addtoolbar = qt.QToolBar(
+            _("Insert toolbar - Veusz"), parentwin)
         # note wrong description!: backwards compatibility
         self.addtoolbar.setObjectName("veuszeditingtoolbar")
 
         # toolbar for editting widgets
-        self.edittoolbar = qt.QToolBar(_("Edit toolbar - Veusz"),
-                                        parentwin)
+        self.edittoolbar = qt.QToolBar(
+            _("Edit toolbar - Veusz"), parentwin)
         self.edittoolbar.setObjectName("veuszedittoolbar")
 
         self._constructToolbarMenu()
@@ -875,54 +877,53 @@ class TreeEditDock(qt.QDockWidget):
 
         a = utils.makeAction
         actions.update({
-                'edit.cut':
-                    a(self, _('Cut the selected widget'), _('Cu&t'),
-                      self.slotWidgetCut,
-                      icon='veusz-edit-cut', key='Ctrl+X'),
-                'edit.copy':
-                    a(self, _('Copy the selected widget'), _('&Copy'),
-                      self.slotWidgetCopy,
-                      icon='kde-edit-copy', key='Ctrl+C'),
-                'edit.paste':
-                    a(self, _('Paste widget from the clipboard'), _('&Paste'),
-                      self.slotWidgetPaste,
-                      icon='kde-edit-paste', key='Ctrl+V'),
-                'edit.moveup':
-                    a(self, _('Move the selected widget up'), _('Move &up'),
-                      lambda: self.slotWidgetMove(-1),
-                      icon='kde-go-up', key='Ctrl+PgUp'),
-                'edit.movedown':
-                    a(self, _('Move the selected widget down'), _('Move d&own'),
-                      lambda: self.slotWidgetMove(1),
-                      icon='kde-go-down', key='Ctrl+PgDown'),
-                'edit.delete':
-                    a(self, _('Remove the selected widget'), _('&Delete'),
-                      self.slotWidgetDelete,
-                      icon='kde-edit-delete'),
-                'edit.rename':
-                    a(self, _('Renames the selected widget'), _('&Rename'),
-                      self.slotWidgetRename,
-                      icon='kde-edit-rename'),
-                'edit.show':
-                    a(self, _('Show selected widget(s)'), _('Show'),
-                      self.slotWidgetShow,
-                      key='Ctrl+]'),
-                'edit.hide':
-                    a(self, _('Hide selected widget(s)'), _('Hide'),
-                      self.slotWidgetHide,
-                      key='Ctrl+['),
+            'edit.cut': a(
+                self, _('Cut the selected widget'), _('Cu&t'),
+                self.slotWidgetCut,
+                icon='veusz-edit-cut', key='Ctrl+X'),
+            'edit.copy': a(
+                self, _('Copy the selected widget'), _('&Copy'),
+                self.slotWidgetCopy,
+                icon='kde-edit-copy', key='Ctrl+C'),
+            'edit.paste': a(
+                self, _('Paste widget from the clipboard'), _('&Paste'),
+                self.slotWidgetPaste,
+                icon='kde-edit-paste', key='Ctrl+V'),
+            'edit.moveup': a(
+                self, _('Move the selected widget up'), _('Move &up'),
+                lambda: self.slotWidgetMove(-1),
+                icon='kde-go-up', key='Ctrl+PgUp'),
+            'edit.movedown': a(
+                self, _('Move the selected widget down'), _('Move d&own'),
+                lambda: self.slotWidgetMove(1),
+                icon='kde-go-down', key='Ctrl+PgDown'),
+            'edit.delete': a(
+                self, _('Remove the selected widget'), _('&Delete'),
+                self.slotWidgetDelete,
+                icon='kde-edit-delete'),
+            'edit.rename': a(
+                self, _('Renames the selected widget'), _('&Rename'),
+                self.slotWidgetRename,
+                icon='kde-edit-rename'),
+            'edit.show': a(
+                self, _('Show selected widget(s)'), _('Show'),
+                self.slotWidgetShow,
+                key='Ctrl+]'),
+            'edit.hide': a(
+                self, _('Hide selected widget(s)'), _('Hide'),
+                self.slotWidgetHide,
+                key='Ctrl+['),
 
-                'add.shapemenu':
-                    a(self, _('Add a shape to the plot'), _('Shape'),
-                      self.slotShowShapeMenu,
-                      icon='veusz-shape-menu'),
+            'add.shapemenu': a(
+                self, _('Add a shape to the plot'), _('Shape'),
+                self.slotShowShapeMenu,
+                icon='veusz-shape-menu'),
 
-                'add.axismenu':
-                    a(self, _('Add an axis to the plot'), _('Axis'),
-                      None,
-                      icon='button_axis'),
-
-                })
+            'add.axismenu': a(
+                self, _('Add an axis to the plot'), _('Axis'),
+                None,
+                icon='button_axis'),
+        })
 
         # list of widget-generating actions for menu and toolbar
         widgetactions = (
@@ -955,55 +956,61 @@ class TreeEditDock(qt.QDockWidget):
             'add.graph3d',
             'add.covariance',
             'add.shapemenu',
-            )
+        )
 
         # separate menus for adding shapes and axis types
         shapemenu = qt.QMenu()
         shapemenu.addActions( [actions[act] for act in (
-                    'add.rect',
-                    'add.ellipse',
-                    'add.line',
-                    'add.imagefile',
-                    'add.polygon',
-                    )])
+            'add.rect',
+            'add.ellipse',
+            'add.line',
+            'add.imagefile',
+            'add.polygon',
+        )])
         actions['add.shapemenu'].setMenu(shapemenu)
 
         axismenu = qt.QMenu()
         axismenu.addActions( [actions[act] for act in (
-                    'add.axis',
-                    'add.axis-broken',
-                    'add.axis-function',
-             )])
+            'add.axis',
+            'add.axis-broken',
+            'add.axis-function',
+        )])
         actions['add.axismenu'].setMenu(axismenu)
         actions['add.axismenu'].triggered.connect(actions['add.axis'].trigger)
 
         menuitems = (
             ('insert', '', widgetactions),
             ('edit', '', (
-                    'edit.cut',
-                    'edit.copy',
-                    'edit.paste',
-                    'edit.delete',
-                    'edit.rename',
-                    'edit.moveup',
-                    'edit.movedown',
-                    'edit.show',
-                    'edit.hide',
-                    )),
-            )
-        utils.constructMenus( self.parentwin.menuBar(),
-                              self.parentwin.menus,
-                              menuitems,
-                              actions )
+                'edit.cut',
+                'edit.copy',
+                'edit.paste',
+                'edit.delete',
+                'edit.rename',
+                'edit.moveup',
+                'edit.movedown',
+                'edit.show',
+                'edit.hide',
+            )),
+        )
+        utils.constructMenus(
+            self.parentwin.menuBar(),
+            self.parentwin.menus,
+            menuitems,
+            actions
+        )
 
         # add actions to toolbar to create widgets
         utils.addToolbarActions(self.addtoolbar, actions, widgetactions)
 
         # add action to toolbar for editing
-        utils.addToolbarActions(self.edittoolbar,  actions,
-                                ('edit.cut', 'edit.copy', 'edit.paste',
-                                 'edit.moveup', 'edit.movedown',
-                                 'edit.delete', 'edit.rename'))
+        utils.addToolbarActions(
+            self.edittoolbar,  actions,
+            (
+                'edit.cut', 'edit.copy', 'edit.paste',
+                'edit.moveup', 'edit.movedown',
+                'edit.delete', 'edit.rename',
+            )
+        )
 
         self.parentwin.menus['edit.select'].aboutToShow.connect(
             self.updateSelectMenu)
@@ -1035,8 +1042,8 @@ class TreeEditDock(qt.QDockWidget):
 
         # make the new widget and update the document
         w = self.document.applyOperation(
-            document.OperationWidgetAdd(parent, widgettype, autoadd=autoadd,
-                                        name=name) )
+            document.OperationWidgetAdd(
+                parent, widgettype, autoadd=autoadd, name=name) )
 
         # select the widget
         self.selectWidget(w)
@@ -1402,8 +1409,8 @@ class SettingLabel(qt.QWidget):
         setwidget = self.setting.getWidget()
         if setwidget is None:
             return
-        getWidgetsOfType(self.document.basewidget,
-                         setwidget.typename, widgets)
+        getWidgetsOfType(
+            self.document.basewidget, setwidget.typename, widgets)
         widgets = [w.path for w in widgets if w != setwidget]
         widgets.sort()
 
@@ -1496,16 +1503,18 @@ class SettingLabel(qt.QWidget):
     def actionCopyTypedSiblings(self):
         """Copy setting to siblings of the same type."""
         self.document.applyOperation(
-            document.OperationSettingPropagate(self.setting,
-                                               root=self._clickwidget.parent,
-                                               maxlevels=1) )
+            document.OperationSettingPropagate(
+                self.setting,
+                root=self._clickwidget.parent,
+                maxlevels=1) )
 
     def actionCopyTypedNamedWidgets(self):
         """Copy setting to widgets with the same name and type."""
         self.document.applyOperation(
-            document.OperationSettingPropagate(self.setting,
-                                               widgetname=
-                                               self._clickwidget.name) )
+            document.OperationSettingPropagate(
+                self.setting,
+                widgetname=
+                self._clickwidget.name) )
 
     def actionUnlinkSetting(self):
         """Unlink the setting if it is a reference."""
@@ -1520,8 +1529,10 @@ class SettingLabel(qt.QWidget):
         # apply operation to change it
         self.document.applyOperation(
             document.OperationMultiple(
-                [ document.OperationSettingSet(sslink, self.setting.get()),
-                  document.OperationSettingSet(self.setting,
-                                               self.setting.default) ],
+                [
+                    document.OperationSettingSet(sslink, self.setting.get()),
+                    document.OperationSettingSet(
+                        self.setting, self.setting.default)
+                ],
                 descr=_("make default style"))
-            )
+        )

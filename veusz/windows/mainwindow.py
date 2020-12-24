@@ -143,26 +143,26 @@ class MainWindow(qt.QMainWindow):
         self._defineMenus()
 
         # make plot window
-        self.plot = plotwindow.PlotWindow(self.document, self,
-                                          menu = self.menus['view'])
+        self.plot = plotwindow.PlotWindow(
+            self.document, self, menu=self.menus['view'])
         self.setCentralWidget(self.plot)
         self.plot.showToolbar()
 
         # likewise with the tree-editing window
         self.treeedit = treeeditwindow.TreeEditDock(self.document, self)
         self.addDockWidget(qt.Qt.LeftDockWidgetArea, self.treeedit)
-        self.propdock = treeeditwindow.PropertiesDock(self.document,
-                                                      self.treeedit, self)
+        self.propdock = treeeditwindow.PropertiesDock(
+            self.document, self.treeedit, self)
         self.addDockWidget(qt.Qt.LeftDockWidgetArea, self.propdock)
-        self.formatdock = treeeditwindow.FormatDock(self.document,
-                                                    self.treeedit, self)
+        self.formatdock = treeeditwindow.FormatDock(
+            self.document, self.treeedit, self)
         self.addDockWidget(qt.Qt.LeftDockWidgetArea, self.formatdock)
         self.datadock = DataNavigatorWindow(self.document, self, self)
         self.addDockWidget(qt.Qt.RightDockWidgetArea, self.datadock)
 
         # make the console window a dock
-        self.console = consolewindow.ConsoleWindow(self.document,
-                                                   self)
+        self.console = consolewindow.ConsoleWindow(
+            self.document, self)
         self.console.hide()
         self.interpreter = self.console.interpreter
         self.addDockWidget(qt.Qt.BottomDockWidgetArea, self.console)
@@ -624,15 +624,22 @@ class MainWindow(qt.QMainWindow):
             tb, self.vzactions,
             ('data.import', 'data.edit',
              'data.create', 'data.capture',
-             'data.filter', 'data.reload'))
+             'data.filter', 'data.reload')
+        )
 
         # menu structure
         filemenu = [
-            ['file.new', _('New'),
-             ['file.new.graph', 'file.new.graph3d', 'file.new.polar',
-              'file.new.ternary']],
+            [
+                'file.new', _('New'),
+                [
+                    'file.new.graph', 'file.new.graph3d', 'file.new.polar',
+                    'file.new.ternary'
+                ]
+            ],
             'file.open',
-            ['file.filerecent', _('Open &Recent'), []],
+            [
+                'file.filerecent', _('Open &Recent'), []
+            ],
             'file.reload',
             '',
             'file.save', 'file.saveas', 'file.trust',
@@ -640,7 +647,7 @@ class MainWindow(qt.QMainWindow):
             'file.print', 'file.export',
             '',
             'file.close', 'file.quit'
-            ]
+        ]
         editmenu = [
             'edit.undo', 'edit.redo',
             '',
@@ -657,35 +664,44 @@ class MainWindow(qt.QMainWindow):
             'view.addtool', 'view.edittool'
             ]
         viewmenu = [
-            ['view.viewwindows', _('&Windows'), viewwindowsmenu],
+            [
+                'view.viewwindows', _('&Windows'), viewwindowsmenu
+            ],
             ''
             ]
         insertmenu = [
             ]
 
         # load dataset plugins and create menu
-        datapluginsmenu = self.definePlugins( plugins.datasetpluginregistry,
-                                              self.vzactions, 'data.ops' )
+        datapluginsmenu = self.definePlugins(
+            plugins.datasetpluginregistry,
+            self.vzactions, 'data.ops'
+        )
 
         datamenu = [
-            ['data.ops', _('&Operations'), datapluginsmenu],
+            [
+                'data.ops', _('&Operations'), datapluginsmenu
+            ],
             'data.import', 'data.edit', 'data.create',
             'data.create2d', 'data.capture', 'data.filter', 'data.histogram',
             'data.reload',
-            ]
+        ]
         helpmenu = [
             'help.home', 'help.bug', 'help.update',
             '',
             'help.tutorial',
             '',
-            ['help.examples', _('&Example documents'), []],
+            [
+                'help.examples', _('&Example documents'), []
+            ],
             '',
             'help.about'
-            ]
+        ]
 
         # load tools plugins and create menu
-        toolsmenu = self.definePlugins( plugins.toolspluginregistry,
-                                        self.vzactions, 'tools' )
+        toolsmenu = self.definePlugins(
+            plugins.toolspluginregistry,
+            self.vzactions, 'tools')
 
         menus = [
             ['file', _('&File'), filemenu],
@@ -695,7 +711,7 @@ class MainWindow(qt.QMainWindow):
             ['data', _('&Data'), datamenu],
             ['tools', _('&Tools'), toolsmenu],
             ['help', _('&Help'), helpmenu],
-            ]
+        ]
 
         self.menus = {}
         utils.constructMenus(self.menuBar(), self.menus, menus, self.vzactions)
@@ -716,9 +732,11 @@ class MainWindow(qt.QMainWindow):
 
         # not cstr here forces to unicode for Python 2, getting
         # filenames in unicode
-        examples = [ os.path.join(utils.exampleDirectory, f)
-                     for f in os.listdir(str(utils.exampleDirectory))
-                     if os.path.splitext(f)[1] == ".vsz" ]
+        examples = [
+            os.path.join(utils.exampleDirectory, f)
+            for f in os.listdir(str(utils.exampleDirectory))
+            if os.path.splitext(f)[1] == ".vsz"
+        ]
 
         menu = self.menus["help.examples"]
         for ex in sorted(examples):
@@ -742,16 +760,18 @@ class MainWindow(qt.QMainWindow):
 
         # set whether windows are visible and connect up to toggle windows
         self.viewwinfns = []
-        for win, act in ((self.treeedit, 'view.edit'),
-                         (self.propdock, 'view.props'),
-                         (self.formatdock, 'view.format'),
-                         (self.console, 'view.console'),
-                         (self.datadock, 'view.datanav'),
-                         (self.maintoolbar, 'view.maintool'),
-                         (self.datatoolbar, 'view.datatool'),
-                         (self.treeedit.edittoolbar, 'view.edittool'),
-                         (self.treeedit.addtoolbar, 'view.addtool'),
-                         (self.plot.viewtoolbar, 'view.viewtool')):
+        for win, act in (
+                (self.treeedit, 'view.edit'),
+                (self.propdock, 'view.props'),
+                (self.formatdock, 'view.format'),
+                (self.console, 'view.console'),
+                (self.datadock, 'view.datanav'),
+                (self.maintoolbar, 'view.maintool'),
+                (self.datatoolbar, 'view.datatool'),
+                (self.treeedit.edittoolbar, 'view.edittool'),
+                (self.treeedit.addtoolbar, 'view.addtool'),
+                (self.plot.viewtoolbar, 'view.viewtool')
+        ):
 
             a = self.vzactions[act]
             fn = viewHideWindow(win)
@@ -861,7 +881,7 @@ class MainWindow(qt.QMainWindow):
               "Would you like to start the tutorial now?\n"
               "If not, you can access it later through the Help menu."),
             qt.QMessageBox.Yes | qt.QMessageBox.No
-            )
+        )
 
         if retn == qt.QMessageBox.Yes:
             self.slotHelpTutorial()
@@ -908,7 +928,7 @@ class MainWindow(qt.QMainWindow):
               "Is this ok? This choice can be changed in Preferences."),
             qt.QMessageBox.Yes | qt.QMessageBox.No,
             qt.QMessageBox.Yes
-            )
+        )
 
         setting.settingdb['vercheck_disabled'] = retn==qt.QMessageBox.No
         setting.settingdb['vercheck_asked_user'] = True
@@ -950,7 +970,7 @@ class MainWindow(qt.QMainWindow):
               "Is this ok? This choice can be changed in Preferences."),
             qt.QMessageBox.Yes | qt.QMessageBox.No,
             qt.QMessageBox.Yes
-            )
+        )
 
         setting.settingdb['feedback_disabled'] = retn==qt.QMessageBox.No
         setting.settingdb['feedback_asked_user'] = True
@@ -988,7 +1008,8 @@ class MainWindow(qt.QMainWindow):
             _("Save file?"),
             _("Document%s was modified. Save first?") % filetext,
             qt.QMessageBox.Save | qt.QMessageBox.Discard |
-            qt.QMessageBox.Cancel)
+            qt.QMessageBox.Cancel
+        )
 
     def closeEvent(self, event):
         """Before closing, check whether we need to save first."""
@@ -1084,8 +1105,8 @@ class MainWindow(qt.QMainWindow):
         if self.filename == '':
             self.setWindowTitle(_('Untitled - Veusz'))
         else:
-            self.setWindowTitle( _("%s - Veusz") %
-                                 os.path.basename(self.filename) )
+            self.setWindowTitle(
+                _("%s - Veusz") % os.path.basename(self.filename))
 
     def plotQueueChanged(self, incr):
         self.plotqueuecount += incr
@@ -1312,8 +1333,8 @@ class MainWindow(qt.QMainWindow):
         menu.clear()
 
         if setdb['main_recentfiles']:
-            files = [f for f in setdb['main_recentfiles']
-                     if os.path.isfile(f)]
+            files = [
+                f for f in setdb['main_recentfiles'] if os.path.isfile(f)]
 
             # add each recent file to menu
             newmenuitems = []
@@ -1338,7 +1359,8 @@ class MainWindow(qt.QMainWindow):
             _("Reload file"),
             _("Reload document from file, losing any changes?"),
             qt.QMessageBox.Yes | qt.QMessageBox.Cancel,
-            qt.QMessageBox.Cancel)
+            qt.QMessageBox.Cancel
+        )
         if retn == qt.QMessageBox.Yes:
             if not os.path.exists(self.filename):
                 qt.QMessageBox.critical(
@@ -1380,11 +1402,11 @@ class MainWindow(qt.QMainWindow):
     def slotUpdatePage(self, number):
         """Update page number when the plot window says so."""
 
-        np = self.document.getNumberPages()
-        if np == 0:
+        nump = self.document.getNumberPages()
+        if nump == 0:
             self.pagelabel.setText(_("No pages"))
         else:
-            self.pagelabel.setText(_("Page %i/%i") % (number+1, np))
+            self.pagelabel.setText(_("Page %i/%i") % (number+1, nump))
 
     def slotUpdateAxisValues(self, values):
         """Update the position where the mouse is relative to the axes."""

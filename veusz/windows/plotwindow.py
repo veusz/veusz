@@ -234,7 +234,7 @@ class PlotWindow( qt.QGraphicsView ):
         (2000, _('Every 2s')),
         (5000, _('Every 5s')),
         (10000, _('Every 10s')),
-        )
+    )
 
     def __init__(self, document, parent, menu=None):
         """Initialise the window.
@@ -380,81 +380,81 @@ class PlotWindow( qt.QGraphicsView ):
 
         a = utils.makeAction
         actions.update({
-                'view.zoomin':
-                    a(self, _('Zoom into the plot'), _('Zoom &In'),
-                      self.slotViewZoomIn,
-                      icon='kde-zoom-in', key='Ctrl++'),
-                'view.zoomout':
-                    a(self, _('Zoom out of the plot'), _('Zoom &Out'),
-                      self.slotViewZoomOut,
-                      icon='kde-zoom-out', key='Ctrl+-'),
-                'view.zoom11':
-                    a(self, _('Restore plot to natural size'), _('Zoom 1:1'),
-                      self.slotViewZoom11,
-                      icon='kde-zoom-1-veuszedit', key='Ctrl+1'),
-                'view.zoomwidth':
-                    a(self, _('Zoom plot to show whole width'), _('Zoom to width'),
-                      self.slotViewZoomWidth,
-                      icon='kde-zoom-width-veuszedit'),
-                'view.zoomheight':
-                    a(self, _('Zoom plot to show whole height'), _('Zoom to height'),
-                      self.slotViewZoomHeight,
-                      icon='kde-zoom-height-veuszedit'),
-                'view.zoompage':
-                    a(self, _('Zoom plot to show whole page'), _('Zoom to page'),
-                      self.slotViewZoomPage,
-                      icon='kde-zoom-page-veuszedit'),
-                'view.zoommenu':
-                    a(self, _('Zoom functions menu'), _('Zoom'),
-                      None,
-                      icon='kde-zoom-veuszedit'),
-                'view.prevpage':
-                    a(self, _('Move to the previous page'), _('&Previous page'),
-                      self.slotViewPreviousPage,
-                      icon='kde-go-previous', key='Ctrl+PgUp'),
-                'view.nextpage':
-                    a(self, _('Move to the next page'), _('&Next page'),
-                      self.slotViewNextPage,
-                      icon='kde-go-next', key='Ctrl+PgDown'),
-                'view.select':
-                    a(self, _('Select items from the graph or scroll'),
-                      _('Select items or scroll'),
-                      None,
-                      icon='kde-mouse-pointer'),
-                'view.pick':
-                    a(self, _('Read data points on the graph'),
-                      _('Read data points'),
-                      None,
-                      icon='veusz-pick-data'),
-                'view.graphzoom':
-                    a(self,
-                      _('Click or draw a rectangle to zoom graph axes'),
-                      _('Zoom into graph'),
-                      None,
-                      icon='veusz-zoom-graph'),
-                'view.graphzoomout':
-                    a(self,
-                      _('Click to zoom out of graph axes'),
-                      _('Zoom out of graph'),
-                      None,
-                      icon='veusz-zoom-graph-out'),
-                'view.graphrecenter':
-                    a(self,
-                      _('Click to recenter graph axes'),
-                      _('Recenter graph'),
-                      None,
-                      icon='veusz-zoom-graph-recenter'),
-                'view.graphreset':
-                    a(self,
-                      _('Click to reset graph axes'),
-                      _('Reset axes'),
-                      None,
-                      icon='veusz-zoom-reset'),
-                'view.fullscreen':
-                    a(self, _('View plot full screen'), _('Full screen'),
-                      self.slotFullScreen,
-                      icon='veusz-view-fullscreen', key='Ctrl+F11'),
-                })
+            'view.zoomin': a(
+                self, _('Zoom into the plot'), _('Zoom &In'),
+                self.slotViewZoomIn,
+                icon='kde-zoom-in', key='Ctrl++'),
+            'view.zoomout': a(
+                self, _('Zoom out of the plot'), _('Zoom &Out'),
+                self.slotViewZoomOut,
+                icon='kde-zoom-out', key='Ctrl+-'),
+            'view.zoom11': a(
+                self, _('Restore plot to natural size'), _('Zoom 1:1'),
+                self.slotViewZoom11,
+                icon='kde-zoom-1-veuszedit', key='Ctrl+1'),
+            'view.zoomwidth': a(
+                self, _('Zoom plot to show whole width'), _('Zoom to width'),
+                self.slotViewZoomWidth,
+                icon='kde-zoom-width-veuszedit'),
+            'view.zoomheight': a(
+                self, _('Zoom plot to show whole height'), _('Zoom to height'),
+                self.slotViewZoomHeight,
+                icon='kde-zoom-height-veuszedit'),
+            'view.zoompage': a(
+                self, _('Zoom plot to show whole page'), _('Zoom to page'),
+                self.slotViewZoomPage,
+                icon='kde-zoom-page-veuszedit'),
+            'view.zoommenu': a(
+                self, _('Zoom functions menu'), _('Zoom'),
+                None,
+                icon='kde-zoom-veuszedit'),
+            'view.prevpage': a(
+                self, _('Move to the previous page'), _('&Previous page'),
+                self.slotViewPreviousPage,
+                icon='kde-go-previous', key='Ctrl+PgUp'),
+            'view.nextpage': a(
+                self, _('Move to the next page'), _('&Next page'),
+                self.slotViewNextPage,
+                icon='kde-go-next', key='Ctrl+PgDown'),
+            'view.select': a(
+                self, _('Select items from the graph or scroll'),
+                _('Select items or scroll'),
+                None,
+                icon='kde-mouse-pointer'),
+            'view.pick': a(
+                self, _('Read data points on the graph'),
+                _('Read data points'),
+                None,
+                icon='veusz-pick-data'),
+            'view.graphzoom': a(
+                self,
+                _('Click or draw a rectangle to zoom graph axes'),
+                _('Zoom into graph'),
+                None,
+                icon='veusz-zoom-graph'),
+            'view.graphzoomout': a(
+                self,
+                _('Click to zoom out of graph axes'),
+                _('Zoom out of graph'),
+                None,
+                icon='veusz-zoom-graph-out'),
+            'view.graphrecenter': a(
+                self,
+                _('Click to recenter graph axes'),
+                _('Recenter graph'),
+                None,
+                icon='veusz-zoom-graph-recenter'),
+            'view.graphreset': a(
+                self,
+                _('Click to reset graph axes'),
+                _('Reset axes'),
+                None,
+                icon='veusz-zoom-reset'),
+            'view.fullscreen': a(
+                self, _('View plot full screen'), _('Full screen'),
+                self.slotFullScreen,
+                icon='veusz-view-fullscreen', key='Ctrl+F11'),
+        })
 
         if menu:
             # only construct menu if required
@@ -780,9 +780,11 @@ class PlotWindow( qt.QGraphicsView ):
 
         # work out whether user is clicking on a control point
         items = self.items(event.pos())
-        self.ignoreclick = ( len(items)==0 or
-                             items[0] is not self.pixmapitem or
-                             self.painthelper is None )
+        self.ignoreclick = (
+            len(items)==0 or
+            items[0] is not self.pixmapitem or
+            self.painthelper is None
+        )
 
         if event.button() == qt.Qt.LeftButton and not self.ignoreclick:
 
@@ -1116,7 +1118,8 @@ class PlotWindow( qt.QGraphicsView ):
         dpr = helper.devicepixelratio
         bufferpixmap = qt.QPixmap.fromImage(img)
         bufferpixmap.setDevicePixelRatio(dpr)
-        self.setSceneRect(0, 0, bufferpixmap.width()/dpr, bufferpixmap.height()/dpr)
+        self.setSceneRect(
+            0, 0, bufferpixmap.width()/dpr, bufferpixmap.height()/dpr)
         self.pixmapitem.setPixmap(bufferpixmap)
 
     def updatePlotSettings(self):
@@ -1416,11 +1419,13 @@ class FullScreenPlotWindow(qt.QScrollArea):
         self.showFullScreen()
 
         self.toolbar = qt.QToolBar(_("Full screen toolbar"), self)
-        self.toolbar.addAction(utils.getIcon("kde-window-close"), _("Close"),
-                               self.close)
-        for a in ('view.zoom11', 'view.zoomin', 'view.zoomout',
-                  'view.zoomwidth', 'view.zoomheight',
-                  'view.zoompage', 'view.prevpage', 'view.nextpage'):
+        self.toolbar.addAction(
+            utils.getIcon("kde-window-close"), _("Close"), self.close)
+        for a in (
+                'view.zoom11', 'view.zoomin', 'view.zoomout',
+                'view.zoomwidth', 'view.zoomheight',
+                'view.zoompage', 'view.prevpage', 'view.nextpage'
+        ):
             self.toolbar.addAction( pw.vzactions[a] )
         self.toolbar.show()
 
@@ -1430,8 +1435,8 @@ class FullScreenPlotWindow(qt.QScrollArea):
         qt.QScrollArea.resizeEvent(self, event)
 
         # size graph to fill screen
-        pagesize = self.document.pageSize(self.plotwin.pagenumber,
-                                          dpi=self.plotwin.dpi)
+        pagesize = self.document.pageSize(
+            self.plotwin.pagenumber, dpi=self.plotwin.dpi)
         screensize = self.plotwin.size()
 
         aspectw = screensize.width() / pagesize[0]
