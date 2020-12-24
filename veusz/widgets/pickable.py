@@ -38,7 +38,7 @@ class PickInfo:
         self.distance = float('inf')
         self.displaytype = ('numeric', 'numeric')
 
-    def _bool_(self):
+    def __bool__(self):
         return bool(
             self.widget and self.graphpos and self.labels and self.coords)
 
