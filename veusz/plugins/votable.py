@@ -15,9 +15,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
+import io
+from urllib import request
 
-from ..compat import CStringIO, CBytesIO, curlrequest
 from .importplugin import ImportPlugin, importpluginregistry
 from .datasetplugin import Dataset1D, DatasetText
 
@@ -35,11 +35,11 @@ class ImportPluginVoTable(ImportPlugin):
     def _load_votable(self, params):
         if 'url' in params.field_results:
             try:
-                buff = CStringIO(curlrequest.urlopen(
-                        params.field_results['url']).read())
+                buff = io.StringIO(request.urlopen(
+                    params.field_results['url']).read())
             except TypeError:
-                buff = CBytesIO(curlrequest.urlopen(
-                        params.field_results['url']).read())
+                buff = io.BytesIO(request.urlopen(
+                    params.field_results['url']).read())
             return parse(buff, filename=params.filename)
         else:
             return parse(params.filename)
@@ -52,26 +52,29 @@ class ImportPluginVoTable(ImportPlugin):
             for field in table.fields:
                 fieldname = field.name
 
-                if field.datatype in ['float', 'double', 'short',
-                                      'int', 'unsignedByte']:
-                    result.append(Dataset1D(fieldname,
-                                            table.array[fieldname]))
+                if field.datatype in [
+                        'float', 'double', 'short', 'int', 'unsignedByte']:
+                    result.append(Dataset1D(
+                        fieldname, table.array[fieldname]))
 
                 elif field.datatype in ['char', 'string', 'unicodeChar']:
-                    result.append(DatasetText(fieldname,
-                                             table.array[fieldname]))
+                    result.append(DatasetText(
+                        fieldname, table.array[fieldname]))
 
                 elif field.datatype in ['floatComplex', 'doubleComplex']:
-                    print(('VO table import: skipping complex field ' +
-                          fieldname))
+                    print(
+                        'VO table import: skipping complex field ' +
+                        fieldname)
 
                 elif field.datatype in ['boolean', 'bit']:
-                    print(('VO table import: skipping boolean field ' +
-                          fieldname))
+                    print(
+                        'VO table import: skipping boolean field ' +
+                        fieldname)
 
                 else:
-                    print(('VO table import: unknown data type ' +
-                          field.datatype + ' for field ' + fieldname))
+                    print(
+                        'VO table import: unknown data type ' +
+                        field.datatype + ' for field ' + fieldname)
 
         return result
 
@@ -87,8 +90,9 @@ class ImportPluginVoTable(ImportPlugin):
         for table in votable.iter_tables():
             summary.append(table.name + ':')
             for field in table.fields:
-                summary.append('    ' + field.name +
-                               ' (' + field.datatype +')')
+                summary.append(
+                    '    ' + field.name +
+                    ' (' + field.datatype +')')
 
         return ('\n'.join(summary), True)
 

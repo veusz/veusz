@@ -18,16 +18,13 @@
 
 """Image plotting from 2d datasets."""
 
-from __future__ import division
-
-from .. import qtall as qt
 import numpy as N
 
+from .. import qtall as qt
 from .. import setting
 from .. import document
 from .. import utils
 from ..helpers import qtloops
-
 from . import plotters
 
 def _(text, disambiguation=None, context='Image'):

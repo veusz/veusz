@@ -18,11 +18,11 @@
 
 """A Qt data model show a tree of Python nodes."""
 
-from __future__ import division, print_function
 import bisect
+
 from .. import qtall as qt
 
-class TMNode(object):
+class TMNode:
     """Object to represent nodes in TreeModel.
 
     Each node has a tuple of data items, a parent node and a list of
@@ -220,7 +220,7 @@ class TreeModel(qt.QAbstractItemModel):
                 k = c[i].data[0]
             else:
                 k = None
-                
+
             # one to be deleted
             if k in todelete:
                 todelete.remove(k)

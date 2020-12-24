@@ -19,7 +19,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import sys
 import string
 import re
@@ -32,10 +31,9 @@ import csv
 import time
 from collections import defaultdict
 
-from ..compat import citems, cstr, CStringIO, cbasestr, cpy3, cbytes, crepr, \
-    crange
-from .. import qtall as qt
 import numpy as N
+
+from .. import qtall as qt
 
 class IgnoreException(Exception):
     """A special exception class to be ignored by the exception handler."""
@@ -142,7 +140,7 @@ def pixmapAsHtml(pix):
     buf = qt.QBuffer(ba)
     buf.open(qt.QIODevice.WriteOnly)
     pix.toImage().save(buf, "PNG")
-    b64 = cbytes(buf.data().toBase64()).decode('ascii')
+    b64 = bytes(buf.data().toBase64()).decode('ascii')
     return '<img src="data:image/png;base64,%s">' % b64
 
 def pythonise(text):
@@ -323,7 +321,7 @@ def openEncoding(filename, encoding, mode='r'):
     """
     if filename == '{clipboard}':
         text = qt.QApplication.clipboard().text()
-        return CStringIO(text)
+        return io.StringIO(text)
     else:
         return io.open(filename, mode, encoding=encoding, errors='ignore')
 
@@ -354,31 +352,21 @@ class _UTF8Decoder:
         return self
     def next(self):
         line = self.iterator.next()
-        return [cstr(x, "utf-8") for x in line]
+        return [str(x, "utf-8") for x in line]
 
 def get_unicode_csv_reader(filename, dialect=csv.excel,
                            encoding='utf-8', **kwds):
     """Return an iterator to iterate over CSV file with encoding given."""
 
     if filename != '{clipboard}':
-        if cpy3:
-            # python3 native encoding support
-            f = open(filename, encoding=encoding, errors='ignore')
-        else:
-            # recode the opened file as utf-8
-            f = _UTF8Recoder(open(filename), encoding)
+        f = open(filename, encoding=encoding, errors='ignore')
     else:
         # take the unicode clipboard and just put into utf-8 format
         s = qt.QApplication.clipboard().text()
-        if not cpy3:
-            s = s.encode("utf-8")
-        f = CStringIO(s)
+        f = io.StringIO(s)
 
     reader = csv.reader(f, dialect=dialect, **kwds)
-    if cpy3:
-        return reader
-    else:
-        return _UTF8Decoder(reader)
+    return reader
 
 # End python doc classes
 
@@ -464,12 +452,12 @@ def topological_sort(dependency_pairs):
             if not num_heads[t]:
                 ordered.append(t)
         i += 1
-    cyclic = [n for n, heads in citems(num_heads) if heads]
+    cyclic = [n for n, heads in num_heads.items() if heads]
     return ordered, cyclic
 
 def isiternostr(i):
     """Is this iterator, but not a string?"""
-    return hasattr(i, '__iter__') and not isinstance(i, cbasestr)
+    return hasattr(i, '__iter__') and not isinstance(i, str)
 
 def nextfloat(fin):
     """Return (approximately) next float value (for f>0)."""
@@ -499,7 +487,7 @@ def round2delt(fin1, fin2):
     else:
         out1 = out2 = ''
 
-    for i in crange(maxlog,-200,-1):
+    for i in range(maxlog,-200,-1):
         p = 10**i
         d1, d2 = int(f1/p), int(f2/p)
         f1 -= int(d1)*p
@@ -564,7 +552,7 @@ def rrepr(val):
         l = [rrepr(v) for v in val]
         return "[%s]" % ", ".join(l)
     else:
-        return crepr(val)
+        return repr(val)
 
 def escapeHDFDataName(name):
     """Return escaped dataset name for saving in HDF5 files.

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #    Copyright (C) 2010 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -20,7 +18,6 @@
 
 """Polar plot widget."""
 
-from __future__ import division
 import numpy as N
 import fractions
 import math
@@ -29,7 +26,6 @@ from .nonorthgraph import NonOrthGraph
 from .axisticks import AxisTicks
 from . import axis
 
-from ..compat import crange
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -391,7 +387,7 @@ class Polar(NonOrthGraph):
             labels = [u'%g°' % x for x in vals]
         elif s.units == 'radians':
             labels = []
-            for i in crange(numspokes):
+            for i in range(numspokes):
                 # use fraction module to work out labels
                 # angle in radians (/pi)
                 f = fractions.Fraction(2*i, numspokes)
@@ -405,13 +401,13 @@ class Polar(NonOrthGraph):
                 labels.append(txt)
         elif s.units == 'fractions':
             labels = []
-            for i in crange(numspokes):
+            for i in range(numspokes):
                 val = i/numspokes
                 label = ('%.2f' % val).rstrip('0').rstrip('.')
                 labels.append(label)
         elif s.units == 'percentages':
             labels = []
-            for i in crange(numspokes):
+            for i in range(numspokes):
                 txt = '%.1f' % (100*i/numspokes)
                 if txt[-2:] == '.0': txt = txt[:-2]
                 labels.append(txt)
@@ -452,7 +448,7 @@ class Polar(NonOrthGraph):
             painter.setBrush( qt.QBrush() )
             angle = 2 * math.pi / numspokes
             lines = []
-            for i in crange(numspokes):
+            for i in range(numspokes):
                 x = self._xc +  N.cos(angle*i) * self._xscale
                 y = self._yc +  N.sin(angle*i) * self._yscale
                 lines.append(

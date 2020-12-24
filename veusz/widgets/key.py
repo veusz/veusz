@@ -18,10 +18,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import math
 
-from ..compat import crange, citems
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -37,7 +35,7 @@ def _(text, disambiguation=None, context='Key'):
 #############################################################################
 # classes for controlling key position interactively
 
-class ControlKey(object):
+class ControlKey:
     """Control the position of a key on a plot."""
 
     def __init__( self, widget, phelper, parentposn,
@@ -95,8 +93,8 @@ class _GraphControlKey(qt.QGraphicsRectItem, controlgraph._ScaledShape):
 
         # these are special places where the key is aligned
         self.highlightpoints = {}
-        for xname, xval in citems(xposn):
-            for yname, yval in citems(yposn):
+        for xname, xval in xposn.items():
+            for yname, yval in yposn.items():
                 self.highlightpoints[(xname, yname)] = qt.QPointF(
                     xval*params.cgscale, yval*params.cgscale)
 
@@ -111,7 +109,7 @@ class _GraphControlKey(qt.QGraphicsRectItem, controlgraph._ScaledShape):
 
         highlight = None
         highlightrect = qt.QRectF(rect.left()-10, rect.top()-10, 20, 20)
-        for name, point in citems(self.highlightpoints):
+        for name, point in self.highlightpoints.items():
             if highlightrect.contains(point):
                 highlight = name
                 break
@@ -339,14 +337,14 @@ class Key(widget.Widget):
             victimcol = numcols
             while True:
                 # find the right-most column with excess occupation number
-                for i in reversed(crange(victimcol)):
+                for i in reversed(range(victimcol)):
                     if colstats[i] > meanoccupation:
                         victimcol = i
                         break
 
                 # find the last item in the victim column
                 victim = 0
-                for i in reversed(crange(len(layout))):
+                for i in reversed(range(len(layout))):
                     if layout[i][2] == victimcol:
                         victim = i
                         break
@@ -438,7 +436,7 @@ class Key(widget.Widget):
                 continue
 
             # add an entry for each key entry for each widget
-            for i in crange(num):
+            for i in range(num):
                 lines = 1
                 if showtext:
                     w, h = utils.Renderer(

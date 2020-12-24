@@ -39,7 +39,6 @@ g.Close()
 More than one embedded window can be opened at once
 """
 
-from __future__ import division
 import atexit
 import sys
 import os
@@ -51,12 +50,7 @@ import time
 import uuid
 import functools
 import types
-
-# python3 compatibility
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 
 # check remote process has this API version
 API_VERSION = 2
@@ -72,7 +66,7 @@ def findOnPath(cmd):
             return cmdtry
     return None
 
-class Embedded(object):
+class Embedded:
     """An embedded instance of Veusz.
 
     This embedded instance supports all the normal veusz functions
@@ -92,13 +86,11 @@ class Embedded(object):
             Embedded.startRemote()
 
         if not copyof:
-            retval = self.sendCommand( (-1, '_NewWindow',
-                                         (name,),
-                                         {'hidden': hidden}) )
+            retval = self.sendCommand(
+                (-1, '_NewWindow', (name,), {'hidden': hidden}) )
         else:
-            retval = self.sendCommand( (-1, '_NewWindowCopy',
-                                         (name, copyof.winno),
-                                         {'hidden': hidden}) )
+            retval = self.sendCommand(
+                (-1, '_NewWindowCopy', (name, copyof.winno), {'hidden': hidden}) )
 
         self.winno, cmds = retval
 
@@ -116,9 +108,11 @@ class Embedded(object):
         except AttributeError:
             remotever = 0
         if remotever != API_VERSION:
-            raise RuntimeError("Remote Veusz instance reports version %i of"
-                               " API. This embed.py supports version %i." %
-                               (remotever, API_VERSION))
+            raise RuntimeError(
+                "Remote Veusz instance reports version %i of"
+                " API. This embed.py supports version %i." %
+                (remotever, API_VERSION)
+            )
         # define root object
         self.Root = WidgetNode(self, 'widget', '/')
 
@@ -146,8 +140,7 @@ class Embedded(object):
         if ( hasattr(socket, 'AF_UNIX') and hasattr(socket, 'socketpair') ):
             # convenient interface
             cls.sockfamily = socket.AF_UNIX
-            sock, socket2 = socket.socketpair(cls.sockfamily,
-                                              socket.SOCK_STREAM)
+            sock, socket2 = socket.socketpair(cls.sockfamily, socket.SOCK_STREAM)
 
             # socket is closed on popen in Python 3.4+ without this (PEP 446)
             try:
@@ -176,7 +169,7 @@ class Embedded(object):
     @classmethod
     def makeRemoteProcess(cls):
         """Try to find veusz process for remote program."""
-        
+
         # here's where to look for embed_remote.py
         thisdir = os.path.dirname(os.path.abspath(__file__))
 
@@ -196,25 +189,28 @@ class Embedded(object):
             if not findexe:
                 try:
                     # add the usual place as a guess :-(
-                    findexe = os.path.join(os.environ['ProgramFiles'],
-                                           'Veusz', 'veusz.exe')
+                    findexe = os.path.join(
+                        os.environ['ProgramFiles'],
+                        'Veusz', 'veusz.exe')
                 except KeyError:
                     pass
 
             # here is the list of commands to try
             possiblecommands = [
-                [findpython, os.path.join(thisdir, 'veusz_main.py')],
-                [findexe] ]
+                [ findpython, os.path.join(thisdir, 'veusz_main.py') ],
+                [ findexe ],
+            ]
 
         else:
             executable = sys.executable
 
             # try embed_remote.py in this directory, veusz in this directory
             # or veusz on the path in order
-            possiblecommands = [ [executable,
-                                  os.path.join(thisdir, 'veusz_main.py')],
-                                 [os.path.join(thisdir, 'veusz')],
-                                 [findOnPath('veusz')] ]
+            possiblecommands = [
+                [ executable, os.path.join(thisdir, 'veusz_main.py') ],
+                [ os.path.join(thisdir, 'veusz') ],
+                [ findOnPath('veusz') ],
+            ]
 
         # cheat and look for Veusz app for MacOS under the standard application
         # directory. I don't know how else to find it :-(
@@ -237,11 +233,13 @@ class Embedded(object):
                 try:
                     # we don't use stdout below, but works around windows bug
                     # http://bugs.python.org/issue1124861
-                    cls.remote = subprocess.Popen(cmd + ['--embed-remote'],
-                                                  shell=False, bufsize=0,
-                                                  close_fds=False,
-                                                  stdin=subprocess.PIPE,
-                                                  stdout=subprocess.PIPE)
+                    cls.remote = subprocess.Popen(
+                        cmd + ['--embed-remote'],
+                        shell=False, bufsize=0,
+                        close_fds=False,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                    )
                     return
                 except OSError:
                     pass
@@ -301,8 +299,8 @@ class Embedded(object):
         cls.writeToSocket( cls.serv_socket, struct.pack('<I', len(outs)) )
         cls.writeToSocket( cls.serv_socket, outs )
 
-        backlen = struct.unpack('<I', cls.readLenFromSocket(cls.serv_socket,
-                                                            cls.cmdlen))[0]
+        backlen = struct.unpack('<I', cls.readLenFromSocket(
+            cls.serv_socket, cls.cmdlen))[0]
         rets = cls.readLenFromSocket( cls.serv_socket, backlen )
         retobj = pickle.loads(rets)
 
@@ -330,7 +328,7 @@ class Embedded(object):
 ############################################################################
 # Tree-based interface to Veusz widget tree below
 
-class Node(object):
+class Node:
     """Represents an element in the Veusz widget-settinggroup-setting tree."""
 
     def __init__(self, ci, wtype, path):
@@ -345,11 +343,11 @@ class Node(object):
     def __ne__(self, other):
         """Is this a different node?"""
         return self._ci is not other._ci or self._path != other._path
-        
+
     def __repr__(self):
         """Text description"""
-        return "<%s at %s (type %s)>" % (self.__class__.__name__,
-                                         repr(self._path), self._type)
+        return "<%s at %s (type %s)>" % (
+            self.__class__.__name__, repr(self._path), self._type)
 
     def fromPath(self, path):
         """Return a new Node for the path given."""
@@ -559,7 +557,7 @@ class WidgetNode(Node):
 
         self._ci.Rename(self._path, newname)
         self._path = '/'.join( self._path.split('/')[:-1] + [newname] )
-        
+
     def Action(self, action):
         """Applies action on widget."""
         self._ci.Action(action, widget=self._path)
@@ -572,7 +570,6 @@ class WidgetNode(Node):
         """Clone widget, placing at newparent. Uses newname if given.
 
         Returns new node."""
-        path = self._ci.CloneWidget(self._path, newparent._path,
-                                    newname=newname)
+        path = self._ci.CloneWidget(
+            self._path, newparent._path, newname=newname)
         return WidgetNode( self._ci, 'widget', path )
-

@@ -19,7 +19,6 @@
 """Helper for doing the plotting of the document.
 """
 
-from __future__ import division
 from .. import qtall as qt
 from .. import setting
 from .. import utils
@@ -31,7 +30,7 @@ except ImportError:
     def RecordPaintDevice(width, height, dpix, dpiy):
         return qt.QPicture()
 
-class DrawState(object):
+class DrawState:
     """Each widget plotted has a recorded state in this object."""
 
     def __init__(self, widget, bounds, clip, helper):
@@ -102,7 +101,7 @@ class RecordPainter(PainterRoot):
     def __exit__(self, exc_type, exc_value, traceback):
         self.helper.widgetstack.pop()
 
-class PaintHelper(object):
+class PaintHelper:
     """Helper used when painting widgets.
 
     Designed to be used for a particular page.
@@ -269,7 +268,7 @@ class PaintHelper(object):
         origimg = origpix.toImage()
         # store most recent widget here
         lastwidget = [None]
-        
+
         def rendernextstate(state):
             """Recursively draw painter.
 

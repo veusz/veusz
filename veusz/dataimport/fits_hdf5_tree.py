@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function, absolute_import
-
 from .. import qtall as qt
 from . import fits_hdf5_helpers
 
@@ -88,7 +86,7 @@ class GenericTreeModel(qt.QAbstractItemModel):
             return self.columnheads[section]
         return None
 
-class Node(object):
+class Node:
     """Generic Node used by tree model."""
     def __init__(self, parent):
         self.parent = parent

@@ -16,9 +16,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
-
-class ReferenceBase(object):
+class ReferenceBase:
     """Reference objects are inherited from this base class.
 
     They should have a "value" property.

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #    Copyright (C) 2005 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -24,13 +23,10 @@
     changed. The creator should use this to change the setting.
 """
 
-from __future__ import division
 import re
 import numpy as N
 
-from ..compat import crange, czip, citems, cstr
 from .. import qtall as qt
-
 from .settingdb import settingdb
 from .. import utils
 
@@ -44,14 +40,15 @@ def styleClear(widget):
 
 def styleError(widget):
     """Show error state on widget."""
-    widget.setStyleSheet("background-color: " +
-                         settingdb.color('error').name() )
+    widget.setStyleSheet(
+        "background-color: " + settingdb.color('error').name() )
 
 class DotDotButton(qt.QPushButton):
     """A button for opening up more complex editor."""
     def __init__(self, tooltip=None, checkable=True):
-        qt.QPushButton.__init__(self, "..", flat=True, checkable=checkable,
-                                 maximumWidth=16, maximumHeight=16)
+        qt.QPushButton.__init__(
+            self, "..", flat=True, checkable=checkable,
+            maximumWidth=16, maximumHeight=16)
         if tooltip:
             self.setToolTip(tooltip)
         self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
@@ -97,7 +94,7 @@ class _EditBox(qt.QTextEdit):
     Emits closing(text) when the box closes
     """
 
-    closing = qt.pyqtSignal(cstr)
+    closing = qt.pyqtSignal(str)
 
     def __init__(self, origtext, readonly, parent):
         """Make a popup, framed widget containing a text editor."""
@@ -194,8 +191,8 @@ class String(qt.QWidget):
 
         # if button is down and there's no existing popup, bring up a new one
         if on:
-            e = _EditBox( self.edit.text(),
-                          self.setting.readonly, self.button)
+            e = _EditBox(
+                self.edit.text(), self.setting.readonly, self.button)
 
             # we get notified with text when the popup closes
             e.closing.connect(self.boxClosing)
@@ -402,7 +399,7 @@ class Choice(qt.QComboBox):
             self.addItems( list(toadd) )
         else:
             # add pixmaps and text to list
-            for icon, text in czip(icons, toadd):
+            for icon, text in zip(icons, toadd):
                 self.addItem(icon, text)
 
         # use tooltip descriptions if requested
@@ -501,9 +498,11 @@ class FillStyleExtended(ChoiceSwitch):
         if self._icons is None:
             self._generateIcons()
 
-        ChoiceSwitch.__init__(self, setting, False,
-                              utils.extfillstyles, parent,
-                              icons=self._icons)
+        ChoiceSwitch.__init__(
+            self, setting, False,
+            utils.extfillstyles, parent,
+            icons=self._icons
+        )
 
     @classmethod
     def _generateIcons(cls):
@@ -651,7 +650,7 @@ class Distance(Choice):
             newitems.insert(0, text)
 
         # get rid of existing items in list (clear doesn't work here)
-        for i in crange(self.count()):
+        for i in range(self.count()):
             self.removeItem(0)
 
         # put new items in and select the correct option
@@ -674,7 +673,7 @@ class DistancePt(Choice):
         '4pt', '5pt', '6pt', '8pt', '10pt', '12pt', '14pt', '16pt',
         '18pt', '20pt', '22pt', '24pt', '26pt', '28pt', '30pt',
         '34pt', '40pt', '44pt', '50pt', '60pt', '70pt'
-        )
+    )
 
     def __init__(self, setting, parent, allowauto=False):
         '''Initialise with blank list, then populate with sensible units.'''
@@ -719,14 +718,20 @@ class Dataset(qt.QWidget):
 
         # get datasets of the correct dimension
         datasets = []
-        for name, ds in citems(self.document.data):
-            if ( (ds.dimensions == self.dimensions or
-                  self.dimensions == 'all') and (
-                      ds.datatype == self.datatype or
-                      self.datatype == 'all' or
-                      ds.datatype in self.datatype)
-            ):
+        for name, ds in self.document.data.items():
+            okdims = (
+                ds.dimensions == self.dimensions or
+                self.dimensions == 'all'
+            )
+            oktype = (
+                ds.datatype == self.datatype or
+                self.datatype == 'all' or
+                ds.datatype in self.datatype
+            )
+
+            if okdims and oktype:
                 datasets.append(name)
+
         datasets.sort()
 
         if datasets != self.lastdatasets:
@@ -742,11 +747,12 @@ class Dataset(qt.QWidget):
         """Bring up list of datasets."""
         if on:
             from ..qtwidgets.datasetbrowser import DatasetBrowserPopup
-            d = DatasetBrowserPopup(self.document,
-                                    self.choice.currentText(),
-                                    self.button,
-                                    filterdims=set((self.dimensions,)),
-                                    filterdtype=set((self.datatype,)) )
+            d = DatasetBrowserPopup(
+                self.document,
+                self.choice.currentText(),
+                self.button,
+                filterdims=set((self.dimensions,)),
+                filterdtype=set((self.datatype,)) )
             d.closing.connect(self.boxClosing)
             d.newdataset.connect(self.newDataset)
             d.show()
@@ -774,8 +780,9 @@ class DatasetOrString(Dataset):
 
         # if button is down and there's no existing popup, bring up a new one
         if on:
-            e = _EditBox( self.choice.currentText(),
-                          self.choice.setting.readonly, self.textbutton)
+            e = _EditBox(
+                self.choice.currentText(),
+                self.choice.setting.readonly, self.textbutton)
 
             # we get notified with text when the popup closes
             e.closing.connect(self.textBoxClosing)
@@ -804,9 +811,11 @@ class FillStyle(Choice):
         if self._icons is None:
             self._generateIcons()
 
-        Choice.__init__(self, setting, False,
-                        self._fills, parent,
-                        icons=self._icons)
+        Choice.__init__(
+            self, setting, False,
+            self._fills, parent,
+            icons=self._icons
+        )
 
     @classmethod
     def _generateIcons(cls):
@@ -836,9 +845,11 @@ class Marker(Choice):
         if self._icons is None:
             self._generateIcons()
 
-        Choice.__init__(self, setting, False,
-                        utils.MarkerCodes, parent,
-                        icons=self._icons)
+        Choice.__init__(
+            self, setting, False,
+            utils.MarkerCodes, parent,
+            icons=self._icons
+        )
 
     @classmethod
     def _generateIcons(cls):
@@ -868,9 +879,11 @@ class Arrow(Choice):
         if self._icons is None:
             self._generateIcons()
 
-        Choice.__init__(self, setting, False,
-                        utils.ArrowCodes, parent,
-                        icons=self._icons)
+        Choice.__init__(
+            self, setting, False,
+            utils.ArrowCodes, parent,
+            icons=self._icons
+        )
 
     @classmethod
     def _generateIcons(cls):
@@ -885,10 +898,11 @@ class Arrow(Choice):
             painter.setRenderHint(qt.QPainter.Antialiasing)
             painter.setBrush(brush)
             painter.setPen(pen)
-            utils.plotLineArrow(painter, size*0.4, size*0.5,
-                                size*2, 0.,
-                                arrowsize=size*0.2,
-                                arrowleft=arrow, arrowright=arrow)
+            utils.plotLineArrow(
+                painter, size*0.4, size*0.5,
+                size*2, 0.,
+                arrowsize=size*0.2,
+                arrowleft=arrow, arrowright=arrow)
             painter.end()
             icons.append( qt.QIcon(pix) )
 
@@ -907,9 +921,11 @@ class LineStyle(Choice):
         if self._icons is None:
             self._generateIcons()
 
-        Choice.__init__(self, setting, False,
-                        self._lines, parent,
-                        icons=self._icons)
+        Choice.__init__(
+            self, setting, False,
+            self._lines, parent,
+            icons=self._icons
+        )
         self.setIconSize( qt.QSize(*self.size) )
 
     @classmethod
@@ -949,7 +965,7 @@ class LineStyle(Choice):
         cls._icons = icons
 
 class _ColNotifier(qt.QObject):
-    sigNewColor = qt.pyqtSignal(cstr)
+    sigNewColor = qt.pyqtSignal(str)
 
 
 class Color(qt.QWidget):
@@ -1169,7 +1185,7 @@ class ListSet(qt.QFrame):
         for row, val in enumerate(self.setting.val):
             cntrls = self.populateRow(row)
             self.updateRow(cntrls, val)
-            for col in crange(len(cntrls)):
+            for col in range(len(cntrls)):
                 self.layout.addWidget(cntrls[col], row, col)
             for c in cntrls:
                 c.show()
@@ -1215,7 +1231,7 @@ class ListSet(qt.QFrame):
     def onModified(self):
         """called when the setting is changed remotely"""
         self.populate()
-        for cntrls, row in czip(self.controls, self.setting.val):
+        for cntrls, row in zip(self.controls, self.setting.val):
             self.updateRow(cntrls, row)
 
     def identifyPosn(self, widget):
@@ -1271,7 +1287,7 @@ class ListSet(qt.QFrame):
             for icon in icons:
                 wcombo.addItem(icon, "")
         else:
-            for text, icon in czip(texts, icons):
+            for text, icon in zip(texts, icons):
                 wcombo.addItem(icon, text)
 
         wcombo._vz_values = values
@@ -1516,8 +1532,9 @@ class FillSet(ListSet):
 
     def editMore(self, on, row):
         if on:
-            fb = _FillBox(self.setting.getDocument(), self.setting,
-                          row, self.buttonAtRow(row), self.parent())
+            fb = _FillBox(
+                self.setting.getDocument(), self.setting,
+                row, self.buttonAtRow(row), self.parent())
             fb.closing.connect(self.boxClosing)
             fb.sigSettingChanged.connect(self.sigSettingChanged)
             fb.show()
@@ -1681,7 +1698,7 @@ class Datasets(MultiSettingWidget):
     def getDatasets(self):
         """Get applicable datasets (sorted)."""
         datasets = []
-        for name, ds in citems(self.document.data):
+        for name, ds in self.document.data.items():
             if (ds.dimensions == self.dimensions and
                 ds.datatype == self.datatype):
                 datasets.append(name)
@@ -1690,7 +1707,7 @@ class Datasets(MultiSettingWidget):
 
     def updateControls(self):
         """Set values of controls."""
-        for cntrls, val in czip(self.controls, self.setting.val):
+        for cntrls, val in zip(self.controls, self.setting.val):
             cntrls[0].lineEdit().setText(val)
 
     @qt.pyqtSlot()
@@ -1732,7 +1749,7 @@ class Strings(MultiSettingWidget):
 
     def updateControls(self):
         """Set values of controls."""
-        for cntrls, val in czip(self.controls, self.setting.val):
+        for cntrls, val in zip(self.controls, self.setting.val):
             cntrls[0].setText(val)
 
 class Filename(qt.QWidget):
@@ -1761,8 +1778,8 @@ class Filename(qt.QWidget):
         self.edit.setText( setting.toUIText() )
         layout.addWidget(self.edit)
 
-        b = self.button = DotDotButton(checkable=False,
-                                       tooltip=_("Browse for file"))
+        b = self.button = DotDotButton(
+            checkable=False, tooltip=_("Browse for file"))
         layout.addWidget(b)
 
         # connect up signals
@@ -1788,8 +1805,9 @@ class Filename(qt.QWidget):
         filefilter = _("All files (*)")
         if self.mode == 'image':
             title = _('Choose image')
-            filefilter = ("Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
-                          "*.gif *.xbm *.xpm);;" + filefilter)
+            filefilter = (
+                "Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
+                "*.gif *.xbm *.xpm);;" + filefilter)
 
         retn = qt.QFileDialog.getOpenFileName(
             self, title, self.edit.text(), filefilter)
@@ -1864,9 +1882,11 @@ class ErrorStyle(Choice):
         if self._icons is None:
             self._generateIcons()
 
-        Choice.__init__(self, setting, False,
-                        self._errorstyles, parent,
-                        icons=self._icons)
+        Choice.__init__(
+            self, setting, False,
+            self._errorstyles, parent,
+            icons=self._icons
+        )
 
     @classmethod
     def _generateIcons(cls):
@@ -1889,9 +1909,11 @@ class Colormap(Choice):
         names = sorted(document.evaluate.colormaps)
 
         icons = Colormap._generateIcons(document, names)
-        Choice.__init__(self, setn, True,
-                        names, parent,
-                        icons=icons)
+        Choice.__init__(
+            self, setn, True,
+            names, parent,
+            icons=icons
+        )
         self.setIconSize( qt.QSize(*self.size) )
 
     @classmethod
@@ -1917,9 +1939,8 @@ class Colormap(Choice):
                     pixmap.fill(qt.Qt.transparent)
                 else:
                     # generate icon
-                    image = utils.applyColorMap(val, 'linear',
-                                                fakedataset,
-                                                0., size[0]-1., 0)
+                    image = utils.applyColorMap(
+                        val, 'linear', fakedataset, 0., size[0]-1., 0)
                     pixmap = qt.QPixmap.fromImage(image)
                 icon = qt.QIcon(pixmap)
                 kls._icons[name] = icon

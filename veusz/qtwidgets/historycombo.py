@@ -21,8 +21,6 @@
 The history is stored in the Veusz settings database.
 """
 
-from __future__ import division
-from ..compat import crange
 from .. import qtall as qt
 from .. import setting
 
@@ -74,12 +72,12 @@ class HistoryCombo(qt.QComboBox):
         if index != -1:
             # remove any old items matching this
             self.removeItem(index)
-            
+
         # put new item in
         self.insertItem(0, item)
         # set selected item in drop down list match current item
         self.setCurrentIndex(0)
-    
+
     def getSettingName(self):
         """Get name for saving in settings."""
 
@@ -108,7 +106,7 @@ class HistoryCombo(qt.QComboBox):
             return
 
         # collect current items
-        history = [ self.itemText(i) for i in crange(self.count()) ]
+        history = [ self.itemText(i) for i in range(self.count()) ]
         history.insert(0, self.currentText())
 
         # remove dups

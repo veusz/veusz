@@ -16,16 +16,14 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import numpy as N
 
-from ..compat import citems
 from .. import utils
 from .commonfn import _
 from .oned import Dataset1DBase
 from .expression import evalDatasetExpression
 
-class DatasetHistoGenerator(object):
+class DatasetHistoGenerator:
     def __init__(self, document, inexpr,
                  binmanual = None, binparams = None,
                  method = 'counts',
@@ -155,7 +153,7 @@ class DatasetHistoGenerator(object):
         binlocs = self.binLocations()
         hist, edges = N.histogram(data, bins=binlocs, density=density)
         hist = hist.astype(N.float64)  # integers can break plots (github#49)
-        
+
         if self.method == 'fractions':
             hist = hist * (1./data.size)
 
@@ -184,7 +182,7 @@ class DatasetHistoGenerator(object):
 
         # lookup names of datasets in document
         bindsname = valuedsname = ''
-        for name, ds in citems(self.document.data):
+        for name, ds in self.document.data.items():
             if ds is self.bindataset:
                 bindsname = name
             elif ds is self.valuedataset:

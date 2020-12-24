@@ -16,7 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 from .. import qtall as qt
 
 from .. import document
@@ -54,7 +53,7 @@ class SimpleWindow(qt.QMainWindow):
         if self.toolbar is not None and not enable:
             self.toolbar.close()
             self.toolbar = None
-            
+
     def setZoom(self, zoom):
         """Zoom(zoom)
 

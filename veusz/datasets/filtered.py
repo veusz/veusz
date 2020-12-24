@@ -16,17 +16,14 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division, print_function
 import numpy as N
-
-from ..compat import czip, crepr
 
 from .commonfn import _
 from .base import DatasetBase
 from .oned import Dataset
 from .expression import evalDatasetExpression
 
-class DatasetFilterGenerator(object):
+class DatasetFilterGenerator:
     """This object is shared by all DatasetFiltered datasets, to calculate
     the filter expression."""
 
@@ -73,10 +70,9 @@ class DatasetFilterGenerator(object):
         """Filter a text dataset."""
         data = ds.data
         if self.replaceblanks:
-            filtered = [(d if f else "")
-                        for f, d in czip(filterarr, data)]
+            filtered = [(d if f else "") for f, d in zip(filterarr, data)]
         else:
-            filtered = [d for f, d in czip(filterarr, data) if f]
+            filtered = [d for f, d in zip(filterarr, data) if f]
         return ds.returnCopyWithNewData(data=filtered)
 
     def checkUpdate(self, doc):
@@ -147,13 +143,13 @@ class DatasetFilterGenerator(object):
                 names.append(ds.namein)
 
         args = [
-            crepr(self.inexpr),
-            crepr(names),
+            repr(self.inexpr),
+            repr(names),
         ]
         if self.prefix:
-            args.append("prefix="+crepr(self.prefix))
+            args.append("prefix="+repr(self.prefix))
         if self.suffix:
-            args.append("suffix="+crepr(self.suffix))
+            args.append("suffix="+repr(self.suffix))
         if self.invert:
             args.append("invert=True")
         if self.replaceblanks:

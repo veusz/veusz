@@ -18,10 +18,8 @@
 
 """For plotting xy points."""
 
-from __future__ import division
 import numpy as N
 
-from ..compat import czip
 from .. import qtall as qt
 from .. import datasets
 from .. import document
@@ -182,7 +180,7 @@ class ErrorBarDraw:
         # non-filling brush
         painter.setBrush( qt.QBrush() )
 
-        for xp, yp, xmn, ymn, xmx, ymx in czip(xplt, yplt, xmin, ymin, xmax, ymax):
+        for xp, yp, xmn, ymn, xmx, ymx in zip(xplt, yplt, xmin, ymin, xmax, ymax):
             p = qt.QPainterPath()
             p.moveTo(xp + (xmx-xp), yp)
             p.arcTo(qt.QRectF(
@@ -201,7 +199,7 @@ class ErrorBarDraw:
         if utils.anyNone(xmin, xmax, ymin, ymax):
             return
 
-        for xp, yp, xmn, ymn, xmx, ymx in czip(xplt, yplt, xmin, ymin, xmax, ymax):
+        for xp, yp, xmn, ymn, xmx, ymx in zip(xplt, yplt, xmin, ymin, xmax, ymax):
 
             if not self.fillabove.hideerror:
                 p = qt.QPainterPath()
@@ -800,8 +798,7 @@ class PointPlotter(GenericPlotter):
         angle = lab.angle
 
         # iterate over each point and plot each label
-        for x, y, t in czip(xplotter+deltax, yplotter+deltay,
-                            textvals):
+        for x, y, t in zip(xplotter+deltax, yplotter+deltay, textvals):
             utils.Renderer(
                 painter, font, x, y, t,
                 alignhorz, alignvert, angle,

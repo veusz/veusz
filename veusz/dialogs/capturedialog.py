@@ -18,8 +18,6 @@
 
 """Veusz data capture dialog."""
 
-from __future__ import division
-from ..compat import citems, cstr, cstrerror
 from .. import qtall as qt
 from .. import setting
 from ..dataimport import capture, simpleread
@@ -165,7 +163,7 @@ class CaptureDialog(VeuszDialog):
         except ValueError:
             qt.QMessageBox.critical(self, _("Invalid number"), _("Invalid number"))
             return
-            
+
         # get method of getting data
         method = self.methodBG.checkedId()
         try:
@@ -187,7 +185,7 @@ class CaptureDialog(VeuszDialog):
             qt.QMessageBox.critical(
                 self, _("Cannot open input"),
                 _("Cannot open input:\n %s (error %i)") % (
-                    cstrerror(e), e.errno)
+                    e.strerror, e.errno)
             )
             return
 
@@ -260,19 +258,20 @@ class CapturingDialog(VeuszDialog):
             self.simpleread.readData(self.stream)
         except capture.CaptureFinishException as e:
             # stream tells us it's time to finish
-            self.streamCaptureFinished( cstr(e) )
+            self.streamCaptureFinished( str(e) )
 
     def slotDisplayTimer(self):
         """Time to update information about data source."""
-        self.statusLabel.setText( self.txt_statusLabel %
-                                  (self.stream.bytesread,
-                                   self.starttime.elapsed() // 1000) )
+        self.statusLabel.setText(
+            self.txt_statusLabel %
+            (self.stream.bytesread, self.starttime.elapsed() // 1000)
+        )
 
         tree = self.datasetTreeWidget
         cts = self.simpleread.getDatasetCounts()
 
         # iterate over each dataset
-        for name, length in citems(cts):
+        for name, length in cts.items():
             find = tree.findItems(name, qt.Qt.MatchExactly, 0)
             if find:
                 # if already in tree, update number of counts
@@ -343,5 +342,3 @@ class CapturingDialog(VeuszDialog):
 
         # close dialog
         self.close()
-
- 

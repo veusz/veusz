@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
-from ..compat import citems
 from .. import qtall as qt
 from .. import utils
 from .. import document
@@ -150,7 +148,7 @@ def ImportFile(comm, filename, descriptor, useblocks=False, linked=False,
 
     if comm.verbose:
         print("Imported datasets %s" % ' '.join(op.outnames))
-        for name, num in citems(op.outinvalids):
+        for name, num in op.outinvalids.items():
             print("%i errors encountered reading dataset %s" % (num, name))
 
     return (op.outnames, op.outinvalids)
@@ -177,7 +175,7 @@ def ImportString(comm, descriptor, dstring, useblocks=False):
 
     if comm.verbose:
         print("Imported datasets %s" % ' '.join(op.outnames))
-        for name, num in citems(op.outinvalids):
+        for name, num in op.outinvalids.items():
             print("%i errors encountered reading dataset %s" % (num, name))
 
     return (op.outnames, op.outinvalids)

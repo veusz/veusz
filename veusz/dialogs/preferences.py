@@ -16,7 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 from .. import qtall as qt
 from .. import setting
 from .. import utils
@@ -215,7 +214,7 @@ class PreferencesDialog(VeuszDialog):
         # use cwd
         setdb['dirname_usecwd'] = self.dirDocCWDRadio.isChecked()
         setdb['docfile_addimportpaths'] = self.docFileAddImportPaths.isChecked()
-        
+
         # add import paths
         setdb['docfile_addimportpaths'] = self.docFileAddImportPaths.isChecked()
 

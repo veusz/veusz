@@ -18,15 +18,16 @@
 
 """Non orthogonal graph root."""
 
-from __future__ import division
 from . import controlgraph
 from .widget import Widget
 
 from .. import qtall as qt
 from .. import setting
 
-filloptions = ('center', 'outside', 'top', 'bottom', 'left', 'right',
-               'polygon')
+filloptions = (
+    'center', 'outside', 'top', 'bottom', 'left', 'right',
+    'polygon',
+)
 
 def _(text, disambiguation=None, context='NonOrthGraph'):
     """Translate text."""
@@ -97,7 +98,7 @@ class NonOrthGraph(Widget):
         bounds: usual tuple (minx, miny, maxx, maxy)
         ptsx, ptsy: translated plotter coordinates
         '''
-    
+
     def drawGraph(self, painter, bounds, datarange, outerbounds=None):
         '''Plot graph area.
         datarange is  [mina, maxa, minb, maxb] or None

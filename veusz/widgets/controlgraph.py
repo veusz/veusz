@@ -23,10 +23,8 @@ Control items have a createGraphicsItem method which returns a graphics
 item to control the object
 """
 
-from __future__ import division
 import math
 
-from ..compat import crange, czip
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -135,7 +133,7 @@ class _EdgeLine(qt.QGraphicsLineItem, _ScaledShape):
 
 ##############################################################################
 
-class ControlMarginBox(object):
+class ControlMarginBox:
     def __init__(self, widget, posn, maxposn, painthelper,
                  ismovable = True, isresizable = True):
         """Create control box item.
@@ -245,12 +243,12 @@ class _GraphMarginBox(qt.QGraphicsItem):
         self.setZValue(2.)
 
         # create corners of box
-        self.corners = [_ShapeCorner(self, params) for i in crange(4)]
+        self.corners = [_ShapeCorner(self, params) for i in range(4)]
 
         # lines connecting corners
         self.lines = [
             _EdgeLine(self, params, ismovable=params.ismovable)
-            for i in crange(4)]
+            for i in range(4)]
 
         # hide corners if box is not resizable
         if not params.isresizable:
@@ -277,8 +275,8 @@ class _GraphMarginBox(qt.QGraphicsItem):
         pos[3] = min(pos[3], par.maxposn[3])
 
         # move corners
-        for corner, (xindex, yindex) in czip(self.corners,
-                                             self.mapcornertoposn):
+        for corner, (xindex, yindex) in zip(
+                self.corners, self.mapcornertoposn):
             corner.setScaledPos(pos[xindex], pos[yindex])
 
         # move lines
@@ -359,7 +357,7 @@ class _GraphMarginBox(qt.QGraphicsItem):
 
 ##############################################################################
 
-class ControlResizableBox(object):
+class ControlResizableBox:
     """Control a resizable box.
     Item resizes centred around a position
     """
@@ -392,7 +390,7 @@ class _GraphResizableBox(qt.QGraphicsItem):
         self.params = params
 
         # create child graphicsitem for each corner
-        self.corners = [_ShapeCorner(self, params) for i in crange(4)]
+        self.corners = [_ShapeCorner(self, params) for i in range(4)]
         self.corners[0].setCursor(qt.Qt.SizeFDiagCursor)
         self.corners[1].setCursor(qt.Qt.SizeBDiagCursor)
         self.corners[2].setCursor(qt.Qt.SizeBDiagCursor)
@@ -402,7 +400,7 @@ class _GraphResizableBox(qt.QGraphicsItem):
 
         # lines connecting corners
         self.lines = [
-            _EdgeLine(self, params, ismovable=True) for i in crange(4)]
+            _EdgeLine(self, params, ismovable=True) for i in range(4)]
 
         # whether box is allowed to be rotated
         self.rotator = None
@@ -469,7 +467,7 @@ class _GraphResizableBox(qt.QGraphicsItem):
         angle = par.angle/180.*math.pi
         s, c = math.sin(angle), math.cos(angle)
 
-        for corn, (xd, yd) in czip(
+        for corn, (xd, yd) in zip(
                 self.corners, ((-1, -1), (1, -1), (-1, 1), (1, 1))):
             dx, dy = xd*par.dims[0]*0.5, yd*par.dims[1]*0.5
             corn.setScaledPos(
@@ -570,7 +568,7 @@ class _GraphMovableBox(_GraphMarginBox):
 
 ##############################################################################
 
-class ControlLine(object):
+class ControlLine:
     """For controlling the position and ends of a line."""
     def __init__(self, widget, phelper, x1, y1, x2, y2):
         self.widget = widget
@@ -641,9 +639,7 @@ class _AxisGraphicsLineItem(qt.QGraphicsLineItem, _ScaledShape):
         qt.QGraphicsLineItem.mouseMoveEvent(self, event)
         self.parent.doLineUpdate()
 
-
-
-class ControlAxisLine(object):
+class ControlAxisLine:
     """Controlling position of an axis."""
 
     def __init__(self, widget, painthelper, direction,

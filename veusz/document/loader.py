@@ -28,7 +28,6 @@ from .. import qtall as qt
 from .. import setting
 from .. import utils
 
-from ..compat import cexec, cstrerror, cbytes, cexceptionuser, cpy3
 from .commandinterface import CommandInterface
 from . import datasets
 
@@ -48,7 +47,7 @@ class LoadError(RuntimeError):
 def bconv(s):
     """Sometimes h5py returns non-unicode strings,
     so hack to decode strings if in wrong format."""
-    if isinstance(s, cbytes):
+    if isinstance(s, bytes):
         return s.decode('utf-8')
     return s
 
@@ -59,7 +58,7 @@ def _importcaller(interface, name, callbackimporterror):
             try:
                 getattr(interface, name)(*args, **argsk)
             except IOError as e:
-                errmsg = cexceptionuser(e)
+                errmsg = str(e)
                 fnameidx = interface.import_filenamearg[name]
                 assert fnameidx >= 0
                 filename = args[fnameidx]
@@ -102,7 +101,7 @@ def executeScript(thedoc, filename, script,
     def genexception(exc):
         info = sys.exc_info()
         backtrace = ''.join(traceback.format_exception(*info))
-        return LoadError(cexceptionuser(exc), backtrace=backtrace)
+        return LoadError(str(exc), backtrace=backtrace)
 
     # compile script and check for security (if reqd)
     while True:
@@ -154,7 +153,7 @@ def executeScript(thedoc, filename, script,
     with thedoc.suspend():
         try:
             # actually run script text
-            cexec(compiled, env)
+            exec(compiled, env)
         except LoadError:
             raise
         except Exception as e:
@@ -272,15 +271,16 @@ def loadDocument(thedoc, filename, mode='vsz',
 
     if mode == 'vsz':
         try:
-            mode = 'r' if cpy3 else 'rU'
-            with io.open(filename, mode, encoding='utf-8') as f:
+            with io.open(filename, 'r', encoding='utf-8') as f:
                 script = f.read()
         except EnvironmentError as e:
-            raise LoadError( _("Cannot open document '%s'\n\n%s") %
-                             (os.path.basename(filename), cstrerror(e)) )
+            raise LoadError(
+                _("Cannot open document '%s'\n\n%s") %
+                (os.path.basename(filename), e.strerror) )
         except UnicodeDecodeError:
-            raise LoadError( _("File '%s' is not a valid Veusz document") %
-                             os.path.basename(filename) )
+            raise LoadError(
+                _("File '%s' is not a valid Veusz document") %
+                os.path.basename(filename) )
 
         thedoc.wipe()
         thedoc.filename = filename

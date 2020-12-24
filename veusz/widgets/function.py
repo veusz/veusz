@@ -18,10 +18,8 @@
 
 """For plotting numerical functions."""
 
-from __future__ import division
 import numpy as N
 
-from ..compat import czip, cstr
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -100,7 +98,7 @@ class FunctionPlotter(GenericPlotter):
         """Write error message to document log for exception ex."""
         self.document.log(
             "Error evaluating expression in function widget '%s': '%s'" % (
-                self.name, cstr(ex)))
+                self.name, str(ex)))
 
     def affectsAxisRange(self):
         s = self.settings
@@ -191,7 +189,7 @@ class FunctionPlotter(GenericPlotter):
         # or reach the end, then plot them
         pts = qt.QPolygonF()
         lastx = lasty = -65536
-        for x, y in czip(xpts, ypts):
+        for x, y in zip(xpts, ypts):
 
             # ignore point if it outside sensible bounds
             if x < -32767 or y < -32767 or x > 32767 or y > 32767:

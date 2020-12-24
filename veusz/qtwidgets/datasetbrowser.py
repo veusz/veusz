@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #    Copyright (C) 2011 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -19,12 +18,11 @@
 
 """A widget for navigating datasets."""
 
-from __future__ import division
 import os.path
-import numpy as N
 import textwrap
 
-from ..compat import crange, citems, czip, cbasestr, cstr
+import numpy as N
+
 from .. import qtall as qt
 from .. import setting
 from .. import document
@@ -228,10 +226,10 @@ class DatasetRelationModel(TreeModel):
         if self.filter != "":
             keep = False
             if any([t.find(self.filter) >= 0 for t in ds.tags
-                    if isinstance(t, cbasestr)]):
+                    if isinstance(t, str)]):
                 keep = True
             if any([t.find(self.filter) >= 0 for t in node.data
-                    if isinstance(t, cbasestr)]):
+                    if isinstance(t, str)]):
                 keep = True
         # check dimensions haven't been filtered
         if ( self.filterdims is not None and
@@ -257,7 +255,7 @@ class DatasetRelationModel(TreeModel):
             cols += [_('check')]
 
         tree = TMNode(heads , None)
-        for name, ds in citems(self.doc.data):
+        for name, ds in self.doc.data.items():
             child = DatasetNode(self, name, cols, None)
 
             # add if not filtered for filtering
@@ -278,7 +276,7 @@ class DatasetRelationModel(TreeModel):
             colitems = colitems + [_('check')]
 
         grpnodes = {}
-        for name, ds in citems(self.doc.data):
+        for name, ds in self.doc.data.items():
             child = DatasetNode(self, name, colitems, None)
 
             # check whether filtered out
@@ -433,7 +431,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
         hdr = self.header()
         hdr.setStretchLastSection(False)
         hdr.setSectionResizeMode(0, qt.QHeaderView.Stretch)
-        for col in crange(1, 3):
+        for col in range(1, 3):
             hdr.setSectionResizeMode(col, qt.QHeaderView.ResizeToContents)
 
         # when documents have finished opening, expand all nodes
@@ -523,13 +521,13 @@ class DatasetsNavigatorTree(qt.QTreeView):
 
         def _edit():
             """Open up dialog box to recreate dataset."""
-            for dataset, dsname in czip(datasets, dsnames):
+            for dataset, dsname in zip(datasets, dsnames):
                 if type(dataset) in dataeditdialog.recreate_register:
                     dataeditdialog.recreate_register[type(dataset)](
                         self.mainwindow, self.doc, dataset, dsname)
         def _edit_data():
             """Open up data edit dialog."""
-            for dataset, dsname in czip(datasets, dsnames):
+            for dataset, dsname in zip(datasets, dsnames):
                 if type(dataset) not in dataeditdialog.recreate_register:
                     self.mainwindow.slotDataEdit(editdataset=dsname)
         def _delete():
@@ -543,7 +541,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
             self.doc.applyOperation(
                 document.OperationMultiple(
                     [document.OperationDatasetUnlinkFile(n)
-                     for d,n in czip(datasets,dsnames)
+                     for d,n in zip(datasets,dsnames)
                      if d.canUnlink() and d.linked],
                     descr=_('unlink dataset(s)')))
         def _unlink_relation():
@@ -551,7 +549,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
             self.doc.applyOperation(
                 document.OperationMultiple(
                     [document.OperationDatasetUnlinkRelation(n)
-                     for d,n in czip(datasets,dsnames)
+                     for d,n in zip(datasets,dsnames)
                      if d.canUnlink() and not d.linked],
                     descr=_('unlink dataset(s)')))
         def _copy():
@@ -715,7 +713,7 @@ class DatasetBrowser(qt.QWidget):
     grpentries = {
         "none": _("None"),
         "filename": _("Filename"),
-        "type": _("Type"), 
+        "type": _("Type"),
         "size": _("Size"),
         "tags": _("Tags"),
         }
@@ -807,7 +805,7 @@ class DatasetBrowserPopup(DatasetBrowser):
     """
 
     closing = qt.pyqtSignal()
-    newdataset = qt.pyqtSignal(cstr)
+    newdataset = qt.pyqtSignal(str)
 
     def __init__(self, document, dsname, parent,
                  filterdims=None, filterdtype=None):

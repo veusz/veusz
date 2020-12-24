@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #    Copyright (C) 2011 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -17,13 +16,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import os.path
 
-try:
-    from PyQt5 import sip
-except ImportError:
-    import sip
 from .. import qtall as qt
 from .. import utils
 from .. import setting
@@ -842,12 +836,12 @@ class TutorialDock(qt.QDockWidget):
         # it: hence the sip.isdeleted
 
         if ( self.flash is not self.oldflash and self.oldflash is not None
-             and not sip.isdeleted(self.oldflash) ):
+             and not qt.sip.isdeleted(self.oldflash) ):
             # clear any flashing on previous widget
             self.oldflash.setStyleSheet('')
             self.oldflash = None
 
-        if self.flash is not None and not sip.isdeleted(self.flash):
+        if self.flash is not None and not qt.sip.isdeleted(self.flash):
             # set flash state and toggle variable
             if self.flashon:
                 self.flash.setStyleSheet('background: yellow;')

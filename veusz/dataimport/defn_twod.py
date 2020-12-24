@@ -16,8 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
-from ..compat import cbasestr
 from .. import qtall as qt
 from .. import utils
 from .. import document
@@ -76,7 +74,7 @@ class LinkedFile2D(base.LinkedFileBase):
 
 class OperationDataImport2D(base.OperationDataImportBase):
     """Import a 2D matrix from a file."""
-    
+
     descr = _('import 2D data')
 
     def doImport(self):
@@ -144,11 +142,11 @@ def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
     # look up filename on path
     realfilename = comm.findFileOnImportPath(filename)
 
-    if isinstance(datasetnames, cbasestr):
+    if isinstance(datasetnames, str):
         datasetnames = [datasetnames]
 
     params = ImportParams2D(
-        datasetnames=datasetnames, 
+        datasetnames=datasetnames,
         filename=realfilename, xrange=xrange,
         yrange=yrange, invertrows=invertrows,
         invertcols=invertcols, transpose=transpose,
@@ -181,7 +179,7 @@ def ImportString2D(comm, datasetnames, dstring, xrange=None, yrange=None,
     Returns: list of imported datasets
     """
 
-    if isinstance(datasetnames, cbasestr):
+    if isinstance(datasetnames, str):
         datasetnames = [datasetnames]
 
     params = ImportParams2D(

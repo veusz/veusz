@@ -16,9 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
-
-from ..compat import cstrerror
 from .. import utils
 from .. import qtall as qt
 from .. import document
@@ -102,7 +99,7 @@ class StylesheetDialog(VeuszDialog):
 
     def slotSaveStyleSheet(self):
         """Save stylesheet as a file."""
-    
+
         filename = self.parent().fileSaveDialog(
             [_('Veusz stylesheet (*.vst)')], _('Save stylesheet'))
         if filename:
@@ -116,7 +113,7 @@ class StylesheetDialog(VeuszDialog):
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save '%s'\n\n%s") % (
-                        filename, cstrerror(e)))
+                        filename, e.strerror))
 
     def slotLoadStyleSheet(self):
         """Load a style sheet."""
@@ -129,7 +126,7 @@ class StylesheetDialog(VeuszDialog):
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to load '%s'\n\n%s") % (
-                        filename, cstrerror(e)))
+                        filename, e.strerror))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

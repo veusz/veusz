@@ -16,7 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
 import re
 
 from .. import qtall as qt
@@ -152,7 +151,7 @@ def ImportFileCSV(comm, filename,
 
     params = ImportParamsCSV(
         filename=realfilename, readrows=readrows,
-        delimiter=delimiter, skipwhitespace=skipwhitespace, 
+        delimiter=delimiter, skipwhitespace=skipwhitespace,
         textdelimiter=textdelimiter,
         encoding=encoding,
         headerignore=headerignore, rowsignore=rowsignore,

@@ -16,7 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 from collections import defaultdict
 import os.path
 import re
@@ -26,7 +25,6 @@ import numpy as N
 
 from . import colors
 
-from ..compat import citems, cstr, cexec
 from .. import setting
 from .. import utils
 from .. import datasets
@@ -125,7 +123,7 @@ class Evaluate:
 
         # add numpy things
         # we try to avoid various bits and pieces for safety
-        for name, val in citems(N.__dict__):
+        for name, val in N.__dict__.items():
             if ( (callable(val) or type(val)==float) and
                  name not in __builtins__ and
                  name[:1] != '_' and name[-1:] != '_' ):
@@ -204,7 +202,7 @@ class Evaluate:
                     defn = 'from %s import %s' % (
                         module, ', '.join(symbols))
                     try:
-                        cexec(defn, self.context)
+                        exec(defn, self.context)
                     except Exception:
                         self.doc.log(_(
                             "Failed to import '%s' from module '%s'") % (
@@ -213,7 +211,7 @@ class Evaluate:
                 else:
                     defn = 'import %s' % module
                     try:
-                        cexec(defn, self.context)
+                        exec(defn, self.context)
                     except Exception:
                         self.doc.log(_(
                             "Failed to import module '%s'") % module)
@@ -274,9 +272,9 @@ class Evaluate:
         try:
             cmap = self.validateProcessColormap(val)
         except ValueError as e:
-            self.doc.log( cstr(e) )
+            self.doc.log( str(e) )
         else:
-            self.colormaps[ cstr(name) ] = cmap
+            self.colormaps[ str(name) ] = cmap
 
     def _updateDefinition(self, name, val):
         """Update a function or constant in eval function context."""
@@ -302,7 +300,7 @@ class Evaluate:
             self.context[name] = eval(comp, self.context)
         except Exception as e:
             self.doc.log( _(
-                "Error evaluating '%s': '%s'") % (name, cstr(e)) )
+                "Error evaluating '%s': '%s'") % (name, str(e)) )
 
     def compileCheckedExpression(self, expr, origexpr=None, log=True):
         """Compile expression and check for errors.
@@ -334,13 +332,13 @@ class Evaluate:
         except utils.SafeEvalException as e:
             if log:
                 self.doc.log(
-                    _("Unsafe expression '%s': %s") % (origexpr, cstr(e)))
+                    _("Unsafe expression '%s': %s") % (origexpr, str(e)))
             self.compfailed.add(expr)
             return None
         except Exception as e:
             if log:
                 self.doc.log(
-                    _("Error in expression '%s': %s") % (origexpr, cstr(e)))
+                    _("Error in expression '%s': %s") % (origexpr, str(e)))
             return None
         else:
             self.compiled[expr] = checked

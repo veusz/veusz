@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #    Copyright (C) 2016 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -21,7 +20,6 @@
 
 import numpy as N
 
-from ..compat import crepr
 from .. import utils
 
 from .commonfn import _, dsPreviewHelper
@@ -86,7 +84,7 @@ class DatasetND(DatasetNDBase):
     def saveDataDumpToText(self, fileobj, name):
         """Save data to vsz in form of text."""
 
-        fileobj.write("ImportStringND(%s, '''\n" % crepr(name))
+        fileobj.write("ImportStringND(%s, '''\n" % repr(name))
         if self.data.shape[0] == 1:
             # unfortunately it's hard to decode a single dimension
             # here so we record this unambiguously

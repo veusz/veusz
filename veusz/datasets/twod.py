@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #    Copyright (C) 2016 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -19,10 +18,8 @@
 
 """Two dimensional datasets."""
 
-from __future__ import division
 import numpy as N
 
-from ..compat import crepr, cstr
 from .. import utils
 
 from .commonfn import _, dsPreviewHelper, convertNumpy
@@ -253,7 +250,7 @@ class Dataset2D(Dataset2DBase):
     def saveDataDumpToText(self, fileobj, name):
         """Write the 2d dataset to the file given."""
 
-        fileobj.write("ImportString2D(%s, '''\n" % crepr(name))
+        fileobj.write("ImportString2D(%s, '''\n" % repr(name))
         if self.xcent is not None:
             fileobj.write("xcent %s\n" %
                           " ".join(("%e" % v for v in self.xcent)) )
@@ -334,7 +331,7 @@ class Dataset2DXYFunc(Dataset2DBase):
         try:
             return self.evalDataset()
         except DatasetExpressionException as ex:
-            self.document.log(cstr(ex))
+            self.document.log(str(ex))
             return N.array([[]])
 
     def evalDataset(self):
@@ -373,7 +370,7 @@ class Dataset2DXYFunc(Dataset2DBase):
         '''Save expressions to file.
         '''
         s = 'SetData2DXYFunc(%s, %s, %s, %s, linked=True)\n' % (
-            crepr(name), crepr(self.xstep), crepr(self.ystep), crepr(self.expr) )
+            repr(name), repr(self.xstep), repr(self.ystep), repr(self.expr) )
         fileobj.write(s)
 
     def canUnlink(self):

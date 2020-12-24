@@ -19,7 +19,6 @@
 """A colorbar widget for the image widget. Should show the scale of
 the image."""
 
-from __future__ import division
 from .. import qtall as qt
 import numpy as N
 
@@ -77,7 +76,7 @@ class ColorBar(axis.Axis):
                                       descr = _('Height of colorbar'),
                                       usertext=_('Height'),
                                       formatting=True) )
-        
+
         s.add( setting.Float( 'horzManual',
                               0.,
                               descr = _('Manual horizontal fractional position'),

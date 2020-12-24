@@ -96,7 +96,7 @@ external sources such as Internet sockets or other programs.
   * Multithreaded rendering
 
 ## Requirements for source install:
-  * [Python](https://www.python.org/) 2.x (2.7 or greater required) or 3.x (3.3 or greater required)
+  * [Python](https://www.python.org/) 3.x (3.3 or greater required)
   * [Qt](https://www.qt.io/) >= 5.5 (free edition)
   * [PyQt](http://www.riverbankcomputing.co.uk/software/pyqt/) >= 5.2  (Qt and SIP is required to be installed first)
   * [SIP](http://www.riverbankcomputing.co.uk/software/sip/) >= 4.15

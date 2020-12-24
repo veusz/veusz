@@ -18,7 +18,6 @@
 
 """A database for default values of settings."""
 
-from __future__ import division, print_function
 import sys
 import datetime
 
@@ -118,7 +117,7 @@ defaultValues = {
     'secure_unsaved': True,
 }
 
-class _SettingDB(object):
+class _SettingDB:
     """A class which provides access to a persistant settings database.
 
     Items are accesses as a dict, with items as key=value

@@ -40,13 +40,11 @@ Commas are now optional in 1.6, so descriptors can look like
 x +- y + -
 """
 
-from __future__ import division
 import re
 import ast
-
+import io
 import numpy as N
 
-from ..compat import crange, cnext, CStringIO
 from .. import utils
 from .. import datasets
 from .. import qtall as qt
@@ -65,9 +63,9 @@ descrtokens_split_re = re.compile(r'''
 
 range_re = re.compile(r'''^
  \[
- (-?[0-9]+)? 
+ (-?[0-9]+)?
  :
- (-?[0-9]+)? 
+ (-?[0-9]+)?
  \]
 $''', re.VERBOSE)
 
@@ -198,7 +196,7 @@ def guessDataType(val):
     # assume string otherwise
     return 'string'
 
-class DescriptorPart(object):
+class DescriptorPart:
     """Represents part of a descriptor."""
 
     def __init__(self, name, datatype, columns, idxrange):
@@ -214,7 +212,7 @@ class DescriptorPart(object):
         self.columns = tuple(columns)
 
         self.errorcount = 0
-        
+
         self.single = idxrange is None
         if self.single:
             self.startindex = self.stopindex = 1
@@ -225,7 +223,7 @@ class DescriptorPart(object):
         """Read data from stream, and write to thedatasets."""
 
         # loop over column range
-        for index in crange(self.startindex, self.stopindex+1):
+        for index in range(self.startindex, self.stopindex+1):
             # name for variable
             if self.single:
                 name = self.name
@@ -293,7 +291,7 @@ class DescriptorPart(object):
         if self.datatype is None:
             return
 
-        for index in crange(self.startindex, self.stopindex+1):
+        for index in range(self.startindex, self.stopindex+1):
             # name for variable
             if self.single:
                 name = '%s' % (self.name,)
@@ -347,10 +345,10 @@ class DescriptorPart(object):
             else:
                 break
 
-class Stream(object):
+class Stream:
     """This object reads through an input data source (override
     readLine) and interprets data from the source."""
-                                    
+
     # this is a regular expression for finding data items in data stream
     # I'll try to explain this bit-by-bit (these are ORd, and matched in order)
     find_re = re.compile( r'''
@@ -422,15 +420,15 @@ class FileStream(Stream):
     def readLine(self):
         """Read the next line of the data source.
         StopIteration is raised if there is no more data."""
-        return cnext(self.file)
+        return next(self.file)
 
 class StringStream(FileStream):
     '''For reading data from a string.'''
-    
+
     def __init__(self, text):
         """A stream which reads in from a text string."""
-        
-        FileStream.__init__( self, CStringIO(text) )
+
+        FileStream.__init__( self, io.StringIO(text) )
 
 class CSVStream(Stream):
     """Read text from csv file."""
@@ -449,7 +447,7 @@ class CSVStream(Stream):
     def newLine(self):
         """Get next line from CSV file."""
         try:
-            line = cnext(self.csvfile)
+            line = next(self.csvfile)
         except StopIteration:
             return False
 
@@ -473,7 +471,7 @@ class CSVStream(Stream):
                     self.remainingline.append(t)
         return True
 
-class SimpleRead(object):
+class SimpleRead:
     '''Class to read in datasets from a stream.
 
     The descriptor specifies the format of data to read from the stream
@@ -530,7 +528,7 @@ class SimpleRead(object):
                 self._parseDescriptor(descriptor)
                 allparts += self.parts
                 self.autodescr = False
-            elif ( self.ignoretext and len(stream.remainingline) > 0 and 
+            elif ( self.ignoretext and len(stream.remainingline) > 0 and
                    text_start_re.match(stream.remainingline[0]) and
                    len(self.parts) > 0 and
                    self.parts[0].datatype != 'string' and
@@ -644,7 +642,7 @@ class SimpleRead(object):
 class Read2DError(base.ImportingError):
     pass
 
-class SimpleRead2D(object):
+class SimpleRead2D:
     def __init__(self, name, params):
         """Read dataset with name given.
         params is a ImportParams2D object
@@ -848,7 +846,7 @@ class SimpleRead2D(object):
 class ReadNDError(base.ImportingError):
     pass
 
-class SimpleReadND(object):
+class SimpleReadND:
     def __init__(self, name, params):
         """Read dataset with name given.
         params is a ImportParamsND object
@@ -926,7 +924,7 @@ class SimpleReadND(object):
 
                     # move to next value at current level
                     dimstack[dimidx] += 1
-                    for i in crange(dimidx+1, len(dimstack)):
+                    for i in range(dimidx+1, len(dimstack)):
                         dimstack[i] = 0
                     dimidx = len(dimstack)
 

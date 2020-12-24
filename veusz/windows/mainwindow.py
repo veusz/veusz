@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #    Copyright (C) 2003 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -19,7 +18,6 @@
 
 """Implements the main window of the application."""
 
-from __future__ import division, print_function
 import os
 import os.path
 import sys
@@ -32,7 +30,6 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import cstr, cstrerror, cgetcwd, cbytes
 from .. import qtall as qt
 
 from .. import document
@@ -210,7 +207,7 @@ class MainWindow(qt.QMainWindow):
         # working directory - use previous one
         self.dirname = setdb.get('dirname', qt.QDir.homePath())
         if setdb['dirname_usecwd']:
-            self.dirname = cgetcwd()
+            self.dirname = os.getcwd()
 
         # connect plot signals to main window
         self.plot.sigUpdatePage.connect(self.slotUpdatePage)
@@ -314,7 +311,7 @@ class MainWindow(qt.QMainWindow):
                 qt.QMessageBox.warning(
                     self, _("Error - Veusz"),
                     _("Unable to load default stylesheet '%s'\n\n%s") %
-                    (filename, cstrerror(e)))
+                    (filename, e.strerror))
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -331,7 +328,7 @@ class MainWindow(qt.QMainWindow):
                 qt.QMessageBox.warning(
                     self, _("Error - Veusz"),
                     _("Unable to load custom definitions '%s'\n\n%s") %
-                    (filename, cstrerror(e)))
+                    (filename, e.strerror))
             else:
                 # reset any modified flag
                 self.document.setModified(False)
@@ -720,7 +717,7 @@ class MainWindow(qt.QMainWindow):
         # not cstr here forces to unicode for Python 2, getting
         # filenames in unicode
         examples = [ os.path.join(utils.exampleDirectory, f)
-                     for f in os.listdir(cstr(utils.exampleDirectory))
+                     for f in os.listdir(str(utils.exampleDirectory))
                      if os.path.splitext(f)[1] == ".vsz" ]
 
         menu = self.menus["help.examples"]
@@ -1014,7 +1011,7 @@ class MainWindow(qt.QMainWindow):
 
         # store docked windows
         data = self.saveState().data()
-        setdb['geometry_mainwindowstate'] = cbytes(data)
+        setdb['geometry_mainwindowstate'] = bytes(data)
 
         # save current setting db
         setdb.writeSettings()
@@ -1080,7 +1077,7 @@ class MainWindow(qt.QMainWindow):
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save document as '%s'\n\n%s") %
-                    (self.filename, cstrerror(e)))
+                    (self.filename, e.strerror))
 
     def updateTitlebar(self):
         """Put the filename into the title bar."""
@@ -1155,7 +1152,7 @@ class MainWindow(qt.QMainWindow):
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to open '%s'\n\n%s") %
-                    (filename, cstrerror(e)))
+                    (filename, e.strerror))
                 return None
             return filename
         return None
@@ -1240,12 +1237,12 @@ class MainWindow(qt.QMainWindow):
         except document.LoadError as e:
             from ..dialogs.errorloading import ErrorLoadingDialog
             if e.backtrace:
-                d = ErrorLoadingDialog(self, filename, cstr(e), e.backtrace)
+                d = ErrorLoadingDialog(self, filename, str(e), e.backtrace)
                 d.exec_()
             else:
                 qt.QMessageBox.critical(
                     self, _("Error opening %s - Veusz") % filename,
-                    cstr(e))
+                    str(e))
             return False
 
         # need to remember to restore stdout, stderr

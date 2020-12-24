@@ -16,14 +16,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
-
 import collections
 import re
 
 import numpy as N
 from .. import qtall as qt
-from ..compat import citems, cvalues, cbytes, cunicode, cpy3
 from .. import document
 from .. import datasets
 from .. import utils
@@ -49,7 +46,7 @@ def bconv(s):
 
     Byte string attributes are not converted to normal strings."""
 
-    if isinstance(s, cbytes):
+    if isinstance(s, bytes):
         return s.decode('utf-8', 'replace')
     return s
 
@@ -184,7 +181,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             if dtype.kind == 'V':
                 # compound dataset - walk columns
                 if not names:
-                    names = item.dtype.names 
+                    names = item.dtype.names
 
                 for name in names:
                     attrs = fits_hdf5_helpers.filterAttrsByName(item.attrs, name)
@@ -211,11 +208,6 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         dsread = {}
         with h5py.File(self.params.filename, "r") as hdff:
             for hi in self.params.items:
-                # workaround for h5py bug
-                # using unicode names for groups/datasets does not work
-                if not cpy3 and isinstance(hi, cunicode):
-                    hi = hi.encode("utf-8")
-
                 # lookup group/dataset in file
                 names = [x for x in hi.split("/") if x != ""]
                 node = hdff
@@ -286,8 +278,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                          'perr': errordatasets[name]['+'] }
 
                 # find minimum length and cut down if necessary
-                minlen = min([len(d) for d in cvalues(args)
-                              if d is not None])
+                minlen = min(
+                    [len(d) for d in args.values() if d is not None])
                 for a in list(args):
                     if args[a] is not None and len(args[a]) > minlen:
                         args[a] = args[a][:minlen]
@@ -396,7 +388,7 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             linkedfile = None
 
         # create the veusz output datasets
-        for name, dread in citems(dsread):
+        for name, dread in dsread.items():
             if isinstance(dread.data, N.ndarray):
                 # numeric
                 ds = self.numericDataToDataset(name, dread, errordatasets)
@@ -458,7 +450,7 @@ def ImportFileHDF5(comm, filename,
           1970-01-01
        for a text dataset, this should give the format of the date/time,
           e.g. 'YYYY-MM-DD|T|hh:mm:ss' or 'iso' for iso format
- 
+
     renames is a dict mapping old to new dataset names, to be renamed
     after importing
 
@@ -476,7 +468,7 @@ def ImportFileHDF5(comm, filename,
      'vsz_convert_datetime': treat as date/time, set to one of the values
                              above.
     References to other datasets can be provided in thes attributes.
- 
+
     For compound datasets these attributes can be given on a
     per-column basis using attribute names
     vsz_attributename_columnname.

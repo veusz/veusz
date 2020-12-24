@@ -19,20 +19,15 @@
 '''Dialog to pop up if an exception occurs in Veusz.
 This allows the user to send a bug report.'''
 
-from __future__ import division, print_function
 import sys
 import time
 import traceback
 import re
 import base64
+from urllib import request
 
 import numpy
-try:
-    from PyQt5 import sip
-except ImportError:
-    import sip
 
-from ..compat import citems, curlrequest, cexceptionuser
 from .. import qtall as qt
 from .. import utils
 from .veuszdialog import VeuszDialog
@@ -76,9 +71,9 @@ def createReportText(exception):
         numpy.__version__,
         qt.qVersion(),
         qt.PYQT_VERSION_STR,
-        sip.SIP_VERSION_STR,
+        qt.sip.SIP_VERSION_STR,
         time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
-        cexceptionuser(exception),
+        str(exception),
     )
 
 class ExceptionSendDialog(VeuszDialog):
@@ -107,7 +102,7 @@ class ExceptionSendDialog(VeuszDialog):
 
         try:
             # send the message
-            curlrequest.urlopen(_emailUrl, b'message='+text)
+            request.urlopen(_emailUrl, b'message='+text)
         except:
             # something went wrong...
             qt.QMessageBox.critical(
@@ -144,7 +139,7 @@ def formatLocals(exception):
              frame.f_lineno))
 
         # get local variables for frame
-        for key, value in citems(frame.f_locals):
+        for key, value in frame.f_locals.items():
             # print out variables in frame
             try:
                 v = repr(value)

@@ -16,10 +16,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 from itertools import count
 
-from ..compat import czip, CStringIO
+from io import StringIO
 from .. import qtall as qt
 
 from . import doc
@@ -80,7 +79,7 @@ def generateDatasetsMime(datasets, document):
     text = ('\n'.join(output)).encode('utf-8')
     mimedata.setData('text/plain', qt.QByteArray(text))
 
-    textfile = CStringIO()
+    textfile = StringIO()
     for name in datasets:
         # get unlinked copy of dataset
         ds = document.data[name].returnCopy()
@@ -202,7 +201,7 @@ class OperationWidgetPaste(operations.OperationMultiple):
         newwidgets = []
         widgetline = 1+4*numwidgets
         try:
-            for wtype, name, numline in czip(types, names, widgetslines):
+            for wtype, name, numline in zip(types, names, widgetslines):
                 thisparent = doc.getSuitableParent(wtype, parentwidget)
 
                 if thisparent is None:
@@ -272,7 +271,7 @@ class OperationDataPaste(operations.Operation):
         tempdoc = doc.Document()
         # interpreter to create datasets
         interpreter = commandinterpreter.CommandInterpreter(tempdoc)
-        interpreter.runFile(CStringIO(self.data))
+        interpreter.runFile(StringIO(self.data))
 
         # list of pasted datasets
         self.newds = []

@@ -19,7 +19,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import textwrap
 from .. import qtall as qt
 
@@ -196,7 +195,7 @@ class Root(widget.Widget):
                     #if hasattr(sett, 'formatting') and not sett.formatting:
                     #    continue
                     newsett.add( sett.copy() )
-            
+
                 stylesheet.add(newsett)
 
 # allow the factory to instantiate this

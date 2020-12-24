@@ -18,14 +18,12 @@
 
 """Plugins for general operations."""
 
-from __future__ import division
 import random
 import re
 import fnmatch
 
 import numpy as N
 
-from ..compat import cbasestr
 from .. import qtall as qt
 from .. import utils
 from . import field
@@ -42,7 +40,7 @@ class ToolsPluginException(RuntimeError):
     """
     pass
 
-class ToolsPlugin(object):
+class ToolsPlugin:
     # the plugin will get inserted into the menu in a hierarchy based on
     # the elements of this tuple
     menu = (_('Base plugin'),)
@@ -83,17 +81,22 @@ class ColorsRandomize(ToolsPlugin):
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr=_("Start from widget"),
-                              default="/"),
-            field.FieldBool("randxy", descr=_("Randomize xy plotters"),
-                            default=True),
-            field.FieldBool("randfunc", descr=_("Randomize function plotters"),
-                            default=True),
-            field.FieldColor('color1', descr=_("Start of color range"),
-                             default='#404040'),
-            field.FieldColor('color2', descr=_("End of color range"),
-                             default='#ff0004'),
-            ]
+            field.FieldWidget(
+                "widget", descr=_("Start from widget"),
+                default="/"),
+            field.FieldBool(
+                "randxy", descr=_("Randomize xy plotters"),
+                default=True),
+            field.FieldBool(
+                "randfunc", descr=_("Randomize function plotters"),
+                default=True),
+            field.FieldColor(
+                'color1', descr=_("Start of color range"),
+                default='#404040'),
+            field.FieldColor(
+                'color2', descr=_("End of color range"),
+                default='#ff0004'),
+        ]
 
     def getRandomColor(self, col1, col2):
         """Return RGB name for a random color."""
@@ -154,7 +157,7 @@ class ColorsSequenceCMap(ToolsPlugin):
                 "randomize", descr=_("Randomize order"), default=False),
             field.FieldColormap(
                 "colormap", descr=_("Colormap"), default="grey"),
-            ]
+        ]
 
     def apply(self, ifc, fields):
         """Do the randomizing."""
@@ -206,17 +209,22 @@ class ColorsSequence(ToolsPlugin):
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr=_("Start from widget"),
-                              default="/"),
-            field.FieldBool("randxy", descr=_("Color xy plotters"),
-                            default=True),
-            field.FieldBool("randfunc", descr=_("Color function plotters"),
-                            default=True),
-            field.FieldColor('color1', descr=_("Start of color range"),
-                             default='#ff0000'),
-            field.FieldColor('color2', descr=_("End of color range"),
-                             default='#4000ff'),
-            ]
+            field.FieldWidget(
+                "widget", descr=_("Start from widget"),
+                default="/"),
+            field.FieldBool(
+                "randxy", descr=_("Color xy plotters"),
+                default=True),
+            field.FieldBool(
+                "randfunc", descr=_("Color function plotters"),
+                default=True),
+            field.FieldColor(
+                'color1', descr=_("Start of color range"),
+                default='#ff0000'),
+            field.FieldColor(
+                'color2', descr=_("End of color range"),
+                default='#4000ff'),
+        ]
 
     def apply(self, ifc, fields):
         """Do the sequence."""
@@ -266,15 +274,19 @@ class ColorsReplace(ToolsPlugin):
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr=_("Start from widget"),
-                              default="/"),
-            field.FieldBool("follow", descr=_("Change references and defaults"),
-                            default=True),
-            field.FieldColor('color1', descr=_("Color to change"),
-                             default='black'),
-            field.FieldColor('color2', descr=_("Replacement color"),
-                             default='red'),
-            ]
+            field.FieldWidget(
+                "widget", descr=_("Start from widget"),
+                default="/"),
+            field.FieldBool(
+                "follow", descr=_("Change references and defaults"),
+                default=True),
+            field.FieldColor(
+                'color1', descr=_("Color to change"),
+                default='black'),
+            field.FieldColor(
+                'color2', descr=_("Replacement color"),
+                default='red'),
+        ]
 
     def apply(self, ifc, fields):
         """Do the color search and replace."""
@@ -312,15 +324,19 @@ class ColorsSwap(ToolsPlugin):
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr=_("Start from widget"),
-                              default="/"),
-            field.FieldBool("follow", descr=_("Change references and defaults"),
-                            default=True),
-            field.FieldColor('color1', descr=_("First color"),
-                             default='black'),
-            field.FieldColor('color2', descr=_("Second color"),
-                             default='red'),
-            ]
+            field.FieldWidget(
+                "widget", descr=_("Start from widget"),
+                default="/"),
+            field.FieldBool(
+                "follow", descr=_("Change references and defaults"),
+                default=True),
+            field.FieldColor(
+                'color1', descr=_("First color"),
+                default='black'),
+            field.FieldColor(
+                'color2', descr=_("Second color"),
+                default='red'),
+        ]
 
     def apply(self, ifc, fields):
         """Do the color search and replace."""
@@ -361,17 +377,22 @@ class TextReplace(ToolsPlugin):
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr=_("Start from widget"),
-                              default="/"),
-            field.FieldBool("follow", descr=_("Change references and defaults"),
-                            default=True),
-            field.FieldBool("onlystr", descr=_("Change only textual data"),
-                            default=False),
-            field.FieldText('text1', descr=_("Text to change"),
-                            default=''),
-            field.FieldText('text2', descr=_("Replacement text"),
-                            default=''),
-            ]
+            field.FieldWidget(
+                "widget", descr=_("Start from widget"),
+                default="/"),
+            field.FieldBool(
+                "follow", descr=_("Change references and defaults"),
+                default=True),
+            field.FieldBool(
+                "onlystr", descr=_("Change only textual data"),
+                default=False),
+            field.FieldText(
+                'text1', descr=_("Text to change"),
+                default=''),
+            field.FieldText(
+                'text2', descr=_("Replacement text"),
+                default=''),
+        ]
 
     def apply(self, ifc, fields):
         """Do the search and replace."""
@@ -388,8 +409,8 @@ class TextReplace(ToolsPlugin):
 
                 val = node.val
                 # try to change if a string, and not only strings or type is string
-                if isinstance(val, cbasestr) and (not fields['onlystr'] or
-                                                  node.settingtype == 'str'):
+                if isinstance(val, str) and (
+                        not fields['onlystr'] or node.settingtype == 'str'):
                     # update text if it changes
                     val2 = val.replace(fields['text1'], fields['text2'])
                     if val != val2:
@@ -415,19 +436,25 @@ class WidgetsClone(ToolsPlugin):
     def __init__(self):
         """Construct plugin."""
         self.fields = [
-            field.FieldWidget("widget", descr=_("Clone widget"),
-                              default=""),
-            field.FieldDataset('ds1', descr=_("Dataset 1 to change"),
-                               default=''),
-            field.FieldDatasetMulti('ds1repl',
-                                    descr=_("Replacement(s) for dataset 1")),
-            field.FieldDataset('ds2', descr=_("Dataset 2 to change (optional)"),
-                               default=''),
-            field.FieldDatasetMulti('ds2repl',
-                                    descr=_("Replacement(s) for dataset 2")),
-            field.FieldBool("names", descr=_("Build new names from datasets"),
-                            default=True),
-            ]
+            field.FieldWidget(
+                "widget", descr=_("Clone widget"),
+                default=""),
+            field.FieldDataset(
+                'ds1', descr=_("Dataset 1 to change"),
+                default=''),
+            field.FieldDatasetMulti(
+                'ds1repl',
+                descr=_("Replacement(s) for dataset 1")),
+            field.FieldDataset(
+                'ds2', descr=_("Dataset 2 to change (optional)"),
+                default=''),
+            field.FieldDatasetMulti(
+                'ds2repl',
+                descr=_("Replacement(s) for dataset 2")),
+            field.FieldBool(
+                "names", descr=_("Build new names from datasets"),
+                default=True),
+        ]
 
     def apply(self, ifc, fields):
         """Do the cloning."""
@@ -526,13 +553,16 @@ class FontSize(ToolsPlugin):
         """
         self.dirn = dirn
         self.fields = [
-            field.FieldWidget("widget", descr=_("Start from widget"),
-                              default="/"),
-            field.FieldBool("follow", descr=_("Change references and defaults"),
-                            default=True),
-            field.FieldFloat("delta", descr=_("Change by value"),
-                             default=2),
-            ]
+            field.FieldWidget(
+                "widget", descr=_("Start from widget"),
+                default="/"),
+            field.FieldBool(
+                "follow", descr=_("Change references and defaults"),
+                default=True),
+            field.FieldFloat(
+                "delta", descr=_("Change by value"),
+                default=2),
+        ]
 
     def apply(self, ifc, fields):
         """Do the search and replace."""
@@ -603,4 +633,4 @@ toolspluginregistry += [
     WidgetsClone,
     FontSizeIncrease,
     FontSizeDecrease,
-    ]
+]

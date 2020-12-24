@@ -4,7 +4,6 @@
 # Written by Giovanni Bajo <rasky at develer dot com>
 # Based on Pyrex.Distutils, written by Graham Fawcett and Darrel Gallion.
 
-from __future__ import division, print_function, absolute_import
 import os
 import sys
 import sysconfig

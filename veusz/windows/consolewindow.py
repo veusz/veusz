@@ -19,14 +19,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import codeop
 import traceback
 import sys
 
-from ..compat import cstr
 from .. import qtall as qt
-
 from .. import document
 from .. import utils
 from .. import setting
@@ -37,7 +34,7 @@ def _(text, disambiguation=None, context='ConsoleWindow'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class _Writer(object):
+class _Writer:
     """ Class to behave like an output stream. Pipes input back to
     the specified function."""
 
@@ -53,7 +50,7 @@ class _Writer(object):
         """Does nothing as yet."""
         pass
 
-class _Reader(object):
+class _Reader:
     """Fake reading input stream object."""
     def read(self, *args):
         raise IOError('Interactive input not supported')
@@ -67,7 +64,7 @@ class _CommandEdit(qt.QLineEdit):
     The edit control has a history (press up and down keys to access)
     """
 
-    sigEnter = qt.pyqtSignal(cstr)
+    sigEnter = qt.pyqtSignal(str)
 
     def __init__(self, *args):
         qt.QLineEdit.__init__(self, *args)

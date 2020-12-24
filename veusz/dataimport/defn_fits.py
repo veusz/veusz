@@ -16,13 +16,10 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function, absolute_import
-
 import collections
 
 import numpy as N
 from .. import qtall as qt
-from ..compat import citems, cvalues
 from .. import document
 from .. import datasets
 from . import base
@@ -299,7 +296,7 @@ class OperationDataImportFITS(base.OperationDataImportBase):
                      'perr': errordatasets[name]['+'] }
 
             # find minimum length and cut down if necessary
-            minlen = min([len(d) for d in cvalues(args)
+            minlen = min([len(d) for d in args.values()
                           if d is not None])
             for a in list(args):
                 if args[a] is not None and len(args[a]) > minlen:
@@ -371,7 +368,7 @@ class OperationDataImportFITS(base.OperationDataImportBase):
             linkedfile = None
 
         # create the veusz output datasets
-        for name, dread in citems(dsread):
+        for name, dread in dsread.items():
             if isinstance(dread.data, N.ndarray):
                 # numeric
                 ds = self.numericDataToDataset(name, dread, errordatasets)
@@ -464,7 +461,7 @@ def ImportFileFITS(
       KEY=VALUE
     or for column-specific values
       COLUMNNAME: KEY=VALUE
- 
+
     Returns: list of imported datasets
 
     """

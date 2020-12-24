@@ -19,13 +19,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import numpy as N
 
-from ..compat import CBool
 from .. import document
 
-class PickInfo(CBool):
+class PickInfo:
     """Encapsulates the results of a Pick operation. graphpos and coords are
        numeric (x,y) tuples, labels are the textual labels for the x and y
        datasets, and index is some object that the picker can use to figure out
@@ -40,7 +38,7 @@ class PickInfo(CBool):
         self.distance = float('inf')
         self.displaytype = ('numeric', 'numeric')
 
-    def cbool(self):
+    def _bool_(self):
         return bool(
             self.widget and self.graphpos and self.labels and self.coords)
 

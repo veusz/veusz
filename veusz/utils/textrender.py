@@ -19,23 +19,16 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import math
 import re
 
 import numpy as N
 
-from ..compat import cbasestr, cstr
 from .. import qtall as qt
 from . import points
 
-mmlsupport = True
-try:
-    from ..helpers import qtmml
-    from ..helpers import recordpaint
-except ImportError:
-    mmlsupport = False
-
+from ..helpers import qtmml
+from ..helpers import recordpaint
 from ..helpers.qtloops import RotatedRectangle
 
 def _(text, disambiguation=None, context='TextRender'):
@@ -595,7 +588,7 @@ symbols = {
     '\\wr'              : u'\u2240',
     }
 
-class RenderState(object):
+class RenderState:
     """Holds the state of the rendering."""
     def __init__(self, font, painter, x, y, alignhorz,
                  actually_render=True):
@@ -615,7 +608,7 @@ class RenderState(object):
         """Return number of pixels per point in the rendering."""
         return self.painter.pixperpt
 
-class Part(object):
+class Part:
     """Represents a part of the text to be rendered, made up of smaller parts."""
     def __init__(self, children):
         self.children = children
@@ -1199,12 +1192,12 @@ def makePartTree(partlist):
         if p == r'\\':
             lines.append( Part(itemlist) )
             itemlist = []
-        elif isinstance(p, cbasestr):
+        elif isinstance(p, str):
             if p in symbols:
                 addText(symbols[p])
             elif p in part_commands:
                 klass, numargs = part_commands[p]
-                if numargs == 1 and len(partlist) > i+1 and isinstance(partlist[i+1], cbasestr):
+                if numargs == 1 and len(partlist) > i+1 and isinstance(partlist[i+1], str):
                     # coerce a single argument to a partlist so that things
                     # like "A^\dagger" render correctly without needing
                     # curly brackets
@@ -1428,9 +1421,9 @@ class _StdRenderer(_Renderer):
                 if comp is None:
                     return _("* Evaluation error *")
 
-                return cstr(eval(comp, self.doc.evaluate.context))
+                return str(eval(comp, self.doc.evaluate.context))
             except Exception as e:
-                return _("* Evaluation error: %s *") % latexEscape(cstr(e))
+                return _("* Evaluation error: %s *") % latexEscape(str(e))
 
     def _getWidthHeight(self):
         """Get size of box around text."""
@@ -1508,17 +1501,13 @@ class _MmlRenderer(_Renderer):
 
         self.error = ''
         self.size = qt.QSize(1, 1)
-        if not mmlsupport:
-            self.mmldoc = None
-            self.error = _('Error: MathML support not built\n')
-            return
 
         self.mmldoc = doc = qtmml.QtMmlDocument()
         try:
             self.mmldoc.setContent(text)
         except ValueError as e:
             self.mmldoc = None
-            self.error = _('Error interpreting MathML: %s\n') % cstr(e)
+            self.error = _('Error interpreting MathML: %s\n') % str(e)
             return
 
         # this is pretty horrible :-(

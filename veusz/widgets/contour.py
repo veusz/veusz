@@ -22,11 +22,9 @@ Contour plotting requires that the veusz_helpers package is installed,
 as a C routine (taken from matplotlib) is used to trace the contours.
 """
 
-from __future__ import division, print_function
 import sys
 import math
 
-from ..compat import czip, crange
 from .. import qtall as qt
 import numpy as N
 
@@ -383,7 +381,7 @@ class Contour(plotters.GenericPlotter):
         elif scaling == 'manual':
             drange = N.arange(1, num)
             out = [[]]
-            for conmin, conmax in czip(levels[:-1], levels[1:]):
+            for conmin, conmax in zip(levels[:-1], levels[1:]):
                 delta = (conmax-conmin) / num
                 out.append( conmin+drange*delta )
             slev = N.hstack(out)
@@ -524,7 +522,7 @@ class Contour(plotters.GenericPlotter):
             # trace the polygons between the contours
             if len(s.Fills.fills) != 0 and len(levels) > 1 and not s.Fills.hide:
                 self._cachedpolygons = []
-                for level1, level2 in czip(levels[:-1], levels[1:]):
+                for level1, level2 in zip(levels[:-1], levels[1:]):
                     linelist = c.trace(level1, level2)
                     self._cachedpolygons.append( finitePoly(linelist) )
 
@@ -593,7 +591,7 @@ class Contour(plotters.GenericPlotter):
         linelabeller.process()
         painter.setClipPath(linelabeller.clippath)
 
-        for i in crange(linelabeller.getNumPolySets()):
+        for i in range(linelabeller.getNumPolySets()):
             polyset = linelabeller.getPolySet(i)
             painter.setPen(linestyles.makePen(painter, levels[i]))
             for poly in polyset:

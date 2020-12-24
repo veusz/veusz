@@ -18,7 +18,6 @@
 
 """Define a base dialog class cleans up self after being hidden."""
 
-from __future__ import division
 import os.path
 
 from .. import qtall as qt

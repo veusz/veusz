@@ -24,11 +24,9 @@ Module supplies the command interface used in the program, and for
 external programs.
 """
 
-from __future__ import division, print_function
 import os.path
 import numpy as N
 
-from ..compat import cbasestr
 from .. import qtall as qt
 from .. import setting
 from .. import embed
@@ -201,7 +199,7 @@ class CommandInterface(qt.QObject):
         if ctype == 'colormap':
             self.document.evaluate.validateProcessColormap(val)
         else:
-            if not isinstance(val, cbasestr):
+            if not isinstance(val, str):
                 raise RuntimeError('Value should be string')
 
         if mode not in ('appendalways', 'append', 'replace'):
@@ -236,7 +234,7 @@ class CommandInterface(qt.QObject):
 
     def AddImportPath(self, directory):
         """Add directory to import file path."""
-        assert isinstance(directory, cbasestr)
+        assert isinstance(directory, str)
         self.importpath.append(directory)
 
     def CloneWidget(self, widget, newparent, newname=None):

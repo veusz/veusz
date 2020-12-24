@@ -18,7 +18,6 @@
 
 """For evaluating dataset expressions and dataset classes using expressions."""
 
-from __future__ import division
 import re
 import numpy as N
 
@@ -28,7 +27,6 @@ from .oned import Dataset1DBase, Dataset
 from .twod import Dataset2DBase, Dataset2D
 from .text import DatasetText
 
-from ..compat import czip, crange, cstr, crepr
 from .. import utils
 
 # split expression on python operators or quoted `DATASET`
@@ -56,7 +54,7 @@ def substituteDatasets(datasets, expression, thispart):
             # quoted text, so remove backtick-"quotes"
             bit = bit[1:-1]
             # replace name with a function to call
-            bits[i] = "_DS_(%s, %s)" % (crepr(bit), crepr(part))
+            bits[i] = "_DS_(%s, %s)" % (repr(bit), repr(part))
             dslist.append(bit)
 
         else:
@@ -67,9 +65,9 @@ def substituteDatasets(datasets, expression, thispart):
                 bit = '_'.join(bitbits)
             if bit in datasets:
                 # replace name with a function to call
-                bits[i] = "_DS_(%s, %s)" % (crepr(bit), crepr(part))
+                bits[i] = "_DS_(%s, %s)" % (repr(bit), repr(part))
                 dslist.append(bit)
-            
+
     return ''.join(bits), dslist
 
 def _evaluateDataset(datasets, dsname, dspart):
@@ -113,7 +111,7 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
             minlen = len(vals[0])
             if len(vals) in (2,3):
                 # expand/convert error bars
-                for i in crange(1, len(vals)):
+                for i in range(1, len(vals)):
                     if N.isscalar(vals[i]):
                         # convert to scalar
                         vals[i] = N.zeros(minlen) + vals[i]
@@ -125,7 +123,7 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
                     minlen = min(minlen, len(vals[i]))
 
                 # chop to minimum length
-                for i in crange(len(vals)):
+                for i in range(len(vals)):
                     vals[i] = vals[i][:minlen]
             vals = N.array(vals, dtype=N.float64)
             err = None
@@ -220,7 +218,7 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
     try:
         evalout = eval(comp, env)
     except Exception as ex:
-        doc.log(_("Error evaluating '%s': '%s'" % (origexpr, cstr(ex))))
+        doc.log(_("Error evaluating '%s': '%s'" % (origexpr, str(ex))))
         return None
 
     # return correct dataset for data type
@@ -228,11 +226,11 @@ def evalDatasetExpression(doc, origexpr, datatype='numeric',
         if datatype == 'numeric':
             return _returnNumericDataset(doc, evalout, dimensions, subdatasets)
         elif datatype == 'text':
-            return DatasetText([cstr(x) for x in evalout])
+            return DatasetText([str(x) for x in evalout])
         else:
             raise RuntimeError('Invalid data type')
     except DatasetExpressionException as ex:
-        doc.log(_("Error evaluating '%s': %s\n") % (origexpr, cstr(ex)))
+        doc.log(_("Error evaluating '%s': %s\n") % (origexpr, str(ex)))
 
     return None
 
@@ -308,7 +306,7 @@ class DatasetExpression(Dataset1DBase):
         except Exception as ex:
             self.document.log(
                 _("Error evaluating expression: %s\n"
-                  "Error: %s") % (self.expr[part], cstr(ex)) )
+                  "Error: %s") % (self.expr[part], str(ex)) )
             return False
 
         # make evaluated error expression have same shape as data
@@ -374,15 +372,15 @@ class DatasetExpression(Dataset1DBase):
         '''Save data to file.
         '''
 
-        parts = [crepr(name), crepr(self.expr['data'])]
+        parts = [repr(name), repr(self.expr['data'])]
         if self.expr['serr']:
-            parts.append('symerr=%s' % crepr(self.expr['serr']))
+            parts.append('symerr=%s' % repr(self.expr['serr']))
         if self.expr['nerr']:
-            parts.append('negerr=%s' % crepr(self.expr['nerr']))
+            parts.append('negerr=%s' % repr(self.expr['nerr']))
         if self.expr['perr']:
-            parts.append('poserr=%s' % crepr(self.expr['perr']))
+            parts.append('poserr=%s' % repr(self.expr['perr']))
         if self.parametric is not None:
-            parts.append('parametric=%s' % crepr(self.parametric))
+            parts.append('parametric=%s' % repr(self.parametric))
 
         parts.append('linked=True')
 
@@ -408,8 +406,7 @@ class DatasetExpression(Dataset1DBase):
             text.append(_('Linked parametric dataset'))
         else:
             text.append(_('Linked expression dataset'))
-        for label, part in czip(self.column_descriptions,
-                                self.columns):
+        for label, part in zip(self.column_descriptions, self.columns):
             if self.expr[part]:
                 text.append('%s: %s' % (label, self.expr[part]))
 
@@ -521,8 +518,9 @@ class Dataset2DXYZExpression(Dataset2DBase):
             try:
                 evaluated[name] = eval(comp, environment)
             except Exception as e:
-                self.document.log(_("Error evaluating expression: %s\n"
-                                    "Error: %s") % (expr, cstr(e)) )
+                self.document.log(
+                    _("Error evaluating expression: %s\nError: %s") %
+                    (expr, str(e)) )
                 return None
 
         minx, maxx, stepx, stepsx = getSpacing(evaluated['exprx'])
@@ -541,8 +539,9 @@ class Dataset2DXYZExpression(Dataset2DBase):
         try:
             self.cacheddata.flat [ xpts + ypts*stepsx ] = evaluated['exprz']
         except Exception as e:
-            self.document.log(_("Shape mismatch when constructing dataset\n"
-                                "Error: %s") % cstr(e) )
+            self.document.log(
+                _("Shape mismatch when constructing dataset\nError: %s") %
+                str(e) )
             return None
 
         return self.cacheddata
@@ -577,7 +576,7 @@ class Dataset2DXYZExpression(Dataset2DBase):
         '''
 
         s = 'SetData2DExpressionXYZ(%s, %s, %s, %s, linked=True)\n' % (
-            crepr(name), crepr(self.exprx), crepr(self.expry), crepr(self.exprz) )
+            repr(name), repr(self.exprx), repr(self.expry), repr(self.exprz) )
         fileobj.write(s)
 
     def canUnlink(self):
@@ -651,7 +650,7 @@ class Dataset2DExpression(Dataset2DBase):
     def saveDataRelationToText(self, fileobj, name):
         '''Save expression to file.'''
         s = 'SetData2DExpression(%s, %s, linked=True)\n' % (
-            crepr(name), crepr(self.expr) )
+            repr(name), repr(self.expr) )
         fileobj.write(s)
 
     def canUnlink(self):

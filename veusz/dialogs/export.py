@@ -16,7 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
 import os
 import os.path
 
@@ -24,7 +23,6 @@ from .. import qtall as qt
 from .. import setting
 from .. import utils
 from .. import document
-from ..compat import citems, cstrerror, cstr, cgetcwd
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context='ExportDialog'):
@@ -73,14 +71,14 @@ class ExportDialog(VeuszDialog):
         for types, descr in document.AsyncExport.getFormats():
             docfmts.update(types)
         # disable type if not allowed
-        for fmt, radio in citems(self.fmtradios):
+        for fmt, radio in self.fmtradios.items():
             if fmt not in docfmts:
                 radio.setEnabled(False)
 
         # connect format radio buttons
         def fmtclicked(f):
             return lambda: self.formatClicked(f)
-        for r, f in citems(self.radiofmts):
+        for r, f in self.radiofmts.items():
             r.clicked.connect(fmtclicked(f))
 
         # connect page radio buttons
@@ -100,7 +98,7 @@ class ExportDialog(VeuszDialog):
         if eloc == 'doc':
             self.dirname = os.path.dirname(os.path.abspath(docfilename))
         elif eloc == 'cwd':
-            self.dirname = cgetcwd()
+            self.dirname = os.getcwd()
         else: # 'prev'
             self.dirname = setdb.get('dirname_export', qt.QDir.homePath())
 
@@ -483,9 +481,9 @@ class ExportDialog(VeuszDialog):
             except (RuntimeError, EnvironmentError) as e:
                 # errors from the export
                 if isinstance(e, EnvironmentError):
-                    msg = cstrerror(e)
+                    msg = e.strerror
                 else:
-                    msg = cstr(e)
+                    msg = str(e)
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Error exporting to file '%s'\n\n%s") %

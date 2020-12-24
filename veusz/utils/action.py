@@ -16,11 +16,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
-from .. import qtall as qt
-from . import utilfuncs
 import os.path
 import textwrap
+
+from .. import qtall as qt
+from . import utilfuncs
 
 # where images are stored
 imagedir = os.path.join(utilfuncs.resourceDirectory, 'icons')

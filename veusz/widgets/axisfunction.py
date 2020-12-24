@@ -18,10 +18,8 @@
 
 '''An axis based on a function of another axis.'''
 
-from __future__ import division
 import numpy as N
 
-from ..compat import crange, cstr
 from .. import qtall as qt
 from .. import setting
 from .. import document
@@ -74,12 +72,13 @@ def solveFunction(function, vals, mint=None, maxt=None):
     try:
         yvals = function(xvals) + N.zeros(len(xvals))
     except Exception as e:
-        raise FunctionError(_('Error evaluating function: %s') % cstr(e))
+        raise FunctionError(_('Error evaluating function: %s') % str(e))
 
     anynan = N.any( N.isnan(yvals) )
     if anynan:
-        raise FunctionError(_('Invalid regions in function '
-                               '(try setting minimum or maximum t)'))
+        raise FunctionError(
+            _('Invalid regions in function (try setting minimum or maximum t)')
+        )
 
     # remove any infinite regions
     f = N.isfinite(yvals)
@@ -125,7 +124,7 @@ def solveFunction(function, vals, mint=None, maxt=None):
 
         # binary search
         tol = abs(1e-6 * thisval)
-        for i in crange(30):
+        for i in range(30):
             # print x1, y1, "->", x2, y2
 
             if abs(y1) <= tol and abs(y1) < abs(y2):
@@ -220,7 +219,7 @@ class AxisFunction(axis.Axis):
         '''Write error message to document log for exception ex.'''
         self.document.log(
             _("Error in axis-function (%s): '%s'") % (
-                self.settings.function, cstr(ex)))
+                self.settings.function, str(ex)))
 
     def getMinMaxT(self):
         '''Get minimum and maximum t.'''

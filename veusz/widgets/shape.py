@@ -18,12 +18,10 @@
 
 """For plotting shapes."""
 
-from __future__ import division, print_function
 import codecs
 import itertools
 import os
 
-from ..compat import czip, cbytes
 from .. import qtall as qt
 from .. import setting
 from .. import document
@@ -136,10 +134,11 @@ class BoxShape(Shape):
             index = 0
             dx, dy = posn[2]-posn[0], posn[3]-posn[1]
             x = y = w = h = r = None
-            for x, y, w, h, r in czip(xpos, ypos,
-                                      itertools.cycle(width),
-                                      itertools.cycle(height),
-                                      itertools.cycle(rotate)):
+            for x, y, w, h, r in zip(
+                    xpos, ypos,
+                    itertools.cycle(width),
+                    itertools.cycle(height),
+                    itertools.cycle(rotate)):
                 wp, hp = dx*w, dy*h
                 painter.save()
                 painter.translate(x, y)

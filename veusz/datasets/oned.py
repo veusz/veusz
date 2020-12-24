@@ -25,7 +25,6 @@ from .commonfn import (
     convertNumpyAbs, convertNumpyNegAbs, datasetNameToDescriptorName)
 from .base import DatasetConcreteBase, DatasetException
 
-from ..compat import czip,  crepr
 from .. import utils
 
 class Dataset1DBase(DatasetConcreteBase):
@@ -147,7 +146,7 @@ class Dataset1DBase(DatasetConcreteBase):
 
         # do the conversion
         lines = []
-        for line in czip(*cols):
+        for line in zip(*cols):
             lines.append( format % line )
         return ''.join(lines)
 
@@ -220,7 +219,7 @@ class Dataset(Dataset1DBase):
         if self.nerr is not None:
             descriptor += ',-'
 
-        fileobj.write( "ImportString(%s,'''\n" % crepr(descriptor) )
+        fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
         fileobj.write( self.datasetAsText(fmt='%e', join=' ') )
         fileobj.write( "''')\n" )
 
@@ -314,13 +313,13 @@ class DatasetRange(Dataset1DBase):
     def saveDataRelationToText(self, fileobj, name):
         """Save dataset to file."""
 
-        parts = [crepr(name), crepr(self.numsteps), crepr(self.range_data)]
+        parts = [repr(name), repr(self.numsteps), repr(self.range_data)]
         if self.range_serr is not None:
-            parts.append('symerr=%s' % crepr(self.range_serr))
+            parts.append('symerr=%s' % repr(self.range_serr))
         if self.range_perr is not None:
-            parts.append('poserr=%s' % crepr(self.range_perr))
+            parts.append('poserr=%s' % repr(self.range_perr))
         if self.range_nerr is not None:
-            parts.append('negerr=%s' % crepr(self.range_nerr))
+            parts.append('negerr=%s' % repr(self.range_nerr))
         parts.append('linked=True')
 
         s = 'SetDataRange(%s)\n' % ', '.join(parts)
@@ -332,8 +331,7 @@ class DatasetRange(Dataset1DBase):
     def linkedInformation(self):
         """Return information about linking."""
         text = [_('Linked range dataset')]
-        for label, part in czip(self.column_descriptions,
-                                self.columns):
+        for label, part in zip(self.column_descriptions, self.columns):
             val = getattr(self, 'range_%s' % part)
             if val:
                 text.append('%s: %g:%g' % (label, val[0], val[1]))

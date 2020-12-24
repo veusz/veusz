@@ -18,16 +18,13 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
-import sys
-from .. import qtall as qt
 import numpy as N
 
+from .. import qtall as qt
+from . import colormap
 from ..helpers.qtloops import plotPathsToPainter, scalePath
 
-from . import colormap
-
-"""This is the symbol plotting part of Veusz
+"""Symbol plotting part of Veusz
 
 There are actually several different ways symbols are plotted.
 We choose the most appropriate one for the shape:
@@ -286,6 +283,7 @@ def _calcAreaScales():
     array
     """
 
+    import sys
     app = qt.QApplication(sys.argv)
     scale = 600
     c = scale*4

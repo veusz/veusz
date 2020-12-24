@@ -19,13 +19,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division, absolute_import, print_function
 import re
 import sys
 
 import numpy as N
 
-from ..compat import czip, cstr
 from .. import document
 from .. import setting
 from .. import utils
@@ -287,12 +285,12 @@ class Fit(FunctionPlotter):
         def evalfunc(params, xvals):
             # update environment with variable and parameters
             evalenv[self.settings.variable] = xvals
-            evalenv.update( czip(paramnames, params) )
+            evalenv.update( zip(paramnames, params) )
 
             try:
                 return eval(compiled, evalenv) + xvals*0.
             except Exception as e:
-                self.document.log(cstr(e))
+                self.document.log(str(e))
                 return N.nan
 
         # minimum set for fitting
@@ -346,7 +344,7 @@ class Fit(FunctionPlotter):
             retn, chi2, dof = utils.fitLM(
                 evalfunc, params, xvals, yvals, yserr)
             vals = {}
-            for i, v in czip(paramnames, retn):
+            for i, v in zip(paramnames, retn):
                 vals[i] = float(v)
 
         # list of operations do we can undo the changes

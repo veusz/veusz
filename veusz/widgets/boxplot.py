@@ -18,11 +18,9 @@
 
 """For making box plots."""
 
-from __future__ import division
 import math
 import numpy as N
 
-from ..compat import crange, czip
 from .. import qtall as qt
 from .. import setting
 from .. import document
@@ -62,7 +60,7 @@ def swapbox(painter, x1, y1, x2, y2, swap):
     else:
         return qt.QRectF(qt.QPointF(x1, y1), qt.QPointF(x2, y2))
 
-class _Stats(object):
+class _Stats:
     """Store statistics about box."""
 
     def calculate(self, data, whiskermode):
@@ -79,7 +77,7 @@ class _Stats(object):
         self.botquart = percentile(cleaned, 25)
         self.topquart = percentile(cleaned, 75)
         self.mean = N.mean(cleaned)
-        
+
         if whiskermode == 'min/max':
             self.botwhisker = cleaned.min()
             self.topwhisker = cleaned.max()
@@ -118,19 +116,19 @@ class BoxPlot(GenericPlotter):
         GenericPlotter.addSettings(s)
 
         s.remove('key')
-        s.add( setting.Choice('whiskermode', 
+        s.add( setting.Choice('whiskermode',
                               ('min/max',
                                '1.5IQR',
                                '1 stddev',
                                '9/91 percentile',
                                '2/98 percentile'),
-                              '1.5IQR', 
-                              descr = _('Whisker mode'), 
+                              '1.5IQR',
+                              descr = _('Whisker mode'),
                               usertext=_('Whisker mode')), 0 )
 
-        s.add( setting.Choice('direction', 
-                              ('horizontal', 'vertical'), 'vertical', 
-                              descr = _('Horizontal or vertical boxes'), 
+        s.add( setting.Choice('direction',
+                              ('horizontal', 'vertical'), 'vertical',
+                              descr = _('Horizontal or vertical boxes'),
                               usertext=_('Direction')), 0 )
         s.add( setting.DatasetOrStr('labels', '',
                                     descr=_('Dataset or string to label bars'),
@@ -435,16 +433,17 @@ class BoxPlot(GenericPlotter):
 
         if s.calculate:
             # calculated boxes
-            for vals, plotpos in czip(values, plotposns):
+            for vals, plotpos in zip(values, plotposns):
                 stats = _Stats()
                 stats.calculate(vals.data, s.whiskermode)
-                self.plotBox(painter, axes, plotpos, widgetposn, width,
-                             clip, stats)
+                self.plotBox(
+                    painter, axes, plotpos, widgetposn, width,
+                    clip, stats)
         else:
             # manually given boxes
             vals = [d.data for d in datasets] + [plotposns]
             lens = [len(d) for d in vals]
-            for i in crange(min(lens)):
+            for i in range(min(lens)):
                 stats = _Stats()
                 stats.topwhisker = vals[0][i]
                 stats.botwhisker = vals[1][i]
@@ -453,8 +452,9 @@ class BoxPlot(GenericPlotter):
                 stats.mean = vals[4][i]
                 stats.median = vals[5][i]
                 stats.outliers = N.array([])
-                self.plotBox(painter, axes, vals[6][i], widgetposn,
-                             width, clip, stats)
+                self.plotBox(
+                    painter, axes, vals[6][i], widgetposn,
+                    width, clip, stats)
 
 # allow the factory to instantiate a boxplot
 document.thefactory.register( BoxPlot )

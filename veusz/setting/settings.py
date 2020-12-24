@@ -18,11 +18,9 @@
 
 """Module for holding collections of settings."""
 
-from __future__ import division
-from ..compat import citems
 from .reference import Reference, ReferenceMultiple
 
-class Settings(object):
+class Settings:
     """A class for holding collections of settings."""
 
     # differentiate widgets, settings and setting
@@ -214,7 +212,7 @@ class Settings(object):
             _root = '/'.join(path)
 
         # iterate over subsettings
-        for name, setn in citems(self.setdict):
+        for name, setn in self.setdict.items():
             thispath = _root + name
             if isinstance(setn, Settings):
                 # call recursively if this is a Settings

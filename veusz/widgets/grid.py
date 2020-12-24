@@ -20,8 +20,6 @@
 The graphs may share axes if they are stored in the grid widget.
 """
 
-from __future__ import division
-from ..compat import crange
 from .. import document
 from .. import setting
 from .. import qtall as qt
@@ -61,8 +59,8 @@ class _gridengine:
 
     def isAllocedBlock(self, c, r, w, h):
         """Is the block (c,r) -> (c+w,r+h) allocated?"""
-        for y in crange(h):
-            for x in crange(w):
+        for y in range(h):
+            for x in range(w):
                 if self.isAlloced(c+x, y+r):
                     return True
         return False
@@ -79,8 +77,8 @@ class _gridengine:
 
     def setAllocedBlock(self, c, r, w, h):
         """Set block (c,r)->(c+w,r+h) as allocated."""
-        for y in crange(h):
-            for x in crange(w):
+        for y in range(h):
+            for x in range(w):
                 self.setAlloced(x+c, y+r)
 
     def add(self, width, height):
@@ -120,7 +118,7 @@ class _gridengine:
                 if (self.row + height > self.rows) and (height <= self.rows):
                     self.row = 0
                     self.col += 1
-                    
+
             # save position
             c = self.col
             r = self.row
@@ -138,7 +136,7 @@ class _gridengine:
         for l in self.alloced:
             w = max(w, len(l))
         return (w, h)
-    
+
 class Grid(widget.Widget):
     """Class to hold plots in a grid arrangement.
 
@@ -312,7 +310,7 @@ class Grid(widget.Widget):
                           'bottomMargin'):
                     operations.append(
                         document.OperationSettingSet(s.get(v), '0cm') )
-                    
+
         self.document.applyOperation(
             document.OperationMultiple(operations, descr='zero margins') )
 
@@ -390,7 +388,7 @@ class Grid(widget.Widget):
         if ( self.children != self.lastchildren or
              self.lastdimensions != dimensions or
              self.lastscalings != scalings ):
-            
+
             self._recalcPositions()
             self.lastchildren = list(self.children)
             self.lastdimensions = dimensions

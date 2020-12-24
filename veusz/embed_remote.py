@@ -16,23 +16,22 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import sys
 import struct
 import socket
+import pickle
 
-from .compat import citems, pickle
+from . import qtall as qt
 from .windows.simplewindow import SimpleWindow
 from . import document
 from . import setting
-from . import qtall as qt
 
 """Program to be run by embedding interface to run Veusz commands."""
 
 # embed.py module checks this is the same as its version number
 API_VERSION = 2
 
-class EmbeddedClient(object):
+class EmbeddedClient:
     """An object for each instance of embedded window with document."""
 
     def __init__(self, title, doc=None, hidden=False):
@@ -217,7 +216,7 @@ class EmbedApplication(qt.QApplication):
         self.clients[self.clientcounter] = client
         # return new number and list of commands and docstrings
         retfuncs = []
-        for name, cmd in citems(client.ci.cmds):
+        for name, cmd in client.ci.cmds.items():
             retfuncs.append( (name, cmd.__doc__) )
 
         retval = self.clientcounter, retfuncs
@@ -254,7 +253,7 @@ class EmbedApplication(qt.QApplication):
     def readFromSocket(self):
         self.notifier.setEnabled(False)
         self.socket.setblocking(1)
-        
+
         # unpickle command and arguments
         window, cmd, args, argsv = self.readCommand(self.socket)
 
@@ -266,9 +265,11 @@ class EmbedApplication(qt.QApplication):
         elif cmd == '_NewWindowCopy':
             # sets the document of this window to be the same as the
             # one specified
-            retval = self.makeNewClient( args[0],
-                                         doc=self.clients[args[1]].document,
-                                         hidden=argsv['hidden'] )
+            retval = self.makeNewClient(
+                args[0],
+                doc=self.clients[args[1]].document,
+                hidden=argsv['hidden']
+            )
         else:
             interpreter = self.clients[window].ci
 
@@ -298,14 +299,16 @@ def runremote():
 
     if params[0] == 'unix':
         # talk to existing unix domain socket
-        listensocket = socket.fromfd( int(params[1]),
-                                      socket.AF_UNIX,
-                                      socket.SOCK_STREAM )
+        listensocket = socket.fromfd(
+            int(params[1]),
+            socket.AF_UNIX,
+            socket.SOCK_STREAM
+        )
 
     elif params[0] == 'internet':
         # talk to internet port
-        listensocket = socket.socket( socket.AF_INET,
-                                      socket.SOCK_STREAM )
+        listensocket = socket.socket(
+            socket.AF_INET, socket.SOCK_STREAM)
         listensocket.connect( (params[1], int(params[2])) )
 
     # get secret from stdin and send back to socket

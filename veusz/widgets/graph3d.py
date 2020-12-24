@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #    Copyright (C) 2013 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -18,11 +16,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
-
 import math
 import numpy as N
-from ..compat import cvalues
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -224,7 +219,7 @@ class Graph3D(widget.Widget):
                 if c.isaxis:
                     axestodraw[c.name] = c
 
-        for axis in cvalues(axestodraw):
+        for axis in axestodraw.values():
             axis.computePlottedRange()
 
         cont = threed.ObjectContainer()

@@ -20,11 +20,9 @@
 
 """Module for implementing dialog boxes for importing data in Veusz."""
 
-from __future__ import division, print_function
 import os.path
 import sys
 
-from ..compat import crange
 from .. import qtall as qt
 from .. import setting
 from .. import utils
@@ -159,7 +157,7 @@ class ImportDialog(VeuszDialog):
 
         # collect filters from tabs
         filters = [_('All files (*)')]
-        for i in crange(self.methodtab.count()):
+        for i in range(self.methodtab.count()):
             w = self.methodtab.widget(i)
             if w.filefilter:
                 ftypes = ' '.join(['*'+t for t in w.filetypes])
@@ -200,7 +198,7 @@ class ImportDialog(VeuszDialog):
         # examine from left to right
         # promoted plugins come after plugins
         idx = -1
-        for i in crange(self.methodtab.count()):
+        for i in range(self.methodtab.count()):
             w = self.methodtab.widget(i)
             if w.isFiletypeSupported(ftype):
                 idx = i

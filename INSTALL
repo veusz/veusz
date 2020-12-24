@@ -7,9 +7,8 @@ Veusz Installation
 Veusz uses distutils for its installation. See below for how to use it.
 
 Requirements:
- python2 >= 2.7 or python3 >= 3.3
-                 https://www.python.org/
- PyQt >= 5.2     https://www.riverbankcomputing.co.uk/software/pyqt/
+ python >= 3.3   https://www.python.org/
+ PyQt >= 5.3     https://www.riverbankcomputing.co.uk/software/pyqt/
  numpy >= 1.0    http://www.numpy.org/
 
 PyQt requires
@@ -20,18 +19,16 @@ PyQt requires
 Optional requirements:
  h5py            http://www.h5py.org/
  astropy >= 0.4  http://www.astropy.org/
- pyemf >= 2.0.0  http://pyemf.sourceforge.net/
-                 (for Python3 see https://github.com/jeremysanders/pyemf)
+ pyemf >= 2.0.0  (for Python3 see https://github.com/jeremysanders/pyemf)
  iminuit         https://github.com/iminuit/iminuit
  ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
  Ghostscript     https://www.ghostscript.com/ (for EPS/PS output)
  Sphinx          http://www.sphinx-doc.org/en/stable/ (to rebuild manual)
 
-Note that the source code is compatible with both python 2.7+ and
-3.3+. It does not need translation with 2to3. The optional dependency
-pyemf does not have Python 3 support, but an in-development version of
-pyemf for Python 3 can be found at https://github.com/jeremysanders/pyemf.
+The optional dependency pyemf does not have Python 3 support, but an
+in-development version of pyemf for Python 3 can be found at
+https://github.com/jeremysanders/pyemf.
 
 1.1 Full installation with distutils
 ====================================
@@ -39,18 +36,17 @@ There are a number of ways to install programs using distutils. I will
 list a few of the possible method here:
 
 To install on Linux to the standard location on the hard disk follow
-these instructions (note python in these commands should be replaced
-by python3 to do a Python 3 installation).
+these instructions.
 
 # cd veusz-3.3.1
-# python setup.py build
+# python3 setup.py build
 # su
 [enter root password]
-# python setup.py install
+# python3 setup.py install
 # exit
 
 If you do not have a root account (as is default on Ubuntu), do
-# sudo python setup.py install
+# sudo python3 setup.py install
 instead of the final three lines
 
 On Windows, it should just be a matter of running the python setup.py
@@ -71,12 +67,12 @@ server for the self test to run. Packagers can use Xvfb in a non
 graphical environment to create a hidden X11 server:
 
 # xvfb-run -a --server-args "-screen 0 640x480x24" \
-    python tests/runselftest.py
+    python3 tests/runselftest.py
 
 Alternatively, the Qt platform can be switched to minimal to avoid the
 use of X11:
 
-# QT_QPA_PLATFORM=minimal python tests/runselftest.py
+# QT_QPA_PLATFORM=minimal python3 tests/runselftest.py
 
 1.1.2 Separate resources directory
 ==================================
@@ -149,7 +145,7 @@ location.
 
 # tar xzf veusz-3.3.1.tar.gz                [change version here]
 # cd veusz-3.3.1
-# python setup.py build                     [or use python3 here]
+# python3 setup.py build                    [or use python3 here]
 # cp build/*/veusz/helpers/*.so veusz/helpers/
 
 To run the program run

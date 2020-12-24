@@ -20,10 +20,8 @@
 
 """Dialog for reloading linked data."""
 
-from __future__ import division
 import os
 
-from ..compat import cstr
 from .. import qtall as qt
 from .. import document
 from .veuszdialog import VeuszDialog
@@ -113,7 +111,7 @@ class ReloadData(VeuszDialog):
             datasets, errors = self.document.reloadLinkedDatasets(
                 self.filenames)
         except EnvironmentError as e:
-            lines.append(_("Error reading file: %s") % cstr(e))
+            lines.append(_("Error reading file: %s") % str(e))
 
         # header showing count
         if len(datasets) > 0:

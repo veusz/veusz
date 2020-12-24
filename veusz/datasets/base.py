@@ -18,9 +18,6 @@
 
 """Base class for all Datasets."""
 
-from __future__ import division
-
-from ..compat import cbasestr
 from .commonfn import _
 
 class DatasetException(Exception):
@@ -31,7 +28,7 @@ class DatasetExpressionException(DatasetException):
     """Raised if there is an error evaluating a dataset expression."""
     pass
 
-class DatasetBase(object):
+class DatasetBase:
     """Base class for all datasets."""
 
 class DatasetConcreteBase(DatasetBase):
@@ -125,7 +122,7 @@ class DatasetConcreteBase(DatasetBase):
         We assume here it is a float, so override if not
         """
         from .. import setting
-        if isinstance(val, cbasestr):
+        if isinstance(val, str):
             val, ok = setting.uilocale.toDouble(val)
             if ok: return val
             raise ValueError("Invalid floating point number")

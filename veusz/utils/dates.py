@@ -16,14 +16,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import math
 import datetime
 import re
 
 import numpy as N
-
-from ..compat import crange, citems, cstr
 
 # date format: YYYY-MM-DDTHH:MM:SS.mmmmmm
 # date and time part are optional (check we have at least one!)
@@ -122,7 +119,7 @@ def dateFloatToString(f):
     if N.isfinite(f):
         return floatToDateTime(f).isoformat()
     else:
-        return cstr(f)
+        return str(f)
 
 def datetimeToTuple(dt):
     """Return tuple (year,month,day,hour,minute,second,microsecond) from
@@ -153,31 +150,31 @@ def addTimeTupleToDateTime(dt,  tt):
     """
 
     # add on most of the time intervals
-    dt = dt + datetime.timedelta(days=tt[2], hours=tt[3], 
-                                 minutes=tt[4], seconds=tt[5], 
+    dt = dt + datetime.timedelta(days=tt[2], hours=tt[3],
+                                 minutes=tt[4], seconds=tt[5],
                                  microseconds=tt[6])
 
     # add on years
     dt = dt.replace(year=dt.year + tt[0])
-    
+
     # add on months - this could be much simpler
     if tt[1] > 0:
-        for i in crange(tt[1]):
+        for i in range(tt[1]):
             # find interval between this month and next...
             m, y = dt.month + 1, dt.year
             if m == 13:
                 m = 1
-                y += 1          
+                y += 1
             dt = dt.replace(year=y, month=m)
     elif tt[1] < 0:
-        for i in crange(abs(tt[1])):
+        for i in range(abs(tt[1])):
             # find interval between this month and next...
             m, y = dt.month - 1, dt.year
             if m == 0:
                 m = 12
-                y -= 1          
+                y -= 1
             dt = dt.replace(year=y, month=m)
-        
+
     return dt
 
 def roundDownToTimeTuple(dt,  tt):
@@ -198,7 +195,7 @@ def roundDownToTimeTuple(dt,  tt):
         timein[i] = ((timein[i]-1) // tt[i])*tt[i] + 1
     else:
         timein[i] = (timein[i] // tt[i])*tt[i]
-        
+
     #print "rounded",  timein
     return tuple(timein)
 
@@ -254,7 +251,7 @@ def dateREMatchToDate(match):
 
     # remove None matches
     grps = {}
-    for k, v in citems(match.groupdict()):
+    for k, v in match.groupdict().items():
         if v is not None:
             grps[k] = v
 

@@ -18,7 +18,6 @@
 
 """Dataset creation dialog."""
 
-from ..compat import cstr
 from .. import qtall as qt
 from .. import utils
 from .. import document
@@ -81,7 +80,7 @@ class DataCreateDialog(VeuszDialog):
         # edit controls for dataset
         self.dsedits = { 'data': self.valueedit, 'serr': self.symerroredit,
                          'perr': self.poserroredit, 'nerr': self.negerroredit }
-        
+
         # update button state
         self.editsEditSlot('')
 
@@ -122,7 +121,7 @@ class DataCreateDialog(VeuszDialog):
         """Given a dataset name, allow it to be edited again
         (if it is editable)."""
 
-        if isinstance(ds, datasets.DatasetExpression): 
+        if isinstance(ds, datasets.DatasetExpression):
             # change selected method
             if ds.parametric is None:
                 # standard expression
@@ -187,7 +186,7 @@ class DataCreateDialog(VeuszDialog):
         # hide / show create button depending whether dataset exists
         self.createbutton.setVisible(not dsexists)
         self.replacebutton.setVisible(dsexists)
-        
+
         # enable buttons if expressions valid
         enabled = dsvalid and editsokay
         self.createbutton.setEnabled(enabled)
@@ -201,13 +200,13 @@ class DataCreateDialog(VeuszDialog):
                       self.tstartedit, self.tendedit, self.tstepsedit,
                       self.nameedit):
             cntrl.setEditText("")
-                      
+
         self.linkcheckbox.setChecked(True)
         self.valueradio.click()
 
     def createButtonClicked(self):
         """Create button pressed."""
-        
+
         dsname = self.nameedit.text()
         dsexists = dsname in self.document.data
 
@@ -238,15 +237,15 @@ class DataCreateDialog(VeuszDialog):
             else:
                 status = _("Creation failed")
 
-            if cstr(e) != '':
-                status += ': %s' % cstr(e)
+            if str(e) != '':
+                status += ': %s' % str(e)
 
             self.statuslabel.setText(status)
-            
+
     def createFromRange(self, name):
         """Make dataset from a range or constant.
         name is the name of the dataset
-        
+
         Raises _DSException if error
         """
 
@@ -259,11 +258,11 @@ class DataCreateDialog(VeuszDialog):
 
             if not text:
                 continue
-                
+
             if text.find(':') != -1:
                 # an actual range
                 parts = text.split(':')
-                
+
                 if len(parts) != 2:
                     raise _DSException(_("Incorrect range format, use form 1:10"))
                 try:
@@ -277,9 +276,9 @@ class DataCreateDialog(VeuszDialog):
                 except ValueError:
                     raise _DSException(_("Invalid number"))
                 maxval = minval
-                
+
             vals[key] = (minval, maxval)
-            
+
         linked = self.linkcheckbox.checkState() == qt.Qt.Checked
         return document.OperationDatasetCreateRange(
             name, numsteps, vals, linked=linked)

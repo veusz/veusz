@@ -19,10 +19,8 @@
 """A home-brewed SVG paint engine for doing svg with clipping
 and exporting text as paths for WYSIWYG."""
 
-from __future__ import division, print_function
 import re
 
-from ..compat import crange, cbytes
 from .. import qtall as qt
 
 # physical sizes
@@ -32,7 +30,7 @@ inch_pt = 72.0
 def printpath(path):
     """Debugging print path."""
     print("Contents of", path)
-    for i in crange(path.elementCount()):
+    for i in range(path.elementCount()):
         el = path.elementAt(i)
         print(" ", el.type, el.x, el.y)
 
@@ -97,7 +95,7 @@ def createPath(path, scale):
         i += 1
     return ''.join(p)
 
-class SVGElement(object):
+class SVGElement:
     """SVG element in output.
     This represents the XML tree in memory
     """
@@ -277,18 +275,18 @@ class SVGPaintEngine(qt.QPaintEngine):
 
         # work out which state differs first
         pop = 0
-        for i in crange(2, -1, -1):
+        for i in range(2, -1, -1):
             if statevec[i] != self.oldstate[i]:
                 pop = i+1
                 break
 
         # go back up the tree the required number of times
-        for i in crange(pop):
+        for i in range(pop):
             if self.oldstate[i]:
                 self.celement = self.celement.parent
 
         # create new elements for changed states
-        for i in crange(pop-1, -1, -1):
+        for i in range(pop-1, -1, -1):
             if statevec[i]:
                 self.celement = SVGElement(
                     self.celement, 'g', ' '.join(statevec[i]))
@@ -541,7 +539,7 @@ class SVGPaintEngine(qt.QPaintEngine):
                   'width="%s" ' % fltStr(r.width()*self.scale),
                   'height="%s" ' % fltStr(r.height()*self.scale),
                   'xlink:href="data:image/%s;base64,' % self.imageformat,
-                  cbytes(data.toBase64()).decode('ascii'),
+                  bytes(data.toBase64()).decode('ascii'),
                   '" preserveAspectRatio="none"' ]
         SVGElement(self.celement, 'image', ''.join(attrb))
 

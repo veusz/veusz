@@ -27,11 +27,9 @@ Quit: exit the listening program
 Zoom x: Change the zoom factor of the plot to x
 """
 
-from __future__ import division
 import sys
 
 from . import qtall as qt
-from .compat import cstr
 
 from .windows.simplewindow import SimpleWindow
 from . import document
@@ -43,7 +41,7 @@ class ReadingThread(qt.QThread):
     Windows as its stdin is a weird object
     """
 
-    newline = qt.pyqtSignal(cstr)
+    newline = qt.pyqtSignal(str)
 
     def run(self):
         """Emit lines read from stdin."""
@@ -59,7 +57,7 @@ class InputListener(qt.QObject):
     def __init__(self, window):
         """Initialse the listening object to send commands to the
         document given by window."""
-        
+
         qt.QObject.__init__(self)
 
         self.window = window
@@ -115,7 +113,7 @@ class InputListener(qt.QObject):
     def enableToolbar(self, enable=True):
         """Enable plot toolbar."""
         self.window.enableToolbar(enable)
-        
+
     def enablePickle(self, on=True):
         """Enable/disable pickling of commands to/data from veusz"""
         self.pickle = on
@@ -127,7 +125,7 @@ class InputListener(qt.QObject):
             retn = self.ci.runPickle( eval(line.strip()) )
             sys.stdout.write('%s\n' % repr(retn))
             sys.stdout.flush()
-            
+
         else:
             self.ci.run(line)
 

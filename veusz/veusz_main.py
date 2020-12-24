@@ -20,14 +20,12 @@
 
 '''Main Veusz executable.'''
 
-from __future__ import division
 import sys
 import os.path
 import signal
 import argparse
 
 import veusz
-from veusz.compat import czip, cbytes, cstr
 from veusz import qtall as qt
 from veusz import utils
 
@@ -115,7 +113,7 @@ def export(exports, docs, options):
     # TODO: validate options
     opttxt = ', '.join(options) if options else ''
 
-    for expfn, vsz in czip(exports, docs):
+    for expfn, vsz in zip(exports, docs):
         doc = document.Document()
         ci = document.CommandInterpreter(doc)
         ci.Load(vsz)
@@ -131,7 +129,7 @@ def convertArgsUnicode(args):
         return args
     out = []
     for a in args:
-        if isinstance(a, cbytes):
+        if isinstance(a, bytes):
             out.append(a.decode(enc))
         else:
             out.append(a)
@@ -314,7 +312,7 @@ class VeuszApp(qt.QApplication):
             try:
                 document.Document.loadPlugins(pluginlist=args.plugin)
             except RuntimeError as e:
-                startuperrors.append(cstr(e))
+                startuperrors.append(str(e))
 
         # different modes
         if args.listen:

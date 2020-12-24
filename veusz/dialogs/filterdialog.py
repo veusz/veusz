@@ -18,8 +18,6 @@
 
 """Dialog for filtering data."""
 
-from __future__ import division, print_function
-
 from .. import qtall as qt
 from .. import document
 from ..qtwidgets.datasetbrowser import DatasetBrowser

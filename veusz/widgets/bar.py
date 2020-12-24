@@ -18,10 +18,8 @@
 
 """For plotting bar graphs."""
 
-from __future__ import division
 import numpy as N
 
-from ..compat import crange, czip
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -37,18 +35,20 @@ class BarFill(setting.Settings):
     '''Filling of bars.'''
     def __init__(self, name, **args):
         setting.Settings.__init__(self, name, **args)
-        self.add( setting.FillSet('fills', [('solid', 'auto', False)],
-                                  descr = _('Fill styles for dataset bars'),
-                                  usertext=_('Fill styles')) )
+        self.add( setting.FillSet(
+            'fills', [('solid', 'auto', False)],
+            descr = _('Fill styles for dataset bars'),
+            usertext=_('Fill styles')) )
 
 class BarLine(setting.Settings):
     '''Edges of bars.'''
     def __init__(self, name, **args):
         setting.Settings.__init__(self, name, **args)
-        self.add( setting.LineSet('lines',
-                                  [('solid', '0.5pt', 'black', False)],
-                                  descr = _('Line styles for dataset bars'), 
-                                  usertext=_('Line styles')) )
+        self.add( setting.LineSet(
+            'lines',
+            [('solid', '0.5pt', 'black', False)],
+            descr = _('Line styles for dataset bars'),
+            usertext=_('Line styles')) )
 
 def extend1DArray(array, length, missing=0.):
     """Return array with length given (original if appropriate.
@@ -75,58 +75,65 @@ class BarPlotter(GenericPlotter):
         # get rid of default key setting
         s.remove('key')
 
-        s.add( setting.Strings('keys', ('',),
-                               descr=_('Key text for each dataset'),
-                               usertext=_('Key text')), 0)
+        s.add( setting.Strings(
+            'keys', ('',),
+            descr=_('Key text for each dataset'),
+            usertext=_('Key text')), 0)
 
-        s.add( setting.DatasetOrStr('labels', '',
-                                    descr=_('Dataset or string to label bars'),
-                                    usertext=_('Labels')), 5 )
+        s.add( setting.DatasetOrStr(
+            'labels', '',
+            descr=_('Dataset or string to label bars'),
+            usertext=_('Labels')), 5 )
 
-        s.add( setting.Choice('mode', ('grouped', 'stacked', 'stacked-area'),
-                              'grouped',
-                              descr=_('Show datasets grouped '
-                                      'together or as a single bar'),
-                              usertext=_('Mode')), 0)
-        s.add( setting.Choice('direction',
-                              ('horizontal', 'vertical'), 'vertical', 
-                              descr = _('Horizontal or vertical bar chart'),
-                              usertext=_('Direction')), 0 )
-        s.add( setting.DatasetExtended('posn', '',
-                                       descr = _('Position of bars, dataset '
-                                                 ' or expression (optional)'),
-                                       usertext=_('Positions')), 0 )
-        s.add( setting.Datasets('lengths', ('y',),
-                                descr = _('Datasets containing lengths of bars'),
-                                usertext=_('Lengths')), 0 )
+        s.add( setting.Choice(
+            'mode', ('grouped', 'stacked', 'stacked-area'),
+            'grouped',
+            descr=_('Show datasets grouped together or as a single bar'),
+            usertext=_('Mode')), 0)
+        s.add( setting.Choice(
+            'direction',
+            ('horizontal', 'vertical'), 'vertical',
+            descr = _('Horizontal or vertical bar chart'),
+            usertext=_('Direction')), 0 )
+        s.add( setting.DatasetExtended(
+            'posn', '',
+            descr = _('Position of bars, dataset or expression (optional)'),
+            usertext=_('Positions')), 0 )
+        s.add( setting.Datasets(
+            'lengths', ('y',),
+            descr = _('Datasets containing lengths of bars'),
+            usertext=_('Lengths')), 0 )
 
-        s.add( setting.Float('barfill', 0.75,
-                             minval = 0., maxval = 1.,
-                             descr = _('Filling fraction of bars'
-                                       ' (between 0 and 1)'),
-                             usertext=_('Bar fill'),
-                             formatting=True) )
-        s.add( setting.Float('groupfill', 0.9,
-                             minval = 0., maxval = 1.,
-                             descr = _('Filling fraction of groups of bars'
-                                       ' (between 0 and 1)'),
-                             usertext=_('Group fill'),
-                             formatting=True) )
+        s.add( setting.Float(
+            'barfill', 0.75,
+            minval = 0., maxval = 1.,
+            descr = _('Filling fraction of bars (between 0 and 1)'),
+            usertext=_('Bar fill'),
+            formatting=True) )
+        s.add( setting.Float(
+            'groupfill', 0.9,
+            minval = 0., maxval = 1.,
+            descr = _('Filling fraction of groups of bars (between 0 and 1)'),
+            usertext=_('Group fill'),
+            formatting=True) )
 
-        s.add( setting.Choice('errorstyle', ('none', 'bar', 'barends'),
-                              'bar',
-                              descr=_('Error bar style to show'),
-                              usertext=_('Error style'),
-                              formatting=True) )
+        s.add( setting.Choice(
+            'errorstyle', ('none', 'bar', 'barends'),
+            'bar',
+            descr=_('Error bar style to show'),
+            usertext=_('Error style'),
+            formatting=True) )
 
-        s.add(BarFill('BarFill', descr=_('Bar fill'), usertext=_('Fill')),
+        s.add(BarFill(
+            'BarFill', descr=_('Bar fill'), usertext=_('Fill')),
               pixmap = 'settings_bgfill')
         s.add(BarLine('BarLine', descr=_('Bar line'), usertext=_('Line')),
               pixmap = 'settings_border')
 
-        s.add( setting.ErrorBarLine('ErrorBarLine',
-                                    descr = _('Error bar line settings'),
-                                    usertext = _('Error bar line')),
+        s.add( setting.ErrorBarLine(
+            'ErrorBarLine',
+            descr = _('Error bar line settings'),
+            usertext = _('Error bar line')),
                pixmap = 'settings_ploterrorline' )
 
     @property
@@ -134,8 +141,8 @@ class BarPlotter(GenericPlotter):
         """User-friendly description."""
 
         s = self.settings
-        return _("lengths='%s', position='%s'") % (', '.join(s.lengths), 
-                                                   s.posn)
+        return _("lengths='%s', position='%s'") % (
+            ', '.join(s.lengths), s.posn)
 
     def affectsAxisRange(self):
         """This widget provides range information about these axes."""
@@ -158,7 +165,7 @@ class BarPlotter(GenericPlotter):
                 p = N.arange( max([len(d.data) for d in lengths]) )+1.
             else:
                 p = positions.data
-            
+
             return (labels, p)
 
         else:
@@ -168,10 +175,10 @@ class BarPlotter(GenericPlotter):
         """For single bars where multiple datasets are added,
         compute maximum range."""
         minv, maxv = 0., 0.
-        for data in czip(*[ds.data for ds in datasets]):
+        for data in zip(*[ds.data for ds in datasets]):
             totpos = sum( [d for d in data if d > 0] )
             totneg = sum( [d for d in data if d < 0] )
-            
+
             minv = min(minv, totneg)
             maxv = max(maxv, totpos)
         return minv,  maxv
@@ -280,21 +287,21 @@ class BarPlotter(GenericPlotter):
         painter.setPen( ebl.makeQPenWHide(painter) )
         w = barwidth*0.25*ebl.endsize
         if ishorz and not ebl.hideHorz:
-            utils.plotLinesToPainter(painter, mincoord, posns,
-                                     maxcoord, posns)
+            utils.plotLinesToPainter(
+                painter, mincoord, posns, maxcoord, posns)
             if s.errorstyle == 'barends':
-                utils.plotLinesToPainter(painter, mincoord, posns-w,
-                                         mincoord, posns+w)
-                utils.plotLinesToPainter(painter, maxcoord, posns-w,
-                                         maxcoord, posns+w)
+                utils.plotLinesToPainter(
+                    painter, mincoord, posns-w, mincoord, posns+w)
+                utils.plotLinesToPainter(
+                    painter, maxcoord, posns-w, maxcoord, posns+w)
         elif not ishorz and not ebl.hideVert:
-            utils.plotLinesToPainter(painter, posns, mincoord,
-                                     posns, maxcoord)
+            utils.plotLinesToPainter(
+                painter, posns, mincoord, posns, maxcoord)
             if s.errorstyle == 'barends':
-                utils.plotLinesToPainter(painter, posns-w, mincoord,
-                                         posns+w, mincoord)
-                utils.plotLinesToPainter(painter, posns-w, maxcoord,
-                                         posns+w, maxcoord)
+                utils.plotLinesToPainter(
+                    painter, posns-w, mincoord, posns+w, mincoord)
+                utils.plotLinesToPainter(
+                    painter, posns-w, maxcoord, posns+w, maxcoord)
 
     def plotBars(self, painter, s, dsnum, clip, corners):
         """Plot a set of boxes."""
@@ -332,33 +339,39 @@ class BarPlotter(GenericPlotter):
         ishorz = s.direction == 'horizontal'
 
         # bar extends from these coordinates
-        zeropt = axes[not ishorz].dataToPlotterCoords(widgetposn,
-                                                      N.array([0.]))
+        zeropt = axes[not ishorz].dataToPlotterCoords(
+            widgetposn, N.array([0.]))
 
         for dsnum, dataset in enumerate(dsvals):
 
             # convert bar length to plotter coords
             lengthcoord = axes[not ishorz].dataToPlotterCoords(
                 widgetposn, dataset['data'])
- 
+
             # these are the coordinates perpendicular to the bar
-            posns1 = posns + (-usablewidth*0.5 + bardelta*dsnum +
-                              (bardelta-barwidth)*0.5)
+            posns1 = posns + (
+                -usablewidth*0.5 + bardelta*dsnum + (bardelta-barwidth)*0.5)
             posns2 = posns1 + barwidth
 
             if ishorz:
-                p = (zeropt + N.zeros(posns1.shape), posns1,
-                     lengthcoord, posns2)
+                p = (
+                    zeropt + N.zeros(posns1.shape), posns1,
+                    lengthcoord, posns2
+                )
             else:
-                p = (posns1, zeropt + N.zeros(posns2.shape),
-                     posns2, lengthcoord)
+                p = (
+                    posns1, zeropt + N.zeros(posns2.shape),
+                    posns2, lengthcoord
+                )
 
             self.plotBars(painter, s, dsnum, clip, p)
 
             # draw error bars
-            self.drawErrorBars(painter, posns2-barwidth*0.5, barwidth,
-                               dataset['data'], dataset,
-                               axes, widgetposn)
+            self.drawErrorBars(
+                painter, posns2-barwidth*0.5, barwidth,
+                dataset['data'], dataset,
+                axes, widgetposn
+            )
 
     def calcStackedPoints(self, dsvals, axis, widgetposn):
         """Calculate stacked dataset coordinates for plotting."""
@@ -413,8 +426,9 @@ class BarPlotter(GenericPlotter):
         posns2 = posns1 + barwidth
 
         # draw bars (reverse order, so edges are plotted correctly)
-        for dsnum, coords in czip( crange(len(stackedcoords)-1, -1, -1),
-                                   stackedcoords[::-1]):
+        for dsnum, coords in zip(
+                range(len(stackedcoords)-1, -1, -1),
+                stackedcoords[::-1]):
             # we iterate over each of these coordinates
             if ishorz:
                 p = (zerocoords, posns1, coords, posns2)
@@ -423,10 +437,12 @@ class BarPlotter(GenericPlotter):
             self.plotBars(painter, s, dsnum, clip, p)
 
         # draw error bars
-        for barval, dsval in czip(stackedvals, dsvals):
-            self.drawErrorBars(painter, posns, barwidth,
-                               barval, dsval,
-                               axes, widgetposn)
+        for barval, dsval in zip(stackedvals, dsvals):
+            self.drawErrorBars(
+                painter, posns, barwidth,
+                barval, dsval,
+                axes, widgetposn
+            )
 
     def areaDrawStacked(self, painter, posns, maxwidth, dsvals,
                         axes, widgetposn, clip):
@@ -449,8 +465,9 @@ class BarPlotter(GenericPlotter):
             return
 
         # draw areas (reverse order, so edges are plotted correctly)
-        for dsnum, coords in czip( crange(len(stackedcoords)-1, -1, -1),
-                                   stackedcoords[::-1]):
+        for dsnum, coords in zip(
+                range(len(stackedcoords)-1, -1, -1),
+                stackedcoords[::-1]):
 
             # add points at end to make polygon
             p1 = N.hstack( [ [zerocoords[0]], coords, [zerocoords[-1]] ] )
@@ -485,10 +502,12 @@ class BarPlotter(GenericPlotter):
 
         # draw error bars
         barwidth = maxwidth * s.barfill
-        for barval, dsval in czip(stackedvals, dsvals):
-            self.drawErrorBars(painter, posns, barwidth,
-                               barval, dsval,
-                               axes, widgetposn)
+        for barval, dsval in zip(stackedvals, dsvals):
+            self.drawErrorBars(
+                painter, posns, barwidth,
+                barval, dsval,
+                axes, widgetposn
+            )
 
     def getNumberKeys(self):
         """Return maximum number of keys."""
@@ -500,7 +519,7 @@ class BarPlotter(GenericPlotter):
     def setupAutoColor(self, painter):
         """Initialise correct number of colors."""
         lengths = self.settings.get('lengths').getData(self.document)
-        for i in crange(len(lengths)):
+        for i in range(len(lengths)):
             self.autoColor(painter, dataindex=i)
 
     def getKeyText(self, number):
@@ -531,7 +550,7 @@ class BarPlotter(GenericPlotter):
         # where the bars are to be placed horizontally
         barposns, maxwidth = self.findBarPositions(
             lengths, positions, axes, widgetposn)
-        
+
         # only use finite positions
         origposnlen = len(barposns)
         validposn = N.isfinite(barposns)

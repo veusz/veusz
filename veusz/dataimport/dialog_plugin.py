@@ -16,14 +16,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function, absolute_import
-
 from .. import qtall as qt
 from .. import setting
 from .. import plugins
 from .. import utils
 from ..dialogs import importdialog
-from ..compat import czip, cstr
 from . import defn_plugin
 
 def _(text, disambiguation=None, context="Import_Plugin"):
@@ -78,7 +75,7 @@ class ImportTabPlugins(importdialog.ImportTab):
         """Return a dict of the fields given."""
         results = {}
         plugin = self.getSelectedPlugin()
-        for field, cntrls in czip(plugin.fields, self.fields):
+        for field, cntrls in zip(plugin.fields, self.fields):
             results[field.name] = field.getControlResults(cntrls)
         return results
 
@@ -158,7 +155,7 @@ class ImportTabPlugins(importdialog.ImportTab):
         try:
             text, ok = plugin.getPreview(params)
         except plugins.ImportPluginException as ex:
-            text = cstr(ex)
+            text = str(ex)
             ok = False
         self.pluginPreview.setPlainText(text)
         return bool(ok)
@@ -181,7 +178,7 @@ class ImportTabPlugins(importdialog.ImportTab):
         try:
             doc.applyOperation(op)
         except plugins.ImportPluginException as ex:
-            self.pluginPreview.setPlainText( cstr(ex) )
+            self.pluginPreview.setPlainText( str(ex) )
             return
 
         # feature feedback

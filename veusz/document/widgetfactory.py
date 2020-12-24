@@ -19,10 +19,7 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
-from ..compat import citems
-
-class WidgetFactory(object):
+class WidgetFactory:
     """Class to help produce any type of widget you want by name."""
 
     def __init__(self):
@@ -46,7 +43,7 @@ class WidgetFactory(object):
         w.linkToStylesheet()
 
         # set all the passed default settings
-        for name, val in citems(optargs):
+        for name, val in optargs.items():
             # allow subsettings to be set using __ -> syntax
             name = name.replace('__', '/')
 

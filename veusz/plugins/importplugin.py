@@ -18,11 +18,9 @@
 
 """Import plugin base class and helpers."""
 
-from __future__ import division
 import os.path
 import numpy as N
 
-from ..compat import crange, cstr, cstrerror, cunicode
 from .. import utils
 from .. import qtall as qt
 
@@ -36,7 +34,7 @@ def _(text, disambiguation=None, context='ImportPlugin'):
 # add an instance of your class to this list to get it registered
 importpluginregistry = []
 
-class ImportPluginParams(object):
+class ImportPluginParams:
     """Parameters to plugin are passed in this object."""
     def __init__(self, filename, encoding, field_results):
         self.filename = filename
@@ -50,7 +48,7 @@ class ImportPluginParams(object):
 class ImportPluginException(RuntimeError):
     """An exception to return errors about importing or previewing data."""
 
-class ImportPlugin(object):
+class ImportPlugin:
     """Define a plugin to read data in a particular format.
 
     Override doImport and optionally getPreview to define a new plugin.
@@ -105,10 +103,12 @@ class ImportPluginExample(ImportPlugin):
             field.FieldText("name", descr=_("Dataset name"), default="name"),
             field.FieldBool("invert", descr=_("invert values")),
             field.FieldFloat("mult", descr=_("Multiplication factor"), default=1),
-            field.FieldInt("skip", descr=_("Skip N lines"),
-                           default=0, minval=0),
-            field.FieldCombo("subtract", items=("0", "1", "2"),
-                             editable=False, default="0")
+            field.FieldInt(
+                "skip", descr=_("Skip N lines"),
+                default=0, minval=0),
+            field.FieldCombo(
+                "subtract", items=("0", "1", "2"),
+                editable=False, default="0")
             ]
 
     def doImport(self, params):
@@ -123,18 +123,20 @@ class ImportPluginExample(ImportPlugin):
             sub = float(params.field_results["subtract"])
             if params.field_results["invert"]:
                 mult *= -1
-            for i in crange(params.field_results["skip"]):
+            for i in range(params.field_results["skip"]):
                 f.readline()
             for line in f:
                 data += [float(x)*mult-sub for x in line.split()]
 
-            return [datasetplugin.Dataset1D(params.field_results["name"], data),
-                    datasetplugin.Constant("testconst", "42"),
-                    datasetplugin.Function("testfunc(x)", "testconst*x**2")]
+            return [
+                datasetplugin.Dataset1D(params.field_results["name"], data),
+                datasetplugin.Constant("testconst", "42"),
+                datasetplugin.Function("testfunc(x)", "testconst*x**2")
+            ]
         except IOError as e:
             raise e
         except Exception as e:
-            raise ImportPluginException(cstr(e))
+            raise ImportPluginException(str(e))
 
 class ImportPluginDateTime(ImportPlugin):
     """An example plugin for reading a set of iso date-times from a
@@ -157,13 +159,12 @@ class ImportPluginDateTime(ImportPlugin):
         f = params.openFileWithEncoding()
         data = []
         for line in f:
-            data.append( datasetplugin.DatasetDateTime.
-                         dateStringToFloat(line.strip()) )
-        return [ datasetplugin.DatasetDateTime(params.field_results["name"],
-                                               data) ]
+            data.append(
+                datasetplugin.DatasetDateTime. dateStringToFloat(line.strip()) )
+        return [ datasetplugin.DatasetDateTime(params.field_results["name"], data) ]
 #importpluginregistry.append( ImportPluginDateTime )
 
-class QdpFile(object):
+class QdpFile:
     """Handle reading of a Qdp file."""
 
     def __init__(self, colnames):
@@ -242,7 +243,7 @@ class QdpFile(object):
 
         for num, r1, c1, r2, c2 in self.datagroup2d:
             arr = []
-            for c in crange(c1-1,c2-1+1):
+            for c in range(c1-1,c2-1+1):
                 try:
                     arr.append( self.data[c][r1-1:r2-1+1] )
                 except IndexError:
@@ -273,7 +274,7 @@ class QdpFile(object):
         """Add data to output array.
         """
 
-        for i in crange(len(self.data)):
+        for i in range(len(self.data)):
             if self.data[i] is None:
                 continue
 
@@ -339,8 +340,8 @@ class QdpFile(object):
                 else:
                     nums.append(float(n))
         except ValueError:
-            raise ImportPluginException(_("Cannot convert '%s' to numbers") %
-                                        (' '.join(p)))
+            raise ImportPluginException(
+                _("Cannot convert '%s' to numbers") % (' '.join(p)))
         col = 0
         ds = 0
         while col < len(nums):
@@ -426,8 +427,8 @@ class ImportPluginQdp(ImportPlugin):
 
     def __init__(self):
         self.fields = [
-            field.FieldTextMulti("names", descr=_("Vector name list "),
-                                 default=['']),
+            field.FieldTextMulti(
+                "names", descr=_("Vector name list "), default=['']),
             ]
 
     def doImport(self, params):
@@ -435,8 +436,9 @@ class ImportPluginQdp(ImportPlugin):
         params is a ImportPluginParams object.
         Return a list of datasetplugin.Dataset1D, datasetplugin.Dataset2D objects
         """
-        names = [x.strip() for x in params.field_results["names"]
-                 if x.strip()]
+        names = [
+            x.strip() for x in params.field_results["names"] if x.strip()
+        ]
 
         f = params.openFileWithEncoding()
         rqdp = QdpFile(names)
@@ -465,7 +467,7 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
     if ( N.issubdtype(val.dtype, N.dtype('S')) or
          N.issubdtype(val.dtype, N.dtype('U')) ):
         # need to convert each item to proper unicode string
-        return datasetplugin.DatasetText(name, [cunicode(v) for v in val])
+        return datasetplugin.DatasetText(name, [str(v) for v in val])
 
     # check whether numeric dataset
     try:
@@ -485,8 +487,8 @@ def cnvtImportNumpyArray(name, val, errorsin2d=True):
             else:
                 # asymmetric errors
                 # unclear on ordering here...
-                return datasetplugin.Dataset1D(name, val[:,0], perr=val[:,1],
-                                               nerr=val[:,2])
+                return datasetplugin.Dataset1D(
+                    name, val[:,0], perr=val[:,1], nerr=val[:,2])
         else:
             return datasetplugin.Dataset2D(name, val)
     else:
@@ -502,13 +504,13 @@ class ImportPluginNpy(ImportPlugin):
 
     def __init__(self):
         self.fields = [
-            field.FieldText("name", descr=_("Dataset name"),
-                            default=''),
-            field.FieldBool("errorsin2d",
-                            descr=_("Treat 2 and 3 column 2D arrays as\n"
-                                    "data with error bars"),
-                            default=True),
-            ]
+            field.FieldText(
+                "name", descr=_("Dataset name"), default=''),
+            field.FieldBool(
+                "errorsin2d",
+                descr=_("Treat 2 and 3 column 2D arrays as\ndata with error bars"),
+                default=True),
+        ]
 
     def getPreview(self, params):
         """Get data to show in a text box to show a preview.
@@ -522,8 +524,8 @@ class ImportPluginNpy(ImportPlugin):
 
         try:
             text = _('Array shape: %s\n') % str(retn.shape)
-            text += _('Array datatype: %s (%s)\n') % (retn.dtype.str,
-                                                      str(retn.dtype))
+            text += _('Array datatype: %s (%s)\n') % (
+                retn.dtype.str, str(retn.dtype))
             text += str(retn)
             return text, True
         except AttributeError:
@@ -542,11 +544,13 @@ class ImportPluginNpy(ImportPlugin):
         except IOError as e:
             raise e
         except Exception as e:
-            raise ImportPluginException(_("Error while reading file: %s") %
-                                        cstr(e))
+            raise ImportPluginException(
+                _("Error while reading file: %s") % str(e))
 
-        return [ cnvtImportNumpyArray(
-                name, retn, errorsin2d=params.field_results["errorsin2d"]) ]
+        return [
+            cnvtImportNumpyArray(
+                name, retn, errorsin2d=params.field_results["errorsin2d"])
+        ]
 
 class ImportPluginNpz(ImportPlugin):
     """For reading single datasets from NPY numpy saved files."""
@@ -558,11 +562,11 @@ class ImportPluginNpz(ImportPlugin):
 
     def __init__(self):
         self.fields = [
-            field.FieldBool("errorsin2d",
-                            descr=_("Treat 2 and 3 column 2D arrays as\n"
-                                    "data with error bars"),
-                            default=True),
-            ]
+            field.FieldBool(
+                "errorsin2d",
+                descr=_("Treat 2 and 3 column 2D arrays as\ndata with error bars"),
+                default=True),
+        ]
 
     def getPreview(self, params):
         """Get data to show in a text box to show a preview.
@@ -598,8 +602,8 @@ class ImportPluginNpz(ImportPlugin):
         except IOError as e:
             raise e
         except Exception as e:
-            raise ImportPluginException(_("Error while reading file: %s") %
-                                        cstr(e))
+            raise ImportPluginException(
+                _("Error while reading file: %s") % str(e))
 
         try:
             retn.files
@@ -610,7 +614,7 @@ class ImportPluginNpz(ImportPlugin):
         out = []
         for f in sorted(retn.files):
             out.append( cnvtImportNumpyArray(
-                    f, retn[f], errorsin2d=params.field_results["errorsin2d"]) )
+                f, retn[f], errorsin2d=params.field_results["errorsin2d"]) )
 
         return out
 
@@ -623,24 +627,26 @@ class ImportPluginBinary(ImportPlugin):
 
     def __init__(self):
         self.fields = [
-            field.FieldText("name", descr=_("Dataset name"),
-                            default=""),
-            field.FieldCombo("datatype", descr=_("Data type"),
-                             items = ("float32", "float64",
-                                      "int8", "int16", "int32", "int64",
-                                      "uint8", "uint16", "uint32", "uint64"),
-                             default="float64", editable=False),
-            field.FieldCombo("endian", descr=_("Endian (byte order)"),
-                             items = ("little", "big"), editable=False),
+            field.FieldText(
+                "name", descr=_("Dataset name"), default=""),
+            field.FieldCombo(
+                "datatype", descr=_("Data type"),
+                items = (
+                    "float32", "float64", "int8", "int16", "int32", "int64",
+                    "uint8", "uint16", "uint32", "uint64"),
+                default="float64", editable=False),
+            field.FieldCombo(
+                "endian", descr=_("Endian (byte order)"),
+                items = ("little", "big"), editable=False),
             field.FieldInt("offset", descr=_("Offset (bytes)"), default=0, minval=0),
             field.FieldInt("length", descr=_("Length (values)"), default=-1)
-            ]
+        ]
 
     def getNumpyDataType(self, params):
         """Convert params to numpy datatype."""
         t = N.dtype(str(params.field_results["datatype"]))
         return t.newbyteorder( {"little": "<", "big": ">"} [
-                params.field_results["endian"]] )
+            params.field_results["endian"]] )
 
     def getPreview(self, params):
         """Preview of data files."""
@@ -649,7 +655,7 @@ class ImportPluginBinary(ImportPlugin):
             data = f.read()
             f.close()
         except EnvironmentError as e:
-            return _("Cannot read file (%s)") % cstrerror(e), False
+            return _("Cannot read file (%s)") % e.strerror, False
 
         text = [_('File length: %i bytes') % len(data)]
 
@@ -661,14 +667,14 @@ class ImportPluginBinary(ImportPlugin):
                 return c.decode('ascii')
 
         # do a hex dump (like in CP/M)
-        for i in crange(0, min(65536, len(data)), 16):
+        for i in range(0, min(65536, len(data)), 16):
             hdr = '%04X  ' % i
             subset = data[i:i+16]
             # below messy due to python2/3 compatibility
             hexdata = ('%02X '*len(subset)) % tuple(
-                [ord(subset[i:i+1]) for i in crange(len(subset))])
+                [ord(subset[i:i+1]) for i in range(len(subset))])
             chrdata = ''.join([
-                filtchr(subset[i:i+1]) for i in crange(len(subset))])
+                filtchr(subset[i:i+1]) for i in range(len(subset))])
 
             text.append(hdr+hexdata + '  ' + chrdata)
 
@@ -687,15 +693,18 @@ class ImportPluginBinary(ImportPlugin):
             retn = f.read()
             f.close()
         except EnvironmentError as e:
-            raise ImportPluginException(_("Error while reading file '%s'\n\n%s") %
-                                        (params.filename, cstrerror(e)))
+            raise ImportPluginException(
+                _("Error while reading file '%s'\n\n%s") %
+                (params.filename, e.strerror(e)))
 
         try:
-            data = N.fromstring(retn, dtype=self.getNumpyDataType(params),
-                                count=params.field_results["length"])
+            data = N.fromstring(
+                retn, dtype=self.getNumpyDataType(params),
+                count=params.field_results["length"])
         except ValueError as e:
-            raise ImportPluginException(_("Error converting data for file '%s'\n\n%s") %
-                                        (params.filename, cstr(e)))
+            raise ImportPluginException(
+                _("Error converting data for file '%s'\n\n%s") %
+                (params.filename, str(e)))
 
         data = data.astype(N.float64)
         return [ datasetplugin.Dataset1D(name, data) ]
@@ -718,7 +727,7 @@ class ImportPluginGnuplot2D(ImportPlugin):
                 "subtract", descr="Offset to subtract", default=0.0),
             field.FieldFloat(
                 "mult", descr="Multiplication factor", default=1),
-            ]
+        ]
 
     def doImport(self, params):
         """Actually import data
@@ -775,4 +784,4 @@ importpluginregistry += [
     ImportPluginBinary,
     ImportPluginExample,
     ImportPluginGnuplot2D,
-    ]
+]

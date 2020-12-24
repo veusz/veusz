@@ -20,11 +20,8 @@
 
 """Module for implementing dialog box for viewing/editing data."""
 
-from __future__ import division
-
 import numpy as N
 
-from ..compat import cstr
 from .. import qtall as qt
 from .. import document
 from .. import datasets
@@ -541,7 +538,7 @@ class ViewDelegate(qt.QStyledItemDelegate):
 
 class DataEditDialog(VeuszDialog):
     """Dialog for editing and rearranging data sets."""
-    
+
     def __init__(self, parent, document):
         VeuszDialog.__init__(self, parent, 'dataedit.ui')
         self.document = document
@@ -628,7 +625,7 @@ class DataEditDialog(VeuszDialog):
         for a in self.datatableview.actions():
             a.setEnabled(model is not None)
 
-        self.datatableview.setModel(model)    
+        self.datatableview.setModel(model)
         self.setUnlinkState()
 
     def setUnlinkState(self):
@@ -738,7 +735,7 @@ class DataEditDialog(VeuszDialog):
                     rowitems = []
                 lastrow = row
             rowitems.append(
-                cstr(model.createIndex(row, column).data()) )
+                str(model.createIndex(row, column).data()) )
         if rowitems:
             lines.append( '\t'.join(rowitems) )
         lines.append('')  # blank line at end

@@ -18,12 +18,10 @@
 
 """Plotting a line with arrowheads or labels."""
 
-from __future__ import division
 import math
 import itertools
 import numpy as N
 
-from ..compat import czip
 from .. import qtall as qt
 from .. import setting
 from .. import document
@@ -139,7 +137,7 @@ class Line(plotters.FreePlotter):
             if len(angle) == 1: angle = itertools.cycle(angle)
 
         out = []
-        for v in czip(xpos, ypos, length, angle):
+        for v in zip(xpos, ypos, length, angle):
             # skip lines which have nans
             if N.all( N.isfinite(v) ):
                 out.append(v)
@@ -162,7 +160,7 @@ class Line(plotters.FreePlotter):
             if len(ypos2) == 1: ypos2 = itertools.cycle(ypos2)
 
         out = []
-        for v in czip(xpos, ypos, xpos2, ypos2):
+        for v in zip(xpos, ypos, xpos2, ypos2):
             # skip nans again
             if N.all( N.isfinite(v) ):
                 length = math.sqrt( (v[0]-v[2])**2 + (v[1]-v[3])**2 )
@@ -179,7 +177,7 @@ class Line(plotters.FreePlotter):
             return
 
         # if a dataset is used, we can't use control items
-        isnotdataset = ( not s.get('xPos').isDataset(d) and 
+        isnotdataset = ( not s.get('xPos').isDataset(d) and
                          not s.get('yPos').isDataset(d) )
 
         if s.mode == 'length-angle':

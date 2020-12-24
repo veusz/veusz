@@ -19,18 +19,16 @@
 """This module contains routines for importing CSV data files
 in an easy-to-use manner."""
 
-from __future__ import division
 import re
 import csv
 import numpy as N
 
 from .base import ImportingError
-from ..compat import crange, cnext, cstr, CIterator
 from .. import datasets
 from .. import utils
 from .. import qtall as qt
 
-class _FileReaderCols(CIterator):
+class _FileReaderCols:
     """Read a CSV file in rows. This acts as an iterator.
 
     This is a very simple wrapper around the csv module
@@ -47,9 +45,9 @@ class _FileReaderCols(CIterator):
     def __next__(self):
         """Return next row."""
         try:
-            row = cnext(self.csvreader)
+            row = next(self.csvreader)
         except csv.Error as e:
-            raise ImportingError("Error in line %i: %s" % (self.line, cstr(e)))
+            raise ImportingError("Error in line %i: %s" % (self.line, str(e)))
 
         self.line += 1
 
@@ -59,7 +57,7 @@ class _FileReaderCols(CIterator):
 
         return row
 
-class _FileReaderRows(CIterator):
+class _FileReaderRows:
     """Read a CSV file in columns. This acts as an iterator.
 
     This means we have to read the whole file in, then return cols :-(
@@ -76,7 +74,7 @@ class _FileReaderRows(CIterator):
                 self.data.append(line)
                 lineno += 1
         except csv.Error as e:
-            raise ImportingError("Error in line %i: %s" % (lineno, cstr(e)))
+            raise ImportingError("Error in line %i: %s" % (lineno, str(e)))
 
         self.counter = 0
 
@@ -114,7 +112,7 @@ typecodes = (
 class _NextValue(Exception):
     """A class to be raised to move to next value."""
 
-class ReadCSV(object):
+class ReadCSV:
     """A class to import data from CSV files."""
 
     def __init__(self, params):
@@ -259,7 +257,7 @@ class ReadCSV(object):
         self.coltypes[colnum] = dtype
 
         # add back on blanks if necessary with correct format
-        for i in crange(self.colblanks[colnum]):
+        for i in range(self.colblanks[colnum]):
             d = (N.nan, '')[dtype == 'string']
             self.data[self.colnames[colnum]].append(d)
         self.colblanks[colnum] = 0
@@ -344,9 +342,9 @@ class ReadCSV(object):
             it = _FileReaderCols(csvf)
 
         # ignore rows (at top), if requested
-        for i in crange(par.rowsignore):
+        for i in range(par.rowsignore):
             try:
-                cnext(it)
+                next(it)
             except StopIteration:
                 return
 
@@ -365,7 +363,7 @@ class ReadCSV(object):
         # iterate over each line (or column)
         while True:
             try:
-                line = cnext(it)
+                line = next(it)
             except StopIteration:
                 break
 
@@ -392,7 +390,7 @@ class ReadCSV(object):
 
             # make them have a maximum length by adding NaNs
             maxlen = max([len(x) for x in data if x is not None])
-            for i in crange(len(data)):
+            for i in range(len(data)):
                 if data[i] is not None and len(data[i]) < maxlen:
                     data[i] = N.concatenate(
                         ( data[i], N.zeros(maxlen-len(data[i]))*N.nan ) )

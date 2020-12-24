@@ -18,12 +18,10 @@
 
 """Widget that represents a page in the document."""
 
-from __future__ import division, print_function
 import collections
 import textwrap
 import numpy as N
 
-from ..compat import crange, citems
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -49,7 +47,7 @@ def _resolveLinkedAxis(axis):
             return None
     return axis
 
-class AxisDependHelper(object):
+class AxisDependHelper:
     """A class to work out the dependency of widgets on axes and vice
     versa, in terms of ranges of the axes.
 
@@ -110,7 +108,7 @@ class AxisDependHelper(object):
 
         Builds up a dict of "nodes" representing each widget: plotter/axis
         Each node is a list of tuples saying which widgets need evaling first
-        The tuples are (widget, depname), where depname is a name for the 
+        The tuples are (widget, depname), where depname is a name for the
         part of the plotter, e.g. "sx" or "sy" for x or y.
         """
 
@@ -163,7 +161,7 @@ class AxisDependHelper(object):
         numcyclic = len(origcyclic)
         best = -1
 
-        for i in crange(len(self.pairs)):
+        for i in range(len(self.pairs)):
             if not self.pairs[i][0][0].isaxis:
                 p = self.pairs[:i] + self.pairs[i+1:]
                 ordered, cyclic = utils.topological_sort(p)
@@ -280,11 +278,11 @@ class Page(widget.Widget):
     typename='page'
     allowusercreation = True
     description=_('Blank page')
- 
+
     @classmethod
     def addSettings(klass, s):
         widget.Widget.addSettings(s)
-        
+
         # page sizes are initially linked to the document page size
         s.add( setting.DistancePhysical(
                 'width',
@@ -330,7 +328,7 @@ class Page(widget.Widget):
         painthelper.axisplottermap.update(axisdependhelper.axis_plotter_map)
         # reverse mapping
         pamap = collections.defaultdict(list)
-        for axis, plotters in citems(painthelper.axisplottermap):
+        for axis, plotters in painthelper.axisplottermap.items():
             for plot in plotters:
                 pamap[plot].append(axis)
         painthelper.plotteraxismap.update(pamap)
@@ -364,4 +362,4 @@ class Page(widget.Widget):
 
 # allow the factory to instantiate this
 document.thefactory.register( Page )
-    
+

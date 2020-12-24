@@ -18,7 +18,6 @@
 
 """Collections of predefined settings for common settings."""
 
-from __future__ import division
 from .. import qtall as qt
 
 from . import setting

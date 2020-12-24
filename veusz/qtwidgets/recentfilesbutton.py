@@ -16,11 +16,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import os.path
 
 from .. import qtall as qt
-from ..compat import cstr
 from .. import setting
 
 def removeBadRecents(itemlist):
@@ -45,7 +43,7 @@ class RecentFilesButton(qt.QPushButton):
     emits filechosen(filename) if a file is chosen
     """
 
-    filechosen = qt.pyqtSignal(cstr)
+    filechosen = qt.pyqtSignal(str)
 
     def __init__(self, *args):
         qt.QPushButton.__init__(self, *args)

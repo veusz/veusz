@@ -18,12 +18,11 @@
 
 """Data entry fields for plugins."""
 
-from __future__ import division
 from .. import qtall as qt
 from .. import utils
 from .. import setting
 
-class Field(object):
+class Field:
     """A class to represent an input field on the dialog or command line."""
     def __init__(self, name, descr=None, default=None):
         """name: name of field
@@ -237,8 +236,8 @@ class _FieldSetting(Field):
 class FieldBool(_FieldSetting):
     """A true/false value using a check box."""
     def __init__(self, name, descr=None, default=False):
-        _FieldSetting.__init__(self, setting.Bool, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.Bool, name, descr=descr, default=default)
 
 class FieldInt(_FieldSetting):
     """An integer number field."""
@@ -250,9 +249,11 @@ class FieldInt(_FieldSetting):
         default: default value.
         minval and maxval: minimum and maximum integers
         """
-        _FieldSetting.__init__(self, setting.Int,
-                               name, descr=descr, default=default,
-                               setnparams={'minval': minval, 'maxval': maxval})
+        _FieldSetting.__init__(
+            self, setting.Int,
+            name, descr=descr, default=default,
+            setnparams={'minval': minval, 'maxval': maxval}
+        )
 
 class FieldFloat(_FieldSetting):
     """A floating point number field."""
@@ -265,9 +266,11 @@ class FieldFloat(_FieldSetting):
         minval and maxval: minimum and maximum values
         """
 
-        _FieldSetting.__init__(self, setting.Float,
-                               name, descr=descr, default=default,
-                               setnparams={'minval': minval, 'maxval': maxval})
+        _FieldSetting.__init__(
+            self, setting.Float,
+            name, descr=descr, default=default,
+            setnparams={'minval': minval, 'maxval': maxval}
+        )
 
 class FieldFloatOrAuto(_FieldSetting):
     """A floating point value or the text 'Auto'."""
@@ -278,53 +281,53 @@ class FieldFloatOrAuto(_FieldSetting):
         default: default value.
         """
 
-        _FieldSetting.__init__(self, setting.FloatOrAuto,
-                               name, descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.FloatOrAuto, name, descr=descr, default=default)
 
 class FieldColor(_FieldSetting):
     """Field for selecting a color - returns #rrggbb string."""
     def __init__(self, name, descr=None, default='black'):
-        _FieldSetting.__init__(self, setting.Color, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.Color, name, descr=descr, default=default)
 
 class FieldFillStyle(_FieldSetting):
     """Field for selecting fill styles - returns a string."""
     def __init__(self, name, descr=None, default='solid'):
-        _FieldSetting.__init__(self, setting.FillStyle, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.FillStyle, name, descr=descr, default=default)
 
 class FieldLineStyle(_FieldSetting):
     """Field for selecting line styles - returns a string."""
     def __init__(self, name, descr=None, default='solid'):
-        _FieldSetting.__init__(self, setting.LineStyle, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.LineStyle, name, descr=descr, default=default)
 
 class FieldMarker(_FieldSetting):
     """Field for selecting a marker type.
-    
+
     Returns a string
     """
     def __init__(self, name, descr=None, default='circle'):
-        _FieldSetting.__init__(self, setting.Marker, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.Marker, name, descr=descr, default=default)
 
 class FieldArrow(_FieldSetting):
     """Field for selecting an arrow type.
-    
+
     Returns a string
     """
     def __init__(self, name, descr=None, default='none'):
-        _FieldSetting.__init__(self, setting.Arrow, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.Arrow, name, descr=descr, default=default)
 
 class FieldErrorStyle(_FieldSetting):
     """Field for selecting an error bar style
-    
+
     Returns a string
     """
     def __init__(self, name, descr=None, default='bar'):
-        _FieldSetting.__init__(self, setting.ErrorStyle, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.ErrorStyle, name, descr=descr, default=default)
 
 class FieldDistance(_FieldSetting):
     """Field for selecting a veusz-style distance, e.g. '1pt'.
@@ -332,8 +335,8 @@ class FieldDistance(_FieldSetting):
     Returns a string
     """
     def __init__(self, name, descr=None, default='1pt'):
-        _FieldSetting.__init__(self, setting.Distance, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.Distance, name, descr=descr, default=default)
 
 class FieldFloatList(_FieldSetting):
     """Field for entering multiple numbers, separated by commas or spaces
@@ -341,8 +344,8 @@ class FieldFloatList(_FieldSetting):
     Returns a list/tuple of floats
     """
     def __init__(self, name, descr=None, default=()):
-        _FieldSetting.__init__(self, setting.FloatList, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.FloatList, name, descr=descr, default=default)
 
 class FieldDataset(_FieldSetting):
     """Field for selecting a datset.
@@ -360,18 +363,19 @@ class FieldDataset(_FieldSetting):
         dims: dimensions of dataset to show (or 'all')
         datatype: type of data: numeric, text or all
         """
-        _FieldSetting.__init__(self, setting.Dataset,
-                               name, descr=descr, default=default,
-                               setnparams={'dimensions': dims,
-                                           'datatype': datatype})
+        _FieldSetting.__init__(
+            self, setting.Dataset,
+            name, descr=descr, default=default,
+            setnparams={'dimensions': dims, 'datatype': datatype}
+        )
 
 class FieldTextMulti(_FieldSetting):
     """Field for entering multiple lines of text.
     Returns a tuple/list of strings.
     """
     def __init__(self, name, descr=None, default=('')):
-        _FieldSetting.__init__(self, setting.Strings, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.Strings, name, descr=descr, default=default)
 
 class FieldDatasetMulti(_FieldSetting):
     """Field for entering multiple datasets.
@@ -384,10 +388,11 @@ class FieldDatasetMulti(_FieldSetting):
 
         datatype is 'numeric' or 'text'
         """
-        _FieldSetting.__init__(self, setting.Datasets, name,
-                               descr=descr, default=default,
-                               setnparams={'dimensions': dims,
-                                           'datatype': datatype})
+        _FieldSetting.__init__(
+            self, setting.Datasets, name,
+            descr=descr, default=default,
+            setnparams={'dimensions': dims, 'datatype': datatype}
+        )
 
 class FieldLineMulti(_FieldSetting):
     """A field for holding a set of lines. Consists of tuples
@@ -401,14 +406,14 @@ class FieldLineMulti(_FieldSetting):
 
     def __init__(self, name, descr=None,
                  default=(('solid', '1pt', 'black', False),) ):
-        _FieldSetting.__init__(self, setting.LineSet, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.LineSet, name, descr=descr, default=default)
 
 class FieldFillMulti(_FieldSetting):
     """A field for holding a set of fills. Consists of tuples
 
     [('solid', 'color', <trans>, False), ...]
-        
+
     These are color, fill style, and hide or
     color, fill style, transparency and hide
 
@@ -416,8 +421,8 @@ class FieldFillMulti(_FieldSetting):
     """
 
     def __init__(self, name, descr=None, default=()):
-        _FieldSetting.__init__(self, setting.FillSet, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.FillSet, name, descr=descr, default=default)
 
 class FieldFontFamily(_FieldSetting):
     """A field for holding a font family.
@@ -429,22 +434,19 @@ class FieldFontFamily(_FieldSetting):
         """Default None selects the default font."""
         if default is None:
             default = setting.Text.defaultfamily
-        _FieldSetting.__init__(self, setting.FontFamily, name,
-                               descr=descr, default=default)
+        _FieldSetting.__init__(
+            self, setting.FontFamily, name, descr=descr, default=default)
 
 class FieldFilename(_FieldSetting):
     """Select a filename with a browse button."""
 
     def __init__(self, name, descr=None, default=''):
-        _FieldSetting.__init__(self, setting.Filename, name,
-                               descr=descr, default=default)
-
+        _FieldSetting.__init__(
+            self, setting.Filename, name, descr=descr, default=default)
 
 class FieldColormap(_FieldSetting):
     """Return the name of a colormap."""
 
     def __init__(self, name, descr=None, default=''):
         _FieldSetting.__init__(
-            self, setting.Colormap, name,
-            descr=descr, default=default)
-
+            self, setting.Colormap, name, descr=descr, default=default)

@@ -18,12 +18,9 @@
 
 """Date time datasets."""
 
-from __future__ import division
-
 import numpy as N
 
 from .. import utils
-from ..compat import cbasestr, cstr, crepr
 
 from .commonfn import _, convertNumpy, datasetNameToDescriptorName
 from .oned import Dataset1DBase
@@ -50,8 +47,8 @@ class DatasetDateTimeBase(Dataset1DBase):
 
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
-        if isinstance(val, cbasestr):
-            v = utils.dateStringToDate( cstr(val) )
+        if isinstance(val, str):
+            v = utils.dateStringToDate( str(val) )
             if not N.isfinite(v):
                 try:
                     v = float(val)
@@ -86,7 +83,7 @@ class DatasetDateTime(DatasetDateTimeBase):
         '''Save data to file.
         '''
         descriptor = datasetNameToDescriptorName(name) + '(date)'
-        fileobj.write( "ImportString(%s,'''\n" % crepr(descriptor) )
+        fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
         fileobj.write( self.datasetAsText() )
         fileobj.write( "''')\n" )
 

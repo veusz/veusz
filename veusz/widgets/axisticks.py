@@ -19,11 +19,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import math
 import numpy as N
 
-from ..compat import crange
 from .. import utils
 
 """Algorithms for working with axis ticks.
@@ -36,7 +34,7 @@ by looking though a list of allowable interval values (after taking
 account of what power of 10 the coordinates are in).
 """
 
-class AxisTicksBase(object):
+class AxisTicksBase:
     """Base class of axis ticks classes."""
 
     def __init__( self, minval, maxval, numticks, numminorticks,
@@ -192,10 +190,10 @@ class AxisTicks(AxisTicksBase):
 
         ticks = []
         # iterate over range in log space
-        for i in crange(alpha, beta+1):
+        for i in range(alpha, beta+1):
             power = 10.**i
             # add ticks for values in correct range
-            for j in crange(2, 10):
+            for j in range(2, 10):
                 v = power*j
                 # blah log conversions mean we have to use 'fuzzy logic'
                 if ( math.fabs(v - minval)/v < 1e-6 or v > minval ) and \

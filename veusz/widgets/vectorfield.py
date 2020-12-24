@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 #    Copyright (C) 2010 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -18,10 +16,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import numpy as N
 
-from ..compat import czip
 from .. import setting
 from .. import document
 from .. import utils
@@ -58,11 +54,12 @@ class VectorField(plotters.GenericPlotter):
                 descr = _('Y coordinate length or vector angle'),
                 usertext = _('dy or theta')),
                1 )
-        s.add( setting.Choice('mode',
-                              ['cartesian', 'polar'],
-                              'cartesian',
-                              descr = _('Cartesian (dx,dy) or polar (r,theta)'),
-                              usertext = _('Mode')),
+        s.add( setting.Choice(
+            'mode',
+            ['cartesian', 'polar'],
+            'cartesian',
+            descr = _('Cartesian (dx,dy) or polar (r,theta)'),
+            usertext = _('Mode')),
                2 )
         s.add( setting.FloatChoice(
             'rotate',
@@ -83,37 +80,44 @@ class VectorField(plotters.GenericPlotter):
                5 )
 
         # formatting
-        s.add( setting.DistancePt('baselength', '10pt',
-                                  descr = _('Base length of unit vector'),
-                                  usertext = _('Base length'),
-                                  formatting=True),
+        s.add( setting.DistancePt(
+            'baselength', '10pt',
+            descr = _('Base length of unit vector'),
+            usertext = _('Base length'),
+            formatting=True),
                0 )
-        s.add( setting.DistancePt('arrowsize', '2pt',
-                                  descr = _('Size of any arrows'),
-                                  usertext = _('Arrow size'),
-                                  formatting=True),
+        s.add( setting.DistancePt(
+            'arrowsize', '2pt',
+            descr = _('Size of any arrows'),
+            usertext = _('Arrow size'),
+            formatting=True),
                1 )
-        s.add( setting.Bool('scalearrow', True,
-                            descr = _('Scale arrow head by length'),
-                            usertext = _('Scale arrow'),
-                            formatting=True),
+        s.add( setting.Bool(
+            'scalearrow', True,
+            descr = _('Scale arrow head by length'),
+            usertext = _('Scale arrow'),
+            formatting=True),
                2 )
-        s.add( setting.Arrow('arrowfront', 'none',
-                             descr = _('Arrow in front direction'),
-                             usertext=_('Arrow front'), formatting=True),
+        s.add( setting.Arrow(
+            'arrowfront', 'none',
+            descr = _('Arrow in front direction'),
+            usertext=_('Arrow front'), formatting=True),
                3)
-        s.add( setting.Arrow('arrowback', 'none',
-                             descr = _('Arrow in back direction'),
-                             usertext=_('Arrow back'), formatting=True),
+        s.add( setting.Arrow(
+            'arrowback', 'none',
+            descr = _('Arrow in back direction'),
+            usertext=_('Arrow back'), formatting=True),
                4)
 
-        s.add( setting.Line('Line',
-                            descr = _('Line style'),
-                            usertext = _('Line')),
+        s.add( setting.Line(
+            'Line',
+            descr = _('Line style'),
+            usertext = _('Line')),
                pixmap = 'settings_plotline' )
-        s.add( setting.ArrowFill('Fill',
-                                 descr = _('Arrow fill settings'),
-                                 usertext = _('Arrow fill')),
+        s.add( setting.ArrowFill(
+            'Fill',
+            descr = _('Arrow fill settings'),
+            usertext = _('Arrow fill')),
                pixmap = 'settings_plotmarkerfill' )
 
     def affectsAxisRange(self):
@@ -217,8 +221,8 @@ class VectorField(plotters.GenericPlotter):
         y1, y2 = yplotter+dy, yplotter-dy
 
         if s.arrowfront == 'none' and s.arrowback == 'none':
-            utils.plotLinesToPainter(painter, x1, y1, x2, y2,
-                                     cliprect)
+            utils.plotLinesToPainter(
+                painter, x1, y1, x2, y2, cliprect)
         else:
             arrowsize = s.get('arrowsize').convert(painter)
             painter.setBrush( s.get('Fill').makeQBrushWHide(painter) )
@@ -226,18 +230,20 @@ class VectorField(plotters.GenericPlotter):
             # this is backward - have to convert from dx, dy to angle, length
             angles = 180 - N.arctan2(dy, dx) * (180./N.pi)
             lengths = N.sqrt(dx**2+dy**2) * 2
-            
+
             # scale arrow heads by arrow length if requested
             if s.scalearrow:
                 arrowsizes = (arrowsize/baselength/2) * lengths
             else:
                 arrowsizes = N.zeros(lengths.shape) + arrowsize
 
-            for x, y, l, a, asize in czip(x2, y2, lengths, angles, arrowsizes):
+            for x, y, l, a, asize in zip(x2, y2, lengths, angles, arrowsizes):
                 if l != 0.:
-                    utils.plotLineArrow(painter, x, y, l, a, asize,
-                                        arrowleft=s.arrowfront,
-                                        arrowright=s.arrowback)
-                
+                    utils.plotLineArrow(
+                        painter, x, y, l, a, asize,
+                        arrowleft=s.arrowfront,
+                        arrowright=s.arrowback
+                    )
+
 # allow the factory to instantiate a vector field
 document.thefactory.register( VectorField )

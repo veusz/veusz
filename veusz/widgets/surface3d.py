@@ -18,7 +18,6 @@
 
 """3D surface plotting widget."""
 
-from __future__ import division, print_function
 import numpy as N
 
 from .. import qtall as qt

@@ -18,11 +18,14 @@
 
 """A convenience module to import used Qt symbols from."""
 
-from __future__ import print_function, division, absolute_import
-
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtSvg import *
 from PyQt5.QtPrintSupport import *
 from PyQt5.uic import loadUi
+
+try:
+    from PyQt5 import sip
+except ImportError:
+    import sip

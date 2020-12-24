@@ -21,7 +21,6 @@
 
 """A generic plotter widget which is inherited by function and point."""
 
-from __future__ import division
 from .. import qtall as qt
 import numpy as N
 

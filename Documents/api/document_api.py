@@ -21,7 +21,6 @@ Document veusz widget types and settings
 Creates an xml file designed to be processed into a web page using xsl
 """
 
-from __future__ import division, print_function
 import re
 
 import veusz.widgets as widgets

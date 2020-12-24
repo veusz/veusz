@@ -26,13 +26,11 @@ Operations store paths to objects to be modified rather than object references
 because some operations cannot restore references (e.g. add object)
 """
 
-from __future__ import division, print_function
 import os.path
 import io
 
 import numpy as N
 
-from ..compat import czip, crange, citems, cbasestr, cpy3
 from . import widgetfactory
 
 from .. import datasets
@@ -46,7 +44,7 @@ def _(text, disambiguation=None, context="Operations"):
 ###############################################################################
 # Setting operations
 
-class Operation(object):
+class Operation:
     """Root class for operations."""
 
     descr = 'REPLACE THIS'
@@ -67,7 +65,7 @@ class OperationSettingSet(Operation):
         Setting may be a widget path
         """
 
-        if isinstance(setting, cbasestr):
+        if isinstance(setting, str):
             self.settingpath = setting
         else:
             self.settingpath = setting.path
@@ -150,7 +148,7 @@ class OperationSettingPropagate(Operation):
     def undo(self, document):
         """Undo all those changes."""
 
-        for setpath, setval in citems(self.restorevals):
+        for setpath, setval in self.restorevals.items():
             setting = document.resolveSettingPath(None, setpath)
             setting.set(setval)
 
@@ -248,7 +246,7 @@ class OperationWidgetsDelete(Operation):
         i = 0
         while i < len(widgetpaths):
             wp = widgetpaths[i]
-            for j in crange(i):
+            for j in range(i):
                 if wp[:len(widgetpaths[j])+1] == widgetpaths[j]+'/':
                     del widgetpaths[i]
                     break
@@ -271,7 +269,7 @@ class OperationWidgetsDelete(Operation):
         """Restore deleted widget."""
 
         # put back widgets in reverse order so that indexes are corrent
-        for i in crange(len(self.oldwidgets)-1,-1,-1):
+        for i in range(len(self.oldwidgets)-1,-1,-1):
             oldparent = document.resolveWidgetPath(None, self.oldparentpaths[i])
             oldparent.addChild(self.oldwidgets[i], index=self.oldindexes[i])
 
@@ -489,7 +487,7 @@ class OperationDatasetRename(Operation):
             # dataset might have been renamed before, so we have to
             # remove that entry and remember how to put it back
             origname = self.oldname
-            for o, n in list(citems(p.renames)):
+            for o, n in list(p.renames.items()):
                 if n == self.oldname:
                     origname = o
                     # store in case of undo
@@ -774,7 +772,7 @@ class OperationDatasetsFilter(Operation):
     def undo(self, doc):
         """Undo operation."""
 
-        for name, val in citems(self.olddatasets):
+        for name, val in self.olddatasets.items():
             if val is None:
                 doc.deleteData(name)
             else:
@@ -873,14 +871,14 @@ class OperationDatasetUnlinkByFile(Operation):
     def do(self, document):
         """Remove links."""
         self.oldlinks = {}
-        for name, ds in citems(document.data):
+        for name, ds in document.data.items():
             if ds.linked is not None and ds.linked.filename == self.filename:
                 self.oldlinks[name] = ds.linked
                 ds.linked = None
 
     def undo(self, document):
         """Restore links."""
-        for name, link in citems(self.oldlinks):
+        for name, link in self.oldlinks.items():
             try:
                 document.data[name].linked = link
             except KeyError:
@@ -905,7 +903,7 @@ class OperationDatasetDeleteByFile(Operation):
 
     def undo(self, document):
         """Restore datasets."""
-        for name, ds in citems(self.olddatasets):
+        for name, ds in self.olddatasets.items():
             document.setData(name, ds)
 
 ###############################################################################
@@ -1177,8 +1175,8 @@ class OperationLoadStyleSheet(OperationMultiple):
         interpreter = commandinterpreter.CommandInterpreter(document)
         try:
             mode = 'r' if cpy3 else 'rU'
-            interpreter.runFile( io.open(self.filename, mode,
-                                         encoding='utf8') )
+            interpreter.runFile( io.open(
+                self.filename, 'r', encoding='utf8') )
         except:
             document.batchHistory(None)
             raise
@@ -1238,7 +1236,7 @@ class OperationDatasetPlugin(Operation):
         names = self.datasetnames = list(manager.datasetnames)
 
         # rename if requested
-        for i in crange(len(names)):
+        for i in range(len(names)):
             if names[i] in self.names:
                 names[i] = self.names[names[i]]
 
@@ -1248,7 +1246,7 @@ class OperationDatasetPlugin(Operation):
                 self.olddata[name] = document.data[name]
 
         # add new datasets to document
-        for name, ds in czip(names, manager.veuszdatasets):
+        for name, ds in zip(names, manager.veuszdatasets):
             if name is not None:
                 document.setData(name, ds)
 
@@ -1267,7 +1265,7 @@ class OperationDatasetPlugin(Operation):
                 document.deleteData(name)
 
         # put back old datasets
-        for name, ds in citems(self.olddata):
+        for name, ds in self.olddata.items():
             document.setData(name, ds)
 
 class OperationDatasetHistogram(Operation):

@@ -16,12 +16,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
-
 from .. import qtall as qt
 from .. import utils
 from ..dialogs import importdialog, veuszdialog
-from ..compat import citems
 from . import defn_standard
 from . import simpleread
 
@@ -103,7 +100,7 @@ class ImportTabStandard(importdialog.ImportTab):
         # tell the user what happened
         # failures in conversion
         lines = []
-        for var, count in citems(op.outinvalids):
+        for var, count in op.outinvalids.items():
             if count != 0:
                 lines.append(_('%i conversions failed for dataset "%s"') %
                              (count, var))

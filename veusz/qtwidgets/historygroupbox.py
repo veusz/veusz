@@ -16,9 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
-
-from ..compat import cstr
 from .. import qtall as qt
 from .. import setting
 
@@ -67,7 +64,7 @@ class HistoryGroupBox(qt.QGroupBox):
 
     def saveHistory(self):
         """Save to settings."""
-        name = cstr(self.getRadioChecked().objectName())
+        name = str(self.getRadioChecked().objectName())
         setting.settingdb[self.getSettingName()] = name
 
     def showEvent(self, event):

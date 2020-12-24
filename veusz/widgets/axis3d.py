@@ -19,7 +19,6 @@
 """Widget to plot 3D axes, and to handle conversion of coordinates to plot
 positions."""
 
-from __future__ import division, print_function, absolute_import
 import math
 import numpy as N
 import itertools
@@ -27,7 +26,6 @@ import itertools
 from . import widget
 from . import axisticks
 from . import axis
-from ..compat import czip
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -718,7 +716,7 @@ class Axis3D(widget.Widget):
 
         # add lines on each face
         lineprop = gridprops.makeLineProp(painter)
-        for p1, p2, n in czip(pts1, pts2, norms):
+        for p1, p2, n in zip(pts1, pts2, norms):
             # container only shows face if norm points to observer
             face = threed.FacingContainer(threed.Vec3(*n))
             c1 = threed.ValVector(N.ravel(N.column_stack(p1)))

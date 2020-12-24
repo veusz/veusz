@@ -18,7 +18,6 @@
 
 """Wrapper for D-Bus module it."""
 
-from __future__ import division
 import sys
 import os
 
@@ -59,6 +58,6 @@ except ImportError:
             return m
         return donothing
 
-    class Object(object):
+    class Object:
         def __init__(self, *args):
             pass

@@ -16,12 +16,10 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
 import csv
 import re
 
 from .. import qtall as qt
-from ..compat import cstr
 from .. import utils
 from ..dialogs import importdialog
 from . import defn_twod
@@ -192,7 +190,7 @@ class ImportTab2D(importdialog.ImportTab):
             utils.feedback.importcts['twod'] += 1
 
         except (simpleread.Read2DError, csv.Error) as e:
-            output = _('Error importing datasets:\n %s') % cstr(e)
+            output = _('Error importing datasets:\n %s') % str(e)
 
         # show status in preview box
         self.twod_previewedit.setPlainText(output)

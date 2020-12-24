@@ -38,8 +38,6 @@ This class is modelled on the one described in
 'GUI Programming in Python: QT Edition' (Boudewijn Rempt)
 """
 
-from __future__ import division, print_function
-
 # get globals before things are imported
 _globals = globals()
 
@@ -47,12 +45,12 @@ import sys
 import traceback
 import io
 import os.path
+import pickle
 
-from ..compat import pickle, cexec, cpy3
 from .commandinterface import CommandInterface
 from .. import utils
 
-class CommandInterpreter(object):
+class CommandInterpreter:
     """Class for executing commands in the Veusz command line language."""
 
     def __init__(self, document):
@@ -71,7 +69,7 @@ class CommandInterpreter(object):
         self.read_stdin = sys.stdin
 
         # import numpy into the environment
-        cexec("from numpy import *", self.globals)
+        exec("from numpy import *", self.globals)
 
         # define root object
         self.globals['Root'] = self.interface.Root
@@ -161,7 +159,7 @@ class CommandInterpreter(object):
             with self.document.suspend():
                 try:
                     # execute the code
-                    cexec(c, self.globals)
+                    exec(c, self.globals)
                 except:
                     # print out the backtrace to stderr
                     info = sys.exc_info()
@@ -175,8 +173,7 @@ class CommandInterpreter(object):
     def Load(self, filename):
         """Replace the document with a new one from the filename."""
 
-        mode = 'r' if cpy3 else 'rU'
-        with io.open(filename, mode, encoding='utf8') as f:
+        with io.open(filename, 'r', encoding='utf8') as f:
             self.document.wipe()
             self.interface.To('/')
             oldfile = self.globals['__file__']
@@ -203,7 +200,7 @@ class CommandInterpreter(object):
         with self.document.suspend():
             # actually run the code
             try:
-                cexec(fileobject.read(), self.globals)
+                exec(fileobject.read(), self.globals)
             except Exception:
                 # print out the backtrace to stderr
                 info = sys.exc_info()

@@ -19,8 +19,6 @@
 """A combobox which remembers previous setting
 """
 
-from __future__ import division
-from ..compat import crange
 from .. import qtall as qt
 from .. import setting
 
@@ -54,7 +52,7 @@ class HistoryValueCombo(qt.QComboBox):
             return
 
         # collect current items
-        history = [ self.itemText(i) for i in crange(self.count()) ]
+        history = [ self.itemText(i) for i in range(self.count()) ]
         history.insert(0, self.currentText())
 
         # remove dups

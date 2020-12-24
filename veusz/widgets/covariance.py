@@ -18,12 +18,10 @@
 
 """Widget for plotting data covariance."""
 
-from __future__ import division
 import numpy as N
 
-from .. import qtall as qt
-from ..compat import czip
 from . import plotters
+from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
@@ -244,7 +242,7 @@ class Covariance(plotters.GenericPlotter):
         lineclip = qt.QRectF(
             qt.QPointF(x1-pw, y1-pw), qt.QPointF(x2+pw, y2+pw))
 
-        for xvals, yvals in czip(ptsx, ptsy):
+        for xvals, yvals in zip(ptsx, ptsy):
             path = qt.QPainterPath()
             poly = qt.QPolygonF()
             utils.addNumpyToPolygonF(poly, xvals, yvals)

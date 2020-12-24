@@ -18,10 +18,8 @@
 
 """Dialog boxes for tools and dataset plugins."""
 
-from __future__ import division
 import sys
 
-from ..compat import czip, cstr
 from .. import qtall as qt
 from .. import document
 from .. import plugins
@@ -124,7 +122,7 @@ class PluginDialog(VeuszDialog):
         """Open up dataset in dialog for editing."""
 
         oldfields = ds.pluginmanager.fields
-        for field, cntrl in czip(self.fields, self.fieldcntrls):
+        for field, cntrl in zip(self.fields, self.fieldcntrls):
             field.setControlVal(cntrl, oldfields[field.name])
 
     def slotApply(self):
@@ -136,7 +134,7 @@ class PluginDialog(VeuszDialog):
             fields = {'currentwidget': self.mainwindow.treeedit.selwidgets[0].path}
 
         # read values from controls
-        for field, cntrls in czip(self.fields, self.fieldcntrls):
+        for field, cntrls in zip(self.fields, self.fieldcntrls):
             fields[field.name] = field.getControlResults(cntrls)
 
         # run plugin
@@ -186,7 +184,7 @@ def runPlugin(window, doc, plugin, fields):
         op.undo(doc)
 
         qt.QMessageBox.warning(
-            window, _("Error in %s") % plugin.name, cstr(ex))
+            window, _("Error in %s") % plugin.name, str(ex))
 
     except Exception:
         op.undo(doc)

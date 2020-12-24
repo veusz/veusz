@@ -18,7 +18,6 @@
 
 """Routines to export the document."""
 
-from __future__ import division
 import os.path
 import random
 import math
@@ -27,7 +26,6 @@ import re
 import sys
 import subprocess
 
-from ..compat import crange
 from .. import qtall as qt
 from .. import setting
 from .. import utils
@@ -560,9 +558,9 @@ def printDialog(parentwindow, document, filename=None):
 
         # reverse or forward order
         if prnt.pageOrder() == qt.QPrinter.FirstPageFirst:
-            pages = list(crange(minval, maxval+1))
+            pages = list(range(minval, maxval+1))
         else:
-            pages = list(crange(maxval, minval-1, -1))
+            pages = list(range(maxval, minval-1, -1))
 
         # if more copies are requested
         pages *= prnt.copyCount()

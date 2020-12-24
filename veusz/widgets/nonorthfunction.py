@@ -18,10 +18,8 @@
 
 '''Non orthogonal function plotting.'''
 
-from __future__ import division
 import numpy as N
 
-from ..compat import cstr
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -56,7 +54,7 @@ class NonOrthFunction(Widget):
         s.add(setting.FloatOrAuto('min', 'Auto',
                                   descr=_('Minimum value at which to plot function'),
                                   usertext=_('Min')))
-        
+
         s.add(setting.FloatOrAuto('max', 'Auto',
                                   descr=_('Maximum value at which to plot function'),
                                   usertext=_('Max')))
@@ -97,7 +95,7 @@ class NonOrthFunction(Widget):
         '''Write error message to document log for exception ex.'''
         self.document.log(
             "Error evaluating expression in function widget '%s': '%s'" % (
-                self.name, cstr(ex)))
+                self.name, str(ex)))
 
     def getFunctionPoints(self):
         '''Get points for plotting function.

@@ -16,13 +16,10 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
-
 from .. import qtall as qt
 from .. import setting
 from .. import utils
 from ..dialogs import importdialog
-from ..compat import cstr
 
 from . import base
 from . import defn_hdf5
@@ -112,7 +109,8 @@ def addsub(parent, grp, datanodes):
                         fdatatype,
                         fdtype,
                         fshape,
-                        field)
+                        field,
+                    )
 
                     childnode.children.append(fnode)
                     datanodes.append(fnode)
@@ -393,7 +391,7 @@ class ImportTabHDF5(importdialog.ImportTab):
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,
-            )
+        )
 
         op = defn_hdf5.OperationDataImportHDF5(params)
 
@@ -402,14 +400,14 @@ class ImportTabHDF5(importdialog.ImportTab):
             doc.applyOperation(op)
 
             # inform user
-            self.hdfimportstatus.setText(_("Import complete (%i datasets)") %
-                                         len(op.outnames))
+            self.hdfimportstatus.setText(
+                _("Import complete (%i datasets)") % len(op.outnames))
 
             # feature feedback
             utils.feedback.importcts['hdf5'] += 1
 
         except base.ImportingError as e:
-            self.hdfimportstatus.setText(_("Error: %s") % cstr(e))
+            self.hdfimportstatus.setText(_("Error: %s") % str(e))
 
         qt.QTimer.singleShot(4000, self.hdfimportstatus.clear)
 

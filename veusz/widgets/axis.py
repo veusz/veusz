@@ -19,11 +19,9 @@
 """Widget to plot axes, and to handle conversion of coordinates to plot
 positions."""
 
-from __future__ import division
 import numpy as N
 import re
 
-from ..compat import czip
 from .. import qtall as qt
 from .. import document
 from .. import setting
@@ -847,7 +845,7 @@ class Axis(widget.Widget):
             if labels is not None and coords is not None:
                 # convert coordinates to plotter coordinates
                 pcoords = self._graphToPlotter(coords)
-                for coord, pcoord, lab in czip(coords, pcoords, labels):
+                for coord, pcoord, lab in zip(coords, pcoords, labels):
                     # return labels that are within the plotted range
                     # of coordinates
                     if N.isfinite(coord) and (minval <= coord <= maxval):
@@ -898,9 +896,9 @@ class Axis(widget.Widget):
                 format = self.autoformat
 
             # generate positions and labels
-            for posn, tickval in czip(coordticks, tickvals):
-                text = utils.formatNumber(tickval*scale, format,
-                                          locale=self.document.locale)
+            for posn, tickval in zip(coordticks, tickvals):
+                text = utils.formatNumber(
+                    tickval*scale, format, locale=self.document.locale)
                 yield posn, text
 
         # position of label perpendicular to axis

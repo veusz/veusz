@@ -16,7 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import select
 import subprocess
 import os
@@ -24,7 +23,6 @@ import socket
 import platform
 import signal
 
-from ..compat import cstr
 from .. import qtall as qt
 from .. import utils
 from . import simpleread
@@ -130,7 +128,7 @@ class FileCaptureStream(CaptureStream):
                 raise CaptureFinishException("End of file")
             return data
         except OSError as e:
-            raise CaptureFinishException("OSError: %s" % cstr(e))
+            raise CaptureFinishException("OSError: %s" % str(e))
 
     def close(self):
         """Close file."""
@@ -231,7 +229,7 @@ class SocketCaptureStream(CaptureStream):
         """Close the socket."""
         self.socket.close()
 
-class OperationDataCaptureSet(object):
+class OperationDataCaptureSet:
     """An operation for setting the results from a SimpleRead into the
     document's data from a data capture.
 

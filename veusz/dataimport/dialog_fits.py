@@ -16,13 +16,10 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function, absolute_import
-
 from .. import qtall as qt
 from .. import setting
 from .. import utils
 from ..dialogs import importdialog
-from ..compat import cstr
 
 from . import base
 from . import defn_fits
@@ -334,7 +331,7 @@ class ImportTabFITS(importdialog.ImportTab):
             utils.feedback.importcts['fits'] += 1
 
         except base.ImportingError as e:
-            self.fitsimportstatus.setText(_("Error: %s") % cstr(e))
+            self.fitsimportstatus.setText(_("Error: %s") % str(e))
 
         qt.QTimer.singleShot(4000, self.fitsimportstatus.clear)
 

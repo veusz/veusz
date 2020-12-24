@@ -23,11 +23,9 @@ The idea is to examine the compiled ast tree and chack for invalid
 entries
 """
 
-# don't do this as it affects imported files
-# from __future__ import division
 import ast
+import builtins
 
-from ..compat import cstr, cpy3, cbuiltins
 from .. import qtall as qt
 
 def _(text, disambiguation=None, context='SafeEval'):
@@ -144,7 +142,7 @@ numpy_forbidden = set((
         ))
 
 # blacklist using whitelist above
-forbidden_builtins = ( set(cbuiltins.__dict__.keys()) - allowed_builtins |
+forbidden_builtins = ( set(builtins.__dict__.keys()) - allowed_builtins |
                        numpy_forbidden )
 
 class SafeEvalException(Exception):
@@ -193,14 +191,10 @@ def compileChecked(code, mode='eval', filename='<string>',
     mode = 'exec' or 'eval'
     """
 
-    # python2 needs filename encoded
-    if not cpy3:
-        filename = filename.encode('utf-8')
-
     try:
         tree = ast.parse(code, filename, mode)
     except Exception as e:
-        raise ValueError(_('Unable to parse file: %s') % cstr(e))
+        raise ValueError(_('Unable to parse file: %s') % str(e))
 
     if not ignoresecurity:
         visitor = CheckNodeVisitor()

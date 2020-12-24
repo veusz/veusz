@@ -16,11 +16,9 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import ast
 import copy
 
-from ..compat import cstrerror
 from .. import qtall as qt
 from .. import document
 from .veuszdialog import VeuszDialog
@@ -299,7 +297,7 @@ class CustomDialog(VeuszDialog):
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to save '%s'\n\n%s") % (
-                        filename, cstrerror(e)))
+                        filename, e.strerror))
 
     def slotLoad(self):
         """Load entries."""
@@ -313,7 +311,7 @@ class CustomDialog(VeuszDialog):
                 qt.QMessageBox.critical(
                     self, _("Error - Veusz"),
                     _("Unable to load '%s'\n\n%s") % (
-                            filename, cstrerror(e)))
+                            filename, e.strerror))
             else:
                 # add to recent file list
                 self.recentButton.addFile(filename)

@@ -16,12 +16,10 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
 import csv
 
 from .. import qtall as qt
 from ..dialogs import importdialog, veuszdialog
-from ..compat import crange, cnext, cstr
 from .. import utils
 from . import defn_csv
 from . import base
@@ -132,8 +130,8 @@ class ImportTabCSV(importdialog.ImportTab):
             rows = []
             numcols = 0
             try:
-                for i in crange(10):
-                    row = cnext(reader)
+                for i in range(10):
+                    row = next(reader)
                     rows.append(row)
                     numcols = max(numcols, len(row))
                 rows.append(['...'])
@@ -148,8 +146,8 @@ class ImportTabCSV(importdialog.ImportTab):
         # fill up table
         t.setColumnCount(numcols)
         t.setRowCount(numrows)
-        for r in crange(numrows):
-            for c in crange(numcols):
+        for r in range(numrows):
+            for c in range(numcols):
                 if c < len(rows[r]):
                     item = qt.QTableWidgetItem(rows[r][c])
                     t.setItem(r, c, item)
@@ -207,7 +205,7 @@ class ImportTabCSV(importdialog.ImportTab):
             utils.feedback.importcts['csv'] += 1
 
         except (base.ImportingError, csv.Error) as e:
-            qt.QMessageBox.warning(self, _("Veusz"), cstr(e))
+            qt.QMessageBox.warning(self, _("Veusz"), str(e))
             return
 
         # update output, showing what datasets were imported

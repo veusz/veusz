@@ -18,17 +18,15 @@
 
 """Parameters for import routines."""
 
-from __future__ import division, print_function
 import sys
 import copy
 
-from ..compat import citems, cstr
 from .. import utils
 
 class ImportingError(RuntimeError):
     """Common error when import fails."""
 
-class ImportParamsBase(object):
+class ImportParamsBase:
     """Import parameters for the various imports.
 
     Parameters:
@@ -56,11 +54,11 @@ class ImportParamsBase(object):
         """
 
         #  set defaults
-        for k, v in citems(self.defaults):
+        for k, v in self.defaults.items():
             setattr(self, k, v)
 
         # set parameters
-        for k, v in citems(argsv):
+        for k, v in argsv.items():
             if k not in self.defaults:
                 raise ValueError("Invalid parameter %s" % k)
             setattr(self, k, v)
@@ -76,7 +74,7 @@ class ImportParamsBase(object):
             newp[k] = getattr(self, k)
         return self.__class__(**newp)
 
-class LinkedFileBase(object):
+class LinkedFileBase:
     """A base class for linked files containing common routines."""
 
     def __init__(self, params):
@@ -116,8 +114,10 @@ class LinkedFileBase(object):
             args.append(utils.rrepr(v))
 
         # parameters key, values to put in command line
-        plist = sorted( [(par, getattr(p, par)) for par in p.defaults] +
-                        list(citems(extraargs)) )
+        plist = sorted(
+            [(par, getattr(p, par)) for par in p.defaults] +
+            list(extraargs.items())
+        )
 
         for par, val in plist:
             if ( val and
@@ -192,12 +192,13 @@ class LinkedFileBase(object):
             tempdoc.applyOperation(op)
         except Exception as ex:
             # if something breaks, record an error and return nothing
-            document.log(cstr(ex))
+            document.log(str(ex))
 
             # find datasets which are linked using this link object
             # return errors for them
-            errors = dict([(name, 1) for name, ds in citems(document.data)
-                           if ds.linked is self])
+            errors = dict(
+                [(name, 1) for name, ds in document.data.items()
+                 if ds.linked is self])
             return ([], errors)
 
         # delete datasets which are linked and imported here
@@ -210,7 +211,7 @@ class LinkedFileBase(object):
 
         return (read, errors)
 
-class OperationDataImportBase(object):
+class OperationDataImportBase:
     """Default useful import class."""
 
     def __init__(self, params):
@@ -277,7 +278,7 @@ class OperationDataImportBase(object):
             self.addCustoms(document, self.outcustoms)
 
         # handle tagging/renaming
-        for name, ds in list(citems(self.outdatasets)):
+        for name, ds in list(self.outdatasets.items()):
             if self.params.tags:
                 ds.tags.update(self.params.tags)
             if self.params.renames and name in self.params.renames:
@@ -289,7 +290,7 @@ class OperationDataImportBase(object):
                              for n in self.outdatasets ]
 
         self.olddatasets = []
-        for name, ds in citems(self.outdatasets):
+        for name, ds in self.outdatasets.items():
             self.olddatasets.append( (name, document.data.get(name)) )
             document.setData(name, ds)
 

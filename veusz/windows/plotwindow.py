@@ -19,14 +19,12 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import sys
 import traceback
 
-from ..compat import crange
-from .. import qtall as qt
 import numpy as N
 
+from .. import qtall as qt
 from .. import setting
 from ..dialogs import exceptiondialog
 from .. import document
@@ -109,7 +107,7 @@ class RenderControl(qt.QObject):
             self.exit = False
 
         # start new ones
-        for i in crange(num):
+        for i in range(num):
             t = RenderThread(self)
             t.start()
             self.threads.append(t)

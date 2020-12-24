@@ -18,15 +18,12 @@
 
 """Functions to be used by module users as helpers."""
 
-from __future__ import division
 import numpy as N
 
 from .base import DatasetBase
 from .oned import Dataset
 from .twod import Dataset2D
 from .text import DatasetText
-
-from ..compat import cstr
 
 def valsToDataset(vals, datatype, dimensions):
     """Return a dataset given a numpy array of values."""
@@ -45,7 +42,7 @@ def valsToDataset(vals, datatype, dimensions):
 
     elif datatype == 'text':
         try:
-            return DatasetText([cstr(x) for x in vals])
+            return DatasetText([str(x) for x in vals])
         except ValueError:
             pass
 

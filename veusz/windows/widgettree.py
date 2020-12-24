@@ -18,10 +18,7 @@
 
 """Contains a model and view for handling a tree of widgets."""
 
-from __future__ import division, print_function
-from ..compat import crange
 from .. import qtall as qt
-
 from .. import utils
 from .. import document
 
@@ -137,7 +134,7 @@ class WidgetTreeModel(qt.QAbstractItemModel):
 
         # now iterate over children to see whether anything has
         # changed
-        for i in crange(len(widget.children)):
+        for i in range(len(widget.children)):
             c = widget.children[i]
             add = False
             if c not in self.widgetnodemap:

@@ -16,12 +16,10 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division, print_function
 import csv
 import re
 
 from .. import qtall as qt
-from ..compat import cstr
 from .. import utils
 from ..dialogs import importdialog
 from . import defn_nd
@@ -150,7 +148,7 @@ class ImportTabND(importdialog.ImportTab):
             output = e.args[0]
 
         except (simpleread.ReadNDError, csv.Error) as e:
-            output = _("Error importing datasets:\n %s") % cstr(e)
+            output = _("Error importing datasets:\n %s") % str(e)
 
         # show status in preview box
         self.nd_previewedit.setPlainText(output)

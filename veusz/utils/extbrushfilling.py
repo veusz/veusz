@@ -21,11 +21,11 @@
 Paints solid, hatching and various qt brushes
 """
 
-from __future__ import division, print_function
-import numpy as N
-from .. import qtall as qt
 import math
 
+import numpy as N
+
+from .. import qtall as qt
 from ..helpers.qtloops import plotLinesToPainter, polygonClip
 
 def dumppath(p):

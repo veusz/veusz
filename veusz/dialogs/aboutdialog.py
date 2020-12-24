@@ -21,7 +21,6 @@
 
 """About dialog module."""
 
-from __future__ import division
 import os.path
 from .. import qtall as qt
 from .. import utils
@@ -49,7 +48,7 @@ class AboutDialog(VeuszDialog):
     def licenseClicked(self):
         """Show the license."""
         LicenseDialog(self).exec_()
-        
+
 class LicenseDialog(VeuszDialog):
     """About license dialog."""
 

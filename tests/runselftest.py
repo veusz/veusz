@@ -42,9 +42,6 @@ If VEUSZ_INPLACE_TEST is set then tests are run assuming that we are
 running from the source directory.
 """
 
-# messes up loaded files if set
-# from __future__ import division
-from __future__ import print_function
 import glob
 import os
 import os.path
@@ -71,7 +68,6 @@ removeenv = os.environ.get('VEUSZ_REMOVE_FROM_ENV', '')
 for remove in removeenv.split():
     del os.environ[remove]
 
-from veusz.compat import cexec, cstr, copenuniversal
 import veusz.qtall as qt
 import veusz.utils as utils
 import veusz.document as document
@@ -115,7 +111,7 @@ excluded_tests = set([
         '3d_volume.vsz',
     ])
 
-class StupidFontMetrics(object):
+class StupidFontMetrics:
     """This is a fake font metrics device which should return the same
     results on all systems with any font."""
     def __init__(self, font, device):
@@ -190,7 +186,7 @@ def renderPyTest(inpy, outfile):
     retn = subprocess.call([sys.executable, inpy, outfile])
     return retn == 0
 
-class Dirs(object):
+class Dirs:
     """Directories and files object."""
     def __init__(self):
         self.thisdir = os.path.dirname(__file__)
@@ -262,8 +258,8 @@ def runTests(test_saves=False, test_unlink=False):
             continue
 
         comparfile = os.path.join(d.thisdir, 'comparison', base + '.selftest')
-        with copenuniversal(outfile) as f1:
-            with copenuniversal(comparfile) as f2:
+        with open(outfile) as f1:
+            with open(comparfile) as f2:
                 comp = f1.read() == f2.read()
 
         if not comp:
@@ -309,15 +305,18 @@ if __name__ == '__main__':
     svg_export.fltStr = fltStr
 
     parser = optparse.OptionParser()
-    parser.add_option("", "--test-saves", action="store_true",
-                      help="tests saving documents and reloading them")
-    parser.add_option("", "--test-unlink", action="store_true",
-                      help="unlinks data from files before --test-saves")
+    parser.add_option(
+        "", "--test-saves", action="store_true",
+        help="tests saving documents and reloading them")
+    parser.add_option(
+        "", "--test-unlink", action="store_true",
+        help="unlinks data from files before --test-saves")
 
     options, args = parser.parse_args()
     if len(args) == 0:
-        runTests(test_saves=options.test_saves,
-                 test_unlink=options.test_unlink)
+        runTests(
+            test_saves=options.test_saves,
+            test_unlink=options.test_unlink)
     elif args == ['regenerate']:
         renderAllTests()
     else:

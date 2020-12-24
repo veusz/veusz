@@ -21,11 +21,11 @@
 
 """A class to represent Veusz documents, with dataset classes."""
 
-from __future__ import division, print_function, absolute_import
 import codecs
 import os.path
 import traceback
 import datetime
+from io import StringIO
 from collections import defaultdict
 
 try:
@@ -33,7 +33,6 @@ try:
 except ImportError:
     h5py = None
 
-from ..compat import citems, cvalues, cstr, CStringIO, cexecfile
 from .. import qtall as qt
 
 from . import widgetfactory
@@ -59,7 +58,7 @@ def getSuitableParent(widgettype, initialwidget):
         parent = parent.parent
     return parent
 
-class DocSuspend(object):
+class DocSuspend:
     """Handle document updates/suspensions."""
     def __init__(self, doc):
         self.doc = doc
@@ -78,7 +77,7 @@ class Document(qt.QObject):
     # this is emitted when the document is modified
     signalModified = qt.pyqtSignal(int)
     # emited to log a message
-    sigLog = qt.pyqtSignal(cstr)
+    sigLog = qt.pyqtSignal(str)
     # emitted when document wiped
     sigWiped = qt.pyqtSignal()
     # to ask whether an import is allowed
@@ -261,9 +260,10 @@ class Document(qt.QObject):
         if filenames is a set, only get the objects with filenames given
         """
         links = set()
-        for ds in cvalues(self.data):
-            if ds.linked and (filenames is None or
-                              ds.linked.filename in filenames):
+        for ds in self.data.values():
+            if ds.linked and (
+                    filenames is None or
+                    ds.linked.filename in filenames):
                 links.add(ds.linked)
         return list(links)
 
@@ -295,7 +295,7 @@ class Document(qt.QObject):
 
     def datasetName(self, dataset):
         """Find name for given dataset, raising ValueError if missing."""
-        for name, ds in citems(self.data):
+        for name, ds in self.data.items():
             if ds is dataset:
                 return name
         raise ValueError("Cannot find dataset")
@@ -337,7 +337,8 @@ class Document(qt.QObject):
 
         for plugin in pluginlist:
             try:
-                cexecfile(plugin, {})
+                with open(filename) as f:
+                    exec(f.read())
             except Exception:
                 err = _('Error loading plugin %s\n\n%s') % (
                     plugin, traceback.format_exc())
@@ -365,7 +366,7 @@ class Document(qt.QObject):
     def datasetTags(self):
         """Get list of all tags in datasets."""
         tags = set()
-        for dataset in cvalues(self.data):
+        for dataset in self.data.values():
             tags.update(dataset.tags)
         return sorted(tags)
 
@@ -444,7 +445,7 @@ class Document(qt.QObject):
         datagrp = vszgrp.create_group('Data')
         docgrp = vszgrp.create_group('Document')
 
-        textstream = CStringIO()
+        textstream = StringIO()
 
         self._writeFileHeader(textstream, 'saved document')
 

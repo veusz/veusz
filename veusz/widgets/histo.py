@@ -18,10 +18,8 @@
 
 """For histogramming data."""
 
-from __future__ import division
 import numpy as N
 
-from ..compat import czip
 from .. import qtall as qt
 from .. import datasets
 from .. import document

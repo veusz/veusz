@@ -23,13 +23,12 @@
 Return Veusz' version number
 """
 
-from __future__ import division
 import os.path
 import sys
 import datetime
+from urllib import request
 
 from . import utilfuncs
-from ..compat import curlrequest
 from .. import qtall as qt
 
 _errmsg = """Failed to find VERSION file.
@@ -69,7 +68,7 @@ def latestVersion():
     """
 
     try:
-        f = curlrequest.urlopen(
+        f = request.urlopen(
             'http://veusz.github.io/download/newest-version.html')
         p = f.read()
         f.close()

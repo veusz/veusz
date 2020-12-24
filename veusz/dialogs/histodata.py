@@ -16,9 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
-
-from ..compat import crange, citems, cstr
 from .. import qtall as qt
 from .. import utils
 from .. import datasets
@@ -93,7 +90,7 @@ class HistoDataDialog(VeuszDialog):
     def escapeDatasets(self, dsnames):
         """Escape dataset names if they are not typical python ones."""
 
-        for i in crange(len(dsnames)):
+        for i in range(len(dsnames)):
             if not utils.validPythonIdentifier(dsnames[i]):
                 dsnames[i] = '`%s`' % dsnames[i]
 
@@ -101,7 +98,7 @@ class HistoDataDialog(VeuszDialog):
         """Update list of datasets."""
 
         datasets = []
-        for name, ds in citems(self.document.data):
+        for name, ds in self.document.data.items():
             if ds.datatype == 'numeric' and ds.dimensions == 1:
                 datasets.append(name)
         datasets.sort()
@@ -117,7 +114,7 @@ class HistoDataDialog(VeuszDialog):
         text = self.indataset.text()
         datasets.evalDatasetExpression(self.document, text)
 
-    class Params(object):
+    class Params:
         """Parameters to creation of histogram."""
 
         def __init__(self, dialog):
@@ -183,7 +180,7 @@ class HistoDataDialog(VeuszDialog):
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError as ex:
-            qt.QMessageBox.warning(self, _("Invalid parameters"), cstr(ex))
+            qt.QMessageBox.warning(self, _("Invalid parameters"), str(ex))
             return
 
         self.binmodel.beginRemoveRows(qt.QModelIndex(), 0, len(self.bindata)-1)
@@ -240,7 +237,7 @@ class HistoDataDialog(VeuszDialog):
         self.indataset.setEditText(gen.inexpr)
 
         # need to map backwards to get dataset names
-        revds = dict( (a,b) for b,a in citems(self.document.data) )
+        revds = dict( (a,b) for b,a in self.document.data.items() )
         self.outdataset.setEditText(revds.get(gen.valuedataset, ''))
         self.outbins.setEditText(revds.get(gen.bindataset, ''))
 
@@ -248,8 +245,8 @@ class HistoDataDialog(VeuszDialog):
         if gen.binparams:
             p = gen.binparams
             self.numbins.setValue( p[0] )
-            self.minval.setEditText( cstr(p[1]) )
-            self.maxval.setEditText( cstr(p[2]) )
+            self.minval.setEditText( str(p[1]) )
+            self.maxval.setEditText( str(p[2]) )
             self.logarithmic.setChecked( bool(p[3]) )
         else:
             self.numbins.setValue(10)
@@ -266,7 +263,7 @@ class HistoDataDialog(VeuszDialog):
         # select correct method
         {'counts': self.counts, 'density': self.density,
          'fractions': self.fractions}[gen.method].click()
-        
+
         # select if cumulative
         {'none': self.cumlOff, 'smalltolarge': self.cumlStoL,
          'largetosmall': self.cumlLtoS}[gen.cumulative].click()
@@ -281,7 +278,7 @@ class HistoDataDialog(VeuszDialog):
         try:
             p = HistoDataDialog.Params(self)
         except RuntimeError as ex:
-            self.statuslabel.setText(_("Invalid parameters: %s") % cstr(ex))
+            self.statuslabel.setText(_("Invalid parameters: %s") % str(ex))
             return
 
         exprresult = datasets.evalDatasetExpression(self.document, p.expr)
@@ -300,4 +297,3 @@ def recreateDataset(mainwindow, document, dataset, datasetname):
     dialog = HistoDataDialog(mainwindow, document)
     mainwindow.showDialog(dialog)
     dialog.reEditDataset(dataset, datasetname)
-

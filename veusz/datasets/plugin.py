@@ -16,15 +16,13 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from ..compat import cstr, citems
-
 from .oned import Dataset1DBase, Dataset
 from .twod import Dataset2DBase, Dataset2D
 from .nd import DatasetNDBase, DatasetND
 from .text import DatasetText
 from .date import DatasetDateTimeBase, DatasetDateTime
 
-class _DatasetPlugin(object):
+class _DatasetPlugin:
     """Shared methods for dataset plugins."""
 
     def __init__(self, manager, ds):
@@ -39,8 +37,8 @@ class _DatasetPlugin(object):
         """Return information about how this dataset was created."""
 
         fields = []
-        for name, val in citems(self.pluginmanager.fields):
-            fields.append('%s: %s' % (cstr(name), cstr(val)))
+        for name, val in self.pluginmanager.fields.items():
+            fields.append('%s: %s' % (str(name), str(val)))
 
         try:
             shape = [str(x) for x in self.data.shape]

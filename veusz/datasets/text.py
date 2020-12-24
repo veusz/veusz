@@ -18,12 +18,9 @@
 
 """Text datasets."""
 
-from __future__ import division
-
 from .commonfn import _
 from .base import DatasetConcreteBase
 
-from ..compat import cstr, crepr
 from .. import utils
 
 class DatasetText(DatasetConcreteBase):
@@ -59,7 +56,7 @@ class DatasetText(DatasetConcreteBase):
 
     def uiConvertToDataItem(self, val):
         """Return a value cast to this dataset data type."""
-        return cstr(val)
+        return str(val)
 
     def uiDataItemToData(self, val):
         """Return val converted to data."""
@@ -68,9 +65,9 @@ class DatasetText(DatasetConcreteBase):
     def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.
         '''
-        fileobj.write("SetDataText(%s, [\n" % crepr(name))
+        fileobj.write("SetDataText(%s, [\n" % repr(name))
         for line in self.data:
-            fileobj.write("    %s,\n" % crepr(line))
+            fileobj.write("    %s,\n" % repr(line))
         fileobj.write("])\n")
 
     def saveDataDumpToHDF5(self, group, name):

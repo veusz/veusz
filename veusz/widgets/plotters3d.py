@@ -18,7 +18,6 @@
 
 """Generic 3D plotting widet."""
 
-from __future__ import division, print_function
 from .. import qtall as qt
 import numpy as N
 

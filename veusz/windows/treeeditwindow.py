@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #    Copyright (C) 2004 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
 #
@@ -20,9 +19,6 @@
 """Window to edit the document using a tree, widget properties
 and formatting properties."""
 
-from __future__ import division
-
-from ..compat import crange, citems
 from .. import qtall as qt
 
 from .. import widgets
@@ -36,7 +32,7 @@ def _(text, disambiguation=None, context='TreeEditWindow'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class SettingsProxy(object):
+class SettingsProxy:
     """Object to handle communication between widget/settings
     or sets of widgets/settings."""
 
@@ -794,7 +790,7 @@ class TreeEditDock(qt.QDockWidget):
 
         # check whether each button can have this widget
         # (or a parent) as parent
-        for wc, action in citems(self.addslots):
+        for wc, action in self.addslots.items():
             w = selw
             while w is not None and not wc.willAllowParent(w):
                 w = w.parent
@@ -1075,7 +1071,7 @@ class TreeEditDock(qt.QDockWidget):
     def doInitialWidgetSelect(self):
         """Select a sensible initial widget."""
         w = self.document.basewidget
-        for i in crange(2):
+        for i in range(2):
             try:
                 c = w.children[0]
             except IndexError:

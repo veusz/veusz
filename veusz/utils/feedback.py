@@ -16,23 +16,19 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division, absolute_import, print_function
 from collections import defaultdict
 import datetime
 import sys
 import atexit
 import platform
+from urllib import request
+from urllib.parse import urlencode
 
-try:
-    from PyQt5 import sip
-except ImportError:
-    import sip
 import numpy as N
 from .. import qtall as qt
 
 from .utilfuncs import rrepr
 from .version import version
-from ..compat import citems, curlrequest, curlencode
 
 """Feedback module for providing information about usage.
 
@@ -79,11 +75,11 @@ def updatects():
     exportcts = eval(setn.value('counts/export', '{}'))
 
     # add existing counts
-    for k, v in citems(feedback.widgetcts):
+    for k, v in feedback.widgetcts.items():
         widgetcts[k] = widgetcts.get(k, 0) + v
-    for k, v in citems(feedback.importcts):
+    for k, v in feedback.importcts.items():
         importcts[k] = importcts.get(k, 0) + v
-    for k, v in citems(feedback.exportcts):
+    for k, v in feedback.exportcts.items():
         exportcts[k] = exportcts.get(k, 0) + v
 
     setn.setValue('counts/widget', rrepr(widgetcts))
@@ -158,17 +154,17 @@ class FeedbackCheckThread(qt.QThread):
             'numpy-version': N.__version__,
             'qt-version': qt.qVersion(),
             'pyqt-version': qt.PYQT_VERSION_STR,
-            'sip-version': sip.SIP_VERSION_STR,
+            'sip-version': qt.sip.SIP_VERSION_STR,
             'locale': qt.QLocale().name(),
             'widgetcts': widgetcts,
             'importcts': importcts,
             'exportcts': exportcts,
         }
-        postdata = curlencode(args).encode('utf8')
+        postdata = urlencode(args).encode('utf8')
 
         # now post the data
         try:
-            f = curlrequest.urlopen(_url, postdata)
+            f = request.urlopen(_url, postdata)
             retn = f.readline().decode('utf8').strip()
             f.close()
 

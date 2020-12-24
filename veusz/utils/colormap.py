@@ -16,12 +16,11 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-from __future__ import division
 import re
+
 import numpy as N
 
 from .. import qtall as qt
-
 from ..helpers.qtloops import numpyToQImage, applyImageTransparancy
 
 # Default colormaps used by widgets.
@@ -786,7 +785,7 @@ def stepCMap(cmap, n):
 
     return N.vstack( ([-1,0,0,0], N.column_stack((b,g,r,a))) ).astype(N.intc)
 
-class ColorMaps(object):
+class ColorMaps:
     """Class representing defined color maps.
 
     This is initialised from the default list.

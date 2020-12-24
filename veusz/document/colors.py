@@ -18,11 +18,9 @@
 
 """Store document colors."""
 
-from __future__ import division
 import re
 
 from .. import qtall as qt
-from ..compat import crange
 
 # match name of color
 themecolor_re = re.compile(r'^theme([1-9][0-9]*)$')
@@ -298,8 +296,8 @@ class ColorModel(qt.QAbstractListModel):
             else:
                 cnames = ['lightgrey', 'darkgrey']
             cols = [qt.QColor(c).rgba() for c in cnames]
-            for x in crange(xw):
-                for y in crange(yw):
+            for x in range(xw):
+                for y in range(yw):
                     idx = (x//4 + y//4) % len(cols)
                     image.setPixel(x, y, cols[idx])
             pixmap = qt.QPixmap.fromImage(image)

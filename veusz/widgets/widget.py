@@ -19,10 +19,8 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from __future__ import division
 import itertools
 
-from ..compat import czip, crepr
 from .. import document
 from .. import setting
 from .. import qtall as qt
@@ -31,7 +29,7 @@ def _(text, disambiguation=None, context='Widget'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
 
-class Action(object):
+class Action:
     """A class to wrap functions operating on widgets.
 
     Attributes:
@@ -54,7 +52,7 @@ class Action(object):
         self.descr = descr
         self.usertext = usertext
 
-class Widget(object):
+class Widget:
     """ Fundamental plotting widget interface."""
 
     # differentiate widgets, settings and setting
@@ -311,14 +309,14 @@ class Widget(object):
         # now go throught the subwidgets
         for c in self.children:
             text += ( "Add('%s', name=%s, autoadd=False)\n" %
-                      (c.typename, crepr(c.name)) )
+                      (c.typename, repr(c.name)) )
 
             # if we need to go to the child, go there
             ctext = c.getSaveText(saveall)
             if ctext != '':
                 text += ("To(%s)\n"
                          "%s"
-                         "To('..')\n") % (crepr(c.name), ctext)
+                         "To('..')\n") % (repr(c.name), ctext)
 
         return text
 
@@ -342,7 +340,7 @@ class Widget(object):
 
         slots.append( (self, 0) )
 
-        for child, index in czip(self.children, itertools.count(1)):
+        for child, index in zip(self.children, itertools.count(1)):
             child._recursiveBuildSlots(slots)
             slots.append( (self, index) )
 
