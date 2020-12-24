@@ -59,26 +59,26 @@ class Scene3D(widget.Widget):
             'xRotation',
             0,
             minval=-180, maxval=180, step=15, tick=45,
-            descr=_(u'Rotation around x axis (°)'),
+            descr=_('Rotation around x axis (°)'),
             usertext=_('X rotation') ))
         s.add( setting.FloatSlider(
             'yRotation',
             35.,
             minval=-180, maxval=180, step=15, tick=45,
-            descr=_(u'Rotation around y axis (°)'),
+            descr=_('Rotation around y axis (°)'),
             usertext=_('Y rotation') ))
         s.add( setting.FloatSlider(
             'zRotation',
             0,
             minval=-180, maxval=180, step=15, tick=45,
-            descr=_(u'Rotation around z axis (°)'),
+            descr=_('Rotation around z axis (°)'),
             usertext=_('Z rotation') ))
 
         s.add( setting.FloatSlider(
             'distance',
             5,
             minval=1, maxval=50, step=0.5, tick=5, scale=0.1,
-            descr=_(u'Viewing distance'),
+            descr=_('Viewing distance'),
             usertext=_('Distance') ))
 
         s.add( setting.FloatOrAuto(
@@ -99,29 +99,29 @@ class Scene3D(widget.Widget):
             descr=_('Method used to draw 3D plot') ))
 
         s.add( setting.Distance(
-                'leftMargin',
-                '1cm',
-                descr=_('Distance from left of graph to edge'),
-                usertext=_('Left margin'),
-                formatting=True) )
+            'leftMargin',
+            '1cm',
+            descr=_('Distance from left of graph to edge'),
+            usertext=_('Left margin'),
+            formatting=True) )
         s.add( setting.Distance(
-                'rightMargin',
-                '1cm',
-                descr=_('Distance from right of graph to edge'),
-                usertext=_('Right margin'),
-                formatting=True) )
+            'rightMargin',
+            '1cm',
+            descr=_('Distance from right of graph to edge'),
+            usertext=_('Right margin'),
+            formatting=True) )
         s.add( setting.Distance(
-                'topMargin',
-                '1cm',
-                descr=_('Distance from top of graph to edge'),
-                usertext=_('Top margin'),
-                formatting=True) )
+            'topMargin',
+            '1cm',
+            descr=_('Distance from top of graph to edge'),
+            usertext=_('Top margin'),
+            formatting=True) )
         s.add( setting.Distance(
-                'bottomMargin',
-                '1cm',
-                descr=_('Distance from bottom of graph to edge'),
-                usertext=_('Bottom margin'),
-                formatting=True) )
+            'bottomMargin',
+            '1cm',
+            descr=_('Distance from bottom of graph to edge'),
+            usertext=_('Bottom margin'),
+            formatting=True) )
 
         s.add(setting.Lighting3D(
             'Lighting1',

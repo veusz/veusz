@@ -44,7 +44,7 @@ class _DatasetPlugin:
             shape = [str(x) for x in self.data.shape]
         except AttributeError:
             shape = [str(len(self.data))]
-        shape = u'\u00d7'.join(shape)
+        shape = '\u00d7'.join(shape)
 
         return '%s plugin dataset (fields %s), size %s' % (
             self.pluginmanager.plugin.name,

@@ -46,22 +46,23 @@ def solveFunction(function, vals, mint=None, maxt=None):
     mint and maxt are the bounds to use when solving
     '''
 
-    xvals = N.array(
-        ( -1e90, -1e70, -1e50, -1e40, -1e30, -1e20,
-           -1e10, -1e8, -1e6, -1e5, -1e4,
-           -1e3, -1e2, -1e1, -4e0, -2e0, -1e0,
-           -1e-1, -1e-2, -1e-3, -1e-4,
-           -1e-6, -1e-8, -1e-10, -1e-12, -1e-14,
-           -1e-18, -1e-22, -1e-26, -1e-30, -1e-34,
-           -1e-40, -1e-50, -1e-70, -1e-90,
-           0,
-           1e-90, 1e-70, 1e-50, 1e-40,
-           1e-34, 1e-30, 1e-26, 1e-22, 1e-18,
-           1e-14, 1e-12, 1e-10, 1e-8, 1e-6,
-           1e-4, 1e-3, 1e-2, 1e-1,
-           1e0, 2e0, 4e0, 1e1, 1e2, 1e3,
-           1e4, 1e5, 1e6, 1e8, 1e10,
-           1e20, 1e30, 1e40, 1e50, 1e70, 1e90 ))
+    xvals = N.array((
+        -1e90, -1e70, -1e50, -1e40, -1e30, -1e20,
+        -1e10, -1e8, -1e6, -1e5, -1e4,
+        -1e3, -1e2, -1e1, -4e0, -2e0, -1e0,
+        -1e-1, -1e-2, -1e-3, -1e-4,
+        -1e-6, -1e-8, -1e-10, -1e-12, -1e-14,
+        -1e-18, -1e-22, -1e-26, -1e-30, -1e-34,
+        -1e-40, -1e-50, -1e-70, -1e-90,
+        0,
+        1e-90, 1e-70, 1e-50, 1e-40,
+        1e-34, 1e-30, 1e-26, 1e-22, 1e-18,
+        1e-14, 1e-12, 1e-10, 1e-8, 1e-6,
+        1e-4, 1e-3, 1e-2, 1e-1,
+        1e0, 2e0, 4e0, 1e1, 1e2, 1e3,
+        1e4, 1e5, 1e6, 1e8, 1e10,
+        1e20, 1e30, 1e40, 1e50, 1e70, 1e90
+    ))
 
     if mint is not None:
         xvals = N.hstack(( mint, xvals[xvals > mint] ))
@@ -92,8 +93,8 @@ def solveFunction(function, vals, mint=None, maxt=None):
     delta = yfilt[1:] - yfilt[:-1]
     pos, neg = N.all(delta >= 0), N.all(delta <= 0)
     if not (pos or neg):
-        raise FunctionError(_('Not a monotonic function '
-                               '(try setting minimum or maximum t)'))
+        raise FunctionError(
+            _('Not a monotonic function (try setting minimum or maximum t)'))
     if pos and neg:
         raise FunctionError(_('Constant function'))
 
@@ -186,25 +187,28 @@ class AxisFunction(axis.Axis):
         axis.Axis.addSettings(s)
 
         s.add( setting.BoolSwitch(
-                'linked', False,
-                settingsfalse=('min', 'max'),
-                settingstrue=('linkedaxis',),
-                descr=_('Link axis to another axis'),
-                usertext=_('Linked') ), 0 )
+            'linked', False,
+            settingsfalse=('min', 'max'),
+            settingstrue=('linkedaxis',),
+            descr=_('Link axis to another axis'),
+            usertext=_('Linked') ), 0 )
 
-        s.add( setting.Str('function', 't',
-                           descr=_('Monotonic function (use t as variable)'),
-                           usertext=_('Function')), 1 )
-        s.add( setting.Axis('linkedaxis', '', 'both',
-                            descr =
-                            _('Axis which this axis is based on'),
-                            usertext=_('Linked axis')), 6 )
-        s.add( setting.FloatOrAuto('mint', 'Auto',
-                                   descr=_('Minimum value of t or Auto'),
-                                   usertext=('Min t')), 7 )
-        s.add( setting.FloatOrAuto('maxt', 'Auto',
-                                   descr=_('Maximum value of t or Auto'),
-                                   usertext=('Max t')), 8 )
+        s.add( setting.Str(
+            'function', 't',
+            descr=_('Monotonic function (use t as variable)'),
+            usertext=_('Function')), 1 )
+        s.add( setting.Axis(
+            'linkedaxis', '', 'both',
+            descr=_('Axis which this axis is based on'),
+            usertext=_('Linked axis')), 6 )
+        s.add( setting.FloatOrAuto(
+            'mint', 'Auto',
+            descr=_('Minimum value of t or Auto'),
+            usertext=('Min t')), 7 )
+        s.add( setting.FloatOrAuto(
+            'maxt', 'Auto',
+            descr=_('Maximum value of t or Auto'),
+            usertext=('Max t')), 8 )
 
         s.get('autoRange').hidden = True
         s.get('autoRange').newDefault('exact')
@@ -327,8 +331,8 @@ class AxisFunction(axis.Axis):
             if not N.all( N.isfinite(therange) ):
                 therange = None
 
-        axis.Axis.computePlottedRange(self, force=force,
-                                      overriderange=therange)
+        axis.Axis.computePlottedRange(
+            self, force=force, overriderange=therange)
 
     def _orderCoordinates(self):
         '''Put coordinates in correct order for linear interpolation.'''
@@ -481,8 +485,9 @@ class AxisFunction(axis.Axis):
                            lowerupperposition=None):
         '''Calculate conversion from pixels to axis values.'''
 
-        axis.Axis.updateAxisLocation(self, bounds, otherposition=otherposition,
-                                     lowerupperposition=lowerupperposition)
+        axis.Axis.updateAxisLocation(
+            self, bounds, otherposition=otherposition,
+            lowerupperposition=lowerupperposition)
 
         if ( self.boundschangeset == self.document.changeset and
              bounds == self.cachedbounds ):
@@ -496,12 +501,12 @@ class AxisFunction(axis.Axis):
 
         # fractional coordinate grid to evaluate functions
         fraccoords = N.hstack((
-                N.linspace(-10., -2.0, 5, endpoint=False),
-                N.linspace(-2.0, -0.2, 25, endpoint=False),
-                N.linspace(-0.2, +1.2, 250, endpoint=False),
-                N.linspace(+1.2, +3.0, 25, endpoint=False),
-                N.linspace(+3.0, +11., 5, endpoint=False)
-                ))
+            N.linspace(-10., -2.0, 5, endpoint=False),
+            N.linspace(-2.0, -0.2, 25, endpoint=False),
+            N.linspace(-0.2, +1.2, 250, endpoint=False),
+            N.linspace(+1.2, +3.0, 25, endpoint=False),
+            N.linspace(+3.0, +11., 5, endpoint=False)
+        ))
 
         if self.isLinked():
             self._updateLinkedAxis(bounds, fraccoords)

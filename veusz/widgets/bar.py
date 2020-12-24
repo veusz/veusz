@@ -93,27 +93,27 @@ class BarPlotter(GenericPlotter):
         s.add( setting.Choice(
             'direction',
             ('horizontal', 'vertical'), 'vertical',
-            descr = _('Horizontal or vertical bar chart'),
+            descr=_('Horizontal or vertical bar chart'),
             usertext=_('Direction')), 0 )
         s.add( setting.DatasetExtended(
             'posn', '',
-            descr = _('Position of bars, dataset or expression (optional)'),
+            descr=_('Position of bars, dataset or expression (optional)'),
             usertext=_('Positions')), 0 )
         s.add( setting.Datasets(
             'lengths', ('y',),
-            descr = _('Datasets containing lengths of bars'),
+            descr=_('Datasets containing lengths of bars'),
             usertext=_('Lengths')), 0 )
 
         s.add( setting.Float(
             'barfill', 0.75,
-            minval = 0., maxval = 1.,
-            descr = _('Filling fraction of bars (between 0 and 1)'),
+            minval=0., maxval=1.,
+            descr=_('Filling fraction of bars (between 0 and 1)'),
             usertext=_('Bar fill'),
             formatting=True) )
         s.add( setting.Float(
             'groupfill', 0.9,
-            minval = 0., maxval = 1.,
-            descr = _('Filling fraction of groups of bars (between 0 and 1)'),
+            minval=0., maxval=1.,
+            descr=_('Filling fraction of groups of bars (between 0 and 1)'),
             usertext=_('Group fill'),
             formatting=True) )
 
@@ -126,15 +126,15 @@ class BarPlotter(GenericPlotter):
 
         s.add(BarFill(
             'BarFill', descr=_('Bar fill'), usertext=_('Fill')),
-              pixmap = 'settings_bgfill')
+            pixmap='settings_bgfill')
         s.add(BarLine('BarLine', descr=_('Bar line'), usertext=_('Line')),
-              pixmap = 'settings_border')
+            pixmap='settings_border')
 
         s.add( setting.ErrorBarLine(
             'ErrorBarLine',
-            descr = _('Error bar line settings'),
-            usertext = _('Error bar line')),
-               pixmap = 'settings_ploterrorline' )
+            descr=_('Error bar line settings'),
+            usertext=_('Error bar line')),
+            pixmap='settings_ploterrorline' )
 
     @property
     def userdescription(self):

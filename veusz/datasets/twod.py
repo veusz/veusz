@@ -154,7 +154,7 @@ class Dataset2DBase(DatasetConcreteBase):
 
     def userSize(self):
         """Return dimensions of dataset for user."""
-        return u'%i×%i' % self.data.shape
+        return '%i×%i' % self.data.shape
 
     def userPreview(self):
         """Return preview of data."""
@@ -164,9 +164,10 @@ class Dataset2DBase(DatasetConcreteBase):
         """Get description of dataset."""
 
         xr, yr = self.getDataRanges()
-        text = _(u"2D (%i×%i), numeric, x=%.4g->%.4g, y=%.4g->%.4g") % (
+        text = _("2D (%i×%i), numeric, x=%.4g->%.4g, y=%.4g->%.4g") % (
             self.data.shape[0], self.data.shape[1],
-            xr[0], xr[1], yr[0], yr[1])
+            xr[0], xr[1], yr[0], yr[1]
+        )
         return text
 
     def returnCopy(self):

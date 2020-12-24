@@ -724,7 +724,7 @@ class SimpleRead2D:
             'invertcols': self._paramInvertCols,
             'transpose': self._paramTranspose,
             'gridatedge': self._paramGridAtEdge,
-            }
+        }
 
         rows = []
         # loop over lines
@@ -829,11 +829,13 @@ class SimpleRead2D:
         """Set the data in the output dict out
         """
 
-        ds = datasets.Dataset2D(self.data,
-                                xrange=self.params.xrange,
-                                yrange=self.params.yrange,
-                                xedge=self.xedge, yedge=self.yedge,
-                                xcent=self.xcent, ycent=self.ycent)
+        ds = datasets.Dataset2D(
+            self.data,
+            xrange=self.params.xrange,
+            yrange=self.params.yrange,
+            xedge=self.xedge, yedge=self.yedge,
+            xcent=self.xcent, ycent=self.ycent
+        )
 
         ds.linked = linkedfile
 

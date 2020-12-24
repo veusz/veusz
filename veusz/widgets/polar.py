@@ -139,44 +139,44 @@ class Polar(NonOrthGraph):
             'units',
             ('degrees', 'radians', 'fractions', 'percentages'),
             'degrees',
-            descr = _('Angular units'),
+            descr=_('Angular units'),
             usertext=_('Units')) )
         s.add( setting.Choice(
             'direction',
             ('clockwise', 'anticlockwise'),
             'anticlockwise',
-            descr = _('Angle direction'),
-            usertext = _('Direction')) )
+            descr=_('Angle direction'),
+            usertext=_('Direction')) )
         s.add( setting.Choice(
             'position0',
             ('right', 'top', 'left', 'bottom'),
             'right',
-            descr = _('Direction of 0 angle'),
-            usertext = _(u'Position of 0°')) )
+            descr=_('Direction of 0 angle'),
+            usertext=_('Position of 0°')) )
         s.add( setting.Bool(
             'log', False,
-            descr = _('Logarithmic radial axis'),
-            usertext = _('Log')) )
+            descr=_('Logarithmic radial axis'),
+            usertext=_('Log')) )
 
         s.add( TickLabel(
             'TickLabels',
-            descr = _('Radial tick labels'),
+            descr=_('Radial tick labels'),
             usertext=_('Radial tick labels')),
-               pixmap='settings_axisticklabels' )
+            pixmap='settings_axisticklabels' )
 
         s.add( OldLine('Tick') )
 
         s.add( SpokeLine(
             'SpokeLine',
-            descr = _('Spoke line'),
+            descr=_('Spoke line'),
             usertext=_('Spoke line')),
-               pixmap='settings_axismajorticks' )
+            pixmap='settings_axismajorticks' )
 
         s.add( RadiiLine(
             'RadiiLine',
-            descr = _('Radii line'),
+            descr=_('Radii line'),
             usertext=_('Radii line')),
-               pixmap='settings_contourline' )
+            pixmap='settings_contourline' )
 
         s.get('leftMargin').newDefault('1cm')
         s.get('rightMargin').newDefault('1cm')
@@ -202,7 +202,7 @@ class Polar(NonOrthGraph):
         return [
             [self._minradius, self._maxradius],
             angularrange
-            ]
+        ]
 
     def toPlotAngle(self, angles):
         """Convert one or more angles to angle on plot."""
@@ -214,15 +214,16 @@ class Polar(NonOrthGraph):
             'radians': 1,
             'fractions': 2*math.pi,
             'percentages': 0.02*math.pi,
-            }
+        }
         angles = angles * mult[s.units]
 
         # change direction
         if self.settings.direction == 'anticlockwise':
             angles = -angles
         # add offset
-        angles -= {'right': 0, 'top': 0.5*math.pi, 'left': math.pi,
-                   'bottom': 1.5*math.pi}[self.settings.position0]
+        angles -= {
+            'right': 0, 'top': 0.5*math.pi, 'left': math.pi,
+            'bottom': 1.5*math.pi}[self.settings.position0]
         return angles
 
     def toPlotRadius(self, radii):
@@ -230,7 +231,7 @@ class Polar(NonOrthGraph):
         if self.settings.log:
             logmin = N.log(self._minradius)
             logmax = N.log(self._maxradius)
-            r = ( N.log(N.clip(radii, 1e-99, 1e99)) - logmin ) / (
+            r = (N.log(N.clip(radii, 1e-99, 1e99)) - logmin) / (
                 logmax - logmin)
         else:
             r = (radii - self._minradius) / (
@@ -384,7 +385,7 @@ class Polar(NonOrthGraph):
         numspokes = spokesL.number
         if s.units == 'degrees':
             vals = N.linspace(0., 360., numspokes+1)[:-1]
-            labels = [u'%g°' % x for x in vals]
+            labels = ['%g°' % x for x in vals]
         elif s.units == 'radians':
             labels = []
             for i in range(numspokes):
@@ -394,7 +395,7 @@ class Polar(NonOrthGraph):
                 if f.numerator == 0:
                     txt = '0'
                 else:
-                    txt = u'%iπ/%i' % (f.numerator, f.denominator)
+                    txt = '%iπ/%i' % (f.numerator, f.denominator)
                     # remove superfluous 1* or /1
                     if txt[-2:] == '/1': txt = txt[:-2]
                     txt = txt.lstrip('1')

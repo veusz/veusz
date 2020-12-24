@@ -89,8 +89,6 @@ class Evaluate:
         self.def_colors = []
         self.def_colormaps = []
 
-        #self.customs = []
-
         # this is the context used to evaluate expressions
         self.context = {}
 

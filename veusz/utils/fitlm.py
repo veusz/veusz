@@ -138,4 +138,3 @@ def fitLM(func, params, xvals, yvals, errors,
     print("chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (chi2, dof, redchi2))
 
     return (params, chi2, dof)
-

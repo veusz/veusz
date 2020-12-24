@@ -51,7 +51,7 @@ def localeFormat(totfmt, args, locale=None):
                 i += 1
             except IndexError:
                 raise TypeError("Not enough arguments for format string")
-            s = s.replace('-', u'\u2212')
+            s = s.replace('-', '\u2212')
             if locale is not None and code in 'eEfFgG':
                 s = s.replace('.', locale.decimalPoint())
 
@@ -79,7 +79,7 @@ def sciToHuman(val, cleanup=False):
         leader = ''
     else:
         # add multiply sign
-        leader += u'\u00d7'
+        leader += '\u00d7'
 
     return '%s10^{%i}' % (leader, int(exponent))
 
@@ -147,7 +147,7 @@ def formatGeneral(num, fmtarg, locale=None):
     return retn
 
 engsuffixes = ( 'y', 'z', 'a', 'f', 'p', 'n',
-                u'\u03bc', 'm', '', 'k', 'M', 'G',
+                '\u03bc', 'm', '', 'k', 'M', 'G',
                 'T', 'P', 'E', 'Z', 'Y' )
 
 def formatEngineering(num, fmtarg, locale=None):
@@ -227,7 +227,7 @@ def formatNumber(num, formatstr, locale=None):
                 out = _formaterror
 
             # replace hyphen with true minus sign
-            out = out.replace('-', u'\u2212')
+            out = out.replace('-', '\u2212')
         elif ftype == '%':
             out = '%'
         else:

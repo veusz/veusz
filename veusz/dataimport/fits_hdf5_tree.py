@@ -357,7 +357,7 @@ class FileDataNode(FileNode):
             elif column == _ColDataType:
                 return self.datatype
             elif column == _ColShape:
-                return u'\u00d7'.join([str(x) for x in self.shape])
+                return '\u00d7'.join([str(x) for x in self.shape])
 
             elif column == _ColImportName:
                 if role == qt.Qt.EditRole and not self.importname:
@@ -465,7 +465,7 @@ class FileCompoundNode(FileGroupNode):
             if column == _ColDataType:
                 return _("Table")
             elif column == _ColShape:
-                return u'\u00d7'.join([str(x) for x in self.shape])
+                return '\u00d7'.join([str(x) for x in self.shape])
         return FileGroupNode.data(self, column, role)
 
 ##############################################################################

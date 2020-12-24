@@ -361,5 +361,4 @@ class Page(widget.Widget):
         cgi.setPageSize()
 
 # allow the factory to instantiate this
-document.thefactory.register( Page )
-
+document.thefactory.register(Page)

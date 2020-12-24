@@ -226,7 +226,7 @@ class MainWindow(qt.QMainWindow):
         # enable/disable undo/redo
         self.menus['edit'].aboutToShow.connect(self.slotAboutToShowEdit)
 
-        #Get the list of recently opened files
+        # get the list of recently opened files
         self.populateRecentFiles()
         self.setupWindowGeometry()
         self.defineViewWindowMenu()
@@ -248,8 +248,7 @@ class MainWindow(qt.QMainWindow):
 
     def dragEnterEvent(self, event):
         """Check whether event is valid to be dropped."""
-        if (event.mimeData().hasUrls() and
-            self._getVeuszDropFiles(event)):
+        if event.mimeData().hasUrls() and self._getVeuszDropFiles(event):
             event.acceptProposedAction()
 
     def dropEvent(self, event):
@@ -593,7 +592,7 @@ class MainWindow(qt.QMainWindow):
             'help.about':
                 a(self, _('Displays information about the program'), _('About...'),
                   self.slotHelpAbout, icon='veusz')
-            }
+        }
 
         # create main toolbar
         tb = self.maintoolbar = qt.QToolBar(_("Main toolbar - Veusz"), self)
@@ -604,8 +603,8 @@ class MainWindow(qt.QMainWindow):
 
         utils.makeMenuGroupSaved(
             'file.new.menu', self, self.vzactions, (
-                    'file.new.graph', 'file.new.graph3d',
-                    'file.new.polar', 'file.new.ternary',
+                'file.new.graph', 'file.new.graph3d',
+                'file.new.polar', 'file.new.ternary',
             )
         )
 
@@ -654,22 +653,22 @@ class MainWindow(qt.QMainWindow):
             '',
             'edit.prefs', 'edit.stylesheet', 'edit.custom',
             ''
-            ]
+        ]
         viewwindowsmenu = [
             'view.edit', 'view.props', 'view.format',
             'view.console', 'view.datanav',
             '',
             'view.maintool', 'view.viewtool',
             'view.addtool', 'view.edittool'
-            ]
+        ]
         viewmenu = [
             [
                 'view.viewwindows', _('&Windows'), viewwindowsmenu
             ],
             ''
-            ]
+        ]
         insertmenu = [
-            ]
+        ]
 
         # load dataset plugins and create menu
         datapluginsmenu = self.definePlugins(
@@ -914,10 +913,10 @@ class MainWindow(qt.QMainWindow):
         dayssinceinstall = (
             datetime.date.today() -
             datetime.date(*setting.settingdb['install_date'])).days
-        if (dayssinceinstall<mininterval or
-            setting.settingdb['vercheck_asked_user'] or
-            setting.settingdb['vercheck_disabled'] or
-            utils.disableVersionChecks):
+        if ( dayssinceinstall<mininterval or
+             setting.settingdb['vercheck_asked_user'] or
+             setting.settingdb['vercheck_disabled'] or
+             utils.disableVersionChecks ):
             return
 
         retn = qt.QMessageBox.question(
@@ -954,10 +953,10 @@ class MainWindow(qt.QMainWindow):
         dayssinceinstall = (
             datetime.date.today() -
             datetime.date(*setting.settingdb['install_date'])).days
-        if (dayssinceinstall<mininterval or
-            setting.settingdb['feedback_asked_user'] or
-            setting.settingdb['feedback_disabled'] or
-            utils.disableFeedback):
+        if ( dayssinceinstall<mininterval or
+             setting.settingdb['feedback_asked_user'] or
+             setting.settingdb['feedback_disabled'] or
+             utils.disableFeedback ):
             return
 
         retn = qt.QMessageBox.question(
@@ -1109,7 +1108,7 @@ class MainWindow(qt.QMainWindow):
 
     def plotQueueChanged(self, incr):
         self.plotqueuecount += incr
-        text = u'•' * self.plotqueuecount
+        text = '•' * self.plotqueuecount
         self.plotqueuelabel.setText(text)
 
     def fileSaveDialog(self, filters, dialogtitle):
@@ -1488,15 +1487,17 @@ class MainWindow(qt.QMainWindow):
         msgbox = qt.QMessageBox(
             qt.QMessageBox.Warning,
             _("Potentially unsafe code in document"),
-            _("<p><b>The document '%s' contains potentially unsafe code</b></p>"
-              "<p>Directory: '%s'</p>"
-              "<p>This file could damage your computer or data "
-              "as it can contain arbitrary code. "
-              "Please check "
-              "that the file was made by you or a trusted source.</p>") % (
-                  os.path.basename(absfile) if fname else "",
-                  filedir if fname else "",
-              ),
+            _(
+                "<p><b>The document '%s' contains potentially unsafe code</b></p>"
+                "<p>Directory: '%s'</p>"
+                "<p>This file could damage your computer or data "
+                "as it can contain arbitrary code. "
+                "Please check "
+                "that the file was made by you or a trusted source.</p>"
+            ) % (
+                os.path.basename(absfile) if fname else "",
+                filedir if fname else "",
+            ),
             qt.QMessageBox.NoButton,
             self,
         )

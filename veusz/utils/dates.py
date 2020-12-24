@@ -150,9 +150,11 @@ def addTimeTupleToDateTime(dt,  tt):
     """
 
     # add on most of the time intervals
-    dt = dt + datetime.timedelta(days=tt[2], hours=tt[3],
-                                 minutes=tt[4], seconds=tt[5],
-                                 microseconds=tt[6])
+    dt = dt + datetime.timedelta(
+        days=tt[2], hours=tt[3],
+        minutes=tt[4], seconds=tt[5],
+        microseconds=tt[6]
+    )
 
     # add on years
     dt = dt.replace(year=dt.year + tt[0])
@@ -210,19 +212,19 @@ def dateStrToRegularExpression(instr):
     # back again to the regular expression. This avoids the regular
     # expression being remapped.
     maps = (
-            ('YYYY', u'\ue001', r'(?P<YYYY>[0-9]{4})'),
-            ('YY',   u'\ue002', r'(?P<YY>[0-9]{2})'),
-            ('MM',   u'\ue003', r'(?P<MM>[0-9]{2})'),
-            ('M',    u'\ue004', r'(?P<MM>[0-9]{1,2})'),
-            ('DD',   u'\ue005', r'(?P<DD>[0-9]{2})'),
-            ('D',    u'\ue006', r'(?P<DD>[0-9]{1,2})'),
-            ('hh',   u'\ue007', r'(?P<hh>[0-9]{2})'),
-            ('h',    u'\ue008', r'(?P<hh>[0-9]{1,2})'),
-            ('mm',   u'\ue009', r'(?P<mm>[0-9]{2})'),
-            ('m',    u'\ue00a', r'(?P<mm>[0-9]{1,2})'),
-            ('ss',   u'\ue00b', r'(?P<ss>[0-9]{2}(\.[0-9]*)?)'),
-            ('s',    u'\ue00c', r'(?P<ss>[0-9]{1,2}(\.[0-9]*)?)'),
-        )
+        ('YYYY', '\ue001', r'(?P<YYYY>[0-9]{4})'),
+        ('YY',   '\ue002', r'(?P<YY>[0-9]{2})'),
+        ('MM',   '\ue003', r'(?P<MM>[0-9]{2})'),
+        ('M',    '\ue004', r'(?P<MM>[0-9]{1,2})'),
+        ('DD',   '\ue005', r'(?P<DD>[0-9]{2})'),
+        ('D',    '\ue006', r'(?P<DD>[0-9]{1,2})'),
+        ('hh',   '\ue007', r'(?P<hh>[0-9]{2})'),
+        ('h',    '\ue008', r'(?P<hh>[0-9]{1,2})'),
+        ('mm',   '\ue009', r'(?P<mm>[0-9]{2})'),
+        ('m',    '\ue00a', r'(?P<mm>[0-9]{1,2})'),
+        ('ss',   '\ue00b', r'(?P<ss>[0-9]{2}(\.[0-9]*)?)'),
+        ('s',    '\ue00c', r'(?P<ss>[0-9]{1,2}(\.[0-9]*)?)'),
+    )
 
     out = []
     for p in instr.split('|'):

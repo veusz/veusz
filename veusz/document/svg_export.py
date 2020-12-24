@@ -53,12 +53,12 @@ def fltStr(v, prec=2):
 def escapeXML(text):
     """Escape special characters in XML."""
     # we have swap & with an unused character, so we can replace it later
-    text = text.replace('&', u'\ue001')
+    text = text.replace('&', '\ue001')
     text = text.replace('<', '&lt;')
     text = text.replace('>', '&gt;')
     text = text.replace('"', '&quot;')
     text = text.replace("'", '&apos;')
-    text = text.replace(u'\ue001', '&amp;')
+    text = text.replace('\ue001', '&amp;')
     return text
 
 def createPath(path, scale):

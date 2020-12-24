@@ -255,7 +255,7 @@ class CustomDialog(VeuszDialog):
             1: (self.importView, self.importModel),
             2: (self.colorView, self.colorModel),
             3: (self.colormapView, self.colormapModel)
-            }[self.viewsTab.currentIndex()]
+        }[self.viewsTab.currentIndex()]
 
     def slotRemove(self):
         """Remove an entry."""

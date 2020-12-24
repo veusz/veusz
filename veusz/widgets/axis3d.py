@@ -324,38 +324,32 @@ class Axis3D(widget.Widget):
         s.add( setting.Line3D(
             'Line',
             descr = _('Axis line settings'),
-            usertext = _('Axis line')),
-               pixmap='settings_axisline' )
+            usertext = _('Axis line')), pixmap='settings_axisline' )
         s.add( AxisLabel(
             'Label',
             descr = _('Axis label settings'),
-            usertext = _('Axis label')),
-               pixmap='settings_axislabel' )
+            usertext = _('Axis label')), pixmap='settings_axislabel' )
         s.add( TickLabel(
             'TickLabels',
             descr = _('Tick label settings'),
-            usertext = _('Tick labels')),
-               pixmap='settings_axisticklabels' )
+            usertext = _('Tick labels')), pixmap='settings_axisticklabels' )
         s.add( MajorTick(
             'MajorTicks',
             descr = _('Major tick line settings'),
-            usertext = _('Major ticks')),
-               pixmap='settings_axismajorticks' )
+            usertext = _('Major ticks')), pixmap='settings_axismajorticks' )
         s.add( MinorTick(
             'MinorTicks',
             descr = _('Minor tick line settings'),
-            usertext = _('Minor ticks')),
-               pixmap='settings_axisminorticks' )
+            usertext = _('Minor ticks')),  pixmap='settings_axisminorticks' )
         s.add( GridLine(
             'GridLines',
             descr = _('Grid line settings'),
-            usertext = _('Grid lines')),
-               pixmap='settings_axisgridlines' )
+            usertext = _('Grid lines')), pixmap='settings_axisgridlines' )
         s.add( MinorGridLine(
             'MinorGridLines',
             descr = _('Minor grid line settings'),
             usertext = _('Grid lines for minor ticks')),
-               pixmap='settings_axisminorgridlines' )
+            pixmap='settings_axisminorgridlines' )
 
     @classmethod
     def allowedParentTypes(self):
@@ -415,8 +409,8 @@ class Axis3D(widget.Widget):
         # line
         if ( abs(self.plottedrange[0] - self.plottedrange[1]) <
              ( abs(self.plottedrange[0]) + abs(self.plottedrange[1]) )*1e-8 ):
-               self.plottedrange[1] = ( self.plottedrange[0] +
-                                        max(1., self.plottedrange[0]*0.1) )
+            self.plottedrange[1] = ( self.plottedrange[0] +
+                                     max(1., self.plottedrange[0]*0.1) )
 
         # handle axis values round the wrong way
         invertaxis = self.plottedrange[0] > self.plottedrange[1]

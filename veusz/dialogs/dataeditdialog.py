@@ -411,8 +411,8 @@ class DatasetTableModel2D(qt.QAbstractTableModel):
                 len(self.yedge)-section-2]
             v2 = self.xedge[section+1] if xaxis else self.yedge[
                 len(self.yedge)-section-1]
-            return u'%s\u2013%s' % (setting.ui_floattostring(v1),
-                                    setting.ui_floattostring(v2))
+            return '%s\u2013%s' % (
+                setting.ui_floattostring(v1), setting.ui_floattostring(v2))
 
         return None
 
@@ -557,7 +557,7 @@ class DataEditDialog(VeuszDialog):
             (_('Copy'), self.slotCopy),
             (_('Delete row'), self.slotDeleteRow),
             (_('Insert row'), self.slotInsertRow),
-            ):
+        ):
             act = qt.QAction(text, self)
             act.triggered.connect(slot)
             self.datatableview.addAction(act)

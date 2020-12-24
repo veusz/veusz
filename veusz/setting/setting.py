@@ -667,7 +667,7 @@ class Distance(Setting):
         '%': _distPerc,
         '/': _distFrac,
         '': _distRatio
-        }
+    }
 
     # inverse functions for converting points to units
     inv_unit_func = {
@@ -686,7 +686,7 @@ class Distance(Setting):
         '%': _distInvPerc,
         '/': _distInvPerc,
         '': _distInvPerc
-        }
+    }
 
     @classmethod
     def isDist(kls, dist):
@@ -733,8 +733,8 @@ class Distance(Setting):
             return func(m, painter)
 
         # none of the regexps match
-        raise ValueError( "Cannot convert distance in form '%s'" %
-                          dist )
+        raise ValueError(
+            "Cannot convert distance in form '%s'" % dist )
 
     def convert(self, painter):
         """Convert this setting's distance as above"""
@@ -818,8 +818,12 @@ class Choice(Setting):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper(
-            (self.vallist,), (), {
-                'descriptions': self.descriptions, 'uilist': self.uilist})
+            (self.vallist,), (),
+            {
+                'descriptions': self.descriptions,
+                'uilist': self.uilist,
+            }
+        )
 
     def normalize(self, val):
         if val in self.vallist:
@@ -837,9 +841,11 @@ class Choice(Setting):
             raise utils.InvalidType
 
     def makeControl(self, *args):
-        return controls.Choice(self, False, self.vallist,
-                               descriptions=self.descriptions,
-                               uilist=self.uilist, *args)
+        return controls.Choice(
+            self, False, self.vallist,
+            descriptions=self.descriptions,
+            uilist=self.uilist, *args
+        )
 
 class ChoiceOrMore(Setting):
     """One out of a list of strings, or anything else."""
@@ -861,8 +867,11 @@ class ChoiceOrMore(Setting):
     def copy(self):
         """Make a copy of the setting."""
         return self._copyHelper(
-            (self.vallist,), (), {
-                'descriptions': self.descriptions})
+            (self.vallist,), (),
+            {
+                'descriptions': self.descriptions
+            }
+        )
 
     def normalize(self, val):
         return val
@@ -874,7 +883,7 @@ class ChoiceOrMore(Setting):
         return text
 
     def makeControl(self, *args):
-        argsv = {'descriptions': self.descriptions}
+        argsv = { 'descriptions': self.descriptions }
         return controls.Choice(self, True, self.vallist, *args, **argsv)
 
 class FloatChoice(ChoiceOrMore):
@@ -920,8 +929,10 @@ class FloatDict(Setting):
         return dict(val)
 
     def toUIText(self):
-        text = ['%s = %s' % (k, ui_floattostring(self.val[k]))
-                for k in sorted(self.val)]
+        text = [
+            '%s = %s' % (k, ui_floattostring(self.val[k]))
+            for k in sorted(self.val)
+        ]
         return '\n'.join(text)
 
     def fromUIText(self, text):
@@ -1004,7 +1015,7 @@ class WidgetPath(Str):
     typename = 'widget-path'
 
     def __init__(self, name, val, relativetoparent=True,
-                 allowedwidgets = None,
+                 allowedwidgets=None,
                  **args):
         """Initialise the setting.
 
@@ -1021,9 +1032,13 @@ class WidgetPath(Str):
 
     def copy(self):
         """Make a copy of the setting."""
-        return self._copyHelper((), (),
-                                {'relativetoparent': self.relativetoparent,
-                                 'allowedwidgets': self.allowedwidgets})
+        return self._copyHelper(
+            (), (),
+            {
+                'relativetoparent': self.relativetoparent,
+                'allowedwidgets': self.allowedwidgets,
+            }
+        )
 
     def getReferredWidget(self, val = None):
         """Get the widget referred to. We double-check here to make sure
@@ -1084,14 +1099,19 @@ class Dataset(Str):
 
     def copy(self):
         """Make a setting which has its values copied from this one."""
-        return self._copyHelper((), (),
-                                {'dimensions': self.dimensions,
-                                 'datatype': self.datatype})
+        return self._copyHelper(
+            (), (),
+            {
+                'dimensions': self.dimensions,
+                'datatype': self.datatype,
+            }
+        )
 
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        return controls.Dataset(self, self.getDocument(), self.dimensions,
-                                self.datatype, *args)
+        return controls.Dataset(
+            self, self.getDocument(), self.dimensions,
+            self.datatype, *args)
 
     def getData(self, doc):
         """Return a list of datasets entered."""
@@ -1099,7 +1119,7 @@ class Dataset(Str):
         if ( d is not None and
              d.datatype == self.datatype and
              (d.dimensions == self.dimensions or self.dimensions == 'all') ):
-                 return d
+            return d
 
 class Strings(Setting):
     """A multiple set of strings."""
@@ -1163,14 +1183,20 @@ class Datasets(Setting):
 
     def copy(self):
         """Make a setting which has its values copied from this one."""
-        return self._copyHelper((), (),
-                                {'dimensions': self.dimensions,
-                                 'datatype': self.datatype})
+        return self._copyHelper(
+            (), (),
+            {
+                'dimensions': self.dimensions,
+                'datatype': self.datatype
+            }
+        )
 
     def makeControl(self, *args):
         """Allow user to choose between the datasets."""
-        return controls.Datasets(self, self.getDocument(), self.dimensions,
-                                 self.datatype, *args)
+        return controls.Datasets(
+            self, self.getDocument(), self.dimensions,
+            self.datatype, *args
+        )
 
     def getData(self, doc):
         """Return a list of datasets entered."""
@@ -1480,8 +1506,12 @@ class WidgetChoice(Str):
 
     def copy(self):
         """Make a copy of the setting."""
-        return self._copyHelper((), (),
-                                {'widgettypes': self.widgettypes})
+        return self._copyHelper(
+            (), (),
+            {
+                'widgettypes': self.widgettypes
+            }
+        )
 
     def buildWidgetList(self, level, widget, outdict):
         """A recursive helper to build up a list of possible widgets.
@@ -1740,7 +1770,7 @@ class ErrorStyle(Choice):
         'barhi', 'barlo',
         'barendshi', 'barendslo',
         'linehorzlo', 'linehorzhi', 'linevertlo', 'lineverthi',
-        )
+    )
 
     controls.ErrorStyle._errorstyles  = _errorstyles
 
@@ -1879,19 +1909,20 @@ class RotateInterval(Choice):
     '''Rotate a label with intervals given.'''
 
     def __init__(self, name, val, **args):
-        Choice.__init__(self, name,
-                        ('-180', '-135', '-90', '-45',
-                         '0', '45', '90', '135', '180'),
-                        val, **args)
+        Choice.__init__(
+            self, name,
+            ('-180', '-135', '-90', '-45', '0', '45', '90', '135', '180'),
+            val, **args
+        )
 
     def normalize(self, val):
         """Store rotate angle."""
         # backward compatibility with rotate option
         # False: angle 0
         # True:  angle 90
-        if val == False:
+        if val is False:
             val = '0'
-        elif val == True:
+        elif val is True:
             val = '90'
         return Choice.normalize(self, val)
 

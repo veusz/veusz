@@ -172,9 +172,9 @@ class Key(widget.Widget):
 
         s.add( setting.Text(
             'Text',
-            descr = _('Text settings'),
+            descr=_('Text settings'),
             usertext=_('Text')),
-               pixmap = 'settings_axislabel' )
+            pixmap='settings_axislabel' )
 
         s.add( setting.Str(
             'order', '',
@@ -195,69 +195,69 @@ class Key(widget.Widget):
             'Background',
             descr = _('Key background fill'),
             usertext=_('Background')),
-               pixmap = 'settings_bgfill' )
+            pixmap='settings_bgfill' )
         s.add( setting.Line(
             'Border',
             descr = _('Key border line'),
             usertext=_('Border')),
-               pixmap = 'settings_border' )
+            pixmap='settings_border' )
 
         s.add( setting.AlignHorzWManual(
             'horzPosn',
             'right',
-            descr = _('Horizontal key position'),
+            descr=_('Horizontal key position'),
             usertext=_('Horz posn'),
             formatting=True) )
         s.add( setting.AlignVertWManual(
             'vertPosn',
             'bottom',
-            descr = _('Vertical key position'),
+            descr=_('Vertical key position'),
             usertext=_('Vert posn'),
             formatting=True) )
 
         s.add( setting.Distance(
             'keyLength',
             '1cm',
-            descr = _('Length of line to show in sample'),
+            descr=_('Length of line to show in sample'),
             usertext=_('Key length'),
             formatting=True) )
 
         s.add( setting.AlignVert(
             'keyAlign',
             'top',
-            descr = _('Alignment of key symbols relative to text'),
-            usertext = _('Key alignment'),
+            descr=_('Alignment of key symbols relative to text'),
+            usertext=_('Key alignment'),
             formatting=True) )
 
         s.add( setting.Float(
             'horzManual',
             0.,
-            descr = _('Manual horizontal fractional position'),
+            descr=_('Manual horizontal fractional position'),
             usertext=_('Horz manual'),
             formatting=True) )
         s.add( setting.Float(
             'vertManual',
             0.,
-            descr = _('Manual vertical fractional position'),
+            descr=_('Manual vertical fractional position'),
             usertext=_('Vert manual'),
             formatting=True) )
 
         s.add( setting.Float(
             'marginSize',
             1.,
-            minval = 0.,
-            descr = _('Width of margin in characters'),
+            minval=0.,
+            descr=_('Width of margin in characters'),
             usertext=_('Margin size'),
             formatting=True) )
 
         s.add( setting.Int(
             'columns',
             1,
-            descr = _('Number of columns in key'),
-            usertext = _('Columns'),
-            minval = 1,
-            maxval = 100,
-            formatting = True) )
+            descr=_('Number of columns in key'),
+            usertext=_('Columns'),
+            minval=1,
+            maxval=100,
+            formatting=True) )
 
         s.add( setting.Bool(
             'symbolswap',

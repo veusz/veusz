@@ -151,62 +151,53 @@ class Image(plotters.GenericPlotter):
             'data', '',
             dimensions = 2,
             descr = _('Dataset to plot'),
-            usertext=_('Dataset')),
-               0 )
+            usertext=_('Dataset')), 0 )
         s.add( setting.FloatOrAuto(
             'min', 'Auto',
             descr = _('Minimum value of image scale'),
-            usertext=_('Min. value')),
-               1 )
+            usertext=_('Min. value')), 1 )
         s.add( setting.FloatOrAuto(
             'max', 'Auto',
             descr = _('Maximum value of image scale'),
-            usertext=_('Max. value')),
-               2 )
+            usertext=_('Max. value')), 2 )
         s.add( setting.Choice(
             'colorScaling',
             ['linear', 'sqrt', 'log', 'squared'],
             'linear',
             descr = _('Scaling to transform numbers to color'),
-            usertext=_('Scaling')),
-               3 )
+            usertext=_('Scaling')), 3 )
 
         s.add( setting.DatasetExtended(
             'transparencyData', '',
             dimensions = 2,
             descr = _('Dataset to use for transparency (0 to 1)'),
-            usertext=_('Trans. data')),
-               4 )
+            usertext=_('Trans. data')), 4 )
 
         s.add( setting.Choice(
             'mapping',
             ('pixels', 'bounds'),
             'pixels',
             descr = _('Map image using pixels or bound coordinates'),
-            usertext=_('Mapping')),
-               5 )
+            usertext=_('Mapping')), 5 )
 
         s.add( setting.Colormap(
             'colorMap',
             'grey',
             descr = _('Set of colors to plot data with'),
             usertext=_('Colormap'),
-            formatting=True),
-               5 )
+            formatting=True), 5 )
         s.add( setting.Bool(
             'colorInvert', False,
             descr = _('Invert color map'),
             usertext=_('Invert colormap'),
-            formatting=True),
-               6 )
+            formatting=True), 6 )
         s.add( setting.Int(
             'transparency', 0,
             descr = _('Transparency percentage'),
             usertext = _('Transparency'),
             minval = 0,
             maxval = 100,
-            formatting=True),
-               7 )
+            formatting=True), 7 )
 
         s.add( setting.Choice(
             'drawMode',
@@ -214,8 +205,7 @@ class Image(plotters.GenericPlotter):
             'default',
             descr = _('Method for drawing output'),
             usertext=_('Draw Mode'),
-            formatting = True )
-        )
+            formatting = True ) )
 
         # translate smooth to drawMode
         s.add( setting.SettingBackwardCompat(
@@ -225,10 +215,9 @@ class Image(plotters.GenericPlotter):
             translatefn=lambda x: {
                 True: 'resample-smooth',
                 False: 'default'
-                }[x],
+            }[x],
             formatting=True,
-            )
-        )
+        ) )
 
     @property
     def userdescription(self):

@@ -33,7 +33,7 @@ class DatasetNDBase(DatasetConcreteBase):
     editable = False
 
     def userSize(self):
-        return u'×'.join(str(x) for x in self.data.shape)
+        return '×'.join(str(x) for x in self.data.shape)
 
     def userPreview(self):
         return dsPreviewHelper(N.ravel(self.data))

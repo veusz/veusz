@@ -170,9 +170,9 @@ class CommandInterface(qt.QObject):
 
     def AddCustom(self, ctype, name, val, mode='appendalways'):
         """Add a custom definition for evaluation of expressions.
-	This can define a constant (can be in terms of other
-	constants), a function of 1 or more variables, or a function
-	imported from an external python module.
+        This can define a constant (can be in terms of other
+        constants), a function of 1 or more variables, or a function
+        imported from an external python module.
 
         ctype is "constant", "function", "definition" (either
         constant or function), "import", "color" or "colormap".
@@ -222,7 +222,7 @@ class CommandInterface(qt.QObject):
                     if mode == 'append':
                         del vals[i]
                         vals.append(item)
-                    else: # replace
+                    else:  # replace
                         vals[i] = item
                     break
             else:

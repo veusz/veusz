@@ -626,7 +626,7 @@ class PlotWindow( qt.QGraphicsView ):
         py = pos.y() / self.painthelper.cgscale
 
         for widget, bounds in self.painthelper.widgetBoundsIterator(
-            widgettype=widgets.Axis):
+                widgettype=widgets.Axis):
             # if widget is axis, and point lies within bounds
             if ( px>=bounds[0] and px<=bounds[2] and
                  py>=bounds[1] and py<=bounds[3] ):
@@ -1014,8 +1014,8 @@ class PlotWindow( qt.QGraphicsView ):
         """Move the the selected page."""
 
         # we don't need to do anything
-        if (self.pagenumber == pageno and
-            self.document.changeset == self.docchangeset):
+        if ( self.pagenumber == pageno and
+             self.document.changeset == self.docchangeset ):
             return
 
         # keep within bounds

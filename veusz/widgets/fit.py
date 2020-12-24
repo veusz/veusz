@@ -95,17 +95,17 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
 
     if have_err:
         print(_('Fit results:\n') + "\n".join([
-                    u"    %s = %g \u00b1 %g (+%g / %g)"
-                    % (n, m.values[n], m.errors[n], m.merrors[(n, 1.0)],
-                       m.merrors[(n, -1.0)]) for n in names]))
+            "    %s = %g \u00b1 %g (+%g / %g)" % (
+                n, m.values[n], m.errors[n], m.merrors[(n, 1.0)],
+                m.merrors[(n, -1.0)]) for n in names]))
     elif have_symerr:
         print(_('Fit results:\n') + "\n".join([
-                    u"    %s = %g \u00b1 %g" % (n, m.values[n], m.errors[n])
-                    for n in names]))
+            "    %s = %g \u00b1 %g" % (n, m.values[n], m.errors[n])
+            for n in names]))
         print(_('MINOS error estimate not available.'))
     else:
         print(_('Fit results:\n') + "\n".join([
-                    '    %s = %g' % (n, m.values[n]) for n in names]))
+            '    %s = %g' % (n, m.values[n]) for n in names]))
         print(_('No error analysis available: fit quality uncertain'))
 
     print("chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2))

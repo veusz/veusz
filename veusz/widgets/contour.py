@@ -207,65 +207,59 @@ class Contour(plotters.GenericPlotter):
         s.add( setting.FloatOrAuto(
             'max', 'Auto',
             descr = _('Maximum value of contour scale'),
-            usertext=_('Max. value')),
-               2 )
+            usertext=_('Max. value')), 2 )
         s.add( setting.Int(
             'numLevels', 5,
             minval = 1,
             descr = _('Number of contour levels to plot'),
-            usertext=_('Number levels')),
-               3 )
+            usertext=_('Number levels')), 3 )
         s.add( setting.Choice(
             'scaling',
             ['linear', 'sqrt', 'log', 'squared', 'manual'],
             'linear',
             descr = _('Scaling between contour levels'),
-            usertext=_('Scaling')),
-               4 )
+            usertext=_('Scaling')), 4 )
         s.add( setting.FloatList(
             'manualLevels',
             [],
             descr = _('Levels to use for manual scaling'),
-            usertext=_('Manual levels')),
-               5 )
+            usertext=_('Manual levels')), 5 )
 
         s.add( setting.Bool(
             'keyLevels',
             False,
             descr=_('Show levels in key'),
-            usertext=_('Levels in key')),
-               6 )
+            usertext=_('Levels in key')), 6 )
 
         s.add( setting.FloatList(
             'levelsOut',
             [],
             descr = _('Levels used in the plot'),
-            usertext=_('Output levels')),
-               7, readonly=True )
+            usertext=_('Output levels')), 7, readonly=True )
 
         s.add( ContourLabel(
             'ContourLabels',
             descr = _('Contour label settings'),
             usertext = _('Contour labels')),
-               pixmap = 'settings_axisticklabels' )
+            pixmap = 'settings_axisticklabels' )
 
         s.add( ContourLines(
             'Lines',
             descr=_('Contour lines'),
             usertext=_('Contour lines')),
-               pixmap = 'settings_contourline' )
+            pixmap = 'settings_contourline' )
 
         s.add( ContourFills(
             'Fills',
             descr=_('Fill within contours'),
             usertext=_('Contour fills')),
-               pixmap = 'settings_contourfill' )
+            pixmap = 'settings_contourfill' )
 
         s.add( SubContourLines(
             'SubLines',
             descr=_('Sub-contour lines'),
             usertext=_('Sub-contour lines')),
-               pixmap = 'settings_subcontourline' )
+            pixmap = 'settings_subcontourline' )
 
         s.add( setting.SettingBackwardCompat('lines', 'Lines/lines', None) )
         s.add( setting.SettingBackwardCompat('fills', 'Fills/fills', None) )
@@ -602,16 +596,20 @@ class Contour(plotters.GenericPlotter):
     def plotContours(self, painter, posn, axes, clip):
         """Plot the traced contours on the painter."""
         s = self.settings
-        self._plotContours(painter, posn, axes, s.Lines.get('lines'),
-                           self._cachedcontours,
-                           not s.ContourLabels.hide, s.Lines.hide, clip)
+        self._plotContours(
+            painter, posn, axes, s.Lines.get('lines'),
+            self._cachedcontours,
+            not s.ContourLabels.hide, s.Lines.hide, clip
+        )
 
     def plotSubContours(self, painter, posn, axes, clip):
         """Plot sub contours on painter."""
         s = self.settings
-        self._plotContours(painter, posn, axes, s.SubLines.get('lines'),
-                           self._cachedsubcontours,
-                           False, s.SubLines.hide, clip)
+        self._plotContours(
+            painter, posn, axes, s.SubLines.get('lines'),
+            self._cachedsubcontours,
+            False, s.SubLines.hide, clip
+        )
 
     def plotContourFills(self, painter, posn, axes, clip):
         """Plot the traced contours on the painter."""
@@ -644,4 +642,4 @@ class Contour(plotters.GenericPlotter):
             utils.brushExtFillPath(painter, brush, path)
 
 # allow the factory to instantiate a contour
-document.thefactory.register( Contour )
+document.thefactory.register(Contour)

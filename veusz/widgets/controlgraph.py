@@ -193,7 +193,7 @@ class ControlMarginBox:
             document.OperationSettingSet(s.get('rightMargin'), right),
             document.OperationSettingSet(s.get('topMargin'), top),
             document.OperationSettingSet(s.get('bottomMargin'), bottom)
-            )
+        )
         self.widget.document.applyOperation(
             document.OperationMultiple(operations, descr=_('resize margins')))
 
@@ -221,7 +221,7 @@ class ControlMarginBox:
         operations = (
             document.OperationSettingSet(s.get('width'), width),
             document.OperationSettingSet(s.get('height'), height),
-            )
+        )
         self.widget.document.applyOperation(
             document.OperationMultiple(operations, descr=_('change page size')))
 
@@ -524,11 +524,15 @@ class ControlMovableBox(ControlMarginBox):
     """
 
     def __init__(self, widget, posn, painthelper, crosspos=None):
-        ControlMarginBox.__init__(self, widget, posn,
-                                  [-10000, -10000, 10000, 10000],
-                                  painthelper, isresizable=False)
-        self.deltacrosspos = (crosspos[0] - self.posn[0],
-                              crosspos[1] - self.posn[1])
+        ControlMarginBox.__init__(
+            self, widget, posn,
+            [-10000, -10000, 10000, 10000],
+            painthelper, isresizable=False
+        )
+        self.deltacrosspos = (
+            crosspos[0] - self.posn[0],
+            crosspos[1] - self.posn[1]
+        )
 
     def createGraphicsItem(self, parent):
         return _GraphMovableBox(parent, self)

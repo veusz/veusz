@@ -311,7 +311,7 @@ encodings = [
     'ptcp154', 'shift_jis_2004', 'shift_jis', 'shift_jisx0213',
     'tis_620','utf_16_be', 'utf_16_le', 'utf_16',
     'utf_32_be', 'utf_32_le', 'utf_32', 'utf_7', 'utf_8', 'utf_8_sig'
-    ]
+]
 
 def openEncoding(filename, encoding, mode='r'):
     """Convenience function for opening file with encoding given.
@@ -595,8 +595,11 @@ class Struct:
 
     def __repr__(self):
         return '<%s>' % str(
-            ', '.join('%s:%s' % (k, repr(getattr(self, k)))
-                       for k in sorted(self.__dict__)))
+            ', '.join(
+                '%s:%s' % (k, repr(getattr(self, k)))
+                for k in sorted(self.__dict__)
+            )
+        )
 
 class SvgWidgetFixedAspect(qt.QWidget):
     """Draw an SVG file with the aspect ratio fixed to the original."""
