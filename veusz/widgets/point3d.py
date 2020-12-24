@@ -86,25 +86,25 @@ class Point3D(plotters3d.GenericPlotter3D):
         plotters3d.GenericPlotter3D.addSettings(s)
 
         s.add( setting.DatasetExtended(
-                'zData', 'z',
-                descr=_('Z values, given by dataset, expression or list of values'),
-                usertext=_('Z data')), 0 )
+            'zData', 'z',
+            descr=_('Z values, given by dataset, expression or list of values'),
+            usertext=_('Z data')), 0 )
         s.add( setting.DatasetExtended(
-               'yData', 'y',
-                descr=_('Y values, given by dataset, expression or list of values'),
-                usertext=_('Y data')), 0 )
+            'yData', 'y',
+            descr=_('Y values, given by dataset, expression or list of values'),
+            usertext=_('Y data')), 0 )
         s.add( setting.DatasetExtended(
-                'xData', 'x',
-                descr=_('X values, given by dataset, expression or list of values'),
-                usertext=_('X data')), 0 )
+            'xData', 'x',
+            descr=_('X values, given by dataset, expression or list of values'),
+            usertext=_('X data')), 0 )
         # s.add( setting.DatasetOrStr(
         #     'labels', '',
         #     descr=_('Dataset or string to label points'),
         #     usertext=_('Labels')), 5 )
         s.add( setting.DatasetExtended(
             'scalePoints', '',
-            descr = _('Scale size of markers given by dataset, expression'
-                      ' or list of values'),
+            descr=_('Scale size of markers given by dataset, expression'
+                    ' or list of values'),
             usertext=_('Scale markers')), 6 )
 
         s.add( setting.Bool(
@@ -121,35 +121,35 @@ class Point3D(plotters3d.GenericPlotter3D):
         s.add( setting.Color(
             'color',
             'auto',
-            descr = _('Master color'),
-            usertext = _('Color'),
+            descr=_('Master color'),
+            usertext=_('Color'),
             formatting=True), 0 )
         s.add( setting.Marker(
             'marker', 'circle',
-            descr = _('Type of marker to plot'),
+            descr=_('Type of marker to plot'),
             usertext=_('Marker'), formatting=True), 0 )
         s.add( setting.DataColor('Color') )
 
         s.add( PlotLine3D(
             'PlotLine',
-            descr = _('Plot line settings'),
-            usertext = _('Plot line')),
-               pixmap = 'settings_plotline' )
+            descr=_('Plot line settings'),
+            usertext=_('Plot line')),
+            pixmap='settings_plotline' )
         s.add( MarkerFill3D(
             'MarkerFill',
-            descr = _('Marker fill settings'),
+            descr=_('Marker fill settings'),
             usertext=_('Marker fill')),
-              pixmap='settings_plotmarkerfill' )
+            pixmap='settings_plotmarkerfill' )
         s.add( MarkerLine3D(
             'MarkerLine',
-            descr = _('Marker border settings'),
-            usertext = _('Marker border')),
-               pixmap = 'settings_plotmarkerline' )
+            descr=_('Marker border settings'),
+            usertext=_('Marker border')),
+            pixmap='settings_plotmarkerline' )
         s.add( ErrorLine3D(
             'Error',
-            descr = _('Error bar settings'),
-            usertext = _('Error bar')),
-               pixmap = 'settings_ploterrorline' )
+            descr=_('Error bar settings'),
+            usertext=_('Error bar')),
+            pixmap='settings_ploterrorline' )
 
     def affectsAxisRange(self):
         """Which axes this widget affects."""

@@ -37,9 +37,10 @@ class FillBrush(setting.BrushExtended):
     '''Brush for filling point region.'''
     def __init__(self, *args, **argsv):
         setting.BrushExtended.__init__(self, *args, **argsv)
-        self.add( setting.Choice('filltype', filloptions, 'center',
-                                 descr=_('Fill to this edge/position'),
-                                 usertext=_('Fill type')) )
+        self.add( setting.Choice(
+            'filltype', filloptions, 'center',
+            descr=_('Fill to this edge/position'),
+            usertext=_('Fill type')) )
         self.get('hide').newDefault(True)
 
 class NonOrthGraph(Widget):
@@ -50,33 +51,39 @@ class NonOrthGraph(Widget):
         '''Construct list of settings.'''
         Widget.addSettings(s)
 
-        s.add( setting.Distance( 'leftMargin',
-                                 '1.7cm',
-                                 descr=_('Distance from left of graph to edge'),
-                                 usertext=_('Left margin'),
-                                 formatting=True) )
-        s.add( setting.Distance( 'rightMargin',
-                                 '0.2cm',
-                                 descr=_('Distance from right of graph to edge'),
-                                 usertext=_('Right margin'),
-                                 formatting=True) )
-        s.add( setting.Distance( 'topMargin',
-                                 '0.2cm',
-                                 descr=_('Distance from top of graph to edge'),
-                                 usertext=_('Top margin'),
-                                 formatting=True) )
-        s.add( setting.Distance( 'bottomMargin',
-                                 '1.7cm',
-                                 descr=_('Distance from bottom of graph to edge'),
-                                 usertext=_('Bottom margin'),
-                                 formatting=True) )
-        s.add( setting.GraphBrush( 'Background',
-                                   descr = _('Background plot fill'),
-                                   usertext=_('Background')),
-               pixmap='settings_bgfill' )
-        s.add( setting.Line('Border', descr = _('Graph border line'),
-                            usertext=_('Border')),
-               pixmap='settings_border')
+        s.add( setting.Distance(
+            'leftMargin',
+            '1.7cm',
+            descr=_('Distance from left of graph to edge'),
+            usertext=_('Left margin'),
+            formatting=True) )
+        s.add( setting.Distance(
+            'rightMargin',
+            '0.2cm',
+            descr=_('Distance from right of graph to edge'),
+            usertext=_('Right margin'),
+            formatting=True) )
+        s.add( setting.Distance(
+            'topMargin',
+            '0.2cm',
+            descr=_('Distance from top of graph to edge'),
+            usertext=_('Top margin'),
+            formatting=True) )
+        s.add( setting.Distance(
+            'bottomMargin',
+            '1.7cm',
+            descr=_('Distance from bottom of graph to edge'),
+            usertext=_('Bottom margin'),
+            formatting=True) )
+        s.add( setting.GraphBrush(
+            'Background',
+            descr = _('Background plot fill'),
+            usertext=_('Background')),
+            pixmap='settings_bgfill' )
+        s.add( setting.Line(
+            'Border', descr = _('Graph border line'),
+            usertext=_('Border')),
+            pixmap='settings_border')
 
     @classmethod
     def allowedParentTypes(klass):
@@ -129,10 +136,12 @@ class NonOrthGraph(Widget):
     def getMargins(self, painthelper):
         """Use settings to compute margins."""
         s = self.settings
-        return ( s.get('leftMargin').convert(painthelper),
-                 s.get('topMargin').convert(painthelper),
-                 s.get('rightMargin').convert(painthelper),
-                 s.get('bottomMargin').convert(painthelper) )
+        return (
+            s.get('leftMargin').convert(painthelper),
+            s.get('topMargin').convert(painthelper),
+            s.get('rightMargin').convert(painthelper),
+            s.get('bottomMargin').convert(painthelper)
+        )
 
     def draw(self, parentposn, phelper, outerbounds=None):
         '''Update the margins before drawing.'''
@@ -164,7 +173,7 @@ class NonOrthGraph(Widget):
 
         # controls for adjusting margins
         phelper.setControlGraph(self, [
-                controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
+            controlgraph.ControlMarginBox(self, bounds, maxbounds, phelper)])
 
         return bounds
 

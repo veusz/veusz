@@ -45,39 +45,45 @@ class NonOrthFunction(Widget):
         '''Settings for widget.'''
         Widget.addSettings(s)
 
-        s.add( setting.Str('function', 'a',
-                           descr=_('Function expression'),
-                           usertext=_('Function')) )
-        s.add( setting.Choice('variable', ['a', 'b'], 'a',
-                              descr=_('Variable the function is a function of'),
-                              usertext=_('Variable')) )
-        s.add(setting.FloatOrAuto('min', 'Auto',
-                                  descr=_('Minimum value at which to plot function'),
-                                  usertext=_('Min')))
+        s.add( setting.Str(
+            'function', 'a',
+            descr=_('Function expression'),
+            usertext=_('Function')) )
+        s.add( setting.Choice(
+            'variable', ['a', 'b'], 'a',
+            descr=_('Variable the function is a function of'),
+            usertext=_('Variable')) )
+        s.add(setting.FloatOrAuto(
+            'min', 'Auto',
+            descr=_('Minimum value at which to plot function'),
+            usertext=_('Min')))
 
-        s.add(setting.FloatOrAuto('max', 'Auto',
-                                  descr=_('Maximum value at which to plot function'),
-                                  usertext=_('Max')))
+        s.add(setting.FloatOrAuto(
+            'max', 'Auto',
+            descr=_('Maximum value at which to plot function'),
+            usertext=_('Max')))
 
-
-        s.add( setting.Line('PlotLine',
-                            descr = _('Plot line settings'),
-                            usertext = _('Plot line')),
-               pixmap = 'settings_plotline' )
+        s.add( setting.Line(
+            'PlotLine',
+            descr=_('Plot line settings'),
+            usertext=_('Plot line')),
+            pixmap='settings_plotline' )
         s.get('PlotLine').get('color').newDefault('auto')
-        s.add( FillBrush('Fill1',
-                         descr = _('Fill settings (1)'),
-                         usertext = _('Area fill 1')),
-               pixmap = 'settings_plotfillbelow' )
-        s.add( FillBrush('Fill2',
-                         descr = _('Fill settings (2)'),
-                         usertext = _('Area fill 2')),
-               pixmap = 'settings_plotfillbelow' )
+        s.add( FillBrush(
+            'Fill1',
+            descr=_('Fill settings (1)'),
+            usertext=_('Area fill 1')),
+            pixmap='settings_plotfillbelow' )
+        s.add( FillBrush(
+            'Fill2',
+            descr=_('Fill settings (2)'),
+            usertext=_('Area fill 2')),
+            pixmap='settings_plotfillbelow' )
 
-        s.add( setting.Int('steps', 50,
-                           descr = _('Number of steps to evaluate the function'
-                                     ' over'),
-                           usertext=_('Steps'), formatting=True), 0 )
+        s.add( setting.Int(
+            'steps', 50,
+            descr = _('Number of steps to evaluate the function over'),
+            usertext=_('Steps'), formatting=True), 0 )
 
     @classmethod
     def allowedParentTypes(klass):
@@ -111,8 +117,8 @@ class NonOrthFunction(Widget):
 
         steps = max(2, s.steps)
         # input values for function
-        invals = ( N.arange(steps)*(1./(steps-1))*(crange[1]-crange[0]) +
-                   crange[0] )
+        invals = (
+            N.arange(steps)*(1./(steps-1))*(crange[1]-crange[0]) + crange[0] )
 
         # do evaluation
         env = self.initEnviron()
@@ -191,4 +197,4 @@ class NonOrthFunction(Widget):
                     painter.setPen( s.PlotLine.makeQPen(painter) )
                     utils.plotClippedPolyline(painter, cliprect, p)
 
-document.thefactory.register( NonOrthFunction )
+document.thefactory.register(NonOrthFunction)

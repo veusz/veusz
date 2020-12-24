@@ -60,35 +60,31 @@ class Surface3D(plotters3d.GenericPlotter3D):
             'mode', klass.modes,
             'z(x,y)',
             descr=_('Axes of plot surface'),
-            usertext=_('Mode')),
-              0)
+            usertext=_('Mode')), 0)
         s.add(setting.DatasetExtended(
             'data', '',
             dimensions=2,
             descr=_('Dataset to plot'),
-            usertext=_('Dataset')),
-              1)
+            usertext=_('Dataset')), 1)
         s.add(setting.DataColor(
-            'DataColor', dimensions=2),
-              2)
+            'DataColor', dimensions=2), 2)
 
         s.add(setting.Bool(
             'highres', False,
             descr=_('High resolution surface (accurate bin centres)'),
             usertext=_('High res.'),
-            formatting=True)
-          )
+            formatting=True) )
 
         s.add(setting.LineGrid3D(
             'Line',
             descr = _('Grid line settings'),
             usertext = _('Grid line')),
-               pixmap = 'settings_gridline' )
+            pixmap = 'settings_gridline' )
         s.add(setting.Surface3DWColorMap(
             'Surface',
             descr=_('Surface fill settings'),
             usertext=_('Surface')),
-              pixmap='settings_bgfill')
+            pixmap='settings_bgfill')
 
     def affectsAxisRange(self):
         """Which axes this widget affects."""

@@ -157,9 +157,9 @@ class Grid(widget.Widget):
         widget.Widget.__init__(self, parent, name=name)
 
         self.addAction( widget.Action(
-                'zeroMargins', self.actionZeroMargins,
-                descr = _('Zero margins of graphs in grid'),
-                usertext = _('Zero margins')) )
+            'zeroMargins', self.actionZeroMargins,
+            descr = _('Zero margins of graphs in grid'),
+            usertext = _('Zero margins')) )
 
         # calculated positions for children
         self.childpositions = {}
@@ -175,53 +175,55 @@ class Grid(widget.Widget):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
 
-        s.add(setting.Int('rows', 2,
-                          descr = _('Number of rows in grid'),
-                          usertext=_('Number of rows')) )
-        s.add(setting.Int('columns', 2,
-                          descr = _('Number of columns in grid'),
-                          usertext=_('Number of columns')) )
+        s.add(setting.Int(
+            'rows', 2,
+            descr=_('Number of rows in grid'),
+            usertext=_('Number of rows')) )
+        s.add(setting.Int(
+            'columns', 2,
+            descr=_('Number of columns in grid'),
+            usertext=_('Number of columns')) )
 
         s.add( setting.FloatList(
-                'scaleRows',
-                [],
-                descr = _('Row scaling factors. A sequence'
-                          ' of values\nby which to scale rows '
-                          'relative to each other.'),
-                usertext=_('Row scalings')) )
+            'scaleRows',
+            [],
+            descr = _('Row scaling factors. A sequence'
+                      ' of values\nby which to scale rows '
+                      'relative to each other.'),
+            usertext=_('Row scalings')) )
         s.add( setting.FloatList(
-                'scaleCols',
-                [],
-                descr = _('Column scaling factors. A sequence'
-                          ' of values\nby which to scale columns'
-                          ' relative to each other.'),
-                usertext=_('Column scalings')) )
+            'scaleCols',
+            [],
+            descr = _('Column scaling factors. A sequence'
+                      ' of values\nby which to scale columns'
+                      ' relative to each other.'),
+            usertext=_('Column scalings')) )
 
         s.add( setting.Distance(
-                'leftMargin', '1.7cm',
-                descr=_('Distance from left of grid to edge of page'),
-                usertext=_('Left margin'),
-                formatting=True) )
+            'leftMargin', '1.7cm',
+            descr=_('Distance from left of grid to edge of page'),
+            usertext=_('Left margin'),
+            formatting=True) )
         s.add( setting.Distance(
-                'rightMargin', '0.2cm',
-                descr=_('Distance from right of grid to edge of page'),
-                usertext=_('Right margin'),
-                formatting=True) )
+            'rightMargin', '0.2cm',
+            descr=_('Distance from right of grid to edge of page'),
+            usertext=_('Right margin'),
+            formatting=True) )
         s.add( setting.Distance(
-                'topMargin', '0.2cm',
-                descr=_('Distance from top of grid to edge of page'),
-                usertext=_('Top margin'),
-                formatting=True) )
+            'topMargin', '0.2cm',
+            descr=_('Distance from top of grid to edge of page'),
+            usertext=_('Top margin'),
+            formatting=True) )
         s.add( setting.Distance(
-                'bottomMargin', '1.7cm',
-                descr=_('Distance from bottom of grid to edge of page'),
-                usertext=_('Bottom margin'),
-                formatting=True) )
+            'bottomMargin', '1.7cm',
+            descr=_('Distance from bottom of grid to edge of page'),
+            usertext=_('Bottom margin'),
+            formatting=True) )
         s.add( setting.Distance(
-                'internalMargin', '0cm',
-                descr=_('Gap between grid members'),
-                usertext=_('Internal margin'),
-                formatting=True) )
+            'internalMargin', '0cm',
+            descr=_('Gap between grid members'),
+            usertext=_('Internal margin'),
+            formatting=True) )
 
     @classmethod
     def allowedParentTypes(klass):
@@ -306,8 +308,8 @@ class Grid(widget.Widget):
         for c in self.children:
             if isinstance(c, graph.Graph):
                 s = c.settings
-                for v in ('leftMargin', 'topMargin', 'rightMargin',
-                          'bottomMargin'):
+                for v in (
+                        'leftMargin', 'topMargin', 'rightMargin', 'bottomMargin'):
                     operations.append(
                         document.OperationSettingSet(s.get(v), '0cm') )
 
@@ -337,10 +339,12 @@ class Grid(widget.Widget):
                 intmargin = 0
 
             # bounds for child
-            newbounds = [ bounds[0]+dx*cpos[0]+intmargin*cidx[0],
-                          bounds[1]+dy*cpos[1]+intmargin*cidx[1],
-                          bounds[0]+dx*cpos[2]+intmargin*cidx[0],
-                          bounds[1]+dy*cpos[3]+intmargin*cidx[1] ]
+            newbounds = [
+                bounds[0]+dx*cpos[0]+intmargin*cidx[0],
+                bounds[1]+dy*cpos[1]+intmargin*cidx[1],
+                bounds[0]+dx*cpos[2]+intmargin*cidx[0],
+                bounds[1]+dy*cpos[3]+intmargin*cidx[1]
+            ]
             # bounds the axes can spread into
             coutbound = list(newbounds)
 
@@ -372,10 +376,12 @@ class Grid(widget.Widget):
     def getMargins(self, painthelper):
         """Use settings to compute margins."""
         s = self.settings
-        return ( s.get('leftMargin').convert(painthelper),
-                 s.get('topMargin').convert(painthelper),
-                 s.get('rightMargin').convert(painthelper),
-                 s.get('bottomMargin').convert(painthelper) )
+        return (
+            s.get('leftMargin').convert(painthelper),
+            s.get('topMargin').convert(painthelper),
+            s.get('rightMargin').convert(painthelper),
+            s.get('bottomMargin').convert(painthelper)
+        )
 
     def draw(self, parentposn, phelper, outerbounds=None):
         """Draws the widget's children."""
@@ -416,4 +422,4 @@ class Grid(widget.Widget):
         cgi.setWidgetMargins()
 
 # allow the factory to instantiate a grid
-document.thefactory.register( Grid )
+document.thefactory.register(Grid)

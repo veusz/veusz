@@ -90,29 +90,35 @@ class Line(plotters.FreePlotter):
             usertext=_('Y positions 2'),
             formatting=False), 7 )
 
-        s.add( setting.Bool('clip', False,
-                            descr=_('Clip line to its container'),
-                            usertext=_('Clip'),
-                            formatting=True), 0 )
+        s.add( setting.Bool(
+            'clip', False,
+            descr=_('Clip line to its container'),
+            usertext=_('Clip'),
+            formatting=True), 0 )
 
-        s.add( setting.Line('Line',
-                            descr = _('Line style'),
-                            usertext = _('Line')),
-               pixmap = 'settings_plotline' )
-        s.add( setting.ArrowFill('Fill',
-                                 descr = _('Arrow fill settings'),
-                                 usertext = _('Arrow fill')),
-               pixmap = 'settings_plotmarkerfill' )
+        s.add( setting.Line(
+            'Line',
+            descr=_('Line style'),
+            usertext=_('Line')),
+            pixmap='settings_plotline' )
+        s.add( setting.ArrowFill(
+            'Fill',
+            descr=_('Arrow fill settings'),
+            usertext=_('Arrow fill')),
+            pixmap='settings_plotmarkerfill' )
 
-        s.add( setting.DistancePt('arrowSize', '5pt',
-                                  descr = _('Size of arrow to plot'),
-                                  usertext=_('Arrow size'), formatting=True), 0)
-        s.add( setting.Arrow('arrowright', 'none',
-                             descr = _('Arrow to plot on right side'),
-                             usertext=_('Arrow right'), formatting=True), 0)
-        s.add( setting.Arrow('arrowleft', 'none',
-                             descr = _('Arrow to plot on left side'),
-                             usertext=_('Arrow left'), formatting=True), 0)
+        s.add( setting.DistancePt(
+            'arrowSize', '5pt',
+            descr=_('Size of arrow to plot'),
+            usertext=_('Arrow size'), formatting=True), 0)
+        s.add( setting.Arrow(
+            'arrowright', 'none',
+            descr=_('Arrow to plot on right side'),
+            usertext=_('Arrow right'), formatting=True), 0)
+        s.add( setting.Arrow(
+            'arrowleft', 'none',
+            descr=_('Arrow to plot on left side'),
+            usertext=_('Arrow left'), formatting=True), 0)
 
     def _computeLinesLengthAngle(self, posn, lengthscaling):
         """Return set of lines to plot for length-angle."""
@@ -177,17 +183,20 @@ class Line(plotters.FreePlotter):
             return
 
         # if a dataset is used, we can't use control items
-        isnotdataset = ( not s.get('xPos').isDataset(d) and
-                         not s.get('yPos').isDataset(d) )
+        isnotdataset = (
+            not s.get('xPos').isDataset(d) and
+            not s.get('yPos').isDataset(d) )
 
         if s.mode == 'length-angle':
-            isnotdataset = ( isnotdataset and
-                             not s.get('length').isDataset(d) and
-                             not s.get('angle').isDataset(d) )
+            isnotdataset = (
+                isnotdataset and
+                not s.get('length').isDataset(d) and
+                not s.get('angle').isDataset(d) )
         else:
-            isnotdataset = ( isnotdataset and
-                             not s.get('xPos2').isDataset(d) and
-                             not s.get('yPos2').isDataset(d) )
+            isnotdataset = (
+                isnotdataset and
+                not s.get('xPos2').isDataset(d) and
+                not s.get('yPos2').isDataset(d) )
 
         # now do the drawing
         clip = None
@@ -267,15 +276,17 @@ class Line(plotters.FreePlotter):
         operations = [
             document.OperationSettingSet(s.get('xPos'), x),
             document.OperationSettingSet(s.get('yPos'), y),
-            ]
+        ]
 
         if s.mode == 'length-angle':
             # convert 2nd point to length, angle
             def la(ptx, pty):
-                length = ( math.sqrt( (ptx-pt1[0])**2 + (pty-pt1[1])**2 ) /
-                           (cgi.widgetposn[2]-cgi.widgetposn[0]) )
-                angle = ( (math.atan2( pty-pt1[1], ptx-pt1[0] )
-                           * 180. / math.pi) % 360. )
+                length = (
+                    math.sqrt( (ptx-pt1[0])**2 + (pty-pt1[1])**2 ) /
+                    (cgi.widgetposn[2]-cgi.widgetposn[0]) )
+                angle = (
+                    (math.atan2( pty-pt1[1], ptx-pt1[0] ) *
+                     180. / math.pi) % 360. )
                 return length, angle
             length, angle = la(pt2[0], pt2[1])
             # calculate length angle for neighbouring point, to get delta
@@ -324,4 +335,4 @@ class Line(plotters.FreePlotter):
         self.document.applyOperation(
             document.OperationMultiple(operations, descr=_('adjust lines')) )
 
-document.thefactory.register( Line )
+document.thefactory.register(Line)

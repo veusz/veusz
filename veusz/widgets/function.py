@@ -48,14 +48,12 @@ class FunctionPlotter(GenericPlotter):
             'steps',
             50,
             minval = 3,
-            descr = _('Number of steps to evaluate the function'
-                      ' over'),
+            descr = _('Number of steps to evaluate the function over'),
             usertext=_('Steps'), formatting=True), 0 )
         s.add( setting.Choice(
             'variable', ['x', 'y'], 'x',
             descr=_('Variable the function is a function of'),
-            usertext=_('Variable')),
-               0 )
+            usertext=_('Variable')), 0 )
         s.add( setting.Str(
             'function', 'x',
             descr=_('Function expression'),
@@ -73,21 +71,21 @@ class FunctionPlotter(GenericPlotter):
 
         s.add( setting.Line(
             'Line',
-            descr = _('Function line settings'),
-            usertext = _('Plot line')),
-               pixmap = 'settings_plotline' )
+            descr=_('Function line settings'),
+            usertext=_('Plot line')),
+            pixmap='settings_plotline' )
         s.Line.get('color').newDefault('auto')
 
         s.add( setting.PlotterFill(
             'FillBelow',
-            descr = _('Fill below/left function'),
-            usertext = _('Fill below')),
-               pixmap = 'settings_plotfillbelow' )
+            descr=_('Fill below/left function'),
+            usertext=_('Fill below')),
+            pixmap='settings_plotfillbelow' )
         s.add( setting.PlotterFill(
             'FillAbove',
-            descr = _('Fill mode above/right function'),
-            usertext = _('Fill above')),
-               pixmap = 'settings_plotfillabove' )
+            descr=_('Fill mode above/right function'),
+            usertext=_('Fill above')),
+            pixmap='settings_plotfillabove' )
 
     @property
     def userdescription(self):
@@ -362,7 +360,7 @@ class FunctionPlotter(GenericPlotter):
         (xpts, ypts), (pxpts, pypts) = self.calcFunctionPoints(axes, posn)
 
         return pickable.GenericPickable(
-                    self, axisnames, (xpts, ypts), (pxpts, pypts) )
+            self, axisnames, (xpts, ypts), (pxpts, pypts) )
 
     def pickPoint(self, x0, y0, bounds, distance='radial'):
         return self._pickable(bounds).pickPoint(x0, y0, bounds, distance)
@@ -395,12 +393,12 @@ class FunctionPlotter(GenericPlotter):
                 "Cannot evaluate '%s'" % s.function)
         else:
             if not s.FillBelow.hide:
-                self._fillRegion(painter, pxpts, pypts, posn, True, cliprect,
-                                 s.FillBelow)
+                self._fillRegion(
+                    painter, pxpts, pypts, posn, True, cliprect, s.FillBelow)
 
             if not s.FillAbove.hide:
-                self._fillRegion(painter, pxpts, pypts, posn, False, cliprect,
-                                 s.FillAbove)
+                self._fillRegion(
+                    painter, pxpts, pypts, posn, False, cliprect, s.FillAbove)
 
             if not s.Line.hide:
                 painter.setBrush( qt.QBrush() )

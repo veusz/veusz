@@ -52,18 +52,16 @@ class AxisBroken(axis.Axis):
         axis.Axis.addSettings(s)
 
         s.add( setting.FloatList(
-                'breakPoints',
-                [],
-                descr = _('Pairs of values to start and stop breaks'),
-                usertext = _('Break pairs'),
-                ), 4 )
+            'breakPoints',
+            [],
+            descr = _('Pairs of values to start and stop breaks'),
+            usertext = _('Break pairs')), 4 )
         s.add( setting.FloatList(
-                'breakPosns',
-                [],
-                descr = _('Positions (fractions) along axis where to break'),
-                usertext = _('Break positions'),
-                formatting=True,
-                ) )
+            'breakPosns',
+            [],
+            descr = _('Positions (fractions) along axis where to break'),
+            usertext = _('Break positions'),
+            formatting=True) )
 
     def switchBreak(self, num, posn, otherposition=None):
         """Switch to break given (or None to disable)."""
@@ -351,12 +349,14 @@ class AxisBroken(axis.Axis):
                 self.switchBreak(i, parentposn)
                 if not s.MinorGridLines.hide:
                     coordminorticks = self._graphToPlotter(self.minorticklist[i])
-                    self._drawGridLines('MinorGridLines', painter, coordminorticks,
-                                        parentposn)
+                    self._drawGridLines(
+                        'MinorGridLines', painter, coordminorticks,
+                        parentposn)
                 if not s.GridLines.hide:
                     coordticks = self._graphToPlotter(self.majorticklist[i])
-                    self._drawGridLines('GridLines', painter, coordticks,
-                                        parentposn)
+                    self._drawGridLines(
+                        'GridLines', painter, coordticks,
+                        parentposn)
 
             self.switchBreak(None, parentposn)
             painter.restore()
@@ -406,9 +406,10 @@ class AxisBroken(axis.Axis):
             # plot tick labels
             suppresstext = self._suppressText(painter, parentposn, outerbounds)
             if not s.TickLabels.hide and not suppresstext:
-                self._drawTickLabels(phelper, painter, coordticks, sign,
-                                     outerbounds, self.majorticklist[i],
-                                     texttorender)
+                self._drawTickLabels(
+                    phelper, painter, coordticks, sign,
+                    outerbounds, self.majorticklist[i],
+                    texttorender)
 
             # this is the maximum delta of any of the breaks
             max_delta = max(max_delta, self._delta_axis)
@@ -424,8 +425,8 @@ class AxisBroken(axis.Axis):
 
         # make control item for axis
         phelper.setControlGraph(self, [ controlgraph.ControlAxisLine(
-                    self, phelper, self.settings.direction, self.coordParr1,
-                    self.coordParr2, self.coordPerp, posn) ])
+            self, phelper, self.settings.direction, self.coordParr1,
+            self.coordParr2, self.coordPerp, posn) ])
 
 # allow the factory to instantiate the widget
-document.thefactory.register( AxisBroken )
+document.thefactory.register(AxisBroken)

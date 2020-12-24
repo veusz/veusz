@@ -69,68 +69,85 @@ class Ternary(NonOrthGraph):
         '''Construct list of settings.'''
         NonOrthGraph.addSettings(s)
 
-        s.add( setting.Choice('mode',
-                              ('percentage', 'fraction'),
-                              'percentage',
-                              descr=_('Show percentages or fractions'),
-                              usertext=_('Mode')) )
+        s.add( setting.Choice(
+            'mode',
+            ('percentage', 'fraction'),
+            'percentage',
+            descr=_('Show percentages or fractions'),
+            usertext=_('Mode')) )
 
-        s.add( setting.Choice('coords',
-                              ('bottom-left', 'bottom-right',
-                               'left-bottom', 'left-right',
-                               'right-left', 'right-bottom'),
-                              'bottom-left',
-                              descr=_('Axes to use for plotting coordinates'),
-                              usertext=_('Coord system')) )
+        s.add( setting.Choice(
+            'coords',
+            (
+                'bottom-left', 'bottom-right',
+                'left-bottom', 'left-right',
+                'right-left', 'right-bottom'
+            ),
+            'bottom-left',
+            descr=_('Axes to use for plotting coordinates'),
+            usertext=_('Coord system')) )
 
-        s.add( setting.Str('labelbottom', '',
-                           descr=_('Bottom axis label text'),
-                           usertext=_('Label bottom')) )
-        s.add( setting.Str('labelleft', '',
-                           descr=_('Left axis label text'),
-                           usertext=_('Label left')) )
-        s.add( setting.Str('labelright', '',
-                           descr=_('Right axis label text'),
-                           usertext=_('Label right')) )
+        s.add( setting.Str(
+            'labelbottom', '',
+            descr=_('Bottom axis label text'),
+            usertext=_('Label bottom')) )
+        s.add( setting.Str(
+            'labelleft', '',
+            descr=_('Left axis label text'),
+            usertext=_('Label left')) )
+        s.add( setting.Str(
+            'labelright', '',
+            descr=_('Right axis label text'),
+            usertext=_('Label right')) )
 
-        s.add( setting.Float('originleft', 0.,
-                             descr=_('Fractional origin of left axis at its top'),
-                             usertext=_('Left origin')) )
-        s.add( setting.Float('originbottom', 0.,
-                             descr=_('Fractional origin of bottom axis at its left'),
-                             usertext=_('Bottom origin')) )
-        s.add( setting.Float('fracsize', 1.,
-                             descr=_('Fractional size of plot'),
-                             usertext=_('Size')) )
+        s.add( setting.Float(
+            'originleft', 0.,
+            descr=_('Fractional origin of left axis at its top'),
+            usertext=_('Left origin')) )
+        s.add( setting.Float(
+            'originbottom', 0.,
+            descr=_('Fractional origin of bottom axis at its left'),
+            usertext=_('Bottom origin')) )
+        s.add( setting.Float(
+            'fracsize', 1.,
+            descr=_('Fractional size of plot'),
+            usertext=_('Size')) )
 
-        s.add( setting.Bool('reverse', False,
-                            descr=_('Reverse axes'),
-                            usertext=_('Reverse')) )
+        s.add( setting.Bool(
+            'reverse', False,
+            descr=_('Reverse axes'),
+            usertext=_('Reverse')) )
 
-        s.add( AxisLabel('Label',
-                         descr = _('Axis label settings'),
-                         usertext = _('Axis label')),
-               pixmap='settings_axislabel' )
-        s.add( TickLabel('TickLabels',
-                         descr = _('Tick label settings'),
-                         usertext = _('Tick labels')),
-               pixmap='settings_axisticklabels' )
-        s.add( MajorTick('MajorTicks',
-                         descr = _('Major tick line settings'),
-                         usertext = _('Major ticks')),
-               pixmap='settings_axismajorticks' )
-        s.add( MinorTick('MinorTicks',
-                         descr = _('Minor tick line settings'),
-                         usertext = _('Minor ticks')),
-               pixmap='settings_axisminorticks' )
-        s.add( GridLine('GridLines',
-                        descr = _('Grid line settings'),
-                        usertext = _('Grid lines')),
-               pixmap='settings_axisgridlines' )
-        s.add( MinorGridLine('MinorGridLines',
-                             descr = _('Minor grid line settings'),
-                             usertext = _('Grid lines for minor ticks')),
-               pixmap='settings_axisminorgridlines' )
+        s.add( AxisLabel(
+            'Label',
+            descr=_('Axis label settings'),
+            usertext=_('Axis label')),
+            pixmap='settings_axislabel' )
+        s.add( TickLabel(
+            'TickLabels',
+            descr=_('Tick label settings'),
+            usertext=_('Tick labels')),
+            pixmap='settings_axisticklabels' )
+        s.add( MajorTick(
+            'MajorTicks',
+            descr=_('Major tick line settings'),
+            usertext=_('Major ticks')),
+            pixmap='settings_axismajorticks' )
+        s.add( MinorTick(
+            'MinorTicks',
+            descr=_('Minor tick line settings'),
+            usertext=_('Minor ticks')),
+            pixmap='settings_axisminorticks' )
+        s.add( GridLine(
+            'GridLines',
+            descr=_('Grid line settings'),
+            usertext=_('Grid lines')),
+            pixmap='settings_axisgridlines' )
+        s.add( MinorGridLine(
+            'MinorGridLines',
+            descr=_('Minor grid line settings'),
+            usertext=_('Grid lines for minor ticks')),
+            pixmap='settings_axisminorgridlines' )
 
         s.get('leftMargin').newDefault('1cm')
         s.get('rightMargin').newDefault('1cm')
@@ -248,10 +265,12 @@ class Ternary(NonOrthGraph):
             widthh = height / math.tan(d60)
 
         # box for equilateral triangle
-        self._box = ( (bounds[2]+bounds[0])/2 - widthh,
-                      (bounds[1]+bounds[3])/2 - height/2,
-                      (bounds[2]+bounds[0])/2 + widthh,
-                      (bounds[1]+bounds[3])/2 + height/2 )
+        self._box = (
+            (bounds[2]+bounds[0])/2 - widthh,
+            (bounds[1]+bounds[3])/2 - height/2,
+            (bounds[2]+bounds[0])/2 + widthh,
+            (bounds[1]+bounds[3])/2 + height/2
+        )
         self._width = widthh*2
         self._height = height
 
@@ -264,8 +283,8 @@ class Ternary(NonOrthGraph):
         path = qt.QPainterPath()
         path.addPolygon(p)
         path.closeSubpath()
-        utils.brushExtFillPath(painter, s.Background, path,
-                               stroke=s.Border.makeQPenWHide(painter))
+        utils.brushExtFillPath(
+            painter, s.Background, path, stroke=s.Border.makeQPenWHide(painter))
 
         # work out origins and size
         self._size = max(min(s.fracsize, 1.), 0.)
@@ -287,21 +306,24 @@ class Ternary(NonOrthGraph):
         d = 1e-6
 
         # get ticks along left axis
-        atickleft = AxisTicks(self._orgleft-d, self._orgleft+self._size+d,
-                              s.MajorTicks.number, s.MinorTicks.number,
-                              extendmin=False, extendmax=False)
+        atickleft = AxisTicks(
+            self._orgleft-d, self._orgleft+self._size+d,
+            s.MajorTicks.number, s.MinorTicks.number,
+            extendmin=False, extendmax=False)
         atickleft.getTicks()
         # use the interval from above to calculate ticks for right
-        atickright = AxisTicks(self._orgright-d, self._orgright+self._size+d,
-                               s.MajorTicks.number, s.MinorTicks.number,
-                               extendmin=False, extendmax=False,
-                               forceinterval = atickleft.interval)
+        atickright = AxisTicks(
+            self._orgright-d, self._orgright+self._size+d,
+            s.MajorTicks.number, s.MinorTicks.number,
+            extendmin=False, extendmax=False,
+            forceinterval = atickleft.interval)
         atickright.getTicks()
         # then calculate for bottom
-        atickbot = AxisTicks(self._orgbot-d, self._orgbot+self._size+d,
-                             s.MajorTicks.number, s.MinorTicks.number,
-                             extendmin=False, extendmax=False,
-                             forceinterval = atickleft.interval)
+        atickbot = AxisTicks(
+            self._orgbot-d, self._orgbot+self._size+d,
+            s.MajorTicks.number, s.MinorTicks.number,
+            extendmin=False, extendmax=False,
+            forceinterval = atickleft.interval)
         atickbot.getTicks()
 
         return atickbot, atickleft, atickright
@@ -509,8 +531,9 @@ class Ternary(NonOrthGraph):
                 doc=self.document)
 
             painter.save()
-            painter.translate(self._box[0]+self._width*0.75 ,
-                              0.5*(self._box[1]+self._box[3]) )
+            painter.translate(
+                self._box[0]+self._width*0.75 ,
+                0.5*(self._box[1]+self._box[3]) )
             painter.rotate(60)
             painter.translate(-aoffset, -ldelta - off)
             r.render()
@@ -525,13 +548,15 @@ class Ternary(NonOrthGraph):
         tbot, tleft, tright = self._computeTickVals()
 
         # draw the major ticks
-        self._drawTickSet(painter, s.MajorTicks, s.GridLines,
-                          tbot.tickvals, tleft.tickvals, tright.tickvals,
-                          tickLabelSetn=s.TickLabels,
-                          labelSetn=s.Label)
+        self._drawTickSet(
+            painter, s.MajorTicks, s.GridLines,
+            tbot.tickvals, tleft.tickvals, tright.tickvals,
+            tickLabelSetn=s.TickLabels,
+            labelSetn=s.Label)
 
         # now draw the minor ones
-        self._drawTickSet(painter, s.MinorTicks, s.MinorGridLines,
-                          tbot.minorticks, tleft.minorticks, tright.minorticks)
+        self._drawTickSet(
+            painter, s.MinorTicks, s.MinorGridLines,
+            tbot.minorticks, tleft.minorticks, tright.minorticks)
 
 document.thefactory.register(Ternary)
