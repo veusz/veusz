@@ -22,7 +22,6 @@ This allows the user to send a bug report.'''
 import sys
 import time
 import traceback
-import re
 import base64
 from urllib import request
 

@@ -1,6 +1,5 @@
 # automate building the binary installer on windows
 
-import sys
 import shutil
 import os.path
 import os

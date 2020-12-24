@@ -20,7 +20,6 @@
 
 import os.path
 import random
-import math
 import codecs
 import re
 import sys

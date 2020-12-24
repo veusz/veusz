@@ -1027,7 +1027,6 @@ class PartTilde(Part):
         font = state.font
         size = font.pointSizeF()
         height = state.fontMetrics().capHeight()
-        linewidth = state.fontMetrics().lineWidth()
 
         font.setPointSizeF(size*0.7)
         state.painter.setFont(font)

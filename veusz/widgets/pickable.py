@@ -21,8 +21,6 @@
 
 import numpy as N
 
-from .. import document
-
 class PickInfo:
     """Encapsulates the results of a Pick operation. graphpos and coords are
        numeric (x,y) tuples, labels are the textual labels for the x and y

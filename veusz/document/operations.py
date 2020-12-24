@@ -1174,7 +1174,6 @@ class OperationLoadStyleSheet(OperationMultiple):
         # fire up interpreter to read file
         interpreter = commandinterpreter.CommandInterpreter(document)
         try:
-            mode = 'r' if cpy3 else 'rU'
             interpreter.runFile( io.open(
                 self.filename, 'r', encoding='utf8') )
         except:

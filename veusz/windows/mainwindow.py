@@ -21,7 +21,6 @@
 import os
 import os.path
 import sys
-import glob
 import re
 import datetime
 

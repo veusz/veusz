@@ -25,7 +25,6 @@ import io
 import numpy as N
 
 from .. import qtall as qt
-from .. import setting
 from .. import utils
 
 from .commandinterface import CommandInterface

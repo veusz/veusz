@@ -23,7 +23,6 @@
 import os
 
 from .. import qtall as qt
-from .. import document
 from .veuszdialog import VeuszDialog
 
 def _(text, disambiguation=None, context="ReloadDialog"):

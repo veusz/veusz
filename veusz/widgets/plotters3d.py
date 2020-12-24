@@ -19,7 +19,6 @@
 """Generic 3D plotting widet."""
 
 from .. import qtall as qt
-import numpy as N
 
 from .. import setting
 from . import widget

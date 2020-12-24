@@ -20,7 +20,6 @@
 """
 
 from .. import qtall as qt
-from .. import setting
 from .. import utils
 
 try:

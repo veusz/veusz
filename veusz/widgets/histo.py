@@ -21,7 +21,6 @@
 import numpy as N
 
 from .. import qtall as qt
-from .. import datasets
 from .. import document
 from .. import setting
 from .. import utils

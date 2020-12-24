@@ -25,7 +25,6 @@ see the file INSTALL for details on how to install Veusz
 
 import glob
 import os.path
-import sys
 import numpy
 
 import setuptools

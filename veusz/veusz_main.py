@@ -21,7 +21,6 @@
 '''Main Veusz executable.'''
 
 import sys
-import os.path
 import signal
 import argparse
 

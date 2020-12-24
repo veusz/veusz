@@ -16,7 +16,6 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-from collections import defaultdict
 import os.path
 import re
 import datetime
@@ -206,7 +205,7 @@ class Evaluate:
                     except Exception:
                         self.doc.log(_(
                             "Failed to import '%s' from module '%s'") % (
-                                ', '.join(toimport), module))
+                                ', '.join(symbols), module))
                         return
                 else:
                     defn = 'import %s' % module
