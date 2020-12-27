@@ -162,12 +162,9 @@ class build_ext(distutils.command.build_ext.build_ext):
         """
 
         infix = build_cmd.qt_libinfix
-        print(infix)
         if infix is not None:
-            print("not None")
             return infix
         if 'QT_LIBINFIX' in os.environ:
-            print("QT_LIBINFIX")
             return os.environ['QT_LIBINFIX']
 
         # use this to find location of qconfig file
@@ -175,7 +172,6 @@ class build_ext(distutils.command.build_ext.build_ext):
         archdir = read_command_output(
             [self._get_qmake(build_cmd), '-query', 'QT_INSTALL_ARCHDATA'])
         qconfig = os.path.join(archdir, 'mkspecs', 'qconfig.pri')
-        #qconfig = os.path.join("/mnt/c/Qt/5.13.0/msvc2017", 'mkspecs', 'qconfig.pri')
 
         libinfix = ''
         for line in open(qconfig):
