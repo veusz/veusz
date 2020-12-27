@@ -168,7 +168,6 @@ class build_ext(distutils.command.build_ext.build_ext):
             return os.environ['QT_LIBINFIX']
 
         # use this to find location of qconfig file
-        print(build_cmd)
         archdir = read_command_output(
             [self._get_qmake(build_cmd), '-query', 'QT_INSTALL_ARCHDATA'])
         qconfig = os.path.join(archdir, 'mkspecs', 'qconfig.pri')
