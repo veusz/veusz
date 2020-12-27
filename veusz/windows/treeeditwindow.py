@@ -298,6 +298,44 @@ class SettingsProxyMulti(SettingsProxy):
         self.document.applyOperation(
             document.OperationMultiple(ops, descr=_("reset to default")))
 
+class VisibilityButton(qt.QPushButton):
+    """Button for toggling 'hide' settings."""
+
+    def __init__(self, setnsproxy, setn, *args, **argsv):
+        qt.QPushButton.__init__(self, *args, **argsv)
+        self.setContentsMargins(0,0,0,0)
+        self.setSizePolicy(
+            qt.QSizePolicy.Minimum, qt.QSizePolicy.Minimum)
+        self.setIconSize(qt.QSize(24,12))
+        self.setFlat(True)
+        self.setFocusPolicy(qt.Qt.NoFocus)
+
+        self.setnsproxy = setnsproxy
+        self.setn = setn
+
+        setn.setOnModified(self.updateIcon)
+
+        self.updateIcon()
+        self.clicked.connect(self.onClicked)
+
+    def updateIcon(self):
+        """Update state given current setting."""
+        hidden = self.setn.get()
+        if hidden:
+            icon = 'veusz-eye-grey'
+            tooltip = _('Hidden (click to show)')
+        else:
+            icon = 'veusz-eye'
+            tooltip = _('Visible (click to hide)')
+
+        self.setIcon(utils.getIcon(icon))
+        self.setToolTip(tooltip)
+
+    def onClicked(self):
+        """Toggle the setting."""
+        hidden = self.setn.get()
+        self.setnsproxy.onSettingChanged(None, self.setn, not hidden)
+
 class PropertyList(qt.QWidget):
     """Edit the widget properties using a set of controls."""
 
@@ -444,14 +482,36 @@ class PropertyList(qt.QWidget):
         self.setncntrls = {}
         self.layout.setEnabled(False)
 
+        # list of settings to show
+        setlist = setnsproxy.childProxyList()
+        names = [x.name for x in setlist]
+
+        # we special case hide by always showing it at the top
+        try:
+            hideidx = names.index('hide')
+        except ValueError:
+            hideidx = None
+
         # add a title if requested
         if title is not None:
             lab = qt.QLabel(
                 title[0],
+                toolTip=title[1] )
+            lab.setSizePolicy(
+                qt.QSizePolicy.Expanding, qt.QSizePolicy.Minimum)
+
+            titlewidget = qt.QFrame(
                 frameShape=qt.QFrame.Panel,
                 frameShadow=qt.QFrame.Sunken,
-                toolTip=title[1] )
-            self.layout.addWidget(lab, row, 0, 1, -1)
+            )
+            tlayout = qt.QHBoxLayout()
+            tlayout.addWidget(lab)
+            if hideidx is not None:
+                button = VisibilityButton(setnsproxy, setlist[hideidx])
+                tlayout.addWidget(button)
+            titlewidget.setLayout(tlayout)
+
+            self.layout.addWidget(titlewidget, row, 0, 1, -1)
             row += 1
 
         # add actions if parent is widget
@@ -465,6 +525,7 @@ class PropertyList(qt.QWidget):
             row += 1
             self.childlist.append(tabbed)
         else:
+
             def addrow(setn):
                 # only add if formatting setting and formatting allowed
                 # and not formatting and not formatting not allowed
@@ -479,21 +540,13 @@ class PropertyList(qt.QWidget):
                        not onlyformatting ):
                     row = self._addGroupedSettingsControl(setn, row)
 
-            setlist = setnsproxy.childProxyList()
-            names = [x.name for x in setlist]
-
-            # we special case hide by always showing it at the top
-            try:
-                hideidx = names.index('hide')
-            except ValueError:
-                hideidx = None
-            if hideidx is not None:
-                addrow(setlist[hideidx])
-
             # else add settings proper as a list
             for name, setn in zip(names, setlist):
                 if name != 'hide':
                     addrow(setn)
+
+            if hideidx is not None:
+                addrow(setlist[hideidx])
 
         # add empty widget to take rest of space
         w = qt.QWidget( sizePolicy=qt.QSizePolicy(
