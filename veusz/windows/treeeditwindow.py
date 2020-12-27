@@ -58,6 +58,7 @@ class SettingsProxy(object):
     def onAction(self, action, console):
         """Called if action pressed. Console window is given."""
 
+    @property
     def name(self):
         """Return name of Settings."""
 
@@ -122,6 +123,7 @@ class SettingsProxySingle(SettingsProxy):
         """Run action on console."""
         console.runFunction(action.function)
 
+    @property
     def name(self):
         """Return name."""
         return self.settings.name
@@ -262,6 +264,7 @@ class SettingsProxyMulti(SettingsProxy):
                 if a.name == aname:
                     console.runFunction(a.function)
 
+    @property
     def name(self):
         return self._settingsatlevel[0].name
 
@@ -462,12 +465,10 @@ class PropertyList(qt.QWidget):
             row += 1
             self.childlist.append(tabbed)
         else:
-            # else add settings proper as a list
-            for setn in setnsproxy.childProxyList():
-
-                # add setting
+            def addrow(setn):
                 # only add if formatting setting and formatting allowed
                 # and not formatting and not formatting not allowed
+                nonlocal row
                 if ( isinstance(setn, setting.Setting) and (
                         (setn.formatting and (showformatting or onlyformatting))
                         or (not setn.formatting and not onlyformatting)) and
@@ -477,6 +478,22 @@ class PropertyList(qt.QWidget):
                        setn.setnsmode() == 'groupedsetting' and
                        not onlyformatting ):
                     row = self._addGroupedSettingsControl(setn, row)
+
+            setlist = setnsproxy.childProxyList()
+            names = [x.name for x in setlist]
+
+            # we special case hide by always showing it at the top
+            try:
+                hideidx = names.index('hide')
+            except ValueError:
+                hideidx = None
+            if hideidx is not None:
+                addrow(setlist[hideidx])
+
+            # else add settings proper as a list
+            for name, setn in zip(names, setlist):
+                if name != 'hide':
+                    addrow(setn)
 
         # add empty widget to take rest of space
         w = qt.QWidget( sizePolicy=qt.QSizePolicy(
@@ -547,7 +564,7 @@ class TabbedFormatting(qt.QTabWidget):
                     pixmap = subset.pixmap()
                 else:
                     pixmap = None
-                tabname = subset.name()
+                tabname = subset.name
                 tooltip = title = subset.usertext()
 
             # hide name in tab
