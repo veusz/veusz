@@ -17,6 +17,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
+        sudo apt-get -y update
         sudo apt-get -y install \
           libqt5core5a libqt5dbus5 libqt5gui5 libqt5svg5 libqt5widgets5 libqt5xml5 \
           python3-all python3-astropy python3-h5py python3-pyqt5 python3-pyqt5.qtsvg \
