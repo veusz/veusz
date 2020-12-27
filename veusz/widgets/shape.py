@@ -382,6 +382,155 @@ class ImageFile(BoxShape):
             # finally draw image
             painter.drawImage(rect, image, irect)
 
+class SVGFile(BoxShape):
+    """Draw an scalable vector graphic."""
+
+    typename = 'svgfile'
+    description = _('Scalable vector graphic file')
+    allowusercreation = True
+
+    def __init__(self, parent, name=None):
+        BoxShape.__init__(self, parent, name=name)
+
+        self.cacheimage = None
+        self.cachefilename = None
+        self.cachestat = None
+        self.cacheembeddata = None
+
+        self.addAction( widget.Action('embed', self.actionEmbed,
+                                      descr = _('Embed scalable vector graphic in Veusz document '
+                                                'to remove dependency on external file'),
+                                      usertext = _('Embed SVG')) )
+
+    @classmethod
+    def addSettings(klass, s):
+        """Construct list of settings."""
+        BoxShape.addSettings(s)
+
+        s.add( setting.SVGFilename('filename', '',
+                                     descr=_('SVG filename'),
+                                     usertext=_('Filename'),
+                                     formatting=False),
+               posn=0 )
+
+        s.add( setting.Str('embeddedSVGData', '',
+                           descr=_('Embedded scalable vector graphic data, '
+                                   'used if filename set to {embedded}'),
+                           usertext=_('Embedded data'),
+                           hidden=True) )
+
+        s.add( setting.Bool('aspect', True,
+                            descr=_('Preserve aspect ratio'),
+                            usertext=_('Preserve aspect'),
+                            formatting=True),
+               posn=0 )
+        s.Border.get('hide').newDefault(True)
+
+    def actionEmbed(self):
+        """Embed external vector graphic into veusz document."""
+
+        s = self.settings
+
+        if s.filename == '{embedded}':
+            print("Data already embedded")
+            return
+
+        # get data from external file
+        try:
+            f = open(s.filename, 'rb')
+            data = f.read()
+            f.close()
+        except EnvironmentError:
+            print("Could not find file. Not embedding.")
+            return
+
+        # convert to base 64 to make it nicer in the saved file
+        encoded = codecs.encode(data, 'base64').decode('ascii')
+
+        # now put embedded data in hidden setting
+        ops = [
+            document.OperationSettingSet(s.get('filename'), '{embedded}'),
+            document.OperationSettingSet(s.get('embeddedSVGData'),
+                                         encoded)
+            ]
+        self.document.applyOperation(
+            document.OperationMultiple(ops, descr=_('embed SVG')) )
+
+    def updateCachedImage(self):
+        """Update cache."""
+        s = self.settings
+        self.cachestat = os.stat(s.filename)
+        self.cacheimage = qt.QSvgRenderer(s.filename)
+        self.cachefilename = s.filename
+
+    def updateCachedEmbedded(self):
+        """Update cached image from embedded data."""
+        s = self.settings
+        self.cacheimage = qt.QSvgRenderer()
+
+        # convert the embedded data from base64 and load into the SVG image
+        binarized = qt.QByteArray.fromBase64(s.embeddedSVGData.encode('ascii'))
+        self.cacheimage.load(binarized)
+
+        # we cache the data we have decoded
+        self.cacheembeddata = s.embeddedSVGData
+
+    def drawShape(self, painter, rect):
+        """Draw image."""
+        s = self.settings
+
+        # draw border and fill
+        painter.drawRect(rect)
+
+        # check to see whether image needs reloading
+        image = None
+        if s.filename != '' and os.path.isfile(s.filename):
+            if (self.cachefilename != s.filename or
+                os.stat(s.filename) != self.cachestat):
+                # update the image cache
+                self.updateCachedImage()
+                # clear any embedded image data
+                self.settings.get('embeddedSVGData').set('')
+            image = self.cacheimage
+
+        # or needs recreating from embedded data
+        if s.filename == '{embedded}':
+            if s.embeddedSVGData is not self.cacheembeddata:
+                self.updateCachedEmbedded()
+            image = self.cacheimage
+
+        # if no image, then use default image
+        if ( not image or not image.isValid() or
+             image.viewBox().width() == 0 or image.viewBox().height() == 0 ):
+            # load replacement image
+            fname = os.path.join(utils.imagedir, 'button_svgfile.svg')
+            r = qt.QSvgRenderer(fname)
+            r.render(painter, rect)
+
+        else:
+            # image rectangle
+            irect = qt.QRectF(image.viewBox())
+
+            # preserve aspect ratio
+            if s.aspect:
+                xr = rect.width() / irect.width()
+                yr = rect.height() / irect.height()
+
+                if xr > yr:
+                    rect = qt.QRectF(
+                        rect.left()+(rect.width()-irect.width()*yr)*0.5,
+                        rect.top(), irect.width()*yr, rect.height())
+                else:
+                    rect = qt.QRectF(
+                        rect.left(),
+                        rect.top()+(rect.height()-irect.height()*xr)*0.5,
+                        rect.width(), irect.height()*xr)
+
+            # finally draw image
+            # painter.drawImage(rect, image, irect)
+            image.render(painter, rect)
+
 document.thefactory.register( Ellipse )
 document.thefactory.register( Rectangle )
 document.thefactory.register( ImageFile )
+document.thefactory.register( SVGFile )

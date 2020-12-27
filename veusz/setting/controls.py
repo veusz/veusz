@@ -1790,6 +1790,10 @@ class Filename(qt.QWidget):
             title = _('Choose image')
             filefilter = ("Images (*.png *.jpg *.jpeg *.bmp *.svg *.tiff *.tif "
                           "*.gif *.xbm *.xpm);;" + filefilter)
+        
+        elif self.mode == 'svg':
+            title = _('Chose SVG file')
+            filefilter = ("Images (*.svg);;" + filefilter)
 
         retn = qt.QFileDialog.getOpenFileName(
             self, title, self.edit.text(), filefilter)
