@@ -505,10 +505,11 @@ class PropertyList(qt.QWidget):
                 frameShadow=qt.QFrame.Sunken,
             )
             tlayout = qt.QHBoxLayout()
-            tlayout.addWidget(lab)
             if hideidx is not None:
                 button = VisibilityButton(setnsproxy, setlist[hideidx])
                 tlayout.addWidget(button)
+            tlayout.addWidget(lab)
+            tlayout.setContentsMargins(0,0,0,0)
             titlewidget.setLayout(tlayout)
 
             self.layout.addWidget(titlewidget, row, 0, 1, -1)
