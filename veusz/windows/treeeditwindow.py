@@ -21,6 +21,7 @@
 and formatting properties."""
 
 from __future__ import division
+import functools
 
 from ..compat import crange, citems
 from .. import qtall as qt
@@ -487,25 +488,18 @@ class PropertyList(qt.QWidget):
         names = [x.name for x in setlist]
 
         # we special case hide by always showing it at the top
-        try:
-            hideidx = names.index('hide')
-        except ValueError:
-            hideidx = None
+        hideidx = utils.listIndex(names, 'hide')
 
         # add a title if requested
         if title is not None:
-            lab = qt.QLabel(
-                title[0],
-                toolTip=title[1] )
+            lab = qt.QLabel(title[0], toolTip=title[1])
             lab.setSizePolicy(
                 qt.QSizePolicy.Expanding, qt.QSizePolicy.Minimum)
 
             titlewidget = qt.QFrame(
-                frameShape=qt.QFrame.Panel,
-                frameShadow=qt.QFrame.Sunken,
-            )
+                frameShape=qt.QFrame.Panel, frameShadow=qt.QFrame.Sunken)
             tlayout = qt.QHBoxLayout()
-            if hideidx is not None:
+            if hideidx >= 0:
                 button = VisibilityButton(setnsproxy, setlist[hideidx])
                 tlayout.addWidget(button)
             tlayout.addWidget(lab)
@@ -546,7 +540,7 @@ class PropertyList(qt.QWidget):
                 if name != 'hide':
                     addrow(setn)
 
-            if hideidx is not None:
+            if hideidx >= 0:
                 addrow(setlist[hideidx])
 
         # add empty widget to take rest of space
@@ -600,11 +594,20 @@ class TabbedFormatting(qt.QTabWidget):
         # tabs which have been initialized
         self.tabinit = set()
 
-        # add tab for each subsettings
+        # for modifiying tab icons depending on hidden status
+        hide_mapper = qt.QSignalMapper(self)
+        self.hide_map = {}
+
         for subset in setnslist:
             if subset.setnsmode() not in ('formatting', 'widgetsettings'):
                 continue
             self.tabsubsetns.append(subset)
+
+            hidesetn = None
+            for s in subset.settingList():
+                if s.name == 'hide':
+                    hidesetn = s
+                    break
 
             # details of tab
             if subset is setnsproxy:
@@ -629,8 +632,28 @@ class TabbedFormatting(qt.QTabWidget):
             self.tabtooltips.append(tooltip)
 
             # create tab
-            indx = self.addTab(qt.QWidget(), utils.getIcon(pixmap), tabname)
+            indx = self.addTab(qt.QWidget(), tabname)
+
+            # tab icon updates to visible/invisible depending on
+            # whether subsetting is hidden or not
+            if hidesetn is not None:
+                hidesetn.onmodified.onModified.connect(
+                    hide_mapper.map)
+                hide_mapper.setMapping(hidesetn.onmodified, indx)
+                self.hide_map[indx] = (pixmap, hidesetn)
+
+            self.updateIcon(indx)
             self.setTabToolTip(indx, tooltip)
+
+        hide_mapper.mapped[int].connect(self.updateIcon)
+
+    def updateIcon(self, indx):
+        """Update icon for tab, depending on status of hide setting."""
+        pixmap, hidesetn = self.hide_map[indx]
+        icon = utils.getIcon(pixmap)
+        if hidesetn is not None and hidesetn.get():
+            icon = qt.QIcon(utils.DisabledIconEngine(icon))
+        self.setTabIcon(indx, icon)
 
     def slotCurrentChanged(self, tab):
         """Lazy loading of tab when displayed."""
