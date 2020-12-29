@@ -1792,7 +1792,7 @@ class Filename(qt.QWidget):
                           "*.gif *.xbm *.xpm);;" + filefilter)
         
         elif self.mode == 'svg':
-            title = _('Chose SVG file')
+            title = _('Choose SVG file')
             filefilter = ("Images (*.svg);;" + filefilter)
 
         retn = qt.QFileDialog.getOpenFileName(
