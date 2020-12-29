@@ -324,10 +324,10 @@ class VisibilityButton(qt.QPushButton):
         hidden = self.setn.get()
         if hidden:
             icon = 'veusz-eye-grey'
-            tooltip = _('Hidden (click to show)')
+            tooltip = _('Hidden (click to show; set hide to False)')
         else:
             icon = 'veusz-eye'
-            tooltip = _('Visible (click to hide)')
+            tooltip = _('Visible (click to hide; set hide to True)')
 
         self.setIcon(utils.getIcon(icon))
         self.setToolTip(tooltip)
