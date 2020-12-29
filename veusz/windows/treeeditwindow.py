@@ -498,13 +498,14 @@ class PropertyList(qt.QWidget):
 
             titlewidget = qt.QFrame(
                 frameShape=qt.QFrame.Panel, frameShadow=qt.QFrame.Sunken)
-            tlayout = qt.QHBoxLayout()
+            titlelayout = qt.QHBoxLayout()
+            titlelayout.setSpacing(0)
             if hideidx >= 0:
                 button = VisibilityButton(setnsproxy, setlist[hideidx])
-                tlayout.addWidget(button)
-            tlayout.addWidget(lab)
-            tlayout.setContentsMargins(0,0,0,0)
-            titlewidget.setLayout(tlayout)
+                titlelayout.addWidget(button)
+            titlelayout.addWidget(lab)
+            titlelayout.setContentsMargins(0,0,0,0)
+            titlewidget.setLayout(titlelayout)
 
             self.layout.addWidget(titlewidget, row, 0, 1, -1)
             row += 1
@@ -640,8 +641,8 @@ class TabbedFormatting(qt.QTabWidget):
                 hidesetn.onmodified.onModified.connect(
                     hide_mapper.map)
                 hide_mapper.setMapping(hidesetn.onmodified, indx)
-                self.hide_map[indx] = (pixmap, hidesetn)
 
+            self.hide_map[indx] = (pixmap, hidesetn)
             self.updateIcon(indx)
             self.setTabToolTip(indx, tooltip)
 
