@@ -857,7 +857,7 @@ class TreeEditDock(qt.QDockWidget):
                 'xy', 'bar', 'histo', 'fit', 'function', 'boxplot',
                 'image', 'contour', 'vectorfield',
                 'key', 'label', 'colorbar',
-                'rect', 'ellipse', 'imagefile',
+                'rect', 'ellipse', 'imagefile', 'svgfile',
                 'line', 'polygon', 'polar', 'ternary',
                 'nonorthpoint', 'nonorthfunc',
                 'covariance',
@@ -968,6 +968,7 @@ class TreeEditDock(qt.QDockWidget):
                     'add.ellipse',
                     'add.line',
                     'add.imagefile',
+                    'add.svgfile',
                     'add.polygon',
                     )])
         actions['add.shapemenu'].setMenu(shapemenu)

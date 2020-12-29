@@ -1715,6 +1715,14 @@ class ImageFilename(Filename):
     def makeControl(self, *args):
         return controls.Filename(self, 'image', *args)
 
+class SVGFilename(Filename):
+    """Represents an svg filename setting."""
+
+    typename = 'filename-svg'
+
+    def makeControl(self, *args):
+        return controls.Filename(self, 'svg', *args)
+
 class FontFamily(Str):
     """Represents a font family."""
 

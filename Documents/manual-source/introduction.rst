@@ -194,6 +194,9 @@ The widget types include
    #. :command:`imagefile` - draw an external graphs file on the graph
       or page, with size and rotation given. The centre can be given
       in axis coordinates or fractional coordinates.
+   #. :command:`svgfile` - draw an external scalable vector graphic on the graph
+      or page, with size and rotation given. The centre can be given
+      in axis coordinates or fractional coordinates.
    #. :command:`line` - draw a line with optional arrowheads on the
       graph or page. One end can be given in axis coordinates or
       fractional coordinates.
