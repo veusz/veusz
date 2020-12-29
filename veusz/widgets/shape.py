@@ -437,9 +437,8 @@ class SVGFile(BoxShape):
 
         # get data from external file
         try:
-            f = open(s.filename, 'rb')
-            data = f.read()
-            f.close()
+            with open(s.filename, 'rb') as f:
+                data = f.read()
         except EnvironmentError:
             print("Could not find file. Not embedding.")
             return
