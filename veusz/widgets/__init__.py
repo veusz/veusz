@@ -37,7 +37,7 @@ from .fit import Fit
 from .image import Image
 from .contour import Contour
 from .colorbar import ColorBar
-from .shape import Shape, BoxShape, Rectangle, Ellipse, ImageFile
+from .shape import Shape, BoxShape, Rectangle, Ellipse, ImageFile, SVGFile
 from .line import Line
 from .bar import BarPlotter
 from .polygon import Polygon
