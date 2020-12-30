@@ -21,6 +21,7 @@
 and formatting properties."""
 
 from __future__ import division
+import functools
 
 from ..compat import crange, citems
 from .. import qtall as qt
@@ -58,6 +59,7 @@ class SettingsProxy(object):
     def onAction(self, action, console):
         """Called if action pressed. Console window is given."""
 
+    @property
     def name(self):
         """Return name of Settings."""
 
@@ -122,6 +124,7 @@ class SettingsProxySingle(SettingsProxy):
         """Run action on console."""
         console.runFunction(action.function)
 
+    @property
     def name(self):
         """Return name."""
         return self.settings.name
@@ -262,6 +265,7 @@ class SettingsProxyMulti(SettingsProxy):
                 if a.name == aname:
                     console.runFunction(a.function)
 
+    @property
     def name(self):
         return self._settingsatlevel[0].name
 
@@ -294,6 +298,44 @@ class SettingsProxyMulti(SettingsProxy):
             ops.append(document.OperationSettingSet(setn, setn.default))
         self.document.applyOperation(
             document.OperationMultiple(ops, descr=_("reset to default")))
+
+class VisibilityButton(qt.QPushButton):
+    """Button for toggling 'hide' settings."""
+
+    def __init__(self, setnsproxy, setn, *args, **argsv):
+        qt.QPushButton.__init__(self, *args, **argsv)
+        self.setContentsMargins(0,0,0,0)
+        self.setSizePolicy(
+            qt.QSizePolicy.Minimum, qt.QSizePolicy.Minimum)
+        self.setIconSize(qt.QSize(24,12))
+        self.setFlat(True)
+        self.setFocusPolicy(qt.Qt.NoFocus)
+
+        self.setnsproxy = setnsproxy
+        self.setn = setn
+
+        setn.setOnModified(self.updateIcon)
+
+        self.updateIcon()
+        self.clicked.connect(self.onClicked)
+
+    def updateIcon(self):
+        """Update state given current setting."""
+        hidden = self.setn.get()
+        if hidden:
+            icon = 'veusz-eye-grey'
+            tooltip = _('Hidden (click to show; set hide to False)')
+        else:
+            icon = 'veusz-eye'
+            tooltip = _('Visible (click to hide; set hide to True)')
+
+        self.setIcon(utils.getIcon(icon))
+        self.setToolTip(tooltip)
+
+    def onClicked(self):
+        """Toggle the setting."""
+        hidden = self.setn.get()
+        self.setnsproxy.onSettingChanged(None, self.setn, not hidden)
 
 class PropertyList(qt.QWidget):
     """Edit the widget properties using a set of controls."""
@@ -441,14 +483,31 @@ class PropertyList(qt.QWidget):
         self.setncntrls = {}
         self.layout.setEnabled(False)
 
+        # list of settings to show
+        setlist = setnsproxy.childProxyList()
+        names = [x.name for x in setlist]
+
+        # we special case hide by always showing it at the top
+        hideidx = utils.listIndex(names, 'hide')
+
         # add a title if requested
         if title is not None:
-            lab = qt.QLabel(
-                title[0],
-                frameShape=qt.QFrame.Panel,
-                frameShadow=qt.QFrame.Sunken,
-                toolTip=title[1] )
-            self.layout.addWidget(lab, row, 0, 1, -1)
+            lab = qt.QLabel(title[0], toolTip=title[1])
+            lab.setSizePolicy(
+                qt.QSizePolicy.Expanding, qt.QSizePolicy.Minimum)
+
+            titlewidget = qt.QFrame(
+                frameShape=qt.QFrame.Panel, frameShadow=qt.QFrame.Sunken)
+            titlelayout = qt.QHBoxLayout()
+            titlelayout.setSpacing(0)
+            if hideidx >= 0:
+                button = VisibilityButton(setnsproxy, setlist[hideidx])
+                titlelayout.addWidget(button)
+            titlelayout.addWidget(lab)
+            titlelayout.setContentsMargins(0,0,0,0)
+            titlewidget.setLayout(titlelayout)
+
+            self.layout.addWidget(titlewidget, row, 0, 1, -1)
             row += 1
 
         # add actions if parent is widget
@@ -462,12 +521,11 @@ class PropertyList(qt.QWidget):
             row += 1
             self.childlist.append(tabbed)
         else:
-            # else add settings proper as a list
-            for setn in setnsproxy.childProxyList():
 
-                # add setting
+            def addrow(setn):
                 # only add if formatting setting and formatting allowed
                 # and not formatting and not formatting not allowed
+                nonlocal row
                 if ( isinstance(setn, setting.Setting) and (
                         (setn.formatting and (showformatting or onlyformatting))
                         or (not setn.formatting and not onlyformatting)) and
@@ -477,6 +535,14 @@ class PropertyList(qt.QWidget):
                        setn.setnsmode() == 'groupedsetting' and
                        not onlyformatting ):
                     row = self._addGroupedSettingsControl(setn, row)
+
+            # else add settings proper as a list
+            for name, setn in zip(names, setlist):
+                if name != 'hide':
+                    addrow(setn)
+
+            if hideidx >= 0:
+                addrow(setlist[hideidx])
 
         # add empty widget to take rest of space
         w = qt.QWidget( sizePolicy=qt.QSizePolicy(
@@ -529,11 +595,20 @@ class TabbedFormatting(qt.QTabWidget):
         # tabs which have been initialized
         self.tabinit = set()
 
-        # add tab for each subsettings
+        # for modifiying tab icons depending on hidden status
+        hide_mapper = qt.QSignalMapper(self)
+        self.hide_map = {}
+
         for subset in setnslist:
             if subset.setnsmode() not in ('formatting', 'widgetsettings'):
                 continue
             self.tabsubsetns.append(subset)
+
+            hidesetn = None
+            for s in subset.settingList():
+                if s.name == 'hide':
+                    hidesetn = s
+                    break
 
             # details of tab
             if subset is setnsproxy:
@@ -547,7 +622,7 @@ class TabbedFormatting(qt.QTabWidget):
                     pixmap = subset.pixmap()
                 else:
                     pixmap = None
-                tabname = subset.name()
+                tabname = subset.name
                 tooltip = title = subset.usertext()
 
             # hide name in tab
@@ -558,8 +633,28 @@ class TabbedFormatting(qt.QTabWidget):
             self.tabtooltips.append(tooltip)
 
             # create tab
-            indx = self.addTab(qt.QWidget(), utils.getIcon(pixmap), tabname)
+            indx = self.addTab(qt.QWidget(), tabname)
+
+            # tab icon updates to visible/invisible depending on
+            # whether subsetting is hidden or not
+            if hidesetn is not None:
+                hidesetn.onmodified.onModified.connect(
+                    hide_mapper.map)
+                hide_mapper.setMapping(hidesetn.onmodified, indx)
+
+            self.hide_map[indx] = (pixmap, hidesetn)
+            self.updateIcon(indx)
             self.setTabToolTip(indx, tooltip)
+
+        hide_mapper.mapped[int].connect(self.updateIcon)
+
+    def updateIcon(self, indx):
+        """Update icon for tab, depending on status of hide setting."""
+        pixmap, hidesetn = self.hide_map[indx]
+        icon = utils.getIcon(pixmap)
+        if hidesetn is not None and hidesetn.get():
+            icon = qt.QIcon(utils.DisabledIconEngine(icon))
+        self.setTabIcon(indx, icon)
 
     def slotCurrentChanged(self, tab):
         """Lazy loading of tab when displayed."""

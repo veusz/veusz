@@ -599,6 +599,13 @@ def findOnPath(cmd):
             return cmdtry
     return None
 
+def listIndex(inlist, item):
+    """Return index of item in list or -1 if not available."""
+    try:
+        return inlist.index(item)
+    except ValueError:
+        return -1
+
 class Struct:
     """Simple structure-like class."""
 
@@ -654,3 +661,28 @@ class OverrideCursor:
 
     def __exit__(self, typ, value, traceback):
         qt.QApplication.restoreOverrideCursor()
+
+class DisabledIconEngine(qt.QIconEngine):
+    """Icon engine which draws icons in a disabled state."""
+
+    def __init__(self, icon):
+        qt.QIconEngine.__init__(self)
+        self.icon = icon
+
+    def actualSize(self, size, mode, state):
+        return size
+
+    def clone(self):
+        return GreyIconEngine(self.icon)
+
+    def iconName(self):
+        return ''
+
+    def key(self):
+        return str(id(self))
+
+    def paint(self, painter, rect, mode, state):
+        self.icon.paint(painter, rect, qt.Qt.AlignCenter, qt.QIcon.Disabled, state)
+
+    def pixmap(self, size, mode, state):
+        return self.icon.pixmap(size, qt.QIcon.Disabled, state)
