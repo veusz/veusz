@@ -126,7 +126,7 @@ class ImportTabND(importdialog.ImportTab):
                 tags=tags,
                 linked=linked,
                 encoding=encoding
-                )
+            )
 
             # do the importing
             op = defn_nd.OperationDataImportND(params)

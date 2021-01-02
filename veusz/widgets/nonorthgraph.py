@@ -77,11 +77,11 @@ class NonOrthGraph(Widget):
             formatting=True) )
         s.add( setting.GraphBrush(
             'Background',
-            descr = _('Background plot fill'),
+            descr=_('Background plot fill'),
             usertext=_('Background')),
             pixmap='settings_bgfill' )
         s.add( setting.Line(
-            'Border', descr = _('Graph border line'),
+            'Border', descr=_('Graph border line'),
             usertext=_('Border')),
             pixmap='settings_border')
 

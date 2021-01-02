@@ -83,10 +83,12 @@ def createPath(path, scale):
         elif e.type == qt.QPainterPath.CurveToElement:
             e1 = path.elementAt(i+1)
             e2 = path.elementAt(i+2)
-            p.append( 'c%s,%s,%s,%s,%s,%s' % (
+            p.append(
+                'c%s,%s,%s,%s,%s,%s' % (
                     fltStr(nx-ox), fltStr(ny-oy),
                     fltStr(e1.x*scale-ox), fltStr(e1.y*scale-oy),
-                    fltStr(e2.x*scale-ox), fltStr(e2.y*scale-oy)) )
+                    fltStr(e2.x*scale-ox), fltStr(e2.y*scale-oy))
+            )
             ox, oy = e2.x*scale, e2.y*scale
             i += 2
         else:
@@ -165,11 +167,13 @@ class SVGPaintEngine(qt.QPaintEngine):
         # svg root element for qt defaults
         self.rootelement = SVGElement(
             None, 'svg',
-            ('width="%spx" height="%spx" version="1.1"\n'
-             '    xmlns="http://www.w3.org/2000/svg"\n'
-             '    xmlns:xlink="http://www.w3.org/1999/xlink"') % (
-                 fltStr(self.device.width*self.device.sdpi*self.scale),
-                 fltStr(self.device.height*self.device.sdpi*self.scale))
+            (
+                'width="%spx" height="%spx" version="1.1"\n'
+                '    xmlns="http://www.w3.org/2000/svg"\n'
+                '    xmlns:xlink="http://www.w3.org/1999/xlink"') % (
+                    fltStr(self.device.width*self.device.sdpi*self.scale),
+                    fltStr(self.device.height*self.device.sdpi*self.scale),
+                )
         )
         SVGElement(self.rootelement, 'desc', '', 'Veusz output document')
 
@@ -224,9 +228,11 @@ class SVGPaintEngine(qt.QPaintEngine):
         self.pruneEmptyGroups()
 
         fileobj = self.device.fileobj
-        fileobj.write('<?xml version="1.0" standalone="no"?>\n'
-                      '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n'
-                      '  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n')
+        fileobj.write(
+            '<?xml version="1.0" standalone="no"?>\n'
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n'
+            '  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n'
+        )
 
         # write all the elements
         self.rootelement.write(fileobj)
@@ -304,8 +310,8 @@ class SVGPaintEngine(qt.QPaintEngine):
         if path in self.existingclips:
             url = 'url(#c%i)' % self.existingclips[path]
         else:
-            clippath = SVGElement(self.defs, 'clipPath',
-                                  'id="c%i"' % self.clipnum)
+            clippath = SVGElement(
+                self.defs, 'clipPath', 'id="c%i"' % self.clipnum)
             SVGElement(clippath, 'path', 'd="%s"' % path)
             url = 'url(#c%i)' % self.clipnum
             self.existingclips[path] = self.clipnum
@@ -332,14 +338,14 @@ class SVGPaintEngine(qt.QPaintEngine):
                 qt.Qt.SvgMiterJoin: 'miter',
                 qt.Qt.RoundJoin: 'round',
                 qt.Qt.BevelJoin: 'bevel'
-                }[p.joinStyle()]
+            }[p.joinStyle()]
         # - cap style
         if p.capStyle() != qt.Qt.SquareCap:
             vals['stroke-linecap'] = {
                 qt.Qt.FlatCap: 'butt',
                 qt.Qt.SquareCap: 'square',
                 qt.Qt.RoundCap: 'round'
-                }[p.capStyle()]
+            }[p.capStyle()]
         # - width
         w = p.widthF()
         # width 0 is device width for qt
@@ -372,13 +378,17 @@ class SVGPaintEngine(qt.QPaintEngine):
             m = self.transform
             dx, dy = m.dx(), m.dy()
             if (m.m11(), m.m12(), m.m21(), m.m22()) == (1., 0., 0., 1):
-                out = ('transform="translate(%s,%s)"' % (
-                        fltStr(dx*self.scale), fltStr(dy*self.scale)) ,)
+                out = (
+                    'transform="translate(%s,%s)"' % (
+                        fltStr(dx*self.scale), fltStr(dy*self.scale)),
+                )
             else:
-                out = ('transform="matrix(%s %s %s %s %s %s)"' % (
+                out = (
+                    'transform="matrix(%s %s %s %s %s %s)"' % (
                         fltStr(m.m11(), 4), fltStr(m.m12(), 4),
                         fltStr(m.m21(), 4), fltStr(m.m22(), 4),
-                        fltStr(dx*self.scale), fltStr(dy*self.scale) ),)
+                        fltStr(dx*self.scale), fltStr(dy*self.scale) ),
+                )
         else:
             out = ()
         return out
@@ -403,11 +413,13 @@ class SVGPaintEngine(qt.QPaintEngine):
                 element.attrb += ' id="p%i"' % num
 
             # if the parent is a translation, swallow this into the use element
-            m = re.match(r'transform="translate\(([-0-9.]+),([-0-9.]+)\)"',
-                         self.celement.attrb)
+            m = re.match(
+                r'transform="translate\(([-0-9.]+),([-0-9.]+)\)"',
+                self.celement.attrb)
             if m:
-                SVGElement(self.celement.parent, 'use',
-                           'xlink:href="#p%i" x="%s" y="%s"' % (
+                SVGElement(
+                    self.celement.parent, 'use',
+                    'xlink:href="#p%i" x="%s" y="%s"' % (
                         num, m.group(1), m.group(2)))
             else:
                 SVGElement(self.celement, 'use', 'xlink:href="#p%i"' % num)
@@ -434,7 +446,7 @@ class SVGPaintEngine(qt.QPaintEngine):
                 'fill-opacity="%.3g"' % self.pen.color().alphaF(),
                 'font-family="%s"' % escapeXML(font.family()),
                 'font-size="%s"' % size,
-                ]
+            ]
             if font.italic():
                 grpattrb.append('font-style="italic"')
             if font.bold():
@@ -450,7 +462,7 @@ class SVGPaintEngine(qt.QPaintEngine):
                 'x="%s"' % fltStr(pt.x()*self.scale),
                 'y="%s"' % fltStr(pt.y()*self.scale),
                 'textLength="%s"' % fltStr(textitem.width()*self.scale),
-                ]
+            ]
 
             # spaces get lost without this
             if text.find('  ') >= 0 or text[:1] == ' ' or text[-1:] == ' ':
@@ -460,7 +472,8 @@ class SVGPaintEngine(qt.QPaintEngine):
             SVGElement(
                 grp, 'text',
                 ' '.join(textattrb),
-                text=text )
+                text=text
+            )
 
         else:
             # convert to a path
@@ -491,8 +504,9 @@ class SVGPaintEngine(qt.QPaintEngine):
             pts.append( '%s,%s' % (fltStr(p.x()*self.scale), fltStr(p.y()*self.scale)) )
 
         if mode == qt.QPaintEngine.PolylineMode:
-            SVGElement(self.celement, 'polyline',
-                       'fill="none" points="%s"' % ' '.join(pts))
+            SVGElement(
+                self.celement, 'polyline',
+                'fill="none" points="%s"' % ' '.join(pts))
 
         else:
             attrb = 'points="%s"' % ' '.join(pts)
@@ -502,20 +516,28 @@ class SVGPaintEngine(qt.QPaintEngine):
 
     def drawEllipse(self, rect):
         """Draw an ellipse to the svg file."""
-        SVGElement(self.celement, 'ellipse',
-                   'cx="%s" cy="%s" rx="%s" ry="%s"' %
-                   (fltStr(rect.center().x()*self.scale),
-                    fltStr(rect.center().y()*self.scale),
-                    fltStr(rect.width()*0.5*self.scale),
-                    fltStr(rect.height()*0.5*self.scale)))
+        SVGElement(
+            self.celement, 'ellipse',
+            'cx="%s" cy="%s" rx="%s" ry="%s"' %
+            (
+                fltStr(rect.center().x()*self.scale),
+                fltStr(rect.center().y()*self.scale),
+                fltStr(rect.width()*0.5*self.scale),
+                fltStr(rect.height()*0.5*self.scale)
+            )
+        )
 
     def drawPoints(self, points):
         """Draw points."""
         for pt in points:
             x, y = fltStr(pt.x()*self.scale), fltStr(pt.y()*self.scale)
-            SVGElement(self.celement, 'line',
-                       ('x1="%s" y1="%s" x2="%s" y2="%s" '
-                        'stroke-linecap="round"') % (x, y, x, y))
+            SVGElement(
+                self.celement, 'line',
+                (
+                    'x1="%s" y1="%s" x2="%s" y2="%s" '
+                    'stroke-linecap="round"'
+                ) % (x, y, x, y)
+            )
 
     def drawImage(self, r, img, sr, flags):
         """Draw image.
@@ -535,12 +557,14 @@ class SVGPaintEngine(qt.QPaintEngine):
         pixmap.save(buf, self.imageformat.upper(), 0)
         buf.close()
 
-        attrb = [ 'x="%s" y="%s" ' % (fltStr(r.x()*self.scale), fltStr(r.y()*self.scale)),
-                  'width="%s" ' % fltStr(r.width()*self.scale),
-                  'height="%s" ' % fltStr(r.height()*self.scale),
-                  'xlink:href="data:image/%s;base64,' % self.imageformat,
-                  bytes(data.toBase64()).decode('ascii'),
-                  '" preserveAspectRatio="none"' ]
+        attrb = [
+            'x="%s" y="%s" ' % (fltStr(r.x()*self.scale), fltStr(r.y()*self.scale)),
+            'width="%s" ' % fltStr(r.width()*self.scale),
+            'height="%s" ' % fltStr(r.height()*self.scale),
+            'xlink:href="data:image/%s;base64,' % self.imageformat,
+            bytes(data.toBase64()).decode('ascii'),
+            '" preserveAspectRatio="none"'
+        ]
         SVGElement(self.celement, 'image', ''.join(attrb))
 
     def type(self):

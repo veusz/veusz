@@ -35,8 +35,8 @@ class HistoryCheck(qt.QCheckBox):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
-        return '%s_%s_HistoryCheck'  % ( dialog.objectName(),
-                                         self.objectName() )
+        return '%s_%s_HistoryCheck'  % (
+            dialog.objectName(), self.objectName() )
 
     def loadHistory(self):
         """Load contents of HistoryCheck from settings."""

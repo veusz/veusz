@@ -39,14 +39,15 @@ class PlotLine3D(setting.Line3D):
         self.get('hide').newDefault(True)
         self.add(setting.Colormap(
             'colorMap', 'none',
-            descr = _('If color markers dataset is given, use this colormap '
-                      'for the line color'),
+            descr=_(
+                'If color markers dataset is given, use this colormap '
+                'for the line color'),
             usertext=_('Color map'),
             formatting=True) )
         self.add( setting.Bool(
             'colorMapInvert', False,
-            descr = _('Invert color map'),
-            usertext = _('Invert map'),
+            descr=_('Invert color map'),
+            usertext=_('Invert map'),
             formatting=True) )
         self.get('color').newDefault(setting.Reference('../color'))
         self.get('reflectivity').newDefault(20)
@@ -103,8 +104,9 @@ class Point3D(plotters3d.GenericPlotter3D):
         #     usertext=_('Labels')), 5 )
         s.add( setting.DatasetExtended(
             'scalePoints', '',
-            descr=_('Scale size of markers given by dataset, expression'
-                    ' or list of values'),
+            descr=_(
+                'Scale size of markers given by dataset, expression'
+                ' or list of values'),
             usertext=_('Scale markers')), 6 )
 
         s.add( setting.Bool(

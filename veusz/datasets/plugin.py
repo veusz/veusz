@@ -106,14 +106,18 @@ class Dataset1DPlugin(_DatasetPlugin, Dataset1DBase):
         return Dataset(**self._getItemHelper(key))
 
     # parent class sets these attributes, so override setattr to do nothing
-    data = property( lambda self: self.getPluginData('data'),
-                     lambda self, val: None )
-    serr = property( lambda self: self.getPluginData('serr'),
-                     lambda self, val: None )
-    nerr = property( lambda self: self.getPluginData('nerr'),
-                     lambda self, val: None )
-    perr = property( lambda self: self.getPluginData('perr'),
-                     lambda self, val: None )
+    data = property(
+        lambda self: self.getPluginData('data'),
+        lambda self, val: None )
+    serr = property(
+        lambda self: self.getPluginData('serr'),
+        lambda self, val: None )
+    nerr = property(
+        lambda self: self.getPluginData('nerr'),
+        lambda self, val: None )
+    perr = property(
+        lambda self: self.getPluginData('perr'),
+        lambda self, val: None )
 
 class Dataset2DPlugin(_DatasetPlugin, Dataset2DBase):
     """Return 2D dataset from a plugin."""
@@ -123,24 +127,32 @@ class Dataset2DPlugin(_DatasetPlugin, Dataset2DBase):
         Dataset2DBase.__init__(self)
 
     def __getitem__(self, key):
-        return Dataset2D(self.data[key], xrange=self.xrange, yrange=self.yrange,
-                         xedge=self.xedge, yedge=self.yedge,
-                         xcent=self.xcent, ycent=self.ycent)
+        return Dataset2D(
+            self.data[key], xrange=self.xrange, yrange=self.yrange,
+            xedge=self.xedge, yedge=self.yedge,
+            xcent=self.xcent, ycent=self.ycent)
 
-    data   = property( lambda self: self.getPluginData('data'),
-                       lambda self, val: None )
-    xrange = property( lambda self: self.getPluginData('rangex'),
-                       lambda self, val: None )
-    yrange = property( lambda self: self.getPluginData('rangey'),
-                       lambda self, val: None )
-    xedge  = property( lambda self: self.getPluginData('xedge'),
-                       lambda self, val: None )
-    yedge  = property( lambda self: self.getPluginData('yedge'),
-                       lambda self, val: None )
-    xcent  = property( lambda self: self.getPluginData('xcent'),
-                       lambda self, val: None )
-    ycent  = property( lambda self: self.getPluginData('ycent'),
-                       lambda self, val: None )
+    data   = property(
+        lambda self: self.getPluginData('data'),
+        lambda self, val: None )
+    xrange = property(
+        lambda self: self.getPluginData('rangex'),
+        lambda self, val: None )
+    yrange = property(
+        lambda self: self.getPluginData('rangey'),
+        lambda self, val: None )
+    xedge  = property(
+        lambda self: self.getPluginData('xedge'),
+        lambda self, val: None )
+    yedge  = property(
+        lambda self: self.getPluginData('yedge'),
+        lambda self, val: None )
+    xcent  = property(
+        lambda self: self.getPluginData('xcent'),
+        lambda self, val: None )
+    ycent  = property(
+        lambda self: self.getPluginData('ycent'),
+        lambda self, val: None )
 
 class DatasetNDPlugin(_DatasetPlugin, DatasetNDBase):
     """Return N-dimensional dataset from plugin."""
@@ -152,8 +164,9 @@ class DatasetNDPlugin(_DatasetPlugin, DatasetNDBase):
     def __getitem__(self, key):
         return DatasetND(self.data[key])
 
-    data = property( lambda self: self.getPluginData('data'),
-                     lambda self, val: None )
+    data = property(
+        lambda self: self.getPluginData('data'),
+        lambda self, val: None )
 
 class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     """Return text dataset from a plugin."""
@@ -165,8 +178,9 @@ class DatasetTextPlugin(_DatasetPlugin, DatasetText):
     def __getitem__(self, key):
         return DatasetText(self.data[key])
 
-    data = property( lambda self: self.getPluginData('data'),
-                     lambda self, val: None )
+    data = property(
+        lambda self: self.getPluginData('data'),
+        lambda self, val: None )
 
 class DatasetDateTimePlugin(_DatasetPlugin, DatasetDateTimeBase):
     """Return date dataset from plugin."""
@@ -179,5 +193,6 @@ class DatasetDateTimePlugin(_DatasetPlugin, DatasetDateTimeBase):
     def __getitem__(self, key):
         return DatasetDateTime(self.data[key])
 
-    data = property( lambda self: self.getPluginData('data'),
-                     lambda self, val: None )
+    data = property(
+        lambda self: self.getPluginData('data'),
+        lambda self, val: None )

@@ -35,8 +35,8 @@ class HistoryGroupBox(qt.QGroupBox):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
-        return '%s_%s_HistoryGroup'  % ( dialog.objectName(),
-                                         self.objectName() )
+        return '%s_%s_HistoryGroup'  % (
+            dialog.objectName(), self.objectName() )
 
     def loadHistory(self):
         """Load from settings."""

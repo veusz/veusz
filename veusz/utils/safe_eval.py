@@ -116,7 +116,7 @@ allowed_builtins = frozenset((
         'unicode',
         'xrange',
         'zip'
-        ))
+))
 
 numpy_forbidden = set((
         'frombuffer',
@@ -139,7 +139,7 @@ numpy_forbidden = set((
         'seterr',
         'seterrcall',
         'seterrobj',
-        ))
+))
 
 # blacklist using whitelist above
 forbidden_builtins = ( set(builtins.__dict__.keys()) - allowed_builtins |

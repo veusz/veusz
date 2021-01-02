@@ -206,9 +206,8 @@ class DatasetHistoGenerator:
         if self.binmanual is not None:
             bins = _('manual bins')
         else:
-            bins = _('%i bins from %s to %s') % (self.binparams[0],
-                                                 self.binparams[1],
-                                                 self.binparams[2])
+            bins = _('%i bins from %s to %s') % (
+                self.binparams[0], self.binparams[1], self.binparams[2])
 
         return _("Histogram of '%s' with %s") % (self.inexpr, bins)
 

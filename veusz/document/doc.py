@@ -374,8 +374,9 @@ class Document(qt.QObject):
         """Write a header to a saved file of type."""
 
         fileobj.write('# Veusz %s (version %s)\n' % (type, utils.version()))
-        fileobj.write('# Saved at %s\n\n' %
-                      datetime.datetime.utcnow().isoformat())
+        fileobj.write(
+            '# Saved at %s\n\n' %
+            datetime.datetime.utcnow().isoformat())
 
     def saveDatasetTags(self, fileobj):
         """Write dataset tags to output file"""
@@ -462,8 +463,8 @@ class Document(qt.QObject):
         # we do this first in case the datasets are overridden below
         savedlinks = {}
         for name, dataset in sorted(self.data.items()):
-            dataset.saveLinksToSavedDoc(textstream, savedlinks,
-                                        relpath=reldirname)
+            dataset.saveLinksToSavedDoc(
+                textstream, savedlinks, relpath=reldirname)
 
         # save the remaining datasets
         for name, dataset in sorted(self.data.items()):
@@ -642,16 +643,19 @@ class Document(qt.QObject):
 
             # do the widget's children
             for w in root.children:
-                self.walkNodes(tocall, root=w, nodetypes=nodetypes,
-                               _path = _path + '/' + w.name)
+                self.walkNodes(
+                    tocall, root=w, nodetypes=nodetypes,
+                    _path=_path+'/'+w.name)
             # then do the widget's settings
-            self.walkNodes(tocall, root=root.settings,
-                           nodetypes=nodetypes, _path=_path)
+            self.walkNodes(
+                tocall, root=root.settings,
+                nodetypes=nodetypes, _path=_path)
         elif root.nodetype == 'settings':
             # do the settings of the settings
             for name, s in sorted(root.setdict.items()):
-                self.walkNodes(tocall, root=s, nodetypes=nodetypes,
-                               _path = _path + '/' + s.name)
+                self.walkNodes(
+                    tocall, root=s, nodetypes=nodetypes,
+                    _path=_path+'/'+s.name)
         # elif root.nodetype == 'setting': pass
 
     def formatValsWithDatatypeToText(self, vals, displaydatatype):
@@ -661,8 +665,9 @@ class Document(qt.QObject):
         if displaydatatype == 'text':
             return vals
         elif displaydatatype == 'numeric':
-            return [ utils.formatNumber(val, '%Vg', locale=self.locale)
-                     for val in vals ]
+            return [
+                utils.formatNumber(val, '%Vg', locale=self.locale)
+                for val in vals ]
         elif displaydatatype == 'date':
             return [ utils.dateFloatToString(val) for val in vals ]
         else:

@@ -123,7 +123,7 @@ extfillstyles = (
     'double cross', 'double diagonal cross',
     '94% dense', '88% dense', '63% dense', '50% dense',
     '37% dense', '12% dense', '6% dense',
-    )
+)
 
 # hatching styles
 # map names to lists of (offsetx, offsety, gradx, grady)
@@ -159,11 +159,13 @@ _hatchmap = {
     'vertical double': ((0, 0, 1, 0), (0.2828, 0, 1, 0), ),
     'forward double': ((0, 0, 0.7071, -0.7071), (0.4,0, 0.7071, -0.7071)),
     'backward double': ((0, 0, 0.7071, 0.7071), (0.4,0, 0.7071, 0.7071)),
-    'double cross': ((0, 0, 0, 1), (0, 0.2828, 0, 1),
-                     (0, 0, 1, 0), (0.2828, 0, 1, 0),),
-    'double diagonal cross': ((0, 0, 0.7071, -0.7071), (0.4,0, 0.7071, -0.7071),
-                              (0, 0, 0.7071, 0.7071), (0.4,0, 0.7071, 0.7071)),
-    }
+    'double cross': (
+        (0, 0, 0, 1), (0, 0.2828, 0, 1),
+        (0, 0, 1, 0), (0.2828, 0, 1, 0),),
+    'double diagonal cross': (
+        (0, 0, 0.7071, -0.7071), (0.4,0, 0.7071, -0.7071),
+        (0, 0, 0.7071, 0.7071), (0.4,0, 0.7071, 0.7071)),
+}
 
 # convert qt-specific fill styles into qt styles
 _fillcnvt = {
@@ -175,7 +177,7 @@ _fillcnvt = {
     '37% dense': qt.Qt.Dense5Pattern,
     '12% dense': qt.Qt.Dense6Pattern,
     '6% dense': qt.Qt.Dense7Pattern
-    }
+}
 
 def brushExtFillPath(painter, extbrush, path, ignorehide=False,
                      stroke=None, dataindex=0):

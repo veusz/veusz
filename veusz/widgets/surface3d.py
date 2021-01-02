@@ -77,9 +77,9 @@ class Surface3D(plotters3d.GenericPlotter3D):
 
         s.add(setting.LineGrid3D(
             'Line',
-            descr = _('Grid line settings'),
-            usertext = _('Grid line')),
-            pixmap = 'settings_gridline' )
+            descr=_('Grid line settings'),
+            usertext=_('Grid line')),
+            pixmap='settings_gridline' )
         s.add(setting.Surface3DWColorMap(
             'Surface',
             descr=_('Surface fill settings'),

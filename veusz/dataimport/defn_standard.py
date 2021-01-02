@@ -40,7 +40,7 @@ class ImportParamsSimple(base.ImportParamsBase):
         'useblocks': False,
         'datastr': None,
         'ignoretext': False,
-        }
+    }
     defaults.update(base.ImportParamsBase.defaults)
 
 class LinkedFile(base.LinkedFileBase):
@@ -95,8 +95,8 @@ class OperationDataImport(base.OperationDataImportBase):
 
         # do the import
         self.simpleread.clearState()
-        self.simpleread.readData(stream, useblocks=p.useblocks,
-                                 ignoretext=p.ignoretext)
+        self.simpleread.readData(
+            stream, useblocks=p.useblocks, ignoretext=p.ignoretext)
 
         # associate linked file
         LF = None

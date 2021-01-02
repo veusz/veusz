@@ -83,7 +83,7 @@ class ImportTabStandard(importdialog.ImportTab):
             tags=tags,
             ignoretext=ignoretext,
             encoding=encoding,
-            )
+        )
 
         try:
             # construct operation. this checks the descriptor.
@@ -102,8 +102,9 @@ class ImportTabStandard(importdialog.ImportTab):
         lines = []
         for var, count in op.outinvalids.items():
             if count != 0:
-                lines.append(_('%i conversions failed for dataset "%s"') %
-                             (count, var))
+                lines.append(
+                    _('%i conversions failed for dataset "%s"') %
+                    (count, var))
         if len(lines) != 0:
             lines.append('')
 

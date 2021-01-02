@@ -192,8 +192,9 @@ class CaptureDialog(VeuszDialog):
         stream.maxlines = maxlines
         stream.timeout = timeout
         simprd.tail = tail
-        cd = CapturingDialog(self.document, simprd, stream, self,
-                             updateinterval=updateinterval)
+        cd = CapturingDialog(
+            self.document, simprd, stream, self,
+            updateinterval=updateinterval)
         self.mainwindow.showDialog(cd)
 
 ########################################################################
@@ -236,8 +237,8 @@ class CapturingDialog(VeuszDialog):
         # timer for updating display
         self.displaytimer = qt.QTimer(self)
         self.displaytimer.timeout.connect(self.slotDisplayTimer)
-        self.sourceLabel.setText( self.sourceLabel.text() %
-                                  stream.name )
+        self.sourceLabel.setText(
+            self.sourceLabel.text() % stream.name )
         self.txt_statusLabel = self.statusLabel.text()
         self.slotDisplayTimer() # initialise label
 

@@ -48,15 +48,18 @@ class GenericPlotter(widget.Widget):
         """Construct list of settings."""
         widget.Widget.addSettings(s)
 
-        s.add( setting.Str('key', '',
-                           descr = _('Description of the plotted data to appear in key'),
-                           usertext=_('Key text')) )
-        s.add( setting.Axis('xAxis', 'x', 'horizontal',
-                            descr = _('Name of X-axis to use'),
-                            usertext=_('X axis')) )
-        s.add( setting.Axis('yAxis', 'y', 'vertical',
-                            descr = _('Name of Y-axis to use'),
-                            usertext=_('Y axis')) )
+        s.add( setting.Str(
+            'key', '',
+            descr=_('Description of the plotted data to appear in key'),
+            usertext=_('Key text')) )
+        s.add( setting.Axis(
+            'xAxis', 'x', 'horizontal',
+            descr=_('Name of X-axis to use'),
+            usertext=_('X axis')) )
+        s.add( setting.Axis(
+            'yAxis', 'y', 'vertical',
+            descr=_('Name of Y-axis to use'),
+            usertext=_('Y axis')) )
 
     def autoColor(self, painter, dataindex=0):
         """Automatic color for plotting."""
@@ -198,27 +201,29 @@ class FreePlotter(widget.Widget):
         widget.Widget.addSettings(s)
 
         s.add( setting.DatasetExtended(
-                'xPos', [0.5],
-                descr=_('List of fractional X coordinates or dataset'),
-                usertext=_('X positions'),
-                formatting=False) )
+            'xPos', [0.5],
+            descr=_('List of fractional X coordinates or dataset'),
+            usertext=_('X positions'),
+            formatting=False) )
         s.add( setting.DatasetExtended(
-                'yPos', [0.5],
-                descr=_('List of fractional Y coordinates or dataset'),
-                usertext=_('Y positions'),
-                formatting=False) )
-        s.add( setting.Choice('positioning',
-                              ['axes', 'relative'], 'relative',
-                              descr=_('Use axes or fractional '
-                                      'position to place label'),
-                              usertext=_('Position mode'),
-                              formatting=False) )
-        s.add( setting.Axis('xAxis', 'x', 'horizontal',
-                            descr = _('Name of X-axis to use'),
-                            usertext=_('X axis')) )
-        s.add( setting.Axis('yAxis', 'y', 'vertical',
-                            descr = _('Name of Y-axis to use'),
-                            usertext=_('Y axis')) )
+            'yPos', [0.5],
+            descr=_('List of fractional Y coordinates or dataset'),
+            usertext=_('Y positions'),
+            formatting=False) )
+        s.add( setting.Choice(
+            'positioning',
+            ['axes', 'relative'], 'relative',
+            descr=_('Use axes or fractional position to place label'),
+            usertext=_('Position mode'),
+            formatting=False) )
+        s.add( setting.Axis(
+            'xAxis', 'x', 'horizontal',
+            descr=_('Name of X-axis to use'),
+            usertext=_('X axis')) )
+        s.add( setting.Axis(
+            'yAxis', 'y', 'vertical',
+            descr=_('Name of Y-axis to use'),
+            usertext=_('Y axis')) )
 
     def _getPlotterCoords(self, posn, xsetting='xPos', ysetting='yPos'):
         """Calculate coordinates from relative or axis positioning.
@@ -234,8 +239,7 @@ class FreePlotter(widget.Widget):
         if s.positioning == 'axes':
 
             if hasattr(self.parent, 'getAxes'):
-                axes = self.parent.getAxes( (s.xAxis,
-                                             s.yAxis) )
+                axes = self.parent.getAxes( (s.xAxis, s.yAxis) )
             else:
                 return None, None
             if axes[0] is None or axes[1] is None:

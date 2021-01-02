@@ -347,13 +347,16 @@ class DatasetPluginHelper:
         if isinstance(ds, datasets.DatasetDateTime):
             return DatasetDateTime(name, data=ds.data)
         elif ds.dimensions == 1:
-            return Dataset1D(name, data=ds.data, serr=ds.serr,
-                             perr=ds.perr, nerr=ds.nerr)
+            return Dataset1D(
+                name, data=ds.data, serr=ds.serr,
+                perr=ds.perr, nerr=ds.nerr)
         elif ds.dimensions == 2:
-            return Dataset2D(name, ds.data,
-                             rangex=ds.xrange, rangey=ds.yrange,
-                             xedge=ds.xedge, yedge=ds.yedge,
-                             xcent=ds.xcent, ycent=ds.ycent)
+            return Dataset2D(
+                name, ds.data,
+                rangex=ds.xrange, rangey=ds.yrange,
+                xedge=ds.xedge, yedge=ds.yedge,
+                xcent=ds.xcent, ycent=ds.ycent
+            )
         else:
             return DatasetND(name, ds.data)
 
@@ -609,8 +612,8 @@ class MultiplyDatasetPlugin(_OneOutputDatasetPlugin):
     menu = (_('Multiply'), _('By constant'),)
     name = 'Multiply'
     description_short = _('Multiply dataset by a constant')
-    description_full = _('Multiply a dataset by a factor. '
-                         'Error bars are also scaled.')
+    description_full = _(
+        'Multiply a dataset by a factor. Error bars are also scaled.')
 
     def __init__(self):
         """Define fields."""
@@ -649,13 +652,17 @@ class AddDatasetPlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldFloat('value', _('Add value'), default=0.),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do shifting of dataset."""
         ds_in = helper.getDataset(fields['ds_in'])
-        self.dsout.update(data = ds_in.data + fields['value'],
-                          serr=ds_in.serr, perr=ds_in.perr, nerr=ds_in.nerr)
+        self.dsout.update(
+            data=ds_in.data+fields['value'],
+            serr=ds_in.serr,
+            perr=ds_in.perr,
+            nerr=ds_in.nerr
+        )
 
 class ReverseDatasetPlugin(_OneOutputDatasetPlugin):
     """Dataset plugin to reverse datasets."""
@@ -670,7 +677,7 @@ class ReverseDatasetPlugin(_OneOutputDatasetPlugin):
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do reverse of dataset."""
@@ -699,7 +706,7 @@ class ConcatenateDatasetPlugin(_OneOutputDatasetPlugin):
         self.fields = [
             field.FieldDatasetMulti('ds_in', _('Input datasets')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do concatenation of dataset."""
@@ -747,15 +754,16 @@ class InterleaveDatasetPlugin(_OneOutputDatasetPlugin):
     menu = (_('Join'), _('Element by element'),)
     name = 'Interleave'
     description_short = _('Join datasets, interleaving element by element')
-    description_full = _('Join datasets, interleaving element by element.\n'
-                         'Error bars are merged.')
+    description_full = _(
+        'Join datasets, interleaving element by element.\n'
+        'Error bars are merged.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDatasetMulti('ds_in', _('Input datasets')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do concatenation of dataset."""
@@ -822,8 +830,9 @@ class ChopDatasetPlugin(_OneOutputDatasetPlugin):
     menu = (_('Split'), _('Chop'),)
     name = 'Chop'
     description_short = _('Chop dataset part into new dataset')
-    description_full = _('Chop out a section of a dataset. Give starting '
-                         'index of data and number of datapoints to take.')
+    description_full = _(
+        'Chop out a section of a dataset. Give starting '
+        'index of data and number of datapoints to take.')
 
     def __init__(self):
         """Define fields."""
@@ -832,7 +841,7 @@ class ChopDatasetPlugin(_OneOutputDatasetPlugin):
             field.FieldInt('start', _('Starting index (from 1)'), default=1),
             field.FieldInt('num', _('Maximum number of datapoints'), default=1),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do chopping of dataset."""
@@ -857,16 +866,17 @@ class PartsDatasetPlugin(DatasetPlugin):
     menu = (_('Split'), _('Parts'),)
     name = 'Parts'
     description_short = _('Split dataset into equal-size parts')
-    description_full = _('Split dataset into equal-size parts. '
-                         'The parts will differ in size if the dataset '
-                         'cannot be split equally.')
+    description_full = _(
+        'Split dataset into equal-size parts. '
+        'The parts will differ in size if the dataset '
+        'cannot be split equally.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldDatasetMulti('ds_out', _('Output datasets')),
-            ]
+        ]
 
     def getDatasets(self, fields):
         """Get output datasets."""
@@ -901,8 +911,9 @@ class ThinDatasetPlugin(_OneOutputDatasetPlugin):
     menu = (_('Split'), _('Thin'),)
     name = 'Thin'
     description_short = _('Select data points at intervals from dataset')
-    description_full = _('Select data points at intervals from dataset '
-                         'to create new dataset')
+    description_full = _(
+        'Select data points at intervals from dataset '
+        'to create new dataset')
 
     def __init__(self):
         """Define fields."""
@@ -911,7 +922,7 @@ class ThinDatasetPlugin(_OneOutputDatasetPlugin):
             field.FieldInt('start', _('Starting index (from 1)'), default=1),
             field.FieldInt('interval', _('Interval between data points'), default=1),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do thinning of dataset."""
@@ -935,15 +946,15 @@ class MeanDatasetPlugin(_OneOutputDatasetPlugin):
     menu = (_('Compute'), _('Mean of datasets'),)
     name = 'Mean'
     description_short = _('Compute mean of datasets')
-    description_full = _('Compute mean of multiple datasets to create '
-                         'a single dataset.')
+    description_full = _(
+        'Compute mean of multiple datasets to create a single dataset.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDatasetMulti('ds_in', _('Input datasets')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Compute means of dataset."""
@@ -998,15 +1009,16 @@ class AddDatasetsPlugin(_OneOutputDatasetPlugin):
     menu = (_('Add'), _('Datasets'),)
     name = 'Add Datasets'
     description_short = _('Add two or more datasets together')
-    description_full = _('Add datasets together to make a single dataset. '
-                         'Error bars are combined.')
+    description_full = _(
+        'Add datasets together to make a single dataset. '
+        'Error bars are combined.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDatasetMulti('ds_in', _('Input datasets')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Sum datasets."""
@@ -1037,8 +1049,8 @@ class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
     menu = (_('Subtract'), _('Datasets'),)
     name = 'Subtract Datasets'
     description_short = _('Subtract two datasets')
-    description_full = _('Subtract two datasets. '
-                         'Combined error bars are also calculated.')
+    description_full = _(
+        'Subtract two datasets. Combined error bars are also calculated.')
 
     def __init__(self):
         """Define fields."""
@@ -1046,7 +1058,7 @@ class SubtractDatasetPlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_in1', _('Input dataset 1')),
             field.FieldDataset('ds_in2', _('Input dataset 2')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do scaling of dataset."""
@@ -1090,8 +1102,9 @@ class SubtractMeanDatasetPlugin(_OneOutputDatasetPlugin):
     menu = (_('Subtract'), _('Mean'),)
     name = 'Subtract Mean'
     description_short = _('Subtract mean from dataset')
-    description_full = _('Subtract mean from dataset,'
-                         ' optionally dividing by standard deviation.')
+    description_full = _(
+        'Subtract mean from dataset,'
+        ' optionally dividing by standard deviation.')
 
     def __init__(self):
         """Define fields."""
@@ -1099,7 +1112,7 @@ class SubtractMeanDatasetPlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_in', _('Input dataset 1')),
             field.FieldBool('divstddev', _('Divide by standard deviation')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do scaling of dataset."""
@@ -1131,7 +1144,7 @@ class SubtractMinimumDatasetPlugin(_OneOutputDatasetPlugin):
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset 1')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do subtraction of dataset."""
@@ -1159,7 +1172,7 @@ class SubtractMaximumDatasetPlugin(_OneOutputDatasetPlugin):
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset 1')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do subtraction of dataset."""
@@ -1180,15 +1193,16 @@ class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
     menu = (_('Multiply'), _('Datasets'),)
     name = 'Multiply Datasets'
     description_short = _('Multiply two or more datasets')
-    description_full = _('Multiply two or more datasets. '
-                         'Combined error bars are also calculated.')
+    description_full = _(
+        'Multiply two or more datasets. '
+        'Combined error bars are also calculated.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDatasetMulti('ds_in', _('Input datasets')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Multiply the datasets."""
@@ -1218,20 +1232,22 @@ class DivideDatasetsPlugin(_OneOutputDatasetPlugin):
 
     menu = (_('Divide'), _('Datasets'),)
     name = 'Divide Datasets'
-    description_short = _('Compute ratio or fractional difference'
-                          ' between two datasets')
-    description_full = _('Divide or compute fractional difference'
-                         ' between two datasets')
+    description_short = _(
+        'Compute ratio or fractional difference'
+        ' between two datasets')
+    description_full = _(
+        'Divide or compute fractional difference'
+        ' between two datasets')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in1', _('Input dataset 1')),
             field.FieldDataset('ds_in2', _('Input dataset 2')),
-            field.FieldBool('frac', _('Compute fractional difference'),
-                            default=False),
+            field.FieldBool(
+                'frac', _('Compute fractional difference'), default=False),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Compute ratio."""
@@ -1264,7 +1280,7 @@ class DivideMaxPlugin(_OneOutputDatasetPlugin):
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
 
@@ -1300,7 +1316,7 @@ class DivideNormalizePlugin(_OneOutputDatasetPlugin):
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
 
@@ -1329,8 +1345,9 @@ class ExtremesDatasetPlugin(DatasetPlugin):
     menu = (_('Compute'), _('Dataset extremes'),)
     name = 'Extremes'
     description_short = _('Compute extreme values of input datasets')
-    description_full = _('Compute extreme values of input datasets. Creates '
-                         'minimum and maximum datasets.')
+    description_full = _(
+        'Compute extreme values of input datasets. Creates '
+        'minimum and maximum datasets.')
 
     def __init__(self):
         """Define fields."""
@@ -1339,9 +1356,9 @@ class ExtremesDatasetPlugin(DatasetPlugin):
             field.FieldBool('errorbars', _('Include error bars')),
             field.FieldDataset('ds_min', _('Output minimum dataset (optional)')),
             field.FieldDataset('ds_max', _('Output maximum dataset (optional)')),
-            field.FieldDataset('ds_errorbar', _('Output range as error bars '
-                                                'in dataset (optional)')),
-            ]
+            field.FieldDataset('ds_errorbar', _(
+                'Output range as error bars in dataset (optional)')),
+        ]
 
     def getDatasets(self, fields):
         """Returns output dataset."""
@@ -1414,9 +1431,10 @@ class CumulativePlugin(_OneOutputDatasetPlugin):
     menu = (_('Compute'), _('Cumulative value'),)
     name = 'Cumulative'
     description_short = _('Compute the cumulative value of a dataset')
-    description_full = _('Compute the cumulative value of a dataset. '
-                         ' Error bars are combined.\n'
-                         'Default behaviour is to accumulate from start.')
+    description_full = _(
+        'Compute the cumulative value of a dataset. '
+        ' Error bars are combined.\n'
+        'Default behaviour is to accumulate from start.')
 
     def __init__(self):
         """Define fields."""
@@ -1424,7 +1442,7 @@ class CumulativePlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldBool('fromend', _('Compute cumulative value from end')),
             field.FieldDataset('ds_out', _('Output dataset')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do accumulation."""
@@ -1455,17 +1473,18 @@ class DemultiplexPlugin(DatasetPlugin):
     menu = (_('Split'), _('Element by element'),)
     name = 'Demultiplex'
     description_short = _('Split dataset into multiple datasets element-by-element')
-    description_full = _('Split dataset into multiple datasets on an '
-                         'element-by-element basis.\n'
-                         'e.g. 1, 2, 3, 4, 5, 6 could be converted to '
-                         '1, 3, 5 and 2, 4, 6.')
+    description_full = _(
+        'Split dataset into multiple datasets on an '
+        'element-by-element basis.\n'
+        'e.g. 1, 2, 3, 4, 5, 6 could be converted to '
+        '1, 3, 5 and 2, 4, 6.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldDatasetMulti('ds_out', _('Output datasets')),
-            ]
+        ]
 
     def getDatasets(self, fields):
         """Returns demuxed output datasets."""
@@ -1499,20 +1518,22 @@ class PolarToCartesianPlugin(DatasetPlugin):
     menu = (_('Convert'), _('Polar to Cartesian'),)
     name = 'PolarToCartesian'
     description_short = _('Convert r,theta coordinates to x,y coordinates')
-    description_full = _('Convert r,theta coordinates to x,y coordinates.\n'
-                         'Error bars are ignored.')
+    description_full = _(
+        'Convert r,theta coordinates to x,y coordinates.\n'
+        'Error bars are ignored.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('r_in', _('Input dataset (r)')),
             field.FieldDataset('theta_in', _('Input dataset (theta)')),
-            field.FieldCombo('units', _('Angular units'),
-                             items=('radians', 'degrees'),
-                             editable=False),
+            field.FieldCombo(
+                'units', _('Angular units'),
+                items=('radians', 'degrees'),
+                editable=False),
             field.FieldDataset('x_out', _('Output dataset (x)')),
             field.FieldDataset('y_out', _('Output dataset (y)')),
-            ]
+        ]
 
     def getDatasets(self, fields):
         """Returns x and y output datasets."""
@@ -1544,19 +1565,22 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
     menu = (_('Filter'), _('Expression'),)
     name = 'FilterExpression'
     description_short = _('Filter a dataset using an expression')
-    description_full = _('Filter a dataset using an expression, '
-                         'e.g. "x>10" or "(x>1) & (y<2)"')
+    description_full = _(
+        'Filter a dataset using an expression, '
+        'e.g. "x>10" or "(x>1) & (y<2)"')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldText('filter', _('Filter expression')),
-            field.FieldBool('replacenan', _('Replace excluded points by NaN\n'
-                                            '(indicate missing points)'),
-                            default=False),
+            field.FieldBool(
+                'replacenan', _(
+                    'Replace excluded points by NaN\n'
+                    '(indicate missing points)'),
+                default=False),
             field.FieldDataset('ds_out', _('Output dataset')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do filtering of dataset."""
@@ -1598,20 +1622,23 @@ class MovingAveragePlugin(_OneOutputDatasetPlugin):
     menu = (_('Filtering'), _('Moving Average'),)
     name = 'MovingAverage'
     description_short = _('Compute moving average for regularly spaced data')
-    description_full = _('Compute moving average for regularly spaced data.'
-                         'Average is computed either\nside of each data point '
-                         'by number of points given.')
+    description_full = _(
+        'Compute moving average for regularly spaced data.'
+        'Average is computed either\nside of each data point '
+        'by number of points given.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_in', _('Input dataset')),
-            field.FieldInt('width', _('Points either side of point to average'),
-                           default=1, minval=0),
-            field.FieldBool('weighterrors', _('Weight by error bars'),
-                            default=True),
+            field.FieldInt(
+                'width', _('Points either side of point to average'),
+                default=1, minval=0),
+            field.FieldBool(
+                'weighterrors', _('Weight by error bars'),
+                default=True),
             field.FieldDataset('ds_out', _('Output dataset')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Compute moving average of dataset."""
@@ -1632,10 +1659,11 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
     menu = (_('Filtering'), _('Linear interpolation'),)
     name = 'LinearInterpolation'
     description_short = _('Linear interpolation of x,y data')
-    description_full = _("Compute linear interpolation of x,y data.\n"
-                         "Given datasets for y = f(x), compute y' = f(x'), "
-                         "using linear interpolation.\n"
-                         "Assumes x dataset increases in value.")
+    description_full = _(
+        "Compute linear interpolation of x,y data.\n"
+        "Given datasets for y = f(x), compute y' = f(x'), "
+        "using linear interpolation.\n"
+        "Assumes x dataset increases in value.")
 
     def __init__(self):
         """Define fields."""
@@ -1645,7 +1673,7 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_xprime', _("Input dataset x'")),
             field.FieldBool('edgenan', _('Use nan for values outside x range')),
             field.FieldDataset('ds_out', _("Output dataset y'")),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Compute linear interpolation of dataset."""
@@ -1658,9 +1686,11 @@ class LinearInterpolatePlugin(_OneOutputDatasetPlugin):
         if fields['edgenan']:
             pad = N.nan
 
-        interpol = N.interp(ds_xprime,
-                            ds_x[:minlenin], ds_y[:minlenin],
-                            left=pad, right=pad)
+        interpol = N.interp(
+            ds_xprime,
+            ds_x[:minlenin], ds_y[:minlenin],
+            left=pad, right=pad
+        )
 
         self.dsout.update(data=interpol)
 
@@ -1670,25 +1700,27 @@ class ReBinXYPlugin(DatasetPlugin):
     menu = (_('Filtering'), _('Bin X,Y'))
     name = 'RebinXY'
     description_short = 'Bin every N datapoints'
-    description_full = ('Given dataset Y (and optionally X), for every N '
-                        'datapoints calculate the binned value. For '
-                        'dataset Y this is the sum or mean of every N '
-                        'datapoints. For X this is the midpoint of the '
-                        'datapoints (using error bars to give the range.')
+    description_full = (
+        'Given dataset Y (and optionally X), for every N '
+        'datapoints calculate the binned value. For '
+        'dataset Y this is the sum or mean of every N '
+        'datapoints. For X this is the midpoint of the '
+        'datapoints (using error bars to give the range.')
 
     def __init__(self):
         """Define fields."""
         self.fields = [
             field.FieldDataset('ds_y', _('Input dataset Y')),
             field.FieldDataset('ds_x', _('Input dataset X (optional)')),
-            field.FieldInt('binsize', _('Bin size (N)'),
-                           minval=1, default=2),
-            field.FieldCombo('mode', _('Mode of binning'),
-                             items=('sum', 'average'),
-                             editable=False),
+            field.FieldInt(
+                'binsize', _('Bin size (N)'), minval=1, default=2),
+            field.FieldCombo(
+                'mode', _('Mode of binning'),
+                items=('sum', 'average'),
+                editable=False),
             field.FieldDataset('ds_yout', _("Output Y'")),
             field.FieldDataset('ds_xout', _("Output X' (optional)")),
-            ]
+        ]
 
     def getDatasets(self, fields):
         """Return output datasets"""
@@ -1784,7 +1816,7 @@ class SortPlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_sort', _('Sort by (optional)')),
             field.FieldBool('reverse', _('Reverse')),
             field.FieldDataset('ds_out', _('Output dataset')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do sorting of dataset."""
@@ -1819,7 +1851,7 @@ class SortTextPlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_sort', _('Sort by (optional)')),
             field.FieldBool('reverse', _('Reverse')),
             field.FieldDataset('ds_out', _('Output dataset'), datatype='text'),
-            ]
+        ]
 
     def getDatasets(self, fields):
         """Returns single output dataset (self.dsout)."""
@@ -1859,8 +1891,9 @@ class Histogram2D(DatasetPlugin):
     menu = (_('Compute'), _('2D histogram'),)
     name = 'Histogram 2D'
     description_short = _('Compute 2D histogram.')
-    description_full = _('Given two 1D datasets, compute a 2D histogram. '
-                         'Can optionally compute a probability distribution.')
+    description_full = _(
+        'Given two 1D datasets, compute a 2D histogram. '
+        'Can optionally compute a probability distribution.')
 
     def __init__(self):
         """Input fields."""
@@ -1868,24 +1901,28 @@ class Histogram2D(DatasetPlugin):
             field.FieldDataset('ds_inx', _('Input dataset x')),
             field.FieldFloatOrAuto('minx', _('Minimum value for dataset x')),
             field.FieldFloatOrAuto('maxx', _('Maximum value for dataset x')),
-            field.FieldInt('binsx', _('Number of bins for dataset x'),
-                           default=10, minval=2),
+            field.FieldInt(
+                'binsx', _('Number of bins for dataset x'),
+                default=10, minval=2),
 
             field.FieldDataset('ds_iny', _('Input dataset y')),
             field.FieldFloatOrAuto('miny', _('Minimum value for dataset y')),
             field.FieldFloatOrAuto('maxy', _('Maximum value for dataset y')),
-            field.FieldInt('binsy', _('Number of bins for dataset y'),
-                           default=10, minval=2),
+            field.FieldInt(
+                'binsy', _('Number of bins for dataset y'),
+                default=10, minval=2),
 
-            field.FieldCombo('mode', _('Mode'),
-                             items=('Count',
-                                    'Fraction',
-                                    'CumulativeProbability',
-                                    'CumulativeProbabilityInverse'),
-                             default='Count', editable=False),
+            field.FieldCombo(
+                'mode', _('Mode'),
+                items=(
+                    'Count',
+                    'Fraction',
+                    'CumulativeProbability',
+                    'CumulativeProbabilityInverse'),
+                default='Count', editable=False),
 
             field.FieldDataset('ds_out', _('Output 2D dataset'), dims=2),
-            ]
+        ]
 
     def probabilityCalculator(self, histo):
         """Convert an image of counts to a cumulative probability
@@ -1959,14 +1996,16 @@ class ConvertNumbersToText(DatasetPlugin):
     menu = (_('Convert'), _('Numbers to Text'),)
     name = 'NumbersToText'
     description_short = _('Convert numeric dataset to text')
-    description_full = _('Given a 1D numeric dataset, create a text dataset '
-                         'by applying formatting. Format string is in standard '
-                         'Veusz-extended C formatting, e.g.\n'
-                         ' "%Vg" - general,'
-                         ' "%Ve" - scientific,'
-                         ' "%VE" - engineering suffix,'
-                         ' "%.2f" - two decimal places and'
-                         ' "%e" - C-style scientific')
+    description_full = _(
+        'Given a 1D numeric dataset, create a text dataset '
+        'by applying formatting. Format string is in standard '
+        'Veusz-extended C formatting, e.g.\n'
+        ' "%Vg" - general,'
+        ' "%Ve" - scientific,'
+        ' "%VE" - engineering suffix,'
+        ' "%.2f" - two decimal places and'
+        ' "%e" - C-style scientific'
+    )
 
     def __init__(self):
         """Define fields."""
@@ -1974,7 +2013,7 @@ class ConvertNumbersToText(DatasetPlugin):
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldText('format', _('Format'), default='%Vg'),
             field.FieldDataset('ds_out', _('Output dataset name')),
-            ]
+        ]
 
     def getDatasets(self, fields):
         if fields['ds_out'] == '':
@@ -2010,7 +2049,7 @@ class ClipPlugin(_OneOutputDatasetPlugin):
             field.FieldBool('disablemax', _('Disable maximum')),
             field.FieldBool('cliperrs', _('Clip error bars'), default=True),
             field.FieldDataset('ds_out', _('Output dataset')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Do clipping of dataset."""
@@ -2068,7 +2107,7 @@ class LogPlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldFloat('base', _('Base'), default=10., minval=1e-10),
             field.FieldDataset('ds_out', _('Output dataset')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Compute log of dataset."""
@@ -2111,7 +2150,7 @@ class ExpPlugin(_OneOutputDatasetPlugin):
             field.FieldDataset('ds_in', _('Input dataset')),
             field.FieldFloat('base', _('Base'), default=10., minval=1e-10),
             field.FieldDataset('ds_out', _('Output dataset')),
-            ]
+        ]
 
     def updateDatasets(self, fields, helper):
         """Compute exponential of dataset."""
@@ -2156,7 +2195,7 @@ class ReshapeDatasetPlugin(DatasetPlugin):
             field.FieldText('shape', _('Shape')),
             field.FieldBool('transpose', _('Transpose')),
             field.FieldDataset('ds_out', _('Output dataset'), dims='all'),
-            ]
+        ]
 
     def getDatasets(self, fields):
         if fields['ds_out'] == '':
@@ -2228,4 +2267,4 @@ datasetpluginregistry += [
     SortTextPlugin,
 
     Histogram2D,
-    ]
+]

@@ -90,8 +90,9 @@ def interpretDescriptor(descr):
 
         # ignore column
         if token == ',':
-            if tokenindex == 0 or ( tokens[tokenindex-1] == ',' or
-                                    tokens[tokenindex-1] == ' ' ):
+            if tokenindex == 0 or (
+                    tokens[tokenindex-1] == ',' or
+                    tokens[tokenindex-1] == ' ' ):
                 columns.append(',')
             continue
 
@@ -162,7 +163,7 @@ datatype_name_convert = {
     'string': 'string',
     'date': 'date',
     'time': 'date'
-    }
+}
 
 def guessDataType(val):
     """Try to work out data type from sample value (val)
@@ -884,7 +885,7 @@ class SimpleReadND:
         settings = {
             'transpose': self._paramTranspose,
             'shape': self._paramShape,
-            }
+        }
 
         vals = []
 

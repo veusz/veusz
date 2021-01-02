@@ -107,7 +107,7 @@ typecodes = (
     ('(float)', 'float'),
     ('(numeric)', 'float'),
     ('(number)', 'float'),
-    )
+)
 
 class _NextValue(Exception):
     """A class to be raised to move to next value."""

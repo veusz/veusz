@@ -50,47 +50,55 @@ class ColorBar(axis.Axis):
         """Construct list of settings."""
         axis.Axis.addSettings(s)
 
-        s.add( setting.WidgetChoice('widgetName', '',
-                                    descr=_('Corresponding widget'),
-                                    widgettypes=('image', 'xy', 'nonorthpoint'),
-                                    usertext = _('Widget')), 0 )
+        s.add( setting.WidgetChoice(
+            'widgetName', '',
+            descr=_('Corresponding widget'),
+            widgettypes=('image', 'xy', 'nonorthpoint'),
+            usertext = _('Widget')), 0 )
 
         s.get('log').readonly = True
         s.get('datascale').readonly = True
 
-        s.add( setting.AlignHorzWManual( 'horzPosn',
-                                         'right',
-                                         descr = _('Horizontal position'),
-                                         usertext=_('Horz posn'),
-                                         formatting=True) )
-        s.add( setting.AlignVertWManual( 'vertPosn',
-                                         'bottom',
-                                         descr = _('Vertical position'),
-                                         usertext=_('Vert posn'),
-                                         formatting=True) )
-        s.add( setting.DistanceOrAuto('width', 'Auto',
-                                      descr = _('Width of colorbar'),
-                                      usertext=_('Width'),
-                                      formatting=True) )
-        s.add( setting.DistanceOrAuto('height', 'Auto',
-                                      descr = _('Height of colorbar'),
-                                      usertext=_('Height'),
-                                      formatting=True) )
+        s.add( setting.AlignHorzWManual(
+            'horzPosn',
+            'right',
+            descr = _('Horizontal position'),
+            usertext=_('Horz posn'),
+            formatting=True) )
+        s.add( setting.AlignVertWManual(
+            'vertPosn',
+            'bottom',
+            descr = _('Vertical position'),
+            usertext=_('Vert posn'),
+            formatting=True) )
+        s.add( setting.DistanceOrAuto(
+            'width', 'Auto',
+            descr = _('Width of colorbar'),
+            usertext=_('Width'),
+            formatting=True) )
+        s.add( setting.DistanceOrAuto(
+            'height', 'Auto',
+            descr = _('Height of colorbar'),
+            usertext=_('Height'),
+            formatting=True) )
 
-        s.add( setting.Float( 'horzManual',
-                              0.,
-                              descr = _('Manual horizontal fractional position'),
-                              usertext=_('Horz manual'),
-                              formatting=True) )
-        s.add( setting.Float( 'vertManual',
-                              0.,
-                              descr = _('Manual vertical fractional position'),
-                              usertext=_('Vert manual'),
-                              formatting=True) )
+        s.add( setting.Float(
+            'horzManual',
+            0.,
+            descr = _('Manual horizontal fractional position'),
+            usertext=_('Horz manual'),
+            formatting=True) )
+        s.add( setting.Float(
+            'vertManual',
+            0.,
+            descr = _('Manual vertical fractional position'),
+            usertext=_('Vert manual'),
+            formatting=True) )
 
-        s.add( setting.Line('Border', descr = _('Colorbar border line'),
-                            usertext=_('Border')),
-               pixmap='settings_border')
+        s.add( setting.Line(
+            'Border', descr = _('Colorbar border line'),
+            usertext=_('Border')),
+            pixmap='settings_border')
 
         s.add( setting.SettingBackwardCompat('image', 'widgetName', None) )
 
@@ -237,8 +245,8 @@ class ColorBar(axis.Axis):
             painter.drawRect( routside )
 
         # actually draw axis
-        axis.Axis._axisDraw(self, bounds, parentposn, None, painter,
-                            phelper)
+        axis.Axis._axisDraw(
+            self, bounds, parentposn, None, painter, phelper)
 
 # allow the factory to instantiate a colorbar
-document.thefactory.register( ColorBar )
+document.thefactory.register(ColorBar)

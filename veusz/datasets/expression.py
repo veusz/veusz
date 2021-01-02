@@ -156,8 +156,9 @@ def _returnNumericDataset(doc, vals, dimensions, subdatasets):
             for ds in subdatasets:
                 d = doc.data[ds]
                 if d.dimensions == 2:
-                    for p in ('xrange', 'yrange', 'xedge', 'yedge',
-                              'xcent', 'ycent'):
+                    for p in (
+                            'xrange', 'yrange', 'xedge', 'yedge',
+                            'xcent', 'ycent' ):
                         dsrange[p] = getattr(d, p)
                     break
 
@@ -304,9 +305,9 @@ class DatasetExpression(Dataset1DBase):
             if len(evalout.shape) > 1:
                 raise RuntimeError("Number of dimensions is not 1")
         except Exception as ex:
-            self.document.log(
-                _("Error evaluating expression: %s\n"
-                  "Error: %s") % (self.expr[part], str(ex)) )
+            self.document.log(_(
+                "Error evaluating expression: %s\n"
+                "Error: %s") % (self.expr[part], str(ex)) )
             return False
 
         # make evaluated error expression have same shape as data
@@ -459,8 +460,10 @@ def getSpacing(data):
     if mindelta is None or mindelta == 0:
         raise DatasetExpressionException('Could not identify delta')
 
-    return (uniquesorted[0], uniquesorted[-1], mindelta,
-            int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1)
+    return (
+        uniquesorted[0], uniquesorted[-1], mindelta,
+        int((uniquesorted[-1]-uniquesorted[0])/mindelta)+1
+    )
 
 class Dataset2DXYZExpression(Dataset2DBase):
     '''A 2d dataset with expressions for x, y and z.'''

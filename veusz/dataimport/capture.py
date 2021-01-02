@@ -50,10 +50,12 @@ class CaptureStream(simpleread.Stream):
     def _setTimeout(self, timeout):
         """Setter for setting timeout property."""
         if timeout:
-            self.timer = qt.QTimer.singleShot(timeout*1000,
-                                               self._timedOut)
-    timeout = property(None, _setTimeout, None,
-                       "Time interval to stop in (seconds) or None")
+            self.timer = qt.QTimer.singleShot(
+                timeout*1000, self._timedOut)
+
+    timeout = property(
+        None, _setTimeout, None,
+        "Time interval to stop in (seconds) or None")
 
     def _timedOut(self):
         self.timedout = True
@@ -142,9 +144,10 @@ class CommandCaptureStream(CaptureStream):
         CaptureStream.__init__(self)
 
         self.name = commandline
-        self.popen = subprocess.Popen(commandline, shell=True,
-                                      bufsize=0, stdout=subprocess.PIPE,
-                                      universal_newlines=True)
+        self.popen = subprocess.Popen(
+            commandline, shell=True,
+            bufsize=0, stdout=subprocess.PIPE,
+            universal_newlines=True)
 
         # make new thread to read stdout
         self.readerthread = utils.NonBlockingReaderThread(self.popen.stdout)
@@ -159,8 +162,8 @@ class CommandCaptureStream(CaptureStream):
             poll = self.popen.poll()
             if poll is not None:
                 # process has ended
-                raise CaptureFinishException("Process ended (status code %i)" %
-                                             poll)
+                raise CaptureFinishException(
+                    "Process ended (status code %i)" % poll)
         return retn
 
     def close(self):
@@ -191,8 +194,8 @@ class SocketCaptureStream(CaptureStream):
 
         self.name = '%s:%i' % (host, port)
         try:
-            self.socket = socket.socket( socket.AF_INET,
-                                         socket.SOCK_STREAM )
+            self.socket = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM )
             self.socket.connect( (host, port) )
         except socket.error as e:
             self._handleSocketError(e)

@@ -37,21 +37,21 @@ _defaultmaps = {
     'blank': (
         (0,   0,   0,   0),
         (0,   0,   0,   0),
-        ),
+    ),
     'heat': (
         (0,   0,   0,   255),
         (0,   0,   186, 255),
         (50,  139, 255, 255),
         (19,  239, 248, 255),
         (255, 255, 255, 255),
-        ),
+    ),
     'spectrum2': (
         (0,   0,   255, 255),
         (0,   255, 255, 255),
         (0,   255, 0,   255),
         (255, 255, 0,   255),
         (255, 0,   0,   255),
-        ),
+    ),
     'spectrum2-step': (
         (-1,  0,   0,   0),
         (0,   0,   255, 255),
@@ -59,7 +59,7 @@ _defaultmaps = {
         (0,   255, 0,   255),
         (255, 255, 0,   255),
         (255, 0,   0,   255),
-        ),
+    ),
     'spectrum': (
         (0,   0,   0,   255),
         (0,   0,   255, 255),
@@ -68,44 +68,44 @@ _defaultmaps = {
         (255, 255, 0,   255),
         (255, 0,   0,   255),
         (255, 255, 255, 255),
-        ),
+    ),
     'grey': (
         (0,   0,   0,   255),
         (255, 255, 255, 255),
-        ),
+    ),
     'blue': (
         (0,   0,   0,   255),
         (255, 0,   0,   255),
         (255, 255, 255, 255),
-        ),
+    ),
     'red': (
         (0,   0,   0,   255),
         (0,   0,   255, 255),
         (255, 255, 255, 255),
-        ),
+    ),
     'green': (
         (0,   0,   0,   255),
         (0,   255, 0,   255),
         (255, 255, 255, 255),
-        ),
+    ),
     'bluegreen': (
         (0,   0,   0,   255),
         (255, 123, 0,   255),
         (255, 226, 72,  255),
         (161, 255, 0,   255),
         (255, 255, 255, 255),
-        ),
+    ),
     'transblack': (
         (0,   0,   0,   255),
         (0,   0,   0,   0),
-        ),
+    ),
     'royal': (
         (0,   0,   0,   255),
         (128, 0,   0,   255),
         (255, 0,   128, 255),
         (0,   255, 255, 255),
         (255, 255, 255, 255),
-        ),
+    ),
     'complement': (
         (0,   0,   0,   255),
         (0,   255, 0,   255),
@@ -113,7 +113,7 @@ _defaultmaps = {
         (0,   0,   255, 255),
         (0,   255, 255, 255),
         (255, 255, 255, 255),
-        ),
+    ),
 
     # from http://www.kennethmoreland.com/color-maps/
     'cool-warm': (
@@ -150,7 +150,7 @@ _defaultmaps = {
         (203, 62, 56, 255),
         (192, 40, 47, 255),
         (180, 4, 38, 255),
-        ),
+    ),
 
     # from http://geog.uoregon.edu/datagraphics/color_scales.htm
     'green-magenta': (
@@ -170,7 +170,7 @@ _defaultmaps = {
         (187, 0, 187, 255),
         (134, 0, 134, 255),
         (80, 0, 80, 255)
-        ),
+    ),
 
     'blue-darkred': (
         (216, 0, 36, 255),
@@ -191,7 +191,7 @@ _defaultmaps = {
         (53, 39, 247, 255),
         (47, 21, 216, 255),
         (33, 0, 165, 255)
-        ),
+    ),
 
     'blue-darkorange': (
         (102, 102, 0, 255),
@@ -212,7 +212,7 @@ _defaultmaps = {
         (0, 85, 204, 255),
         (0, 61, 153, 255),
         (0, 39, 102, 255)
-        ),
+    ),
 
     'brown-blue': (
         (0, 25, 51, 255),
@@ -227,7 +227,7 @@ _defaultmaps = {
         (255, 227, 50, 255),
         (204, 169, 0, 255),
         (153, 122, 0, 255)
-        ),
+    ),
 
     'blue-orange': (
         (255, 42, 0, 255),
@@ -242,7 +242,7 @@ _defaultmaps = {
         (50, 153, 255, 255),
         (25, 102, 255, 255),
         (0, 42, 255, 255)
-        ),
+    ),
 
     'seq': (
         (15, 15, 153, 255),
@@ -270,7 +270,7 @@ _defaultmaps = {
         (204, 81, 101, 255),
         (229, 126, 143, 255),
         (255, 178, 191, 255),
-        ),
+    ),
 
     # from https://github.com/visit-vis/VisIt/blob/master/avt/Pipeline/Data/avtColorTables.C
     'hot_desaturated': (
@@ -282,7 +282,7 @@ _defaultmaps = {
         (0,   96,  255, 255),
         (0,   0,   107, 255),
         (76,  76,  224, 255),
-        ),
+    ),
 
     # exported from VisIt color table (http://www.visitusers.org)
     'yellow-green': (
@@ -295,7 +295,7 @@ _defaultmaps = {
         (67,  132, 35,  255),
         (55,  104, 0,   255),
         (41,  69,  0,   255),
-        ),
+    ),
     'yellow-green-blue': (
         (217, 255, 255, 255),
         (177, 248, 237, 255),
@@ -306,7 +306,7 @@ _defaultmaps = {
         (168, 94,  34,  255),
         (148, 52,  37,  255),
         (88,  29,  8,   255),
-        ),
+    ),
     'yellow-orange-brown': (
         (229, 255, 255, 255),
         (188, 247, 255, 255),
@@ -317,7 +317,7 @@ _defaultmaps = {
         (2,   76,  204, 255),
         (4,   52,  153, 255),
         (6,   37,  102, 255),
-        ),
+    ),
     'yellow-orange-red': (
         (204, 255, 255, 255),
         (160, 237, 255, 255),
@@ -328,7 +328,7 @@ _defaultmaps = {
         (28,  26,  227, 255),
         (38,  0,   189, 255),
         (38,  0,   128, 255),
-        ),
+    ),
 
     'none': (
         (255, 255, 255, 255),
@@ -968,8 +968,9 @@ def applyColorMap(cmap, scaling, datain, minval, maxval,
     # apply transparency
     if trans != 0:
         cmap = cmap.copy()
-        cmap[:,3] = (cmap[:,3].astype(N.float32) * (100-trans) /
-                     100.).astype(N.intc)
+        cmap[:,3] = (
+            cmap[:,3].astype(N.float32) * (100-trans) /
+            100.).astype(N.intc)
 
     # apply scaling of data
     fracs = applyScaling(datain, scaling, minval, maxval)
@@ -1006,8 +1007,8 @@ def makeColorbarImage(minval, maxval, scaling, cmap, transparency,
         assert direction == 'vertical'
         vals = vals.reshape(barsize, 1)
 
-    img = applyColorMap(cmap, colorscaling, vals,
-                        minval, maxval, transparency)
+    img = applyColorMap(
+        cmap, colorscaling, vals, minval, maxval, transparency)
 
     return img
 

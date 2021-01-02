@@ -91,15 +91,15 @@ class Covariance(plotters.GenericPlotter):
 
         s.add( CovarianceLine(
             'Line',
-            descr = _('Line'),
-            usertext = _('Ellipse line')),
-               pixmap = 'settings_plotline' )
+            descr=_('Line'),
+            usertext=_('Ellipse line')),
+            pixmap='settings_plotline' )
 
         s.add( setting.PlotterFill(
             'Fill',
-            descr = _('Fill'),
-            usertext = _('Ellipse fill')),
-               pixmap = 'settings_plotfillbelow' )
+            descr=_('Fill'),
+            usertext=_('Ellipse fill')),
+            pixmap='settings_plotfillbelow' )
 
     def _computeCovFromData(self, data):
         """Compute a single covariance matrix given data."""

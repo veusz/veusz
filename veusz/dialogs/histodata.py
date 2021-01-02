@@ -45,8 +45,9 @@ class ManualBinModel(qt.QAbstractListModel):
     def rowCount(self, parent):
         return len(self.thedata)
     def flags(self, index):
-        return ( qt.Qt.ItemIsSelectable | qt.Qt.ItemIsEnabled |
-                 qt.Qt.ItemIsEditable )
+        return (
+            qt.Qt.ItemIsSelectable | qt.Qt.ItemIsEnabled |
+            qt.Qt.ItemIsEditable )
     def setData(self, index, value, role):
         if role == qt.Qt.EditRole:
             try:
@@ -261,12 +262,16 @@ class HistoDataDialog(VeuszDialog):
             self.binmodel.endResetModel()
 
         # select correct method
-        {'counts': self.counts, 'density': self.density,
-         'fractions': self.fractions}[gen.method].click()
+        {
+            'counts': self.counts, 'density': self.density,
+            'fractions': self.fractions
+        }[gen.method].click()
 
         # select if cumulative
-        {'none': self.cumlOff, 'smalltolarge': self.cumlStoL,
-         'largetosmall': self.cumlLtoS}[gen.cumulative].click()
+        {
+            'none': self.cumlOff, 'smalltolarge': self.cumlStoL,
+            'largetosmall': self.cumlLtoS
+        }[gen.cumulative].click()
 
         # if error bars
         self.errorBars.setChecked( bool(gen.errors) )

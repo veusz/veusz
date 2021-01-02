@@ -102,10 +102,9 @@ def cropGridImageToBox(image, gridx, gridy, posn):
             # reverse order of grid
             gridr = grid[::-1]
 
-            i1 = max( len(grid) - N.searchsorted(gridr, p2, side='left')-1,
-                      0)
-            i2 = min( len(grid) - N.searchsorted(gridr, p1, side='right'),
-                      len(grid) ) + 1
+            i1 = max(len(grid)-N.searchsorted(gridr, p2, side='left')-1, 0)
+            i2 = min(
+                len(grid)-N.searchsorted(gridr, p1, side='right'), len(grid))+1
 
         return i1, i2
 
@@ -149,63 +148,63 @@ class Image(plotters.GenericPlotter):
 
         s.add( setting.DatasetExtended(
             'data', '',
-            dimensions = 2,
-            descr = _('Dataset to plot'),
+            dimensions=2,
+            descr=_('Dataset to plot'),
             usertext=_('Dataset')), 0 )
         s.add( setting.FloatOrAuto(
             'min', 'Auto',
-            descr = _('Minimum value of image scale'),
+            descr=_('Minimum value of image scale'),
             usertext=_('Min. value')), 1 )
         s.add( setting.FloatOrAuto(
             'max', 'Auto',
-            descr = _('Maximum value of image scale'),
+            descr=_('Maximum value of image scale'),
             usertext=_('Max. value')), 2 )
         s.add( setting.Choice(
             'colorScaling',
             ['linear', 'sqrt', 'log', 'squared'],
             'linear',
-            descr = _('Scaling to transform numbers to color'),
+            descr=_('Scaling to transform numbers to color'),
             usertext=_('Scaling')), 3 )
 
         s.add( setting.DatasetExtended(
             'transparencyData', '',
-            dimensions = 2,
-            descr = _('Dataset to use for transparency (0 to 1)'),
+            dimensions=2,
+            descr=_('Dataset to use for transparency (0 to 1)'),
             usertext=_('Trans. data')), 4 )
 
         s.add( setting.Choice(
             'mapping',
             ('pixels', 'bounds'),
             'pixels',
-            descr = _('Map image using pixels or bound coordinates'),
+            descr=_('Map image using pixels or bound coordinates'),
             usertext=_('Mapping')), 5 )
 
         s.add( setting.Colormap(
             'colorMap',
             'grey',
-            descr = _('Set of colors to plot data with'),
+            descr=_('Set of colors to plot data with'),
             usertext=_('Colormap'),
             formatting=True), 5 )
         s.add( setting.Bool(
             'colorInvert', False,
-            descr = _('Invert color map'),
+            descr=_('Invert color map'),
             usertext=_('Invert colormap'),
             formatting=True), 6 )
         s.add( setting.Int(
             'transparency', 0,
-            descr = _('Transparency percentage'),
-            usertext = _('Transparency'),
-            minval = 0,
-            maxval = 100,
+            descr=_('Transparency percentage'),
+            usertext=_('Transparency'),
+            minval=0,
+            maxval=100,
             formatting=True), 7 )
 
         s.add( setting.Choice(
             'drawMode',
             ['default', 'resample-pixels', 'resample-smooth', 'rectangles'],
             'default',
-            descr = _('Method for drawing output'),
+            descr=_('Method for drawing output'),
             usertext=_('Draw Mode'),
-            formatting = True ) )
+            formatting=True ) )
 
         # translate smooth to drawMode
         s.add( setting.SettingBackwardCompat(

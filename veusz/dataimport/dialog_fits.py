@@ -194,15 +194,16 @@ class ImportTabFITS(importdialog.ImportTab):
             'pixel': 1,
             'pixel_wcs': 2,
             'fraction': 3,
-            }[wcsmode]
+        }[wcsmode]
         self.fitswcsmode.setCurrentIndex(idx)
 
     def updateOptionsTwoD(self, node):
         """Read options for 2d datasets on dialog."""
 
         rangeout = []
-        for w in (self.fitstwodminx, self.fitstwodminy,
-                  self.fitstwodmaxx, self.fitstwodmaxy):
+        for w in (
+                self.fitstwodminx, self.fitstwodminy,
+                self.fitstwodmaxx, self.fitstwodmaxy):
             txt = w.text()
             val, ok = setting.uilocale.toDouble(txt)
             if not ok: val = None
@@ -258,7 +259,7 @@ class ImportTabFITS(importdialog.ImportTab):
 
         for widget, name in (
             (self.fitstwodgrp, 'twod'),
-            ):
+        ):
             if name == toshow:
                 widget.show()
             else:
@@ -315,7 +316,7 @@ class ImportTabFITS(importdialog.ImportTab):
             tags=tags,
             prefix=prefix, suffix=suffix,
             linked=linked,
-            )
+        )
 
         op = defn_fits.OperationDataImportFITS(params)
 

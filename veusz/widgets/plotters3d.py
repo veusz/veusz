@@ -50,15 +50,15 @@ class GenericPlotter3D(widget.Widget):
         #     usertext=_('Key text')) )
         s.add( setting.Axis(
             'xAxis', 'x', 'x',
-            descr = _('Name of X-axis to use'),
+            descr=_('Name of X-axis to use'),
             usertext=_('X axis')) )
         s.add( setting.Axis(
             'yAxis', 'y', 'y',
-            descr = _('Name of Y-axis to use'),
+            descr=_('Name of Y-axis to use'),
             usertext=_('Y axis')) )
         s.add( setting.Axis(
             'zAxis', 'z', 'z',
-            descr = _('Name of Z-axis to use'),
+            descr=_('Name of Z-axis to use'),
             usertext=_('Z axis')) )
 
     def autoColor(self, painter, dataindex=0):
@@ -164,12 +164,14 @@ class GenericPlotter3D(widget.Widget):
     def makeClipContainer(self, axes):
         """Make an object container to clip data to axes."""
         return threed.ClipContainer(
-            threed.Vec3(axes[0].settings.lowerPosition,
-                        axes[1].settings.lowerPosition,
-                        axes[2].settings.lowerPosition),
-            threed.Vec3(axes[0].settings.upperPosition,
-                        axes[1].settings.upperPosition,
-                        axes[2].settings.upperPosition))
+            threed.Vec3(
+                axes[0].settings.lowerPosition,
+                axes[1].settings.lowerPosition,
+                axes[2].settings.lowerPosition),
+            threed.Vec3(
+                axes[0].settings.upperPosition,
+                axes[1].settings.upperPosition,
+                axes[2].settings.upperPosition))
 
     def drawToObject(self, painter, painthelper):
         # exit if hidden or function blank

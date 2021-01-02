@@ -56,8 +56,9 @@ class Line(plotters.FreePlotter):
             'mode',
             ('length-angle', 'point-to-point'),
             'length-angle',
-            descr=_('Provide line position and length,angle or '
-                    'first and second points'),
+            descr=_(
+                'Provide line position and length,angle '
+                'or first and second points'),
             usertext=_('Mode'),
             formatting=False,
             showfn=klass.showOrHideSetn), 0)
@@ -71,22 +72,24 @@ class Line(plotters.FreePlotter):
         s.add( setting.DatasetExtended(
             'angle',
             [0.],
-            descr=_('List of angle of lines, dataset or expression '
-                    '(degrees)'),
+            descr=_(
+                'List of angle of lines, dataset or expression (degrees)'),
             usertext=_('Angles'),
             formatting=False), 5 )
         s.add( setting.DatasetExtended(
             'xPos2',
             [1.],
-            descr=_('List of fractional X coordinates, dataset or '
-                    'expression for point 2'),
+            descr=_(
+                'List of fractional X coordinates, dataset or '
+                'expression for point 2'),
             usertext=_('X positions 2'),
             formatting=False), 6 )
         s.add( setting.DatasetExtended(
             'yPos2',
             [1.],
-            descr=_('List of fractional Y coordinates, dataset or '
-                    'expression for point 2'),
+            descr=_(
+                'List of fractional Y coordinates, dataset or '
+                'expression for point 2'),
             usertext=_('Y positions 2'),
             formatting=False), 7 )
 

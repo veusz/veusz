@@ -145,8 +145,8 @@ class DatasetTableModel1D(qt.QAbstractTableModel):
         ops = document.OperationMultiple([], descr=_('set value'))
         if data is None:
             ops.addOperation(
-                document.OperationDatasetAddColumn(self.dsname,
-                                                   ds.columns[column]))
+                document.OperationDatasetAddColumn(
+                    self.dsname, ds.columns[column]))
 
         # add a row if necessary
         if row == len(ds.data):
@@ -160,9 +160,8 @@ class DatasetTableModel1D(qt.QAbstractTableModel):
             return False
 
         ops.addOperation(
-            document.OperationDatasetSetVal(self.dsname,
-                                            ds.columns[column],
-                                            row, val))
+            document.OperationDatasetSetVal(
+                self.dsname, ds.columns[column], row, val))
         try:
             self.document.applyOperation(ops)
         except RuntimeError:
@@ -584,20 +583,23 @@ class DataEditDialog(VeuszDialog):
             self.slotDatasetsSelected)
 
         # connect buttons
-        for btn, slot in ( (self.deletebutton, self.slotDatasetDelete),
-                           (self.unlinkbutton, self.slotDatasetUnlink),
-                           (self.duplicatebutton, self.slotDatasetDuplicate),
-                           (self.importbutton, self.slotDatasetImport),
-                           (self.createbutton, self.slotDatasetCreate),
-                           (self.editbutton, self.slotDatasetEdit),
-                           ):
+        for btn, slot in (
+                (self.deletebutton, self.slotDatasetDelete),
+                (self.unlinkbutton, self.slotDatasetUnlink),
+                (self.duplicatebutton, self.slotDatasetDuplicate),
+                (self.importbutton, self.slotDatasetImport),
+                (self.createbutton, self.slotDatasetCreate),
+                (self.editbutton, self.slotDatasetEdit),
+        ):
             btn.clicked.connect(slot)
 
         # menu for new button
         self.newmenu = qt.QMenu()
-        for text, slot in ( (_('Numerical dataset'), self.slotNewNumericalDataset),
-                            (_('Text dataset'), self.slotNewTextDataset),
-                            (_('Date/time dataset'), self.slotNewDateDataset) ):
+        for text, slot in (
+                (_('Numerical dataset'), self.slotNewNumericalDataset),
+                (_('Text dataset'), self.slotNewTextDataset),
+                (_('Date/time dataset'), self.slotNewDateDataset)
+        ):
             a = self.newmenu.addAction(text)
             a.triggered.connect(slot)
         self.newbutton.setMenu(self.newmenu)
@@ -708,8 +710,8 @@ class DataEditDialog(VeuszDialog):
         for name in self.dsbrowser.navtree.getSelectedDatasets():
             dataset = self.document.data[name]
             try:
-                recreate_register[type(dataset)](self.mainwindow, self.document,
-                                                 dataset, name)
+                recreate_register[type(dataset)](
+                    self.mainwindow, self.document, dataset, name)
             except KeyError:
                 pass
 

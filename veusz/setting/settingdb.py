@@ -132,7 +132,7 @@ class _SettingDB:
         'command': 'blue',
         'cntrlline': 'blue',
         'cntrlcorner': 'black',
-        }
+    }
 
     def __init__(self):
         """Initialise the object, reading the settings."""
@@ -182,8 +182,9 @@ class _SettingDB:
             try:
                 self.database[realkey] = eval(val)
             except:
-                print('Error interpreting item "%s" in '
-                      'settings file' % realkey, file=sys.stderr)
+                print(
+                    'Error interpreting item "%s" in '
+                    'settings file' % realkey, file=sys.stderr)
 
         # set any defaults which haven't been set
         for key in defaultValues:

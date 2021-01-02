@@ -86,27 +86,27 @@ class Volume3D(plotters3d.GenericPlotter3D):
             usertext=_('X data')), 0 )
         s.add(DataColor(
             'DataColor', dimensions=1),
-              0)
+            0)
 
         s.add(setting.Colormap(
             'colorMap',
             'grey',
-            descr = _('Set of colors to plot data with'),
+            descr=_('Set of colors to plot data with'),
             usertext=_('Colormap'),
             formatting=True),
             0)
         s.add(setting.Bool(
             'colorInvert', False,
-            descr = _('Invert color map'),
+            descr=_('Invert color map'),
             usertext=_('Invert colormap'),
             formatting=True),
             1)
         s.add(setting.Int(
             'transparency', 50,
-            descr = _('Transparency percentage'),
-            usertext = _('Transparency'),
-            minval = 0,
-            maxval = 100,
+            descr=_('Transparency percentage'),
+            usertext=_('Transparency'),
+            minval=0,
+            maxval=100,
             formatting=True),
             2)
         s.add(setting.Int(
@@ -126,9 +126,9 @@ class Volume3D(plotters3d.GenericPlotter3D):
 
         s.add(setting.Line3D(
             'Line',
-            descr = _('Line settings'),
-            usertext = _('Box line')),
-               pixmap = 'settings_plotline' )
+            descr=_('Line settings'),
+            usertext=_('Box line')),
+            pixmap='settings_plotline' )
 
     def affectsAxisRange(self):
         """Which axes this widget affects."""

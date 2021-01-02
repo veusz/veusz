@@ -98,7 +98,7 @@ class Function3D(plotters3d.GenericPlotter3D):
             'x,y=fns(z)': (('fnx', 'fny'), ('fnz',)),
             'y,z=fns(x)': (('fny', 'fnz'), ('fnx',)),
             'x,z=fns(y)': (('fnx', 'fnz'), ('fny',)),
-            }[v]
+        }[v]
 
     @classmethod
     def addSettings(klass, s):
@@ -107,16 +107,17 @@ class Function3D(plotters3d.GenericPlotter3D):
         s.add(setting.Int(
             'linesteps',
             50,
-            minval = 3,
-            descr = _('Number of steps to evaluate the function over for lines'),
+            minval=3,
+            descr=_('Number of steps to evaluate the function over for lines'),
             usertext=_('Line steps'),
             formatting=True ))
         s.add(setting.Int(
             'surfacesteps',
             20,
-            minval = 3,
-            descr = _('Number of steps to evaluate the function over for surfaces'
-                      ' in each direction'),
+            minval=3,
+            descr=_(
+                'Number of steps to evaluate the function over for surfaces'
+                ' in each direction'),
             usertext=_('Surface steps'),
             formatting=True ))
         s.add(setting.ChoiceSwitch(
@@ -146,24 +147,24 @@ class Function3D(plotters3d.GenericPlotter3D):
         s.add( setting.Color(
             'color',
             'auto',
-            descr = _('Master color'),
-            usertext = _('Color'),
+            descr=_('Master color'),
+            usertext=_('Color'),
             formatting=True), 0 )
         s.add(FunctionLine(
             'Line',
-            descr = _('Line settings'),
-            usertext = _('Plot line')),
-               pixmap = 'settings_plotline' )
+            descr=_('Line settings'),
+            usertext=_('Plot line')),
+            pixmap='settings_plotline' )
         s.add(setting.LineGrid3D(
             'GridLine',
-            descr = _('Grid line settings'),
-            usertext = _('Grid line')),
-               pixmap = 'settings_gridline' )
+            descr=_('Grid line settings'),
+            usertext=_('Grid line')),
+            pixmap='settings_gridline' )
         s.add(FunctionSurface(
             'Surface',
-            descr = _('Surface fill settings'),
+            descr=_('Surface fill settings'),
             usertext=_('Surface')),
-              pixmap='settings_bgfill' )
+            pixmap='settings_bgfill' )
 
     def affectsAxisRange(self):
         """Which axes this widget affects."""
@@ -435,9 +436,11 @@ class Function3D(plotters3d.GenericPlotter3D):
         if not s.GridLine.hide:
             lineprop = s.GridLine.makeLineProp(painter)
 
-        dirn = {'x': threed.Mesh.X_DIRN,
-                'y': threed.Mesh.Y_DIRN,
-                'z': threed.Mesh.Z_DIRN}[depvar]
+        dirn = {
+            'x': threed.Mesh.X_DIRN,
+            'y': threed.Mesh.Y_DIRN,
+            'z': threed.Mesh.Z_DIRN
+        }[depvar]
 
         mesh = threed.Mesh(
             threed.ValVector(lsteps1), threed.ValVector(lsteps2),

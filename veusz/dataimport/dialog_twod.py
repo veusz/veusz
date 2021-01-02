@@ -38,8 +38,10 @@ class ImportTab2D(importdialog.ImportTab):
         """Load user interface and set up validators."""
         importdialog.ImportTab.loadUi(self)
 
-        self.rangeedits = [ self.twod_xminedit, self.twod_xmaxedit,
-                            self.twod_yminedit, self.twod_ymaxedit ]
+        self.rangeedits = [
+            self.twod_xminedit, self.twod_xmaxedit,
+            self.twod_yminedit, self.twod_ymaxedit
+        ]
 
         # set up some validators for 2d edits
         dval = qt.QDoubleValidator(self)
@@ -73,9 +75,10 @@ class ImportTab2D(importdialog.ImportTab):
         """Reset controls."""
         for combo in self.rangeedits + [self.twod_datasetsedit]:
             combo.setEditText("")
-        for check in (self.twod_invertrowscheck, self.twod_invertcolscheck,
-                      self.twod_transposecheck, self.twod_gridatedge,
-                      self.twod_gridatedge):
+        for check in (
+                self.twod_invertrowscheck, self.twod_invertcolscheck,
+                self.twod_transposecheck, self.twod_gridatedge,
+                self.twod_gridatedge ):
             check.setChecked(False)
         self.twod_mode.setCurrentIndex(0)
         self.twod_csvdelim.setEditText(dialog_csv.csv_delimiters[0])
@@ -171,7 +174,7 @@ class ImportTab2D(importdialog.ImportTab):
             tags=tags,
             linked=linked,
             encoding=encoding
-            )
+        )
 
         try:
             op = defn_twod.OperationDataImport2D(params)

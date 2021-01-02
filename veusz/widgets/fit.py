@@ -123,9 +123,10 @@ class Fit(FunctionPlotter):
     def __init__(self, parent, name=None):
         FunctionPlotter.__init__(self, parent, name=name)
 
-        self.addAction( widget.Action('fit', self.actionFit,
-                                      descr = _('Fit function'),
-                                      usertext = _('Fit function')) )
+        self.addAction( widget.Action(
+            'fit', self.actionFit,
+            descr=_('Fit function'),
+            usertext=_('Fit function')) )
 
     @classmethod
     def addSettings(klass, s):
@@ -133,50 +134,49 @@ class Fit(FunctionPlotter):
         FunctionPlotter.addSettings(s)
 
         s.add( setting.FloatDict(
-                'values',
-                {'a': 0.0, 'b': 1.0},
-                descr = _('Variables and fit values'),
-                usertext=_('Parameters')), 1 )
+            'values',
+            {'a': 0.0, 'b': 1.0},
+            descr=_('Variables and fit values'),
+            usertext=_('Parameters')), 1 )
         s.add( setting.DatasetExtended(
-                'xData', 'x',
-                descr = _('X data to fit (dataset name, list of values '
-                          'or expression)'),
-                usertext=_('X data')), 2 )
+            'xData', 'x',
+            descr=_('X data to fit (dataset name, list of values or expression)'),
+            usertext=_('X data')), 2 )
         s.add( setting.DatasetExtended(
-                'yData', 'y',
-                descr = _('Y data to fit (dataset name, list of values '
-                          'or expression)'),
-                usertext=_('Y data')), 3 )
+            'yData', 'y',
+            descr=_('Y data to fit (dataset name, list of values or expression)'),
+            usertext=_('Y data')), 3 )
         s.add( setting.Bool(
-                'fitRange', False,
-                descr = _('Fit only the data between the '
-                          'minimum and maximum of the axis for '
-                          'the function variable'),
-                usertext=_('Fit only range')),
-               4 )
+            'fitRange', False,
+            descr=_(
+                'Fit only the data between the minimum and maximum '
+                'of the axis for the function variable'),
+            usertext=_('Fit only range')), 4 )
         s.add( setting.WidgetChoice(
-                'outLabel', '',
-                descr=_('Write best fit parameters to this text label '
-                        'after fitting'),
-                widgettypes=('label',),
-                usertext=_('Output label')),
-               5 )
-        s.add( setting.Str('outExpr', '',
-                           descr = _('Output best fitting expression'),
-                           usertext=_('Output expression')),
-               6, readonly=True )
-        s.add( setting.Float('chi2', -1,
-                             descr = 'Output chi^2 from fitting',
-                             usertext=_('Fit &chi;<sup>2</sup>')),
-               7, readonly=True )
-        s.add( setting.Int('dof', -1,
-                           descr = _('Output degrees of freedom from fitting'),
-                           usertext=_('Fit d.o.f.')),
-               8, readonly=True )
-        s.add( setting.Float('redchi2', -1,
-                             descr = _('Output reduced-chi-squared from fitting'),
-                             usertext=_('Fit reduced &chi;<sup>2</sup>')),
-               9, readonly=True )
+            'outLabel', '',
+            descr=_('Write best fit parameters to this text label after fitting'),
+            widgettypes=('label',),
+            usertext=_('Output label')), 5 )
+        s.add( setting.Str(
+            'outExpr', '',
+            descr=_('Output best fitting expression'),
+            usertext=_('Output expression')),
+            6, readonly=True )
+        s.add( setting.Float(
+            'chi2', -1,
+            descr='Output chi^2 from fitting',
+            usertext=_('Fit &chi;<sup>2</sup>')),
+            7, readonly=True )
+        s.add( setting.Int(
+            'dof', -1,
+            descr=_('Output degrees of freedom from fitting'),
+            usertext=_('Fit d.o.f.')),
+            8, readonly=True )
+        s.add( setting.Float(
+            'redchi2', -1,
+            descr=_('Output reduced-chi-squared from fitting'),
+            usertext=_('Fit reduced &chi;<sup>2</sup>')),
+            9, readonly=True )
 
         f = s.get('function')
         f.newDefault('a + b*x')
@@ -221,14 +221,14 @@ class Fit(FunctionPlotter):
                 txt.append( '%s = %s' % (l, val) )
             # add chi2 output
             txt.append( r'\chi^{2}_{\nu} = %s/%i = %s' % (
-                    utils.formatNumber(chi2, '%.4Vg', locale=loc),
-                    dof,
-                    utils.formatNumber(chi2/dof, '%.4Vg', locale=loc) ))
+                utils.formatNumber(chi2, '%.4Vg', locale=loc),
+                dof,
+                utils.formatNumber(chi2/dof, '%.4Vg', locale=loc) ))
 
             # update label with text
             text = r'\\'.join(txt)
             ops.append( document.OperationSettingSet(
-                    labelwidget.settings.get('label') , text ) )
+                labelwidget.settings.get('label') , text ) )
 
     def actionFit(self):
         """Fit the data."""
@@ -278,8 +278,8 @@ class Fit(FunctionPlotter):
                 drange = self.parent.getAxes((s.yAxis,))[0].getPlottedRange()
                 mask = N.logical_and(yvals >= drange[0], yvals <= drange[1])
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
-            print("Fitting %s from %g to %g" % (s.variable,
-                                                drange[0], drange[1]))
+            print("Fitting %s from %g to %g" % (
+                s.variable, drange[0], drange[1]))
 
         evalenv = self.initEnviron()
         def evalfunc(params, xvals):
@@ -401,4 +401,4 @@ class Fit(FunctionPlotter):
         return ''.join(parts)
 
 # allow the factory to instantiate an x,y plotter
-document.thefactory.register( Fit )
+document.thefactory.register(Fit)

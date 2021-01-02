@@ -53,7 +53,7 @@ class ImportParamsCSV(base.ImportParamsBase):
         'numericlocale': 'en_US',
         'dateformat': 'YYYY-MM-DD|T|hh:mm:ss',
         'headermode': 'multi',
-        }
+    }
     defaults.update(base.ImportParamsBase.defaults)
 
     def __init__(self, **argsv):
@@ -161,7 +161,7 @@ def ImportFileCSV(comm, filename,
         prefix=dsprefix, suffix=dssuffix,
         renames=renames,
         linked=linked,
-        )
+    )
     op = OperationDataImportCSV(params)
     comm.document.applyOperation(op)
 

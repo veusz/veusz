@@ -87,8 +87,8 @@ class HistoryCombo(qt.QComboBox):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
-        return '%s_%s_HistoryCombo'  % ( dialog.objectName(),
-                                         self.objectName() )
+        return '%s_%s_HistoryCombo'  % (
+            dialog.objectName(), self.objectName() )
 
     def loadHistory(self):
         """Load contents of history combo from settings."""

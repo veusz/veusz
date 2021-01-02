@@ -50,13 +50,15 @@ class NonOrthPoint(Widget):
 
         s.add( setting.DatasetExtended(
             'data1', 'x',
-            descr=_('Dataset containing 1st dataset, list of values '
-                    'or expression'),
+            descr=_(
+                'Dataset containing 1st dataset, list of values '
+                'or expression'),
             usertext=_('Dataset 1')) )
         s.add( setting.DatasetExtended(
             'data2', 'y',
-            descr=_('Dataset containing 2nd dataset, list of values '
-                    'or expression'),
+            descr=_(
+                'Dataset containing 2nd dataset, list of values '
+                'or expression'),
             usertext=_('Dataset 2')) )
         s.add( setting.DatasetOrStr(
             'labels', '',
@@ -64,8 +66,9 @@ class NonOrthPoint(Widget):
             usertext=_('Labels')) )
         s.add( setting.DatasetExtended(
             'scalePoints', '',
-            descr = _('Scale size of plotted markers by this dataset, '
-                      ' list of values or expression'),
+            descr = _(
+                'Scale size of plotted markers by this dataset, '
+                ' list of values or expression'),
             usertext=_('Scale markers')) )
         s.add( setting.DataColor('Color') )
 

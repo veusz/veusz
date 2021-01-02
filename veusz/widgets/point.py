@@ -330,14 +330,15 @@ class MarkerFillBrush(setting.Brush):
 
         self.add( setting.Colormap(
             'colorMap', 'grey',
-            descr = _('If color markers dataset is given, use this colormap '
-                      'instead of the fill color'),
+            descr=_(
+                'If color markers dataset is given, use this colormap '
+                'instead of the fill color'),
             usertext=_('Color map'),
             formatting=True) )
         self.add( setting.Bool(
             'colorMapInvert', False,
-            descr = _('Invert color map'),
-            usertext = _('Invert map'),
+            descr=_('Invert color map'),
+            usertext=_('Invert map'),
             formatting=True) )
         self.add( setting.Bool(
             'newMarkerSizes', False,
@@ -372,8 +373,9 @@ class PointPlotter(GenericPlotter):
             usertext=_('Labels')), 5 )
         s.add( setting.DatasetExtended(
             'scalePoints', '',
-            descr = _('Scale size of markers given by dataset, expression'
-                      ' or list of values'),
+            descr=_(
+                'Scale size of markers given by dataset, expression'
+                ' or list of values'),
             usertext=_('Scale markers')), 6 )
 
         # formatting
@@ -386,25 +388,26 @@ class PointPlotter(GenericPlotter):
         s.add( setting.Int(
             'thinfactor', 1,
             minval=1,
-            descr=_('Thin number of markers plotted'
-                    ' for each datapoint by this factor'),
+            descr=_(
+                'Thin number of markers plotted for each datapoint '
+                'by this factor'),
             usertext=_('Thin markers'),
             formatting=True), 0 )
         s.add( setting.Color(
             'color',
             'auto',
-            descr = _('Master color'),
-            usertext = _('Color'),
+            descr=_('Master color'),
+            usertext=_('Color'),
             formatting=True), 0 )
         s.add( setting.DistancePt(
             'markerSize',
             '3pt',
-            descr = _('Size of marker to plot'),
+            descr=_('Size of marker to plot'),
             usertext=_('Marker size'), formatting=True), 0 )
         s.add( setting.Marker(
             'marker',
             'circle',
-            descr = _('Type of marker to plot'),
+            descr=_('Type of marker to plot'),
             usertext=_('Marker'), formatting=True), 0 )
         s.add( setting.DataColor('Color') )
 
@@ -416,44 +419,44 @@ class PointPlotter(GenericPlotter):
 
         s.add( setting.XYPlotLine(
             'PlotLine',
-            descr = _('Plot line'),
-            usertext = _('Plot line')),
-               pixmap = 'settings_plotline' )
+            descr=_('Plot line'),
+            usertext=_('Plot line')),
+            pixmap='settings_plotline' )
 
         s.add( setting.MarkerLine(
             'MarkerLine',
-            descr = _('Line around marker'),
-            usertext = _('Marker border')),
-               pixmap = 'settings_plotmarkerline' )
+            descr=_('Line around marker'),
+            usertext=_('Marker border')),
+            pixmap='settings_plotmarkerline' )
         s.add( MarkerFillBrush(
             'MarkerFill',
-            descr = _('Marker fill'),
-            usertext = _('Marker fill')),
-               pixmap = 'settings_plotmarkerfill' )
+            descr=_('Marker fill'),
+            usertext=_('Marker fill')),
+            pixmap='settings_plotmarkerfill' )
 
         s.add( setting.ErrorBarLine(
             'ErrorBarLine',
-            descr = _('Error bar line'),
-            usertext = _('Error bar line')),
-               pixmap = 'settings_ploterrorline' )
+            descr=_('Error bar line'),
+            usertext=_('Error bar line')),
+            pixmap='settings_ploterrorline' )
         s.ErrorBarLine.get('color').newDefault( setting.Reference('../color') )
 
         s.add( setting.PointFill(
             'FillBelow',
-            descr = _('Fill mode 1'),
-            usertext = _('Fill 1')),
-               pixmap = 'settings_plotfillbelow' )
+            descr=_('Fill mode 1'),
+            usertext=_('Fill 1')),
+            pixmap='settings_plotfillbelow' )
         s.FillBelow.get('fillto').newDefault('bottom')
         s.add( setting.PointFill(
             'FillAbove',
-            descr = _('Fill 2'),
-            usertext = _('Fill 2')),
-               pixmap = 'settings_plotfillabove' )
+            descr=_('Fill 2'),
+            usertext=_('Fill 2')),
+            pixmap='settings_plotfillabove' )
         s.add( setting.PointLabel(
             'Label',
-            descr = _('Label settings'),
+            descr=_('Label settings'),
             usertext=_('Label')),
-               pixmap = 'settings_axislabel' )
+            pixmap='settings_axislabel' )
 
     @classmethod
     def onNewCompatLevel(klass, stylesheet, level):
@@ -850,8 +853,10 @@ class PointPlotter(GenericPlotter):
         """Return parameters for colorbar."""
         s = self.settings
         c = s.Color
-        return (c.min, c.max, c.scaling, s.MarkerFill.colorMap, 0,
-                s.MarkerFill.colorMapInvert)
+        return (
+            c.min, c.max, c.scaling, s.MarkerFill.colorMap, 0,
+            s.MarkerFill.colorMapInvert
+        )
 
     def dataDraw(self, painter, axes, posn, cliprect):
         """Plot the data on a plotter."""
@@ -929,8 +934,9 @@ class PointPlotter(GenericPlotter):
             # plot normal errors bars
             if s.errorStyle not in ('fillvert', 'fillhorz'):
                 # normally the error bar is painted after the line
-                self._plotErrors(posn, painter, xpltpoint, ypltpoint,
-                                 axes, xvals, yvals, cliprect)
+                self._plotErrors(
+                    posn, painter, xpltpoint, ypltpoint,
+                    axes, xvals, yvals, cliprect)
 
             # plot the points (we do this last so they are on top)
             markersize = s.get('markerSize').convert(painter)
@@ -994,4 +1000,4 @@ class PointPlotter(GenericPlotter):
                     tvals, markersize)
 
 # allow the factory to instantiate an x,y plotter
-document.thefactory.register( PointPlotter )
+document.thefactory.register(PointPlotter)

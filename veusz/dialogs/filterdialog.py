@@ -109,7 +109,7 @@ class FilterDialog(VeuszDialog):
         datasets = [
             d for d in gen.indatasets
             if d in self.document.data
-            ]
+        ]
         self.dsbrowser.setCheckedDatasets(datasets)
 
 def recreateDataset(mainwindow, document, dataset, datasetname):

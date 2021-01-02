@@ -174,8 +174,8 @@ class ImportNameDeligate(qt.QItemDelegate):
 
     def setModelData(self, editor, model, index):
         """Update data in model."""
-        model.setData(index, editor.currentText(),
-                      qt.Qt.EditRole)
+        model.setData(
+            index, editor.currentText(), qt.Qt.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):
         """Update editor geometry."""
@@ -218,9 +218,11 @@ class FileGroupNode(FileNode):
         if column == _ColName and role == qt.Qt.DisplayRole:
             return self.name
         elif role == qt.Qt.CheckStateRole and column == _ColToImport:
-            return ( qt.Qt.Checked
-                     if self.grpimport or self.grpImport()
-                     else qt.Qt.Unchecked )
+            return (
+                qt.Qt.Checked
+                if self.grpimport or self.grpImport()
+                else qt.Qt.Unchecked
+            )
 
         elif role == qt.Qt.ToolTipRole:
             if column == _ColToImport:
@@ -479,8 +481,10 @@ def setupTreeView(view, rootnode, datanodes):
 
     mod = GenericTreeModel(
         view, rootnode,
-        [_('Name'), _('Type'), _('Size'), _('Import'),
-         _('Import as'), _('Slice')])
+        [
+            _('Name'), _('Type'), _('Size'), _('Import'),
+            _('Import as'), _('Slice')
+        ])
 
     view.setModel(mod)
     view.expandAll()

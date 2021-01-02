@@ -241,10 +241,11 @@ def loadHDF5Doc(thedoc, filename,
         maxformat = 1
         if vszformat > maxformat:
             raise LoadError(
-                _("This document version (%i) is not supported. "
-                  "It was written by Veusz %s.\n"
-                  "This Veusz only supports document version %i.") %
-                (vszformat, vszversion, maxformat))
+                _(
+                    "This document version (%i) is not supported. "
+                    "It was written by Veusz %s.\n"
+                    "This Veusz only supports document version %i."
+                ) % (vszformat, vszversion, maxformat))
 
         # load document
         script = hdffile['Veusz']['Document']['document'][0].decode('utf-8')

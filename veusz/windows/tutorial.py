@@ -170,8 +170,8 @@ Enter key.</p>
 '''), mainwin,
             flash = mainwin.propdock,
             disablenext = True,
-            nextonsetting = ('/page1/graph1/x/label',
-                             lambda val: val != ''),
+            nextonsetting = (
+                '/page1/graph1/x/label', lambda val: val != ''),
             nextstep = StepPropertiesWin2)
 
 class StepPropertiesWin2(TutorialStep):
@@ -238,8 +238,9 @@ be <code>x**2</code>, plotting x squared.</p>
 <p>(Veusz uses Python syntax for its functions, so the power operator
 is <code>**</code>, rather than <code>^</code>)</p>
 '''), mainwin,
-            nextonsetting = ('/page1/graph1/function1/function',
-                             lambda val: val.strip() == 'x**2'),
+            nextonsetting = (
+                '/page1/graph1/function1/function',
+                lambda val: val.strip() == 'x**2'),
             disablenext = True,
             nextstep=FunctionFormatting)
 
@@ -295,8 +296,9 @@ function line.</p>
 '''),
             mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/graph1/function1/Line/color',
-                             lambda val: val.strip() != 'black'),
+            nextonsetting = (
+                '/page1/graph1/function1/Line/color',
+                lambda val: val.strip() != 'black'),
             nextstep=DataStart)
 
 ###########
@@ -336,8 +338,9 @@ class DataImport(TutorialStep):
             nextstep=DataImportDialog)
 
         # make sure we have the default delimiters
-        for k in ( 'importdialog_csvdelimitercombo_HistoryCombo',
-                   'importdialog_csvtextdelimitercombo_HistoryCombo' ):
+        for k in (
+                'importdialog_csvdelimitercombo_HistoryCombo',
+                'importdialog_csvtextdelimitercombo_HistoryCombo' ):
             if k in setting.settingdb:
                 del setting.settingdb[k]
 
@@ -450,8 +453,9 @@ widget. Click on this, or go to the Insert menu and choose "Add xy".</p>
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.xy']),
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy1/xData',
-                             lambda val: val != ''),
+            nextonsetting = (
+                '/page1/graph1/xy1/xData',
+                lambda val: val != ''),
             nextstep=SetXY_X)
 
 class SetXY_X(TutorialStep):
@@ -465,8 +469,9 @@ class SetXY_X(TutorialStep):
 menu or type it.</p>
 '''), mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy1/xData',
-                             lambda val: val == 'alpha'),
+            nextonsetting = (
+                '/page1/graph1/xy1/xData',
+                lambda val: val == 'alpha'),
             nextstep=SetXY_Y)
 
 class SetXY_Y(TutorialStep):
@@ -477,8 +482,9 @@ class SetXY_Y(TutorialStep):
 <code>beta</code> dataset.</p>
 '''), mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy1/yData',
-                             lambda val: val == 'beta'),
+            nextonsetting = (
+                '/page1/graph1/xy1/yData',
+                lambda val: val == 'beta'),
             nextstep=SetXYLine)
 
 class SetXYLine(TutorialStep):
@@ -496,8 +502,9 @@ the bottom, to hide the line plotted between the data points.</p>
 ''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotline.svg')),
             mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy1/PlotLine/hide',
-                             lambda val: val),
+            nextonsetting = (
+                '/page1/graph1/xy1/PlotLine/hide',
+                lambda val: val),
             nextstep=SetXYFill)
 
 class SetXYFill(TutorialStep):
@@ -511,8 +518,9 @@ Change the fill color of the plotted data.</p>
 ''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotmarkerfill.svg')),
             mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy1/MarkerFill/color',
-                             lambda val: val != 'black'),
+            nextonsetting = (
+                '/page1/graph1/xy1/MarkerFill/color',
+                lambda val: val != 'black'),
             nextstep=AddXY2nd)
 
 class AddXY2nd(TutorialStep):
@@ -530,8 +538,9 @@ flashing icon, or go to the Insert menu and choose "Add xy".</p>
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.xy']),
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy2/xData',
-                             lambda val: val != ''),
+            nextonsetting = (
+                '/page1/graph1/xy2/xData',
+                lambda val: val != ''),
             nextstep=AddXY2nd_2)
 
 class AddXY2nd_2(TutorialStep):
@@ -542,8 +551,9 @@ class AddXY2nd_2(TutorialStep):
 <code>alpha</code> dataset.</p>
 '''), mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy2/xData',
-                             lambda val: val == 'alpha'),
+            nextonsetting = (
+                '/page1/graph1/xy2/xData',
+                lambda val: val == 'alpha'),
             nextstep=AddXY2nd_3)
 
 class AddXY2nd_3(TutorialStep):
@@ -554,8 +564,9 @@ class AddXY2nd_3(TutorialStep):
 <code>gamma</code> dataset.</p>
 '''), mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy2/yData',
-                             lambda val: val == 'gamma'),
+            nextonsetting = (
+                '/page1/graph1/xy2/yData',
+                lambda val: val == 'gamma'),
             nextstep=AddXY2nd_4)
 
 class AddXY2nd_4(TutorialStep):
@@ -570,8 +581,9 @@ option.</p>
 ''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotfillbelow.png')),
             mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/graph1/xy2/FillBelow/hide',
-                             lambda val: not val),
+            nextonsetting = (
+                '/page1/graph1/xy2/FillBelow/hide',
+                lambda val: not val),
             nextstep=File1)
 
 class File1(TutorialStep):
@@ -663,8 +675,9 @@ class AddGrid(TutorialStep):
             flash=mainwin.treeedit.addtoolbar.widgetForAction(
                 mainwin.vzactions['add.grid']),
             disablenext=True,
-            nextonsetting = ('/page1/grid1/rows',
-                             lambda val: val != ''),
+            nextonsetting = (
+                '/page1/grid1/rows',
+                lambda val: val != ''),
             nextstep=Paste1)
 
 class Paste1(TutorialStep):
@@ -679,8 +692,9 @@ from the Edit menu.</p>
             disablenext=True,
             flash=mainwin.treeedit.edittoolbar.widgetForAction(
                 mainwin.vzactions['edit.paste']),
-            nextonsetting = ('/page1/grid1/graph1/leftMargin',
-                             lambda val: val != ''),
+            nextonsetting = (
+                '/page1/grid1/graph1/leftMargin',
+                lambda val: val != ''),
             nextstep=Paste2)
 
 class Paste2(TutorialStep):
@@ -695,8 +709,9 @@ or choose "Paste" from the Edit menu.</p>
             disablenext=True,
             flash=mainwin.treeedit.edittoolbar.widgetForAction(
                 mainwin.vzactions['edit.paste']),
-            nextonsetting = ('/page1/grid1/graph2/leftMargin',
-                             lambda val: val != ''),
+            nextonsetting = (
+                '/page1/grid1/graph2/leftMargin',
+                lambda val: val != ''),
             nextstep=Paste3)
 
 class Paste3(TutorialStep):
@@ -710,8 +725,9 @@ change the graphs to be arranged in rows.</p>
 number of columns to 1.</p>
 '''), mainwin,
             disablenext=True,
-            nextonsetting = ('/page1/grid1/columns',
-                             lambda val: val == 1),
+            nextonsetting = (
+                '/page1/grid1/columns',
+                lambda val: val == 1),
             nextstep=Paste4)
 
 class Paste4(TutorialStep):
@@ -763,7 +779,7 @@ class TutorialDock(qt.QDockWidget):
             "p.usercmd { color: blue; } "
             "h1 { font-size: x-large; color: darkblue; } "
             "code { color: green;} "
-            )
+        )
         self.textedit = qt.QTextEdit(readOnly=True)
         self.textedit.setDocument(txtdoc)
 

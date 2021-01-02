@@ -83,7 +83,7 @@ class SpokeLine(setting.Line):
         self.add( setting.Int(
             'number', 12,
             minval=1,
-            descr = _('Number of spokes to use'),
+            descr=_('Number of spokes to use'),
             usertext=_('Number')) )
         self.get('color').newDefault('grey')
 
@@ -95,7 +95,7 @@ class RadiiLine(setting.Line):
         self.add( setting.Int(
             'number', 6,
             minval=1,
-            descr = _('Number of radial ticks to aim for'),
+            descr=_('Number of radial ticks to aim for'),
             usertext=_('Number')) )
         self.get('color').newDefault('grey')
 
@@ -108,11 +108,11 @@ class TickLabel(axis.TickLabel):
         self.remove('hide')
         self.add( setting.Bool(
             'hideradial', False,
-            descr = _('Hide radial labels'),
+            descr=_('Hide radial labels'),
             usertext=_('Hide radial') ) )
         self.add( setting.Bool(
             'hidetangential', False,
-            descr = _('Hide spoke labels'),
+            descr=_('Hide spoke labels'),
             usertext=_('Hide spokes') ) )
 
 class Polar(NonOrthGraph):

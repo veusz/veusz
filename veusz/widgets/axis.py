@@ -273,8 +273,8 @@ class AutoRange(setting.ChoiceOrMore):
             origrange = list(plottedrange)
             if log:
                 # logarithmic
-                logrng = abs( N.log(plottedrange[1]) -
-                           N.log(plottedrange[0]) )
+                logrng = abs(
+                    N.log(plottedrange[1]) - N.log(plottedrange[0]) )
                 if adjustmin:
                     plottedrange[0] /= N.exp(logrng * expandfrac1)
                 if adjustmax:
@@ -407,7 +407,7 @@ class Axis(widget.Widget):
             'match', '',
             descr=_('Match the scale of this axis to the axis specified'),
             usertext=_('Match'),
-            allowedwidgets = [Axis] ))
+            allowedwidgets=[Axis] ))
 
         s.add( setting.Line(
             'Line',
@@ -793,11 +793,13 @@ class Axis(widget.Widget):
         if self.parent.typename == 'graph':
             if not self.parent.settings.Border.hide:
                 if self.settings.direction == 'horizontal':
-                    ok = ( (N.abs(coordticks-parentposn[0]) > 1e-3) &
-                           (N.abs(coordticks-parentposn[2]) > 1e-3) )
+                    ok = (
+                        (N.abs(coordticks-parentposn[0]) > 1e-3) &
+                        (N.abs(coordticks-parentposn[2]) > 1e-3) )
                 else:
-                    ok = ( (N.abs(coordticks-parentposn[1]) > 1e-3) &
-                           (N.abs(coordticks-parentposn[3]) > 1e-3) )
+                    ok = (
+                        (N.abs(coordticks-parentposn[1]) > 1e-3) &
+                        (N.abs(coordticks-parentposn[3]) > 1e-3) )
                 coordticks = coordticks[ok]
 
         self.swaplines(
@@ -1344,11 +1346,11 @@ class Axis(widget.Widget):
             if ( (s.min == 'Auto' or not N.allclose(c1, s.min, rtol=1e-8))
                  and N.isfinite(round1) ):
                 ops.append( document.OperationSettingSet(
-                        s.get('min'), round1) )
+                    s.get('min'), round1) )
             if ( (s.max == 'Auto' or not N.allclose(c2, s.max, rtol=1e-8))
                  and N.isfinite(round2) ):
                 ops.append( document.OperationSettingSet(
-                        s.get('max'), round2) )
+                    s.get('max'), round2) )
 
             self.document.applyOperation(
                 document.OperationMultiple(ops, descr=_('zoom axis')))

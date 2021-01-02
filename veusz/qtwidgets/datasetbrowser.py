@@ -298,7 +298,7 @@ class DatasetRelationModel(TreeModel):
             ["name", "size", "type"],
             lambda ds: (datasetLinkFile(ds),),
             FilenameNode
-            )
+        )
 
     def makeGrpTreeSize(self):
         """Make a tree of datasets grouped by dataset size."""
@@ -307,7 +307,7 @@ class DatasetRelationModel(TreeModel):
             ["name", "type", "linkfile"],
             lambda ds: (ds.userSize(),),
             TMNode
-            )
+        )
 
     def makeGrpTreeType(self):
         """Make a tree of datasets grouped by dataset type."""
@@ -316,7 +316,7 @@ class DatasetRelationModel(TreeModel):
             ["name", "size", "linkfile"],
             lambda ds: (ds.dstype,),
             TMNode
-            )
+        )
 
     def makeGrpTreeTags(self):
         """Make a tree of datasets grouped by tags."""
@@ -332,7 +332,7 @@ class DatasetRelationModel(TreeModel):
             ["name", "size", "type", "linkfile"],
             getgrp,
             TMNode
-            )
+        )
 
     def flags(self, idx):
         """Return model flags for index."""
@@ -385,7 +385,7 @@ class DatasetRelationModel(TreeModel):
             "size": self.makeGrpTreeSize,
             "type": self.makeGrpTreeType,
             "tags": self.makeGrpTreeTags,
-            }[self.grouping]()
+        }[self.grouping]()
 
         self.syncTree(tree)
 
@@ -599,7 +599,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
                 tag = tag.strip().replace(' ', '')
                 if tag:
                     self.doc.applyOperation( document.OperationDataTag(
-                            tag, dsnames) )
+                        tag, dsnames) )
         tagmenu.addAction(_("Add..."), addtag)
 
         # copy
@@ -716,7 +716,7 @@ class DatasetBrowser(qt.QWidget):
         "type": _("Type"),
         "size": _("Size"),
         "tags": _("Tags"),
-        }
+    }
 
     def __init__(self, thedocument, mainwin, parent, readonly=False,
                  filterdims=None, filterdtype=None, checkable=False):

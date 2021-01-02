@@ -342,8 +342,8 @@ class AxisBroken(axis.Axis):
         with painter:
             painter.save()
             painter.setClipRect( qt.QRectF(
-                    qt.QPointF(parentposn[0], parentposn[1]),
-                    qt.QPointF(parentposn[2], parentposn[3]) ) )
+                qt.QPointF(parentposn[0], parentposn[1]),
+                qt.QPointF(parentposn[2], parentposn[3]) ) )
 
             for i in range(self.breakvnum):
                 self.switchBreak(i, parentposn)

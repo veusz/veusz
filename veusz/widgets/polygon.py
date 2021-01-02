@@ -44,14 +44,16 @@ class Polygon(plotters.FreePlotter):
         """Construct list of settings."""
         plotters.FreePlotter.addSettings(s)
 
-        s.add( setting.Line('Line',
-                            descr = _('Line around polygon'),
-                            usertext = _('Line')),
-               pixmap = 'settings_plotline' )
-        s.add( setting.BrushExtended('Fill',
-                                     descr = _('Fill within polygon'),
-                                     usertext = _('Fill')),
-               pixmap = 'settings_plotfillbelow' )
+        s.add( setting.Line(
+            'Line',
+            descr=_('Line around polygon'),
+            usertext=_('Line')),
+            pixmap='settings_plotline' )
+        s.add( setting.BrushExtended(
+            'Fill',
+            descr=_('Fill within polygon'),
+            usertext=_('Fill')),
+            pixmap='settings_plotfillbelow' )
 
     def draw(self, posn, phelper, outerbounds=None):
         """Plot the data on a plotter."""
@@ -93,4 +95,4 @@ class Polygon(plotters.FreePlotter):
                 utils.brushExtFillPath(painter, s.Fill, path, stroke=pen)
 
 # allow the factory to instantiate this
-document.thefactory.register( Polygon )
+document.thefactory.register(Polygon)

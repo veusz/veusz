@@ -45,18 +45,21 @@ class Shape(plotters.FreePlotter):
         """Construct list of settings."""
         plotters.FreePlotter.addSettings(s)
 
-        s.add( setting.ShapeFill('Fill',
-                                 descr = _('Shape fill'),
-                                 usertext=_('Fill')),
-               pixmap = 'settings_bgfill' )
-        s.add( setting.Line('Border',
-                            descr = _('Shape border'),
-                            usertext=_('Border')),
-               pixmap = 'settings_border' )
-        s.add( setting.Bool('clip', False,
-                            descr=_('Clip shape to its container'),
-                            usertext=_('Clip'),
-                            formatting=True) )
+        s.add( setting.ShapeFill(
+            'Fill',
+            descr = _('Shape fill'),
+            usertext=_('Fill')),
+            pixmap = 'settings_bgfill' )
+        s.add( setting.Line(
+            'Border',
+            descr = _('Shape border'),
+            usertext=_('Border')),
+            pixmap = 'settings_border' )
+        s.add( setting.Bool(
+            'clip', False,
+            descr=_('Clip shape to its container'),
+            usertext=_('Clip'),
+            formatting=True) )
 
 class BoxShape(Shape):
     """For drawing box-like shapes."""
@@ -70,20 +73,20 @@ class BoxShape(Shape):
         Shape.addSettings(s)
 
         s.add( setting.DatasetExtended(
-                'width', [0.1],
-                descr=_('List of fractional widths, dataset or expression'),
-                usertext=_('Widths'),
-                formatting=False), 3 )
+            'width', [0.1],
+            descr=_('List of fractional widths, dataset or expression'),
+            usertext=_('Widths'),
+            formatting=False), 3 )
         s.add( setting.DatasetExtended(
-                'height', [0.1],
-                descr=_('List of fractional heights, dataset or expression'),
-                usertext=_('Heights'),
-                formatting=False), 4 )
+            'height', [0.1],
+            descr=_('List of fractional heights, dataset or expression'),
+            usertext=_('Heights'),
+            formatting=False), 4 )
         s.add( setting.DatasetExtended(
-                'rotate', [0.],
-                descr=_('Rotation angles of shape, dataset or expression'),
-                usertext=_('Rotate'),
-                formatting=False), 5 )
+            'rotate', [0.],
+            descr=_('Rotation angles of shape, dataset or expression'),
+            usertext=_('Rotate'),
+            formatting=False), 5 )
 
     def drawShape(self, painter, rect):
         pass
@@ -163,8 +166,8 @@ class BoxShape(Shape):
         s = self.settings
 
         # calculate new position coordinate for item
-        xpos, ypos = self._getGraphCoords(cgi.widgetposn,
-                                          cgi.posn[0], cgi.posn[1])
+        xpos, ypos = self._getGraphCoords(
+            cgi.widgetposn, cgi.posn[0], cgi.posn[1])
         if xpos is None or ypos is None:
             return
 
@@ -205,11 +208,12 @@ class Rectangle(BoxShape):
         """Construct list of settings."""
         BoxShape.addSettings(s)
 
-        s.add( setting.Int('rounding', 0,
-                           minval=0, maxval=100,
-                           descr=_('Round corners with this percentage'),
-                           usertext=_('Rounding corners'),
-                           formatting=True) )
+        s.add( setting.Int(
+            'rounding', 0,
+            minval=0, maxval=100,
+            descr=_('Round corners with this percentage'),
+            usertext=_('Rounding corners'),
+            formatting=True) )
 
     def drawShape(self, painter, rect):
         s = self.settings
@@ -249,33 +253,39 @@ class ImageFile(BoxShape):
         self.cachestat = None
         self.cacheembeddata = None
 
-        self.addAction( widget.Action('embed', self.actionEmbed,
-                                      descr = _('Embed image in Veusz document '
-                                                'to remove dependency on external file'),
-                                      usertext = _('Embed image')) )
+        self.addAction( widget.Action(
+            'embed', self.actionEmbed,
+            descr=_(
+                'Embed image in Veusz document '
+                'to remove dependency on external file'),
+            usertext=_('Embed image')) )
 
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
         BoxShape.addSettings(s)
 
-        s.add( setting.ImageFilename('filename', '',
-                                     descr=_('Image filename'),
-                                     usertext=_('Filename'),
-                                     formatting=False),
-               posn=0 )
+        s.add( setting.ImageFilename(
+            'filename', '',
+            descr=_('Image filename'),
+            usertext=_('Filename'),
+            formatting=False),
+            posn=0 )
 
-        s.add( setting.Str('embeddedImageData', '',
-                           descr=_('Embedded base 64-encoded image data, '
-                                   'used if filename set to {embedded}'),
-                           usertext=_('Embedded data'),
-                           hidden=True) )
+        s.add( setting.Str(
+            'embeddedImageData', '',
+            descr=_(
+                'Embedded base 64-encoded image data, '
+                'used if filename set to {embedded}'),
+            usertext=_('Embedded data'),
+            hidden=True) )
 
-        s.add( setting.Bool('aspect', True,
-                            descr=_('Preserve aspect ratio'),
-                            usertext=_('Preserve aspect'),
-                            formatting=True),
-               posn=0 )
+        s.add( setting.Bool(
+            'aspect', True,
+            descr=_('Preserve aspect ratio'),
+            usertext=_('Preserve aspect'),
+            formatting=True),
+            posn=0 )
         s.Border.get('hide').newDefault(True)
 
     def actionEmbed(self):
@@ -302,9 +312,9 @@ class ImageFile(BoxShape):
         # now put embedded data in hidden setting
         ops = [
             document.OperationSettingSet(s.get('filename'), '{embedded}'),
-            document.OperationSettingSet(s.get('embeddedImageData'),
-                                         encoded)
-            ]
+            document.OperationSettingSet(
+                s.get('embeddedImageData'), encoded)
+        ]
         self.document.applyOperation(
             document.OperationMultiple(ops, descr=_('embed image')) )
 
@@ -396,33 +406,39 @@ class SVGFile(BoxShape):
         self.cachestat = None
         self.cacheembeddata = None
 
-        self.addAction( widget.Action('embed', self.actionEmbed,
-                                      descr = _('Embed scalable vector graphic in Veusz document '
-                                                'to remove dependency on external file'),
-                                      usertext = _('Embed SVG')) )
+        self.addAction( widget.Action(
+            'embed', self.actionEmbed,
+            descr=_(
+                'Embed scalable vector graphic in Veusz document '
+                'to remove dependency on external file'),
+            usertext=_('Embed SVG')) )
 
     @classmethod
     def addSettings(klass, s):
         """Construct list of settings."""
         BoxShape.addSettings(s)
 
-        s.add( setting.SVGFilename('filename', '',
-                                     descr=_('SVG filename'),
-                                     usertext=_('Filename'),
-                                     formatting=False),
-               posn=0 )
+        s.add( setting.SVGFilename(
+            'filename', '',
+            descr=_('SVG filename'),
+            usertext=_('Filename'),
+            formatting=False),
+            posn=0 )
 
-        s.add( setting.Str('embeddedSVGData', '',
-                           descr=_('Embedded scalable vector graphic data, '
-                                   'used if filename set to {embedded}'),
-                           usertext=_('Embedded data'),
-                           hidden=True) )
+        s.add( setting.Str(
+            'embeddedSVGData', '',
+            descr=_(
+                'Embedded scalable vector graphic data, '
+                'used if filename set to {embedded}'),
+            usertext=_('Embedded data'),
+            hidden=True) )
 
-        s.add( setting.Bool('aspect', True,
-                            descr=_('Preserve aspect ratio'),
-                            usertext=_('Preserve aspect'),
-                            formatting=True),
-               posn=0 )
+        s.add( setting.Bool(
+            'aspect', True,
+            descr=_('Preserve aspect ratio'),
+            usertext=_('Preserve aspect'),
+            formatting=True),
+            posn=0 )
         s.Border.get('hide').newDefault(True)
 
     def actionEmbed(self):
@@ -448,9 +464,9 @@ class SVGFile(BoxShape):
         # now put embedded data in hidden setting
         ops = [
             document.OperationSettingSet(s.get('filename'), '{embedded}'),
-            document.OperationSettingSet(s.get('embeddedSVGData'),
-                                         encoded)
-            ]
+            document.OperationSettingSet(
+                s.get('embeddedSVGData'), encoded)
+        ]
         self.document.applyOperation(
             document.OperationMultiple(ops, descr=_('embed SVG')) )
 
@@ -528,7 +544,7 @@ class SVGFile(BoxShape):
             # painter.drawImage(rect, image, irect)
             image.render(painter, rect)
 
-document.thefactory.register( Ellipse )
-document.thefactory.register( Rectangle )
-document.thefactory.register( ImageFile )
-document.thefactory.register( SVGFile )
+document.thefactory.register(Ellipse)
+document.thefactory.register(Rectangle)
+document.thefactory.register(ImageFile)
+document.thefactory.register(SVGFile)

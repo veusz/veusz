@@ -68,8 +68,8 @@ class PreferencesDialog(VeuszDialog):
         # disable thread option if not supported
         if not qt.QFontDatabase.supportsThreadedFontRendering():
             self.threadSpinBox.setEnabled(False)
-            self.threadSpinBox.setToolTip(_("Disabled because of lack of "
-                                            "threaded drawing support"))
+            self.threadSpinBox.setToolTip(
+                _("Disabled because of lack of threaded drawing support"))
 
         # use cwd for file dialogs
         (self.dirDocCWDRadio if setdb['dirname_usecwd'] else self.dirDocPrevRadio).click()
@@ -307,8 +307,8 @@ class PreferencesDialog(VeuszDialog):
             [_('Python scripts (*.py)')], _('Choose plugin'))
         if filename:
             self.pluginmodel.insertRows(0, 1)
-            self.pluginmodel.setData( self.pluginmodel.index(0),
-                                      filename )
+            self.pluginmodel.setData(
+                self.pluginmodel.index(0), filename)
 
     def pluginRemoveClicked(self):
         """Remove selected plugin."""

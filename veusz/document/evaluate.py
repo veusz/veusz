@@ -258,8 +258,9 @@ class Evaluate:
                 out.append( (int(entry[2]), int(entry[1]), int(entry[0]),
                              int(entry[3])) )
             else:
-                raise ValueError( _("Each colormap entry consists of R,G,B "
-                                    "and optionally alpha values") )
+                raise ValueError( _(
+                    "Each colormap entry consists of R,G,B "
+                    "and optionally alpha values") )
 
         return tuple(out)
 

@@ -190,7 +190,7 @@ class FillBrush1(setting.BrushExtended):
             usertext=_('Mode')), 0)
         self.add( setting.Bool(
             'hideerror', False,
-            descr = _('Hide the filled region inside the error bars'),
+            descr=_('Hide the filled region inside the error bars'),
             usertext=_('Hide error fill')) )
 
 class FillBrush2(FillBrush1):
@@ -265,9 +265,11 @@ class Histo(GenericPlotter):
 
         s.add( setting.ChoiceSwitch(
             'binning',
-            ('constant', 'manual', 'auto',
-             'fd', 'doane', 'scott', 'stone', 'rice',
-             'sturges', 'sqrt'),
+            (
+                'constant', 'manual', 'auto',
+                'fd', 'doane', 'scott', 'stone', 'rice',
+                'sturges', 'sqrt'
+            ),
             'constant',
             showfn=klass._showbinning,
             descr=_('Binning mode'),
@@ -316,25 +318,25 @@ class Histo(GenericPlotter):
         s.add( setting.Color(
             'color',
             'auto',
-            descr = _('Master color'),
-            usertext = _('Color'),
+            descr=_('Master color'),
+            usertext=_('Color'),
             formatting=True), 0 )
         s.add( setting.Choice(
             'style',
             ('step', 'join'),
             'step',
-            descr = _('Drawing style'),
-            usertext = _('Style'),
+            descr=_('Drawing style'),
+            usertext=_('Style'),
             formatting=True), 1 )
         s.add( setting.Marker(
             'marker',
             'none',
-            descr = _('Type of marker to plot'),
+            descr=_('Type of marker to plot'),
             usertext=_('Marker'), formatting=True), 2 )
         s.add( setting.DistancePt(
             'markerSize',
             '3pt',
-            descr = _('Size of marker to plot'),
+            descr=_('Size of marker to plot'),
             usertext=_('Marker size'), formatting=True), 3 )
         s.add( setting.ErrorStyle(
             'errorStyle',
@@ -344,41 +346,41 @@ class Histo(GenericPlotter):
 
         s.add( PlotLine(
             'Line',
-            descr = _('Plot line'),
-            usertext = _('Plot line')),
-               pixmap = 'settings_plotline' )
+            descr=_('Plot line'),
+            usertext=_('Plot line')),
+            pixmap='settings_plotline' )
         s.add( FillBrush1(
             'Fill1',
-            descr = _('Fill under'),
-            usertext = _('Fill under')),
-               pixmap = 'settings_plotfillbelow' )
+            descr=_('Fill under'),
+            usertext=_('Fill under')),
+            pixmap='settings_plotfillbelow' )
         s.add( FillBrush2(
             'Fill2',
-            descr = _('Fill over'),
-            usertext = _('Fill over')),
-               pixmap = 'settings_plotfillabove' )
+            descr=_('Fill over'),
+            usertext=_('Fill over')),
+            pixmap='settings_plotfillabove' )
         s.add( PostLine(
             'PostLine',
-            descr = _('Post line'),
-            usertext = _('Post line')),
-               pixmap = 'settings_postline' )
+            descr=_('Post line'),
+            usertext=_('Post line')),
+            pixmap='settings_postline' )
 
         s.add( setting.MarkerLine(
             'MarkerLine',
-            descr = _('Line around marker'),
-            usertext = _('Marker border')),
-               pixmap = 'settings_plotmarkerline' )
+            descr=_('Line around marker'),
+            usertext=_('Marker border')),
+            pixmap='settings_plotmarkerline' )
         s.add( MarkerFillBrush(
             'MarkerFill',
-            descr = _('Marker fill'),
-            usertext = _('Marker fill')),
-               pixmap = 'settings_plotmarkerfill' )
+            descr=_('Marker fill'),
+            usertext=_('Marker fill')),
+            pixmap='settings_plotmarkerfill' )
 
         s.add( setting.ErrorBarLine(
             'ErrorBarLine',
-            descr = _('Error bar line'),
-            usertext = _('Error bar line')),
-               pixmap = 'settings_ploterrorline' )
+            descr=_('Error bar line'),
+            usertext=_('Error bar line')),
+            pixmap='settings_ploterrorline' )
         s.ErrorBarLine.get('color').newDefault( setting.Reference('../color') )
 
     def computeHisto(self):

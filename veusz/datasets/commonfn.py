@@ -88,9 +88,11 @@ def dsPreviewHelper(d):
     if d.shape[0] <= 6:
         line1 = ', '.join( ['%.3g' % x for x in d] )
     else:
-        line1 = ', '.join( ['%.3g' % x for x in d[:3]] +
-                           [ '...' ] +
-                           ['%.3g' % x for x in d[-3:]] )
+        line1 = ', '.join(
+            ['%.3g' % x for x in d[:3]] +
+            [ '...' ] +
+            ['%.3g' % x for x in d[-3:]]
+        )
 
     try:
         line2 = _('mean: %.3g, min: %.3g, max: %.3g') % (

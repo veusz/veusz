@@ -63,7 +63,7 @@ class ImportTabCSV(importdialog.ImportTab):
             'YYYY-MM-DD|T|hh:mm:ss',
             'DD/MM/YY| |hh:mm:ss',
             'M/D/YY| |hh:mm:ss'
-            ]
+        ]
         self.csvnumfmtcombo.defaultlist = csv_locales
         self.csvheadermodecombo.defaultlist = [_('Multiple'), _('1st row'), _('None')]
         self.csvdirectioncombo.defaultlist = [_('Columns'), _('Rows')]
@@ -193,7 +193,7 @@ class ImportTabCSV(importdialog.ImportTab):
             prefix=prefix, suffix=suffix,
             tags=tags,
             linked=linked,
-            )
+        )
 
         try:
             op = defn_csv.OperationDataImportCSV(params)

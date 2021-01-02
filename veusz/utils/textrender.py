@@ -1611,4 +1611,4 @@ def Renderer(painter, font, x, y, text,
         alignhorz=alignhorz, alignvert=alignvert,
         angle=angle, usefullheight=usefullheight,
         doc=doc
-        )
+    )

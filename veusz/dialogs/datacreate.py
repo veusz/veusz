@@ -70,16 +70,20 @@ class DataCreateDialog(VeuszDialog):
         self.tstepsedit.setValidator( qt.QIntValidator(1, 99999999, self) )
 
         # connect up edit control to update create button status
-        for edit in (self.numstepsedit, self.tstartedit, self.tendedit,
-                     self.tstepsedit, self.nameedit,
-                     self.valueedit):
+        for edit in (
+                self.numstepsedit, self.tstartedit, self.tendedit,
+                self.tstepsedit, self.nameedit,
+                self.valueedit
+        ):
             edit.editTextChanged.connect(self.editsEditSlot)
 
         self.nameedit.currentIndexChanged[int].connect(self.datasetSelected)
 
         # edit controls for dataset
-        self.dsedits = { 'data': self.valueedit, 'serr': self.symerroredit,
-                         'perr': self.poserroredit, 'nerr': self.negerroredit }
+        self.dsedits = {
+            'data': self.valueedit, 'serr': self.symerroredit,
+            'perr': self.poserroredit, 'nerr': self.negerroredit
+        }
 
         # update button state
         self.editsEditSlot('')
@@ -172,9 +176,11 @@ class DataCreateDialog(VeuszDialog):
             editsokay = self.numstepsedit.hasAcceptableInput()
         elif method is self.parametricradio:
             # parametric
-            editsokay = (self.tstartedit.hasAcceptableInput() and
-                         self.tendedit.hasAcceptableInput() and
-                         self.tstepsedit.hasAcceptableInput())
+            editsokay = (
+                self.tstartedit.hasAcceptableInput() and
+                self.tendedit.hasAcceptableInput() and
+                self.tstepsedit.hasAcceptableInput()
+            )
         else:
             # function
             editsokay = True
@@ -195,10 +201,12 @@ class DataCreateDialog(VeuszDialog):
     def resetButtonClicked(self):
         """Reset button clicked - reset dialog."""
 
-        for cntrl in (self.valueedit, self.symerroredit, self.poserroredit,
-                      self.negerroredit, self.numstepsedit,
-                      self.tstartedit, self.tendedit, self.tstepsedit,
-                      self.nameedit):
+        for cntrl in (
+                self.valueedit, self.symerroredit, self.poserroredit,
+                self.negerroredit, self.numstepsedit,
+                self.tstartedit, self.tendedit, self.tstepsedit,
+                self.nameedit
+        ):
             cntrl.setEditText("")
 
         self.linkcheckbox.setChecked(True)
@@ -215,8 +223,8 @@ class DataCreateDialog(VeuszDialog):
             createfn = {
                 self.valueradio: self.createFromRange,
                 self.parametricradio: self.createParametric,
-                self.expressionradio: self.createFromExpression }[
-                self.methodGroup.getRadioChecked()]
+                self.expressionradio: self.createFromExpression,
+            }[self.methodGroup.getRadioChecked()]
 
             # make a new dataset using method
             op = createfn(dsname)

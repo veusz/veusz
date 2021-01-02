@@ -516,8 +516,8 @@ class Ternary(NonOrthGraph):
                 doc=self.document)
 
             painter.save()
-            painter.translate(self._box[0]+self._width*0.25,
-                              0.5*(self._box[1]+self._box[3]))
+            painter.translate(
+                self._box[0]+self._width*0.25, 0.5*(self._box[1]+self._box[3]))
             painter.rotate(-60)
             painter.translate(-aoffset, -ldelta - off)
             r.render()

@@ -170,8 +170,7 @@ class MajorTick(setting.Line3D):
         self.add(setting.FloatList(
             'manualTicks',
             [],
-            descr = _('List of tick values'
-                      ' overriding defaults'),
+            descr = _('List of tick values overriding defaults'),
             usertext= _('Manual ticks')))
 
 class MinorTick(setting.Line3D):
@@ -271,7 +270,7 @@ class Axis3D(widget.Widget):
             usertext=_('Max')) )
         s.add( setting.Bool(
             'log', False,
-            descr = _('Whether axis is logarithmic'),
+            descr=_('Whether axis is logarithmic'),
             usertext=_('Log')) )
         s.add( axis.AutoRange(
             'autoRange', 'next-tick') )
@@ -279,13 +278,12 @@ class Axis3D(widget.Widget):
             'mode',
             ('numeric', 'datetime', 'labels'),
             'numeric',
-            descr = _('Type of ticks to show on on axis'),
+            descr=_('Type of ticks to show on on axis'),
             usertext=_('Mode')) )
 
         s.add( setting.Bool(
             'autoMirror', True,
-            descr = _('Place axis on opposite side of graph '
-                      'if none'),
+            descr=_('Place axis on opposite side of graph if none'),
             usertext=_('Auto mirror'),
             formatting=True) )
 
@@ -298,57 +296,55 @@ class Axis3D(widget.Widget):
             'direction',
             ['x', 'y', 'z'],
             'x',
-            descr = _('Direction of axis'),
+            descr=_('Direction of axis'),
             usertext=_('Direction')) )
         s.add( setting.Float(
             'lowerPosition', 0.,
-            descr=_('Fractional position of lower end of '
-                    'axis on graph'),
+            descr=_('Fractional position of lower end of axis on graph'),
             usertext=_('Min position')) )
         s.add( setting.Float(
             'upperPosition', 1.,
-            descr=_('Fractional position of upper end of '
-                    'axis on graph'),
+            descr=_('Fractional position of upper end of axis on graph'),
             usertext=_('Max position')) )
         s.add( setting.Float(
             'otherPosition1', 0.,
-            descr=_('Fractional position of axis '
-                    'in its perpendicular direction 1'),
+            descr=_(
+                'Fractional position of axis in its perpendicular direction 1'),
             usertext=_('Axis position 1')) )
         s.add( setting.Float(
             'otherPosition2', 0.,
-            descr=_('Fractional position of axis '
-                    'in its perpendicular direction 2'),
+            descr=_(
+                'Fractional position of axis in its perpendicular direction 2'),
             usertext=_('Axis position 2')) )
 
         s.add( setting.Line3D(
             'Line',
-            descr = _('Axis line settings'),
-            usertext = _('Axis line')), pixmap='settings_axisline' )
+            descr=_('Axis line settings'),
+            usertext=_('Axis line')), pixmap='settings_axisline' )
         s.add( AxisLabel(
             'Label',
-            descr = _('Axis label settings'),
-            usertext = _('Axis label')), pixmap='settings_axislabel' )
+            descr=_('Axis label settings'),
+            usertext=_('Axis label')), pixmap='settings_axislabel' )
         s.add( TickLabel(
             'TickLabels',
-            descr = _('Tick label settings'),
-            usertext = _('Tick labels')), pixmap='settings_axisticklabels' )
+            descr=_('Tick label settings'),
+            usertext=_('Tick labels')), pixmap='settings_axisticklabels' )
         s.add( MajorTick(
             'MajorTicks',
-            descr = _('Major tick line settings'),
-            usertext = _('Major ticks')), pixmap='settings_axismajorticks' )
+            descr=_('Major tick line settings'),
+            usertext=_('Major ticks')), pixmap='settings_axismajorticks' )
         s.add( MinorTick(
             'MinorTicks',
-            descr = _('Minor tick line settings'),
-            usertext = _('Minor ticks')),  pixmap='settings_axisminorticks' )
+            descr=_('Minor tick line settings'),
+            usertext=_('Minor ticks')),  pixmap='settings_axisminorticks' )
         s.add( GridLine(
             'GridLines',
-            descr = _('Grid line settings'),
-            usertext = _('Grid lines')), pixmap='settings_axisgridlines' )
+            descr=_('Grid line settings'),
+            usertext=_('Grid lines')), pixmap='settings_axisgridlines' )
         s.add( MinorGridLine(
             'MinorGridLines',
-            descr = _('Minor grid line settings'),
-            usertext = _('Grid lines for minor ticks')),
+            descr=_('Minor grid line settings'),
+            usertext=_('Grid lines for minor ticks')),
             pixmap='settings_axisminorgridlines' )
 
     @classmethod
@@ -360,8 +356,8 @@ class Axis3D(widget.Widget):
     def userdescription(self):
         """User friendly description."""
         s = self.settings
-        return "range %s to %s%s" % ( str(s.min), str(s.max),
-                                      ['',' (log)'][s.log])
+        return "range %s to %s%s" % (
+            str(s.min), str(s.max), ['',' (log)'][s.log])
 
     def isLinked(self):
         """Whether is an axis linked to another."""
@@ -455,10 +451,12 @@ class Axis3D(widget.Widget):
         extendmax = nexttick and s.max == 'Auto' and allowauto
 
         # create object to compute ticks
-        axs = tickclass(self.plottedrange[0], self.plottedrange[1],
-                        s.MajorTicks.number, s.MinorTicks.number,
-                        extendmin = extendmin, extendmax = extendmax,
-                        logaxis = s.log )
+        axs = tickclass(
+            self.plottedrange[0], self.plottedrange[1],
+            s.MajorTicks.number, s.MinorTicks.number,
+            extendmin = extendmin, extendmax = extendmax,
+            logaxis = s.log
+        )
 
         axs.getTicks()
         self.plottedrange[0] = axs.minval
@@ -642,10 +640,12 @@ class Axis3D(widget.Widget):
                 ptsoff1 = (op1pts2, op2pts, tfracs)
                 ptsoff2 = (op1pts, op2pts2, tfracs)
 
-            outstart += [N.ravel(N.column_stack(ptsonaxis)),
-                         N.ravel(N.column_stack(ptsonaxis))]
-            outend += [N.ravel(N.column_stack(ptsoff1)),
-                       N.ravel(N.column_stack(ptsoff2))]
+            outstart += [
+                N.ravel(N.column_stack(ptsonaxis)),
+                N.ravel(N.column_stack(ptsonaxis))]
+            outend += [
+                N.ravel(N.column_stack(ptsoff1)),
+                N.ravel(N.column_stack(ptsoff2))]
 
         # add labels for ticks and axis label
         if ticklabelsprop is not None:

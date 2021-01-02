@@ -325,4 +325,4 @@ class Graph(widget.Widget):
         cgi.setWidgetMargins()
 
 # allow users to make Graph objects
-document.thefactory.register( Graph )
+document.thefactory.register(Graph)

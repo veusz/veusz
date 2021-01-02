@@ -52,52 +52,58 @@ class TextLabel(plotters.FreePlotter):
         """Construct list of settings."""
         plotters.FreePlotter.addSettings(s)
 
-        s.add( setting.DatasetOrStr('label', '',
-                                    descr=_('Text to show or text dataset'),
-                                    usertext=_('Label')), 0 )
+        s.add( setting.DatasetOrStr(
+            'label', '',
+            descr=_('Text to show or text dataset'),
+            usertext=_('Label')), 0 )
 
-        s.add( setting.AlignHorz('alignHorz',
-                                 'left',
-                                 descr=_('Horizontal alignment of label'),
-                                 usertext=_('Horz alignment'),
-                                 formatting=True), 7)
-        s.add( setting.AlignVert('alignVert',
-                                 'bottom',
-                                 descr=_('Vertical alignment of label'),
-                                 usertext=_('Vert alignment'),
-                                 formatting=True), 8)
+        s.add( setting.AlignHorz(
+            'alignHorz',
+            'left',
+            descr=_('Horizontal alignment of label'),
+            usertext=_('Horz alignment'),
+            formatting=True), 7)
+        s.add( setting.AlignVert(
+            'alignVert',
+            'bottom',
+            descr=_('Vertical alignment of label'),
+            usertext=_('Vert alignment'),
+            formatting=True), 8)
 
-        s.add( setting.Float('angle', 0.,
-                             descr=_('Angle of the label in degrees'),
-                             usertext=_('Angle'),
-                             formatting=True), 9 )
+        s.add( setting.Float(
+            'angle', 0.,
+            descr=_('Angle of the label in degrees'),
+            usertext=_('Angle'),
+            formatting=True), 9 )
 
         s.add( setting.DistancePt(
-                'margin',
-                '4pt',
-                descr = _('Margin of fill/border'),
-                usertext=_('Margin'),
-                formatting=True), 10 )
+            'margin',
+            '4pt',
+            descr=_('Margin of fill/border'),
+            usertext=_('Margin'),
+            formatting=True), 10 )
 
-        s.add( setting.Bool('clip', False,
-                            descr=_('Clip text to its container'),
-                            usertext=_('Clip'),
-                            formatting=True), 11 )
+        s.add( setting.Bool(
+            'clip', False,
+            descr=_('Clip text to its container'),
+            usertext=_('Clip'),
+            formatting=True), 11 )
 
-        s.add( setting.Text('Text',
-                            descr = _('Text settings'),
-                            usertext=_('Text')),
-               pixmap = 'settings_axislabel' )
+        s.add( setting.Text(
+            'Text',
+            descr=_('Text settings'),
+            usertext=_('Text')),
+            pixmap='settings_axislabel' )
         s.add( setting.ShapeFill(
-                'Background',
-                descr=_('Fill behind text'),
-                usertext=_('Background')),
-               pixmap = 'settings_bgfill' )
+            'Background',
+            descr=_('Fill behind text'),
+            usertext=_('Background')),
+            pixmap='settings_bgfill' )
         s.add( BorderLine(
-                'Border',
-                descr=_('Border around text'),
-                usertext=_('Border')),
-               pixmap = 'settings_border' )
+            'Border',
+            descr=_('Border around text'),
+            usertext=_('Border')),
+            pixmap='settings_border' )
 
     # convert text to alignments used by Renderer
     cnvtalignhorz = { 'left': -1, 'centre': 0, 'right': 1 }
@@ -141,8 +147,9 @@ class TextLabel(plotters.FreePlotter):
             margin = s.get('margin').convert(painter)
 
             # we should only be able to move non-dataset labels
-            isnotdataset = ( not s.get('xPos').isDataset(d) and
-                             not s.get('yPos').isDataset(d) )
+            isnotdataset = (
+                not s.get('xPos').isDataset(d) and
+                not s.get('yPos').isDataset(d) )
 
             controlgraphitems = []
             for index, (x, y, t) in enumerate(zip(
@@ -159,7 +166,8 @@ class TextLabel(plotters.FreePlotter):
                     TextLabel.cnvtalignhorz[s.alignHorz],
                     TextLabel.cnvtalignvert[s.alignVert],
                     s.angle,
-                    doc=d)
+                    doc=d
+                )
 
                 tbounds = r.getBounds()
                 if borderorfill:
@@ -172,8 +180,8 @@ class TextLabel(plotters.FreePlotter):
                     path = qt.QPainterPath()
                     path.addRect(rect)
                     pen = s.get('Border').makeQPenWHide(painter)
-                    utils.brushExtFillPath(painter, s.Background, path,
-                                           stroke=pen)
+                    utils.brushExtFillPath(
+                        painter, s.Background, path, stroke=pen)
 
                 r.render()
 
@@ -197,13 +205,15 @@ class TextLabel(plotters.FreePlotter):
         ind = cgi.index
 
         # calculate new position coordinate for item
-        xpos, ypos = self._getGraphCoords(cgi.widgetposn,
-                                          cgi.deltacrosspos[0]+cgi.posn[0],
-                                          cgi.deltacrosspos[1]+cgi.posn[1])
+        xpos, ypos = self._getGraphCoords(
+            cgi.widgetposn,
+            cgi.deltacrosspos[0]+cgi.posn[0],
+            cgi.deltacrosspos[1]+cgi.posn[1])
         # this is a small distance away to get delta
-        xposd, yposd = self._getGraphCoords(cgi.widgetposn,
-                                            cgi.deltacrosspos[0]+cgi.posn[0]+1,
-                                            cgi.deltacrosspos[1]+cgi.posn[1]+1)
+        xposd, yposd = self._getGraphCoords(
+            cgi.widgetposn,
+            cgi.deltacrosspos[0]+cgi.posn[0]+1,
+            cgi.deltacrosspos[1]+cgi.posn[1]+1)
         if xpos is None or ypos is None:
             return
 
@@ -214,9 +224,9 @@ class TextLabel(plotters.FreePlotter):
         operations = (
             document.OperationSettingSet(s.get('xPos'), pointsX),
             document.OperationSettingSet(s.get('yPos'), pointsY)
-            )
+        )
         self.document.applyOperation(
             document.OperationMultiple(operations, descr=_('move label')) )
 
 # allow the factory to instantiate a text label
-document.thefactory.register( TextLabel )
+document.thefactory.register(TextLabel)

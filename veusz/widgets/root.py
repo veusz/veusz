@@ -199,4 +199,4 @@ class Root(widget.Widget):
                 stylesheet.add(newsett)
 
 # allow the factory to instantiate this
-document.thefactory.register( Root )
+document.thefactory.register(Root)

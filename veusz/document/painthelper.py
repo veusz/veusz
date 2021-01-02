@@ -168,8 +168,10 @@ class PaintHelper:
 
     def sizeAtDpi(self, dpi):
         """Return a tuple size for the page given an output device dpi."""
-        return ( int(self.pagesize[0]/self.dpi[0] * dpi),
-                 int(self.pagesize[1]/self.dpi[1] * dpi) )
+        return (
+            int(self.pagesize[0]/self.dpi[0] * dpi),
+            int(self.pagesize[1]/self.dpi[1] * dpi)
+        )
 
     def painter(self, widget, bounds, clip=None, layer=None):
         """Return a painter for use when drawing the widget.

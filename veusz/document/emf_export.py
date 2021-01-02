@@ -140,9 +140,10 @@ class EMFPaintEngine(qt.QPaintEngine):
 
         for pt in points:
             x, y = (pt.x()-0.5)*scale, (pt.y()-0.5)*scale
-            self.emf.Pie( int(x), int(y),
-                          int((pt.x()+0.5)*scale), int((pt.y()+0.5)*scale),
-                          int(x), int(y), int(x), int(y) )
+            self.emf.Pie(
+                int(x), int(y),
+                int((pt.x()+0.5)*scale), int((pt.y()+0.5)*scale),
+                int(x), int(y), int(x), int(y) )
 
     def drawPixmap(self, r, pixmap, sr):
         """Draw pixmap to display."""
@@ -361,9 +362,10 @@ class EMFPaintEngine(qt.QPaintEngine):
 
     def _updateTransform(self, m):
         """Update transformation."""
-        self.emf.SetWorldTransform(m.m11(), m.m12(),
-                                   m.m21(), m.m22(),
-                                   m.dx()*scale, m.dy()*scale)
+        self.emf.SetWorldTransform(
+            m.m11(), m.m12(),
+            m.m21(), m.m22(),
+            m.dx()*scale, m.dy()*scale)
 
     def updateState(self, state):
         """Examine what has changed in state and call apropriate function."""

@@ -85,8 +85,8 @@ class Dataset2DBase(DatasetConcreteBase):
         elif self.xcent is not None:
             xg = fromcentres(self.xcent, scalefnx)
         else:
-            xg = N.linspace(self.xrange[0], self.xrange[1],
-                            self.data.shape[1]+1)
+            xg = N.linspace(
+                self.xrange[0], self.xrange[1], self.data.shape[1]+1)
             if scalefnx:
                 xg = scalefnx(xg)
 
@@ -97,8 +97,8 @@ class Dataset2DBase(DatasetConcreteBase):
         elif self.ycent is not None:
             yg = fromcentres(self.ycent, scalefny)
         else:
-            yg = N.linspace(self.yrange[0], self.yrange[1],
-                            self.data.shape[0]+1)
+            yg = N.linspace(
+                self.yrange[0], self.yrange[1], self.data.shape[0]+1)
             if scalefny:
                 yg = scalefny(yg)
 
@@ -171,10 +171,11 @@ class Dataset2DBase(DatasetConcreteBase):
         return text
 
     def returnCopy(self):
-        return Dataset2D( N.array(self.data),
-                          xrange=self.xrange, yrange=self.yrange,
-                          xedge=self.xedge, yedge=self.yedge,
-                          xcent=self.xcent, ycent=self.ycent )
+        return Dataset2D(
+            N.array(self.data),
+            xrange=self.xrange, yrange=self.yrange,
+            xedge=self.xedge, yedge=self.yedge,
+            xcent=self.xcent, ycent=self.ycent )
 
     def returnCopyWithNewData(self, **args):
         return Dataset2D(**args)
@@ -253,20 +254,24 @@ class Dataset2D(Dataset2DBase):
 
         fileobj.write("ImportString2D(%s, '''\n" % repr(name))
         if self.xcent is not None:
-            fileobj.write("xcent %s\n" %
-                          " ".join(("%e" % v for v in self.xcent)) )
+            fileobj.write(
+                "xcent %s\n" %
+                " ".join(("%e" % v for v in self.xcent)) )
         elif self.xedge is not None:
-            fileobj.write("xedge %s\n" %
-                          " ".join(("%e" % v for v in self.xedge)) )
+            fileobj.write(
+                "xedge %s\n" %
+                " ".join(("%e" % v for v in self.xedge)) )
         else:
             fileobj.write("xrange %e %e\n" % tuple(self.xrange))
 
         if self.ycent is not None:
-            fileobj.write("ycent %s\n" %
-                          " ".join(("%e" % v for v in self.ycent)) )
+            fileobj.write(
+                "ycent %s\n" %
+                " ".join(("%e" % v for v in self.ycent)) )
         elif self.yedge is not None:
-            fileobj.write("yedge %s\n" %
-                          " ".join(("%e" % v for v in self.yedge)) )
+            fileobj.write(
+                "yedge %s\n" %
+                " ".join(("%e" % v for v in self.yedge)) )
         else:
             fileobj.write("yrange %e %e\n" % tuple(self.yrange))
 
@@ -279,8 +284,9 @@ class Dataset2D(Dataset2DBase):
         tdgrp = group.create_group(utils.escapeHDFDataName(name))
         tdgrp.attrs['vsz_datatype'] = '2d'
 
-        for v in ('data', 'xcent', 'xedge', 'ycent',
-                  'yedge', 'xrange', 'yrange'):
+        for v in (
+                'data', 'xcent', 'xedge', 'ycent',
+                'yedge', 'xrange', 'yrange' ):
             if getattr(self, v) is not None:
                 tdgrp[v] = getattr(self, v)
 
@@ -343,10 +349,10 @@ class Dataset2DXYFunc(Dataset2DBase):
 
         env = self.document.evaluate.context.copy()
 
-        xarange = N.arange(self.xstep[0], self.xstep[1]+self.xstep[2],
-                           self.xstep[2])
-        yarange = N.arange(self.ystep[0], self.ystep[1]+self.ystep[2],
-                           self.ystep[2])
+        xarange = N.arange(
+            self.xstep[0], self.xstep[1]+self.xstep[2], self.xstep[2])
+        yarange = N.arange(
+            self.ystep[0], self.ystep[1]+self.ystep[2], self.ystep[2])
         ystep, xstep = N.indices( (len(yarange), len(xarange)) )
         xstep = xarange[xstep]
         ystep = yarange[ystep]
@@ -356,9 +362,9 @@ class Dataset2DXYFunc(Dataset2DBase):
         try:
             data = eval(self.expr, env)
         except Exception as e:
-            raise DatasetExpressionException(
-                _("Error evaluating expression: %s\n"
-                  "Error: %s") % (self.expr, str(e)) )
+            raise DatasetExpressionException(_(
+                "Error evaluating expression: %s\n"
+                "Error: %s") % (self.expr, str(e)) )
 
         # ensure we get an array out of this (in case expr is scalar)
         data = data + xstep*0

@@ -43,82 +43,73 @@ class VectorField(plotters.GenericPlotter):
 
         # datasets
         s.add( setting.DatasetExtended(
-                'data1', '',
-                dimensions = 2,
-                descr = _('X coordinate length or vector magnitude'),
-                usertext = _('dx or r')),
-               0 )
+            'data1', '',
+            dimensions=2,
+            descr=_('X coordinate length or vector magnitude'),
+            usertext=_('dx or r')), 0 )
         s.add( setting.DatasetExtended(
-                'data2', '',
-                dimensions = 2,
-                descr = _('Y coordinate length or vector angle'),
-                usertext = _('dy or theta')),
-               1 )
+            'data2', '',
+            dimensions=2,
+            descr=_('Y coordinate length or vector angle'),
+            usertext=_('dy or theta')), 1 )
         s.add( setting.Choice(
             'mode',
             ['cartesian', 'polar'],
             'cartesian',
-            descr = _('Cartesian (dx,dy) or polar (r,theta)'),
-            usertext = _('Mode')),
-               2 )
+            descr=_('Cartesian (dx,dy) or polar (r,theta)'),
+            usertext=_('Mode')), 2 )
         s.add( setting.FloatChoice(
             'rotate',
             [0., 45., 90., 135., 180., -135., -90., -45.],
             0.,
-            descr = _('Rotate vector clockwise by this angle in degrees'),
-            usertext = _('Rotate')),
-               3 )
+            descr=_('Rotate vector clockwise by this angle in degrees'),
+            usertext=_('Rotate')), 3 )
         s.add( setting.Bool(
             'reflectx', False,
-            descr = _('Reflect vector in X direction'),
-            usertext = _('Reflect X')),
-               4 )
+            descr=_('Reflect vector in X direction'),
+            usertext=_('Reflect X')), 4 )
         s.add( setting.Bool(
             'reflecty', False,
-            descr = _('Reflect vector in Y direction'),
-            usertext = _('Reflect Y')),
-               5 )
+            descr=_('Reflect vector in Y direction'),
+            usertext=_('Reflect Y')), 5 )
 
         # formatting
         s.add( setting.DistancePt(
             'baselength', '10pt',
-            descr = _('Base length of unit vector'),
-            usertext = _('Base length'),
-            formatting=True),
-               0 )
+            descr=_('Base length of unit vector'),
+            usertext=_('Base length'),
+            formatting=True), 0 )
         s.add( setting.DistancePt(
             'arrowsize', '2pt',
-            descr = _('Size of any arrows'),
-            usertext = _('Arrow size'),
-            formatting=True),
-               1 )
+            descr=_('Size of any arrows'),
+            usertext=_('Arrow size'),
+            formatting=True), 1 )
         s.add( setting.Bool(
             'scalearrow', True,
-            descr = _('Scale arrow head by length'),
-            usertext = _('Scale arrow'),
-            formatting=True),
-               2 )
+            descr=_('Scale arrow head by length'),
+            usertext=_('Scale arrow'),
+            formatting=True), 2 )
         s.add( setting.Arrow(
             'arrowfront', 'none',
-            descr = _('Arrow in front direction'),
-            usertext=_('Arrow front'), formatting=True),
-               3)
+            descr=_('Arrow in front direction'),
+            usertext=_('Arrow front'),
+            formatting=True), 3)
         s.add( setting.Arrow(
             'arrowback', 'none',
-            descr = _('Arrow in back direction'),
-            usertext=_('Arrow back'), formatting=True),
-               4)
+            descr=_('Arrow in back direction'),
+            usertext=_('Arrow back'),
+            formatting=True), 4)
 
         s.add( setting.Line(
             'Line',
-            descr = _('Line style'),
-            usertext = _('Line')),
-               pixmap = 'settings_plotline' )
+            descr=_('Line style'),
+            usertext=_('Line')),
+            pixmap='settings_plotline' )
         s.add( setting.ArrowFill(
             'Fill',
-            descr = _('Arrow fill settings'),
-            usertext = _('Arrow fill')),
-               pixmap = 'settings_plotmarkerfill' )
+            descr=_('Arrow fill settings'),
+            usertext=_('Arrow fill')),
+            pixmap='settings_plotmarkerfill' )
 
     def affectsAxisRange(self):
         """Range information provided by widget."""
@@ -246,4 +237,4 @@ class VectorField(plotters.GenericPlotter):
                     )
 
 # allow the factory to instantiate a vector field
-document.thefactory.register( VectorField )
+document.thefactory.register(VectorField)

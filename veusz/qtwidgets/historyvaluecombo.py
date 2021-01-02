@@ -41,8 +41,8 @@ class HistoryValueCombo(qt.QComboBox):
             dialog = dialog.parent()
 
         # combine dialog and object names to make setting
-        return '%s_%s_HistoryValueCombo'  % ( dialog.objectName(),
-                                              self.objectName() )
+        return '%s_%s_HistoryValueCombo'  % (
+            dialog.objectName(), self.objectName() )
 
     def saveHistory(self):
         """Save contents of history combo to settings."""

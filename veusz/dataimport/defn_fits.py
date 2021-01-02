@@ -62,7 +62,7 @@ class ImportParamsFITS(base.ImportParamsBase):
         'twodranges': None,
         'twod_as_oned': None,
         'wcsmodes': None,
-        }
+    }
     defaults.update(base.ImportParamsBase.defaults)
 
 class LinkedFileFITS(base.LinkedFileBase):
@@ -153,9 +153,11 @@ class OperationDataImportFITS(base.OperationDataImportBase):
             mode = attr['wcsmode']
 
         # standard linear wcs keywords
-        wcs = [hdu.header.get(x, None) for x in (
-            'CRVAL1', 'CRPIX1', 'CDELT1',
-            'CRVAL2', 'CRPIX2', 'CDELT2')]
+        wcs = [
+            hdu.header.get(x, None) for x in (
+                'CRVAL1', 'CRPIX1', 'CDELT1',
+                'CRVAL2', 'CRPIX2', 'CDELT2')
+        ]
 
         if mode == "pixel" or (None in wcs and "wcs" in mode):
             rangex = rangey = None
@@ -290,10 +292,12 @@ class OperationDataImportFITS(base.OperationDataImportBase):
         if data.ndim == 1:
             # Standard 1D Import
             # handle any possible error bars
-            args = { 'data': data,
-                     'serr': errordatasets[name]['+-'],
-                     'nerr': errordatasets[name]['-'],
-                     'perr': errordatasets[name]['+'] }
+            args = {
+                'data': data,
+                'serr': errordatasets[name]['+-'],
+                'nerr': errordatasets[name]['-'],
+                'perr': errordatasets[name]['+'] 
+            }
 
             # find minimum length and cut down if necessary
             minlen = min([len(d) for d in args.values()
@@ -325,8 +329,9 @@ class OperationDataImportFITS(base.OperationDataImportBase):
                     r = dread.options["range"]
                     attrs["xrange"] = (r[0], r[2])
                     attrs["yrange"] = (r[1], r[3])
-                for attr in ("xrange", "yrange", "xcent", "ycent",
-                             "xedge", "yedge"):
+                for attr in (
+                        "xrange", "yrange", "xcent", "ycent",
+                        "xedge", "yedge" ):
                     if attr in dread.options:
                         attrs[attr] = dread.options.get(attr)
 
@@ -549,7 +554,7 @@ def ImportFITSFile(comm, dsname, filename, hdu,
             renames=renames,
             wcsmodes={fullname: wcsmode},
             linked=linked,
-            )
+        )
 
     else:
         # handle tables
@@ -581,7 +586,7 @@ def ImportFITSFile(comm, dsname, filename, hdu,
             namemap=namemap,
             renames=renames,
             linked=linked,
-            )
+        )
 
 # new import command
 document.registerImportCommand("ImportFileFITS", ImportFileFITS)

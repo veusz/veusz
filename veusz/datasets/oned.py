@@ -33,8 +33,12 @@ class Dataset1DBase(DatasetConcreteBase):
     # number of dimensions the dataset holds
     dimensions = 1
     columns = ('data', 'serr', 'nerr', 'perr')
-    column_descriptions = (_('Data'), _('Sym. errors'), _('Neg. errors'),
-                           _('Pos. errors') )
+    column_descriptions = (
+        _('Data'),
+        _('Sym. errors'),
+        _('Neg. errors'),
+        _('Pos. errors')
+    )
     dstype = _('1D')
 
     # subclasses must define .data, .serr, .perr, .nerr
@@ -89,8 +93,10 @@ class Dataset1DBase(DatasetConcreteBase):
         if self.perr is not None:
             maxvals += self.perr
 
-        return ( minvals[N.isfinite(minvals)],
-                 maxvals[N.isfinite(maxvals)] )
+        return (
+            minvals[N.isfinite(minvals)],
+            maxvals[N.isfinite(maxvals)]
+        )
 
     def getRange(self):
         '''Get total range of coordinates. Returns None if empty.'''
@@ -152,10 +158,12 @@ class Dataset1DBase(DatasetConcreteBase):
 
     def returnCopy(self):
         """Return version of dataset with no linking."""
-        return Dataset(data = copyOrNone(self.data),
-                       serr = copyOrNone(self.serr),
-                       perr = copyOrNone(self.perr),
-                       nerr = copyOrNone(self.nerr))
+        return Dataset(
+            data=copyOrNone(self.data),
+            serr=copyOrNone(self.serr),
+            perr=copyOrNone(self.perr),
+            nerr=copyOrNone(self.nerr)
+        )
 
     def returnCopyWithNewData(self, **args):
         """Return dataset of same type using the column data given."""

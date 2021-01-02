@@ -47,7 +47,7 @@ class ImportParamsBase:
         'suffix': '',
         'tags': None,
         'renames': None,
-        }
+    }
 
     def __init__(self, **argsv):
         """Initialise the reader to import data from filename.
@@ -232,7 +232,7 @@ class OperationDataImportBase:
             'constant': 'def_definitions',
             'function': 'def_definitions',
             'definition': 'def_definitions',
-            }
+        }
 
         if len(customs) > 0:
             doceval = document.evaluate
@@ -286,8 +286,8 @@ class OperationDataImportBase:
                 self.outdatasets[self.params.renames[name]] = ds
 
         # only remember the parts we need
-        self.olddatasets = [ (n, document.data.get(n))
-                             for n in self.outdatasets ]
+        self.olddatasets = [
+            (n, document.data.get(n)) for n in self.outdatasets ]
 
         self.olddatasets = []
         for name, ds in self.outdatasets.items():

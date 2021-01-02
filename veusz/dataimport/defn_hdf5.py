@@ -84,7 +84,7 @@ class ImportParamsHDF5(base.ImportParamsBase):
         'twodranges': None,
         'twod_as_oned': None,
         'convert_datetime': None,
-        }
+    }
     defaults.update(base.ImportParamsBase.defaults)
 
 class LinkedFileHDF5(base.LinkedFileBase):
@@ -185,8 +185,8 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
 
                 for name in names:
                     attrs = fits_hdf5_helpers.filterAttrsByName(item.attrs, name)
-                    self.readDataset(item[name], attrs, item.name+"/"+name,
-                                     dsread)
+                    self.readDataset(
+                        item[name], attrs, item.name+"/"+name, dsread)
             else:
                 self.readDataset(item, item.attrs, item.name, dsread)
 
@@ -272,10 +272,12 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             else:
                 # Standard 1D Import
                 # handle any possible error bars
-                args = { 'data': data,
-                         'serr': errordatasets[name]['+-'],
-                         'nerr': errordatasets[name]['-'],
-                         'perr': errordatasets[name]['+'] }
+                args = {
+                    'data': data,
+                    'serr': errordatasets[name]['+-'],
+                    'nerr': errordatasets[name]['-'],
+                    'perr': errordatasets[name]['+']
+                }
 
                 # find minimum length and cut down if necessary
                 minlen = min(
@@ -307,8 +309,9 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
                     r = dread.options["vsz_range"]
                     attrs["xrange"] = (r[0], r[2])
                     attrs["yrange"] = (r[1], r[3])
-                for attr in ("xrange", "yrange", "xcent", "ycent",
-                             "xedge", "yedge"):
+                for attr in (
+                        "xrange", "yrange", "xcent", "ycent",
+                        "xedge", "yedge"):
                     if "vsz_"+attr in dread.options:
                         attrs[attr] = dread.options.get("vsz_"+attr)
 

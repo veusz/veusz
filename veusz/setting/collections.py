@@ -37,27 +37,27 @@ class Line(Settings):
         self.add( setting.Color(
             'color',
             setting.Reference('/StyleSheet/Line/color'),
-            descr = _('Color of line'),
-            usertext = _('Color')) )
+            descr=_('Color of line'),
+            usertext=_('Color')) )
         self.add( setting.DistancePt(
             'width',
             setting.Reference('/StyleSheet/Line/width'),
-            descr = _('Width of line'),
-            usertext = _('Width')) )
+            descr=_('Width of line'),
+            usertext=_('Width')) )
         self.add( setting.LineStyle(
             'style', 'solid',
-            descr = _('Line style'),
-            usertext = _('Style')) )
+            descr=_('Line style'),
+            usertext=_('Style')) )
         self.add( setting.Int(
             'transparency', 0,
-            descr = _('Transparency percentage'),
-            usertext = _('Transparency'),
-            minval = 0,
-            maxval = 100 ) )
+            descr=_('Transparency percentage'),
+            usertext=_('Transparency'),
+            minval=0,
+            maxval=100 ) )
         self.add( setting.Bool(
             'hide', False,
-            descr = _('Hide the line'),
-            usertext = _('Hide')) )
+            descr=_('Hide the line'),
+            usertext=_('Hide')) )
 
     def makeQPen(self, painter):
         '''Make a QPen from the settings (ignoring hide).
@@ -100,12 +100,12 @@ class XYPlotLine(Line):
                 'vcentre'
             ],
             'off',
-            descr = _('Plot 90 degree steps instead of a line'),
-            usertext = _('Steps')), 0 )
+            descr=_('Plot 90 degree steps instead of a line'),
+            usertext=_('Steps')), 0 )
         self.add( setting.Bool(
             'bezierJoin', False,
             descr=_('Connect points with a cubic Bezier curve'),
-            usertext = _('Bezier join')), 1 )
+            usertext=_('Bezier join')), 1 )
         self.get('color').newDefault( Reference('../color') )
 
 class MarkerLine(Line):
@@ -116,8 +116,7 @@ class MarkerLine(Line):
 
         self.add( setting.Bool(
             'scaleLine', True,
-            descr=_('Scale line width with marker if scaling'
-                    ' enabled'),
+            descr=_('Scale line width with marker if scaling enabled'),
             usertext=_('Scale')), 4 )
 
 class ErrorBarLine(Line):
@@ -128,16 +127,16 @@ class ErrorBarLine(Line):
 
         self.add( setting.Float(
             'endsize', 1.0,
-            minval = 0.,
-            descr = _('Scale ends of error bars by this factor'),
-            usertext = _('End size')) )
+            minval=0.,
+            descr=_('Scale ends of error bars by this factor'),
+            usertext=_('End size')) )
         self.add( setting.Bool(
             'hideHorz', False,
-            descr = _('Hide horizontal errors'),
-            usertext = _('Hide horz.')) )
+            descr=_('Hide horizontal errors'),
+            usertext=_('Hide horz.')) )
         self.add( setting.Bool(
             'hideVert', False,
-            descr = _('Hide vertical errors'),
+            descr=_('Hide vertical errors'),
             usertext=_('Hide vert.')) )
 
 class Brush(Settings):
@@ -148,22 +147,22 @@ class Brush(Settings):
 
         self.add( setting.Color(
             'color', 'foreground',
-            descr = _('Fill colour'),
-            usertext = _('Color')) )
+            descr=_('Fill colour'),
+            usertext=_('Color')) )
         self.add( setting.FillStyle(
             'style', 'solid',
-            descr = _('Fill style'),
-            usertext = _('Style')) )
+            descr=_('Fill style'),
+            usertext=_('Style')) )
         self.add( setting.Int(
             'transparency', 0,
-            descr = _('Transparency percentage'),
-            usertext = _('Transparency'),
-            minval = 0,
-            maxval = 100 ) )
+            descr=_('Transparency percentage'),
+            usertext=_('Transparency'),
+            minval=0,
+            maxval=100 ) )
         self.add( setting.Bool(
             'hide', False,
-            descr = _('Hide the fill'),
-            usertext = _('Hide')) )
+            descr=_('Hide the fill'),
+            usertext=_('Hide')) )
 
     def makeQBrush(self, painter):
         '''Make a QBrush from the settings.'''
@@ -186,51 +185,51 @@ class BrushExtended(Settings):
         Settings.__init__(self, name, **args)
 
         self.add( setting.Color(
-                'color', 'foreground',
-                descr = _('Fill colour'),
-                usertext=_('Color')) )
+            'color', 'foreground',
+            descr=_('Fill colour'),
+            usertext=_('Color')) )
         self.add( setting.FillStyleExtended(
-                'style', 'solid',
-                descr = _('Fill style'),
-                usertext=_('Style')) )
+            'style', 'solid',
+            descr=_('Fill style'),
+            usertext=_('Style')) )
 
         self.add( setting.Bool(
-                'hide', False,
-                descr = _('Hide the fill'),
-                usertext=_('Hide')) )
+            'hide', False,
+            descr=_('Hide the fill'),
+            usertext=_('Hide')) )
 
         self.add( setting.Int(
-                'transparency', 0,
-                descr = _('Transparency percentage'),
-                usertext = _('Transparency'),
-                minval = 0,
-                maxval = 100 ) )
+            'transparency', 0,
+            descr=_('Transparency percentage'),
+            usertext=_('Transparency'),
+            minval=0,
+            maxval=100 ) )
         self.add( setting.DistancePt(
-                'linewidth', '0.5pt',
-                descr = _('Width of hatch or pattern line'),
-                usertext=_('Line width')) )
+            'linewidth', '0.5pt',
+            descr=_('Width of hatch or pattern line'),
+            usertext=_('Line width')) )
         self.add( setting.LineStyle(
-                'linestyle', 'solid',
-                descr = _('Hatch or pattern line style'),
-                usertext=_('Line style')) )
+            'linestyle', 'solid',
+            descr=_('Hatch or pattern line style'),
+            usertext=_('Line style')) )
         self.add( setting.DistancePt(
-                'patternspacing', '5pt',
-                descr = _('Hatch or pattern spacing'),
-                usertext = _('Spacing')) )
+            'patternspacing', '5pt',
+            descr=_('Hatch or pattern spacing'),
+            usertext=_('Spacing')) )
         self.add( setting.Color(
-                'backcolor', 'background',
-                descr = _('Hatch or pattern background color'),
-                usertext = _('Back color') ) )
+            'backcolor', 'background',
+            descr=_('Hatch or pattern background color'),
+            usertext=_('Back color') ) )
         self.add( setting.Int(
-                'backtransparency', 0,
-                descr = _('Hatch or pattern background transparency percentage'),
-                usertext = _('Back trans.'),
-                minval = 0,
-                maxval = 100 ) )
+            'backtransparency', 0,
+            descr=_('Hatch or pattern background transparency percentage'),
+            usertext=_('Back trans.'),
+            minval=0,
+            maxval=100 ) )
         self.add( setting.Bool(
-                'backhide', True,
-                descr = _('Hide hatch or pattern background'),
-                usertext=_('Back hide')) )
+            'backhide', True,
+            descr=_('Hide hatch or pattern background'),
+            usertext=_('Back hide')) )
 
 class KeyBrush(BrushExtended):
     '''Fill used for back of key.'''
@@ -287,7 +286,7 @@ class PointFill(BrushExtended):
 
         self.add( setting.Bool(
             'hideerror', False,
-            descr = _('Hide the filled region inside the error bars'),
+            descr=_('Hide the filled region inside the error bars'),
             usertext=_('Hide error fill')) )
 
 class ShapeFill(BrushExtended):
@@ -305,7 +304,7 @@ class ArrowFill(Brush):
         Brush.__init__(self, name, **args)
 
         self.get('color').newDefault( setting.Reference(
-                '../Line/color') )
+            '../Line/color') )
 
 class Text(Settings):
     '''Text settings.'''
@@ -321,34 +320,34 @@ class Text(Settings):
         self.add( setting.FontFamily(
             'font',
             setting.Reference('/StyleSheet/Font/font'),
-            descr = _('Font name'),
-            usertext = _('Font')) )
+            descr=_('Font name'),
+            usertext=_('Font')) )
         self.add( setting.DistancePt(
             'size',
             setting.Reference('/StyleSheet/Font/size'),
-            descr = _('Font size'),
-            usertext = _('Size') ) )
+            descr=_('Font size'),
+            usertext=_('Size') ) )
         self.add( setting.Color(
             'color',
             setting.Reference('/StyleSheet/Font/color'),
-            descr = _('Font color'),
-            usertext = _('Color') ) )
+            descr=_('Font color'),
+            usertext=_('Color') ) )
         self.add( setting.Bool(
             'italic', False,
-            descr = _('Italic font'),
-            usertext = _('Italic') ) )
+            descr=_('Italic font'),
+            usertext=_('Italic') ) )
         self.add( setting.Bool(
             'bold', False,
-            descr = _('Bold font'),
-            usertext = _('Bold') ) )
+            descr=_('Bold font'),
+            usertext=_('Bold') ) )
         self.add( setting.Bool(
             'underline', False,
-            descr = _('Underline font'),
-            usertext = _('Underline') ) )
+            descr=_('Underline font'),
+            usertext=_('Underline') ) )
         self.add( setting.Bool(
             'hide', False,
-            descr = _('Hide the text'),
-            usertext = _('Hide')) )
+            descr=_('Hide the text'),
+            usertext=_('Hide')) )
 
     def copy(self):
         """Make copy of settings."""
@@ -385,21 +384,21 @@ class PointLabel(Text):
 
         self.add( setting.Float(
             'angle', 0.,
-            descr = _('Angle of the labels in degrees'),
-            usertext = _('Angle'),
-            formatting = True), 0 )
+            descr=_('Angle of the labels in degrees'),
+            usertext=_('Angle'),
+            formatting=True), 0 )
         self.add( setting.AlignVert(
             'posnVert',
             'centre',
-            descr = _('Vertical position of label'),
-            usertext = _('Vert position'),
-            formatting = True), 0 )
+            descr=_('Vertical position of label'),
+            usertext=_('Vert position'),
+            formatting=True), 0 )
         self.add( setting.AlignHorz(
             'posnHorz',
             'right',
-            descr = _('Horizontal position of label'),
-            usertext = _('Horz position'),
-            formatting = True), 0 )
+            descr=_('Horizontal position of label'),
+            usertext=_('Horz position'),
+            formatting=True), 0 )
 
 class DataColor(Settings):
     """Settings for a coloring points using data values."""
@@ -408,22 +407,22 @@ class DataColor(Settings):
         Settings.__init__(self, name, setnsmode='groupedsetting')
         self.add( setting.DatasetExtended(
             'points', '',
-            descr = _('Use color value (0-1) in dataset'),
+            descr=_('Use color value (0-1) in dataset'),
             dimensions=dimensions,
             usertext=_('Color')) )
         self.add( setting.Float(
             'min', 0.,
-            descr = _('Minimum value of color dataset'),
-            usertext = _('Min val') ))
+            descr=_('Minimum value of color dataset'),
+            usertext=_('Min val') ))
         self.add( setting.Float(
             'max', 1.,
-            descr = _('Maximum value of color dataset'),
-            usertext = _('Max val') ))
+            descr=_('Maximum value of color dataset'),
+            usertext=_('Max val') ))
         self.add( setting.Choice(
             'scaling',
             ['linear', 'sqrt', 'log', 'squared'],
             'linear',
-            descr = _('Scaling to transform numbers to color'),
+            descr=_('Scaling to transform numbers to color'),
             usertext=_('Scaling')))
 
 class Line3D(Settings):
@@ -435,16 +434,16 @@ class Line3D(Settings):
         self.add( setting.Color(
             'color',
             setting.Reference('/StyleSheet/Line/color'),
-            descr = _('Color of line'),
+            descr=_('Color of line'),
             usertext=_('Color')) )
         self.add( setting.Float(
             'width', 1.,
             minval=0., maxval=1000,
-            descr = _('Width of line'),
+            descr=_('Width of line'),
             usertext=_('Width')) )
         self.add( setting.LineStyle(
             'style', 'solid',
-            descr = _('Line style'),
+            descr=_('Line style'),
             usertext=_('Style')) )
         self.add( setting.FloatSlider(
             'transparency', 0.,
@@ -458,7 +457,7 @@ class Line3D(Settings):
             usertext=_('Reflectivity')) )
         self.add( setting.Bool(
             'hide', False,
-            descr = _('Hide the line'),
+            descr=_('Hide the line'),
             usertext=_('Hide')) )
 
     def makeLineProp(self, painter):
@@ -493,7 +492,7 @@ class Surface3D(Settings):
         self.add( setting.Color(
             'color',
             'grey',
-            descr = _('Color of surface'),
+            descr=_('Color of surface'),
             usertext=_('Color')) )
         self.add( setting.FloatSlider(
             'transparency', 0.,
@@ -507,7 +506,7 @@ class Surface3D(Settings):
             usertext=_('Reflectivity')) )
         self.add( setting.Bool(
             'hide', False,
-            descr = _('Hide surface'),
+            descr=_('Hide surface'),
             usertext=_('Hide')) )
 
     def makeSurfaceProp(self, painter):
@@ -529,14 +528,15 @@ class Surface3DWColorMap(Surface3D):
 
         self.add( setting.Colormap(
             'colorMap', 'grey',
-            descr = _('If color markers dataset is given, use this colormap '
-                      'instead of the fill color'),
+            descr=_(
+                'If color markers dataset is given, use this colormap '
+                'instead of the fill color'),
             usertext=_('Color map'),
             formatting=True) )
         self.add( setting.Bool(
             'colorMapInvert', False,
-            descr = _('Invert color map'),
-            usertext = _('Invert map'),
+            descr=_('Invert color map'),
+            usertext=_('Invert map'),
             formatting=True) )
 
 class Line3DWColorMap(Line3D):
@@ -547,14 +547,15 @@ class Line3DWColorMap(Line3D):
 
         self.add( setting.Colormap(
             'colorMap', 'grey',
-            descr = _('If color markers dataset is given, use this colormap '
-                      'instead of the fill color'),
+            descr=_(
+                'If color markers dataset is given, use this colormap '
+                'instead of the fill color'),
             usertext=_('Color map'),
             formatting=True) )
         self.add( setting.Bool(
             'colorMapInvert', False,
-            descr = _('Invert color map'),
-            usertext = _('Invert map'),
+            descr=_('Invert color map'),
+            usertext=_('Invert map'),
             formatting=True) )
 
 class LineGrid3D(Line3D):
@@ -563,11 +564,11 @@ class LineGrid3D(Line3D):
         Line3D.__init__(self, name, **args)
         self.add( setting.Bool(
             'hidehorz', False,
-            descr = _('Hide horizontal lines'),
+            descr=_('Hide horizontal lines'),
             usertext=_('Hide horz.')) )
         self.add( setting.Bool(
             'hidevert', False,
-            descr = _('Hide vertical lines'),
+            descr=_('Hide vertical lines'),
             usertext=_('Hide vert.')) )
 
 class Lighting3D(Settings):
@@ -582,7 +583,7 @@ class Lighting3D(Settings):
             usertext=_('Enable')) )
         self.add( setting.Color(
             'color', 'white',
-            descr = _('Color of lighting'),
+            descr=_('Color of lighting'),
             usertext=_('Color')) )
         self.add( setting.FloatSlider(
             'intensity', 100.,

@@ -60,8 +60,10 @@ class DataCreate2DDialog(VeuszDialog):
 
         document.signalModified.connect(self.updateDatasetLists)
 
-        for combo in (self.namecombo, self.xexprcombo, self.yexprcombo,
-                      self.zexprcombo):
+        for combo in (
+                self.namecombo, self.xexprcombo, self.yexprcombo,
+                self.zexprcombo
+        ):
             combo.editTextChanged.connect(self.enableDisableCreate)
 
         self.fromxyzexpr.toggle()
@@ -173,8 +175,10 @@ class DataCreate2DDialog(VeuszDialog):
 
         elif self.mode == 'xyfunc':
             # need x and yexpr in special step format min:max:step
-            disable = disable or ( checkGetStep(text['xexpr']) is None or
-                                   checkGetStep(text['yexpr']) is None )
+            disable = disable or (
+                checkGetStep(text['xexpr']) is None or
+                checkGetStep(text['yexpr']) is None
+            )
 
         # finally check button
         self.createbutton.setDisabled(disable)

@@ -54,7 +54,7 @@ class ImportParams2D(base.ImportParamsBase):
         'csvdelimiter': ',',
         'csvtextdelimiter': '"',
         'csvlocale': 'en_US',
-        }
+    }
     defaults.update(base.ImportParamsBase.defaults)
 
 class LinkedFile2D(base.LinkedFileBase):

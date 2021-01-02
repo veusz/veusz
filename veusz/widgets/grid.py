@@ -158,8 +158,8 @@ class Grid(widget.Widget):
 
         self.addAction( widget.Action(
             'zeroMargins', self.actionZeroMargins,
-            descr = _('Zero margins of graphs in grid'),
-            usertext = _('Zero margins')) )
+            descr=_('Zero margins of graphs in grid'),
+            usertext=_('Zero margins')) )
 
         # calculated positions for children
         self.childpositions = {}
@@ -187,16 +187,16 @@ class Grid(widget.Widget):
         s.add( setting.FloatList(
             'scaleRows',
             [],
-            descr = _('Row scaling factors. A sequence'
-                      ' of values\nby which to scale rows '
-                      'relative to each other.'),
+            descr=_(
+                'Row scaling factors. A sequence of values\nby which to '
+                'scale rows relative to each other.'),
             usertext=_('Row scalings')) )
         s.add( setting.FloatList(
             'scaleCols',
             [],
-            descr = _('Column scaling factors. A sequence'
-                      ' of values\nby which to scale columns'
-                      ' relative to each other.'),
+            descr=_(
+                'Column scaling factors. A sequence of values\nby which to '
+                'scale columns relative to each other.'),
             usertext=_('Column scalings')) )
 
         s.add( setting.Distance(

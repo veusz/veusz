@@ -109,7 +109,7 @@ class ImportPluginExample(ImportPlugin):
             field.FieldCombo(
                 "subtract", items=("0", "1", "2"),
                 editable=False, default="0")
-            ]
+        ]
 
     def doImport(self, params):
         """Actually import data
@@ -149,7 +149,7 @@ class ImportPluginDateTime(ImportPlugin):
     def __init__(self):
         self.fields = [
             field.FieldText("name", descr=_("Dataset name"), default="name"),
-            ]
+        ]
 
     def doImport(self, params):
         """Actually import data
@@ -429,7 +429,7 @@ class ImportPluginQdp(ImportPlugin):
         self.fields = [
             field.FieldTextMulti(
                 "names", descr=_("Vector name list "), default=['']),
-            ]
+        ]
 
     def doImport(self, params):
         """Actually import data

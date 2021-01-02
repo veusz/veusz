@@ -116,10 +116,11 @@ class Widget:
     @classmethod
     def addSettings(klass, s):
         """Add items to settings s."""
-        s.add( setting.Bool('hide', False,
-                            descr = _('Hide object'),
-                            usertext = _('Hide'),
-                            formatting = True) )
+        s.add( setting.Bool(
+            'hide', False,
+            descr=_('Hide object'),
+            usertext=_('Hide'),
+            formatting=True) )
 
     @classmethod
     def onNewCompatLevel(klass, stylesheet, level):
@@ -308,15 +309,19 @@ class Widget:
 
         # now go throught the subwidgets
         for c in self.children:
-            text += ( "Add('%s', name=%s, autoadd=False)\n" %
-                      (c.typename, repr(c.name)) )
+            text += (
+                "Add('%s', name=%s, autoadd=False)\n" %
+                (c.typename, repr(c.name))
+            )
 
             # if we need to go to the child, go there
             ctext = c.getSaveText(saveall)
             if ctext != '':
-                text += ("To(%s)\n"
-                         "%s"
-                         "To('..')\n") % (repr(c.name), ctext)
+                text += (
+                    "To(%s)\n"
+                    "%s"
+                    "To('..')\n"
+                ) % (repr(c.name), ctext)
 
         return text
 
@@ -411,4 +416,4 @@ class Widget:
         self.autoColor(painter)
 
 # allow the factory to instantiate a generic widget
-document.thefactory.register( Widget )
+document.thefactory.register(Widget)

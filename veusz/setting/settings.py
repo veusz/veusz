@@ -69,13 +69,17 @@ class Settings:
 
     def getSettingList(self):
         """Get a list of setting types."""
-        return [self.setdict[n] for n in self.setnames
-                if not isinstance(self.setdict[n], Settings)]
+        return [
+            self.setdict[n] for n in self.setnames
+            if not isinstance(self.setdict[n], Settings)
+        ]
 
     def getSettingsList(self):
         """Get a list of settings types."""
-        return [self.setdict[n] for n in self.setnames
-                if isinstance(self.setdict[n], Settings)]
+        return [
+            self.setdict[n] for n in self.setnames
+            if isinstance(self.setdict[n], Settings)
+        ]
 
     def getNames(self):
         """Return list of names."""
@@ -83,13 +87,17 @@ class Settings:
 
     def getSettingNames(self):
         """Get list of setting names."""
-        return [n for n in self.setnames
-                if not isinstance(self.setdict[n], Settings)]
+        return [
+            n for n in self.setnames
+            if not isinstance(self.setdict[n], Settings)
+        ]
 
     def getSettingsNames(self):
         """Get list of settings names."""
-        return [n for n in self.setnames
-                if isinstance(self.setdict[n], Settings)]
+        return [
+            n for n in self.setnames
+            if isinstance(self.setdict[n], Settings)
+        ]
 
     def isSetting(self, name):
         """Is the name a supported setting?"""
@@ -192,8 +200,10 @@ class Settings:
         else:
             rootname += self.name + '/'
 
-        text = ''.join( [self.setdict[name].saveText(saveall, rootname)
-                         for name in self.setnames] )
+        text = ''.join( [
+            self.setdict[name].saveText(saveall, rootname)
+            for name in self.setnames
+        ] )
         return text
 
     def linkToStylesheet(self, _root=None):

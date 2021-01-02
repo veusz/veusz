@@ -46,8 +46,9 @@ class LineEditWithClear(qt.QLineEdit):
 
         # positioning of the button
         fw = self.style().pixelMetric(qt.QStyle.PM_DefaultFrameWidth)
-        self.setStyleSheet("QLineEdit { padding-right: %ipx; } " %
-                           (cb.sizeHint().width() + fw + 1))
+        self.setStyleSheet(
+            "QLineEdit { padding-right: %ipx; } " %
+            (cb.sizeHint().width() + fw + 1))
         msz = self.minimumSizeHint()
         mx =  cb.sizeHint().height()+ fw*2 + 2
         self.setMinimumSize( max(msz.width(), mx), max(msz.height(), mx) )
@@ -57,8 +58,9 @@ class LineEditWithClear(qt.QLineEdit):
         sz = self.clearbutton.sizeHint()
         fw = self.style().pixelMetric(qt.QStyle.PM_DefaultFrameWidth)
         r = self.rect()
-        self.clearbutton.move( r.right() - fw - sz.width(),
-                               (r.bottom() + 1 - sz.height())//2 )
+        self.clearbutton.move(
+            r.right() - fw - sz.width(),
+            (r.bottom() + 1 - sz.height())//2 )
 
     def updateCloseButton(self, text):
         """Button should only appear if there is text."""

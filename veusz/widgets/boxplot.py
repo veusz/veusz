@@ -116,106 +116,124 @@ class BoxPlot(GenericPlotter):
         GenericPlotter.addSettings(s)
 
         s.remove('key')
-        s.add( setting.Choice('whiskermode',
-                              ('min/max',
-                               '1.5IQR',
-                               '1 stddev',
-                               '9/91 percentile',
-                               '2/98 percentile'),
-                              '1.5IQR',
-                              descr = _('Whisker mode'),
-                              usertext=_('Whisker mode')), 0 )
+        s.add( setting.Choice(
+            'whiskermode',
+            (
+                'min/max',
+                '1.5IQR',
+                '1 stddev',
+                '9/91 percentile',
+                '2/98 percentile'
+            ),
+            '1.5IQR',
+            descr=_('Whisker mode'),
+            usertext=_('Whisker mode')), 0 )
 
-        s.add( setting.Choice('direction',
-                              ('horizontal', 'vertical'), 'vertical',
-                              descr = _('Horizontal or vertical boxes'),
-                              usertext=_('Direction')), 0 )
-        s.add( setting.DatasetOrStr('labels', '',
-                                    descr=_('Dataset or string to label bars'),
-                                    usertext=_('Labels')), 0 )
+        s.add( setting.Choice(
+            'direction',
+            ('horizontal', 'vertical'), 'vertical',
+            descr=_('Horizontal or vertical boxes'),
+            usertext=_('Direction')), 0 )
+        s.add( setting.DatasetOrStr(
+            'labels', '',
+            descr=_('Dataset or string to label bars'),
+            usertext=_('Labels')), 0 )
         s.add( setting.DatasetExtended(
-                'posn', '',
-                descr = _('Dataset or list of values giving '
-                          'positions of boxes (optional)'),
-                usertext=_('Positions')), 0 )
+            'posn', '',
+            descr=_(
+                'Dataset or list of values giving positions of boxes (optional)'),
+            usertext=_('Positions')), 0 )
 
         # calculate statistics from these datasets
-        s.add( setting.Datasets('values', ('data',),
-                                descr = _('Datasets containing values to '
-                                          'calculate statistics for'),
-                                usertext=_('Datasets')), 0 )
+        s.add( setting.Datasets(
+            'values', ('data',),
+            descr=_('Datasets containing values to calculate statistics for'),
+            usertext=_('Datasets')), 0 )
 
         # alternate mode where data are provided for boxes
         s.add( setting.DatasetExtended(
-                'whiskermax', '',
-                descr=_('Dataset with whisker maxima or list of values'),
-                usertext=_('Whisker max')), 0 )
+            'whiskermax', '',
+            descr=_('Dataset with whisker maxima or list of values'),
+            usertext=_('Whisker max')), 0 )
         s.add( setting.DatasetExtended(
-                'whiskermin', '',
-                descr=_('Dataset with whisker minima or list of values'),
-                usertext=_('Whisker min')), 0 )
+            'whiskermin', '',
+            descr=_('Dataset with whisker minima or list of values'),
+            usertext=_('Whisker min')), 0 )
         s.add( setting.DatasetExtended(
-                'boxmax', '',
-                descr=_('Dataset with box maxima or list of values'),
-                usertext=_('Box max')), 0 )
+            'boxmax', '',
+            descr=_('Dataset with box maxima or list of values'),
+            usertext=_('Box max')), 0 )
         s.add( setting.DatasetExtended(
-                'boxmin', '',
-                descr=_('Dataset with box minima or list of values'),
-                usertext=_('Box min')), 0 )
+            'boxmin', '',
+            descr=_('Dataset with box minima or list of values'),
+            usertext=_('Box min')), 0 )
         s.add( setting.DatasetExtended(
-                'median', '',
-                descr=_('Dataset with medians or list of values'),
-                usertext=_('Median')), 0 )
+            'median', '',
+            descr=_('Dataset with medians or list of values'),
+            usertext=_('Median')), 0 )
         s.add( setting.DatasetExtended(
-                'mean', '',
-                descr=_('Dataset with means or list of values'),
-                usertext=_('Mean')), 0 )
+            'mean', '',
+            descr=_('Dataset with means or list of values'),
+            usertext=_('Mean')), 0 )
 
         # switch between different modes
-        s.add( setting.BoolSwitch('calculate', True,
-                                  descr = _('Calculate statistics from datasets'
-                                            ' rather than given manually'),
-                                  usertext = _('Calculate'),
-                                  settingstrue=('whiskermode', 'values'),
-                                  settingsfalse=('boxmin', 'whiskermin',
-                                                 'boxmax', 'whiskermax',
-                                                 'mean', 'median')), 0 )
+        s.add( setting.BoolSwitch(
+            'calculate', True,
+            descr=_(
+                'Calculate statistics from datasets rather than given manually'),
+            usertext=_('Calculate'),
+            settingstrue=('whiskermode', 'values'),
+            settingsfalse=(
+                'boxmin', 'whiskermin',
+                'boxmax', 'whiskermax',
+                'mean', 'median')), 0 )
 
         # formatting options
-        s.add( setting.Float('fillfraction', 0.75,
-                             descr = _('Fill fraction of boxes'),
-                             usertext=_('Fill fraction'), formatting=True) )
-        s.add( setting.Marker('outliersmarker',
-                              'circle',
-                              descr = _('Marker for outliers'),
-                              usertext=_('Outliers'), formatting=True) )
-        s.add( setting.Marker('meanmarker',
-                              'linecross',
-                              descr = _('Marker for mean'),
-                              usertext=_('Mean'), formatting=True) )
-        s.add( setting.DistancePt('markerSize',
-                                  '3pt',
-                                  descr = _('Size of markers to plot'),
-                                  usertext=_('Markers size'), formatting=True) )
+        s.add( setting.Float(
+            'fillfraction', 0.75,
+            descr=_('Fill fraction of boxes'),
+            usertext=_('Fill fraction'), formatting=True) )
+        s.add( setting.Marker(
+            'outliersmarker',
+            'circle',
+            descr=_('Marker for outliers'),
+            usertext=_('Outliers'), formatting=True) )
+        s.add( setting.Marker(
+            'meanmarker',
+            'linecross',
+            descr=_('Marker for mean'),
+            usertext=_('Mean'), formatting=True) )
+        s.add( setting.DistancePt(
+            'markerSize',
+            '3pt',
+            descr=_('Size of markers to plot'),
+            usertext=_('Markers size'), formatting=True) )
 
-        s.add( setting.GraphBrush( 'Fill',
-                                   descr = _('Box fill'),
-                                   usertext=_('Box fill')),
-               pixmap='settings_bgfill' )
-        s.add( setting.Line('Border', descr = _('Box border line'),
-                            usertext=_('Box border')),
-               pixmap='settings_border')
-        s.add( setting.Line('Whisker', descr = _('Whisker line'),
-                            usertext=_('Whisker line')),
-               pixmap='settings_whisker')
-        s.add( setting.Line('MarkersLine',
-                            descr = _('Line around markers'),
-                            usertext = _('Markers border')),
-               pixmap = 'settings_plotmarkerline' )
-        s.add( setting.BoxPlotMarkerFillBrush('MarkersFill',
-                                              descr = _('Markers fill'),
-                                              usertext = _('Markers fill')),
-               pixmap = 'settings_plotmarkerfill' )
+        s.add( setting.GraphBrush(
+            'Fill',
+            descr=_('Box fill'),
+            usertext=_('Box fill')),
+            pixmap='settings_bgfill' )
+        s.add( setting.Line(
+            'Border',
+            descr=_('Box border line'),
+            usertext=_('Box border')),
+            pixmap='settings_border')
+        s.add( setting.Line(
+            'Whisker',
+            descr=_('Whisker line'),
+            usertext=_('Whisker line')),
+            pixmap='settings_whisker')
+        s.add( setting.Line(
+            'MarkersLine',
+            descr=_('Line around markers'),
+            usertext=_('Markers border')),
+            pixmap='settings_plotmarkerline' )
+        s.add( setting.BoxPlotMarkerFillBrush(
+            'MarkersFill',
+            descr=_('Markers fill'),
+            usertext=_('Markers fill')),
+            pixmap='settings_plotmarkerfill' )
 
     @property
     def userdescription(self):
@@ -233,8 +251,8 @@ class BoxPlot(GenericPlotter):
         """For updating range in manual mode."""
         s = self.settings
         ds = []
-        for name in ('whiskermin', 'whiskermax', 'boxmin', 'boxmax',
-                     'mean', 'median'):
+        for name in (
+                'whiskermin', 'whiskermax', 'boxmin', 'boxmax', 'mean', 'median'):
             ds.append( s.get(name).getData(self.document) )
         r = [N.inf, -N.inf]
         if None not in ds:
@@ -323,9 +341,11 @@ class BoxPlot(GenericPlotter):
         medplt, botplt, topplt, botwhisplt, topwhisplt = tuple(
             axes[not horz].dataToPlotterCoords(
                 posn,
-                N.array([ stats.median, stats.botquart, stats.topquart,
-                          stats.botwhisker, stats.topwhisker ]))
-            )
+                N.array([
+                    stats.median, stats.botquart, stats.topquart,
+                    stats.botwhisker, stats.topwhisker
+                ]))
+        )
 
         # draw whisker top to bottom
         p = s.Whisker.makeQPenWHide(painter)
@@ -334,23 +354,26 @@ class BoxPlot(GenericPlotter):
         swapline(painter, boxposn, topwhisplt, boxposn, botwhisplt, horz)
         # draw ends of whiskers
         endsize = width/2
-        swapline(painter, boxposn-endsize/2, topwhisplt,
-                 boxposn+endsize/2, topwhisplt, horz)
-        swapline(painter, boxposn-endsize/2, botwhisplt,
-                 boxposn+endsize/2, botwhisplt, horz)
+        swapline(
+            painter, boxposn-endsize/2, topwhisplt,
+            boxposn+endsize/2, topwhisplt, horz)
+        swapline(
+            painter, boxposn-endsize/2, botwhisplt,
+            boxposn+endsize/2, botwhisplt, horz)
 
         # draw box fill
         boxpath = qt.QPainterPath()
-        boxpath.addRect( swapbox(painter, boxposn-width/2, botplt,
-                                 boxposn+width/2, topplt, horz) )
+        boxpath.addRect( swapbox(
+            painter, boxposn-width/2, botplt, boxposn+width/2, topplt, horz) )
         utils.brushExtFillPath(painter, s.Fill, boxpath)
 
         # draw line across box
         p = s.Whisker.makeQPenWHide(painter)
         p.setCapStyle(qt.Qt.FlatCap)
         painter.setPen(p)
-        swapline(painter, boxposn-width/2, medplt,
-                 boxposn+width/2, medplt, horz)
+        swapline(
+            painter, boxposn-width/2, medplt,
+            boxposn+width/2, medplt, horz)
 
         # draw box
         painter.strokePath(boxpath, s.Border.makeQPenWHide(painter) )
@@ -367,8 +390,8 @@ class BoxPlot(GenericPlotter):
             else:
                 x, y = otherpos, pltvals
 
-            utils.plotMarkers( painter, x, y, s.outliersmarker,
-                               markersize, clip=clip )
+            utils.plotMarkers(
+                painter, x, y, s.outliersmarker, markersize, clip=clip )
 
         # draw mean
         meanplt = axes[not horz].dataToPlotterCoords(
@@ -394,9 +417,10 @@ class BoxPlot(GenericPlotter):
                 return
         else:
             # use manual datasets
-            datasets = [ s.get(x).getData(doc) for x in
-                         ('whiskermin', 'whiskermax', 'boxmin',
-                          'boxmax', 'mean', 'median') ]
+            datasets = [
+                s.get(x).getData(doc) for x in
+                ('whiskermin', 'whiskermax', 'boxmin', 'boxmax', 'mean', 'median')
+            ]
             if any((d is None for d in datasets)):
                 return
 
@@ -457,4 +481,4 @@ class BoxPlot(GenericPlotter):
                     width, clip, stats)
 
 # allow the factory to instantiate a boxplot
-document.thefactory.register( BoxPlot )
+document.thefactory.register(BoxPlot)

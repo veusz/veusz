@@ -617,12 +617,14 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
         perr = self.parts.get('perr', None)
         nerr = self.parts.get('nerr', None)
 
-        ds = datasets.DatasetRange(self.numsteps, data, serr=serr,
-                                   perr=perr, nerr=nerr)
+        ds = datasets.DatasetRange(
+            self.numsteps, data, serr=serr,
+            perr=perr, nerr=nerr)
         if not self.linked:
             # copy these values if we don't want to link
-            ds = datasets.Dataset(data=ds.data, serr=ds.serr,
-                                  perr=ds.perr, nerr=ds.nerr)
+            ds = datasets.Dataset(
+                data=ds.data, serr=ds.serr,
+                perr=ds.perr, nerr=ds.nerr)
 
         document.setData(self.datasetname, ds)
         return ds
@@ -661,8 +663,9 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
 
         if not self.linked:
             # copy these values if we don't want to link
-            ds = datasets.Dataset(data=ds.data, serr=ds.serr,
-                                  perr=ds.perr, nerr=ds.nerr)
+            ds = datasets.Dataset(
+                data=ds.data, serr=ds.serr,
+                perr=ds.perr, nerr=ds.nerr)
 
         document.setData(self.datasetname, ds)
         return ds
@@ -710,8 +713,9 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
 
         if not self.link:
             # copy these values if we don't want to link
-            ds = datasets.Dataset(data=ds.data, serr=ds.serr,
-                                  perr=ds.perr, nerr=ds.nerr)
+            ds = datasets.Dataset(
+                data=ds.data, serr=ds.serr,
+                perr=ds.perr, nerr=ds.nerr)
 
         document.setData(self.datasetname, ds)
         return ds
@@ -804,10 +808,11 @@ class OperationDataset2DBase(Operation):
         ds.document = document
         if not self.link:
             # unlink if necessary
-            ds = datasets.Dataset2D(ds.data,
-                                    xrange=ds.xrange, yrange=ds.yrange,
-                                    xedge=ds.xedge, yedge=ds.yedge,
-                                    xcent=ds.xcent, ycent=ds.ycent)
+            ds = datasets.Dataset2D(
+                ds.data,
+                xrange=ds.xrange, yrange=ds.yrange,
+                xedge=ds.xedge, yedge=ds.yedge,
+                xcent=ds.xcent, ycent=ds.ycent)
         document.setData(self.datasetname, ds)
         return ds
 

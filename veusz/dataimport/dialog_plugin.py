@@ -125,9 +125,9 @@ class ImportTabPlugins(importdialog.ImportTab):
             self.fields.append(cntrls)
 
         # update label
-        self.pluginDescr.setText("%s (%s)\n%s" %
-                                 (plugin.name, plugin.author,
-                                  plugin.description))
+        self.pluginDescr.setText(
+            "%s (%s)\n%s" %
+            (plugin.name, plugin.author, plugin.description))
 
         self.dialog.slotUpdatePreview()
 
@@ -150,8 +150,8 @@ class ImportTabPlugins(importdialog.ImportTab):
             return False
 
         # ask the plugin for text
-        params = plugins.ImportPluginParams(filename, encoding,
-                                            self.getPluginFields())
+        params = plugins.ImportPluginParams(
+            filename, encoding, self.getPluginFields())
         try:
             text, ok = plugin.getPreview(params)
         except plugins.ImportPluginException as ex:

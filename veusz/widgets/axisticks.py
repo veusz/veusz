@@ -78,10 +78,12 @@ class AxisTicks(AxisTicksBase):
     # the allowed values we allow ticks to increase by
     # first values are the major tick intervals, followed by a list
     # of allowed minors
-    allowed_minorintervals_linear = { 1.:  (0.1, 0.2, 0.5),
-                                      2.:  (0.2, 0.5, 1.),
-                                      5.:  (0.5, 1., 2.5),
-                                      2.5: (0.5,) }
+    allowed_minorintervals_linear = { 
+        1.:  (0.1, 0.2, 0.5),
+        2.:  (0.2, 0.5, 1.),
+        5.:  (0.5, 1., 2.5),
+        2.5: (0.5,)
+    }
     # just get the allowable majors
     allowed_intervals_linear = sorted(allowed_minorintervals_linear)
 
@@ -325,7 +327,7 @@ class AxisTicks(AxisTicksBase):
             minorticks = self._calcLinearMinorTickValues(
                 minval, maxval, interval, loginterval,
                 AxisTicks.allowed_minorintervals_linear[interval]
-                )
+            )
 
         else:
             # log axis
@@ -384,53 +386,57 @@ class DateTicks(AxisTicksBase):
     # possible intervals for a time/date axis
     # tuples of ((y, m, d, h, m, s, msec), autoformat)
     intervals = (
-                 ((200, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((100, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((50, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((20, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((10, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((5, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((2, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((1, 0, 0, 0, 0, 0, 0), '%VDY'),
-                 ((0, 6, 0, 0, 0, 0, 0), '%VDY-%VDm'),
-                 ((0, 4, 0, 0, 0, 0, 0), '%VDY-%VDm'),
-                 ((0, 3, 0, 0, 0, 0, 0), '%VDY-%VDm'),
-                 ((0, 2, 0, 0, 0, 0, 0), '%VDY-%VDm'),
-                 ((0, 1, 0, 0, 0, 0, 0), '%VDY-%VDm'),
-                 ((0, 0, 28, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
-                 ((0, 0, 14, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
-                 ((0, 0, 7, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
-                 ((0, 0, 2, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
-                 ((0, 0, 1, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
-                 ((0, 0, 0, 12, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
-                 ((0, 0, 0, 6, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
-                 ((0, 0, 0, 4, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
-                 ((0, 0, 0, 3, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
-                 ((0, 0, 0, 2, 0, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 1, 0, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 0, 30, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 0, 15, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 0, 10, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 0, 5, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 0, 2, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 0, 1, 0, 0), '%VDH:%VDM'),
-                 ((0, 0, 0, 0, 0, 30, 0), '%VDH:%VDM:%VDS'),
-                 ((0, 0, 0, 0, 0, 15, 0), '%VDH:%VDM:%VDS'),
-                 ((0, 0, 0, 0, 0, 10, 0), '%VDH:%VDM:%VDS'),
-                 ((0, 0, 0, 0, 0, 5, 0), '%VDH:%VDM:%VDS'),
-                 ((0, 0, 0, 0, 0, 2, 0), '%VDH:%VDM:%VDS'),
-                 ((0, 0, 0, 0, 0, 1, 0), '%VDH:%VDM:%VDS'),
-                 ((0, 0, 0, 0, 0, 0, 500000), '%VDH:%VDM:%VDVS'),
-                 ((0, 0, 0, 0, 0, 0, 200000), '%VDVS'),
-                 ((0, 0, 0, 0, 0, 0, 100000), '%VDVS'),
-                 ((0, 0, 0, 0, 0, 0, 50000), '%VDVS'),
-                 ((0, 0, 0, 0, 0, 0, 10000), '%VDVS'),
-                 )
+        ((200, 0, 0, 0, 0, 0, 0), '%VDY'),
+        ((100, 0, 0, 0, 0, 0, 0), '%VDY'),
+        ((50, 0, 0, 0, 0, 0, 0), '%VDY'),
+        ((20, 0, 0, 0, 0, 0, 0), '%VDY'),
+        ((10, 0, 0, 0, 0, 0, 0), '%VDY'),
+        ((5, 0, 0, 0, 0, 0, 0), '%VDY'),
+        ((2, 0, 0, 0, 0, 0, 0), '%VDY'),
+        ((1, 0, 0, 0, 0, 0, 0), '%VDY'),
+        ((0, 6, 0, 0, 0, 0, 0), '%VDY-%VDm'),
+        ((0, 4, 0, 0, 0, 0, 0), '%VDY-%VDm'),
+        ((0, 3, 0, 0, 0, 0, 0), '%VDY-%VDm'),
+        ((0, 2, 0, 0, 0, 0, 0), '%VDY-%VDm'),
+        ((0, 1, 0, 0, 0, 0, 0), '%VDY-%VDm'),
+        ((0, 0, 28, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+        ((0, 0, 14, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+        ((0, 0, 7, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+        ((0, 0, 2, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+        ((0, 0, 1, 0, 0, 0, 0), '%VDY-%VDm-%VDd'),
+        ((0, 0, 0, 12, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
+        ((0, 0, 0, 6, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
+        ((0, 0, 0, 4, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
+        ((0, 0, 0, 3, 0, 0, 0), '%VDY-%VDm-%VDd\\\\%VDH:%VDM'),
+        ((0, 0, 0, 2, 0, 0, 0), '%VDH:%VDM'),
+        ((0, 0, 0, 1, 0, 0, 0), '%VDH:%VDM'),
+        ((0, 0, 0, 0, 30, 0, 0), '%VDH:%VDM'),
+        ((0, 0, 0, 0, 15, 0, 0), '%VDH:%VDM'),
+        ((0, 0, 0, 0, 10, 0, 0), '%VDH:%VDM'),
+        ((0, 0, 0, 0, 5, 0, 0), '%VDH:%VDM'),
+        ((0, 0, 0, 0, 2, 0, 0), '%VDH:%VDM'),
+        ((0, 0, 0, 0, 1, 0, 0), '%VDH:%VDM'),
+        ((0, 0, 0, 0, 0, 30, 0), '%VDH:%VDM:%VDS'),
+        ((0, 0, 0, 0, 0, 15, 0), '%VDH:%VDM:%VDS'),
+        ((0, 0, 0, 0, 0, 10, 0), '%VDH:%VDM:%VDS'),
+        ((0, 0, 0, 0, 0, 5, 0), '%VDH:%VDM:%VDS'),
+        ((0, 0, 0, 0, 0, 2, 0), '%VDH:%VDM:%VDS'),
+        ((0, 0, 0, 0, 0, 1, 0), '%VDH:%VDM:%VDS'),
+        ((0, 0, 0, 0, 0, 0, 500000), '%VDH:%VDM:%VDVS'),
+        ((0, 0, 0, 0, 0, 0, 200000), '%VDVS'),
+        ((0, 0, 0, 0, 0, 0, 100000), '%VDVS'),
+        ((0, 0, 0, 0, 0, 0, 50000), '%VDVS'),
+        ((0, 0, 0, 0, 0, 0, 10000), '%VDVS'),
+    )
 
-    intervals_sec = N.array([(ms*1e-6+s+mi*60+hr*60*60+dy*24*60*60+
-                              mn*(365/12.)*24*60*60+
-                              yr*365*24*60*60)
-                             for (yr, mn, dy, hr, mi, s, ms), fmt in intervals])
+    intervals_sec = N.array([
+        (
+            ms*1e-6+s+mi*60+hr*60*60+dy*24*60*60 +
+            mn*(365/12.)*24*60*60 +
+            yr*365*24*60*60
+        )
+        for (yr, mn, dy, hr, mi, s, ms), fmt in intervals]
+    )
 
     def bestTickFinder(self, minval, maxval, numticks, extendmin, extendmax,
                        intervals, intervals_sec):
@@ -455,7 +461,7 @@ class DateTicks(AxisTicksBase):
             best = tick1
         else:
             best = tick2
-        besttt, format = intervals[best]
+        besttt, fmt = intervals[best]
 
         mindate = utils.floatToDateTime(minval)
         maxdate = utils.floatToDateTime(maxval)
@@ -474,8 +480,8 @@ class DateTicks(AxisTicksBase):
         # extend bounds if requested
         deltamin = utils.datetimeToFloat(mindate)-utils.datetimeToFloat(mintick)
         if extendmin and (deltamin != 0. and deltamin < delta*0.15):
-            mindate = utils.addTimeTupleToDateTime(minround,
-                                                   [-x for x in besttt])
+            mindate = utils.addTimeTupleToDateTime(
+                minround, [-x for x in besttt])
             mintick = mindate
         deltamax = utils.datetimeToFloat(maxdate)-utils.datetimeToFloat(maxtick)
         if extendmax and (deltamax != 0. and deltamax < delta*0.15):
@@ -489,10 +495,12 @@ class DateTicks(AxisTicksBase):
             ticks.append( utils.datetimeToFloat(dt))
             dt = utils.addTimeTupleToDateTime(dt, besttt)
 
-        return ( utils.datetimeToFloat(mindate),
-                 utils.datetimeToFloat(maxdate),
-                 intervals_sec[best],
-                 N.array(ticks), format )
+        return (
+            utils.datetimeToFloat(mindate),
+            utils.datetimeToFloat(maxdate),
+            intervals_sec[best],
+            N.array(ticks), fmt
+        )
 
     def filterIntervals(self, estint):
         """Filter intervals and intervals_sec to be
@@ -511,7 +519,7 @@ class DateTicks(AxisTicksBase):
         """
 
         # find minor ticks
-        mindate, maxdate, est, ticks, format = self.bestTickFinder(
+        mindate, maxdate, est, ticks, fmt = self.bestTickFinder(
             self.minval, self.maxval, self.numticks,
             self.extendmin, self.extendmax,
             self.intervals, self.intervals_sec)
@@ -528,4 +536,4 @@ class DateTicks(AxisTicksBase):
         self.maxval = maxdate
         self.minorticks = minorticks
         self.tickvals = ticks
-        self.autoformat = format
+        self.autoformat = fmt

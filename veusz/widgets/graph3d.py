@@ -109,12 +109,12 @@ class Graph3D(widget.Widget):
             'Border',
             descr = _('Graph border'),
             usertext = _('Border')),
-               pixmap = 'settings_border' )
+            pixmap = 'settings_border' )
         s.add(BackSurface(
             'Back',
             descr = _('Graph back'),
             usertext = _('Back')),
-               pixmap = 'settings_bgfill' )
+            pixmap = 'settings_bgfill' )
 
     @classmethod
     def allowedParentTypes(self):

@@ -146,9 +146,11 @@ def formatGeneral(num, fmtarg, locale=None):
         retn = retn.replace('.', locale.decimalPoint())
     return retn
 
-engsuffixes = ( 'y', 'z', 'a', 'f', 'p', 'n',
-                '\u03bc', 'm', '', 'k', 'M', 'G',
-                'T', 'P', 'E', 'Z', 'Y' )
+engsuffixes = (
+    'y', 'z', 'a', 'f', 'p', 'n',
+    '\u03bc', 'm', '', 'k', 'M', 'G',
+    'T', 'P', 'E', 'Z', 'Y'
+)
 
 def formatEngineering(num, fmtarg, locale=None):
     """Engineering suffix format notation using SI suffixes."""

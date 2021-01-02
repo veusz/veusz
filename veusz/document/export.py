@@ -474,7 +474,7 @@ class AsyncExport(qt.QObject):
             '.selftest': ExportSelfTestRunnable,
             '.pic': ExportPICRunnable,
             '.emf': ExportEMFRunnable,
-            }[ext](self, filename, phelpers)
+        }[ext](self, filename, phelpers)
 
         self.pool.start(runnable)
 

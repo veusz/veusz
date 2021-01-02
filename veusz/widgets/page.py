@@ -128,8 +128,9 @@ class AxisDependHelper:
                 if resolvedaxis is not None and resolvedaxis.usesAutoRange():
                     # only add dependency if axis has an automatic range
                     self.deps[(origaxis, None)].append((widget, depname))
-                    self.pairs.append( ((widget, depname),
-                                        (resolvedaxis, None)) )
+                    self.pairs.append( (
+                        (widget, depname),
+                        (resolvedaxis, None)) )
 
             # find which axes the plotter needs information from
             for depname, axname in widget.requiresAxisRange():
@@ -137,8 +138,9 @@ class AxisDependHelper:
                 resolvedaxis = _resolveLinkedAxis(origaxis)
                 if resolvedaxis is not None and resolvedaxis.usesAutoRange():
                     self.deps[(widget, depname)].append((origaxis, None))
-                    self.pairs.append( ((resolvedaxis, None),
-                                        (widget, depname)) )
+                    self.pairs.append( (
+                        (resolvedaxis, None),
+                        (widget, depname)) )
 
         elif widget.isaxis:
             if widget.isaxis and widget.isLinked():
@@ -210,7 +212,7 @@ class AxisDependHelper:
                     self.ranges[axis] = [
                         N.nanmin((self.ranges[axis][0], therange[0])),
                         N.nanmax((self.ranges[axis][1], therange[1]))
-                        ]
+                    ]
         else:
             plotter.getRange(axis, plotterdep, self.ranges[axis])
 
@@ -285,23 +287,22 @@ class Page(widget.Widget):
 
         # page sizes are initially linked to the document page size
         s.add( setting.DistancePhysical(
-                'width',
-                setting.Reference('/width'),
-                descr=_('Width of page'),
-                usertext=_('Page width'),
-                formatting=True) )
+            'width',
+            setting.Reference('/width'),
+            descr=_('Width of page'),
+            usertext=_('Page width'),
+            formatting=True) )
         s.add( setting.DistancePhysical(
-                'height',
-                setting.Reference('/height'),
-                descr=_('Height of page'),
-                usertext=_('Page height'),
-                formatting=True) )
+            'height',
+            setting.Reference('/height'),
+            descr=_('Height of page'),
+            usertext=_('Page height'),
+            formatting=True) )
 
         s.add( setting.Notes(
-                'notes', '',
-                descr=_('User-defined notes'),
-                usertext=_('Notes')
-                ) )
+            'notes', '',
+            descr=_('User-defined notes'),
+            usertext=_('Notes')) )
 
     @classmethod
     def allowedParentTypes(klass):
@@ -345,15 +346,16 @@ class Page(widget.Widget):
             h = self.settings.get('height').convert(painter)
 
         painthelper.setControlGraph(self, [
-                controlgraph.ControlMarginBox(self, [0, 0, w, h],
-                                              [-10000, -10000,
-                                                10000,  10000],
-                                              painthelper,
-                                              ismovable = False)
-                ] )
+                controlgraph.ControlMarginBox(
+                    self,
+                    [0, 0, w, h],
+                    [-10000, -10000, 10000,  10000],
+                    painthelper,
+                    ismovable=False)
+        ] )
 
-        bounds = widget.Widget.draw(self, parentposn, painthelper,
-                                    parentposn)
+        bounds = widget.Widget.draw(
+            self, parentposn, painthelper, parentposn)
         return bounds
 
     def updateControlItem(self, cgi):

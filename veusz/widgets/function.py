@@ -406,4 +406,4 @@ class FunctionPlotter(GenericPlotter):
                 self._plotLine(painter, pxpts, pypts, posn, cliprect)
 
 # allow the factory to instantiate an function plotter
-document.thefactory.register( FunctionPlotter )
+document.thefactory.register(FunctionPlotter)

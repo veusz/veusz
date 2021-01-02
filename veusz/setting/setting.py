@@ -421,8 +421,9 @@ class Int(Setting):
 
         This needs to be overridden if the constructor changes
         """
-        return self._copyHelper((), (), {'minval': self.minval,
-                                         'maxval': self.maxval})
+        return self._copyHelper((), (), {
+            'minval': self.minval,
+            'maxval': self.maxval})
 
     def normalize(self, val):
         if isinstance(val, int):
@@ -480,8 +481,9 @@ class Float(Setting):
 
         This needs to be overridden if the constructor changes
         """
-        return self._copyHelper((), (), {'minval': self.minval,
-                                         'maxval': self.maxval})
+        return self._copyHelper((), (), {
+            'minval': self.minval,
+            'maxval': self.maxval})
 
     def normalize(self, val):
         if isinstance(val, int) or isinstance(val, float):

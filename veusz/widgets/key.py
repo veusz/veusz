@@ -193,12 +193,12 @@ class Key(widget.Widget):
 
         s.add( setting.KeyBrush(
             'Background',
-            descr = _('Key background fill'),
+            descr=_('Key background fill'),
             usertext=_('Background')),
             pixmap='settings_bgfill' )
         s.add( setting.Line(
             'Border',
-            descr = _('Key border line'),
+            descr=_('Key border line'),
             usertext=_('Border')),
             pixmap='settings_border' )
 
@@ -560,4 +560,4 @@ class Key(widget.Widget):
             [ControlKey(self, phelper, parentposn, boxposn, boxdims, height)]
         )
 
-document.thefactory.register( Key )
+document.thefactory.register(Key)

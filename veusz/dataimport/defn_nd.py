@@ -43,7 +43,7 @@ class ImportParamsND(base.ImportParamsBase):
         'csvdelimiter': ',',
         'csvtextdelimiter': '"',
         'csvlocale': 'en_US',
-        }
+    }
     defaults.update(base.ImportParamsBase.defaults)
 
 class LinkedFileND(base.LinkedFileBase):

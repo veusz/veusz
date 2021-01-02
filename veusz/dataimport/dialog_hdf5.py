@@ -166,7 +166,7 @@ class ImportTabHDF5(importdialog.ImportTab):
             'YYYY-MM-DD|T|hh:mm:ss',
             'DD/MM/YY| |hh:mm:ss',
             'M/D/YY| |hh:mm:ss',
-            ])
+        ])
 
     def doPreview(self, filename, encoding):
         """Show file as tree."""

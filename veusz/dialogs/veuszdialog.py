@@ -45,7 +45,8 @@ class VeuszDialog(qt.QDialog):
             flag |= (
                 qt.Qt.CustomizeWindowHint | qt.Qt.WindowMinimizeButtonHint |
                 qt.Qt.WindowMaximizeButtonHint | qt.Qt.WindowCloseButtonHint |
-                qt.Qt.WindowTitleHint | qt.Qt.WindowSystemMenuHint )
+                qt.Qt.WindowTitleHint | qt.Qt.WindowSystemMenuHint
+            )
 
         qt.QDialog.__init__(self, mainwindow, flag)
         self.setAttribute(qt.Qt.WA_DeleteOnClose)

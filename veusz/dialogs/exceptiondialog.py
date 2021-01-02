@@ -217,9 +217,9 @@ class ExceptionDialog(VeuszDialog):
             elif thisver_tup > newver_tup:
                 msg = _('You are running an unreleased Veusz version')
             else:
-                msg = (
-                    _('<b>Your current version of Veusz is old. '
-                      'Veusz %s is available.</b>') % newver)
+                msg = (_(
+                    '<b>Your current version of Veusz is old. '
+                    'Veusz %s is available.</b>') % newver)
 
         self.veuszversionlabel.setText(msg)
 

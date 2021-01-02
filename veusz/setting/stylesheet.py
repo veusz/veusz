@@ -54,17 +54,20 @@ class StyleSheet(Settings):
 class StylesheetLine(Settings):
     """Hold the properties of the default line."""
     def __init__(self):
-        Settings.__init__(self, 'Line', pixmap='settings_plotline',
-                          descr=_('Default line style for document'),
-                          usertext=_('Line'))
-        self.add( setting.DistancePt('width', '0.5pt',
-                                     descr=_('Default line width'),
-                                     usertext=_('Width'),
-                                     formatting=True) )
-        self.add( setting.Color('color', 'foreground',
-                                descr=_('Default line color'),
-                                usertext=_('Color'),
-                                formatting=True) )
+        Settings.__init__(
+            self, 'Line', pixmap='settings_plotline',
+            descr=_('Default line style for document'),
+            usertext=_('Line'))
+        self.add( setting.DistancePt(
+            'width', '0.5pt',
+            descr=_('Default line width'),
+            usertext=_('Width'),
+            formatting=True) )
+        self.add( setting.Color(
+            'color', 'foreground',
+            descr=_('Default line color'),
+            usertext=_('Color'),
+            formatting=True) )
 # register these properties with the stylesheet
 StyleSheet.register(StylesheetLine)
 
@@ -73,8 +76,13 @@ def _registerFontStyleSheet():
     families = qt.QFontDatabase().families()
 
     deffont = None
-    for f in ('Times New Roman', 'Bitstream Vera Serif', 'Times', 'Utopia',
-              'Serif'):
+    for f in (
+            'Times New Roman',
+            'Bitstream Vera Serif',
+            'Times',
+            'Utopia',
+            'Serif'
+    ):
         if f in families:
             deffont = f
             break
@@ -100,22 +108,27 @@ class StylesheetText(Settings):
 
     def __init__(self):
         """Initialise with default font family and list of families."""
-        Settings.__init__(self, 'Font', pixmap='settings_axislabel',
-                          descr=_('Default font for document'),
-                          usertext=_('Font'))
+        Settings.__init__(
+            self, 'Font', pixmap='settings_axislabel',
+            descr=_('Default font for document'),
+            usertext=_('Font'))
 
         if StylesheetText.defaultfamily is None:
             _registerFontStyleSheet()
 
-        self.add( setting.FontFamily('font', StylesheetText.defaultfamily,
-                                     descr=_('Font name'), usertext=_('Font'),
-                                     formatting=True))
-        self.add( setting.DistancePt('size', '14pt',
-                                     descr=_('Default font size'),
-                                     usertext=_('Size'),
-                                     formatting=True))
-        self.add( setting.Color('color', 'foreground',
-                                descr=_('Default font color'),
-                                usertext=_('Color'),
-                                formatting=True))
+        self.add( setting.FontFamily(
+            'font', StylesheetText.defaultfamily,
+            descr=_('Font name'), usertext=_('Font'),
+            formatting=True))
+        self.add( setting.DistancePt(
+            'size', '14pt',
+            descr=_('Default font size'),
+            usertext=_('Size'),
+            formatting=True))
+        self.add( setting.Color(
+            'color', 'foreground',
+            descr=_('Default font color'),
+            usertext=_('Color'),
+            formatting=True))
+
 StyleSheet.register(StylesheetText)

@@ -127,17 +127,17 @@ class Scene3D(widget.Widget):
             'Lighting1',
             descr=_('Lighting (1)'),
             usertext=_('Lighting (1)')),
-               pixmap = 'settings_lighting' )
+            pixmap='settings_lighting' )
         s.add(Lighting3D_2(
             'Lighting2',
             descr=_('Lighting (2)'),
             usertext=_('Lighting (2)')),
-               pixmap = 'settings_lighting' )
+            pixmap='settings_lighting' )
         s.add(Lighting3D_3(
             'Lighting3',
             descr=_('Lighting (3)'),
             usertext=_('Lighting (3)')),
-               pixmap = 'settings_lighting' )
+            pixmap='settings_lighting' )
 
     @classmethod
     def allowedParentTypes(self):
@@ -147,10 +147,12 @@ class Scene3D(widget.Widget):
     def getMargins(self, painthelper):
         """Use settings to compute margins."""
         s = self.settings
-        return ( s.get('leftMargin').convert(painthelper),
-                 s.get('topMargin').convert(painthelper),
-                 s.get('rightMargin').convert(painthelper),
-                 s.get('bottomMargin').convert(painthelper) )
+        return (
+            s.get('leftMargin').convert(painthelper),
+            s.get('topMargin').convert(painthelper),
+            s.get('rightMargin').convert(painthelper),
+            s.get('bottomMargin').convert(painthelper)
+        )
 
     def makeObjects(self, painter, bounds, painthelper):
         """Make objects, returning root"""
