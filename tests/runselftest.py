@@ -49,6 +49,9 @@ import sys
 import subprocess
 import optparse
 
+if sys.version_info[0] < 3:
+    raise RuntimeError('Veusz only supports Python 3')
+
 # this needs to be set before main imports
 os.environ['LC_ALL'] = 'C'
 

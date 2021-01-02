@@ -28,6 +28,9 @@ import veusz
 from veusz import qtall as qt
 from veusz import utils
 
+if sys.version_info[0] < 3:
+    raise RuntimeError('Veusz only supports Python 3')
+
 copyr='''Veusz %s
 
 Copyright (C) Jeremy Sanders 2003-2020 <jeremy@jeremysanders.net>

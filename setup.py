@@ -23,6 +23,7 @@ Veusz distutils setup script
 see the file INSTALL for details on how to install Veusz
 """
 
+import sys
 import glob
 import os.path
 import numpy
@@ -32,6 +33,9 @@ from setuptools import setup, Extension
 from setuptools.command.install import install as orig_install
 from distutils.command.install_data import install_data
 import pyqtdistutils
+
+if sys.version_info[0] < 3:
+    raise RuntimeError('Veusz only supports Python 3')
 
 # get version
 with open('VERSION') as verf:

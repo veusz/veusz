@@ -24,6 +24,9 @@
 import sys
 import os.path
 
+if sys.version_info[0] < 3:
+    raise RuntimeError('Veusz only supports Python 3')
+
 thisdir = os.path.abspath( os.path.dirname(__file__) )
 os.environ['VEUSZ_RESOURCE_DIR'] = os.path.join(thisdir)
 
