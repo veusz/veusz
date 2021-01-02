@@ -38,5 +38,9 @@ jobs:
       run: |
         python setup.py build_ext --inplace
     - name: Run tests
+      env:
+        LD_LIBRARY_PATH: ${{ env.Qt5_DIR }}'/lib:'{{ env.LD_LIBRARY_PATH }}
+        QT_QPA_PLATFORM: minimal
+        VEUSZ_INPLACE_TEST: 1
       run: |
-        QT_QPA_PLATFORM=minimal VEUSZ_INPLACE_TEST=1 tests/runselftest.py
+        tests/runselftest.py
