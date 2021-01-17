@@ -176,13 +176,39 @@ class AutoRange(setting.ChoiceOrMore):
     """Choose how to choose range of axis."""
 
     # +5% or -5%
-    re_dr_plusminus = re.compile(r'^\s*([+-][0-9]+)\s*%\s*$')
+    re_dr_plusminus = re.compile(
+        r'''
+        ^\s*                        # start
+        ([+-][0-9]+(?:\.[0-9]+)?)   # +/- number (optional decimal)
+        \s*%                        # percent symbol
+        \s*$                        # end
+        ''', re.VERBOSE)
+
     # 5-10%
-    re_dr_percrange = re.compile(r'^\s*(-?[0-9]+)\s*-\s*([0-9]+)\s*%\s*$')
+    re_dr_percrange = re.compile(
+        r'''
+        ^\s*                    # start
+        (-?[0-9]+(?:\.[0-9]+)?) # 1st number
+        \s*-\s*                 # dash
+        ([0-9]+(?:\.[0-9]+)?)   # 2nd number
+        \s*%\s*$                # end
+        ''', re.VERBOSE)
+
     # < 5%
-    re_dr_lower = re.compile(r'^\s*<\s*([0-9]+)\s*%\s*$')
+    re_dr_lower = re.compile(
+        r'''
+        ^\s*<\s*                # start
+        ([0-9]+(?:\.[0-9]+)?)   # number
+        \s*%\s*$                # end
+        ''', re.VERBOSE)
+
     # > 95%
-    re_dr_upper = re.compile(r'^\s*>\s*([0-9]+)\s*%\s*$')
+    re_dr_upper = re.compile(
+        r'''
+        ^\s*>\s*                # start
+        ([0-9]+(?:\.[0-9]+)?)   # number
+        \s*%\s*$                # end
+        ''', re.VERBOSE)
 
     def __init__(self, name, value, **args):
         setting.ChoiceOrMore.__init__(
