@@ -41,6 +41,12 @@ except ImportError:
     except ImportError:
         minuit = None
 
+# Check whether iminuit version is old (1.x)
+if minuit.__version__[0:1] == '1':
+    isiminuit1 = True
+else:
+    isiminuit1 = False
+
 def _(text, disambiguation=None, context='Fit'):
     """Translate text."""
     return qt.QCoreApplication.translate(context, text, disambiguation)
@@ -69,6 +75,10 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     print(_('Fitting via Minuit:'))
     m = minuit.Minuit(fn, **values)
 
+    # set errordef explicitly (LEAST_SQUARES or LIKELIHOOD) 
+    if not isiminuit1:
+        m.errordef = minuit.Minuit.LEAST_SQUARES
+
     # run the fit
     chi2.runningFit = True
     chi2.iters = 0
@@ -94,10 +104,15 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     redchi2 = retchi2 / dof
 
     if have_err:
-        print(_('Fit results:\n') + "\n".join([
-            "    %s = %g \u00b1 %g (+%g / %g)" % (
+        if isiminuit1:
+            results = ["    %s = %g \u00b1 %g (+%g / %g)" % (
                 n, m.values[n], m.errors[n], m.merrors[(n, 1.0)],
-                m.merrors[(n, -1.0)]) for n in names]))
+                m.merrors[(n, -1.0)]) for n in names]
+        else:
+            results = ["    %s = %g \u00b1 %g (+%g / %g)" % (
+                n, m.values[n], m.errors[n], m.merrors[n].upper,
+                m.merrors[n].lower) for n in names]
+        print(_('Fit results:\n') + "\n".join(results))
     elif have_symerr:
         print(_('Fit results:\n') + "\n".join([
             "    %s = %g \u00b1 %g" % (n, m.values[n], m.errors[n])
@@ -110,7 +125,10 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
 
     print("chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2))
 
-    vals = dict(m.values)
+    if isiminuit1:
+        vals = dict(m.values)
+    else:
+        vals = {name:m.values[name] for name in names}
     return vals, retchi2, dof
 
 class Fit(FunctionPlotter):
