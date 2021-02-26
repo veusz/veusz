@@ -75,9 +75,8 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     print(_('Fitting via Minuit:'))
     m = minuit.Minuit(fn, **values)
 
-    # set errordef explicitly (LEAST_SQUARES or LIKELIHOOD) 
-    if not isiminuit1:
-        m.errordef = minuit.Minuit.LEAST_SQUARES
+    # set errordef explicitly (least-squares: 1.0 or log-likelihood: 0.5) 
+    m.errordef = 1.0
 
     # run the fit
     chi2.runningFit = True
@@ -125,10 +124,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
 
     print("chi^2 = %g, dof = %i, reduced-chi^2 = %g" % (retchi2, dof, redchi2))
 
-    if isiminuit1:
-        vals = dict(m.values)
-    else:
-        vals = {name:m.values[name] for name in names}
+    vals = {name:m.values[name] for name in names}
     return vals, retchi2, dof
 
 class Fit(FunctionPlotter):
