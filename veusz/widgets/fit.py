@@ -42,10 +42,11 @@ except ImportError:
         minuit = None
 
 # Check whether iminuit version is old (1.x)
-if minuit.__version__[0:1] == '1':
-    isiminuit1 = True
-else:
-    isiminuit1 = False
+if minuit is not None:
+    if minuit.__version__[0:1] == '1':
+        isiminuit1 = True
+    else:
+        isiminuit1 = False
 
 def _(text, disambiguation=None, context='Fit'):
     """Translate text."""
