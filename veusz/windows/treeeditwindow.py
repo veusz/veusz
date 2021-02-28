@@ -1187,7 +1187,7 @@ class TreeEditDock(qt.QDockWidget):
                 # set images to QMimeData
                 for ext, mimes in exts.items():
                     try:
-                        fname = tmpdir.name + '/tmp.{}'.format(ext)
+                        fname = os.path.join(tmpdir.name, 'tmp.{}'.format(ext))
                         with open(fname, 'rb') as fo:
                             bs = fo.read()
                         for mime in mimes:
