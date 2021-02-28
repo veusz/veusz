@@ -541,7 +541,6 @@ class SVGFile(BoxShape):
                         rect.width(), irect.height()*xr)
 
             # finally draw image
-            # painter.drawImage(rect, image, irect)
             image.render(painter, rect)
 
 document.thefactory.register(Ellipse)
