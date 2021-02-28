@@ -32,19 +32,8 @@ widgetmime = 'text/x-vnd.veusz-widget-3'
 # dataset mime
 datamime = 'text/x-vnd.veusz-data-1'
 
-# image mime types importable as veusz-widget 
-imgmimes = ['image/svg+xml',
-            'image/png',
-            'PNG',
-            'image/x‑xpixmap',
-            'image/x-bmp',
-            'image/x‑xbm',
-            'image/x‑xbitmap',
-            'image/tiff',
-            'image/jpeg', 
-            'JFIF',
-            'GIF',
-            ]
+# svg mime
+svgmime = 'image/svg+xml'
 
 def generateWidgetsMime(widgets):
     """Create mime data describing widget and children.
@@ -117,19 +106,31 @@ def getWidgetMime(mimedata):
     formats = mimedata.formats()
     if widgetmime in formats:
         return mimedata.data(widgetmime).data().decode('utf-8')
+    elif svgmime in formats:
+        ba = mimedata.data(svgmime).data()
+        return convertImgtoWidgetMime(ba, svgmime)
     else:
-        for imgmime in imgmimes:
-            if imgmime in formats:
-                ba = mimedata.data(imgmime).data()
-                return convertImgtoWidgetMime(ba, imgmime)
-    return None
+        return None
 
 def getClipboardWidgetMime():
     """Returns widget mime data if mimedata contains correct mimetype or None
 
     If mimedata is set, use this rather than clipboard directly
     """
-    return getWidgetMime(qt.QApplication.clipboard().mimeData())
+    clipboard = qt.QApplication.clipboard()
+    clipboardwidgetmime = getWidgetMime(clipboard.mimeData())
+    if clipboardwidgetmime is not None:
+        return clipboardwidgetmime
+    else:
+        qimage = clipboard.image()
+        if qimage.isNull():
+            return None
+        else:
+            ba = qt.QByteArray()
+            buffer = qt.QBuffer(ba)
+            buffer.open(qt.QIODevice.WriteOnly)
+            qimage.save(buffer, 'png')
+            return convertImgtoWidgetMime(ba, 'png')
 
 def getMimeWidgetTypes(data):
     """Get list of widget types in the mime data."""
@@ -177,7 +178,7 @@ def getMimeWidgetCount(mimedata):
 
 def convertImgtoWidgetMime(ba, mimetype):
     """Given image bite array and mimetype, return decoded python string."""
-    if mimetype == 'image/svg+xml':
+    if mimetype == svgmime:
         typename = 'svgfile'
         name = 'svgfile1'
         path = '/page1/svgfile1'
