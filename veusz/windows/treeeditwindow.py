@@ -1170,8 +1170,8 @@ class TreeEditDock(qt.QDockWidget):
     def slotWidgetCopyAsImage(self):
         """Copy current page to the clipboard as image files."""
         # general image extentions and their mime types exportable from document
-        exts = {'svg': ['image/svg+xml'], 
-                'png': ['image/png', 'PNG'], 
+        exts = {'svg': ['image/svg+xml'],
+                'png': ['image/png', 'PNG'],
                 'bmp': ['image/x-bmp'],
                 }
 
@@ -1197,7 +1197,7 @@ class TreeEditDock(qt.QDockWidget):
                         pass
 
                 # set QMimeData to clipboard
-                clipboard.setMimeData(data)          
+                clipboard.setMimeData(data)
                 tmpdir.cleanup()
 
             except:
@@ -1223,7 +1223,7 @@ class TreeEditDock(qt.QDockWidget):
 
         # export images to temporary files
         for ext in exts:
-            fname = tmpdir.name + '/tmp.{}'.format(ext)
+            fname = os.path.join(tmpdir.name, 'tmp.{}'.format(ext))
             export.add(fname, pages)
 
         # copy images to clipboard after finishing export
