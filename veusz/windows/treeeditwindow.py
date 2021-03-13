@@ -19,6 +19,9 @@
 """Window to edit the document using a tree, widget properties
 and formatting properties."""
 
+import os
+import tempfile
+
 from .. import qtall as qt
 
 from .. import widgets
@@ -812,7 +815,7 @@ class TreeEditDock(qt.QDockWidget):
 
         # actions on widget(s)
         for act in (
-                'edit.cut', 'edit.copy', 'edit.paste',
+                'edit.cut', 'edit.copy', 'edit.copy_as_image', 'edit.paste',
                 'edit.moveup', 'edit.movedown', 'edit.delete',
                 'edit.rename'
         ):
@@ -916,7 +919,7 @@ class TreeEditDock(qt.QDockWidget):
         isnotroot = not any([isinstance(w, widgets.Root)
                              for w in self.selwidgets])
 
-        for act in ('edit.cut', 'edit.copy', 'edit.delete',
+        for act in ('edit.cut', 'edit.copy', 'edit.copy_as_image', 'edit.delete',
                     'edit.moveup', 'edit.movedown', 'edit.rename'):
             self.vzactions[act].setEnabled(isnotroot)
 
@@ -979,6 +982,10 @@ class TreeEditDock(qt.QDockWidget):
                 self, _('Copy the selected widget'), _('&Copy'),
                 self.slotWidgetCopy,
                 icon='kde-edit-copy', key='Ctrl+C'),
+            'edit.copy_as_image': a(
+                self, _('Copy the current page as svg image'), _('&Copy as Image'),
+                self.slotWidgetCopyAsImage,
+                icon='kde-edit-copy', key='Ctrl+Alt+C'),
             'edit.paste': a(
                 self, _('Paste widget from the clipboard'), _('&Paste'),
                 self.slotWidgetPaste,
@@ -1078,6 +1085,7 @@ class TreeEditDock(qt.QDockWidget):
             ('edit', '', (
                 'edit.cut',
                 'edit.copy',
+                'edit.copy_as_image',
                 'edit.paste',
                 'edit.delete',
                 'edit.rename',
@@ -1101,7 +1109,7 @@ class TreeEditDock(qt.QDockWidget):
         utils.addToolbarActions(
             self.edittoolbar,  actions,
             (
-                'edit.cut', 'edit.copy', 'edit.paste',
+                'edit.cut', 'edit.copy', 'edit.copy_as_image', 'edit.paste',
                 'edit.moveup', 'edit.movedown',
                 'edit.delete', 'edit.rename',
             )
@@ -1158,6 +1166,70 @@ class TreeEditDock(qt.QDockWidget):
             mimedata = document.generateWidgetsMime(self.selwidgets)
             clipboard = qt.QApplication.clipboard()
             clipboard.setMimeData(mimedata)
+
+    def slotWidgetCopyAsImage(self):
+        """Copy current page to the clipboard as image files."""
+        # general image extentions and their mime types exportable from document
+        exts = {'svg': ['image/svg+xml'],
+                'png': ['image/png', 'PNG'],
+                'bmp': ['image/x-bmp'],
+                }
+
+        def checkDone(export, exts):
+            """Check whether exporting pages as images has finished."""
+            if not export.haveDone():
+                return
+            try:
+                export.finish()
+                clipboard = qt.QApplication.clipboard()
+                data = qt.QMimeData()
+
+                # set images to QMimeData
+                for ext, mimes in exts.items():
+                    try:
+                        fname = os.path.join(tmpdir.name, 'tmp.{}'.format(ext))
+                        with open(fname, 'rb') as fo:
+                            bs = fo.read()
+                        for mime in mimes:
+                            data.setData(mime, bs)
+                        os.remove(fname)
+                    except:
+                        pass
+
+                # set QMimeData to clipboard
+                clipboard.setMimeData(data)
+                tmpdir.cleanup()
+
+            except:
+                qt.QMessageBox.critical(self, _("Error - Veusz"), _("Error while exporting images"))
+            self.checktimer.stop()
+
+        # read settings from settingdb
+        setdb = setting.settingdb
+        export = document.AsyncExport(
+            self.document,
+            bitmapdpi=setdb['export_DPI'],
+            pdfdpi=setdb['export_DPI_PDF'],
+            antialias=setdb['export_antialias'],
+            color=setdb['export_color'],
+            quality=setdb['export_quality'],
+            backcolor=setdb['export_background'],
+            svgtextastext=setdb['export_SVG_text_as_text'],
+            svgdpi=setdb['export_DPI_SVG'],
+        )
+
+        tmpdir = tempfile.TemporaryDirectory()
+        pages = [self.parentwin.plot.getPageNumber()]
+
+        # export images to temporary files
+        for ext in exts:
+            fname = os.path.join(tmpdir.name, 'tmp.{}'.format(ext))
+            export.add(fname, pages)
+
+        # copy images to clipboard after finishing export
+        self.checktimer = qt.QTimer(self)
+        self.checktimer.timeout.connect(lambda: checkDone(export, exts))
+        self.checktimer.start(20)
 
     def updatePasteButton(self):
         """Is the data on the clipboard a valid paste at the currently

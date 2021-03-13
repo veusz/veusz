@@ -17,6 +17,7 @@
 ###############################################################################
 
 from itertools import count
+import base64
 
 from io import StringIO
 from .. import qtall as qt
@@ -30,6 +31,9 @@ widgetmime = 'text/x-vnd.veusz-widget-3'
 
 # dataset mime
 datamime = 'text/x-vnd.veusz-data-1'
+
+# svg mime (convertable to `svgfile` widget)
+svgmime = 'image/svg+xml'
 
 def generateWidgetsMime(widgets):
     """Create mime data describing widget and children.
@@ -109,7 +113,25 @@ def getClipboardWidgetMime():
 
     If mimedata is set, use this rather than clipboard directly
     """
-    return getWidgetMime(qt.QApplication.clipboard().mimeData())
+    clipboard = qt.QApplication.clipboard()
+    mimedata = clipboard.mimeData()
+    formats = mimedata.formats()
+    widgetmime = getWidgetMime(mimedata)
+    if widgetmime is not None:
+        return widgetmime
+    elif svgmime in formats:
+        ba = mimedata.data(svgmime).data()
+        return convertImgtoWidgetMime(ba, svgmime)
+    else:
+        qimage = clipboard.image()
+        if qimage.isNull():
+            return None
+        else:
+            ba = qt.QByteArray()
+            buffer = qt.QBuffer(ba)
+            buffer.open(qt.QIODevice.WriteOnly)
+            qimage.save(buffer, 'png')
+            return convertImgtoWidgetMime(ba, 'image/png')
 
 def getMimeWidgetTypes(data):
     """Get list of widget types in the mime data."""
@@ -154,6 +176,28 @@ def isMimeDropable(parentwidget, mimedata):
 def getMimeWidgetCount(mimedata):
     """Get number of widgets in mimedata."""
     return int( mimedata[:mimedata.find('\n')] )
+
+def convertImgtoWidgetMime(ba, mimetype):
+    """Given image bite array and mimetype, return decoded python string."""
+    if mimetype == svgmime:
+        typename = 'svgfile'
+        name = 'svgfile1'
+        path = '/page1/svgfile1'
+        key = 'embeddedSVGData'
+    else:
+        typename = 'imagefile'
+        name = 'imagefile1'
+        path = '/page1/imagefile1'
+        key = 'embeddedImageData'
+
+    encoded = base64.b64encode(ba).decode('ascii')
+    settings = {'filename': "'{embedded}'",
+                key: "'{}'".format(encoded),
+                }
+    head = ['1', typename, "'{}'".format(name), "'{}'".format(path), '2']
+    body = ["Set('{}', {})".format(s,v) for (s,v) in settings.items()]
+
+    return '\n'.join(head) + '\n' + '\n'.join(body) + '\n'
 
 class OperationWidgetPaste(operations.OperationMultiple):
     """Paste a widget from mime data."""
