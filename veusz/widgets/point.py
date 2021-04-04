@@ -474,6 +474,11 @@ class PointPlotter(GenericPlotter):
 
         # we use the new scaled marker sizes for levels >= 1
         stylesheet.xy.MarkerFill.get('newMarkerSizes').set(level>=1)
+        if level >= 1:
+            stylesheet.xy.FillBelow.get('color').newDefault(
+                setting.Reference('../color'))
+            stylesheet.xy.FillAbove.get('color').newDefault(
+                setting.Reference('../color'))
 
     @property
     def userdescription(self):
@@ -641,7 +646,7 @@ class PointPlotter(GenericPlotter):
                     pts.append( qt.QPointF(xvals[-1], yvals[-1]) )
 
         else:
-            assert False
+            raise RuntimeError('Invalid line mode')
 
         return pts
 
