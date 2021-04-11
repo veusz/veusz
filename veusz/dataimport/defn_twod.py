@@ -112,6 +112,7 @@ def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
                  mode='text', csvdelimiter=',', csvtextdelimiter='"',
                  csvlocale='en_US',
                  prefix="", suffix="", encoding='utf_8',
+                 renames=None,
                  linked=False):
     """Import two-dimensional data from a file.
     filename is the name of the file to read
@@ -133,6 +134,9 @@ def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
     prefix and suffix are prepended and appended to dataset names
 
     encoding is encoding character set
+
+    renames is an optional dict mapping old to new dataset names, to
+    be renamed after importing
 
     if linked=True then the dataset is linked to the file
 
@@ -156,6 +160,7 @@ def ImportFile2D(comm, filename, datasetnames, xrange=None, yrange=None,
         csvtextdelimiter=csvtextdelimiter,
         csvlocale=csvlocale,
         prefix=prefix, suffix=suffix,
+        renames=renames,
         linked=linked)
     op = OperationDataImport2D(params)
     comm.document.applyOperation(op)
