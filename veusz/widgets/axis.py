@@ -78,6 +78,11 @@ class MinorTick(setting.Line):
             20,
             descr=_('Number of minor ticks to aim for'),
             usertext= _('Number') ) )
+        self.add( setting.FloatList(
+            'manualTicks',
+            [],
+            descr = _('List of tick values overriding defaults'),
+            usertext= _('Manual ticks') ) )
 
     def getLength(self, painter):
         '''Return tick length in painter coordinates'''
@@ -631,6 +636,13 @@ class Axis(widget.Widget):
                 if i >= self.plottedrange[0] and i <= self.plottedrange[1]:
                     ticks.append(i)
             self.majortickscalc = N.array(ticks)
+
+        if len(s.MinorTicks.manualTicks) > 0:
+            ticks = []
+            for i in s.MinorTicks.manualTicks:
+                if i >= self.plottedrange[0] and i <= self.plottedrange[1]:
+                    ticks.append(i)
+            self.minortickscalc = N.array(ticks)
 
     def getPlottedRange(self):
         """Return the range plotted by the axes."""
