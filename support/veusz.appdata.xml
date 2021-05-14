@@ -27,12 +27,24 @@
     </p>
   </description>
   <screenshots>
-    <screenshot type="default" width="1248" height="702">https://veusz.github.io/screenshots/appdata-screenshot-0.png</screenshot>
-    <screenshot width="1280" height="1024">https://veusz.github.io/screenshots/multiwins.png</screenshot>
-    <screenshot width="1175" height="756">https://veusz.github.io/screenshots/3d.png</screenshot>
-    <screenshot width="1094" height="611">https://veusz.github.io/screenshots/linux_mainwin.png</screenshot>
-    <screenshot width="1067" height="752">https://veusz.github.io/screenshots/import.png</screenshot>
-    <screenshot width="752" height="602">https://veusz.github.io/screenshots/histogram.png</screenshot>
+    <screenshot type="default">
+        <image>https://veusz.github.io/screenshots/appdata-screenshot-0.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/multiwins.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/3d.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/linux_mainwin.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/import.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/histogram.png</image>
+    </screenshot>
   </screenshots>
   <url type="homepage">https://veusz.github.io/</url>
   <url type="help">https://veusz.github.io/help-support/</url>
