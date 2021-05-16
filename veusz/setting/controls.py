@@ -1880,6 +1880,7 @@ class FontStyle(qt.QComboBox):
     """Font style associated with font family."""
 
     sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
+    deftext = _('default')
 
     def __init__(self, setting, familysetting, parent):
         """Create the combobox."""
@@ -1900,7 +1901,7 @@ class FontStyle(qt.QComboBox):
     def slotActivated(self, val):
         """Update setting if a different item is chosen."""
         newval = self.currentText().strip()
-        if newval == 'default':
+        if newval == self.deftext:
             newval = ''
         self.sigSettingChanged.emit(self, self.setting, newval)
 
@@ -1908,7 +1909,7 @@ class FontStyle(qt.QComboBox):
     def onModified(self):
         """Make control reflect chosen setting."""
 
-        styles = ['default'] + sorted(
+        styles = [self.deftext] + sorted(
             qt.QFontDatabase().styles(self.familysetting.get()))
 
         val = self.setting.get().strip()
