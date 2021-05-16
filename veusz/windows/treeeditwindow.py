@@ -1109,7 +1109,7 @@ class TreeEditDock(qt.QDockWidget):
         utils.addToolbarActions(
             self.edittoolbar,  actions,
             (
-                'edit.cut', 'edit.copy', 'edit.copy_as_image', 'edit.paste',
+                'edit.cut', 'edit.copy', 'edit.paste',
                 'edit.moveup', 'edit.movedown',
                 'edit.delete', 'edit.rename',
             )
