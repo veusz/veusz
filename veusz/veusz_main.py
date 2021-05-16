@@ -23,6 +23,7 @@
 import sys
 import signal
 import argparse
+import re
 
 import veusz
 from veusz import qtall as qt
@@ -309,7 +310,13 @@ class VeuszApp(qt.QApplication):
 
         # add directories to path
         if setting.settingdb['external_pythonpath']:
-            sys.path += setting.settingdb['external_pythonpath'].split(':')
+            # We want a list of items separated by colons
+            # Unfortunately on windows there can be a colon and drive letter,
+            # so we avoid splitting colons which look like a:\foo or B:/bar
+            parts = re.findall(
+                r'[A-Za-z]:[\\/][^:]+|[^:]+',
+                setting.settingdb['external_pythonpath'])
+            sys.path += list(parts)
 
         # load any requested plugins
         if args.plugin:
