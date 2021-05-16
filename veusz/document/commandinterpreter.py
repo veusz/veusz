@@ -177,13 +177,15 @@ class CommandInterpreter:
             self.document.wipe()
             self.interface.To('/')
             oldfile = self.globals['__file__']
-            self.globals['__file__'] = os.path.abspath(filename)
+            absfname = os.path.abspath(filename)
+            self.globals['__file__'] = absfname
 
             self.interface.importpath.append(
                 os.path.dirname(os.path.abspath(filename)))
             self.runFile(f)
             self.interface.importpath.pop()
             self.globals['__file__'] = oldfile
+            self.document.filename = absfname
             self.document.setModified()
             self.document.setModified(False)
             self.document.clearHistory()
