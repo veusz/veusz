@@ -1876,6 +1876,51 @@ class FontFamily(qt.QFontComboBox):
         """Make control reflect chosen setting."""
         self.setCurrentFont( qt.QFont(self.setting.toUIText()) )
 
+class FontStyle(qt.QComboBox):
+    """Font style associated with font family."""
+
+    sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
+
+    def __init__(self, setting, familysetting, parent):
+        """Create the combobox."""
+
+        qt.QComboBox.__init__(self, parent)
+        self.setEditable(True)
+        self.setting = setting
+        self.familysetting = familysetting
+
+        self.onModified()
+
+        self.setting.setOnModified(self.onModified)
+        self.familysetting.setOnModified(self.onModified)
+
+        # if a different item is selected
+        self.activated[str].connect(self.slotActivated)
+
+    def slotActivated(self, val):
+        """Update setting if a different item is chosen."""
+        newval = self.currentText().strip()
+        if newval == 'default':
+            newval = ''
+        self.sigSettingChanged.emit(self, self.setting, newval)
+
+    @qt.pyqtSlot()
+    def onModified(self):
+        """Make control reflect chosen setting."""
+
+        styles = ['default'] + sorted(
+            qt.QFontDatabase().styles(self.familysetting.get()))
+
+        val = self.setting.get().strip()
+        if not val:
+            val = 'default'
+        elif val not in styles:
+            styles.append(val)
+
+        utils.populateCombo(self, styles)
+        idx = self.findText(val)
+        self.setCurrentIndex(idx)
+
 class ErrorStyle(Choice):
     """Choose different error bar styles."""
 

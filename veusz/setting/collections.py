@@ -332,6 +332,12 @@ class Text(Settings):
             setting.Reference('/StyleSheet/Font/color'),
             descr=_('Font color'),
             usertext=_('Color') ) )
+        self.add( setting.FontStyle(
+            'style',
+            setting.Reference('/StyleSheet/Font/style'),
+            'font',
+            descr=_('Font style'),
+            usertext=_('Style') ) )
         self.add( setting.Bool(
             'italic', False,
             descr=_('Italic font'),
@@ -367,7 +373,11 @@ class Text(Settings):
         f = qt.QFont(self.font, int(size), weight, self.italic)
         if self.underline:
             f.setUnderline(True)
-        f.setStyleHint(qt.QFont.Times)
+        style = self.style
+        if style:
+            f.setStyleName(style)
+        else:
+            f.setStyleHint(qt.QFont.Times)
 
         return f
 

@@ -1762,6 +1762,28 @@ class FontFamily(Str):
         """Make a special font combobox."""
         return controls.FontFamily(self, *args)
 
+class FontStyle(Str):
+    """Represents a font style."""
+
+    typename = 'font-style'
+
+    def __init__(self, name, val, familysetnname, **args):
+        """Initialise font style.
+        familysetnname is a name of the family setting the style is associated
+        with."""
+
+        Str.__init__(self, name, val, **args)
+        self.familysetnname = familysetnname
+
+    def copy(self):
+        """Make a copy of the setting."""
+        return self._copyHelper( (), (self.familysetnname,), {})
+
+    def makeControl(self, *args):
+        familysetn = self.parent.get(self.familysetnname)
+
+        return controls.FontStyle(self, familysetn, *args)
+
 class ErrorStyle(Choice):
     """Error bar style.
     The allowed values are below in _errorstyles.

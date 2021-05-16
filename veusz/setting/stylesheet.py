@@ -130,5 +130,11 @@ class StylesheetText(Settings):
             descr=_('Default font color'),
             usertext=_('Color'),
             formatting=True))
+        self.add( setting.FontStyle(
+            'style', '',
+            'font',
+            descr=_('Default font style'),
+            usertext=_('Style'),
+            formatting=True))
 
 StyleSheet.register(StylesheetText)
