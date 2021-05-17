@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2014 Jeremy Sanders <jeremy@jeremysanders.net> -->
 <application>
-  <id type="desktop">veusz.desktop</id>
-  <licence>CC0</licence>
+  <id>io.github.veusz.Veusz</id>
+  <launchable type="desktop-id">Veusz.desktop</launchable>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0-only</project_license>
   <name>Veusz</name>
   <summary>Scientific plotting package</summary>
   <description>
@@ -26,8 +28,32 @@
     </p>
   </description>
   <screenshots>
-    <screenshot type="default" width="1248" height="702">https://veusz.github.io/screenshots/appdata-screenshot-0.png</screenshot>
+    <screenshot type="default">
+        <image>https://veusz.github.io/screenshots/appdata-screenshot-0.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/multiwins.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/3d.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/linux_mainwin.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/import.png</image>
+    </screenshot>
+    <screenshot>
+        <image>https://veusz.github.io/screenshots/histogram.png</image>
+    </screenshot>
   </screenshots>
   <url type="homepage">https://veusz.github.io/</url>
+  <url type="help">https://veusz.github.io/help-support/</url>
+  <url type="bugtracker">https://github.com/veusz/veusz/issues</url>
+  <content_rating type="oars-1.1"/>
+    <releases>
+        <release version="3.3.1" date="2020-12-06">
+        </release>    
+    </releases>
   <updatecontact>jeremy@jeremysanders.net</updatecontact>
 </application>
