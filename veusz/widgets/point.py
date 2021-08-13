@@ -650,7 +650,7 @@ class PointPlotter(GenericPlotter):
 
         return pts
 
-    def _getBezierLine(self, poly, cliprect):
+    def _getBezierLine(self, poly, cliprect, beziertype):
         """Try to draw a bezier line connecting the points."""
 
         # clip to a larger box to help the lines get right angle
@@ -666,18 +666,22 @@ class PointPlotter(GenericPlotter):
         path = qt.QPainterPath()
         for lpoly in polys:
             if len(lpoly) >= 2:
-                npts = qtloops.bezier_fit_cubic_multi(lpoly, 0.1, len(lpoly)+1)
-                qtloops.addCubicsToPainterPath(path, npts);
+                if beziertype == "tight-Bezier":
+                    npts = qtloops.bezier_fit_cubic_tight(lpoly, 0.5)
+                else:
+                    npts = qtloops.bezier_fit_cubic_multi(
+                        lpoly, 0.1, len(lpoly)+1)
+                qtloops.addCubicsToPainterPath(path, npts)
         return path
 
     def _drawBezierLine( self, painter, xvals, yvals, posn,
-                         xdata, ydata, cliprect ):
+                         xdata, ydata, cliprect, beziertype ):
         """Handle bezier lines and fills."""
 
         pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
         if len(pts) < 2:
             return
-        path = self._getBezierLine(pts, cliprect)
+        path = self._getBezierLine(pts, cliprect, beziertype)
         s = self.settings
 
         # do filling
@@ -939,10 +943,11 @@ class PointPlotter(GenericPlotter):
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                if s.PlotLine.bezierJoin:
+                jointstyle = s.PlotLine.jointStyle
+                if jointstyle != "linear":
                     self._drawBezierLine(
                         painter, xplotter, yplotter, posn,
-                        xvals, yvals, cliprect )
+                        xvals, yvals, cliprect, jointstyle )
                 else:
                     self._drawPlotLine(
                         painter, xplotter, yplotter, posn,

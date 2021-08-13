@@ -102,10 +102,25 @@ class XYPlotLine(Line):
             'off',
             descr=_('Plot 90 degree steps instead of a line'),
             usertext=_('Steps')), 0 )
-        self.add( setting.Bool(
-            'bezierJoin', False,
-            descr=_('Connect points with a cubic Bezier curve'),
-            usertext=_('Bezier join')), 1 )
+        self.add( setting.Choice(
+            'jointStyle',
+            [
+                'linear', 'loose-Bezier', 'tight-Bezier',
+            ],
+            'linear',
+            descr=_('Line style (linear/curved) to connect points'),
+            usertext=_('Joint style')), 1 )
+        # translate bezierJoin to jointStyle
+        self.add( setting.SettingBackwardCompat(
+            'bezierJoin',
+            'jointStyle',
+            False,
+            translatefn=lambda x: {
+                True: 'loose-Bezier',
+                False: 'linear'
+            }[x],
+            formatting=True,
+        ) )
         self.get('color').newDefault( Reference('../color') )
 
 class MarkerLine(Line):
