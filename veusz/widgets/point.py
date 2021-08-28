@@ -943,11 +943,11 @@ class PointPlotter(GenericPlotter):
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                jointstyle = s.PlotLine.jointStyle
-                if jointstyle != "linear":
+                interpolation_type = s.PlotLine.interpType
+                if interpolation_type != "linear":
                     self._drawBezierLine(
                         painter, xplotter, yplotter, posn,
-                        xvals, yvals, cliprect, jointstyle )
+                        xvals, yvals, cliprect, interpolation_type )
                 else:
                     self._drawPlotLine(
                         painter, xplotter, yplotter, posn,

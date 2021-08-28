@@ -103,17 +103,17 @@ class XYPlotLine(Line):
             descr=_('Plot 90 degree steps instead of a line'),
             usertext=_('Steps')), 0 )
         self.add( setting.Choice(
-            'jointStyle',
+            'interpType',
             [
                 'linear', 'loose-Bezier', 'tight-Bezier',
             ],
             'linear',
             descr=_('Line style (linear/curved) to connect points'),
-            usertext=_('Joint style')), 1 )
-        # translate bezierJoin to jointStyle
+            usertext=_('Interpolation')), 1 )
+        # translate bezierJoin to interpType
         self.add( setting.SettingBackwardCompat(
             'bezierJoin',
-            'jointStyle',
+            'interpType',
             False,
             translatefn=lambda x: {
                 True: 'loose-Bezier',
