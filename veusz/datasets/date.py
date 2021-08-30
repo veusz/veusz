@@ -77,7 +77,7 @@ class DatasetDateTime(DatasetDateTimeBase):
         DatasetDateTimeBase.__init__(self, linked=linked)
 
         self.data = convertNumpy(data)
-        self.perr = self.nerr = self.serr = None
+        self.perr = self.nerr = self.serr = self.flags = None 
 
     def saveDataDumpToText(self, fileobj, name):
         '''Save data to file.

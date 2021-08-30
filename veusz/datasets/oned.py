@@ -32,17 +32,18 @@ class Dataset1DBase(DatasetConcreteBase):
 
     # number of dimensions the dataset holds
     dimensions = 1
-    columns = ('data', 'serr', 'nerr', 'perr', 'flags') ##J
+    # includes data values, symmetric errors, negative+positive errors, flags for fine-tuned control of datapoints
+    columns = ('data', 'serr', 'nerr', 'perr', 'flags') 
     column_descriptions = (
         _('Data'),
         _('Sym. errors'),
         _('Neg. errors'),
         _('Pos. errors'),
-        _('Flags')  ##J
+        _('Flags')  
     )
     dstype = _('1D')
 
-    # subclasses must define .data, .serr, .perr, .nerr, .flags ##J
+    # subclasses must define .data, .serr, .perr, .nerr, .flags 
 
     def userSize(self):
         """Size of dataset."""
@@ -63,43 +64,75 @@ class Dataset1DBase(DatasetConcreteBase):
             templ = _("1D (length %i)")
         return templ % len(self.data)
 
-    def invalidDataPoints(self):
-        """Return a numpy bool detailing which datapoints are invalid."""
+    def flagExcludeUnset(self):
+        """Return a numpy bool detailing which datapoints do not have the 'exclude' flag set."""
+
+        #on-the-fly conversion to int16, alternative is to enforce int16 datatype at data import/entry stage
+        if self.flags is not None:
+            return ((self.flags.astype(N.int16) & N.int16(2))==0)
+        else:
+            return N.ones(self.data.shape, dtype=N.bool)
+
+    def flagDontProcessUnset(self):
+        """Return a numpy bool detailing which datapoints do not have the 'do not process' flag set."""
+        
+        #on-the-fly conversion to int16, alternative is to enforce int16 datatype at data import/entry stage
+        if self.flags is not None:
+            return ((self.flags.astype(N.int16) & N.int16(1))==0)
+        else:
+            return N.ones(self.data.shape, dtype=N.bool)
+
+    def validDataPoints(self):
+        """Return a numpy bool detailing which datapoints have values, errors and flags (only if defined) that are are real numbers, and the exclude flag is not set."""
 
         valid = N.isfinite(self.data)
-        for error in self.serr, self.perr, self.nerr, self.flags:  ##J
+        for error in self.serr, self.perr, self.nerr, self.flags:  
             if error is not None:
                 valid = N.logical_and(valid, N.isfinite(error))
-        #on-the-fly conversion to int16, alternative is to enforce int16 datatype would need to be enforced at data import/entry stage
-        if self.flags is not None:   ##J
-            valid = N.logical_and(valid, (self.flags.astype(N.int16) & N.int16(2))==0) ##J
-        return N.logical_not(valid)
+        if self.flags is not None:   
+            valid = N.logical_and(valid, self.flagExcludeUnset()) 
+        return valid
+
+    def invalidDataPoints(self):
+        """Return a numpy bool detailing which datapoints are invalid."""
+        
+        return N.logical_not(self.validDataPoints())
+
+    def validatedData(self):
+        """Return a numpy array of the data for which the values, errors and flags (only if defined) are real numbers, and the exclude flag is not set."""
+        
+        return self.data[self.validDataPoints()]
 
     def hasErrors(self):
         '''Whether errors on dataset'''
         return (self.serr is not None or self.nerr is not None or
-                self.perr is not None or self.flags is not None)  ##J
+                self.perr is not None)
 
     def getPointRanges(self):
         '''Get range of coordinates for each point in the form
-        (minima, maxima).'''
+        (minima, maxima), excluding invalid data points.'''
 
-        minvals = self.data.copy()
-        maxvals = self.data.copy()
+        # boolean array for indexing valid data
+        valid = self.validDataPoints()
+        
+        # implicitly creates copy
+        minvals = self.data[valid]
+        maxvals = self.data[valid]
 
+        # note currently if multiple errors are defined these are superimposed on one another
         if self.serr is not None:
-            minvals -= self.serr
-            maxvals += self.serr
+            minvals -= self.serr[valid]
+            maxvals += self.serr[valid]
 
         if self.nerr is not None:
-            minvals += self.nerr
+            minvals += self.nerr[valid]
 
         if self.perr is not None:
-            maxvals += self.perr
+            maxvals += self.perr[valid]
 
+        # only contains finite values
         return (
-            minvals[N.isfinite(minvals)],
-            maxvals[N.isfinite(maxvals)]
+            minvals, maxvals
         )
 
     def getRange(self):
@@ -111,14 +144,18 @@ class Dataset1DBase(DatasetConcreteBase):
             return None
 
     def updateRangeAuto(self, axrange, noneg):
-        val = pos = neg = self.data
+    
+        # boolean array for indexing valid data
+        valid = self.validDataPoints()
+
+        val = pos = neg = self.data[valid]
         if self.serr is not None:
-            pos = pos + self.serr
-            neg = neg - self.serr
+            pos = pos + self.serr[valid]
+            neg = neg - self.serr[valid]
         if self.perr is not None:
-            pos = pos + self.perr
+            pos = pos + self.perr[valid]
         if self.nerr is not None:
-            neg = neg + self.nerr
+            neg = neg + self.nerr[valid]
 
         for v in val, pos, neg:
             if noneg:
@@ -129,14 +166,19 @@ class Dataset1DBase(DatasetConcreteBase):
 
     def rangeVisit(self, fn):
         '''Call fn on data points and error values, in order to get range.'''
-        fn(self.data)
+        
+        # boolean array for indexing valid data
+        valid = self.validDataPoints()
+
+        val = self.data[valid]
+        fn(val)
         if self.serr is not None:
-            fn(self.data - self.serr)
-            fn(self.data + self.serr)
+            fn(val - self.serr[valid])
+            fn(val + self.serr[valid])
         if self.nerr is not None:
-            fn(self.data + self.nerr)
+            fn(val + self.nerr[valid])
         if self.perr is not None:
-            fn(self.data + self.perr)
+            fn(val + self.perr[valid])
 
     def empty(self):
         '''Is the data defined?'''
@@ -147,7 +189,7 @@ class Dataset1DBase(DatasetConcreteBase):
 
         # work out which columns to write
         cols = []
-        for c in (self.data, self.serr, self.perr, self.nerr, self.flags):  ##J
+        for c in (self.data, self.serr, self.perr, self.nerr, self.flags):  
             if c is not None:
                 cols.append(c)
 
@@ -167,7 +209,7 @@ class Dataset1DBase(DatasetConcreteBase):
             serr=copyOrNone(self.serr),
             perr=copyOrNone(self.perr),
             nerr=copyOrNone(self.nerr),
-            flags=copyOrNone(self.flags) ##J
+            flags=copyOrNone(self.flags) 
         )
 
     def returnCopyWithNewData(self, **args):
@@ -179,7 +221,7 @@ class Dataset(Dataset1DBase):
 
     editable = True
 
-    def __init__(self, data = None, serr = None, nerr = None, perr = None, flags = None, ##J
+    def __init__(self, data = None, serr = None, nerr = None, perr = None, flags = None, 
                  linked = None):
         '''Initialise dataset with the sets of values given.
 
@@ -199,7 +241,7 @@ class Dataset(Dataset1DBase):
 
         # check the sizes of things match up
         s = self.data.shape
-        for x in self.serr, self.nerr, self.perr, self.flags: ##J
+        for x in self.serr, self.nerr, self.perr, self.flags: 
             if x is not None and x.shape != s:
                 raise DatasetException('Lengths of error data do not match data')
 
@@ -215,7 +257,7 @@ class Dataset(Dataset1DBase):
 
         # just a check...
         s = self.data.shape
-        for x in (self.serr, self.nerr, self.perr, self.flags): ##J
+        for x in (self.serr, self.nerr, self.perr, self.flags): 
             assert x is None or x.shape == s
 
         # tell the document that we've changed
@@ -234,8 +276,8 @@ class Dataset(Dataset1DBase):
         if self.nerr is not None:
             descriptor += ',-'
         #flags denoted by = symbol
-        if self.flags is not None:  #J
-            descriptor += ',='     #J
+        if self.flags is not None:  
+            descriptor += ',='     
 
         fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
         fileobj.write( self.datasetAsText(fmt='%e', join=' ') )
@@ -250,7 +292,7 @@ class Dataset(Dataset1DBase):
 
         for key, suffix in (
                 ('data', ''), ('serr', ' (+-)'),
-                ('perr', ' (+)'), ('nerr', ' (-)'), ('flags', ' (=)')): #J
+                ('perr', ' (+)'), ('nerr', ' (-)'), ('flags', ' (=)')): 
             if getattr(self, key) is not None:
                 odgrp[key] = getattr(self, key)
                 odgrp[key].attrs['vsz_name'] = (name + suffix).encode('utf-8')
@@ -289,7 +331,7 @@ class DatasetRange(Dataset1DBase):
 
     dstype = _('Range')
 
-    def __init__(self, numsteps, data, serr=None, perr=None, nerr=None, flags=None): ##J
+    def __init__(self, numsteps, data, serr=None, perr=None, nerr=None, flags=None): 
         """Construct dataset.
 
         numsteps: number of steps in range
@@ -301,10 +343,10 @@ class DatasetRange(Dataset1DBase):
         self.range_serr = serr
         self.range_perr = perr
         self.range_nerr = nerr
-        self.range_flags = flags ##J
+        self.range_flags = flags 
         self.numsteps = numsteps
 
-        for name in ('data', 'serr', 'perr', 'nerr', 'flags'):  ##J
+        for name in ('data', 'serr', 'perr', 'nerr', 'flags'):  
             val = getattr(self, 'range_%s' % name)
             if val is not None:
                 minval, maxval = val
@@ -339,8 +381,8 @@ class DatasetRange(Dataset1DBase):
             parts.append('poserr=%s' % repr(self.range_perr))
         if self.range_nerr is not None:
             parts.append('negerr=%s' % repr(self.range_nerr))
-        if self.range_flags is not None:                      ##J
-            parts.append('flags=%s' % repr(self.range_flags))  ##J
+        if self.range_flags is not None:                      
+            parts.append('flags=%s' % repr(self.range_flags))  
         parts.append('linked=True')
 
         s = 'SetDataRange(%s)\n' % ', '.join(parts)

@@ -616,16 +616,16 @@ class OperationDatasetCreateRange(OperationDatasetCreate):
         serr = self.parts.get('serr', None)
         perr = self.parts.get('perr', None)
         nerr = self.parts.get('nerr', None)
-        flags = self.parts.get('flags', None) ##J
+        flags = self.parts.get('flags', None) 
 
         ds = datasets.DatasetRange(
             self.numsteps, data, serr=serr,
-            perr=perr, nerr=nerr, flags=flags) ##J
+            perr=perr, nerr=nerr, flags=flags) 
         if not self.linked:
             # copy these values if we don't want to link
             ds = datasets.Dataset(
                 data=ds.data, serr=ds.serr,
-                perr=ds.perr, nerr=ds.nerr, flags=ds.flags) ##J
+                perr=ds.perr, nerr=ds.nerr, flags=ds.flags) 
 
         document.setData(self.datasetname, ds)
         return ds
@@ -666,7 +666,7 @@ class OperationDatasetCreateParameteric(OperationDatasetCreate):
             # copy these values if we don't want to link
             ds = datasets.Dataset(
                 data=ds.data, serr=ds.serr,
-                perr=ds.perr, nerr=ds.nerr, flags=ds.flags) ##J
+                perr=ds.perr, nerr=ds.nerr, flags=ds.flags) 
 
         document.setData(self.datasetname, ds)
         return ds
@@ -716,7 +716,7 @@ class OperationDatasetCreateExpression(OperationDatasetCreate):
             # copy these values if we don't want to link
             ds = datasets.Dataset(
                 data=ds.data, serr=ds.serr,
-                perr=ds.perr, nerr=ds.nerr, flags=ds.flags) ##J
+                perr=ds.perr, nerr=ds.nerr, flags=ds.flags) 
 
         document.setData(self.datasetname, ds)
         return ds

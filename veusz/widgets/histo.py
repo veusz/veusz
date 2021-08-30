@@ -395,7 +395,10 @@ class Histo(GenericPlotter):
         ds = dsetn.getData(self.document)
         if ds is None or dsetn.isEmpty():
             return
-        data = ds.data
+        if ds.flags is not None:
+          data = ds.data[(N.int16(ds.flags) & N.int16(2))==0]
+        else:
+          data = ds.data
         if len(data) == 0:
             return
 

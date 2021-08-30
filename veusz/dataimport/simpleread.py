@@ -58,7 +58,7 @@ descrtokens_split_re = re.compile(r'''
  `[^`]*`       |  # quoted name
  [ ,]          |  # comma or space
  \([a-z]+?\)   |  # data type
- \+- | \+ | - | = |  # error bars  ##J = denotes flags
+ \+- | \+ | - | = |  # error bars = denotes flags
  \[.*?\]          # indices
 )
 ''', re.VERBOSE)
@@ -105,7 +105,7 @@ def interpretDescriptor(descr):
             continue
 
         # match error bars
-        if token in ('+', '-', '+-','='):  ##J
+        if token in ('+', '-', '+-','='):  
             columns.append(token)
             continue
 
@@ -306,20 +306,20 @@ class DescriptorPart:
             # does the dataset exist?
             if name+'\0D' in thedatasets:
                 vals = thedatasets[name+'\0D']
-                pos = neg = sym = flags = None  ##J
+                pos = neg = sym = flags = None  
 
                 # retrieve the data for this dataset
                 if name+'\0+' in thedatasets: pos = thedatasets[name+'\0+']
                 if name+'\0-' in thedatasets: neg = thedatasets[name+'\0-']
                 if name+'\0+-' in thedatasets: sym = thedatasets[name+'\0+-']
-                if name+'\0=' in thedatasets: flags = thedatasets[name+'\0='] ##J
+                if name+'\0=' in thedatasets: flags = thedatasets[name+'\0='] 
 
                 # make sure components are the same length
                 minlength = 99999999999999
-                for ds in vals, pos, neg, sym, flags: ##J added flags
+                for ds in vals, pos, neg, sym, flags:
                     if ds is not None and len(ds) < minlength:
                         minlength = len(ds)
-                for ds in vals, pos, neg, sym, flags:  ##J added flags
+                for ds in vals, pos, neg, sym, flags:
                     if ds is not None and len(ds) != minlength:
                         del ds[minlength:]
 
@@ -329,12 +329,12 @@ class DescriptorPart:
                     if sym is not None: sym = sym[-tail:]
                     if pos is not None: pos = pos[-tail:]
                     if neg is not None: neg = neg[-tail:]
-                    if flags is not None: flags = flags[-tail:]  ##J
+                    if flags is not None: flags = flags[-tail:]  
 
                 # create the dataset
                 if self.datatype == 'float':
                     ds = datasets.Dataset( data = vals, serr = sym,
-                                           nerr = neg, perr = pos, flags=flags, ##J
+                                           nerr = neg, perr = pos, flags=flags, 
                                            linked = linkedfile )
                 elif self.datatype == 'date':
                     ds = datasets.DatasetDateTime( data=vals,

@@ -300,9 +300,10 @@ class BoxPlot(GenericPlotter):
                 values = s.get('values').getData(doc)
                 if values:
                     for v in values:
-                        if len(v.data) > 0:
-                            axrange[0] = min(axrange[0], N.nanmin(v.data))
-                            axrange[1] = max(axrange[1], N.nanmax(v.data))
+                        validdata = v.validatedData()
+                        if len(validdata) > 0:
+                            axrange[0] = min(axrange[0], N.nanmin(validdata))
+                            axrange[1] = max(axrange[1], N.nanmax(validdata))
             else:
                 # update from manual entries
                 drange = self.rangeManual()
@@ -459,7 +460,7 @@ class BoxPlot(GenericPlotter):
             # calculated boxes
             for vals, plotpos in zip(values, plotposns):
                 stats = _Stats()
-                stats.calculate(vals.data, s.whiskermode)
+                stats.calculate(vals.validatedData(), s.whiskermode)
                 self.plotBox(
                     painter, axes, plotpos, widgetposn, width,
                     clip, stats)

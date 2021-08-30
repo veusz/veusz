@@ -264,24 +264,14 @@ class Fit(FunctionPlotter):
 
         # choose dataset depending on fit variable
         if s.variable == 'x':
-            xvals = s.get('xData').getData(d).data
+            xdata = s.get('xData').getData(d)
             ydata = s.get('yData').getData(d)
         else:
-            xvals = s.get('yData').getData(d).data
+            xdata = s.get('yData').getData(d)
             ydata = s.get('xData').getData(d)
+        xvals = xdata.data
         yvals = ydata.data
-        if ydata.serr is not None:
-            yserr = ydata.serr.copy() #avoid changing original data
-        else:
-            yserr = None
-        #exclude flagged values
-        try:
-            flags = ydata.flags.astype(N.int16) & N.int16(1)
-        except:
-            flags = None
-        if flags is None:
-            flags = N.zeros(ydata.data.shape,dtype=N.int16) #array of same length, '0' denotes include
-        ##
+        yserr = ydata.serr
 
         # if there are no errors on data
         if yserr is None:
@@ -293,6 +283,9 @@ class Fit(FunctionPlotter):
                 yserr = N.abs(yvals*0.05)
                 yserr[yserr < 1e-8] = 1e-8
 
+        # allow exclusion of data from fitting where 'do not process' flag is set 
+        usepoint = ydata.flagDontProcessUnset() & xdata.flagDontProcessUnset()
+
         # if the fitRange parameter is on, we chop out data outside the
         # range of the axis
         if s.fitRange:
@@ -303,7 +296,7 @@ class Fit(FunctionPlotter):
             else:
                 drange = self.parent.getAxes((s.yAxis,))[0].getPlottedRange()
                 mask = N.logical_and(yvals >= drange[0], yvals <= drange[1])
-            xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
+            xvals, yvals, yserr, usepoint = xvals[mask], yvals[mask], yserr[mask], usepoint[mask]
             print("Fitting %s from %g to %g" % (
                 s.variable, drange[0], drange[1]))
 
@@ -325,7 +318,7 @@ class Fit(FunctionPlotter):
                 mask = xvals >= s.min
             else:
                 mask = yvals >= s.min
-            xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
+            xvals, yvals, yserr, usepoint = xvals[mask], yvals[mask], yserr[mask], usepoint[mask]
 
         # maximum set for fitting
         if s.max != 'Auto':
@@ -333,13 +326,13 @@ class Fit(FunctionPlotter):
                 mask = xvals <= s.max
             else:
                 mask = yvals <= s.max
-            xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
+            xvals, yvals, yserr, usepoint = xvals[mask], yvals[mask], yserr[mask], usepoint[mask]
 
         if s.min != 'Auto' or s.max != 'Auto':
             print("Fitting %s between %s and %s" % (s.variable, s.min, s.max))
 
         # various error checks
-        if len(xvals) != len(yvals) or len(xvals) != len(yserr):
+        if len(xvals) != len(yvals) or len(xvals) != len(yserr) or len(xvals) != len(usepoint):
             sys.stderr.write(_('Fit data not equal in length. Not fitting.\n'))
             return
         if len(params) > len(xvals):
@@ -351,8 +344,7 @@ class Fit(FunctionPlotter):
         dof = 1
 
         # only consider finite values
-        # allow exclusion of data from fitting where flag column is set to a non-zero value
-        finite = N.isfinite(xvals) & N.isfinite(yvals) & N.isfinite(yserr) & (flags==0)
+        finite = N.isfinite(xvals) & N.isfinite(yvals) & N.isfinite(yserr) & usepoint
         xvals = xvals[finite]
         yvals = yvals[finite]
         yserr = yserr[finite]
