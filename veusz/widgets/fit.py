@@ -291,6 +291,7 @@ class Fit(FunctionPlotter):
             else:
                 print("Warning: No errors on y values. Assuming 5% errors.")
                 yserr = N.abs(yvals*0.05)
+                yserr[yserr < 1e-8] = 1e-8
 
         # if the fitRange parameter is on, we chop out data outside the
         # range of the axis
