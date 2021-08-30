@@ -32,16 +32,17 @@ class Dataset1DBase(DatasetConcreteBase):
 
     # number of dimensions the dataset holds
     dimensions = 1
-    columns = ('data', 'serr', 'nerr', 'perr')
+    columns = ('data', 'serr', 'nerr', 'perr', 'flags') ##J
     column_descriptions = (
         _('Data'),
         _('Sym. errors'),
         _('Neg. errors'),
-        _('Pos. errors')
+        _('Pos. errors'),
+        _('Flags')  ##J
     )
     dstype = _('1D')
 
-    # subclasses must define .data, .serr, .perr, .nerr
+    # subclasses must define .data, .serr, .perr, .nerr, .flags ##J
 
     def userSize(self):
         """Size of dataset."""
@@ -66,15 +67,18 @@ class Dataset1DBase(DatasetConcreteBase):
         """Return a numpy bool detailing which datapoints are invalid."""
 
         valid = N.isfinite(self.data)
-        for error in self.serr, self.perr, self.nerr:
+        for error in self.serr, self.perr, self.nerr, self.flags:  ##J
             if error is not None:
                 valid = N.logical_and(valid, N.isfinite(error))
+        #on-the-fly conversion to int16, alternative is to enforce int16 datatype would need to be enforced at data import/entry stage
+        if self.flags is not None:   ##J
+            valid = N.logical_and(valid, (self.flags.astype(N.int16) & N.int16(2))==0) ##J
         return N.logical_not(valid)
 
     def hasErrors(self):
         '''Whether errors on dataset'''
         return (self.serr is not None or self.nerr is not None or
-                self.perr is not None)
+                self.perr is not None or self.flags is not None)  ##J
 
     def getPointRanges(self):
         '''Get range of coordinates for each point in the form
@@ -143,7 +147,7 @@ class Dataset1DBase(DatasetConcreteBase):
 
         # work out which columns to write
         cols = []
-        for c in (self.data, self.serr, self.perr, self.nerr):
+        for c in (self.data, self.serr, self.perr, self.nerr, self.flags):  ##J
             if c is not None:
                 cols.append(c)
 
@@ -162,7 +166,8 @@ class Dataset1DBase(DatasetConcreteBase):
             data=copyOrNone(self.data),
             serr=copyOrNone(self.serr),
             perr=copyOrNone(self.perr),
-            nerr=copyOrNone(self.nerr)
+            nerr=copyOrNone(self.nerr),
+            flags=copyOrNone(self.flags) ##J
         )
 
     def returnCopyWithNewData(self, **args):
@@ -174,7 +179,7 @@ class Dataset(Dataset1DBase):
 
     editable = True
 
-    def __init__(self, data = None, serr = None, nerr = None, perr = None,
+    def __init__(self, data = None, serr = None, nerr = None, perr = None, flags = None, ##J
                  linked = None):
         '''Initialise dataset with the sets of values given.
 
@@ -189,17 +194,19 @@ class Dataset(Dataset1DBase):
         self.serr = convertNumpyAbs(serr)
         self.perr = convertNumpyAbs(perr)
         self.nerr = convertNumpyNegAbs(nerr)
+        #ideally add function to create integer
+        self.flags = convertNumpyAbs(flags)
 
         # check the sizes of things match up
         s = self.data.shape
-        for x in self.serr, self.nerr, self.perr:
+        for x in self.serr, self.nerr, self.perr, self.flags: ##J
             if x is not None and x.shape != s:
                 raise DatasetException('Lengths of error data do not match data')
 
     def changeValues(self, thetype, vals):
         """Change the requested part of the dataset to vals.
 
-        thetype == data | serr | perr | nerr
+        thetype == data | serr | perr | nerr | flags
         """
         if thetype in self.columns:
             setattr(self, thetype, vals)
@@ -208,7 +215,7 @@ class Dataset(Dataset1DBase):
 
         # just a check...
         s = self.data.shape
-        for x in (self.serr, self.nerr, self.perr):
+        for x in (self.serr, self.nerr, self.perr, self.flags): ##J
             assert x is None or x.shape == s
 
         # tell the document that we've changed
@@ -226,6 +233,9 @@ class Dataset(Dataset1DBase):
             descriptor += ',+'
         if self.nerr is not None:
             descriptor += ',-'
+        #flags denoted by = symbol
+        if self.flags is not None:  #J
+            descriptor += ',='     #J
 
         fileobj.write( "ImportString(%s,'''\n" % repr(descriptor) )
         fileobj.write( self.datasetAsText(fmt='%e', join=' ') )
@@ -240,7 +250,7 @@ class Dataset(Dataset1DBase):
 
         for key, suffix in (
                 ('data', ''), ('serr', ' (+-)'),
-                ('perr', ' (+)'), ('nerr', ' (-)')):
+                ('perr', ' (+)'), ('nerr', ' (-)'), ('flags', ' (=)')): #J
             if getattr(self, key) is not None:
                 odgrp[key] = getattr(self, key)
                 odgrp[key].attrs['vsz_name'] = (name + suffix).encode('utf-8')
@@ -279,7 +289,7 @@ class DatasetRange(Dataset1DBase):
 
     dstype = _('Range')
 
-    def __init__(self, numsteps, data, serr=None, perr=None, nerr=None):
+    def __init__(self, numsteps, data, serr=None, perr=None, nerr=None, flags=None): ##J
         """Construct dataset.
 
         numsteps: number of steps in range
@@ -291,9 +301,10 @@ class DatasetRange(Dataset1DBase):
         self.range_serr = serr
         self.range_perr = perr
         self.range_nerr = nerr
+        self.range_flags = flags ##J
         self.numsteps = numsteps
 
-        for name in ('data', 'serr', 'perr', 'nerr'):
+        for name in ('data', 'serr', 'perr', 'nerr', 'flags'):  ##J
             val = getattr(self, 'range_%s' % name)
             if val is not None:
                 minval, maxval = val
@@ -328,6 +339,8 @@ class DatasetRange(Dataset1DBase):
             parts.append('poserr=%s' % repr(self.range_perr))
         if self.range_nerr is not None:
             parts.append('negerr=%s' % repr(self.range_nerr))
+        if self.range_flags is not None:                      ##J
+            parts.append('flags=%s' % repr(self.range_flags))  ##J
         parts.append('linked=True')
 
         s = 'SetDataRange(%s)\n' % ', '.join(parts)

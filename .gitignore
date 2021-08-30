@@ -17,3 +17,6 @@ Documents/manual/
 
 .idea/
 veusz.egg-info/
+
+*__pycache__*
+

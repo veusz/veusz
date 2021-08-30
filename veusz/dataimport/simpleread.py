@@ -38,6 +38,8 @@ The first 3 mean the same thing, the last means read from 1 to 5
 
 Commas are now optional in 1.6, so descriptors can look like
 x +- y + -
+
+= denotes flags
 """
 
 import re
@@ -56,7 +58,7 @@ descrtokens_split_re = re.compile(r'''
  `[^`]*`       |  # quoted name
  [ ,]          |  # comma or space
  \([a-z]+?\)   |  # data type
- \+- | \+ | -  |  # error bars
+ \+- | \+ | - | = |  # error bars  ##J = denotes flags
  \[.*?\]          # indices
 )
 ''', re.VERBOSE)
@@ -103,7 +105,7 @@ def interpretDescriptor(descr):
             continue
 
         # match error bars
-        if token in ('+', '-', '+-'):
+        if token in ('+', '-', '+-','='):  ##J
             columns.append(token)
             continue
 
@@ -304,19 +306,20 @@ class DescriptorPart:
             # does the dataset exist?
             if name+'\0D' in thedatasets:
                 vals = thedatasets[name+'\0D']
-                pos = neg = sym = None
+                pos = neg = sym = flags = None  ##J
 
                 # retrieve the data for this dataset
                 if name+'\0+' in thedatasets: pos = thedatasets[name+'\0+']
                 if name+'\0-' in thedatasets: neg = thedatasets[name+'\0-']
                 if name+'\0+-' in thedatasets: sym = thedatasets[name+'\0+-']
+                if name+'\0=' in thedatasets: flags = thedatasets[name+'\0='] ##J
 
                 # make sure components are the same length
                 minlength = 99999999999999
-                for ds in vals, pos, neg, sym:
+                for ds in vals, pos, neg, sym, flags: ##J added flags
                     if ds is not None and len(ds) < minlength:
                         minlength = len(ds)
-                for ds in vals, pos, neg, sym:
+                for ds in vals, pos, neg, sym, flags:  ##J added flags
                     if ds is not None and len(ds) != minlength:
                         del ds[minlength:]
 
@@ -326,11 +329,12 @@ class DescriptorPart:
                     if sym is not None: sym = sym[-tail:]
                     if pos is not None: pos = pos[-tail:]
                     if neg is not None: neg = neg[-tail:]
+                    if flags is not None: flags = flags[-tail:]  ##J
 
                 # create the dataset
                 if self.datatype == 'float':
                     ds = datasets.Dataset( data = vals, serr = sym,
-                                           nerr = neg, perr = pos,
+                                           nerr = neg, perr = pos, flags=flags, ##J
                                            linked = linkedfile )
                 elif self.datatype == 'date':
                     ds = datasets.DatasetDateTime( data=vals,

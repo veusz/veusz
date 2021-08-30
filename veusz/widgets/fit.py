@@ -270,7 +270,18 @@ class Fit(FunctionPlotter):
             xvals = s.get('yData').getData(d).data
             ydata = s.get('xData').getData(d)
         yvals = ydata.data
-        yserr = ydata.serr
+        if ydata.serr is not None:
+            yserr = ydata.serr.copy() #avoid changing original data
+        else:
+            yserr = None
+        #exclude flagged values
+        try:
+            flags = ydata.flags.astype(N.int16) & N.int16(1)
+        except:
+            flags = None
+        if flags is None:
+            flags = N.zeros(ydata.data.shape,dtype=N.int16) #array of same length, '0' denotes include
+        ##
 
         # if there are no errors on data
         if yserr is None:
@@ -279,8 +290,7 @@ class Fit(FunctionPlotter):
                 yserr = N.sqrt( 0.5*(ydata.perr**2 + ydata.nerr**2) )
             else:
                 print("Warning: No errors on y values. Assuming 5% errors.")
-                yserr = yvals*0.05
-                yserr[yserr < 1e-8] = 1e-8
+                yserr = N.abs(yvals*0.05)
 
         # if the fitRange parameter is on, we chop out data outside the
         # range of the axis
@@ -340,7 +350,8 @@ class Fit(FunctionPlotter):
         dof = 1
 
         # only consider finite values
-        finite = N.isfinite(xvals) & N.isfinite(yvals) & N.isfinite(yserr)
+        # allow exclusion of data from fitting where flag column is set to a non-zero value
+        finite = N.isfinite(xvals) & N.isfinite(yvals) & N.isfinite(yserr) & (flags==0)
         xvals = xvals[finite]
         yvals = yvals[finite]
         yserr = yserr[finite]
