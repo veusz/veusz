@@ -128,7 +128,7 @@ class MainWindow(qt.QMainWindow):
         # icon and different size variations
         self.setWindowIcon( utils.getIcon('veusz') )
 
-        # master documenent
+        # master document
         self.document = document.Document()
 
         # filename for document and update titlebar
@@ -286,10 +286,6 @@ class MainWindow(qt.QMainWindow):
             # set color theme
             self.document.basewidget.settings.get(
                 'colorTheme').set(setting.settingdb['colortheme_default'])
-
-            # compatibility version
-            self.document.basewidget.settings.get(
-                'compatLevel').set(self.document.basewidget.max_compat_level)
 
             # load defaults if set
             self.loadDefaultStylesheet()

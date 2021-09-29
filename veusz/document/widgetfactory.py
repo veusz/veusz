@@ -40,6 +40,9 @@ class WidgetFactory:
 
         w = self.regwidgets[widgettype](parent, name=name)
         w.document = document
+
+        w.addSettingsCompatLevel(w.settings, document.compatlevel)
+
         w.linkToStylesheet()
 
         # set all the passed default settings

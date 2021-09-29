@@ -44,12 +44,19 @@ class FunctionPlotter(GenericPlotter):
         """Construct list of settings."""
         GenericPlotter.addSettings(s)
 
+        s.add( setting.Color(
+            'color',
+            'auto',
+            descr=_('Master color'),
+            usertext=_('Color'),
+            formatting=True), 0 )
         s.add( setting.Int(
             'steps',
             50,
             minval = 3,
             descr = _('Number of steps to evaluate the function over'),
-            usertext=_('Steps'), formatting=True), 0 )
+            usertext=_('Steps'), formatting=True), 1 )
+
         s.add( setting.Choice(
             'variable', ['x', 'y'], 'x',
             descr=_('Variable the function is a function of'),
@@ -74,7 +81,7 @@ class FunctionPlotter(GenericPlotter):
             descr=_('Function line settings'),
             usertext=_('Plot line')),
             pixmap='settings_plotline' )
-        s.Line.get('color').newDefault('auto')
+        s.Line.get('color').newDefault(setting.Reference('../color'))
 
         s.add( setting.PlotterFill(
             'FillBelow',
@@ -86,6 +93,14 @@ class FunctionPlotter(GenericPlotter):
             descr=_('Fill mode above/right function'),
             usertext=_('Fill above')),
             pixmap='settings_plotfillabove' )
+
+    @classmethod
+    def addSettingsCompatLevel(klass, s, level):
+        if level >= 1:
+            s.FillBelow.get('color').newDefault(
+                setting.Reference('../color') )
+            s.FillAbove.get('color').newDefault(
+                setting.Reference('../color') )
 
     @property
     def userdescription(self):

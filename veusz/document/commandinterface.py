@@ -55,6 +55,7 @@ class CommandInterface(qt.QObject):
         'AddImportPath',
         'CurrentPath',
         'CloneWidget',
+        'SetCompatLevel',
         'CreateHistogram',
         'DatasetPlugin',
         'FilterDatasets',
@@ -426,6 +427,16 @@ class CommandInterface(qt.QObject):
 
         if self.verbose:
             print( _( "Set setting '%s' to %s") % (setting_path, repr(setn.get())) )
+
+    def SetCompatLevel(self, level):
+        """Set the compatibility level.
+
+        As a side effect, this wipes any widgets in the document
+        and resets all settings.
+
+        If level<0, then choose the latest version
+        """
+        self.document.setCompatLevel(level)
 
     def SetData(self, name, val, symerr=None, negerr=None, poserr=None):
         """Create/set dataset name with values (and optionally errors)."""

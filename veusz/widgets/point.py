@@ -469,16 +469,13 @@ class PointPlotter(GenericPlotter):
             pixmap='settings_axislabel' )
 
     @classmethod
-    def onNewCompatLevel(klass, stylesheet, level):
-        """Called to adjust new defaults if there is a level change."""
-
-        # we use the new scaled marker sizes for levels >= 1
-        stylesheet.xy.MarkerFill.get('newMarkerSizes').set(level>=1)
+    def addSettingsCompatLevel(klass, s, level):
         if level >= 1:
-            stylesheet.xy.FillBelow.get('color').newDefault(
-                setting.Reference('../color'))
-            stylesheet.xy.FillAbove.get('color').newDefault(
-                setting.Reference('../color'))
+            s.FillBelow.get('color').newDefault(
+                setting.Reference('../color') )
+            s.FillAbove.get('color').newDefault(
+                setting.Reference('../color') )
+            s.MarkerFill.get('newMarkerSizes').newDefault(True)
 
     @property
     def userdescription(self):

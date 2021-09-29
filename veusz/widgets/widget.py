@@ -123,8 +123,9 @@ class Widget:
             formatting=True) )
 
     @classmethod
-    def onNewCompatLevel(klass, stylesheet, level):
-        """Called to adjust new defaults if there is a level change."""
+    def addSettingsCompatLevel(klass, s, level):
+        """Update settings compatibility level."""
+        pass
 
     def getDocument(self):
         """Return document.
