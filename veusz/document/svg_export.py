@@ -439,12 +439,18 @@ class SVGPaintEngine(qt.QPaintEngine):
             else:
                 size = f.pointSizeF()*self.scale*self.device.sdpi/inch_pt
 
+            # get qfont for item
             font = textitem.font()
+
+            # get font family, removing any optional bracketed foundry name
+            font_family = re.sub(r'\s+\[.*\]', '', font.family())
+
+            # attributes for text item
             grpattrb = [
                 'stroke="none"',
                 'fill="%s"' % self.pen.color().name(),
                 'fill-opacity="%.3g"' % self.pen.color().alphaF(),
-                'font-family="%s"' % escapeXML(font.family()),
+                'font-family="%s"' % escapeXML(font_family),
                 'font-size="%s"' % size,
             ]
             if font.italic():
