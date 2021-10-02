@@ -85,6 +85,9 @@ class Document(qt.QObject):
     # security value set
     sigSecuritySet = qt.pyqtSignal(bool)
 
+    # compatibility level
+    maxcompatlevel = 1
+
     def __init__(self):
         """Initialise the document."""
         qt.QObject.__init__( self )
@@ -95,6 +98,7 @@ class Document(qt.QObject):
 
         # change tracking of document as a whole
         self.changeset = 0            # increased when the document changes
+        self.compatlevel = 0          # for non-backward compatible changes
 
         # map tags to dataset names
         self.datasettags = defaultdict(list)
@@ -115,8 +119,10 @@ class Document(qt.QObject):
     def wipe(self):
         """Wipe out any stored data."""
         self.data = {}
+
         self.basewidget = widgetfactory.thefactory.makeWidget(
             'document', None, self)
+
         self.setModified(False)
         self.filename = ""
         self.evaluate.wipe()
@@ -146,11 +152,25 @@ class Document(qt.QObject):
         """Return context manager for suspending updates."""
         return DocSuspend(self)
 
-    def makeDefaultDoc(self, mode='graph'):
+    def setCompatLevel(self, level):
+        """Update the compatiblity level.
+
+        If level<0, then use latest version
+        """
+        if level < 0:
+            level = self.maxcompatlevel
+        elif level > self.maxcompatlevel:
+            raise ValueError(
+                "Compatibility level greater than supported by this Veusz version")
+        self.compatlevel = level
+        self.basewidget.makeStylesheet(compatlevel=self.compatlevel)
+
+    def makeDefaultDoc(self, mode='graph', compatlevel=-1):
         """Add default widgets to create document.
 
         mode == 'graph', 'polar', 'ternary' or 'graph3d'
         """
+        self.setCompatLevel(compatlevel)
         page = widgetfactory.thefactory.makeWidget(
             'page', self.basewidget, self)
 
@@ -405,6 +425,9 @@ class Document(qt.QObject):
         """
 
         self._writeFileHeader(fileobj, 'saved document')
+
+        # write compatibility level
+        fileobj.write('SetCompatLevel(%s)\n' % self.compatlevel)
 
         # add file directory to import path if we know it
         reldirname = None

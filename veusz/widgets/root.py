@@ -38,30 +38,32 @@ class Root(widget.Widget):
     typename = 'document'
     allowusercreation = False
 
-    # maximum compatibility version (increase as needed)
-    max_compat_level = 1
-
-    def __init__(self, parent, name=None, document=None):
+    def __init__(self, parent, name=None, compatlevel=0):
         """Initialise object."""
 
         widget.Widget.__init__(self, parent, name=name)
-        s = self.settings
-        self.document = document
+        self.makeStylesheet(compatlevel=compatlevel)
 
-        # don't want user to be able to hide entire document
+        s = self.settings
+        s.get('englishlocale').setOnModified(self.changeLocale)
+        s.get('colorTheme').setOnModified(self.changeColorTheme)
+
+    def makeStylesheet(self, compatlevel=0):
+        """Create a new stylesheet, overwriting an existing one."""
         stylesheet = setting.StyleSheet(
             descr=_('Master settings for document'),
             usertext=_('Style sheet'))
+        s = self.settings
+        if s.isSetting('StyleSheet'):
+            s.remove('StyleSheet')
         s.add(stylesheet)
-        self.fillStylesheet(stylesheet)
-
-        s.get('englishlocale').setOnModified(self.changeLocale)
-        s.get('colorTheme').setOnModified(self.changeColorTheme)
-        s.get('compatLevel').setOnModified(self.changeCompatLevel)
+        self.fillStylesheet(stylesheet, compatlevel)
 
     @classmethod
     def addSettings(klass, s):
         widget.Widget.addSettings(s)
+
+        # don't want user to be able to hide entire document
         s.remove('hide')
 
         s.add( setting.DistancePhysical(
@@ -101,13 +103,6 @@ class Root(widget.Widget):
             usertext=_('Notes')
         ) )
 
-        s.add( setting.Int(
-            'compatLevel', 0,
-            descr=_('Document compatibility level'),
-            usertext=_('Compatibility'),
-            minval=0, maxval=klass.max_compat_level
-        ) )
-
     @classmethod
     def allowedParentTypes(klass):
         return (None,)
@@ -130,13 +125,6 @@ class Root(widget.Widget):
         """Change color theme used by document."""
         self.document.evaluate.colors.setColorTheme(
             self.settings.colorTheme)
-
-    def changeCompatLevel(self):
-        """Update compatibility level for all registered widget types."""
-        compatlevel = self.settings.compatLevel
-        stylesheet = self.settings.StyleSheet
-        for klass in document.thefactory.listWidgetClasses():
-            klass.onNewCompatLevel(stylesheet, compatlevel)
 
     def getPage(self, pagenum):
         """Get page widget."""
@@ -171,7 +159,7 @@ class Root(widget.Widget):
         """Call helper to set page size."""
         cgi.setPageSize()
 
-    def fillStylesheet(self, stylesheet):
+    def fillStylesheet(self, stylesheet, compatlevel):
         """Register widgets with stylesheet."""
 
         for widgetname in document.thefactory.listWidgets():
@@ -183,6 +171,7 @@ class Root(widget.Widget):
                     pixmap="button_%s" % klass.typename)
                 classset = setting.Settings('temp')
                 klass.addSettings(classset)
+                klass.addSettingsCompatLevel(classset, compatlevel)
 
                 # copy formatting settings to stylesheet
                 for name in classset.setnames:

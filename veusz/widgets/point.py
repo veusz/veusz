@@ -469,16 +469,13 @@ class PointPlotter(GenericPlotter):
             pixmap='settings_axislabel' )
 
     @classmethod
-    def onNewCompatLevel(klass, stylesheet, level):
-        """Called to adjust new defaults if there is a level change."""
-
-        # we use the new scaled marker sizes for levels >= 1
-        stylesheet.xy.MarkerFill.get('newMarkerSizes').set(level>=1)
+    def addSettingsCompatLevel(klass, s, level):
         if level >= 1:
-            stylesheet.xy.FillBelow.get('color').newDefault(
-                setting.Reference('../color'))
-            stylesheet.xy.FillAbove.get('color').newDefault(
-                setting.Reference('../color'))
+            s.FillBelow.get('color').newDefault(
+                setting.Reference('../color') )
+            s.FillAbove.get('color').newDefault(
+                setting.Reference('../color') )
+            s.MarkerFill.get('newMarkerSizes').newDefault(True)
 
     @property
     def userdescription(self):
@@ -650,7 +647,7 @@ class PointPlotter(GenericPlotter):
 
         return pts
 
-    def _getBezierLine(self, poly, cliprect):
+    def _getBezierLine(self, poly, cliprect, beziertype):
         """Try to draw a bezier line connecting the points."""
 
         # clip to a larger box to help the lines get right angle
@@ -666,18 +663,22 @@ class PointPlotter(GenericPlotter):
         path = qt.QPainterPath()
         for lpoly in polys:
             if len(lpoly) >= 2:
-                npts = qtloops.bezier_fit_cubic_multi(lpoly, 0.1, len(lpoly)+1)
-                qtloops.addCubicsToPainterPath(path, npts);
+                if beziertype == "tight-Bezier":
+                    npts = qtloops.bezier_fit_cubic_tight(lpoly, 0.5)
+                else:
+                    npts = qtloops.bezier_fit_cubic_multi(
+                        lpoly, 0.1, len(lpoly)+1)
+                qtloops.addCubicsToPainterPath(path, npts)
         return path
 
     def _drawBezierLine( self, painter, xvals, yvals, posn,
-                         xdata, ydata, cliprect ):
+                         xdata, ydata, cliprect, beziertype ):
         """Handle bezier lines and fills."""
 
         pts = self._getLinePoints(xvals, yvals, posn, xdata, ydata)
         if len(pts) < 2:
             return
-        path = self._getBezierLine(pts, cliprect)
+        path = self._getBezierLine(pts, cliprect, beziertype)
         s = self.settings
 
         # do filling
@@ -939,10 +940,11 @@ class PointPlotter(GenericPlotter):
             #print "Painting plot line"
             # plot data line (and/or filling above or below)
             if not s.PlotLine.hide or not s.FillAbove.hide or not s.FillBelow.hide:
-                if s.PlotLine.bezierJoin:
+                interpolation_type = s.PlotLine.interpType
+                if interpolation_type != "linear":
                     self._drawBezierLine(
                         painter, xplotter, yplotter, posn,
-                        xvals, yvals, cliprect )
+                        xvals, yvals, cliprect, interpolation_type )
                 else:
                     self._drawPlotLine(
                         painter, xplotter, yplotter, posn,

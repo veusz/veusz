@@ -103,7 +103,7 @@ class Settings:
         """Is the name a supported setting?"""
         return name in self.setdict
 
-    def add(self, setting, posn = -1, readonly = False, pixmap=None):
+    def add(self, setting, posn=-1, readonly=False, pixmap=None):
         """Add a new setting with the name, or a set of subsettings."""
         name = setting.name
         if name in self.setdict:
