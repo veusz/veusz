@@ -277,6 +277,8 @@ QPolygonF bezier_fit_cubic_single(const QPolygonF& data, double error);
 QPolygonF bezier_fit_cubic_multi(const QPolygonF& data, double error,
 				 unsigned max_beziers);
 
+QPolygonF bezier_fit_cubic_tight(const QPolygonF& data, double looseness);
+
 SIP_PYOBJECT binData(SIP_PYOBJECT data, int binning, bool average);
 %MethodCode
    try
