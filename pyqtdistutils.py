@@ -5,33 +5,17 @@
 # Based on Pyrex.Distutils, written by Graham Fawcett and Darrel Gallion.
 
 import os
-import sys
-import sysconfig
 import subprocess
 
 from distutils.sysconfig import customize_compiler, get_python_lib
 import distutils.command.build_ext
 
-import PyQt5.QtCore
+import toml
 
-##################################################################
-# try to get various useful things we need in order to build
-
-SIP_FLAGS = PyQt5.QtCore.PYQT_CONFIGURATION['sip_flags']
-
-try:
-    # sipconfig is deprecated but necessary to find sip reliably
-    import sipconfig
-except ImportError:
-    # try to guess locations
-    DEF_SIP_DIR = None
-    DEF_SIP_BIN = None
-    DEF_SIP_INC_DIR = None
-else:
-    # use sipconfig if found
-    DEF_SIP_DIR = sipconfig.Configuration().default_sip_dir
-    DEF_SIP_BIN = sipconfig.Configuration().sip_bin
-    DEF_SIP_INC_DIR = sipconfig.Configuration().sip_inc_dir
+from sipbuild.code_generator import set_globals, parse, generateCode
+from sipbuild.exceptions import UserException
+from sipbuild.module import copy_sip_h, resolve_abi_version
+from sipbuild.version import SIP_VERSION, SIP_VERSION_STR
 
 ##################################################################
 
@@ -69,12 +53,6 @@ class build_ext(distutils.command.build_ext.build_ext):
                    '(compile/link to build directory)')
 
     user_options = distutils.command.build_ext.build_ext.user_options + [
-        ('sip-exe=', None,
-         'override sip executable'),
-        ('sip-dir=', None,
-         'override sip file directory'),
-        ('sip-include-dir=', None,
-         'override sip include directory'),
         ('qmake-exe=', None,
          'override qmake executable'),
         ('qt-include-dir=', None,
@@ -87,43 +65,10 @@ class build_ext(distutils.command.build_ext.build_ext):
 
     def initialize_options(self):
         distutils.command.build_ext.build_ext.initialize_options(self)
-        self.sip_exe = None
-        self.sip_dir = None
-        self.sip_include_dir = None
         self.qmake_exe = None
         self.qt_include_dir = None
         self.qt_library_dir = None
         self.qt_libinfix = None
-
-    def _get_sip_exe(self, build_cmd):
-        """Get exe for sip. Sources are:
-        --sip-exe option, environment, DEF_SIP_BIN, search on path."""
-        return (
-            build_cmd.sip_exe or
-            os.environ.get('SIP_EXE') or
-            DEF_SIP_BIN or
-            find_on_path(
-                ('sip5', 'sip-qt5', 'sip', 'sip5.exe', 'sip.exe'), 'sip')
-        )
-
-    def _get_sip_inc_dir(self, build_cmd):
-        """Get include directory for sip."""
-        return (
-            build_cmd.sip_include_dir or
-            os.environ.get('SIP_INCLUDE_DIR') or
-            DEF_SIP_INC_DIR or
-            sysconfig.get_path('include')
-        )
-
-    def _get_sip_dir(self, build_cmd):
-        """Get sip directory."""
-        data_dir = sys.prefix if sys.platform=='win32' else sys.prefix+'/share'
-        return (
-            build_cmd.sip_dir or
-            os.environ.get('SIP_DIR') or
-            DEF_SIP_DIR or
-            os.path.join(data_dir, 'sip')
-        )
 
     def _get_qmake(self, build_cmd):
         """Get qmake executable."""
@@ -207,18 +152,11 @@ class build_ext(distutils.command.build_ext.build_ext):
 
         build_cmd = self.get_finalized_command('build_ext')
 
-        # executable in order of priority using or
-        sip_exe = self._get_sip_exe(build_cmd)
-        sip_inc_dir = self._get_sip_inc_dir(build_cmd)
-
-        # python data directory
-        sip_dir = self._get_sip_dir(build_cmd)
-
         # add directory of input files as include path
         indirs = list(set([os.path.dirname(x) for x in sources]))
 
         # Add the SIP and Qt include directories to the include path
-        extension.include_dirs += [sip_inc_dir] + indirs
+        extension.include_dirs += indirs
 
         libinfix = self._get_qt_libinfix(build_cmd)
 
@@ -277,7 +215,7 @@ class build_ext(distutils.command.build_ext.build_ext):
             sip_builddir = os.path.join(self.build_temp, 'sip-' + sip_basename)
             if not os.path.exists(sip_builddir) or self.force:
                 os.makedirs(sip_builddir, exist_ok=True)
-                self._sip_compile(sip_exe, sip_dir, sip, sip_builddir)
+                self._sip_compile(sip, sip_builddir)
             out = [
                 os.path.join(sip_builddir, fn)
                 for fn in sorted(os.listdir(sip_builddir))
@@ -287,24 +225,50 @@ class build_ext(distutils.command.build_ext.build_ext):
 
         return generated_sources + other_sources
 
-    def _sip_compile(self, sip_exe, sip_dir, source, sip_builddir):
+    def _sip_compile(self, source, sip_builddir):
         """Compile sip file to sources."""
-        if 'sip5' in sip_exe:
-            pyqt5_include_dir = os.path.join(get_python_lib(plat_specific=1),
-                                             'PyQt5', 'bindings')
-            self.spawn(['sip-module', '--target-dir', sip_builddir,
-                        '--sip-h', 'PyQt5.sip'])
+        sip_module = 'PyQt5.sip'
+        pyqt5_include_dir = os.path.join(get_python_lib(plat_specific=1),
+                                         'PyQt5', 'bindings')
+        pyqt5_toml = os.path.join(pyqt5_include_dir, 'QtCore', 'QtCore.toml')
+        pyqt5_cfg = toml.load(pyqt5_toml)
+        abi_version = pyqt5_cfg.get('sip-abi-version')
+        abi_major, abi_minor = abi_version.split('.')
+
+        copy_sip_h(abi_version, sip_builddir, sip_module)
+
+        sip_major_version = SIP_VERSION >> 16
+        common_args = [SIP_VERSION, SIP_VERSION_STR, int(abi_major), int(abi_minor)]
+        if sip_major_version >= 6:
+            set_globals(*common_args, sip_module, UserException, [pyqt5_include_dir])
         else:
-            pyqt5_include_dir = os.path.join(sip_dir, 'PyQt5')
-        self.spawn(
-            [
-                sip_exe,
-                '-c', sip_builddir
-            ] + SIP_FLAGS.split() + [
-                '-I', pyqt5_include_dir,
-                source
-            ]
+            set_globals(*common_args, UserException, [pyqt5_include_dir])
+
+        pt, _fq_name, _uses_limited_api, _sip_files, tags, disabled_features = parse(
+            source,
+            True,   # strict mode
+            [],     # list of additional version/platform tags
+            [],     # list of timeline backstops
+            [],     # list of disabled features
+            False,  # protected is public
         )
+
+        generate_args = [
+            pt,
+            sip_builddir,
+            None,   # source files suffix (default .c, .cpp)
+            False,  # whether to enable support for exceptions
+            False,  # whether to generate code with tracing enabled
+            False,  # whether to always release and reacquire the GIL
+            0,      # number of files to split the generated code into
+            tags,
+            disabled_features,
+            False,  # whether to enable the automatic generation of docstrings
+            False,  # whether to generate code for a debug build of Python
+        ]
+        if sip_major_version < 6:
+            generate_args.append(sip_module)
+        generateCode(*generate_args)
 
     def build_extensions(self):
         # remove annoying flag which causes warning for c++ sources
