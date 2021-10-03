@@ -235,7 +235,7 @@ class build_ext(distutils.command.build_ext.build_ext):
         abi_version = pyqt5_cfg.get('sip-abi-version')
         abi_major, abi_minor = abi_version.split('.')
 
-        copy_sip_h(abi_version, sip_builddir, sip_module)
+        copy_sip_h(abi_major, sip_builddir, sip_module)
 
         sip_major_version = SIP_VERSION >> 16
         common_args = [SIP_VERSION, SIP_VERSION_STR, int(abi_major), int(abi_minor)]
