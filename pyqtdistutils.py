@@ -235,7 +235,12 @@ class build_ext(distutils.command.build_ext.build_ext):
         abi_version = pyqt5_cfg.get('sip-abi-version')
         abi_major, abi_minor = abi_version.split('.')
 
-        copy_sip_h(abi_major, sip_builddir, sip_module)
+        # header file location changed to major version in sip-6.2.0
+        if SIP_VERSION >= 0x60200:
+            hdr_version = abi_major
+        else:
+            hdr_version = abi_version
+        copy_sip_h(hdr_version, sip_builddir, sip_module)
 
         sip_major_version = SIP_VERSION >> 16
         common_args = [SIP_VERSION, SIP_VERSION_STR, int(abi_major), int(abi_minor)]
