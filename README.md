@@ -1,4 +1,4 @@
-# [Veusz 3.3.1](https://veusz.github.io)
+# [Veusz 3.4](https://veusz.github.io)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -10,37 +10,30 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-## Changes in 3.3.1
-  * New tools for zooming into plot on click, zooming out, moving plot center and resetting plot axes
-  * Double clicking on axis range resets endpoint to Auto
-  * Add key entries for histo widget
-  * MacOS improvements
-    * Big Sur compatibility fix
-    * Fix file associations
-  * Python 3.10 prerelease fixes
-  * Fix for reproducible builds
-
-## Changes in 3.3
-  * New histogramming widget (histo)
-  * Add keyboard shortcut for showing/hiding widgets (Ctrl+[ and Ctrl+])
-  * New security model allows running arbitrary code for documents in allowed locations
-  * Allow Python-level module imports
-  * New separate lo and hi error bar styles (#428)
-  * Use same colour for key title as key text (#414)
-  * Add preferences for number of significant figures in picker
-  * New colormaps: inferno, magma, moreland, parula, plasma and viridis
-  * Add CurrentPath() API command to get current widget path
-  * Add dataset operations for reversing and subtracting dataset maximum
-  * Now supports building using sip5
-  * Bugfix for values in boxplots (#455)
-  * Add setting to optionally omit paths in document files
-  * New flight-recorder and histogram examples
-  * Make sure line around arrows is solid (#429)
-  * README is now renamed to README.md
-  * Switch to unsigned long long for widget IDs to fix build
-  * Add multiline FieldTextEdit (#392) field
-  * Windows binary now built only for 64 bit
-  * MacOS binary now built for High Sierra (10.13) or later
+Changes in 3.4:
+  * Font styles can be chosen
+  * Add setting to specify minor ticks in axis
+  * Add setting to ignore NaN values in point plotter, rather than breaking lines
+  * Add copy and paste of images (thanks to chakuro)
+  * Add embedding SVG graphics (thanks to korintje)
+  * New tight-Bezier line style (thanks to korintje)
+  * Add hide icon (eye) in settings and grey tabs as appropriate
+  * Add \ddot latex command
+  * Axis auto ranges (e.g. 5-95%) can now have decimals
+  * Filename set after Load()
+  * Fix renaming 2D datasets
+  * Fix for blank dataset output names in dataset plugin
+  * Fix for crash in QDP plugin
+  * Linux dark mode improvements
+  * Font foundry name removed from SVG files
+  * Add new compatibility level functionality for new documents
+  * Change default xy plotter marker size and fill colour for new documents
+  * Iminuit2 fixes (thanks to korintje)
+  * Drop Python 2 compatibility
+  * Source code reformatting
+  * Updated appdata (thanks to kevinsmia1939)
+  * Import sip from PyQt5.sip if available
+  * Now requires sip>=5.0 build system
 
 ## Features of package:
 

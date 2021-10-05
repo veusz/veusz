@@ -162,7 +162,7 @@ or 'largetosmall'.  errors is to calculate Poisson error bars.
 CurrentPath
 -----------
 
-.. _Command.CurrentPath
+.. _Command.CurrentPath:
 
 :command:`CurrentPath()`
 
@@ -891,6 +891,16 @@ SetAntiAliasing
 
 Enable or disable anti aliasing in the plot window, replotting the
 image.
+
+SetCompatLevel
+--------------
+
+.. _Command.SetCompatLevel:
+
+:command:`SetCompatLevel(level)`
+
+Set the document compatibility level. If `level<0`, then choose the latest version. As a side effect, this wipes any widgets in the document and resets all settings.
+
 
 SetData
 -------

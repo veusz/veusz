@@ -28,7 +28,7 @@ import veusz.embed as veusz
 
 # construct a Veusz embedded window
 # many of these can be opened at any time
-g = veusz.Embedded('window title')
+g = veusz.Embedded('window title', compatlevel=-1)
 g.EnableToolbar()
 
 # construct the plot

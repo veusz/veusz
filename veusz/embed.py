@@ -74,12 +74,13 @@ class Embedded:
 
     remote = None
 
-    def __init__(self, name='Veusz', copyof=None, hidden=False):
+    def __init__(self, name='Veusz', copyof=None, hidden=False, compatlevel=0):
         """Initialse the embedded veusz window.
 
         name is the name of the window to show.
         copyof duplicates a view of the document in the Embedded instance given
         hidden makes a hidden window (useful for batch scripting)
+        compatlevel is the compatibility level to use (-1 is latest)
         """
 
         if not Embedded.remote:
@@ -87,10 +88,14 @@ class Embedded:
 
         if not copyof:
             retval = self.sendCommand(
-                (-1, '_NewWindow', (name,), {'hidden': hidden}) )
+                (-1, '_NewWindow', (name,), {
+                    'hidden': hidden,
+                }) )
         else:
             retval = self.sendCommand(
-                (-1, '_NewWindowCopy', (name, copyof.winno), {'hidden': hidden}) )
+                (-1, '_NewWindowCopy', (name, copyof.winno), {
+                    'hidden': hidden,
+                }) )
 
         self.winno, cmds = retval
 
@@ -113,6 +118,11 @@ class Embedded:
                 " API. This embed.py supports version %i." %
                 (remotever, API_VERSION)
             )
+
+        # increase compatibility level (if requested)
+        if compatlevel != 0:
+            self.SetCompatLevel(compatlevel)
+
         # define root object
         self.Root = WidgetNode(self, 'widget', '/')
 

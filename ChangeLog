@@ -5,6 +5,7 @@ Changes in 3.4:
     breaking lines
   * Add copy and paste of images (thanks to chakuro)
   * Add embedding SVG graphics (thanks to korintje)
+  * New tight-Bezier line style (thanks to korintje)
   * Add hide icon (eye) in settings and grey tabs as appropriate
   * Add \ddot latex command
   * Axis auto ranges (e.g. 5-95%) can now have decimals
@@ -13,11 +14,15 @@ Changes in 3.4:
   * Fix for blank dataset output names in dataset plugin
   * Fix for crash in QDP plugin
   * Linux dark mode improvements
+  * Font foundry name removed from SVG files
+  * Add new compatibility level functionality for new documents
+  * Change default xy plotter marker size and fill colour for new documents
   * Iminuit2 fixes (thanks to korintje)
   * Drop Python 2 compatibility
   * Source code reformatting
-  * Import sip from PyQt5.sip if available
   * Updated appdata (thanks to kevinsmia1939)
+  * Import sip from PyQt5.sip if available
+  * Now requires sip>=5.0 build system
 
 Changes in 3.3.1:
   * New tools for zooming into plot on click, zooming out, moving plot
