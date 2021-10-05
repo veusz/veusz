@@ -304,6 +304,14 @@ class Page(widget.Widget):
             descr=_('User-defined notes'),
             usertext=_('Notes')) )
 
+        s.add(
+            setting.PageBrush(
+                'Background',
+                descr = _('Background page fill'),
+                usertext=_('Background')),
+            pixmap='settings_bgfill',
+        )
+
     @classmethod
     def allowedParentTypes(klass):
         from . import root
@@ -316,6 +324,8 @@ class Page(widget.Widget):
 
     def draw(self, parentposn, painthelper, outerbounds=None):
         """Draw the plotter. Clip graph inside bounds."""
+
+        s = self.settings
 
         # document should pass us the page bounds
         x1, y1, x2, y2 = parentposn
@@ -334,7 +344,7 @@ class Page(widget.Widget):
                 pamap[plot].append(axis)
         painthelper.plotteraxismap.update(pamap)
 
-        if self.settings.hide:
+        if s.hide:
             bounds = self.computeBounds(parentposn, painthelper)
             return bounds
 
@@ -344,6 +354,10 @@ class Page(widget.Widget):
             # w and h are non integer
             w = self.settings.get('width').convert(painter)
             h = self.settings.get('height').convert(painter)
+            if not s.Background.hide:
+                path = qt.QPainterPath()
+                path.addRect(qt.QRectF(0, 0, w, h))
+                utils.brushExtFillPath(painter, s.Background, path)
 
         painthelper.setControlGraph(self, [
                 controlgraph.ControlMarginBox(

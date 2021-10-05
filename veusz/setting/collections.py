@@ -270,6 +270,15 @@ class GraphBrush(BrushExtended):
 
         self.get('color').newDefault('background')
 
+class PageBrush(BrushExtended):
+    '''Fill used for back of page.'''
+
+    def __init__(self, name, **args):
+        BrushExtended.__init__(self, name, **args)
+
+        self.get('color').newDefault('background')
+        self.get('hide').newDefault(True)
+
 class PlotterFill(BrushExtended):
     '''Filling used for filling on plotters.'''
 

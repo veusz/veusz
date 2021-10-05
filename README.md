@@ -28,6 +28,7 @@ Changes in 3.4:
   * Font foundry name removed from SVG files
   * Add new compatibility level functionality for new documents
   * Change default xy plotter marker size and fill colour for new documents
+  * Add page colour or fill setting
   * Iminuit2 fixes (thanks to korintje)
   * Drop Python 2 compatibility
   * Source code reformatting
