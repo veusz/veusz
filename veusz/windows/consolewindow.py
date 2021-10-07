@@ -145,7 +145,7 @@ class _CommandEdit(qt.QLineEdit):
             self.setText(text)
 
 introtext=_('''Welcome to <b><font color="purple">Veusz %s</font></b> --- a scientific plotting application.<br>
-Copyright \u00a9 2003-2020 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt; and contributors.<br>
+Copyright \u00a9 2003-2021 Jeremy Sanders &lt;jeremy@jeremysanders.net&gt; and contributors.<br>
 Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are<br>
 welcome to redistribute it under certain conditions. Enter "GPL()" for details.<br>
 This window is a Python command line console and acts as a calculator.<br>

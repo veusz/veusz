@@ -107,7 +107,7 @@ Changes in 3.4:
 * [Ghostscript](https://www.ghostscript.com/) (for EPS/PS output)
 
 ## License
-Veusz is Copyright (C) 2003-2020 Jeremy Sanders
+Veusz is Copyright (C) 2003-2021 Jeremy Sanders
  and contributors. It is licensed under the [GPL version 2 or greater](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
 
 The latest source code can be found in [this GitHub repository](https://github.com/veusz/veusz).
