@@ -105,10 +105,10 @@ class DatasetNode(TMNode):
             p.setPen( qt.QPen(qt.Qt.black) )
             if minval <= 0 and maxval > 0:
                 y0 = size[1] - (0-minval)/(maxval-minval)*size[1]
-                p.drawLine(x[0], y0, x[-1], y0)
+                p.drawLine(qt.QLineF(x[0], y0, x[-1], y0))
             else:
-                p.drawLine(x[0], size[1], x[-1], size[1])
-            p.drawLine(x[0], 0, x[0], size[1])
+                p.drawLine(qt.QLineF(x[0], size[1], x[-1], size[1]))
+            p.drawLine(qt.QLineF(x[0], 0, x[0], size[1]))
 
         except (ValueError, ZeroDivisionError):
             # zero sized array after filtering or min == max, so return None

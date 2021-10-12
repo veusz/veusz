@@ -77,8 +77,8 @@ def makeSplash(app):
     splash.setGeometry(5, 5, 100, 100)
     screen = qt.QDesktopWidget().screenGeometry()
     splash.move(
-        (screen.width()-layout.sizeHint().width())/2,
-        (screen.height()-layout.sizeHint().height())/2
+        (screen.width()-layout.sizeHint().width())//2,
+        (screen.height()-layout.sizeHint().height())//2
     )
 
     # make sure dialog goes away - avoid problem if a message box pops

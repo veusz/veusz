@@ -101,17 +101,17 @@ class ExportBitmapRunnable(ExportRunnable):
         if fmt == 'png':
             # transparent output
             image = qt.QImage(
-                size[0], size[1],
+                int(size[0]), int(size[1]),
                 qt.QImage.Format_ARGB32_Premultiplied)
         else:
             # non transparent output
             image = qt.QImage(
-                size[0], size[1],
+                int(size[0]), int(size[1]),
                 qt.QImage.Format_RGB32)
             backqcolor.setAlpha(255)
 
-        image.setDotsPerMeterX(self.phelpers[0].dpi[0]*m_inch)
-        image.setDotsPerMeterY(self.phelpers[0].dpi[1]*m_inch)
+        image.setDotsPerMeterX(int(self.phelpers[0].dpi[0]*m_inch))
+        image.setDotsPerMeterY(int(self.phelpers[0].dpi[1]*m_inch))
         if backqcolor.alpha() == 0:
             image.fill(qt.qRgba(0,0,0,0))
         else:

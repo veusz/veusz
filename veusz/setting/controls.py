@@ -573,7 +573,7 @@ class MultiLine(qt.QTextEdit):
         m = self.contentsMargins()
         docheight = self.document().size().height() + m.top() + m.bottom()
         docheight = min(self.heightmax, max(self.heightmin, docheight))
-        self.setFixedHeight(docheight)
+        self.setFixedHeight(int(docheight))
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
