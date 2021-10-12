@@ -67,7 +67,7 @@ def makeSplash(app):
     message.setAlignment(qt.Qt.AlignCenter)
     # increase size of font
     font = message.font()
-    font.setPointSize(font.pointSize()*1.5)
+    font.setPointSizeF(font.pointSize()*1.5)
     message.setFont(font)
     layout.addWidget(message)
     h = qt.QFontMetrics(font).height()
