@@ -265,7 +265,7 @@ class Scene3D(widget.Widget):
         widgetid = scene.idPixel(
             root, painter, camera,
             bounds[0], bounds[1], bounds[2], bounds[3], sizescale,
-            scaling, x, y)
+            scaling, int(x), int(y))
 
         # recursive check id of children against returned value
         widget = [self]
