@@ -13,12 +13,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.3
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.3
     - name: Cache Qt
       id: cache-qt
       uses: actions/cache@v1
@@ -33,6 +33,7 @@ jobs:
         version: 5.15.2
     - name: Install Python dependencies
       run: |
+        python -V
         python -m pip install --upgrade pip
         python -m pip install PyQt5 sip numpy h5py astropy
     - name: Build
