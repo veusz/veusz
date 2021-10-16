@@ -38,7 +38,7 @@ jobs:
         setup-python: false
     - name: Install Python dependencies
       run: |
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -r requirements.txt
     - name: Build
       run: |
         python setup.py build_ext --inplace
