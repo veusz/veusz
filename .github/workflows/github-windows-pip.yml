@@ -32,6 +32,7 @@ jobs:
         modules: 'qtsvg'
     - name: Install Python dependencies
       run: |
+        pip install --upgrade pip
         pip install PyQt5 sip numpy h5py astropy
     - name: Build
       run: |
