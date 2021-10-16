@@ -24,7 +24,7 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ../Qt
-        key: ${{ runner.os }}-QtCache
+        key: ${{ runner.os }}-QtCache2
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -33,8 +33,8 @@ jobs:
         version: 5.15.2
     - name: Install Python dependencies
       run: |
-        pip install --upgrade pip
-        pip install PyQt5 sip numpy h5py astropy
+        python -m pip install --upgrade pip
+        python -m pip install PyQt5 sip numpy h5py astropy
     - name: Build
       run: |
         python setup.py build_ext --inplace
