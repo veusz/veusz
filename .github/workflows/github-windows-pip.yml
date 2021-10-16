@@ -18,7 +18,7 @@ jobs:
       with:
         python-version: 3.8
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.0.3
     - name: Cache Qt
       id: cache-qt
       uses: actions/cache@v1
