@@ -34,7 +34,8 @@ Changes in 3.4:
   * Source code reformatting
   * Updated appdata (thanks to kevinsmia1939)
   * Import sip from PyQt5.sip if available
-  * Now requires sip>=5.0 build system
+  * Update to require SIP 5+ build system (thanks to mitya57)
+  * Python 3.10 fixes
 
 ## Features of package:
 

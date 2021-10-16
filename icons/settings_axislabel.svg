@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="16"
+   height="16"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
+   version="1.0"
+   sodipodi:docname="settings_axislabel.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="20.594486"
+     inkscape:cx="-2.7198918"
+     inkscape:cy="8.5093071"
+     inkscape:document-units="px"
+     inkscape:current-layer="text3130"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox="true"
+     inkscape:document-rotation="0" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Jeremy Sanders</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Copyright (C) Jeremy Sanders</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/GPL/2.0/" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       aria-label="xy"
+       id="text3130"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.3333px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none">
+      <path
+         d="m 4.2924536,4.6610323 q 0.3509123,0.3723966 0.5299492,0.7447933 0.1289065,0.2578131 0.422527,1.3535188 L 5.8751396,5.8140297 Q 6.1257912,5.4702789 6.4838649,5.1623355 6.8419386,4.8472306 7.1140747,4.732647 7.2859501,4.661032 7.4936329,4.661032 q 0.3079434,0 0.4869802,0.1647139 0.1861984,0.1647139 0.1861984,0.4010426 0,0.272136 -0.1074221,0.3723967 Q 7.8588681,5.778222 7.601055,5.778222 q -0.150391,0 -0.3222664,-0.064453 -0.3365893,-0.1145835 -0.4511729,-0.1145835 -0.1718754,0 -0.4082041,0.2005212 -0.4440114,0.3723967 -1.0598982,1.4394565 l 0.5872409,2.4635474 q 0.136068,0.5657564 0.2291672,0.6803404 0.093099,0.107422 0.1861983,0.107422 0.150391,0 0.3509123,-0.164714 0.3938811,-0.3294284 0.6731786,-0.8593774 l 0.2506516,0.128907 Q 7.1856894,10.440343 6.4910264,10.998938 6.0971453,11.314043 5.8250092,11.314043 5.4239666,11.314043 5.187638,10.86287 5.037247,10.583572 4.5645897,8.4566139 3.4473996,10.397374 2.774221,10.955969 q -0.43685,0.358074 -0.8450541,0.358074 -0.2864589,0 -0.5227876,-0.207683 -0.1718754,-0.157552 -0.1718754,-0.422527 0,-0.236329 0.1575524,-0.393881 0.1575525,-0.157553 0.3867197,-0.157553 0.2291672,0 0.4869803,0.229168 0.1861983,0.164714 0.2864589,0.164714 0.085938,0 0.2220058,-0.114584 Q 3.1108103,10.139561 3.6908897,9.2372146 4.2709692,8.3348688 4.4500061,7.9338262 4.0059946,6.1935879 3.9701873,6.0933272 3.8054733,5.6278314 3.5404988,5.4344715 3.2755242,5.2411117 2.759898,5.2411117 q -0.1647139,0 -0.3795581,0.014323 V 4.9976216 Z"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         id="path3132" />
+      <path
+         d="m 10.601713,4.6610323 q 0.24349,0.4153655 0.33659,0.7806007 0.0931,0.3580737 0.186198,1.417972 l 0.315105,3.523446 q 0.429688,-0.5156264 1.246096,-1.6328166 0.393882,-0.5442721 0.973961,-1.4824253 0.350912,-0.572918 0.429689,-0.8020852 0.04297,-0.1145836 0.04297,-0.2363287 0,-0.078776 -0.05013,-0.1289065 -0.05013,-0.05013 -0.264974,-0.1145836 -0.207683,-0.071615 -0.350913,-0.2506516 -0.136068,-0.1861984 -0.136068,-0.422527 0,-0.2936205 0.171876,-0.4726574 0.171875,-0.1790368 0.429688,-0.1790368 0.315105,0 0.537111,0.2649745 0.222005,0.2578131 0.222005,0.7161475 0,0.5657565 -0.386719,1.2962269 -0.38672,0.723309 -1.489587,2.2272187 -1.102867,1.5039101 -2.67123,3.2799561 -1.0813833,1.224612 -1.604171,1.539717 -0.5227877,0.322266 -0.8951844,0.322266 -0.2220057,0 -0.3867196,-0.171875 -0.1718754,-0.164714 -0.1718754,-0.38672 0,-0.279298 0.2363287,-0.508465 0.2291672,-0.229167 0.5013032,-0.229167 0.1432295,0 0.2363287,0.06445 0.057292,0.03581 0.1289065,0.200522 0.064453,0.171875 0.1217451,0.229167 0.035807,0.03581 0.085938,0.03581 0.042969,0 0.150391,-0.07161 0.3938811,-0.24349 0.9166687,-0.773439 0.6875015,-0.701824 1.0169295,-1.145836 L 10.078926,7.009996 Q 9.9786644,5.8856444 9.7781434,5.6421543 9.5776218,5.3986642 9.1049645,5.3986642 q -0.150391,0 -0.5371106,0.042969 L 8.5034006,5.1766584 Z"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.6667px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         id="path3134" />
+    </g>
+  </g>
+</svg>
