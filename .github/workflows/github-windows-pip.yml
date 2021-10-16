@@ -20,22 +20,25 @@ jobs:
       uses: actions/cache@v1
       with:
         path: ../Qt
-        key: ${{ runner.os }}-QtCache2
+        key: ${{ runner.os }}-QtCache-v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Upgrade pip
+      run : |
+        python -V
+        python -m pip install --upgrade pip
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
         modules: 'qtsvg'
         version: 5.15.2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
+        setup-python: false
     - name: Install Python dependencies
       run: |
-        python -V
-        python -m pip install --upgrade pip
-        python -m pip install PyQt5 sip numpy h5py astropy
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build
       run: |
         python setup.py build_ext --inplace
