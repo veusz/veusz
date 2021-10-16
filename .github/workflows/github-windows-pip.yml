@@ -30,6 +30,7 @@ jobs:
       with:
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
         modules: 'qtsvg'
+        version: 5.15.2
     - name: Install Python dependencies
       run: |
         pip install --upgrade pip
