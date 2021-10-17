@@ -10,7 +10,7 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 3.4:
+User-visible changes in 3.4:
   * Font styles can be chosen
   * Add setting to specify minor ticks in axis
   * Add setting to ignore NaN values in point plotter, rather than breaking lines
@@ -26,9 +26,12 @@ Changes in 3.4:
   * Fix for crash in QDP plugin
   * Linux dark mode improvements
   * Font foundry name removed from SVG files
-  * Add new compatibility level functionality for new documents
-  * Change default xy plotter marker size and fill colour for new documents
   * Add page colour or fill setting
+  * Change default xy plotter marker size and fill colour for new documents
+  * Add function widget global colour setting
+
+Internal changes in 3.4:
+  * Add new compatibility level functionality for new documents
   * Iminuit2 fixes (thanks to korintje)
   * Drop Python 2 compatibility
   * Source code reformatting

@@ -38,7 +38,7 @@ list a few of the possible method here:
 To install on Linux to the standard location on the hard disk follow
 these instructions.
 
-# cd veusz-3.3.1
+# cd veusz-3.4
 # python3 setup.py build
 # su
 [enter root password]
@@ -73,6 +73,11 @@ Alternatively, the Qt platform can be switched to minimal to avoid the
 use of X11:
 
 # QT_QPA_PLATFORM=minimal python3 tests/runselftest.py
+
+Please note that the environment variable VEUSZ_INPLACE_TEST is set,
+then the PYTHONPATH and VEUSZ_RESOURCE_DIR are set to include the
+current working directory, making it easier to run the self tests
+in automated scripts without installation.
 
 1.1.2 Separate resources directory
 ==================================
@@ -122,8 +127,8 @@ can currently be run from its own directory. Before this can work, the
 helper modules must be compiled and copied into the appropriate
 location.
 
-# tar xzf veusz-3.3.1.tar.gz                [change version here]
-# cd veusz-3.3.1
+# tar xzf veusz-3.4.tar.gz                [change version here]
+# cd veusz-3.4
 # python3 setup.py build                    [or use python3 here]
 # cp build/*/veusz/helpers/*.so veusz/helpers/
 
@@ -142,8 +147,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xf veusz-3.3.1-linux-x86_64.tar.xz   [change version here]
-# cd veusz-3.3.1-linux-x86_64
+# tar xf veusz-3.4-linux-x86_64.tar.xz   [change version here]
+# cd veusz-3.4-linux-x86_64
 # ./veusz.exe                    [note, it's not a windows exe!]
 
 2.2 Installing in Windows
