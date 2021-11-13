@@ -283,7 +283,7 @@ class WidgetTreeModel(qt.QAbstractItemModel):
         if ( index.internalPointer().parent is not None and
              index.column() == 0 ):
             # allow items other than root to be edited and dragged
-            flags |= qt.Qt.ItemIsEditable | qt.Qt.ItemIsDragEnabled
+            flags = flags | qt.Qt.ItemIsEditable | qt.Qt.ItemIsDragEnabled
 
         return flags
 
