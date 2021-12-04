@@ -358,7 +358,7 @@ class Document(qt.QObject):
         for plugin in pluginlist:
             try:
                 with open(plugin) as f:
-                    exec(f.read())
+                    exec(f.read(), {})
             except Exception:
                 err = _('Error loading plugin %s\n\n%s') % (
                     plugin, traceback.format_exc())
