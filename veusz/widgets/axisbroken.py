@@ -127,6 +127,14 @@ class AxisBroken(axis.Axis):
         if self.rangeswitch is not None:
             return axis.Axis._graphToPlotter(self, vals)
 
+        # support single int/float values
+        try:
+            iter(vals)
+            issingle = False
+        except TypeError:
+            vals = N.array([vals])
+            issingle = True
+
         out = []
         for val in vals:
             breaki = bisect.bisect_left(self.breakvstarts, val) - 1
@@ -144,12 +152,16 @@ class AxisBroken(axis.Axis):
                 else:
                     # lookup value
                     self.switchBreak(breaki, self.currentbounds)
-                    coord = axis.Axis._graphToPlotter(self, N.array([val]))
+                    coord = axis.Axis._graphToPlotter(self, N.array([val]))[0]
             else:
                 coord = N.nan
             out.append(coord)
         self.switchBreak(None, self.currentbounds)
-        return N.array(out)
+
+        if issingle:
+            return out[0]
+        else:
+            return N.array(out)
 
     def updateAxisLocation(self, bounds, otherposition=None):
         """Recalculate broken axis positions."""
