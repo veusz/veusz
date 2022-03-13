@@ -258,6 +258,9 @@ class Graph(widget.Widget):
             awidget.drawGrid(
                 bounds, painthelper, outerbounds=outerbounds, ontop=False)
 
+        # list of axis widgets
+        axiswidgets = [axis for name, axis in axisdrawlist]
+
         # broken axis handling
         brokenaxes = set()
         for axis in axestodraw.values():
@@ -275,9 +278,6 @@ class Graph(widget.Widget):
         # do normal drawing of children
         # iterate over children in reverse order
         for c in reversed(self.children):
-
-            if c.isaxis:
-                axesdrawn.add(c)
 
             axes = axesofwidget.get(c, None)
             if axes is not None and any((a in brokenaxes for a in axes)):
@@ -306,17 +306,20 @@ class Graph(widget.Widget):
                 # standard non broken axis drawing
                 c.draw(bounds, painthelper, outerbounds=outerbounds)
 
+                if c.isaxis:
+                    axesdrawn.add(c)
+                    c.drawAutoMirror(bounds, painthelper, axiswidgets)
+
         # then for grid lines on top
-        axiswidgets = [axis for name, axis in axisdrawlist]
         for awidget in axiswidgets:
             awidget.drawGrid(
                 bounds, painthelper, outerbounds=outerbounds, ontop=True)
-            awidget.drawAutoMirror(bounds, painthelper, axiswidgets)
 
         # draw remaining axes
         for awidget in axiswidgets:
             if awidget not in axesdrawn:
                 awidget.draw(bounds, painthelper, outerbounds=outerbounds)
+                awidget.drawAutoMirror(bounds, painthelper, axiswidgets)
 
         return bounds
 

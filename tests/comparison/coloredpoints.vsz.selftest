@@ -436,6 +436,13 @@
 <text x="47.9" y="21" font-size="14pt" fill="#000000">3</text>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="1.2">
+<path d="M524.4,471.2l0,-464.1"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="0.6">
+<path d="M524.4,471.2l-3.7,0M524.4,432.5l-3.7,0M524.4,393.8l-3.7,0M524.4,355.2l-3.7,0M524.4,316.5l-3.7,0M524.4,277.8l-3.7,0M524.4,239.1l-3.7,0M524.4,200.4l-3.7,0M524.4,161.8l-3.7,0M524.4,123.1l-3.7,0M524.4,84.4l-3.7,0M524.4,45.7l-3.7,0M524.4,7l-3.7,0"/>
+<path d="M524.4,471.2l-7.5,0M524.4,393.8l-7.5,0M524.4,316.5l-7.5,0M524.4,239.1l-7.5,0M524.4,161.8l-7.5,0M524.4,84.4l-7.5,0M524.4,7l-7.5,0"/>
+</g>
+<g fill="none" stroke-linecap="butt" stroke-width="1.2">
 <path d="M60.2,471.2l464.1,0"/>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="0.6">
@@ -450,13 +457,6 @@
 <text x="325.6" y="476.5" font-size="14pt" fill="#000000">0.6</text>
 <text x="418.4" y="476.5" font-size="14pt" fill="#000000">0.8</text>
 <text x="520" y="476.5" font-size="14pt" fill="#000000">1</text>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="1.2">
-<path d="M524.4,471.2l0,-464.1"/>
-</g>
-<g fill="none" stroke-linecap="butt" stroke-width="0.6">
-<path d="M524.4,471.2l-3.7,0M524.4,432.5l-3.7,0M524.4,393.8l-3.7,0M524.4,355.2l-3.7,0M524.4,316.5l-3.7,0M524.4,277.8l-3.7,0M524.4,239.1l-3.7,0M524.4,200.4l-3.7,0M524.4,161.8l-3.7,0M524.4,123.1l-3.7,0M524.4,84.4l-3.7,0M524.4,45.7l-3.7,0M524.4,7l-3.7,0"/>
-<path d="M524.4,471.2l-7.5,0M524.4,393.8l-7.5,0M524.4,316.5l-7.5,0M524.4,239.1l-7.5,0M524.4,161.8l-7.5,0M524.4,84.4l-7.5,0M524.4,7l-7.5,0"/>
 </g>
 <g fill="none" stroke-linecap="butt" stroke-width="1.2">
 <path d="M60.2,7l464.1,0"/>
