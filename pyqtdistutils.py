@@ -237,28 +237,40 @@ class build_ext(distutils.command.build_ext.build_ext):
         modulename = os.path.splitext(os.path.basename(source))[0]
         srcdir = os.path.abspath(os.path.dirname(source))
 
+        # location of sip output files
         output_dir = os.path.abspath(os.path.join(sip_builddir, 'output'))
-        toml_out_fname = os.path.join(sip_builddir, 'pyproject.toml')
-        with open(toml_out_fname, 'w') as fout:
-            fout.write(f'''
-[build-system]
-requires=["sip >=5.5.0, <7"]
-build-backend="sipbuild.api"
+        os.makedirs(output_dir)
 
-[tool.sip.metadata]
-name="{modulename}"
-
-[tool.sip.bindings.{modulename}]
-pep484-pyi=false
-protected-is-public=false
-
-[tool.sip.project]
-sip-include-dirs=["{pyqt5_include_dir}"]
-abi-version="{abi_version}"
-build-dir="{output_dir}"
-sip-module="PyQt5.sip"
-sip-files-dir="{srcdir}"
-''')
+        # generate a pyproject.toml to generate the sip source
+        pyproject_data = {
+            'build-system': {
+                'requires': ['sip >=5.5.0, <7'],
+                'build-backend': 'sipbuild.api',
+            },
+            'tool': {
+                'sip': {
+                    'metadata': {
+                        'name': modulename,
+                    },
+                    'bindings': {
+                        modulename: {
+                            'pep484-pyi': False,
+                            'protected-is-public': False
+                        }
+                    },
+                    'project': {
+                        'sip-include-dirs': [pyqt5_include_dir],
+                        'abi-version': abi_version,
+                        'build-dir': output_dir,
+                        'sip-module': 'PyQt5.sip',
+                        'sip-files-dir': srcdir,
+                    }
+                }
+            }
+        }
+        pyproject_fname = os.path.join(sip_builddir, 'pyproject.toml')
+        with open(pyproject_fname, 'w') as fout:
+            toml.dump(pyproject_data, fout)
 
         # generate the source files for the bindings
         build_cmd = shutil.which('sip-build')
