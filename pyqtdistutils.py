@@ -272,6 +272,11 @@ class build_ext(distutils.command.build_ext.build_ext):
         with open(pyproject_fname, 'w') as fout:
             toml.dump(pyproject_data, fout)
 
+        with open(pyproject_fname) as fin:
+            print('-------')
+            print(repr(fin.read()))
+            print('-------')
+
         # generate the source files for the bindings
         build_cmd = shutil.which('sip-build')
         if not build_cmd:
