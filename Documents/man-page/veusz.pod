@@ -63,7 +63,7 @@ backcolor='I<#RRGGBBAA>' gives the background color of bitmap files
 PDF files (default 150) and svgtextastext=True/False outputs text in
 SVG files as text, rather than as curves (default False).
 
-=item B<--plugin>=I<FILE>
+=item B<--veusz-plugin>=I<FILE>
 
 Loads the Veusz plugin I<FILE> when starting Veusz. This option
 provides a per-session alternative to adding the plugin in the

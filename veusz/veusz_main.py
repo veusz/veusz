@@ -196,7 +196,7 @@ class VeuszApp(qt.QApplication):
             action='store_true',
             help='(internal - not for external use)')
         parser.add_argument(
-            '--plugin', action='append', metavar='FILE',
+            '--veusz-plugin', action='append', metavar='FILE',
             help='load the plugin from the file given for '
             'the session')
         parser.add_argument(
@@ -319,9 +319,9 @@ class VeuszApp(qt.QApplication):
             sys.path += list(parts)
 
         # load any requested plugins
-        if args.plugin:
+        if args.veusz_plugin:
             try:
-                document.Document.loadPlugins(pluginlist=args.plugin)
+                document.Document.loadPlugins(pluginlist=args.veusz_plugin)
             except RuntimeError as e:
                 startuperrors.append(str(e))
 
