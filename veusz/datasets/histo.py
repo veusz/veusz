@@ -245,6 +245,7 @@ class DatasetHistoBins(Dataset1DBase):
     nerr = property(lambda self: self.getData()[1])
     perr = property(lambda self: self.getData()[2])
     serr = None
+    flags = None 
 
 class DatasetHistoValues(Dataset1DBase):
     """A dataset for getting the height of the bins in a histogram."""
@@ -284,3 +285,4 @@ class DatasetHistoValues(Dataset1DBase):
     nerr = property(lambda self: self.getData()[1])
     perr = property(lambda self: self.getData()[2])
     serr = None
+    flags = None 

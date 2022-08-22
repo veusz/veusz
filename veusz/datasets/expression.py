@@ -33,7 +33,8 @@ from .. import utils
 dataexpr_split_re = re.compile(r'(`.*?`|[\.+\-*/\(\)\[\],<>=!|%^~& ])')
 # identify whether string is a quoted identifier
 dataexpr_quote_re = re.compile(r'^`.*`$')
-dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True}
+# data values, errors and new 'flags' field for marking data e.g. as problematic 
+dataexpr_columns = {'data':True, 'serr':True, 'perr':True, 'nerr':True, 'flags':True}
 
 def substituteDatasets(datasets, expression, thispart):
     """Substitute the names of datasets with calls to a function which will
@@ -240,7 +241,7 @@ class DatasetExpression(Dataset1DBase):
 
     dstype = _('Expression')
 
-    def __init__(self, data=None, serr=None, nerr=None, perr=None,
+    def __init__(self, data=None, serr=None, nerr=None, perr=None, flags=None, 
                  parametric=None):
         """Initialise the dataset with the expressions given.
 
@@ -255,6 +256,7 @@ class DatasetExpression(Dataset1DBase):
         self.expr['serr'] = serr
         self.expr['nerr'] = nerr
         self.expr['perr'] = perr
+        self.expr['flags'] = flags 
         self.parametric = parametric
 
         self.docchangeset = -1
@@ -368,6 +370,8 @@ class DatasetExpression(Dataset1DBase):
     serr = property(lambda self: self._propValues('serr'))
     perr = property(lambda self: self._propValues('perr'))
     nerr = property(lambda self: self._propValues('nerr'))
+    flags = property(lambda self: self._propValues('flags')) 
+    
 
     def saveDataRelationToText(self, fileobj, name):
         '''Save data to file.
@@ -380,6 +384,8 @@ class DatasetExpression(Dataset1DBase):
             parts.append('negerr=%s' % repr(self.expr['nerr']))
         if self.expr['perr']:
             parts.append('poserr=%s' % repr(self.expr['perr']))
+        if self.expr['flags']:
+            parts.append('flags=%s' % repr(self.expr['flags'])) 
         if self.parametric is not None:
             parts.append('parametric=%s' % repr(self.parametric))
 
