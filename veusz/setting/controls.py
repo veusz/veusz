@@ -52,6 +52,27 @@ class DotDotButton(qt.QPushButton):
         if tooltip:
             self.setToolTip(tooltip)
         self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
+        self.setStyleSheet('QPushButton { padding: 0; margin: 16; }')
+
+class AddButton(qt.QPushButton):
+    """A button to add item."""
+    def __init__(self):
+        qt.QPushButton.__init__(
+            self, "+", flat=True, 
+            maximumWidth=24, maximumHeight=24)
+        self.setToolTip('Add another item')
+        self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
+        self.setStyleSheet('QPushButton { padding: 0; margin: 24; }')
+
+class SubButton(qt.QPushButton):
+    """A button to subtract item."""
+    def __init__(self):
+        qt.QPushButton.__init__(
+            self, "-", flat=True, 
+            maximumWidth=24, maximumHeight=24)
+        self.setToolTip('Remove item')
+        self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
+        self.setStyleSheet('QPushButton { padding: 0; margin: 24; }')
 
 class Edit(qt.QLineEdit):
     """Main control for editing settings which are text."""
@@ -1572,14 +1593,8 @@ class MultiSettingWidget(qt.QWidget):
         row = len(self.controls)
         cntrl = self.makeControl(row)
         cntrl.installEventFilter(self)
-        addbutton = qt.QPushButton('+')
-        addbutton.setFixedWidth(24)
-        addbutton.setFlat(True)
-        addbutton.setToolTip('Add another item')
-        subbutton = qt.QPushButton('-')
-        subbutton.setToolTip('Remove item')
-        subbutton.setFixedWidth(24)
-        subbutton.setFlat(True)
+        addbutton = AddButton()
+        subbutton = SubButton()
 
         self.controls.append((cntrl, addbutton, subbutton))
 
@@ -2016,3 +2031,4 @@ class AxisBound(Choice):
 
         if self.currentText().lower() != 'auto':
             self.setEditText( self.setting.toUIText() )
+
