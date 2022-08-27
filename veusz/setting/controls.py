@@ -57,21 +57,17 @@ class DotDotButton(qt.QPushButton):
 class AddButton(qt.QPushButton):
     """A button to add item."""
     def __init__(self):
-        qt.QPushButton.__init__(
-            self, "+", flat=True, 
-            maximumWidth=24, maximumHeight=24)
+        qt.QPushButton.__init__(self, "+", flat=True)
+        self.setFixedWidth(24)
         self.setToolTip('Add another item')
-        self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
         self.setStyleSheet('QPushButton { padding: 0; }')
 
 class SubButton(qt.QPushButton):
     """A button to subtract item."""
     def __init__(self):
-        qt.QPushButton.__init__(
-            self, "-", flat=True, 
-            maximumWidth=24, maximumHeight=24)
+        qt.QPushButton.__init__(self, "-", flat=True)
+        self.setFixedWidth(24)
         self.setToolTip('Remove item')
-        self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
         self.setStyleSheet('QPushButton { padding: 0; }')
 
 class Edit(qt.QLineEdit):
