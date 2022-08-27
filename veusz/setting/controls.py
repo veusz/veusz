@@ -52,7 +52,7 @@ class DotDotButton(qt.QPushButton):
         if tooltip:
             self.setToolTip(tooltip)
         self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
-        self.setStyleSheet('QPushButton { padding: 0; margin: 16; }')
+        self.setStyleSheet('QPushButton { padding: 0; }')
 
 class AddButton(qt.QPushButton):
     """A button to add item."""
@@ -62,7 +62,7 @@ class AddButton(qt.QPushButton):
             maximumWidth=24, maximumHeight=24)
         self.setToolTip('Add another item')
         self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
-        self.setStyleSheet('QPushButton { padding: 0; margin: 24; }')
+        self.setStyleSheet('QPushButton { padding: 0; }')
 
 class SubButton(qt.QPushButton):
     """A button to subtract item."""
@@ -72,7 +72,7 @@ class SubButton(qt.QPushButton):
             maximumWidth=24, maximumHeight=24)
         self.setToolTip('Remove item')
         self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
-        self.setStyleSheet('QPushButton { padding: 0; margin: 24; }')
+        self.setStyleSheet('QPushButton { padding: 0; }')
 
 class Edit(qt.QLineEdit):
     """Main control for editing settings which are text."""
