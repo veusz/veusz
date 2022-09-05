@@ -241,6 +241,10 @@ class build_ext(distutils.command.build_ext.build_ext):
         output_dir = os.path.abspath(os.path.join(sip_builddir, 'output'))
         os.makedirs(output_dir)
 
+        def fwd(x):
+            """Workaround bug #404 in toml by not using backslashes in paths."""
+            return x.replace('\\', '/')
+
         # generate a pyproject.toml to generate the sip source
         pyproject_data = {
             'build-system': {
@@ -259,11 +263,11 @@ class build_ext(distutils.command.build_ext.build_ext):
                         }
                     },
                     'project': {
-                        'sip-include-dirs': [pyqt5_include_dir],
+                        'sip-include-dirs': [fwd(pyqt5_include_dir)],
                         'abi-version': abi_version,
-                        'build-dir': output_dir,
+                        'build-dir': fwd(output_dir),
                         'sip-module': 'PyQt5.sip',
-                        'sip-files-dir': srcdir,
+                        'sip-files-dir': fwd(srcdir),
                     }
                 }
             }
