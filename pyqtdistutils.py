@@ -272,6 +272,11 @@ class build_ext(distutils.command.build_ext.build_ext):
         with open(pyproject_fname, 'w') as fout:
             toml.dump(pyproject_data, fout)
 
+        print('********')
+        print(repr(pyqt5_include_dir))
+        print(repr(get_python_lib(plat_specific=1)))
+        print('********')
+
         with open(pyproject_fname) as fin:
             print('-------')
             print(repr(fin.read()))
