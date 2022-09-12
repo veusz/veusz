@@ -1259,12 +1259,20 @@ class TreeEditDock(qt.QDockWidget):
                 w = c
         self.selectWidget(w)
 
-    def slotWidgetPaste(self):
+    def slotWidgetPaste(self, append_name=None):
         """Paste something from the clipboard"""
 
         data = document.getClipboardWidgetMime()
         if data:
-            op = document.OperationWidgetPaste(self.selwidgets[0], data)
+            new_names = None
+
+            # update names, if requested to do so (used for duplication)
+            if append_name is not None:
+              new_names = [w.name + append_name for w in self.selwidgets]
+            op = document.OperationWidgetPaste(
+              self.selwidgets[0], data, -1, new_names
+            )
+
             widgets = self.document.applyOperation(op)
             if widgets:
                 self.selectWidget(widgets[0])
@@ -1273,7 +1281,7 @@ class TreeEditDock(qt.QDockWidget):
         """Duplicate selected widget"""
 
         self.slotWidgetCopy()
-        self.slotWidgetPaste()
+        self.slotWidgetPaste(append_name=" - copy")
 
     def slotWidgetDelete(self):
         """Delete the widget selected."""
