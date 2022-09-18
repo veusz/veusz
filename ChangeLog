@@ -1,3 +1,15 @@
+Changes in 3.5:
+  * Improvements in fitting (thanks to Sebastian Koenig), including:
+    - Assume absolute errors by default
+    - Introduce minimum and maximum fit ranges
+    - Add setting to give default error value and type (absolute/relative)
+  * Fixes for macOS button appearance (Takuro Hosomi)
+  * Plugin fixes, renaming --plugin to --veusz-plugin option
+    (also thanks to Takuro Hosomi)
+  * Bug fix for broken axis drawing
+  * Mirrored axis bug fix
+  * Fix build system to use sip-build, which works with recent SIP versions
+
 User-visible changes in 3.4:
   * Font styles can be chosen
   * Add setting to specify minor ticks in axis

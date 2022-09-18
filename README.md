@@ -1,4 +1,4 @@
-# [Veusz 3.4](https://veusz.github.io)
+# [Veusz 3.5](https://veusz.github.io)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -10,35 +10,17 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-User-visible changes in 3.4:
-  * Font styles can be chosen
-  * Add setting to specify minor ticks in axis
-  * Add setting to ignore NaN values in point plotter, rather than breaking lines
-  * Add copy and paste of images (thanks to chakuro)
-  * Add embedding SVG graphics (thanks to korintje)
-  * New tight-Bezier line style (thanks to korintje)
-  * Add hide icon (eye) in settings and grey tabs as appropriate
-  * Add \ddot latex command
-  * Axis auto ranges (e.g. 5-95%) can now have decimals
-  * Filename set after Load()
-  * Fix renaming 2D datasets
-  * Fix for blank dataset output names in dataset plugin
-  * Fix for crash in QDP plugin
-  * Linux dark mode improvements
-  * Font foundry name removed from SVG files
-  * Add page colour or fill setting
-  * Change default xy plotter marker size and fill colour for new documents
-  * Add function widget global colour setting
-
-Internal changes in 3.4:
-  * Add new compatibility level functionality for new documents
-  * Iminuit2 fixes (thanks to korintje)
-  * Drop Python 2 compatibility
-  * Source code reformatting
-  * Updated appdata (thanks to kevinsmia1939)
-  * Import sip from PyQt5.sip if available
-  * Update to require SIP 5+ build system (thanks to mitya57)
-  * Python 3.10 fixes
+Changes in 3.5:
+  * Improvements in fitting (thanks to Sebastian Koenig), including:
+    - Assume absolute errors by default
+    - Introduce minimum and maximum fit ranges
+    - Add setting to give default error value and type (absolute/relative)
+  * Fixes for macOS button appearance (Takuro Hosomi)
+  * Plugin fixes, renaming --plugin to --veusz-plugin option
+    (also thanks to Takuro Hosomi)
+  * Bug fix for broken axis drawing
+  * Mirrored axis bug fix
+  * Fix build system to use sip-build, which works with recent SIP versions
 
 ## Features of package:
 
@@ -111,7 +93,7 @@ Internal changes in 3.4:
 * [Ghostscript](https://www.ghostscript.com/) (for EPS/PS output)
 
 ## License
-Veusz is Copyright (C) 2003-2021 Jeremy Sanders
+Veusz is Copyright (C) 2003-2022 Jeremy Sanders
  and contributors. It is licensed under the [GPL version 2 or greater](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
 
 The latest source code can be found in [this GitHub repository](https://github.com/veusz/veusz).
