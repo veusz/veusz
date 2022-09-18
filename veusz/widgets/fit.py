@@ -1,4 +1,3 @@
-# fit.py
 # fitting plotter
 
 #    Copyright (C) 2005 Jeremy S. Sanders
@@ -76,7 +75,7 @@ def minuitFit(evalfunc, params, names, values, xvals, yvals, yserr):
     print(_('Fitting via Minuit:'))
     m = minuit.Minuit(fn, **values)
 
-    # set errordef explicitly (least-squares: 1.0 or log-likelihood: 0.5) 
+    # set errordef explicitly (least-squares: 1.0 or log-likelihood: 0.5)
     m.errordef = 1.0
 
     # run the fit
@@ -161,6 +160,23 @@ class Fit(FunctionPlotter):
             'yData', 'y',
             descr=_('Y data to fit (dataset name, list of values or expression)'),
             usertext=_('Y data')), 3 )
+        s.add( setting.Choice(
+            'defErrType', ['absolute', 'relative'], 'absolute',
+            descr=_('Default error type'),
+            usertext=_('Def. error type')) )
+        s.add( setting.Float(
+            'defErr', 0.05,
+            descr = 'Default absolute/relative error value for data',
+            usertext=_('Default error')))
+        s.add(setting.FloatOrAuto(
+            'fitMin', 'Auto',
+            descr=_('Minimum value at which to fit function'),
+            usertext=_('Min. fit range')))
+        s.add(setting.FloatOrAuto(
+            'fitMax', 'Auto',
+            descr=_('Maximum value at which to fit function'),
+            usertext=_('Max. fit range')))
+
         s.add( setting.Bool(
             'fitRange', False,
             descr=_(
@@ -196,10 +212,6 @@ class Fit(FunctionPlotter):
         f = s.get('function')
         f.newDefault('a + b*x')
         f.descr = _('Function to fit')
-
-        # modify description
-        s.get('min').usertext=_('Min. fit range')
-        s.get('max').usertext=_('Max. fit range')
 
     def affectsAxisRange(self):
         """This widget provides range information about these axes."""
@@ -278,9 +290,14 @@ class Fit(FunctionPlotter):
                 print("Warning: Symmeterising positive and negative errors")
                 yserr = N.sqrt( 0.5*(ydata.perr**2 + ydata.nerr**2) )
             else:
-                print("Warning: No errors on y values. Assuming 5% errors.")
-                yserr = yvals*0.05
-                yserr[yserr < 1e-8] = 1e-8
+                err = s.defErr
+                if s.defErrType == 'absolute':
+                    print(f"Warning: No errors on values. Assuming absolute {err} errors.")
+                    yserr = err + yvals*0
+                else: # relative
+                    print(f"Warning: No errors on values. Assuming fractional {err} errors.")
+                    yserr = yvals*err
+                    yserr[yserr < 1e-8] = 1e-8
 
         # if the fitRange parameter is on, we chop out data outside the
         # range of the axis
@@ -309,23 +326,25 @@ class Fit(FunctionPlotter):
                 return N.nan
 
         # minimum set for fitting
-        if s.min != 'Auto':
+        if s.fitMin != 'Auto':
             if s.variable == 'x':
-                mask = xvals >= s.min
+                mask = xvals >= s.fitMin
             else:
-                mask = yvals >= s.min
+                mask = yvals >= s.fitMin
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
 
         # maximum set for fitting
-        if s.max != 'Auto':
+        if s.fitMax != 'Auto':
             if s.variable == 'x':
-                mask = xvals <= s.max
+                mask = xvals <= s.fitMax
             else:
-                mask = yvals <= s.max
+                mask = yvals <= s.fitMax
             xvals, yvals, yserr = xvals[mask], yvals[mask], yserr[mask]
 
-        if s.min != 'Auto' or s.max != 'Auto':
-            print("Fitting %s between %s and %s" % (s.variable, s.min, s.max))
+        if s.fitMin != 'Auto' or s.fitMax != 'Auto':
+            print(
+                "Fitting %s between %s and %s"
+                % (s.variable, s.fitMin, s.fitMax))
 
         # various error checks
         if len(xvals) != len(yvals) or len(xvals) != len(yserr):
