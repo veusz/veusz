@@ -20,6 +20,7 @@ Changes in 3.5:
     (also thanks to Takuro Hosomi)
   * Bug fix for broken axis drawing
   * Mirrored axis bug fix
+  * More keyboard shortcuts
   * Fix build system to use sip-build, which works with recent SIP versions
 
 ## Features of package:
