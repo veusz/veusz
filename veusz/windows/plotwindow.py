@@ -403,7 +403,7 @@ class PlotWindow( qt.QGraphicsView ):
             'view.zoompage': a(
                 self, _('Zoom plot to show whole page'), _('Zoom to page'),
                 self.slotViewZoomPage,
-                icon='kde-zoom-page-veuszedit'),
+                icon='kde-zoom-page-veuszedit', key='Ctrl+0'),
             'view.zoommenu': a(
                 self, _('Zoom functions menu'), _('Zoom'),
                 None,

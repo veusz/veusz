@@ -993,11 +993,11 @@ class TreeEditDock(qt.QDockWidget):
             'edit.moveup': a(
                 self, _('Move the selected widget up'), _('Move &up'),
                 lambda: self.slotWidgetMove(-1),
-                icon='kde-go-up', key='Ctrl+PgUp'),
+                icon='kde-go-up', key='Ctrl+Shift+PgUp'),
             'edit.movedown': a(
                 self, _('Move the selected widget down'), _('Move d&own'),
                 lambda: self.slotWidgetMove(1),
-                icon='kde-go-down', key='Ctrl+PgDown'),
+                icon='kde-go-down', key='Ctrl+Shift+PgDown'),
             'edit.delete': a(
                 self, _('Remove the selected widget'), _('&Delete'),
                 self.slotWidgetDelete,

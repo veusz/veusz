@@ -549,10 +549,10 @@ class MainWindow(qt.QMainWindow):
 
             'data.import':
                 a(self, _('Import data into Veusz'), _('&Import...'),
-                  self.slotDataImport, icon='kde-vzdata-import'),
+                  self.slotDataImport, icon='kde-vzdata-import', key='Ctrl+I'),
             'data.edit':
                 a(self, _('Edit and enter new datasets'), _('&Editor...'),
-                  lambda: self.slotDataEdit(), icon='kde-edit-veuszedit'),
+                  lambda: self.slotDataEdit(), icon='kde-edit-veuszedit', key='Ctrl+E'),
             'data.create':
                 a(self, _('Create new datasets using ranges, parametrically or as functions of existing datasets'), _('&Create...'),
                   self.slotDataCreate, icon='kde-dataset-new-veuszedit'),
@@ -570,7 +570,7 @@ class MainWindow(qt.QMainWindow):
                   self.slotDataHistogram, icon='button_bar'),
             'data.reload':
                 a(self, _('Reload linked datasets'), _('&Reload'),
-                  self.slotDataReload, icon='kde-view-refresh'),
+                  self.slotDataReload, icon='kde-view-refresh', key='F5'),
 
             'help.home':
                 a(self, _('Go to the Veusz home page on the internet'),
