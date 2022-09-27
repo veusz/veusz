@@ -31,7 +31,7 @@ import numpy
 import setuptools
 from setuptools import setup, Extension
 from setuptools.command.install import install as orig_install
-from distutils.command.install_data import install_data
+from setuptools.command.install_data import install_data
 import pyqtdistutils
 
 if sys.version_info[0] < 3:
@@ -98,6 +98,10 @@ def findData(dirname, extns):
         files += glob.glob(os.path.join(dirname, '*.'+extn))
     files.sort()
     return (dirname, files)
+
+if 'bdist_wheel' in sys.argv:
+    # data files can't be installed inside wheels, so don't bother pip
+    raise RuntimeError("This setup.py does not support wheels") 
 
 setup(
     name = 'veusz',
