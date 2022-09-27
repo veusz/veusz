@@ -22,6 +22,7 @@ Changes in 3.5:
   * Mirrored axis bug fix
   * More keyboard shortcuts
   * Fix build system to use sip-build, which works with recent SIP versions
+  * Change high DPI scaling policy
 
 ## Features of package:
 
