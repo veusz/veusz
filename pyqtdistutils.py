@@ -9,7 +9,8 @@ import shutil
 import subprocess
 import toml
 
-from distutils.sysconfig import customize_compiler, get_python_lib
+from distutils.sysconfig import customize_compiler
+from sysconfig import get_path
 import distutils.command.build_ext
 
 ##################################################################
@@ -229,7 +230,7 @@ class build_ext(distutils.command.build_ext.build_ext):
         """Compile sip file to sources."""
 
         pyqt5_include_dir = os.path.join(
-            get_python_lib(plat_specific=1), 'PyQt5', 'bindings')
+            get_path('platlib'), 'PyQt5', 'bindings')
         pyqt5_toml = os.path.join(pyqt5_include_dir, 'QtCore', 'QtCore.toml')
         pyqt5_cfg = toml.load(pyqt5_toml)
         abi_version = pyqt5_cfg.get('sip-abi-version')
