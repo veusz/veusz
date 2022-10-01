@@ -145,7 +145,7 @@ def convertFromBytes(s):
             return s.decode('utf-8')
     return s
 
-def convertDatasetToObject(data, slices):
+def convertDatasetToObject(data, slices, fill_value=None):
     """Convert numpy/hdf dataset to suitable data for veusz.
     Raise ConvertError if cannot."""
 
@@ -169,6 +169,9 @@ def convertDatasetToObject(data, slices):
         data = N.array(data, dtype=N.float64)
         if data.ndim == 0:
             raise ConvertError(_("Dataset has no dimensions"))
+        if fill_value is not None:
+            # support NetCDF _FillValue
+            data[data == fill_value] = N.nan
         return data
 
     elif kind in ('S', 'a', 'U') or (

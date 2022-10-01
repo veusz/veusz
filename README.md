@@ -23,6 +23,7 @@ Changes in 3.5:
   * More keyboard shortcuts
   * Fix build system to use sip-build, which works with recent SIP versions
   * Change high DPI scaling policy
+  * Support \_FillValue and missing_data attributes in HDF5 files for NetCDF
 
 ## Features of package:
 

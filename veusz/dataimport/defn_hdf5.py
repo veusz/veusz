@@ -130,6 +130,12 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
         for a in dsattrs:
             if a[:4] == "vsz_":
                 options[a] = auto_deref_attr(a, dsattrs, dataset)
+            elif a in ('_FillValue', 'missing_data'):
+                # NetCDF support
+                try:
+                    options['__MissingData__'] = float(dsattrs[a])
+                except (TypeError, ValueError):
+                    pass
 
         # find name for dataset
         if (self.params.namemap is not None and
@@ -157,9 +163,13 @@ class OperationDataImportHDF5(base.OperationDataImportBase):
             if self.params.slices and dsname in self.params.slices:
                 aslice = self.params.slices[dsname]
 
-            # finally return data
+            # for NetCDF
+            fill_value = options.get('__MissingData__')
+
+            # return dataset
             objdata = fits_hdf5_helpers.convertDatasetToObject(
-                dataset, aslice)
+                dataset, aslice, fill_value=fill_value)
+
             dsread[name] = _DataRead(dsname, objdata, options)
 
         except fits_hdf5_helpers.ConvertError:
