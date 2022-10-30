@@ -25,7 +25,9 @@ Requires: PyQt-x11-gpl-4.6-snapshot-20090906.tar.gz
 
 import struct
 
-import pyemf
+import pyemf3
+import pyemf3.emr
+
 from .. import qtall as qt
 
 inch_mm = 25.4
@@ -34,45 +36,6 @@ scale = 100
 def isStockObject(obj):
     """Is this a stock windows object."""
     return (obj & 0x80000000) != 0
-
-class _EXTCREATEPEN(pyemf._EMR._EXTCREATEPEN):
-    """Extended pen creation record with custom line style."""
-
-    typedef = [
-        ('i','handle',0),
-        ('i','offBmi',0),
-        ('i','cbBmi',0),
-        ('i','offBits',0),
-        ('i','cbBits',0),
-        ('i','style'),
-        ('i','penwidth'),
-        ('i','brushstyle'),
-        ('i','color'),
-        ('i','brushhatch',0),
-        ('i','numstyleentries')
-    ]
-
-    def __init__(self, style=pyemf.PS_SOLID, width=1, color=0,
-                 styleentries=[]):
-        """Create pen.
-        styleentries is a list of dash and space lengths."""
-
-        pyemf._EMR._EXTCREATEPEN.__init__(self)
-        self.style = style
-        self.penwidth = width
-        self.color = pyemf._normalizeColor(color)
-        self.brushstyle = 0x0  # solid
-
-        if style & pyemf.PS_STYLE_MASK != pyemf.PS_USERSTYLE:
-            styleentries = []
-
-        self.numstyleentries = len(styleentries)
-        if styleentries:
-            self.unhandleddata = struct.pack(
-                "i"*self.numstyleentries, *styleentries)
-
-    def hasHandle(self):
-        return True
 
 class EMFPaintEngine(qt.QPaintEngine):
     """Custom EMF paint engine."""
@@ -91,10 +54,10 @@ class EMFPaintEngine(qt.QPaintEngine):
         self.dpi = dpi
 
     def begin(self, paintdevice):
-        self.emf = pyemf.EMF(self.width, self.height, int(self.dpi*scale))
-        self.pen = self.emf.GetStockObject(pyemf.BLACK_PEN)
+        self.emf = pyemf3.EMF(self.width, self.height, int(self.dpi*scale))
+        self.pen = self.emf.GetStockObject(pyemf3.BLACK_PEN)
         self.pencolor = (0, 0, 0)
-        self.brush = self.emf.GetStockObject(pyemf.NULL_BRUSH)
+        self.brush = self.emf.GetStockObject(pyemf3.NULL_BRUSH)
 
         self.paintdevice = paintdevice
         return True
@@ -116,9 +79,9 @@ class EMFPaintEngine(qt.QPaintEngine):
             self.emf.Polyline(pts)
         else:
             self.emf.SetPolyFillMode({
-                qt.QPaintEngine.WindingMode: pyemf.WINDING,
-                qt.QPaintEngine.OddEvenMode: pyemf.ALTERNATE,
-                qt.QPaintEngine.ConvexMode: pyemf.WINDING
+                qt.QPaintEngine.WindingMode: pyemf3.WINDING,
+                qt.QPaintEngine.OddEvenMode: pyemf3.ALTERNATE,
+                qt.QPaintEngine.ConvexMode: pyemf3.WINDING
             })
             self.emf.Polygon(pts)
 
@@ -161,7 +124,7 @@ class EMFPaintEngine(qt.QPaintEngine):
         dataindex, = struct.unpack('<i', bmp[0xa:0xe])
         datasize, = struct.unpack('<i', bmp[0x22:0x26])
 
-        epix = pyemf._EMR._STRETCHDIBITS()
+        epix = pyemf3.emr.STRETCHDIBITS()
         epix.rclBounds_left = int(r.left()*scale)
         epix.rclBounds_top = int(r.top()*scale)
         epix.rclBounds_right = int(r.right()*scale)
@@ -257,33 +220,33 @@ class EMFPaintEngine(qt.QPaintEngine):
 
         # line style
         style = {
-            qt.Qt.NoPen: pyemf.PS_NULL,
-            qt.Qt.SolidLine: pyemf.PS_SOLID,
-            qt.Qt.DashLine: pyemf.PS_DASH,
-            qt.Qt.DotLine: pyemf.PS_DOT,
-            qt.Qt.DashDotLine: pyemf.PS_DASHDOT,
-            qt.Qt.DashDotDotLine: pyemf.PS_DASHDOTDOT,
-            qt.Qt.CustomDashLine: pyemf.PS_USERSTYLE,
+            qt.Qt.NoPen: pyemf3.PS_NULL,
+            qt.Qt.SolidLine: pyemf3.PS_SOLID,
+            qt.Qt.DashLine: pyemf3.PS_DASH,
+            qt.Qt.DotLine: pyemf3.PS_DOT,
+            qt.Qt.DashDotLine: pyemf3.PS_DASHDOT,
+            qt.Qt.DashDotDotLine: pyemf3.PS_DASHDOTDOT,
+            qt.Qt.CustomDashLine: pyemf3.PS_USERSTYLE,
         }[pen.style()]
 
-        if style != pyemf.PS_NULL:
+        if style != pyemf3.PS_NULL:
             # set cap style
             style |= {
-                qt.Qt.FlatCap: pyemf.PS_ENDCAP_FLAT,
-                qt.Qt.SquareCap: pyemf.PS_ENDCAP_SQUARE,
-                qt.Qt.RoundCap: pyemf.PS_ENDCAP_ROUND,
+                qt.Qt.FlatCap: pyemf3.PS_ENDCAP_FLAT,
+                qt.Qt.SquareCap: pyemf3.PS_ENDCAP_SQUARE,
+                qt.Qt.RoundCap: pyemf3.PS_ENDCAP_ROUND,
             }[pen.capStyle()]
 
             # set join style
             style |= {
-                qt.Qt.MiterJoin: pyemf.PS_JOIN_MITER,
-                qt.Qt.BevelJoin: pyemf.PS_JOIN_BEVEL,
-                qt.Qt.RoundJoin: pyemf.PS_JOIN_ROUND,
-                qt.Qt.SvgMiterJoin: pyemf.PS_JOIN_MITER,
+                qt.Qt.MiterJoin: pyemf3.PS_JOIN_MITER,
+                qt.Qt.BevelJoin: pyemf3.PS_JOIN_BEVEL,
+                qt.Qt.RoundJoin: pyemf3.PS_JOIN_ROUND,
+                qt.Qt.SvgMiterJoin: pyemf3.PS_JOIN_MITER,
             }[pen.joinStyle()]
 
             # use proper widths of lines
-            style |= pyemf.PS_GEOMETRIC
+            style |= pyemf3.PS_GEOMETRIC
 
         width = int(pen.widthF()*scale)
         qc = pen.color()
@@ -315,16 +278,16 @@ class EMFPaintEngine(qt.QPaintEngine):
         if style == qt.Qt.SolidPattern:
             newbrush = self.emf.CreateSolidBrush(color)
         elif style == qt.Qt.NoBrush:
-            newbrush = self.emf.GetStockObject(pyemf.NULL_BRUSH)
+            newbrush = self.emf.GetStockObject(pyemf3.NULL_BRUSH)
         else:
             try:
                 hatch = {
-                    qt.Qt.HorPattern: pyemf.HS_HORIZONTAL,
-                    qt.Qt.VerPattern: pyemf.HS_VERTICAL,
-                    qt.Qt.CrossPattern: pyemf.HS_CROSS,
-                    qt.Qt.BDiagPattern: pyemf.HS_BDIAGONAL,
-                    qt.Qt.FDiagPattern: pyemf.HS_FDIAGONAL,
-                    qt.Qt.DiagCrossPattern: pyemf.HS_DIAGCROSS
+                    qt.Qt.HorPattern: pyemf3.HS_HORIZONTAL,
+                    qt.Qt.VerPattern: pyemf3.HS_VERTICAL,
+                    qt.Qt.CrossPattern: pyemf3.HS_CROSS,
+                    qt.Qt.BDiagPattern: pyemf3.HS_BDIAGONAL,
+                    qt.Qt.FDiagPattern: pyemf3.HS_FDIAGONAL,
+                    qt.Qt.DiagCrossPattern: pyemf3.HS_DIAGCROSS
                 }[brush.style()]
             except KeyError:
                 newbrush = self.emf.CreateSolidBrush(color)
@@ -342,8 +305,8 @@ class EMFPaintEngine(qt.QPaintEngine):
         if operation != qt.Qt.NoClip:
             self._createPath(path)
             clipmode = {
-                 qt.Qt.ReplaceClip: pyemf.RGN_COPY,
-                 qt.Qt.IntersectClip: pyemf.RGN_AND,
+                 qt.Qt.ReplaceClip: pyemf3.RGN_COPY,
+                 qt.Qt.IntersectClip: pyemf3.RGN_AND,
             }[operation]
         else:
             # is this the only wave to get rid of clipping?
@@ -356,7 +319,7 @@ class EMFPaintEngine(qt.QPaintEngine):
             self.emf.LineTo(0, h)
             self.emf.CloseFigure()
             self.emf.EndPath()
-            clipmode = pyemf.RGN_COPY
+            clipmode = pyemf3.RGN_COPY
 
         self.emf.SelectClipPath(mode=clipmode)
 

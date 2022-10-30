@@ -237,7 +237,7 @@ setup(
     # optional requirements
     extras_require = {
         "optional": [
-            'astropy', 'pyemf', 'sampy', 'iminuit', 'h5py'
+            'astropy', 'pyemf3', 'sampy', 'iminuit', 'h5py'
         ]
     },
 

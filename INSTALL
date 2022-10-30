@@ -19,16 +19,12 @@ PyQt requires
 Optional requirements:
  h5py            http://www.h5py.org/
  astropy >= 0.4  http://www.astropy.org/
- pyemf >= 2.0.0  (for Python3 see https://github.com/jeremysanders/pyemf)
+ pyemf3 >= 3.0   https://github.com/jeremysanders/pyemf3
  iminuit         https://github.com/iminuit/iminuit
  ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
  Ghostscript     https://www.ghostscript.com/ (for EPS/PS output)
  Sphinx          http://www.sphinx-doc.org/en/stable/ (to rebuild manual)
-
-The optional dependency pyemf does not have Python 3 support, but an
-in-development version of pyemf for Python 3 can be found at
-https://github.com/jeremysanders/pyemf.
 
 1.1 Full installation with distutils
 ====================================

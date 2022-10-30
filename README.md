@@ -87,8 +87,7 @@ Changes in 3.5:
 
 ## Optional requirements:
 * [h5py](https://www.h5py.org/) (optional for HDF5 support)
-* [pyemf](http://pyemf.sourceforge.net/) >= 2.0.0 (optional for EMF export)
-  - [Python 3 port in development](https://github.com/jeremysanders/pyemf)
+* [pyemf3](https://github.com/jeremysanders/pyemf3) (optional for EMF output)
 * [iminuit](https://github.com/scikit-hep/iminuit) or PyMinuit >= 1.12 (optional improved fitting)
 * [dbus-python](https://dbus.freedesktop.org/doc/dbus-python/), for dbus interface
 * [astropy](https://www.astropy.org/) (optional for VO table import or FITS import)
