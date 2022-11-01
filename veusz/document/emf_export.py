@@ -254,13 +254,12 @@ class EMFPaintEngine(qt.QPaintEngine):
         self.pencolor = color
 
         if pen.style() == qt.Qt.CustomDashLine:
-            # make an extended pen if we need a custom dash pattern
+            # custom dash pattern
             dash = [int(pen.widthF()*scale*f) for f in pen.dashPattern()]
-            newpen = self.emf._appendHandle( _EXTCREATEPEN(
-                style, width=width, color=color, styleentries=dash))
         else:
-            # use a standard create pen
-            newpen = self.emf.CreatePen(style, width, color)
+            dash = None
+
+        newpen = self.emf.CreatePen(style, width, color, styleentries=dash)
         self.emf.SelectObject(newpen)
 
         # delete old pen if it is not a stock object

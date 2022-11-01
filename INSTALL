@@ -19,7 +19,7 @@ PyQt requires
 Optional requirements:
  h5py            http://www.h5py.org/
  astropy >= 0.4  http://www.astropy.org/
- pyemf3 >= 3.0   https://github.com/jeremysanders/pyemf3
+ pyemf3 >= 3.1   https://github.com/jeremysanders/pyemf3
  iminuit         https://github.com/iminuit/iminuit
  ( or PyMinuit    http://code.google.com/p/pyminuit/ )
  dbus-python     http://dbus.freedesktop.org/doc/dbus-python/
