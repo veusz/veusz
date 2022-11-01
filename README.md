@@ -24,6 +24,7 @@ Changes in 3.5:
   * Fix build system to use sip-build, which works with recent SIP versions
   * Change high DPI scaling policy
   * Support \_FillValue and missing_data attributes in HDF5 files for NetCDF
+  * Switch to pyemf3 module for emf output
 
 ## Features of package:
 
