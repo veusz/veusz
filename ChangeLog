@@ -1,3 +1,9 @@
+Changes in 3.5.2:
+  * Fix broken ChangeLog
+
+Changes in 3.5.1:
+  * Fixes for EMF generating code (requires pyemf-3.1)
+
 Changes in 3.5:
   * Improvements in fitting (thanks to Sebastian Koenig), including:
     - Assume absolute errors by default
