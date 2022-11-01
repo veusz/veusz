@@ -3,4 +3,4 @@ PyQt5 >= 5.5.1
 sip >= 5
 astropy >= 2.0
 h5py >= 2.6.0
-toml
+tomli

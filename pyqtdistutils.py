@@ -7,7 +7,7 @@
 import os
 import shutil
 import subprocess
-import toml
+import tomli
 
 from distutils.sysconfig import customize_compiler
 from sysconfig import get_path
@@ -232,7 +232,8 @@ class build_ext(distutils.command.build_ext.build_ext):
         pyqt5_include_dir = os.path.join(
             get_path('platlib'), 'PyQt5', 'bindings')
         pyqt5_toml = os.path.join(pyqt5_include_dir, 'QtCore', 'QtCore.toml')
-        pyqt5_cfg = toml.load(pyqt5_toml)
+        with open(pyqt5_toml, 'rb') as fin:
+            pyqt5_cfg = tomli.load(fin)
         abi_version = pyqt5_cfg.get('sip-abi-version')
 
         modulename = os.path.splitext(os.path.basename(source))[0]
@@ -242,40 +243,33 @@ class build_ext(distutils.command.build_ext.build_ext):
         output_dir = os.path.abspath(os.path.join(sip_builddir, 'output'))
         os.makedirs(output_dir)
 
-        def fwd(x):
-            """Workaround bug #404 in toml by not using backslashes in paths."""
-            return x.replace('\\', '/')
+        def toml_esc(s):
+            s = s.replace("\\", "\\\\").replace('"', r'\"')
+            return '"'+s+'"'
 
-        # generate a pyproject.toml to generate the sip source
-        pyproject_data = {
-            'build-system': {
-                'requires': ['sip >=5.5.0, <7'],
-                'build-backend': 'sipbuild.api',
-            },
-            'tool': {
-                'sip': {
-                    'metadata': {
-                        'name': modulename,
-                    },
-                    'bindings': {
-                        modulename: {
-                            'pep484-pyi': False,
-                            'protected-is-public': False
-                        }
-                    },
-                    'project': {
-                        'sip-include-dirs': [fwd(pyqt5_include_dir)],
-                        'abi-version': abi_version,
-                        'build-dir': fwd(output_dir),
-                        'sip-module': 'PyQt5.sip',
-                        'sip-files-dir': fwd(srcdir),
-                    }
-                }
-            }
-        }
+        toml_text=f'''
+[build-system]
+requires=["sip >= 5.5.0, <7"]
+build-backend="sipbuild.api"
+
+[tool.sip.metadata]
+name="{modulename}"
+
+[tool.sip.project]
+sip-include-dirs=[{toml_esc(pyqt5_include_dir)}]
+abi-version="{abi_version}"
+build-dir={toml_esc(output_dir)}
+sip-module="PyQt5.sip"
+sip-files-dir={toml_esc(srcdir)}
+
+[tool.sip.bindings.{modulename}]
+pep484-pyi=false
+protected-is-public=false
+'''
+
         pyproject_fname = os.path.join(sip_builddir, 'pyproject.toml')
         with open(pyproject_fname, 'w') as fout:
-            toml.dump(pyproject_data, fout)
+            fout.write(toml_text)
 
         # generate the source files for the bindings
         build_cmd = shutil.which('sip-build')
