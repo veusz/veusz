@@ -117,38 +117,14 @@ class EMFPaintEngine(qt.QPaintEngine):
         buf.open(qt.QIODevice.WriteOnly)
         pixmap.save(buf, "BMP")
 
-        # chop off bmp header to get DIB
         bmp = bytes(buf.data())
-        dib = bmp[0xe:]
-        hdrsize, = struct.unpack('<i', bmp[0xe:0x12])
-        dataindex, = struct.unpack('<i', bmp[0xa:0xe])
-        datasize, = struct.unpack('<i', bmp[0x22:0x26])
-
-        epix = pyemf3.emr.STRETCHDIBITS()
-        epix.rclBounds_left = int(r.left()*scale)
-        epix.rclBounds_top = int(r.top()*scale)
-        epix.rclBounds_right = int(r.right()*scale)
-        epix.rclBounds_bottom = int(r.bottom()*scale)
-        epix.xDest = int(r.left()*scale)
-        epix.yDest = int(r.top()*scale)
-        epix.cxDest = int(r.width()*scale)
-        epix.cyDest = int(r.height()*scale)
-        epix.xSrc = int(sr.left())
-        epix.ySrc = int(sr.top())
-        epix.cxSrc = int(sr.width())
-        epix.cySrc = int(sr.height())
-
-        epix.dwRop = 0xcc0020 # SRCCOPY
-        offset = epix.format.minstructsize + 8
-        epix.offBmiSrc = offset
-        epix.cbBmiSrc = hdrsize
-        epix.offBitsSrc = offset + dataindex - 0xe
-        epix.cbBitsSrc = datasize
-        epix.iUsageSrc = 0x0 # DIB_RGB_COLORS
-
-        epix.unhandleddata = dib
-
-        self.emf._append(epix)
+        self.emf.BitmapOut(
+            int(r.left()*scale), int(r.top()*scale),
+            int(r.width()*scale), int(r.bottom()*scale),
+            int(sr.left()), int(sr.top()),
+            int(sr.width()), int(sr.height()),
+            bmp,
+        )
 
     def _createPath(self, path):
         """Convert qt path to emf path"""
