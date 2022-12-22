@@ -246,9 +246,9 @@ class ColorsSequence(ToolsPlugin):
             """Get color in range 0...numwidgets-1."""
             div = max(numwidgets-1, 1)
 
-            H = i * (H2-H1) / div + H1
-            S = i * (S2-S1) / div + S1
-            V = i * (V2-V1) / div + V1
+            H = int(i * (H2-H1) / div + H1)
+            S = int(i * (S2-S1) / div + S1)
+            V = int(i * (V2-V1) / div + V1)
             return str(qt.QColor.fromHsv(H, S, V).name())
 
         idx = 0
