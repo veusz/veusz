@@ -780,8 +780,8 @@ class InterleaveDatasetPlugin(_OneOutputDatasetPlugin):
             ds = [ N.hstack( (d, N.zeros(maxlength-len(d))) )
                    for d in datasets ]
             # which elements are valid
-            good = [ N.hstack( (N.ones(len(d), dtype=N.bool),
-                                N.zeros(maxlength-len(d), dtype=N.bool)) )
+            good = [ N.hstack( (N.ones(len(d), dtype=N.bool_),
+                                N.zeros(maxlength-len(d), dtype=N.bool_)) )
                      for d in datasets ]
 
             intl = N.column_stack(ds).reshape(maxlength*len(datasets))
@@ -966,7 +966,7 @@ class MeanDatasetPlugin(_OneOutputDatasetPlugin):
 
         # mean data (only use finite values)
         tot = N.zeros(maxlength, dtype=N.float64)
-        num = N.zeros(maxlength, dtype=N.int)
+        num = N.zeros(maxlength, dtype=N.int_)
         for d in inds:
             f = N.isfinite(d.data)
             tot[:len(d.data)][f] += d.data[f]
@@ -976,7 +976,7 @@ class MeanDatasetPlugin(_OneOutputDatasetPlugin):
         def averageError(errtype, fallback=None):
             """Get average for an error value."""
             tot = N.zeros(maxlength, dtype=N.float64)
-            num = N.zeros(maxlength, dtype=N.int)
+            num = N.zeros(maxlength, dtype=N.int_)
             for d in inds:
                 vals = getattr(d, errtype)
                 if vals is None and fallback:
@@ -1030,7 +1030,7 @@ class AddDatasetsPlugin(_OneOutputDatasetPlugin):
 
         # add data where finite
         data = N.zeros(maxlength, dtype=N.float64)
-        anyfinite = N.zeros(maxlength, dtype=N.bool)
+        anyfinite = N.zeros(maxlength, dtype=N.bool_)
         for d in inds:
             f = N.isfinite(d.data)
             data[:len(d.data)][f] += d.data[f]
@@ -1213,7 +1213,7 @@ class MultiplyDatasetsPlugin(_OneOutputDatasetPlugin):
 
         # output data and where data is finite
         data = N.ones(maxlength, dtype=N.float64)
-        anyfinite = N.zeros(maxlength, dtype=N.bool)
+        anyfinite = N.zeros(maxlength, dtype=N.bool_)
         for d in inds:
             f = N.isfinite(d.data)
             anyfinite[f] = True
@@ -1386,7 +1386,7 @@ class ExtremesDatasetPlugin(DatasetPlugin):
 
         minvals = N.zeros(maxlength, dtype=N.float64) + 1e100
         maxvals = N.zeros(maxlength, dtype=N.float64) - 1e100
-        anyfinite = N.zeros(maxlength, dtype=N.bool)
+        anyfinite = N.zeros(maxlength, dtype=N.bool_)
         for d in inds:
             f = N.isfinite(d.data)
             anyfinite[f] = True
@@ -1417,7 +1417,7 @@ class ExtremesDatasetPlugin(DatasetPlugin):
         if self.dserror is not None:
             # compute mean and look at differences from it
             tot = N.zeros(maxlength, dtype=N.float64)
-            num = N.zeros(maxlength, dtype=N.int)
+            num = N.zeros(maxlength, dtype=N.int_)
             for d in inds:
                 f = N.isfinite(d.data)
                 tot[f] += d.data[f]
@@ -1594,10 +1594,10 @@ class FilterDatasetPlugin(_OneOutputDatasetPlugin):
 
         if filt is None:
             # select nothing
-            filt = N.zeros(data.shape, dtype=N.bool)
+            filt = N.zeros(data.shape, dtype=N.bool_)
         else:
             # filter must have int/bool type
-            filt = N.array(filt, dtype=N.bool)
+            filt = N.array(filt, dtype=N.bool_)
 
         try:
             if fields['replacenan']:

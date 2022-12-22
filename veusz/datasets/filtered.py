@@ -104,7 +104,7 @@ class DatasetFilterGenerator:
             return [
                 _("Input filter expression non-numeric: '%s'") % self.inexpr]
 
-        filterarr = d.data.astype(N.bool)
+        filterarr = d.data.astype(N.bool_)
         if self.invert:
             filterarr = N.logical_not(filterarr)
 
