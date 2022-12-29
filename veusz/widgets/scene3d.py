@@ -216,9 +216,6 @@ class Scene3D(widget.Widget):
         bounds = self.computeBounds(parentposn, painthelper)
 
         painter = painthelper.painter(self, bounds)
-        painthelper.setControlGraph(self, [
-            controlgraph.ControlMarginBox(
-                self, bounds, outerbounds, painthelper)])
 
         root = self.makeObjects(painter, bounds, painthelper)
         if root is None:
@@ -242,13 +239,16 @@ class Scene3D(widget.Widget):
                 painter, camera,
                 bounds[0], bounds[1], bounds[2], bounds[3], scale)
 
-        #     painter.setPen(qt.QPen(qt.Qt.red))
-        #     origin = ptToScreen((0,0,0))[1]
-        #     for axpt in ((0.5,0,0),(0,0.5,0),(0,0,0.5)):
-        #         painter.drawLine(origin, ptToScreen(axpt)[1])
+        camM = camera.perspM * camera.viewM
+        s = self.settings
+        angles = (s.xRotation, s.yRotation, s.zRotation)
 
-        # axx = threed.Vec4(0,0.5,0,1)
-        # threed.solveInverseRotation(camera.viewM, camera.perspM, scene.screenM, axx, ptToScreen((0,0.5,0))[0])
+        painthelper.setControlGraph(self, [
+            controlgraph.ControlMarginBox(
+                self, bounds, outerbounds, painthelper),
+            controlgraph.ControlSceneRotation(
+                self, camM, scene.screenM, angles, painthelper),
+        ])
 
     def identifyWidgetAtPoint(self, painthelper, bounds, scaling, x, y):
         painter = document.PainterRoot()
