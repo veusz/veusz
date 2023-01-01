@@ -833,6 +833,7 @@ class _SceneEdgeLine(qt.QGraphicsLineItem, _ScaledShape):
         self.setZValue(2.)
 
 class _SceneRotationItem(qt.QGraphicsItem):
+    """For controlling the rotation of a 3D scene."""
 
     def __init__(self, parent, params):
 

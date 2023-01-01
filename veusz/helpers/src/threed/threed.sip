@@ -272,14 +272,6 @@ Vec3 calcProjVec(const Mat4& projM, const Vec3& v);
 Vec3 calcProjVec(const Mat4& projM, const Vec4& v);
 Vec2 projVecToScreen(const Mat3& screenM, const Vec3& vec);
 
-void solveRotation(const Vec2& screenPos, const Mat4& perspViewM,
-                   const Mat3& screenM, const Vec4& inVec,
-                   double thetax,
-                   double thetay,
-                   double thetaz,
-                   double* thetaxp /In,Out/,
-                   double* thetayp /In,Out/);
-
 /////////////////////////////////////////////////
 // Properties
 
