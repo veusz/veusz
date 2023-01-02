@@ -821,16 +821,31 @@ class _GraphAxisLine(qt.QGraphicsItem):
 
 ############################################################
 
-class _SceneEdgeLine(qt.QGraphicsLineItem, _ScaledShape):
+class _SceneEdgeLine(qt.QGraphicsLineItem):
 
-    def __init__(self, parent, params, axis=False):
+    def __init__(self, parent, params, axis=None):
         qt.QGraphicsLineItem.__init__(self, parent)
         self.params = params
         pen = controlLinePen()
-        if axis:
+        if axis is not None:
             pen.setWidth(4)
+            self.text = qt.QGraphicsSimpleTextItem(axis, self)
+            self.text.setBrush(qt.QBrush(pen.color()))
+            self.text.setFont(qt.QFont("sans", 16))
+        else:
+            self.text = None
+
         self.setPen(pen)
         self.setZValue(2.)
+
+    def setScaledLine(self, x1, y1, x2, y2):
+        s = self.params.cgscale
+        self.setPos(x1*s, y1*s)
+        self.setRotation(-qt.QLineF(x1, y1, x2, y2).angle())
+        linelen = math.sqrt((x2-x1)**2+(y2-y1)**2)*s
+        self.setLine(0, 0, linelen, 0)
+        if self.text is not None:
+            self.text.setPos(linelen, 0)
 
 class _SceneRotationItem(qt.QGraphicsItem):
     """For controlling the rotation of a 3D scene."""
@@ -873,10 +888,10 @@ class _SceneRotationItem(qt.QGraphicsItem):
         self.control.setPos(cntrlpnt)
 
         # lines for the box
-        axes = {0, 3, 8}
+        axes = {0:'x', 3:'y', 8:'z'}
         self.lines = []
         for i in range(12):
-            line = _SceneEdgeLine(self, self.params, axis=i in axes)
+            line = _SceneEdgeLine(self, self.params, axis=axes.get(i))
             self.lines.append(line)
 
         self.updatePositions()
@@ -892,7 +907,7 @@ class _SceneRotationItem(qt.QGraphicsItem):
             points.append(point)
 
         idxs = (
-            (0,1), (1,3), (3,2), (2,0),
+            (0,1), (1,3), (3,2), (0,2),
             (4,5), (5,7), (7,6), (6,4),
             (0,4), (1,5), (2,6), (3,7),
         )
