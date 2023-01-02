@@ -419,7 +419,8 @@ class Contour(plotters.GenericPlotter):
         """Draw key for contour level."""
         painter.setPen(
             self.settings.Lines.get('lines').makePen(painter, number))
-        painter.drawLine(x, y+height/2, x+width, y+height/2)
+        painter.drawLine(
+            qt.QPointF(x, y+height/2), qt.QPointF(x+width, y+height/2))
 
     def checkContoursUpToDate(self):
         """Update contours if necessary.
