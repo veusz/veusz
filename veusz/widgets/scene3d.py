@@ -247,7 +247,7 @@ class Scene3D(widget.Widget):
             controlgraph.ControlMarginBox(
                 self, bounds, outerbounds, painthelper),
             controlgraph.ControlSceneRotation(
-                self, camM, scene.screenM, angles, painthelper),
+                bounds, self, camM, scene.screenM, angles, painthelper),
         ])
 
     def identifyWidgetAtPoint(self, painthelper, bounds, scaling, x, y):

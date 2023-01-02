@@ -24,11 +24,13 @@ item to control the object
 """
 
 import math
+import os.path
 from types import SimpleNamespace
 
 from .. import qtall as qt
 from .. import document
 from .. import setting
+from .. import utils
 from ..helpers import threed
 
 def _(text, disambiguation=None, context='controlgraph'):
@@ -847,6 +849,25 @@ class _SceneEdgeLine(qt.QGraphicsLineItem):
         if self.text is not None:
             self.text.setPos(linelen, 0)
 
+class _SvgRotItem(qt.QGraphicsSvgItem, _ScaledShape):
+    """Draw an SVG item."""
+    def __init__(self, filename, parent, mode):
+        qt.QGraphicsSvgItem.__init__(
+            self, os.path.join(utils.imagedir, filename), parent)
+        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
+        self.setZValue(3.)
+        self.mode = mode
+
+    def mouseMoveEvent(self, event):
+        """Notify parent on move."""
+        qt.QGraphicsRectItem.mouseMoveEvent(self, event)
+        self.parentItem().updateMovedCntrl(self, event, self.mode)
+
+    def mouseReleaseEvent(self, event):
+        """Notify parent on unclicking."""
+        qt.QGraphicsRectItem.mouseReleaseEvent(self, event)
+        self.parentItem().updateWidget()
+
 class _SceneRotationItem(qt.QGraphicsItem):
     """For controlling the rotation of a 3D scene."""
 
@@ -878,14 +899,32 @@ class _SceneRotationItem(qt.QGraphicsItem):
             invec = threed.Vec4(dx, dy, dz, 1)
             self.boxpts.append(threed.Vec4(dx, dy, dz, 1))
 
-        # make a rotation control
-        self.control = _ShapeCorner(self, self.params)
-        self.control.setCursor(qt.Qt.SizeAllCursor)
+        # make rotation controls
+        posn = params.posn
 
-        # put control point at centre
-        sp = threed.projVecToScreen(self.params.screenM, threed.Vec3(0,0,1))
-        cntrlpnt = qt.QPointF(sp.get(0), sp.get(1))
-        self.control.setPos(cntrlpnt)
+        cntrl = _SvgRotItem("veusz-arrow-nesw.svg", self, "xy")
+        cntrl.setCursor(qt.Qt.SizeAllCursor)
+        cntrl.setPos(posn[0], posn[1])
+        cntrl.setToolTip(_(
+            "Click and drag to rotate in x and y (hold Ctrl for x and z)"))
+
+        cntrl = _SvgRotItem("veusz-arrow-ns.svg", self, "y")
+        cntrl.setCursor(qt.Qt.SizeVerCursor)
+        cntrl.setPos(posn[0]+20, posn[1])
+        cntrl.setToolTip(_(
+            "Click and drag to rotate in y"))
+
+        cntrl = _SvgRotItem("veusz-arrow-ew.svg", self, "x")
+        cntrl.setCursor(qt.Qt.SizeHorCursor)
+        cntrl.setPos(posn[0]+40, posn[1])
+        cntrl.setToolTip(_(
+            "Click and drag to rotate in x"))
+
+        cntrl = _SvgRotItem("veusz-arrow-circ.svg", self, "z")
+        cntrl.setCursor(qt.Qt.SizeBDiagCursor)
+        cntrl.setPos(posn[0]+68, posn[1])
+        cntrl.setToolTip(_(
+            "Click and drag to rotate in z"))
 
         # lines for the box
         axes = {0:'x', 3:'y', 8:'z'}
@@ -923,8 +962,8 @@ class _SceneRotationItem(qt.QGraphicsItem):
     def paint(self, painter, option, widget):
         """Intentionally empty painter."""
 
-    def updateFromCorner(self, corner, event):
-        """Rotate given corner."""
+    def updateMovedCntrl(self, corner, event, mode):
+        """Rotate given moving control."""
 
         event.accept()
         newpos = event.screenPos()
@@ -934,14 +973,22 @@ class _SceneRotationItem(qt.QGraphicsItem):
 
         delta = newpos-oldpos
 
-        if (int(event.modifiers()) & qt.Qt.ControlModifier) == 0:
-            # rotate in x,y axes on screen
-            deltaM = threed.rotate3M4(
-                -delta.y()/180.*math.pi, -delta.x()/180.*math.pi, 0)
-        else:
-            # if control is pressed, rotate along z axis for y direction
-            deltaM = threed.rotate3M4(
-                -delta.x()/180.*math.pi, 0, -delta.y()/180.*math.pi)
+        if mode == 'xy':
+            if (int(event.modifiers()) & qt.Qt.ControlModifier) == 0:
+                # rotate in x,y axes on screen
+                deltaM = threed.rotate3M4(
+                    -delta.y()/180.*math.pi, -delta.x()/180.*math.pi, 0)
+            else:
+                # if control is pressed, rotate along z axis for y direction
+                deltaM = threed.rotate3M4(
+                    -delta.x()/180.*math.pi, 0, -delta.y()/180.*math.pi)
+        elif mode == 'y':
+            deltaM = threed.rotate3M4(-delta.y()/180.*math.pi, 0, 0)
+        elif mode == 'x':
+            deltaM = threed.rotate3M4(0, -delta.x()/180.*math.pi, 0)
+        elif mode == 'z':
+            deltaM = threed.rotate3M4(0, 0, -delta.x()/180.*math.pi)
+
         self.rotM = deltaM * self.rotM
 
         self.updatePositions()
@@ -980,10 +1027,11 @@ class _SceneRotationItem(qt.QGraphicsItem):
             document.OperationMultiple(operations, descr=_('rotate scene')))
 
 class ControlSceneRotation:
-    def __init__(self, scene, camM, screenM, angles, painthelper):
+    def __init__(self, posn, scene, camM, screenM, angles, painthelper):
         """Control rotation of scene
         """
 
+        self.posn = posn
         self.scene = scene
         self.camM = camM
         self.screenM = screenM
