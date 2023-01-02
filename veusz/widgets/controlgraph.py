@@ -902,27 +902,30 @@ class _SceneRotationItem(qt.QGraphicsItem):
         # make rotation controls
         posn = params.posn
 
+        s = self.params.cgscale
+        bx, by = posn[0]*s, posn[1]*s
+
         cntrl = _SvgRotItem("veusz-arrow-nesw.svg", self, "xy")
         cntrl.setCursor(qt.Qt.SizeAllCursor)
-        cntrl.setPos(posn[0], posn[1])
+        cntrl.setPos(bx, by)
         cntrl.setToolTip(_(
             "Click and drag to rotate in x and y (hold Ctrl for x and z)"))
 
         cntrl = _SvgRotItem("veusz-arrow-ns.svg", self, "y")
         cntrl.setCursor(qt.Qt.SizeVerCursor)
-        cntrl.setPos(posn[0]+20, posn[1])
+        cntrl.setPos(bx+20, by)
         cntrl.setToolTip(_(
             "Click and drag to rotate in y"))
 
         cntrl = _SvgRotItem("veusz-arrow-ew.svg", self, "x")
         cntrl.setCursor(qt.Qt.SizeHorCursor)
-        cntrl.setPos(posn[0]+40, posn[1])
+        cntrl.setPos(bx+40, by)
         cntrl.setToolTip(_(
             "Click and drag to rotate in x"))
 
         cntrl = _SvgRotItem("veusz-arrow-circ.svg", self, "z")
         cntrl.setCursor(qt.Qt.SizeBDiagCursor)
-        cntrl.setPos(posn[0]+68, posn[1])
+        cntrl.setPos(bx+68, by)
         cntrl.setToolTip(_(
             "Click and drag to rotate in z"))
 
