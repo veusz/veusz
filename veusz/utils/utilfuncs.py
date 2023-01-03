@@ -19,21 +19,25 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ###############################################################################
 
-import sys
-import string
-import re
+from collections import defaultdict
+import codecs
+import csv
+import io
+import math
 import os
 import os.path
+import re
+import string
+import sys
 import threading
-import codecs
-import io
-import csv
 import time
-from collections import defaultdict
 
 import numpy as N
 
 from .. import qtall as qt
+
+DEG2RAD = math.pi/180
+RAD2DEG = 180/math.pi
 
 class IgnoreException(Exception):
     """A special exception class to be ignored by the exception handler."""

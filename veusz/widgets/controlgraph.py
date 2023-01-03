@@ -31,6 +31,7 @@ from .. import qtall as qt
 from .. import document
 from .. import setting
 from .. import utils
+from ..utils import DEG2RAD, RAD2DEG
 from ..helpers import threed
 
 def _(text, disambiguation=None, context='controlgraph'):
@@ -459,7 +460,7 @@ class _GraphResizableBox(qt.QGraphicsItem):
             # work out angle relative to centre of widget
             angle = math.atan2(y, x)
             # change to degrees from correct direction
-            par.angle = round((angle*(180/math.pi) + 90.) % 360, 2)
+            par.angle = round((angle*RAD2DEG + 90.) % 360, 2)
 
         self.updateCorners()
 
@@ -468,7 +469,7 @@ class _GraphResizableBox(qt.QGraphicsItem):
         par = self.params
 
         # update corners
-        angle = par.angle/180.*math.pi
+        angle = par.angle*DEG2RAD
         s, c = math.sin(angle), math.cos(angle)
 
         for corn, (xd, yd) in zip(
@@ -868,6 +869,22 @@ class _SvgRotItem(qt.QGraphicsSvgItem, _ScaledShape):
         qt.QGraphicsRectItem.mouseReleaseEvent(self, event)
         self.parentItem().updateWidget()
 
+def rotM_to_angles(rotM):
+    """Convert a rotation matrix to its constituent Euler angles (deg)."""
+
+    # Note: uses atan2 to get correct quadrants, and for theta_y, uses
+    # larger denominator to avoid division by zero
+
+    theta_z = math.atan2(rotM.get(1,0),rotM.get(0,0))
+    theta_x = math.atan2(rotM.get(2,1),rotM.get(2,2))
+    sz, cz = math.sin(theta_z), math.cos(theta_z)
+    if abs(cz) > abs(sz):
+        theta_y = math.atan2(-rotM.get(2,0),rotM.get(0,0)/cz)
+    else:
+        theta_y = math.atan2(-rotM.get(2,0),rotM.get(1,0)/sz)
+
+    return (theta_x*RAD2DEG, theta_y*RAD2DEG, theta_z*RAD2DEG)
+
 class _SceneRotationItem(qt.QGraphicsItem):
     """For controlling the rotation of a 3D scene."""
 
@@ -881,9 +898,7 @@ class _SceneRotationItem(qt.QGraphicsItem):
 
         # the current rotation matrix
         self.rotM = threed.rotate3M4(
-            angles[0]/180.*math.pi,
-            angles[1]/180.*math.pi,
-            angles[2]/180.*math.pi)
+            angles[0]*DEG2RAD, angles[1]*DEG2RAD, angles[2]*DEG2RAD)
 
         self.setZValue(2.)
 
@@ -980,17 +995,17 @@ class _SceneRotationItem(qt.QGraphicsItem):
             if (int(event.modifiers()) & qt.Qt.ControlModifier) == 0:
                 # rotate in x,y axes on screen
                 deltaM = threed.rotate3M4(
-                    -delta.y()/180.*math.pi, -delta.x()/180.*math.pi, 0)
+                    -delta.y()*DEG2RAD, -delta.x()*DEG2RAD, 0)
             else:
                 # if control is pressed, rotate along z axis for y direction
                 deltaM = threed.rotate3M4(
-                    -delta.x()/180.*math.pi, 0, -delta.y()/180.*math.pi)
+                    -delta.x()*DEG2RAD, 0, -delta.y()*DEG2RAD)
         elif mode == 'y':
-            deltaM = threed.rotate3M4(-delta.y()/180.*math.pi, 0, 0)
+            deltaM = threed.rotate3M4(-delta.y()*DEG2RAD, 0, 0)
         elif mode == 'x':
-            deltaM = threed.rotate3M4(0, -delta.x()/180.*math.pi, 0)
+            deltaM = threed.rotate3M4(0, -delta.x()*DEG2RAD, 0)
         elif mode == 'z':
-            deltaM = threed.rotate3M4(0, 0, -delta.x()/180.*math.pi)
+            deltaM = threed.rotate3M4(0, 0, -delta.x()*DEG2RAD)
 
         self.rotM = deltaM * self.rotM
 
@@ -999,32 +1014,15 @@ class _SceneRotationItem(qt.QGraphicsItem):
     def updateWidget(self):
         """Update widget angles."""
 
-        rotM = self.rotM
-
-        # Work out rotation angles for combined matrix
-        # Note: uses atan2 to get correct quadrants, and for theta_y,
-        # use larger denominator to avoid division by zero
-        theta_z = math.atan2(rotM.get(1,0),rotM.get(0,0))
-        theta_x = math.atan2(rotM.get(2,1),rotM.get(2,2))
-        sz, cz = math.sin(theta_z), math.cos(theta_z)
-        if abs(cz) > abs(sz):
-            theta_y = math.atan2(-rotM.get(2,0),rotM.get(0,0)/cz)
-        else:
-            theta_y = math.atan2(-rotM.get(2,0),rotM.get(1,0)/sz)
-
-        # round values
-        combangles = (
-            round(theta_x*180/math.pi, 1),
-            round(theta_y*180/math.pi, 1),
-            round(theta_z*180/math.pi, 1),
-        )
+        # get angles for rotation matrix
+        tx, ty, tz = rotM_to_angles(self.rotM)
 
         # update in document
         s = self.params.scene.settings
         operations = (
-            document.OperationSettingSet(s.get('xRotation'), combangles[0]),
-            document.OperationSettingSet(s.get('yRotation'), combangles[1]),
-            document.OperationSettingSet(s.get('zRotation'), combangles[2]),
+            document.OperationSettingSet(s.get('xRotation'), round(tx,1)),
+            document.OperationSettingSet(s.get('yRotation'), round(ty,1)),
+            document.OperationSettingSet(s.get('zRotation'), round(tz,1)),
         )
         self.params.scene.document.applyOperation(
             document.OperationMultiple(operations, descr=_('rotate scene')))
