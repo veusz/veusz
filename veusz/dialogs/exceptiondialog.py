@@ -37,19 +37,6 @@ def _(text, disambiguation=None, context="ExceptionDialog"):
 
 _emailUrl ='https://barmag.net/veusz-mail.php'
 
-_reportformat = \
-'''Veusz version: %s
-Python version: %s
-Python platform: %s
-Numpy version: %s
-Qt version: %s
-PyQt version: %s
-SIP version: %s
-Date: %s
-
-%s
-'''
-
 _sendformat = \
 '''Email: %s
 
@@ -62,18 +49,24 @@ What the user was doing before the crash
 %s
 '''
 
+
+def versionHeader():
+    """Get software versions"""
+    return f'''Veusz version: {utils.version()}
+Python version: {sys.version}
+Python platform: {sys.platform}
+Numpy version: {numpy.__version__}
+Qt version: {qt.qVersion()}
+PyQt version: {qt.PYQT_VERSION_STR}
+sip version: {qt.sip.SIP_VERSION_STR}'''
+
 def createReportText(exception):
-    return _reportformat % (
-        utils.version(),
-        sys.version,
-        sys.platform,
-        numpy.__version__,
-        qt.qVersion(),
-        qt.PYQT_VERSION_STR,
-        qt.sip.SIP_VERSION_STR,
-        time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime()),
-        str(exception),
-    )
+
+    timehdr = time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime())
+    return f'''{versionHeader()}
+Date: {timehdr}
+
+{str(exception)}'''
 
 class ExceptionSendDialog(VeuszDialog):
     """Dialog to send debugging report."""

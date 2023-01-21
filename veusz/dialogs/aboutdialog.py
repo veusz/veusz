@@ -25,6 +25,7 @@ import os.path
 from .. import qtall as qt
 from .. import utils
 from .veuszdialog import VeuszDialog
+from .exceptiondialog import versionHeader
 
 class AboutDialog(VeuszDialog):
     """About dialog."""
@@ -44,10 +45,15 @@ class AboutDialog(VeuszDialog):
         self.copyrightlabel.setText(copyrighttext)
 
         self.licenseButton.clicked.connect(self.licenseClicked)
+        self.versionsButton.clicked.connect(self.versionsClicked)
 
     def licenseClicked(self):
         """Show the license."""
         LicenseDialog(self).exec_()
+
+    def versionsClicked(self):
+        """Show software versions."""
+        SoftwareVersionsDialog(self).exec_()
 
 class LicenseDialog(VeuszDialog):
     """About license dialog."""
@@ -55,3 +61,10 @@ class LicenseDialog(VeuszDialog):
     def __init__(self, parent):
         VeuszDialog.__init__(self, parent, 'license.ui')
         self.licenseEdit.setPlainText(utils.getLicense())
+
+class SoftwareVersionsDialog(VeuszDialog):
+    """Software versions lists."""
+
+    def __init__(self, parent):
+        VeuszDialog.__init__(self, parent, 'softwareversions.ui')
+        self.versionInfoText.setPlainText(versionHeader())
