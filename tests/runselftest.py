@@ -62,7 +62,6 @@ except ImportError:
 
 if 'VEUSZ_INPLACE_TEST' in os.environ:
     sys.path.append(os.getcwd())
-    os.environ['VEUSZ_RESOURCE_DIR'] = os.getcwd()
     os.environ['PYTHONPATH'] = ('%s:%s' % (
         os.getcwd(), os.environ.get('PYTHONPATH', ''))).rstrip(':')
 
@@ -193,7 +192,7 @@ class Dirs:
     """Directories and files object."""
     def __init__(self):
         self.thisdir = os.path.dirname(__file__)
-        self.exampledir = os.path.join(self.thisdir, '..', 'examples')
+        self.exampledir = utils.exampleDirectory
         self.testdir = os.path.join(self.thisdir, 'selftests')
         self.comparisondir = os.path.join(self.thisdir, 'comparison')
 
