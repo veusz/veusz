@@ -55,8 +55,12 @@ def _getVeuszDirectory():
         # standard installation
         resdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-    # override data directory with symlink
-    if os.path.exists( os.path.join(resdir, 'resources') ):
+    try:
+        # see whether file containing location of resources exists
+        with open(os.path.join(resdir, 'RESOURCES')) as fin:
+            resdir = fin.read().strip()
+    except EnvironmentError:
+        # resources are in subdirectory
         resdir = os.path.realpath( os.path.join(resdir, 'resources') )
 
     # override with VEUSZ_RESOURCE_DIR environment variable if necessary
@@ -73,9 +77,8 @@ resourceDirectory, exampleDirectory = _getVeuszDirectory()
 def getLicense():
     """Return license text."""
     try:
-        f = open(os.path.join(resourceDirectory, 'COPYING'), 'rU')
-        text = f.read()
-        f.close()
+        with open(os.path.join(resourceDirectory, 'COPYING'), 'rU') as f:
+            text = f.read()
     except EnvironmentError:
         text = (
             'Could not open the license file.\n'

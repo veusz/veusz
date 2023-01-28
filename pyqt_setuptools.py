@@ -46,15 +46,11 @@ class sip_build_ext(build_ext):
     )
 
     user_options = build_ext.user_options + [
-        ('qmake-exe=', None,
-         'override qmake executable'),
-        ('qt-include-dir=', None,
-         'override Qt include directory'),
-        ('qt-library-dir=', None,
-         'override Qt library directory'),
-        ('qt-libinfix=', None,
-         'override Qt infix setting'),
-        ]
+        ('qmake-exe=', None, 'override qmake executable'),
+        ('qt-include-dir=', None, 'override Qt include directory'),
+        ('qt-library-dir=', None, 'override Qt library directory'),
+        ('qt-libinfix=', None, 'override Qt infix setting'),
+    ]
 
     def initialize_options(self):
         build_ext.initialize_options(self)
@@ -166,11 +162,11 @@ class sip_build_ext(build_ext):
                     '-framework', 'QtXml'+libinfix,
                     '-framework', 'QtWidgets'+libinfix,
                     '-Wl,-rpath,@executable_path/Frameworks',
-                    '-Wl,-rpath,' + lib_dir
-                    ]
+                    '-Wl,-rpath,' + lib_dir,
+                ]
                 extension.extra_compile_args = [
                     '-F', lib_dir,
-                    ]
+                ]
             else:
                 extension.libraries = [
                     'Qt5Gui'+libinfix,

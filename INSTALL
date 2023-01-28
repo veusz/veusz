@@ -4,12 +4,12 @@ Veusz Installation
 1. INSTALLING FROM SOURCE
 *************************
 
-Veusz uses distutils for its installation. See below for how to use it.
+Veusz uses setuptools for its installation. See below for how to use it.
 
 Requirements:
  python >= 3.3   https://www.python.org/
  PyQt >= 5.3     https://www.riverbankcomputing.co.uk/software/pyqt/
- numpy >= 1.0    http://www.numpy.org/
+ numpy >= 1.7    http://www.numpy.org/
 
 PyQt requires
  Qt5 >= 5.5      https://www.qt.io/developers/
@@ -26,15 +26,15 @@ Optional requirements:
  Ghostscript     https://www.ghostscript.com/ (for EPS/PS output)
  Sphinx          http://www.sphinx-doc.org/en/stable/ (to rebuild manual)
 
-1.1 Full installation with distutils
-====================================
-There are a number of ways to install programs using distutils. I will
+1.1 Full installation with setuptools
+=====================================
+There are a number of ways to install programs using setuptools. I will
 list a few of the possible method here:
 
 To install on Linux to the standard location on the hard disk follow
 these instructions.
 
-# cd veusz-3.4
+# cd veusz-3.6
 # python3 setup.py build
 # su
 [enter root password]
@@ -77,25 +77,18 @@ in automated scripts without installation.
 
 1.1.2 Separate resources directory
 ==================================
-By default, setup.py installs certain resource files (VERSION, icons,
-ui, and examples) in the veusz python module directory. This may not
-be desired behaviour for unix packagers, for example, who want to
-separate the code from the data files.
 
-It is possible to install these files in a different location by using
-the setup.py option "--veusz-resource-dir" (for example with
-/usr/share/veusz). If you do this, then you need to tell veusz where
-these resources are on runtime or when testing. This can be done by
-using a symlink "resources" in the the veusz module directory which
-points to the location of these files and directories. Alternatively,
-the environment variable VEUSZ_RESOURCE_DIR can be set.
+The resources files of veusz are installed in the veusz python module
+directory under the resources subdirectory. This includes the icons,
+ui, VERSION file and examples. From version 3.6, this cannot be
+changed from setup.py.
 
-There is an addition setup.py option "--disable-install-examples"
-which disables installation of the example files. This may be helpful
-for packagers who want to place the example files in
-/usr/share/doc. As veusz shows these files on the help menu and when
-testing, it is suggested that an "examples" symlink is added to the
-resources directory to point to the location of the example files.
+The location can be changed either by:
+
+1. Making resources a symlink to the real location,
+2. writing a file called RESOURCES containing the real location in the
+Veusz module directory, or
+3. using the enviroment variable VEUSZ_RESOURCE_DIR
 
 1.1.3 Qt build parameters
 =========================
@@ -123,8 +116,8 @@ can currently be run from its own directory. Before this can work, the
 helper modules must be compiled and copied into the appropriate
 location.
 
-# tar xzf veusz-3.4.tar.gz                [change version here]
-# cd veusz-3.4
+# tar xzf veusz-3.6.tar.gz                [change version here]
+# cd veusz-3.6
 # python3 setup.py build                    [or use python3 here]
 # cp build/*/veusz/helpers/*.so veusz/helpers/
 
@@ -143,8 +136,8 @@ work on all distributions due to glibc/library
 incompatibilities. Simply unpack the tar file and run the main
 executable:
 
-# tar xf veusz-3.4-linux-x86_64.tar.xz   [change version here]
-# cd veusz-3.4-linux-x86_64
+# tar xf veusz-3.6-linux-x86_64.tar.xz   [change version here]
+# cd veusz-3.6-linux-x86_64
 # ./veusz.exe                    [note, it's not a windows exe!]
 
 2.2 Installing in Windows
@@ -172,7 +165,7 @@ into your Applications directory.
   sub-module.
 
 - Veusz includes a man page in Documents/man-page/veusz.1
-  This are not automatically installed by distutils.
+  This are not automatically installed by setuptools.
 
 - A manual in HTML and PDF format can be found in Documents/manual/
   This and the the man page can be regenerated using the Makefile in

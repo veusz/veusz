@@ -21,19 +21,13 @@
 #    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 ##############################################################################
 
-import sys
 import os.path
-
-if sys.version_info[0] < 3:
-    raise RuntimeError('Veusz only supports Python 3')
-
-thisdir = os.path.abspath( os.path.dirname(__file__) )
-os.environ['VEUSZ_RESOURCE_DIR'] = os.path.join(thisdir)
+import sys
 
 try:
     import veusz
 except ImportError:
-    # python3 will require this
+    thisdir = os.path.abspath( os.path.dirname(__file__) )
     sys.path = [thisdir] + sys.path
     import veusz
 
