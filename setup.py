@@ -224,7 +224,7 @@ setup(
 
     # new command options
     cmdclass = {
-        'build_ext': pyqtdistutils.build_ext,
+        'build_ext': pyqtdistutils.sip_build_ext,
         'install_data': smart_install_data,
         'install': install
     },

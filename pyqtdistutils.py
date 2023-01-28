@@ -1,7 +1,7 @@
-# Subclasses disutils.command.build_ext,
+# Subclasses setuptools.command.build_ext,
 # replacing it with a SIP version that compiles .sip -> .cpp
 # before calling the original build_ext command.
-# Written by Giovanni Bajo <rasky at develer dot com>
+# Originally written by Giovanni Bajo <rasky at develer dot com>
 # Based on Pyrex.Distutils, written by Graham Fawcett and Darrel Gallion.
 
 import os
@@ -9,14 +9,10 @@ import shutil
 import subprocess
 import tomli
 
-from distutils.sysconfig import customize_compiler
 from sysconfig import get_path
-import distutils.command.build_ext
+from setuptools.command.build_ext import build_ext
 
 ##################################################################
-
-def replace_suffix(path, new_suffix):
-    return os.path.splitext(path)[0] + new_suffix
 
 def find_on_path(names, mainname):
     """From a list of names of executables, find the 1st one on a path.
@@ -42,12 +38,14 @@ def read_command_output(cmd):
         raise RuntimeError('Command %s returned error' % str(cmd))
     return stdout.strip()
 
-class build_ext(distutils.command.build_ext.build_ext):
+class sip_build_ext(build_ext):
 
-    description = ('Compile SIP descriptions, then build C/C++ extensions '
-                   '(compile/link to build directory)')
+    description = (
+        'Compile SIP descriptions, then build C/C++ extensions '
+        '(compile/link to build directory)'
+    )
 
-    user_options = distutils.command.build_ext.build_ext.user_options + [
+    user_options = build_ext.user_options + [
         ('qmake-exe=', None,
          'override qmake executable'),
         ('qt-include-dir=', None,
@@ -59,7 +57,7 @@ class build_ext(distutils.command.build_ext.build_ext):
         ]
 
     def initialize_options(self):
-        distutils.command.build_ext.build_ext.initialize_options(self)
+        build_ext.initialize_options(self)
         self.qmake_exe = None
         self.qt_include_dir = None
         self.qt_library_dir = None
@@ -282,13 +280,3 @@ protected-is-public=false
             os.path.join(output_dir, 'sip.h'),
             os.path.join(output_dir, modulename, 'sip.h')
         )
-
-    def build_extensions(self):
-        # remove annoying flag which causes warning for c++ sources
-        # https://stackoverflow.com/a/36293331/351771
-        customize_compiler(self.compiler)
-        try:
-            self.compiler.compiler_so.remove("-Wstrict-prototypes")
-        except (AttributeError, ValueError):
-            pass
-        distutils.command.build_ext.build_ext.build_extensions(self)
