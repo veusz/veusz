@@ -30,14 +30,16 @@ want to use the embedding module.
 
 ### Linux
 
-Unpack the provided tar file.  Note that this may not
-work on all distributions due to glibc/library
-incompatibilities. Simply unpack the tar file and run the main
-executable:
+Unpack the provided tar file and run the `veusz.exe` file inside
+(please note that the `.exe` extension does not mean a Windows
+executable here!):
 
     $ tar xf veusz-3.6-linux-x86_64.tar.xz   [change version here]
     $ cd veusz-3.6-linux-x86_64
-    $ ./veusz.exe                            [note, this is not a windows exe!]
+    $ ./veusz.exe
+
+Note that this may not work on all distributions due to glibc or other
+library incompatibilities.
 
 ### MacOS
 
@@ -80,10 +82,18 @@ An example use of a virtual environment to build veusz would be
     $ python3 -m venv /path/to/virtual/environment      [setup environment]
     $ source /path/to/virtual/environment/bin/activate  [activate it]
     $ pip3 install numpy PyQt5 sip astropy h5py tomli   [install necessary requirements]
-    $ pip3 install h5py astropy iminuit pyemf3          [install optional requirements]
+    $ pip3 install h5py astropy iminuit                 [install optional requirements]
+    $ pip3 install https://github.com/jeremysanders/pyemf3.git [optional, for EMF output]
     $ tar xf veusz-3.5.tar.gz                           [unpack veusz source]
     $ cd veusz-3.5
     $ pip3 install -v .                                 [build and install veusz from current directory]
+
+However, for the above to work requires a working Qt5 development
+installation. This can be your Linux distribution's Qt packages,
+binaries download from the Qt website, or a Qt build from source. A
+quick way to install Qt binaries on different platforms can be using
+the [aqtinstall](https://github.com/miurahr/aqtinstall) command line
+installer.
 
 ### Installing into system Python directories
 
@@ -101,6 +111,15 @@ On Ubuntu/Debian systems the following packages are necessary:
         python3-numpy python3-pyqt5 python3-pyqt5.qtsvg \
         python3-sipbuild python3-tomli \
         pyqt5-dev pyqt5-dev-tools qt5-qmake qtbase5-dev sip-tools
+
+On Fedora the following are required:
+
+    $ dnf install python3-devel python3-setuptools \
+        python3-numpy qt5-qtbase-devel qt5-qtsvg-devel \
+        python3-qt5 python3-qt5-devel python3-pyqt5-sip \
+        python3-h5py python3-tomli
+
+Other Unix or Linux systems will likely contain the needed packages.
 
 ### Testing
 
