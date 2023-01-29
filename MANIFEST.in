@@ -1,4 +1,4 @@
-include AUTHORS ChangeLog COPYING INSTALL README.md
+include AUTHORS ChangeLog COPYING INSTALL.md README.md
 include MANIFEST.in setup.py pyqt_setuptools.py setup.cfg run_veusz_inplace
 include scripts/veusz
 recursive-include veusz/helpers *.c *.cpp *.h README LICENSE_* QtMml*

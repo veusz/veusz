@@ -20,7 +20,7 @@
 
 """
 Veusz setuputils script
-see the file INSTALL for details on how to install Veusz
+see the file INSTALL.md for details on how to install Veusz
 """
 
 import numpy
