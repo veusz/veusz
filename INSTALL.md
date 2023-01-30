@@ -173,9 +173,7 @@ location.
   be installed by the main installer in other locations. However, they
   can be moved by a packager. After moving, a packager can either
   point to the real location with a symlink, set the
-  `VEUSZ_RESOURCE_DIR` environment variable with the location, or
-  write the location in a file called `RESOURCES` in the module
-  directory.
+  `VEUSZ_RESOURCE_DIR` environment variable with the location.
 
 - Veusz is mostly platform-independent python code and data files with
   a separate `helpers` module containing platform-dependent code. It

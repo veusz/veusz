@@ -55,13 +55,8 @@ def _getVeuszDirectory():
         # standard installation
         resdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-    try:
-        # see whether file containing location of resources exists
-        with open(os.path.join(resdir, 'RESOURCES')) as fin:
-            resdir = fin.read().strip()
-    except EnvironmentError:
-        # resources are in subdirectory
-        resdir = os.path.realpath( os.path.join(resdir, 'resources') )
+    # resources are in subdirectory
+    resdir = os.path.realpath( os.path.join(resdir, 'resources') )
 
     # override with VEUSZ_RESOURCE_DIR environment variable if necessary
     resdir = os.environ.get('VEUSZ_RESOURCE_DIR', resdir)
