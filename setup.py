@@ -60,6 +60,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Development Status :: 5 - Production/Stable',
         'Environment :: X11 Applications :: Qt',
         'Intended Audience :: Science/Research',
@@ -83,6 +84,12 @@ setup(
         'veusz.utils',
         'veusz.widgets',
         'veusz.windows',
+
+        # not real modules, but setuptools needs them like this
+        'veusz.resources',
+        'veusz.resources.examples',
+        'veusz.resources.icons',
+        'veusz.resources.ui',
     ],
 
     ext_modules = [
@@ -90,20 +97,20 @@ setup(
         Extension(
             'veusz.helpers.threed',
             [
-                'veusz/helpers/src/threed/camera.cpp',
-                'veusz/helpers/src/threed/mmaths.cpp',
-                'veusz/helpers/src/threed/objects.cpp',
-                'veusz/helpers/src/threed/scene.cpp',
-                'veusz/helpers/src/threed/fragment.cpp',
-                'veusz/helpers/src/threed/numpy_helpers.cpp',
-                'veusz/helpers/src/threed/clipcontainer.cpp',
-                'veusz/helpers/src/threed/bsp.cpp',
-                'veusz/helpers/src/threed/twod.cpp',
-                'veusz/helpers/src/threed/threed.sip'
+                'src/threed/camera.cpp',
+                'src/threed/mmaths.cpp',
+                'src/threed/objects.cpp',
+                'src/threed/scene.cpp',
+                'src/threed/fragment.cpp',
+                'src/threed/numpy_helpers.cpp',
+                'src/threed/clipcontainer.cpp',
+                'src/threed/bsp.cpp',
+                'src/threed/twod.cpp',
+                'src/threed/threed.sip'
             ],
             language="c++",
             include_dirs=[
-                'veusz/helpers/src/threed', numpy.get_include()
+                'src/threed', numpy.get_include()
             ],
         ),
 
@@ -111,30 +118,30 @@ setup(
         Extension(
             'veusz.helpers.qtmml',
             [
-                'veusz/helpers/src/qtmml/qtmmlwidget.cpp',
-                'veusz/helpers/src/qtmml/qtmml.sip'
+                'src/qtmml/qtmmlwidget.cpp',
+                'src/qtmml/qtmml.sip'
             ],
             language="c++",
-            include_dirs=['veusz/helpers/src/qtmml'],
+            include_dirs=['src/qtmml'],
         ),
 
         # device to record paint commands
         Extension(
             'veusz.helpers.recordpaint',
             [
-                'veusz/helpers/src/recordpaint/recordpaintdevice.cpp',
-                'veusz/helpers/src/recordpaint/recordpaintengine.cpp',
-                'veusz/helpers/src/recordpaint/recordpaint.sip'
+                'src/recordpaint/recordpaintdevice.cpp',
+                'src/recordpaint/recordpaintengine.cpp',
+                'src/recordpaint/recordpaint.sip'
             ],
             language="c++",
-            include_dirs=['veusz/helpers/src/recordpaint'],
+            include_dirs=['src/recordpaint'],
         ),
 
         # contour plotting library
         Extension(
             'veusz.helpers._nc_cntr',
             [
-                'veusz/helpers/src/nc_cntr/_nc_cntr.c'
+                'src/nc_cntr/_nc_cntr.c'
             ],
             include_dirs=[numpy.get_include()]
         ),
@@ -143,17 +150,18 @@ setup(
         Extension(
             'veusz.helpers.qtloops',
             [
-                'veusz/helpers/src/qtloops/qtloops.cpp',
-                'veusz/helpers/src/qtloops/qtloops_helpers.cpp',
-                'veusz/helpers/src/qtloops/polygonclip.cpp',
-                'veusz/helpers/src/qtloops/polylineclip.cpp',
-                'veusz/helpers/src/qtloops/beziers.cpp',
-                'veusz/helpers/src/qtloops/beziers_qtwrap.cpp',
-                'veusz/helpers/src/qtloops/numpyfuncs.cpp',
-                'veusz/helpers/src/qtloops/qtloops.sip'],
+                'src/qtloops/qtloops.cpp',
+                'src/qtloops/qtloops_helpers.cpp',
+                'src/qtloops/polygonclip.cpp',
+                'src/qtloops/polylineclip.cpp',
+                'src/qtloops/beziers.cpp',
+                'src/qtloops/beziers_qtwrap.cpp',
+                'src/qtloops/numpyfuncs.cpp',
+                'src/qtloops/qtloops.sip'
+            ],
             language="c++",
             include_dirs=[
-                'veusz/helpers/src/qtloops',
+                'src/qtloops',
                 numpy.get_include()
             ],
         ),
