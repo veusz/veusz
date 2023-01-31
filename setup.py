@@ -29,69 +29,7 @@ from setuptools import setup, Extension
 # setuptools extension for building SIP/PyQt modules
 from pyqt_setuptools import sip_build_ext
 
-# version is stored in a file
-with open('veusz/resources/VERSION') as verf:
-    version = verf.read().strip()
-
-descr = '''Veusz is a 2D and 3D scientific plotting package, designed to
-create publication-ready PDF and SVG output. It features GUI,
-command-line, and scripting interfaces. Graphs are constructed from
-"widgets", allowing complex layouts to be designed. Veusz supports
-plotting functions, data with errors, keys, labels, stacked plots,
-multiple plots, and fitting data.'''
-
 setup(
-    name = 'veusz',
-    version = version,
-    description = 'A scientific plotting package',
-    long_description = descr,
-    author = 'Jeremy Sanders',
-    author_email = 'jeremy@jeremysanders.net',
-    url = 'https://veusz.github.io/',
-    license = 'GPLv2+',
-    classifiers = [
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: X11 Applications :: Qt',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: '
-        'GNU General Public License v2 or later (GPLv2+)',
-        'Topic :: Scientific/Engineering :: Visualization'
-    ],
-    python_requires='>=3.3',
-
-    include_package_data=True,
-    packages = [
-        'veusz',
-        'veusz.dataimport',
-        'veusz.datasets',
-        'veusz.dialogs',
-        'veusz.document',
-        'veusz.helpers',
-        'veusz.plugins',
-        'veusz.qtwidgets',
-        'veusz.setting',
-        'veusz.utils',
-        'veusz.widgets',
-        'veusz.windows',
-
-        # not real modules, but setuptools needs them like this
-        'veusz.resources',
-        'veusz.resources.examples',
-        'veusz.resources.icons',
-        'veusz.resources.ui',
-    ],
-
     ext_modules = [
         # threed support
         Extension(
@@ -170,24 +108,5 @@ setup(
     # new command options
     cmdclass = {
         'build_ext': sip_build_ext,
-    },
-
-    # requires these modules to install
-    install_requires = [
-        'numpy', 'PyQt5'
-    ],
-
-    # optional requirements
-    extras_require = {
-        "optional": [
-            'astropy', 'pyemf3', 'sampy', 'iminuit', 'h5py'
-        ]
-    },
-
-    # GUI entry points
-    entry_points = {
-        'gui_scripts' : [
-            'veusz = veusz.veusz_main:run',
-        ]
     },
 )
