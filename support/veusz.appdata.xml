@@ -4,7 +4,7 @@
   <id>io.github.veusz.Veusz</id>
   <launchable type="desktop-id">Veusz.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>GPL-2.0-only</project_license>
+  <project_license>GPL-2.0+</project_license>
   <name>Veusz</name>
   <summary>Scientific plotting package</summary>
   <description>
@@ -53,7 +53,11 @@
   <content_rating type="oars-1.1"/>
     <releases>
         <release version="3.3.1" date="2020-12-06">
-        </release>    
+        </release>
+        <release version="3.4" date="2021-10-17">
+        </release>
+        <release version="3.5.3" date="2022-11-01">
+        </release>
     </releases>
   <updatecontact>jeremy@jeremysanders.net</updatecontact>
 </application>
