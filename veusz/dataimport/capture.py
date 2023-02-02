@@ -113,7 +113,7 @@ class FileCaptureStream(CaptureStream):
         CaptureStream.__init__(self)
 
         # open file
-        self.fileobj = open(filename, 'rU')
+        self.fileobj = open(filename)
 
         # make new thread to read file
         self.readerthread = utils.NonBlockingReaderThread(

@@ -72,7 +72,7 @@ resourceDirectory, exampleDirectory = _getVeuszDirectory()
 def getLicense():
     """Return license text."""
     try:
-        with open(os.path.join(resourceDirectory, 'COPYING'), 'rU') as f:
+        with open(os.path.join(resourceDirectory, 'COPYING')) as f:
             text = f.read()
     except EnvironmentError:
         text = (

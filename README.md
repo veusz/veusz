@@ -21,6 +21,7 @@ Changes in 3.6:
   * Change to layout of resource directories, due to setuptools. Packagers
     should pay attention to this.
   * Rewrite install instructions in INSTALL.md
+  * Fix for Python 3.11 due to opening with universal newlines
 
 ## Features of package:
 
