@@ -5,9 +5,6 @@ Changes in 3.6:
   * Fix breakage with recent numpy versions due to removal of bool
   * Fix error in colormap sequence
   * About dialog shows software versions
-  * Remove usage of distutils
-  * Change to layout of resource directories, due to setuptools. Packagers
-    should pay attention to this.
   * Rewrite install instructions in INSTALL.md
   * Fix for Python 3.11 due to opening with universal newlines
 

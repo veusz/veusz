@@ -1,11 +1,11 @@
 include AUTHORS ChangeLog COPYING INSTALL.md README.md
-include MANIFEST.in setup.py pyqt_setuptools.py setup.cfg run_veusz_inplace
+include MANIFEST.in *.py setup.cfg run_veusz_inplace
 include scripts/veusz
 recursive-include src *.c *.cpp *.h README LICENSE_* QtMml*
-include veusz/resources/VERSION veusz/resources/COPYING
-recursive-include veusz/resources/examples *.vsz *.py *.csv *.dat
-recursive-include veusz/resources/icons *.icns *.png *.ico *.svg LICENSE-*
-recursive-include veusz/resources/ui *.ui
+include VERSION
+recursive-include examples *.vsz *.py *.csv *.dat
+recursive-include icons *.icns *.png *.ico *.svg LICENSE-*
+recursive-include ui *.ui
 recursive-include support *.xml *.desktop
 
 # self tests

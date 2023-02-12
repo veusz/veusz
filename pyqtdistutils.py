@@ -1,4 +1,4 @@
-# Subclasses setuptools.command.build_ext,
+# Subclasses distutils.command.build_ext,
 # replacing it with a SIP version that compiles .sip -> .cpp
 # before calling the original build_ext command.
 # Originally written by Giovanni Bajo <rasky at develer dot com>
@@ -9,8 +9,9 @@ import shutil
 import subprocess
 import tomli
 
+from distutils.sysconfig import customize_compiler
 from sysconfig import get_path
-from setuptools.command.build_ext import build_ext
+from distutils.command.build_ext import build_ext
 
 ##################################################################
 
@@ -40,17 +41,19 @@ def read_command_output(cmd):
 
 class sip_build_ext(build_ext):
 
-    description = (
-        'Compile SIP descriptions, then build C/C++ extensions '
-        '(compile/link to build directory)'
-    )
+    description = ('Compile SIP descriptions, then build C/C++ extensions '
+                   '(compile/link to build directory)')
 
     user_options = build_ext.user_options + [
-        ('qmake-exe=', None, 'override qmake executable'),
-        ('qt-include-dir=', None, 'override Qt include directory'),
-        ('qt-library-dir=', None, 'override Qt library directory'),
-        ('qt-libinfix=', None, 'override Qt infix setting'),
-    ]
+        ('qmake-exe=', None,
+         'override qmake executable'),
+        ('qt-include-dir=', None,
+         'override Qt include directory'),
+        ('qt-library-dir=', None,
+         'override Qt library directory'),
+        ('qt-libinfix=', None,
+         'override Qt infix setting'),
+        ]
 
     def initialize_options(self):
         build_ext.initialize_options(self)
@@ -276,3 +279,13 @@ protected-is-public=false
             os.path.join(output_dir, 'sip.h'),
             os.path.join(output_dir, modulename, 'sip.h')
         )
+
+    def build_extensions(self):
+        # remove annoying flag which causes warning for c++ sources
+        # https://stackoverflow.com/a/36293331/351771
+        customize_compiler(self.compiler)
+        try:
+            self.compiler.compiler_so.remove("-Wstrict-prototypes")
+        except (AttributeError, ValueError):
+            pass
+        build_ext.build_extensions(self)

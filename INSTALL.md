@@ -163,17 +163,29 @@ location.
 
 * It is recommended to run the self test above (if possible).
 
-* Various files Veusz needs to run are stored in a `resources`
-  subdirectory within the Veusz module directory. These include the
-  current version (`VERSION`), licence (`COPYING`), icons (`icons`
-  subdirectory), user-interface description (`ui` subdirectory) and
-  examples (`examples` subdirectory).
+* Veusz needs access to several subdirectories containing resource
+  files, which are by default installed in the veusz module directory.
+  These include the current version (`VERSION`), licence (`COPYING`),
+  icons (`icons` subdirectory), user-interface description (`ui`
+  subdirectory) and examples (`examples` subdirectory).  This location
+  may not be desired by unix packagers, for example, who want to
+  separate the code from the data files.
 
-  Unfortunately due to the inflexibility of setuptools, these cannot
-  be installed by the main installer in other locations. However, they
-  can be moved by a packager. After moving, a packager can either
-  point to the real location with a symlink, set the
-  `VEUSZ_RESOURCE_DIR` environment variable with the location.
+  It is possible to install these files in a different location by
+  using the setup.py option `--veusz-resource-dir` (for example with
+  `/usr/share/veusz`). If you do this, then you need to tell veusz
+  where these resources are at runtime or when testing. This can be
+  done by using a symlink `resources` in the the veusz module
+  directory which points to the location of these files and
+  directories. Alternatively, the environment variable
+  `VEUSZ_RESOURCE_DIR` can be set.
+
+  There is an addition setup.py option `--disable-install-examples`
+  which disables installation of the example files. This may be
+  helpful for packagers who want to place the example files in
+  `/usr/share/doc`. As veusz shows these files on the help menu, it is
+  suggested that an `examples` symlink is added to the resources
+  directory to point to the location of the example files.
 
 - Veusz is mostly platform-independent python code and data files with
   a separate `helpers` module containing platform-dependent code. It
