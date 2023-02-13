@@ -1,6 +1,7 @@
-# Subclasses distutils.command.build_ext,
+# Subclasses setuptools.command.build_ext,
 # replacing it with a SIP version that compiles .sip -> .cpp
 # before calling the original build_ext command.
+
 # Originally written by Giovanni Bajo <rasky at develer dot com>
 # Based on Pyrex.Distutils, written by Graham Fawcett and Darrel Gallion.
 
@@ -9,9 +10,8 @@ import shutil
 import subprocess
 import tomli
 
-from distutils.sysconfig import customize_compiler
 from sysconfig import get_path
-from distutils.command.build_ext import build_ext
+from setuptools.command.build_ext import build_ext
 
 ##################################################################
 
@@ -279,13 +279,3 @@ protected-is-public=false
             os.path.join(output_dir, 'sip.h'),
             os.path.join(output_dir, modulename, 'sip.h')
         )
-
-    def build_extensions(self):
-        # remove annoying flag which causes warning for c++ sources
-        # https://stackoverflow.com/a/36293331/351771
-        customize_compiler(self.compiler)
-        try:
-            self.compiler.compiler_so.remove("-Wstrict-prototypes")
-        except (AttributeError, ValueError):
-            pass
-        build_ext.build_extensions(self)

@@ -31,8 +31,8 @@ from setuptools import setup, Extension
 from setuptools.command.install import install as orig_install
 from distutils.command.install_data import install_data
 
-# distutils extension for building SIP/PyQt modules
-from pyqtdistutils import sip_build_ext
+# setuptools extension for building SIP/PyQt modules
+from pyqt_setuptools import sip_build_ext
 
 class install(orig_install):
     user_options = orig_install.user_options + [
