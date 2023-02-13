@@ -19,6 +19,7 @@ Changes in 3.6:
   * About dialog shows software versions
   * Rewrite install instructions in INSTALL.md
   * Fix for Python 3.11 due to opening with universal newlines
+  * Remove use of distutils
 
 ## Features of package:
 

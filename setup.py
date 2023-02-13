@@ -29,7 +29,10 @@ import numpy
 
 from setuptools import setup, Extension
 from setuptools.command.install import install as orig_install
-from distutils.command.install_data import install_data
+
+# code taken from distutils for installing data that was removed in
+# setuptools
+from install_data import install_data
 
 # setuptools extension for building SIP/PyQt modules
 from pyqt_setuptools import sip_build_ext
