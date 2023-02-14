@@ -1,0 +1,7 @@
+Drag Veusz to the Applications folder to install it.
+
+You can keep a copy of the examples somewhere for reference (although
+they are included on the help menu).
+
+The files in the embedding folder can be placed on the Python path
+to get access to the embedding interface
