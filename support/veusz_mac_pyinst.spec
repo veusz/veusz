@@ -19,7 +19,7 @@ a = Analysis(
 
 # add necessary documentation, licence
 binaries = a.binaries
-for bin in ('VERSION', 'ChangeLog', 'AUTHORS', 'README.md', 'INSTALL', 'COPYING'):
+for bin in ('VERSION', 'ChangeLog', 'AUTHORS', 'README.md', 'INSTALL.md', 'COPYING'):
     binaries += [ (bin, bin, 'DATA') ]
 
 binaries += [
