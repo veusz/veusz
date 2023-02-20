@@ -861,12 +861,12 @@ class _SvgRotItem(qt.QGraphicsSvgItem, _ScaledShape):
 
     def mouseMoveEvent(self, event):
         """Notify parent on move."""
-        qt.QGraphicsRectItem.mouseMoveEvent(self, event)
+        qt.QGraphicsSvgItem.mouseMoveEvent(self, event)
         self.parentItem().updateMovedCntrl(self, event, self.mode)
 
     def mouseReleaseEvent(self, event):
         """Notify parent on unclicking."""
-        qt.QGraphicsRectItem.mouseReleaseEvent(self, event)
+        qt.QGraphicsSvgItem.mouseReleaseEvent(self, event)
         self.parentItem().updateWidget()
 
 def rotM_to_angles(rotM):
