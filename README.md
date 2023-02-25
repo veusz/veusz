@@ -1,4 +1,4 @@
-# [Veusz 3.5.99](https://veusz.github.io/)
+# [Veusz 3.6](https://veusz.github.io/)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
