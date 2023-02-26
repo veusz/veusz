@@ -1,3 +1,7 @@
+Changes in 3.6.1:
+  * Fix appdata file
+  * Fix issue in setup.cfg
+
 Changes in 3.6:
   * Interactive rotation of 3D plots
   * Add 12-bit rainbow colormap
