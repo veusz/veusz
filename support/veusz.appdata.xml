@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2014 Jeremy Sanders <jeremy@jeremysanders.net> -->
-<application>
+<component type="desktop-application">
   <id>io.github.veusz.Veusz</id>
   <launchable type="desktop-id">Veusz.desktop</launchable>
   <metadata_license>CC0-1.0</metadata_license>
@@ -62,4 +62,4 @@
         </release>
     </releases>
   <updatecontact>jeremy@jeremysanders.net</updatecontact>
-</application>
+</component>
