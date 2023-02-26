@@ -54,13 +54,13 @@ def _getVeuszDirectory():
     else:
         # standard installation
         resdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        if not os.path.exists(os.path.join(resdir, 'VERSION')):
+
+        if os.path.exists( os.path.join(resdir, 'resources') ):
+            # override data directory with symlink
+            resdir = os.path.realpath( os.path.join(resdir, 'resources') )
+        elif not os.path.exists(os.path.join(resdir, 'VERSION')):
             # running from the current direction
             resdir = os.path.join(resdir, '..')
-
-    # override data directory with symlink
-    if os.path.exists( os.path.join(resdir, 'resources') ):
-        resdir = os.path.realpath( os.path.join(resdir, 'resources') )
 
     # override with VEUSZ_RESOURCE_DIR environment variable if necessary
     resdir = os.environ.get('VEUSZ_RESOURCE_DIR', resdir)

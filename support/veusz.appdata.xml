@@ -52,6 +52,8 @@
   <url type="bugtracker">https://github.com/veusz/veusz/issues</url>
   <content_rating type="oars-1.1"/>
     <releases>
+        <release version="3.6.2" date="2023-02-26">
+        </release>
         <release version="3.6.1" date="2023-02-26">
         </release>
         <release version="3.6" date="2023-02-25">

@@ -1,3 +1,6 @@
+Changes in 3.6.2:
+  * Fix broken resource symlink handling
+
 Changes in 3.6.1:
   * Fix appdata file
   * Fix issue in setup.cfg
