@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #    Copyright (C) 2012 Jeremy S. Sanders
 #    Email: Jeremy Sanders <jeremy@jeremysanders.net>
@@ -54,7 +54,7 @@ import os.path
 
 from lxml import etree
 
-class Message(object):
+class Message:
     '''A translatable string.'''
     def __init__(self, string, filename=None, lineno=None, comment=None):
         self.string = string
@@ -159,7 +159,7 @@ class PythonMessageVisitor(ast.NodeVisitor):
         if len(args.args) != 3 or len(args.defaults) != 2:
             return
 
-        argids = [a.id.lower() for a in args.args]
+        argids = [a.arg.lower() for a in args.args]
         # only functions with disambiguation and context as optional arguments
         if 'disambiguation' not in argids or 'context' not in argids:
             return
@@ -190,7 +190,7 @@ class PythonMessageVisitor(ast.NodeVisitor):
         self.fn2context[name] = context
         self.fnargs[name] = argids
 
-class TSWriter(object):
+class TSWriter:
     """Class for writing ts files."""
 
     def __init__(self, filename, contexts, filenames=[], verbose=True):
@@ -203,9 +203,10 @@ class TSWriter(object):
         '''Given the context xml node, add a new message.'''
 
         if self.verbose:
-            sys.stdout.write('Adding new message %s to context %s\n' %
-                             (repr(message.string),
-                              repr(ncontext.find('name').text)))
+            sys.stdout.write(
+                'Adding new message %s to context %s\n' % (
+                    repr(message.string),
+                    repr(ncontext.find('name').text)))
 
         nmessage = etree.SubElement(ncontext, 'message')
 
@@ -263,7 +264,9 @@ class TSWriter(object):
             filename = nlocation.get('filename')
             if filename not in self.filenames:
                 if self.verbose:
-                    sys.stdout.write('Not marking %s as obsolete as file not processed\n' % repr(source))
+                    sys.stdout.write(
+                        'Not marking %s as obsolete as file not processed\n' %
+                        repr(source))
                 return
 
         # message no longer exists, so obsolete
@@ -296,8 +299,9 @@ class TSWriter(object):
         if ntranslation.get('type') == 'obsolete':
             ntranslation.set('type', 'unfinished')
             if self.verbose:
-                sys.stdout.write('Unmarking %s as obsolete\n' %
-                                 nmessage.find('source').text)
+                sys.stdout.write(
+                    'Unmarking %s as obsolete\n' %
+                    nmessage.find('source').text)
 
     def write_new(self):
         '''Write a new output .ts file.'''
@@ -313,9 +317,9 @@ class TSWriter(object):
             self.add_context_to_root(nroot, context, messages)
 
         tree = etree.ElementTree(nroot)
-        with open(self.filename, 'w') as f:
-            f.write('<!DOCTYPE TS>\n')
-            tree.write(f, pretty_print=True, encoding='utf-8')
+        with open(self.filename, 'wb') as f:
+            f.write(b'<!DOCTYPE TS>\n')
+            tree.write(f, pretty_print=True, encoding='utf8')
 
     def update(self):
         '''Update an existing ts file with the contexts given.'''
@@ -412,13 +416,15 @@ def ui_find_strings(filename, retn, verbose=True):
         if not string.text:
             continue
 
-        message = Message(string.text, filename=filename,
-                          lineno=string.sourceline)
+        message = Message(
+            string.text, filename=filename,
+            lineno=string.sourceline)
 
         if verbose:
-            sys.stdout.write('Found string %s in %s:%i\n' %
-                             (repr(message.string), filename,
-                              string.sourceline))
+            sys.stdout.write(
+                'Found string %s in %s:%i\n' % (
+                    repr(message.string), filename,
+                    string.sourceline))
 
         if context not in retn:
             retn[context] = []
@@ -428,31 +434,36 @@ def main():
     parser = argparse.ArgumentParser(
         description='Find translatable strings in PyQt programs',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('files', metavar='FILE', nargs='+',
-                        help='input source file')
-    parser.add_argument('--verbose', action='store_true',
-                        help='display verbose output')
-    parser.add_argument('--reset', action='store_true',
-                        help='write output file as new')
-    parser.add_argument('--output', metavar='FILE',
-                        default='output.ts',
-                        help='output ts file')
-    parser.add_argument('--defn', metavar='FNAME:CTX',nargs='+',default=[],
-						help='force global function name:context')
+    parser.add_argument(
+        'files', metavar='FILE', nargs='+',
+        help='input source file')
+    parser.add_argument(
+        '--verbose', action='store_true',
+        help='display verbose output')
+    parser.add_argument(
+        '--reset', action='store_true',
+        help='write output file as new')
+    parser.add_argument(
+        '--output', metavar='FILE',
+        default='output.ts',
+        help='output ts file')
+    parser.add_argument(
+        '--defn', metavar='FNAME:CTX',nargs='+',default=[],
+        help='force global function name:context')
     args = parser.parse_args()
 
     # Prepare forced global translation functions
     gcontext={}
     gargs={}
     for n in args.defn:
-    	if ':' in n: 
-    		n,ctx = n.split(':')
-    	else:
-    	   # Default context is 'global'
-    	   ctx = 'global'
-    	gcontext[n]=ctx
-    	# Always use default argids for forced functions
-    	gargs[n] = ['text','disambiguation','context']
+        if ':' in n:
+            n,ctx = n.split(':')
+        else:
+            # Default context is 'global'
+            ctx = 'global'
+        gcontext[n]=ctx
+        # Always use default argids for forced functions
+        gargs[n] = ['text','disambiguation','context']
 
     retn = {}
     for infile in args.files:
@@ -462,15 +473,19 @@ def main():
 
         ext = os.path.splitext(infile)[1]
         if ext == '.py':
-            python_find_strings(infile, retn, verbose=args.verbose,gcontext=gcontext,gargs=gargs)
+            python_find_strings(
+                infile, retn, verbose=args.verbose,
+                gcontext=gcontext, gargs=gargs)
         elif ext == '.ui':
             ui_find_strings(infile, retn, verbose=args.verbose)
         else:
-            sys.stderr.write('Unknown file extension %s in %s\n' %
-                             (ext, infile))
+            sys.stderr.write(
+                'Unknown file extension %s in %s\n' %
+                (ext, infile))
 
-    writer = TSWriter(args.output, retn, filenames=args.files,
-                      verbose=args.verbose)
+    writer = TSWriter(
+        args.output, retn, filenames=args.files,
+        verbose=args.verbose)
 
     if os.path.isfile(args.output) and not args.reset:
         writer.update()
