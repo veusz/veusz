@@ -1968,7 +1968,7 @@ class Histogram2D(DatasetPlugin):
         # compute counts in each bin
         histo, xedge, yedge = N.histogram2d(
             dsy, dsx, bins=[fields['binsy'], fields['binsx']],
-            range=[[miny,maxy], [minx,maxx]], normed=False)
+            range=[[miny,maxy], [minx,maxx]], density=False)
 
         m = fields['mode']
         if m == 'Count':
