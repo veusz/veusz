@@ -63,7 +63,7 @@ class ReloadData(VeuszDialog):
 
         # manual reload
         self.reloadbutton = self.buttonBox.addButton(
-            "&Reload again", qt.QDialogButtonBox.StandardButton.ApplyRole)
+            "&Reload again", qt.QDialogButtonBox.ButtonRole.ApplyRole)
         self.reloadbutton.clicked.connect(self.reloadData)
 
         # close by default, not reload

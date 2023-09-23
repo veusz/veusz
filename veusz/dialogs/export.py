@@ -137,9 +137,9 @@ class ExportDialog(VeuszDialog):
         self.fmtradios[ext].click()
 
         # regexp for comma separated ranges
-        valre = qt.QRegExp(
+        valre = qt.QRegularExpression(
             r'^[0-9]+(\s*-\s*[0-9]+)?(\s*,\s*[0-9]+(\s*-\s*[0-9]+)?)*$')
-        valid = qt.QRegExpValidator(valre, self)
+        valid = qt.QRegularExpressionValidator(valre, self)
         self.editPagePages.setValidator(valid)
 
         # set page mode
@@ -204,7 +204,7 @@ class ExportDialog(VeuszDialog):
         fd.setDirectory(dirname if dirname else self.dirname)
 
         fd.setFileMode(qt.QFileDialog.FileMode.AnyFile)
-        fd.setAcceptMode(qt.QFileDialog.DialogLabel.AcceptSave)
+        fd.setAcceptMode(qt.QFileDialog.AcceptMode.AcceptSave)
         fd.setOptions(qt.QFileDialog.Option.DontConfirmOverwrite)
 
         # Create a mapping between a format string and extensions

@@ -50,9 +50,9 @@ class DataCreateDialog(VeuszDialog):
 
         # connect create button
         self.createbutton = self.buttonBox.addButton(
-            _("C&reate"), qt.QDialogButtonBox.StandardButton.ApplyRole )
+            _("C&reate"), qt.QDialogButtonBox.ButtonRole.ApplyRole )
         self.replacebutton = self.buttonBox.addButton(
-            _("&Replace"), qt.QDialogButtonBox.StandardButton.ApplyRole )
+            _("&Replace"), qt.QDialogButtonBox.ButtonRole.ApplyRole )
 
         self.buttonBox.button(
             qt.QDialogButtonBox.StandardButton.Reset).clicked.connect(self.resetButtonClicked)

@@ -23,8 +23,8 @@ class HistoryCheck(qt.QCheckBox):
     """Checkbox remembers its setting between calls
     """
 
-    def __init__(self, *args):
-        qt.QCheckBox.__init__(self, *args)
+    def __init__(self, *args, **argsv):
+        qt.QCheckBox.__init__(self, *args, **argsv)
         self.default = False
 
     def getSettingName(self):

@@ -51,7 +51,7 @@ class DataCreate2DDialog(VeuszDialog):
         self.document = document
 
         self.createbutton = self.buttonBox.addButton(
-            _("C&reate"), qt.QDialogButtonBox.StandardButton.ApplyRole )
+            _("C&reate"), qt.QDialogButtonBox.ButtonRole.ApplyRole )
         self.createbutton.clicked.connect(self.createButtonClickedSlot)
 
         self.fromxyfunc.toggled.connect(self.fromxyfuncSlot)

@@ -437,9 +437,9 @@ class Function3D(plotters3d.GenericPlotter3D):
             lineprop = s.GridLine.makeLineProp(painter)
 
         dirn = {
-            'x': threed.Mesh.X_DIRN,
-            'y': threed.Mesh.Y_DIRN,
-            'z': threed.Mesh.Z_DIRN
+            'x': threed.Mesh.Direction.X_DIRN,
+            'y': threed.Mesh.Direction.Y_DIRN,
+            'z': threed.Mesh.Direction.Z_DIRN
         }[depvar]
 
         mesh = threed.Mesh(

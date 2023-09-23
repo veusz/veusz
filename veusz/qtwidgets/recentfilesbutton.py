@@ -45,8 +45,8 @@ class RecentFilesButton(qt.QPushButton):
 
     filechosen = qt.pyqtSignal(str)
 
-    def __init__(self, *args):
-        qt.QPushButton.__init__(self, *args)
+    def __init__(self, *args, **argsv):
+        qt.QPushButton.__init__(self, *args, **argsv)
 
         self.menu = qt.QMenu()
         self.setMenu(self.menu)

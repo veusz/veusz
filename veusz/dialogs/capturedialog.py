@@ -53,7 +53,7 @@ class CaptureDialog(VeuszDialog):
 
         # add completion for filenames
         c = self.filenamecompleter = qt.QCompleter(self)
-        model = qt.QDirModel(c)
+        model = qt.QFileSystemModel()
         c.setModel(model)
         self.filenameEdit.setCompleter(c)
 
@@ -62,7 +62,7 @@ class CaptureDialog(VeuszDialog):
         self.methodBG.addButton( self.captureFileButton, 0 )
         self.methodBG.addButton( self.captureInternetButton, 1 )
         self.methodBG.addButton( self.captureProgramButton, 2 )
-        self.methodBG.buttonClicked[int].connect(self.slotMethodChanged)
+        self.methodBG.idClicked[int].connect(self.slotMethodChanged)
         # restore previously clicked button
         self.methodBG.button( d.get('CaptureDialog_method', 0) ).click()
 
@@ -71,7 +71,7 @@ class CaptureDialog(VeuszDialog):
         self.stopBG.addButton( self.clickingStopButton, 0 )
         self.stopBG.addButton( self.numLinesStopButton, 1 )
         self.stopBG.addButton( self.timeStopButton, 2 )
-        self.stopBG.buttonClicked[int].connect(self.slotStopChanged)
+        self.stopBG.idClicked[int].connect(self.slotStopChanged)
         self.stopBG.button( d.get('CaptureDialog_stop', 0) ).click()
 
         # update interval
@@ -83,7 +83,9 @@ class CaptureDialog(VeuszDialog):
 
         # user starts capture
         self.captureButton = self.buttonBox.addButton(
-            _("Ca&pture"), qt.QDialogButtonBox.StandardButton.ApplyRole )
+            _("Ca&pture"),
+            qt.QDialogButtonBox.ButtonRole.ApplyRole,
+        )
 
         self.captureButton.clicked.connect(self.slotCaptureClicked)
 

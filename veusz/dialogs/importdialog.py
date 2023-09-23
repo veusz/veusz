@@ -117,16 +117,13 @@ class ImportDialog(VeuszDialog):
         self.filenameedit.editTextChanged.connect(self.slotUpdatePreview)
 
         self.importbutton = self.buttonBox.addButton(
-            _("&Import"), qt.QDialogButtonBox.StandardButton.ApplyRole)
+            _("&Import"), qt.QDialogButtonBox.ButtonRole.ApplyRole)
         self.importbutton.clicked.connect(self.slotImport)
 
-        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Reset).clicked.connect(
-            self.slotReset)
+        self.buttonBox.button(
+            qt.QDialogButtonBox.StandardButton.Reset).clicked.connect(
+                self.slotReset)
         self.encodingcombo.currentIndexChanged.connect(self.slotUpdatePreview)
-
-        # add completion for filename
-        c = self.filenamecompleter = qt.QCompleter(self)
-        self.filenameedit.setCompleter(c)
 
         # change to tab last used
         self.methodtab.setCurrentIndex(
@@ -136,6 +133,10 @@ class ImportDialog(VeuszDialog):
         self.prefixcombo.default = self.suffixcombo.default = ['', '$FILENAME']
 
         # default state for check boxes
+        # add completion for filename
+        c = self.filenamecompleter = qt.QCompleter(self.filenameedit)
+        self.filenameedit.setCompleter(c)
+
         self.linkcheckbox.default = True
 
         # further defaults
@@ -238,9 +239,14 @@ class ImportDialog(VeuszDialog):
             filters = ['*.*']
         else:
             filters = ['*'+t for t in w.filetypes]
-        model = qt.QDirModel(
-            filters, qt.QDir.Filter.AllDirs | qt.QDir.Filter.Files, qt.QDir.SortFlag.Name)
-        self.filenamecompleter.setModel(model)
+
+        # FIXME: doesn't seem to work
+        model = qt.QFileSystemModel()
+        model.setRootPath(ImportDialog.dirname)
+        model.setNameFilters(filters)
+        completer = qt.QCompleter()
+        completer.setModel(model)
+        self.filenameedit.setCompleter(completer)
 
     def enableDisableImport(self, *args):
         """Disable or enable import button if allowed."""

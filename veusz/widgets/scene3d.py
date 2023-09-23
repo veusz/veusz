@@ -193,8 +193,8 @@ class Scene3D(widget.Widget):
         camera.setPerspective(90, 1, 100)
 
         mode = {
-            'painters': threed.Scene.RENDER_PAINTERS,
-            'bsp': threed.Scene.RENDER_BSP,
+            'painters': threed.Scene.RenderMode.RENDER_PAINTERS,
+            'bsp': threed.Scene.RenderMode.RENDER_BSP,
         }[s.rendermode]
         scene = threed.Scene(mode)
 

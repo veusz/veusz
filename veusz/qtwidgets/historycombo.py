@@ -31,8 +31,8 @@ class HistoryCombo(qt.QComboBox):
     Duplicates and blanks are ignored.
     """
 
-    def __init__(self, *args):
-        qt.QComboBox.__init__(self, *args)
+    def __init__(self, *args, **argsv):
+        qt.QComboBox.__init__(self, *args, **argsv)
 
         # sane defaults
         self.setEditable(True)

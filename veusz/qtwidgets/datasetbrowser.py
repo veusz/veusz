@@ -462,14 +462,18 @@ class DatasetsNavigatorTree(qt.QTreeView):
         matches = self.model.match(
             self.model.index(0, 0, qt.QModelIndex()),
             qt.Qt.ItemDataRole.DisplayRole, dsname, -1,
-            qt.Qt.MatchFlag.MatchFixedString | qt.Qt.MatchFlag.MatchCaseSensitive |
-            qt.Qt.MatchFlag.MatchRecursive )
+            qt.Qt.MatchFlag.MatchFixedString |
+            qt.Qt.MatchFlag.MatchCaseSensitive |
+            qt.Qt.MatchFlag.MatchRecursive,
+        )
         for idx in matches:
             if isinstance(self.model.objFromIndex(idx), DatasetNode):
                 self.selectionModel().setCurrentIndex(
-                    idx, qt.QItemSelectionModel.SelectionFlag.SelectionFlag.SelectCurrent |
-                    qt.QItemSelectionModel.SelectionFlag.SelectionFlag.Clear |
-                    qt.QItemSelectionModel.SelectionFlag.SelectionFlag.SelectionFlag.Rows )
+                    idx,
+                    qt.QItemSelectionModel.SelectionFlag.SelectCurrent |
+                    qt.QItemSelectionModel.SelectionFlag.Clear |
+                    qt.QItemSelectionModel.SelectionFlag.Rows,
+                )
 
     def showContextMenu(self, pt):
         """Context menu for nodes."""

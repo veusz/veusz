@@ -26,8 +26,8 @@ class HistoryValueCombo(qt.QComboBox):
     """This combobox records what value was previously saved
     """
 
-    def __init__(self, *args):
-        qt.QComboBox.__init__(self, *args)
+    def __init__(self, *args, **argsv):
+        qt.QComboBox.__init__(self, *args, **argsv)
         self.defaultlist = []
         self.defaultval = None
         self.hasshown = False

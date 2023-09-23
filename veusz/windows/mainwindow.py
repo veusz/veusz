@@ -1116,7 +1116,7 @@ class MainWindow(qt.QMainWindow):
         fd = qt.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
         fd.setFileMode(qt.QFileDialog.FileMode.AnyFile)
-        fd.setAcceptMode(qt.QFileDialog.DialogLabel.AcceptSave)
+        fd.setAcceptMode(qt.QFileDialog.AcceptMode.AcceptSave)
         fd.setNameFilters(filters)
 
         # selected filetype is saved under a key constructed here
@@ -1151,7 +1151,7 @@ class MainWindow(qt.QMainWindow):
         fd = qt.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
         fd.setFileMode( qt.QFileDialog.FileMode.ExistingFile )
-        fd.setAcceptMode( qt.QFileDialog.DialogLabel.AcceptOpen )
+        fd.setAcceptMode( qt.QFileDialog.AcceptMode.AcceptOpen )
         fd.setNameFilters(filters)
 
         # if the user chooses a file

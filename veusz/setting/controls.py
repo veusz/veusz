@@ -1799,7 +1799,7 @@ class Filename(qt.QWidget):
 
         # completion support
         c = self.filenamecompleter = qt.QCompleter(self)
-        model = qt.QDirModel(c)
+        model = qt.QFileSystemModel()
         c.setModel(model)
         self.edit.setCompleter(c)
 
