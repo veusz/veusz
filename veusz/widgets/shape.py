@@ -131,7 +131,7 @@ class BoxShape(Shape):
             if not s.Border.hide:
                 painter.setPen( s.get('Border').makeQPen(painter) )
             else:
-                painter.setPen( qt.QPen(qt.Qt.NoPen) )
+                painter.setPen( qt.QPen(qt.Qt.PenStyle.NoPen) )
 
             # iterate over positions
             index = 0

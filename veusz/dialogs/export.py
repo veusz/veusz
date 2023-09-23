@@ -60,7 +60,7 @@ class ExportDialog(VeuszDialog):
         self.updatePagePages()
 
         # change 'Save' button to 'Export'
-        self.buttonBox.button(qt.QDialogButtonBox.Save).setText(_('Export'))
+        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Save).setText(_('Export'))
 
         # these are mappings between filetypes and radio buttons
         self.fmtradios = dict([(f, getattr(self, r)) for f, r in formatradio])
@@ -203,9 +203,9 @@ class ExportDialog(VeuszDialog):
         dirname = os.path.dirname(self.editFileName.text())
         fd.setDirectory(dirname if dirname else self.dirname)
 
-        fd.setFileMode(qt.QFileDialog.AnyFile)
-        fd.setAcceptMode(qt.QFileDialog.AcceptSave)
-        fd.setOptions(qt.QFileDialog.DontConfirmOverwrite)
+        fd.setFileMode(qt.QFileDialog.FileMode.AnyFile)
+        fd.setAcceptMode(qt.QFileDialog.DialogLabel.AcceptSave)
+        fd.setOptions(qt.QFileDialog.Option.DontConfirmOverwrite)
 
         # Create a mapping between a format string and extensions
         filtertoext = {}
@@ -233,7 +233,7 @@ class ExportDialog(VeuszDialog):
         if os.path.isdir(dirname):
             fd.selectFile(filename)
 
-        if fd.exec_() == qt.QDialog.Accepted:
+        if fd.exec() == qt.QDialog.DialogCode.Accepted:
             # convert filter to extension
             filterused = str(fd.selectedNameFilter())
             chosenext = filtertoext[filterused][0]
@@ -309,7 +309,7 @@ class ExportDialog(VeuszDialog):
             qcolor,
             self,
             "Choose color",
-            qt.QColorDialog.ShowAlphaChannel )
+            qt.QColorDialog.ColorDialogOption.ShowAlphaChannel )
         if color.isValid():
             self.updateExportBackground(utils.extendedColorFromQColor(color))
 
@@ -392,7 +392,7 @@ class ExportDialog(VeuszDialog):
             try:
                 text = cntrl.currentText()
                 valid = cntrl.validator().validate(text, 0)[0]
-                if valid == qt.QValidator.Acceptable:
+                if valid == qt.QValidator.State.Acceptable:
                     setdb[setn] = int(text)
             except ValueError:
                 pass
@@ -415,9 +415,9 @@ class ExportDialog(VeuszDialog):
                 self,
                 _("Overwrite file?"),
                 _("The file %s already exists") % os.path.basename(filename),
-                qt.QMessageBox.Save | qt.QMessageBox.Cancel,
-                qt.QMessageBox.Cancel)
-            return retn == qt.QMessageBox.Save
+                qt.QMessageBox.StandardButton.Save | qt.QMessageBox.StandardButton.Cancel,
+                qt.QMessageBox.StandardButton.Cancel)
+            return retn == qt.QMessageBox.StandardButton.Save
 
         # count exported pages (in list so can be modified in function)
         pagecount = [0]
@@ -469,8 +469,8 @@ class ExportDialog(VeuszDialog):
         # format feedback
         self.showMessage(_('Processing...'))
 
-        self.buttonBox.button(qt.QDialogButtonBox.Close).setEnabled(False)
-        self.buttonBox.button(qt.QDialogButtonBox.Save).setEnabled(False)
+        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Close).setEnabled(False)
+        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Save).setEnabled(False)
 
         def checkDone():
             """Check whether exporting has finished."""
@@ -492,8 +492,8 @@ class ExportDialog(VeuszDialog):
                 if pagecount[0] > 0:
                     self.showMessage(_('Exported %i page(s)') % pagecount[0])
 
-            self.buttonBox.button(qt.QDialogButtonBox.Close).setEnabled(True)
-            self.buttonBox.button(qt.QDialogButtonBox.Save).setEnabled(True)
+            self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Close).setEnabled(True)
+            self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Save).setEnabled(True)
             self.checktimer.stop()
 
         self.checktimer = qt.QTimer(self)

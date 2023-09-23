@@ -306,10 +306,10 @@ class VisibilityButton(qt.QPushButton):
         qt.QPushButton.__init__(self, *args, **argsv)
         self.setContentsMargins(0,0,0,0)
         self.setSizePolicy(
-            qt.QSizePolicy.Minimum, qt.QSizePolicy.Minimum)
+            qt.QSizePolicy.Policy.Minimum, qt.QSizePolicy.Policy.Minimum)
         self.setIconSize(qt.QSize(24,12))
         self.setFlat(True)
-        self.setFocusPolicy(qt.Qt.NoFocus)
+        self.setFocusPolicy(qt.Qt.FocusPolicy.NoFocus)
 
         self.setnsproxy = setnsproxy
         self.setn = setn
@@ -441,8 +441,8 @@ class PropertyList(qt.QWidget):
                 grp_row += 1
 
         grpwidget = qt.QFrame(
-            frameShape = qt.QFrame.Panel,
-            frameShadow = qt.QFrame.Raised,
+            frameShape = qt.QFrame.Shape.Panel,
+            frameShadow = qt.QFrame.Shadow.Raised,
             visible=False )
         grpwidget.setLayout(l)
 
@@ -494,10 +494,10 @@ class PropertyList(qt.QWidget):
         if title is not None:
             lab = qt.QLabel(title[0], toolTip=title[1])
             lab.setSizePolicy(
-                qt.QSizePolicy.Expanding, qt.QSizePolicy.Minimum)
+                qt.QSizePolicy.Policy.Expanding, qt.QSizePolicy.Policy.Minimum)
 
             titlewidget = qt.QFrame(
-                frameShape=qt.QFrame.Panel, frameShadow=qt.QFrame.Sunken)
+                frameShape=qt.QFrame.Shape.Panel, frameShadow=qt.QFrame.Shadow.Sunken)
             titlelayout = qt.QHBoxLayout()
             titlelayout.setSpacing(0)
             if hideidx >= 0:
@@ -546,7 +546,7 @@ class PropertyList(qt.QWidget):
 
         # add empty widget to take rest of space
         w = qt.QWidget( sizePolicy=qt.QSizePolicy(
-            qt.QSizePolicy.Maximum, qt.QSizePolicy.MinimumExpanding) )
+            qt.QSizePolicy.Policy.Maximum, qt.QSizePolicy.Policy.MinimumExpanding) )
         self.layout.addWidget(w, row, 0)
         self.childlist.append(w)
 
@@ -646,7 +646,7 @@ class TabbedFormatting(qt.QTabWidget):
             self.updateIcon(indx)
             self.setTabToolTip(indx, tooltip)
 
-        hide_mapper.mapped[int].connect(self.updateIcon)
+        hide_mapper.mappedInt[int].connect(self.updateIcon)
 
     def updateIcon(self, indx):
         """Update icon for tab, depending on status of hide setting."""
@@ -791,9 +791,9 @@ class TreeEditDock(qt.QDockWidget):
         self.edittoolbar.setObjectName("veuszedittoolbar")
 
         self._constructToolbarMenu()
-        parentwin.addToolBarBreak(qt.Qt.TopToolBarArea)
-        parentwin.addToolBar(qt.Qt.TopToolBarArea, self.addtoolbar)
-        parentwin.addToolBar(qt.Qt.TopToolBarArea, self.edittoolbar)
+        parentwin.addToolBarBreak(qt.Qt.ToolBarArea.TopToolBarArea)
+        parentwin.addToolBar(qt.Qt.ToolBarArea.TopToolBarArea, self.addtoolbar)
+        parentwin.addToolBar(qt.Qt.ToolBarArea.TopToolBarArea, self.edittoolbar)
 
         # this sets various things up
         self.selectWidget(document.basewidget)
@@ -856,7 +856,7 @@ class TreeEditDock(qt.QDockWidget):
     def contextMenuEvent(self, event):
         """Bring up context menu."""
         if self.selwidgets:
-            self.contextmenu.exec_(self.mapToGlobal(event.pos()))
+            self.contextmenu.exec(self.mapToGlobal(event.pos()))
             event.accept()
 
     def _checkPageChange(self):
@@ -1322,12 +1322,12 @@ class TreeEditDock(qt.QDockWidget):
         if index is not None:
             self.treeview.scrollTo(index)
 
-            flags = qt.QItemSelectionModel.Rows | {
+            flags = qt.QItemSelectionModel.SelectionFlag.Rows | {
                 'new':  (
-                    qt.QItemSelectionModel.ClearAndSelect |
-                    qt.QItemSelectionModel.Current),
-                'add': qt.QItemSelectionModel.Select,
-                'toggle': qt.QItemSelectionModel.Toggle,
+                    qt.QItemSelectionModel.SelectionFlag.ClearAndSelect |
+                    qt.QItemSelectionModel.SelectionFlag.Current),
+                'add': qt.QItemSelectionModel.SelectionFlag.Select,
+                'toggle': qt.QItemSelectionModel.SelectionFlag.Toggle,
             }[mode]
 
             self.treeview.selectionModel().select(index, flags)
@@ -1389,8 +1389,9 @@ class TreeEditDock(qt.QDockWidget):
                  (wname is None or w.name == wname) ):
                 idx = self.treemodel.getWidgetIndex(w)
                 self.treeview.selectionModel().select(
-                    idx, qt.QItemSelectionModel.Select |
-                    qt.QItemSelectionModel.Rows)
+                    idx,
+                    qt.QItemSelectionModel.SelectionFlag.Select |
+                    qt.QItemSelectionModel.SelectionFlag.Rows)
 
         self.document.walkNodes(selectwidget, nodetypes=('widget',), root=root)
 
@@ -1404,8 +1405,9 @@ class TreeEditDock(qt.QDockWidget):
             if c is not w and c.typename == wtype:
                 idx = self.treemodel.getWidgetIndex(c)
                 self.treeview.selectionModel().select(
-                    idx, qt.QItemSelectionModel.Select |
-                    qt.QItemSelectionModel.Rows)
+                    idx,
+                    qt.QItemSelectionModel.SelectionFlag.Select |
+                    qt.QItemSelectionModel.SelectionFlag.Rows)
 
     def updateSelectMenu(self):
         """Update edit.select menu."""
@@ -1456,7 +1458,7 @@ class SettingLabel(qt.QWidget):
         """Initialise button, passing document, setting, and parent widget."""
 
         qt.QWidget.__init__(self)
-        self.setFocusPolicy(qt.Qt.StrongFocus)
+        self.setFocusPolicy(qt.Qt.FocusPolicy.StrongFocus)
 
         self.document = document
         document.signalModified.connect(self.slotDocModified)
@@ -1493,7 +1495,7 @@ class SettingLabel(qt.QWidget):
 
     def keyReleaseEvent(self, event):
         """Emit signalClicked(pos) on key release."""
-        if event.key() == qt.Qt.Key_Space:
+        if event.key() == qt.Qt.Key.Key_Space:
             self.signalClicked.emit(
                 self.mapToGlobal(self.iconlabel.pos()) )
             event.accept()
@@ -1654,7 +1656,7 @@ class SettingLabel(qt.QWidget):
 
         self.inmenu = True
         self.updateHighlight()
-        popup.exec_(pos)
+        popup.exec(pos)
         self.inmenu = False
         self.updateHighlight()
 

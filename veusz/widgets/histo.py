@@ -610,7 +610,7 @@ class Histo(GenericPlotter):
             if not s.MarkerLine.hide:
                 painter.setPen(s.MarkerLine.makeQPen(painter))
             else:
-                painter.setPen(qt.QPen(qt.Qt.NoPen))
+                painter.setPen(qt.QPen(qt.Qt.PenStyle.NoPen))
 
             utils.plotMarkers(
                 painter, xplt, yplt, s.marker, markersize,

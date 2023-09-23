@@ -404,7 +404,7 @@ class FunctionPlotter(GenericPlotter):
             painter.setFont(f)
             painter.drawText(
                 cliprect,
-                qt.Qt.AlignCenter,
+                qt.Qt.AlignmentFlag.AlignCenter,
                 "Cannot evaluate '%s'" % s.function)
         else:
             if not s.FillBelow.hide:

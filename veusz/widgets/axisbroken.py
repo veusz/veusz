@@ -329,7 +329,7 @@ class AxisBroken(axis.Axis):
         utils.addNumpyToPolygonF(poly, p1, p2)
 
         pen = s.get('Line').makeQPen(painter)
-        pen.setCapStyle(qt.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
         painter.setPen(pen)
         painter.drawPolyline(poly)
 

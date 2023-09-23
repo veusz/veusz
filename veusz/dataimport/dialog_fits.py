@@ -134,7 +134,7 @@ class ImportTabFITS(importdialog.ImportTab):
         self.datanodes = []
 
         valid = qt.QDoubleValidator(self)
-        valid.setNotation(qt.QDoubleValidator.ScientificNotation)
+        valid.setNotation(qt.QDoubleValidator.Notation.ScientificNotation)
         for w in (self.fitstwodminx, self.fitstwodminy,
                   self.fitstwodmaxx, self.fitstwodmaxy):
             w.setValidator(valid)

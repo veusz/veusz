@@ -34,7 +34,7 @@ class LineEditWithClear(qt.QLineEdit):
         # the clear button itself, with no padding
         self.clearbutton = cb = qt.QToolButton(self)
         cb.setIcon( utils.getIcon('kde-edit-delete') )
-        cb.setCursor(qt.Qt.ArrowCursor)
+        cb.setCursor(qt.Qt.CursorShape.ArrowCursor)
         cb.setStyleSheet('QToolButton { border: none; padding: 0px; }')
         cb.setToolTip("Clear text")
         cb.hide()
@@ -45,7 +45,7 @@ class LineEditWithClear(qt.QLineEdit):
         self.textChanged.connect(self.updateCloseButton)
 
         # positioning of the button
-        fw = self.style().pixelMetric(qt.QStyle.PM_DefaultFrameWidth)
+        fw = self.style().pixelMetric(qt.QStyle.PixelMetric.PM_DefaultFrameWidth)
         self.setStyleSheet(
             "QLineEdit { padding-right: %ipx; } " %
             (cb.sizeHint().width() + fw + 1))
@@ -56,7 +56,7 @@ class LineEditWithClear(qt.QLineEdit):
     def resizeEvent(self, evt):
         """Move button if widget resized."""
         sz = self.clearbutton.sizeHint()
-        fw = self.style().pixelMetric(qt.QStyle.PM_DefaultFrameWidth)
+        fw = self.style().pixelMetric(qt.QStyle.PixelMetric.PM_DefaultFrameWidth)
         r = self.rect()
         self.clearbutton.move(
             r.right() - fw - sz.width(),

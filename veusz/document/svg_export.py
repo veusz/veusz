@@ -74,13 +74,13 @@ def createPath(path, scale):
     while i < count:
         e = path.elementAt(i)
         nx, ny = e.x*scale, e.y*scale
-        if e.type == qt.QPainterPath.MoveToElement:
+        if e.type == qt.QPainterPath.ElementType.MoveToElement:
             p.append( 'm%s,%s' % (fltStr(nx-ox), fltStr(ny-oy)) )
             ox, oy = nx, ny
-        elif e.type == qt.QPainterPath.LineToElement:
+        elif e.type == qt.QPainterPath.ElementType.LineToElement:
             p.append( 'l%s,%s' % (fltStr(nx-ox), fltStr(ny-oy)) )
             ox, oy = nx, ny
-        elif e.type == qt.QPainterPath.CurveToElement:
+        elif e.type == qt.QPainterPath.ElementType.CurveToElement:
             e1 = path.elementAt(i+1)
             e2 = path.elementAt(i+2)
             p.append(
@@ -141,12 +141,12 @@ class SVGPaintEngine(qt.QPaintEngine):
     def __init__(self, writetextastext=False):
         qt.QPaintEngine.__init__(
             self,
-            qt.QPaintEngine.Antialiasing |
-            qt.QPaintEngine.PainterPaths |
-            qt.QPaintEngine.PrimitiveTransform |
-            qt.QPaintEngine.PaintOutsidePaintEvent |
-            qt.QPaintEngine.PixmapTransform |
-            qt.QPaintEngine.AlphaBlend
+            qt.QPaintEngine.PaintEngineFeature.Antialiasing |
+            qt.QPaintEngine.PaintEngineFeature.PainterPaths |
+            qt.QPaintEngine.PaintEngineFeature.PrimitiveTransform |
+            qt.QPaintEngine.PaintEngineFeature.PaintOutsidePaintEvent |
+            qt.QPaintEngine.PaintEngineFeature.PixmapTransform |
+            qt.QPaintEngine.PaintEngineFeature.AlphaBlend
         )
 
         self.imageformat = 'png'
@@ -244,11 +244,11 @@ class SVGPaintEngine(qt.QPaintEngine):
 
         clippath = self.transform.map(clippath)
 
-        if clipoperation == qt.Qt.NoClip:
+        if clipoperation == qt.Qt.ClipOperation.NoClip:
             self.clippath = None
-        elif clipoperation == qt.Qt.ReplaceClip:
+        elif clipoperation == qt.Qt.ClipOperation.ReplaceClip:
             self.clippath = clippath
-        elif clipoperation == qt.Qt.IntersectClip:
+        elif clipoperation == qt.Qt.ClipOperation.IntersectClip:
             self.clippath = self.clippath.intersected(clippath)
         elif clipoperation == qt.Qt.UniteClip:
             self.clippath = self.clippath.united(clippath)
@@ -261,19 +261,19 @@ class SVGPaintEngine(qt.QPaintEngine):
 
         # state is a list of transform, stroke/fill and clip states
         statevec = list(self.oldstate)
-        if ss & qt.QPaintEngine.DirtyTransform:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyTransform:
             self.transform = state.transform()
             statevec[0] = self.transformState()
-        if ss & qt.QPaintEngine.DirtyPen:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyPen:
             self.pen = state.pen()
             statevec[1] = self.strokeFillState()
-        if ss & qt.QPaintEngine.DirtyBrush:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyBrush:
             self.brush = state.brush()
             statevec[1] = self.strokeFillState()
-        if ss & qt.QPaintEngine.DirtyClipPath:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyClipPath:
             self._updateClipPath(state.clipPath(), state.clipOperation())
             statevec[2] = self.clipState()
-        if ss & qt.QPaintEngine.DirtyClipRegion:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyClipRegion:
             path = qt.QPainterPath()
             path.addRegion(state.clipRegion())
             self._updateClipPath(path, state.clipOperation())
@@ -332,19 +332,19 @@ class SVGPaintEngine(qt.QPaintEngine):
         if p.color().alphaF() != 1.:
             vals['stroke-opacity'] = '%.3g' % p.color().alphaF()
         # - join style
-        if p.joinStyle() != qt.Qt.BevelJoin:
+        if p.joinStyle() != qt.Qt.PenJoinStyle.BevelJoin:
             vals['stroke-linejoin'] = {
-                qt.Qt.MiterJoin: 'miter',
-                qt.Qt.SvgMiterJoin: 'miter',
-                qt.Qt.RoundJoin: 'round',
-                qt.Qt.BevelJoin: 'bevel'
+                qt.Qt.PenJoinStyle.MiterJoin: 'miter',
+                qt.Qt.PenJoinStyle.SvgMiterJoin: 'miter',
+                qt.Qt.HighDpiScaleFactorRoundingPolicy.RoundJoin: 'round',
+                qt.Qt.PenJoinStyle.BevelJoin: 'bevel'
             }[p.joinStyle()]
         # - cap style
-        if p.capStyle() != qt.Qt.SquareCap:
+        if p.capStyle() != qt.Qt.PenCapStyle.SquareCap:
             vals['stroke-linecap'] = {
-                qt.Qt.FlatCap: 'butt',
-                qt.Qt.SquareCap: 'square',
-                qt.Qt.RoundCap: 'round'
+                qt.Qt.PenCapStyle.FlatCap: 'butt',
+                qt.Qt.PenCapStyle.SquareCap: 'square',
+                qt.Qt.HighDpiScaleFactorRoundingPolicy.RoundCap: 'round'
             }[p.capStyle()]
         # - width
         w = p.widthF()
@@ -354,16 +354,16 @@ class SVGPaintEngine(qt.QPaintEngine):
         vals['stroke-width'] = fltStr(w*self.scale)
 
         # - line style
-        if p.style() == qt.Qt.NoPen:
+        if p.style() == qt.Qt.PenStyle.NoPen:
             vals['stroke'] = 'none'
-        elif p.style() not in (qt.Qt.SolidLine, qt.Qt.NoPen):
+        elif p.style() not in (qt.Qt.PenStyle.SolidLine, qt.Qt.PenStyle.NoPen):
             # convert from pen width fractions to pts
             nums = [fltStr(self.scale*w*x) for x in p.dashPattern()]
             vals['stroke-dasharray'] = ','.join(nums)
 
         # BRUSH STYLES
         b = self.brush
-        if b.style() == qt.Qt.NoBrush:
+        if b.style() == qt.Qt.BrushStyle.NoBrush:
             vals['fill'] = 'none'
         else:
             vals['fill'] = b.color().name()
@@ -398,7 +398,7 @@ class SVGPaintEngine(qt.QPaintEngine):
         p = createPath(path, self.scale)
 
         attrb = 'd="%s"' % p
-        if path.fillRule() == qt.Qt.WindingFill:
+        if path.fillRule() == qt.Qt.FillRule.WindingFill:
             attrb += ' fill-rule="nonzero"'
 
         if attrb in self.pathcache:
@@ -509,14 +509,14 @@ class SVGPaintEngine(qt.QPaintEngine):
         for p in points:
             pts.append( '%s,%s' % (fltStr(p.x()*self.scale), fltStr(p.y()*self.scale)) )
 
-        if mode == qt.QPaintEngine.PolylineMode:
+        if mode == qt.QPaintEngine.PolygonDrawMode.PolylineMode:
             SVGElement(
                 self.celement, 'polyline',
                 'fill="none" points="%s"' % ' '.join(pts))
 
         else:
             attrb = 'points="%s"' % ' '.join(pts)
-            if mode == qt.Qt.WindingFill:
+            if mode == qt.Qt.FillRule.WindingFill:
                 attrb += ' fill-rule="nonzero"'
             SVGElement(self.celement, 'polygon', attrb)
 
@@ -575,7 +575,7 @@ class SVGPaintEngine(qt.QPaintEngine):
 
     def type(self):
         """A random number for the engine."""
-        return qt.QPaintEngine.User + 11
+        return qt.QPaintEngine.Type.User + 11
 
 class SVGPaintDevice(qt.QPaintDevice):
     """Paint device for SVG paint engine.
@@ -600,27 +600,27 @@ class SVGPaintDevice(qt.QPaintDevice):
     def metric(self, m):
         """Return the metrics of the painter."""
 
-        if m == qt.QPaintDevice.PdmWidth:
+        if m == qt.QPaintDevice.PaintDeviceMetric.PdmWidth:
             return int(self.width*self.sdpi)
-        elif m == qt.QPaintDevice.PdmHeight:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmHeight:
             return int(self.height*self.sdpi)
-        elif m == qt.QPaintDevice.PdmWidthMM:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmWidthMM:
             return int(self.engine.width*inch_mm)
-        elif m == qt.QPaintDevice.PdmHeightMM:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmHeightMM:
             return int(self.engine.height*inch_mm)
-        elif m == qt.QPaintDevice.PdmNumColors:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmNumColors:
             return 2147483647
-        elif m == qt.QPaintDevice.PdmDepth:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDepth:
             return 24
-        elif m == qt.QPaintDevice.PdmDpiX:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDpiX:
             return int(self.sdpi)
-        elif m == qt.QPaintDevice.PdmDpiY:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDpiY:
             return int(self.sdpi)
-        elif m == qt.QPaintDevice.PdmPhysicalDpiX:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmPhysicalDpiX:
             return int(self.sdpi)
-        elif m == qt.QPaintDevice.PdmPhysicalDpiY:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmPhysicalDpiY:
             return int(self.sdpi)
-        elif m == qt.QPaintDevice.PdmDevicePixelRatio:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDevicePixelRatio:
             return 1
 
         # Qt >= 5.6

@@ -80,8 +80,8 @@ class GenericTreeModel(qt.QAbstractItemModel):
         return len(self.columnheads)
 
     def headerData(self, section, orientation, role):
-        if ( orientation == qt.Qt.Horizontal and
-             role == qt.Qt.DisplayRole and
+        if ( orientation == qt.Qt.Orientation.Horizontal and
+             role == qt.Qt.ItemDataRole.DisplayRole and
              section < len(self.columnheads) ):
             return self.columnheads[section]
         return None
@@ -109,7 +109,7 @@ class ErrorNode(Node):
         self.name = name
 
     def data(self, column, role):
-        if column == 0 and role == qt.Qt.DisplayRole:
+        if column == 0 and role == qt.Qt.ItemDataRole.DisplayRole:
             return self.name
         return None
 
@@ -159,12 +159,12 @@ class ImportNameDeligate(qt.QItemDelegate):
 
         w.addItems([x[0] for x in out])
         for v, item in enumerate(out):
-            w.setItemData(v, item[1], qt.Qt.ToolTipRole)
+            w.setItemData(v, item[1], qt.Qt.ItemDataRole.ToolTipRole)
         return w
 
     def setEditorData(self, editor, index):
         """Update data in editor."""
-        text = index.data(qt.Qt.EditRole)
+        text = index.data(qt.Qt.ItemDataRole.EditRole)
 
         i = editor.findText(text)
         if i != -1:
@@ -175,7 +175,7 @@ class ImportNameDeligate(qt.QItemDelegate):
     def setModelData(self, editor, model, index):
         """Update data in model."""
         model.setData(
-            index, editor.currentText(), qt.Qt.EditRole)
+            index, editor.currentText(), qt.Qt.ItemDataRole.EditRole)
 
     def updateEditorGeometry(self, editor, option, index):
         """Update editor geometry."""
@@ -215,16 +215,16 @@ class FileGroupNode(FileNode):
         self.grpimport = False
 
     def data(self, column, role):
-        if column == _ColName and role == qt.Qt.DisplayRole:
+        if column == _ColName and role == qt.Qt.ItemDataRole.DisplayRole:
             return self.name
-        elif role == qt.Qt.CheckStateRole and column == _ColToImport:
+        elif role == qt.Qt.ItemDataRole.CheckStateRole and column == _ColToImport:
             return (
-                qt.Qt.Checked
+                qt.Qt.CheckState.Checked
                 if self.grpimport or self.grpImport()
-                else qt.Qt.Unchecked
+                else qt.Qt.CheckState.Unchecked
             )
 
-        elif role == qt.Qt.ToolTipRole:
+        elif role == qt.Qt.ItemDataRole.ToolTipRole:
             if column == _ColToImport:
                 return _("Check to import all datasets under this group")
             elif column == _ColName:
@@ -236,9 +236,9 @@ class FileGroupNode(FileNode):
         """Enable selection of group for importing. This prevents
         importing child items individually."""
         column = index.column()
-        if column == _ColToImport and role == qt.Qt.CheckStateRole:
+        if column == _ColToImport and role == qt.Qt.ItemDataRole.CheckStateRole:
             # import check has changed
-            self.grpimport = value == qt.Qt.Checked
+            self.grpimport = value == qt.Qt.CheckState.Checked
 
             # disable importing of child nodes
             def recursivedisable(node):
@@ -259,11 +259,11 @@ class FileGroupNode(FileNode):
 
     def flags(self, column, defflags):
         if self.grpImport():
-            defflags &= ~qt.Qt.ItemIsEnabled
+            defflags &= ~qt.Qt.ItemFlag.ItemIsEnabled
             return defflags
 
         if column == _ColToImport:
-            defflags |= qt.Qt.ItemIsUserCheckable
+            defflags |= qt.Qt.ItemFlag.ItemIsUserCheckable
         return defflags
 
 class EmptyDataNode(FileNode):
@@ -276,12 +276,12 @@ class EmptyDataNode(FileNode):
     def data(self, column, role):
         """Return data for column"""
 
-        if role == qt.Qt.DisplayRole:
+        if role == qt.Qt.ItemDataRole.DisplayRole:
             if column == _ColName:
                 return self.name
             elif column == _ColShape:
                 return _('Empty')
-        elif role == qt.Qt.ToolTipRole:
+        elif role == qt.Qt.ItemDataRole.ToolTipRole:
             if column == _ColName:
                 return self.fullname
 
@@ -353,7 +353,7 @@ class FileDataNode(FileNode):
 
     def data(self, column, role):
         """Return data for column"""
-        if role in (qt.Qt.DisplayRole, qt.Qt.EditRole):
+        if role in (qt.Qt.ItemDataRole.DisplayRole, qt.Qt.ItemDataRole.EditRole):
             if column == _ColName:
                 return self.name
             elif column == _ColDataType:
@@ -362,7 +362,7 @@ class FileDataNode(FileNode):
                 return '\u00d7'.join([str(x) for x in self.shape])
 
             elif column == _ColImportName:
-                if role == qt.Qt.EditRole and not self.importname:
+                if role == qt.Qt.ItemDataRole.EditRole and not self.importname:
                     return self.name
                 else:
                     if self.importname:
@@ -381,7 +381,7 @@ class FileDataNode(FileNode):
                         self.attrs["vsz_slice"])
                 return None
 
-        elif role == qt.Qt.ToolTipRole:
+        elif role == qt.Qt.ItemDataRole.ToolTipRole:
             if column == _ColName:
                 return self.fullname
             elif column == _ColDataType:
@@ -406,19 +406,19 @@ class FileDataNode(FileNode):
                     '   :10,:,2:20\n'
                     '   1:10:5,::5')
 
-        elif role == qt.Qt.CheckStateRole and column == _ColToImport:
+        elif role == qt.Qt.ItemDataRole.CheckStateRole and column == _ColToImport:
             if ( (self.toimport or self.grpImport()) and
                  self.dimsOkForImport() ):
-                return qt.Qt.Checked
-            return qt.Qt.Unchecked
+                return qt.Qt.CheckState.Checked
+            return qt.Qt.CheckState.Unchecked
         return None
 
     def setData(self, model, index, value, role):
         # enable selection of dataset for importing
         column = index.column()
-        if column == _ColToImport and role == qt.Qt.CheckStateRole:
+        if column == _ColToImport and role == qt.Qt.ItemDataRole.CheckStateRole:
             # import check has changed
-            self.toimport = value == qt.Qt.Checked
+            self.toimport = value == qt.Qt.CheckState.Checked
             if not self.toimport:
                 self.importname = ''
 
@@ -444,13 +444,13 @@ class FileDataNode(FileNode):
         if ( column == _ColToImport and self.datatypevalid and
              not self.grpImport() and self.dimsOkForImport() ):
             # allow import column to be clicked
-            defflags |= qt.Qt.ItemIsUserCheckable
+            defflags |= qt.Qt.ItemFlag.ItemIsUserCheckable
         elif ( column == _ColImportName and (self.toimport or self.grpImport())
                and self.dimsOkForImport() ):
-            defflags |= qt.Qt.ItemIsEditable
+            defflags |= qt.Qt.ItemFlag.ItemIsEditable
         elif column == _ColSlice and self.datatypevalid:
             # allow name to be edited
-            defflags |= qt.Qt.ItemIsEditable
+            defflags |= qt.Qt.ItemFlag.ItemIsEditable
 
         return defflags
 
@@ -463,7 +463,7 @@ class FileCompoundNode(FileGroupNode):
 
     def data(self, column, role):
         """Return data for column"""
-        if role == qt.Qt.DisplayRole:
+        if role == qt.Qt.ItemDataRole.DisplayRole:
             if column == _ColDataType:
                 return _("Table")
             elif column == _ColShape:

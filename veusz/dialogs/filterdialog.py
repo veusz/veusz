@@ -40,9 +40,9 @@ class FilterDialog(VeuszDialog):
         grplayout.addWidget(self.dsbrowser)
         self.filtergroup.setLayout(grplayout)
 
-        self.buttonBox.button(qt.QDialogButtonBox.Apply).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Apply).clicked.connect(
             self.applyClicked)
-        self.buttonBox.button(qt.QDialogButtonBox.Reset).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Reset).clicked.connect(
             self.resetClicked)
 
     def updateStatus(self, text):

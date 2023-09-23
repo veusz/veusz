@@ -149,22 +149,22 @@ class MainWindow(qt.QMainWindow):
 
         # likewise with the tree-editing window
         self.treeedit = treeeditwindow.TreeEditDock(self.document, self)
-        self.addDockWidget(qt.Qt.LeftDockWidgetArea, self.treeedit)
+        self.addDockWidget(qt.Qt.DockWidgetArea.LeftDockWidgetArea, self.treeedit)
         self.propdock = treeeditwindow.PropertiesDock(
             self.document, self.treeedit, self)
-        self.addDockWidget(qt.Qt.LeftDockWidgetArea, self.propdock)
+        self.addDockWidget(qt.Qt.DockWidgetArea.LeftDockWidgetArea, self.propdock)
         self.formatdock = treeeditwindow.FormatDock(
             self.document, self.treeedit, self)
-        self.addDockWidget(qt.Qt.LeftDockWidgetArea, self.formatdock)
+        self.addDockWidget(qt.Qt.DockWidgetArea.LeftDockWidgetArea, self.formatdock)
         self.datadock = DataNavigatorWindow(self.document, self, self)
-        self.addDockWidget(qt.Qt.RightDockWidgetArea, self.datadock)
+        self.addDockWidget(qt.Qt.DockWidgetArea.RightDockWidgetArea, self.datadock)
 
         # make the console window a dock
         self.console = consolewindow.ConsoleWindow(
             self.document, self)
         self.console.hide()
         self.interpreter = self.console.interpreter
-        self.addDockWidget(qt.Qt.BottomDockWidgetArea, self.console)
+        self.addDockWidget(qt.Qt.DockWidgetArea.BottomDockWidgetArea, self.console)
 
         # assemble the statusbar
         statusbar = self.statusbar = qt.QStatusBar(self)
@@ -361,7 +361,7 @@ class MainWindow(qt.QMainWindow):
     def slotEditPreferences(self):
         from ..dialogs.preferences import PreferencesDialog
         dialog = PreferencesDialog(self)
-        dialog.exec_()
+        dialog.exec()
 
     def slotEditStylesheet(self):
         from ..dialogs.stylesheet import StylesheetDialog
@@ -595,7 +595,7 @@ class MainWindow(qt.QMainWindow):
         iconsize = setdb['toolbar_size']
         tb.setIconSize(qt.QSize(iconsize, iconsize))
         tb.setObjectName('veuszmaintoolbar')
-        self.addToolBar(qt.Qt.TopToolBarArea, tb)
+        self.addToolBar(qt.Qt.ToolBarArea.TopToolBarArea, tb)
 
         utils.makeMenuGroupSaved(
             'file.new.menu', self, self.vzactions, (
@@ -613,7 +613,7 @@ class MainWindow(qt.QMainWindow):
         tb = self.datatoolbar = qt.QToolBar(_("Data toolbar - Veusz"), self)
         tb.setIconSize(qt.QSize(iconsize, iconsize))
         tb.setObjectName('veuszdatatoolbar')
-        self.addToolBar(qt.Qt.TopToolBarArea, tb)
+        self.addToolBar(qt.Qt.ToolBarArea.TopToolBarArea, tb)
         utils.addToolbarActions(
             tb, self.vzactions,
             ('data.import', 'data.edit',
@@ -874,10 +874,10 @@ class MainWindow(qt.QMainWindow):
             _("Veusz includes a tutorial to help get you started.\n"
               "Would you like to start the tutorial now?\n"
               "If not, you can access it later through the Help menu."),
-            qt.QMessageBox.Yes | qt.QMessageBox.No
+            qt.QMessageBox.StandardButton.Yes | qt.QMessageBox.StandardButton.No
         )
 
-        if retn == qt.QMessageBox.Yes:
+        if retn == qt.QMessageBox.StandardButton.Yes:
             self.slotHelpTutorial()
 
     def slotHelpTutorial(self):
@@ -886,7 +886,7 @@ class MainWindow(qt.QMainWindow):
             # run the tutorial
             from .tutorial import TutorialDock
             tutdock = TutorialDock(self.document, self, self)
-            self.addDockWidget(qt.Qt.RightDockWidgetArea, tutdock)
+            self.addDockWidget(qt.Qt.DockWidgetArea.RightDockWidgetArea, tutdock)
             tutdock.show()
         else:
             # open up a blank window for tutorial
@@ -896,7 +896,7 @@ class MainWindow(qt.QMainWindow):
     def slotHelpAbout(self):
         """Show about dialog."""
         from ..dialogs.aboutdialog import AboutDialog
-        AboutDialog(self).exec_()
+        AboutDialog(self).exec()
 
     def askVersionCheck(self, mininterval=2):
         """Check with user whether to do version checks.
@@ -920,11 +920,11 @@ class MainWindow(qt.QMainWindow):
             _("Veusz will periodically check for new Veusz versions and\n"
               "let you know if there is a new one available.\n\n"
               "Is this ok? This choice can be changed in Preferences."),
-            qt.QMessageBox.Yes | qt.QMessageBox.No,
-            qt.QMessageBox.Yes
+            qt.QMessageBox.StandardButton.Yes | qt.QMessageBox.StandardButton.No,
+            qt.QMessageBox.StandardButton.Yes
         )
 
-        setting.settingdb['vercheck_disabled'] = retn==qt.QMessageBox.No
+        setting.settingdb['vercheck_disabled'] = retn==qt.QMessageBox.StandardButton.No
         setting.settingdb['vercheck_asked_user'] = True
 
     def doVersionCheck(self):
@@ -962,11 +962,11 @@ class MainWindow(qt.QMainWindow):
               "of software dependencies, the computer language and how "
               "often features are used.\n\n"
               "Is this ok? This choice can be changed in Preferences."),
-            qt.QMessageBox.Yes | qt.QMessageBox.No,
-            qt.QMessageBox.Yes
+            qt.QMessageBox.StandardButton.Yes | qt.QMessageBox.StandardButton.No,
+            qt.QMessageBox.StandardButton.Yes
         )
 
-        setting.settingdb['feedback_disabled'] = retn==qt.QMessageBox.No
+        setting.settingdb['feedback_disabled'] = retn==qt.QMessageBox.StandardButton.No
         setting.settingdb['feedback_asked_user'] = True
 
     def doFeedback(self):
@@ -1001,8 +1001,8 @@ class MainWindow(qt.QMainWindow):
             self,
             _("Save file?"),
             _("Document%s was modified. Save first?") % filetext,
-            qt.QMessageBox.Save | qt.QMessageBox.Discard |
-            qt.QMessageBox.Cancel
+            qt.QMessageBox.StandardButton.Save | qt.QMessageBox.StandardButton.Discard |
+            qt.QMessageBox.StandardButton.Cancel
         )
 
     def closeEvent(self, event):
@@ -1011,10 +1011,10 @@ class MainWindow(qt.QMainWindow):
         # if the document has been modified then query user for saving
         if self.document.isModified():
             v = self.queryOverwrite()
-            if v == qt.QMessageBox.Cancel:
+            if v == qt.QMessageBox.StandardButton.Cancel:
                 event.ignore()
                 return
-            elif v == qt.QMessageBox.Save:
+            elif v == qt.QMessageBox.StandardButton.Save:
                 self.slotFileSave()
 
         # store working directory
@@ -1038,7 +1038,7 @@ class MainWindow(qt.QMainWindow):
 
         # count number of main windows shown
         nummain = 0
-        for w in qt.qApp.topLevelWidgets():
+        for w in qt.QGuiApplication.topLevelWindows():
             if isinstance(w, qt.QMainWindow):
                 nummain += 1
 
@@ -1047,7 +1047,7 @@ class MainWindow(qt.QMainWindow):
             geometry = setdb['geometry_mainwindow']
             self.resize( qt.QSize(geometry[2], geometry[3]) )
             if nummain <= 1:
-                geomrect = qt.QApplication.desktop().availableGeometry()
+                geomrect = self.screen().geometry()
                 newpos = qt.QPoint(geometry[0], geometry[1])
                 if geomrect.contains(newpos):
                     self.move(newpos)
@@ -1115,8 +1115,8 @@ class MainWindow(qt.QMainWindow):
 
         fd = qt.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
-        fd.setFileMode(qt.QFileDialog.AnyFile)
-        fd.setAcceptMode(qt.QFileDialog.AcceptSave)
+        fd.setFileMode(qt.QFileDialog.FileMode.AnyFile)
+        fd.setAcceptMode(qt.QFileDialog.DialogLabel.AcceptSave)
         fd.setNameFilters(filters)
 
         # selected filetype is saved under a key constructed here
@@ -1129,7 +1129,7 @@ class MainWindow(qt.QMainWindow):
                 fd.selectNameFilter(filter)
 
         # okay was selected (and is okay to overwrite if it exists)
-        if fd.exec_() == qt.QDialog.Accepted:
+        if fd.exec() == qt.QDialog.DialogCode.Accepted:
             # save directory for next time
             self.dirname = fd.directory().absolutePath()
             # update the edit box
@@ -1150,12 +1150,12 @@ class MainWindow(qt.QMainWindow):
 
         fd = qt.QFileDialog(self, dialogtitle)
         fd.setDirectory(self.dirname)
-        fd.setFileMode( qt.QFileDialog.ExistingFile )
-        fd.setAcceptMode( qt.QFileDialog.AcceptOpen )
+        fd.setFileMode( qt.QFileDialog.FileMode.ExistingFile )
+        fd.setAcceptMode( qt.QFileDialog.DialogLabel.AcceptOpen )
         fd.setNameFilters(filters)
 
         # if the user chooses a file
-        if fd.exec_() == qt.QDialog.Accepted:
+        if fd.exec() == qt.QDialog.DialogCode.Accepted:
             # save directory for next time
             self.dirname = fd.directory().absolutePath()
 
@@ -1211,16 +1211,16 @@ class MainWindow(qt.QMainWindow):
             """Ask user if they want to give a new filename in case of import
             error.
             """
-            with utils.OverrideCursor(qt.Qt.ArrowCursor):
+            with utils.OverrideCursor(qt.Qt.CursorShape.ArrowCursor):
                 msgbox = qt.QMessageBox(self)
                 msgbox.setWindowTitle(_("Import error"))
                 msgbox.setText(
                     _("Could not import data from file '%s':\n\n %s") % (
                         filename, error))
                 msgbox.setInformativeText(_("Do you want to look for another file?"))
-                msgbox.setStandardButtons(qt.QMessageBox.Yes | qt.QMessageBox.Cancel)
+                msgbox.setStandardButtons(qt.QMessageBox.StandardButton.Yes | qt.QMessageBox.StandardButton.Cancel)
                 filename = None
-                if msgbox.exec_() == qt.QMessageBox.Yes:
+                if msgbox.exec() == qt.QMessageBox.StandardButton.Yes:
                     filename = qt.QFileDialog.getOpenFileName(self, "Choose data file")
                     filename = filename[0] if filename else None
             return filename
@@ -1253,7 +1253,7 @@ class MainWindow(qt.QMainWindow):
             from ..dialogs.errorloading import ErrorLoadingDialog
             if e.backtrace:
                 d = ErrorLoadingDialog(self, filename, str(e), e.backtrace)
-                d.exec_()
+                d.exec()
             else:
                 qt.QMessageBox.critical(
                     self, _("Error opening %s - Veusz") % filename,
@@ -1352,10 +1352,10 @@ class MainWindow(qt.QMainWindow):
             self,
             _("Reload file"),
             _("Reload document from file, losing any changes?"),
-            qt.QMessageBox.Yes | qt.QMessageBox.Cancel,
-            qt.QMessageBox.Cancel
+            qt.QMessageBox.StandardButton.Yes | qt.QMessageBox.StandardButton.Cancel,
+            qt.QMessageBox.StandardButton.Cancel
         )
-        if retn == qt.QMessageBox.Yes:
+        if retn == qt.QMessageBox.StandardButton.Yes:
             if not os.path.exists(self.filename):
                 qt.QMessageBox.critical(
                     self,
@@ -1391,7 +1391,7 @@ class MainWindow(qt.QMainWindow):
 
     def slotFileQuit(self):
         """File quit chosen."""
-        qt.qApp.closeAllWindows()
+        qt.QApplication.instance().closeAllWindows()
 
     def slotUpdatePage(self, number):
         """Update page number when the plot window says so."""
@@ -1462,8 +1462,8 @@ class MainWindow(qt.QMainWindow):
 
         # we shouldn't allow these places to be added to allowed safe directories
         badlocs = (
-            qt.QStandardPaths.standardLocations(qt.QStandardPaths.DownloadLocation) +
-            qt.QStandardPaths.standardLocations(qt.QStandardPaths.TempLocation)
+            qt.QStandardPaths.standardLocations(qt.QStandardPaths.StandardLocation.DownloadLocation) +
+            qt.QStandardPaths.standardLocations(qt.QStandardPaths.StandardLocation.TempLocation)
         )
         fname = self.document.filename
         absfile = os.path.abspath(fname)
@@ -1477,11 +1477,11 @@ class MainWindow(qt.QMainWindow):
                 isbadloc = True
         # don't allow plain home directory
         if filedir == qt.QStandardPaths.standardLocations(
-                qt.QStandardPaths.HomeLocation)[0]:
+                qt.QStandardPaths.StandardLocation.HomeLocation)[0]:
             isbadloc = True
 
         msgbox = qt.QMessageBox(
-            qt.QMessageBox.Warning,
+            qt.QMessageBox.Icon.Warning,
             _("Potentially unsafe code in document"),
             _(
                 "<p><b>The document '%s' contains potentially unsafe code</b></p>"
@@ -1494,32 +1494,32 @@ class MainWindow(qt.QMainWindow):
                 os.path.basename(absfile) if fname else "",
                 filedir if fname else "",
             ),
-            qt.QMessageBox.NoButton,
+            qt.QMessageBox.StandardButton.NoButton,
             self,
         )
-        allow = msgbox.addButton(_("Allow"), qt.QMessageBox.AcceptRole)
-        addloc = msgbox.addButton(_("Add to trusted locations"), qt.QMessageBox.AcceptRole)
+        allow = msgbox.addButton(_("Allow"), qt.QMessageBox.ButtonRole.AcceptRole)
+        addloc = msgbox.addButton(_("Add to trusted locations"), qt.QMessageBox.ButtonRole.AcceptRole)
         addloc.setEnabled(not isbadloc)
-        stop = msgbox.addButton(_("Skip"), qt.QMessageBox.RejectRole)
+        stop = msgbox.addButton(_("Skip"), qt.QMessageBox.ButtonRole.RejectRole)
 
         msgbox.setDefaultButton(stop)
 
         # we enter here with a busy cursor often, so set back to arrow temporarily
-        with utils.OverrideCursor(qt.Qt.ArrowCursor):
-            msgbox.exec_()
+        with utils.OverrideCursor(qt.Qt.CursorShape.ArrowCursor):
+            msgbox.exec()
 
         clicked = msgbox.clickedButton()
         if clicked is addloc:
-            with utils.OverrideCursor(qt.Qt.ArrowCursor):
+            with utils.OverrideCursor(qt.Qt.CursorShape.ArrowCursor):
                 button = qt.QMessageBox.warning(
                     self, _("Are you sure?"),
                     _("Are you really sure that you want to add directory '%s' to the "
                       "list of trusted locations. Any file loaded from this directory "
                       "will be trusted.") % filedir,
-                    qt.QMessageBox.Yes | qt.QMessageBox.No,
-                    qt.QMessageBox.No,
+                    qt.QMessageBox.StandardButton.Yes | qt.QMessageBox.StandardButton.No,
+                    qt.QMessageBox.StandardButton.No,
                 )
-            if button == qt.QMessageBox.Yes:
+            if button == qt.QMessageBox.StandardButton.Yes:
                 setting.settingdb['secure_dirs'].append(filedir)
                 return True
             else:
@@ -1544,10 +1544,10 @@ class MainWindow(qt.QMainWindow):
             _("Are you sure that you want to trust the document contents, "
               "including any potentially dangerous code? Only trust "
               "documents with a trusted source."),
-            qt.QMessageBox.Yes | qt.QMessageBox.No,
-            qt.QMessageBox.No,
+            qt.QMessageBox.StandardButton.Yes | qt.QMessageBox.StandardButton.No,
+            qt.QMessageBox.StandardButton.No,
         )
-        if button == qt.QMessageBox.Yes:
+        if button == qt.QMessageBox.StandardButton.Yes:
             self.document.evaluate.setSecurity(True)
             # force redraw of document
             self.plot.actionForceUpdate()

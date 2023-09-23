@@ -178,7 +178,7 @@ class EmbedApplication(qt.QApplication):
 
         # listen to commands on the socket
         self.notifier = qt.QSocketNotifier(
-            self.socket.fileno(), qt.QSocketNotifier.Read)
+            self.socket.fileno(), qt.QSocketNotifier.Type.Read)
         self.notifier.activated.connect(self.slotDataToRead)
         self.notifier.setEnabled(True)
 
@@ -319,4 +319,4 @@ def runremote():
     # finally start listening application
     app = EmbedApplication(listensocket, [])
     app.setQuitOnLastWindowClosed(False)
-    app.exec_()
+    app.exec()

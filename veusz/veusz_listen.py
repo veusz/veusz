@@ -150,7 +150,7 @@ def run():
     '''Actually run the program.'''
     app = qt.QApplication(sys.argv)
     openWindow(sys.argv)
-    app.exec_()
+    app.exec()
 
 # if ran as a program
 if __name__ == '__main__':

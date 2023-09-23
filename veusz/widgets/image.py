@@ -328,8 +328,8 @@ class Image(plotters.GenericPlotter):
                     xedgep/s, yedgep/s)
                 image = image.scaled(
                     x1-x0, y1-y0,
-                    qt.Qt.IgnoreAspectRatio,
-                    qt.Qt.SmoothTransformation
+                    qt.Qt.AspectRatioMode.IgnoreAspectRatio,
+                    qt.Qt.TransformationMode.SmoothTransformation
                 )
             else:
                 raise RuntimeError('Invalid draw mode')
@@ -431,12 +431,12 @@ class Image(plotters.GenericPlotter):
                 image = image.scaled(
                     int(pltrangex[1]-pltrangex[0]),
                     int(pltrangey[0]-pltrangey[1]),
-                    qt.Qt.IgnoreAspectRatio, qt.Qt.FastTransformation)
+                    qt.Qt.AspectRatioMode.IgnoreAspectRatio, qt.Qt.TransformationMode.FastTransformation)
             elif drawmode == 'resample-smooth':
                 image = image.scaled(
                     int(pltrangex[1]-pltrangex[0]),
                     int(pltrangey[0]-pltrangey[1]),
-                    qt.Qt.IgnoreAspectRatio, qt.Qt.SmoothTransformation)
+                    qt.Qt.AspectRatioMode.IgnoreAspectRatio, qt.Qt.TransformationMode.SmoothTransformation)
 
             painter.drawImage(imgposn, image)
 

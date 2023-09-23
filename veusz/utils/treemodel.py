@@ -105,14 +105,14 @@ class TreeModel(qt.QAbstractItemModel):
             item = self.objFromIndex(index)
             data = item.nodeData(index.column())
             if data is True:
-                if role == qt.Qt.CheckStateRole:
-                    return qt.Qt.Checked
+                if role == qt.Qt.ItemDataRole.CheckStateRole:
+                    return qt.Qt.CheckState.Checked
             elif data is False:
-                if role == qt.Qt.CheckStateRole:
-                    return qt.Qt.Unchecked
-            elif role in (qt.Qt.DisplayRole, qt.Qt.EditRole):
+                if role == qt.Qt.ItemDataRole.CheckStateRole:
+                    return qt.Qt.CheckState.Unchecked
+            elif role in (qt.Qt.ItemDataRole.DisplayRole, qt.Qt.ItemDataRole.EditRole):
                 return data
-            elif role == qt.Qt.ToolTipRole:
+            elif role == qt.Qt.ItemDataRole.ToolTipRole:
                 return item.toolTip(index.column())
 
         return None
@@ -120,12 +120,12 @@ class TreeModel(qt.QAbstractItemModel):
     def flags(self, index):
         """Return whether node is editable."""
         if not index.isValid():
-            return qt.Qt.NoItemFlags
-        return qt.Qt.ItemIsEnabled | qt.Qt.ItemIsSelectable
+            return qt.Qt.ItemFlag.NoItemFlags
+        return qt.Qt.ItemFlag.ItemIsEnabled | qt.Qt.ItemFlag.ItemIsSelectable
 
     def headerData(self, section, orientation, role):
         """Use root node to get headers."""
-        if orientation == qt.Qt.Horizontal and role == qt.Qt.DisplayRole:
+        if orientation == qt.Qt.Orientation.Horizontal and role == qt.Qt.ItemDataRole.DisplayRole:
             return self.root.nodeData(section)
         return None
 

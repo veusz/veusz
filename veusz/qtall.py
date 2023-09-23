@@ -18,14 +18,15 @@
 
 """A convenience module to import used Qt symbols from."""
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtSvg import *
-from PyQt5.QtPrintSupport import *
-from PyQt5.uic import loadUi
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import *
+from PyQt6.QtGui import *
+from PyQt6.QtSvg import *
+from PyQt6.QtPrintSupport import *
+from PyQt6.QtSvgWidgets import *
+from PyQt6.uic import loadUi
 
 try:
-    from PyQt5 import sip
+    from PyQt6 import sip
 except ImportError:
     import sip

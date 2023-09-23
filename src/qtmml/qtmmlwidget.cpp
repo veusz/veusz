@@ -47,7 +47,7 @@
 #include <QtWidgets/QApplication>
 #include <QtCore/QString>
 #include <QtCore/QMap>
-#include <QtWidgets/QDesktopWidget>
+#include <QtGui/QScreen>
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
 
@@ -4227,8 +4227,8 @@ MmlTextNode::MmlTextNode(const QString &text, MmlDocument *document)
 {
     m_text = text;
     // Trim whitespace from ends, but keep nbsp and thinsp
-    m_text.remove(QRegExp("^[^\\S\\x00a0\\x2009]+"));
-    m_text.remove(QRegExp("[^\\S\\x00a0\\x2009]+$"));
+    m_text.remove(QRegularExpression("^[^\\S\\x00a0\\x2009]+"));
+    m_text.remove(QRegularExpression("[^\\S\\x00a0\\x2009]+$"));
 
     if (m_text == QString(QChar(0x62, 0x20))	     // &InvisibleTimes;
 	    || m_text == QString(QChar(0x63, 0x20))  // &InvisibleComma;
@@ -5560,11 +5560,9 @@ static int interpretSpacing(QString value, int em, int ex, bool *ok)
 	bool float_ok;
 	float factor = value.toFloat(&float_ok);
 	if (float_ok && factor >= 0) {
-	    Q_ASSERT(qApp->desktop() != 0);
-	    QDesktopWidget *dw = qApp->desktop();
-	    Q_ASSERT(dw->width() != 0);
-	    Q_ASSERT(dw->widthMM() != 0);
-	    return (int)(factor*10*dw->width()/dw->widthMM());
+            QScreen *screen = qApp->screenAt(QPoint());
+            Q_ASSERT(screen != 0);
+            return (int)(factor*10*screen->size().width()/screen->physicalSize().width());
 	}
 	else {
 	    qWarning("interpretSpacing(): could not parse \"%scm\"", value.toLatin1().data());
@@ -5579,11 +5577,9 @@ static int interpretSpacing(QString value, int em, int ex, bool *ok)
 	bool float_ok;
 	float factor = value.toFloat(&float_ok);
 	if (float_ok && factor >= 0) {
-	    Q_ASSERT(qApp->desktop() != 0);
-	    QDesktopWidget *dw = qApp->desktop();
-	    Q_ASSERT(dw->width() != 0);
-	    Q_ASSERT(dw->widthMM() != 0);
-	    return (int)(factor*dw->width()/dw->widthMM());
+            QScreen *screen = qApp->screenAt(QPoint());
+            Q_ASSERT(screen != 0);
+            return (int)(factor*screen->size().width()/screen->physicalSize().width());
 	}
 	else {
 	    qWarning("interpretSpacing(): could not parse \"%smm\"", value.toLatin1().data());
@@ -5598,11 +5594,9 @@ static int interpretSpacing(QString value, int em, int ex, bool *ok)
 	bool float_ok;
 	float factor = value.toFloat(&float_ok);
 	if (float_ok && factor >= 0) {
-	    Q_ASSERT(qApp->desktop() != 0);
-	    QDesktopWidget *dw = qApp->desktop();
-	    Q_ASSERT(dw->width() != 0);
-	    Q_ASSERT(dw->widthMM() != 0);
-	    return (int)(factor*10*dw->width()/(2.54*dw->widthMM()));
+            QScreen *screen = qApp->screenAt(QPoint());
+            Q_ASSERT(screen != 0);
+            return (int)(factor*10*screen->size().width()/(2.54*screen->physicalSize().width()));
 	}
 	else {
 	    qWarning("interpretSpacing(): could not parse \"%sin\"", value.toLatin1().data());

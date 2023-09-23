@@ -202,7 +202,7 @@ void plotClippedPolyline(QPainter& painter,
 			 bool autoexpand = true);
 
 // clip polyline to rectangle and return polylines
-QVector<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly);
+QList<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly);
 
 // Do the polygons intersect?
 bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b);
@@ -252,7 +252,7 @@ public:
   void process();
 
   int getNumPolySets() const;
-  QVector<QPolygonF> getPolySet(int i) const;
+  QList<QPolygonF> getPolySet(int i) const;
 };
 
 class RectangleOverlapTester

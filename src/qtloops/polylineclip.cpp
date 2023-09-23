@@ -338,10 +338,10 @@ class PolyAddCallback : public _PolyClipper
   }
 
 public:
-  QVector<QPolygonF> polys;
+  QList<QPolygonF> polys;
 };
 
-QVector<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly)
+QList<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly)
 {
   PolyAddCallback pcb(clip);
   pcb.clipPolyline(poly);
@@ -350,7 +350,7 @@ QVector<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly)
 
 //////////////////////////////////////////////////////
 
-typedef QVector<QPolygonF> PolyVector;
+typedef QList<QPolygonF> PolyVector;
 
 // clip polygon, adding clipped parts to output vector of polygons
 class _LineLabClipper : public _PolyClipper
@@ -584,9 +584,9 @@ void LineLabeller::process()
     } // sets of polylines
 }
 
-QVector<QPolygonF> LineLabeller::getPolySet(int i) const
+QList<QPolygonF> LineLabeller::getPolySet(int i) const
 {
   if( i >= 0 && i < _polys.size() )
     return _polys[i];
-  return QVector<QPolygonF>();
+  return QList<QPolygonF>();
 }

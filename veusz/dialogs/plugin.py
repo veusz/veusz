@@ -64,12 +64,12 @@ class PluginDialog(VeuszDialog):
     def __init__(self, mainwindow, doc, plugininst, pluginkls):
         VeuszDialog.__init__(self, mainwindow, 'plugin.ui')
 
-        reset = self.buttonBox.button(qt.QDialogButtonBox.Reset)
+        reset = self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Reset)
         reset.setAutoDefault(False)
         reset.setDefault(False)
         reset.clicked.connect( self.slotReset)
         self.buttonBox.button(
-            qt.QDialogButtonBox.Apply).clicked.connect(self.slotApply)
+            qt.QDialogButtonBox.StandardButton.Apply).clicked.connect(self.slotApply)
 
         self.pluginkls = pluginkls
         self.plugininst = plugininst
@@ -192,7 +192,7 @@ def runPlugin(window, doc, plugin, fields):
         op.undo(doc)
 
         # show exception dialog
-        exceptiondialog.ExceptionDialog(sys.exc_info(), window).exec_()
+        exceptiondialog.ExceptionDialog(sys.exc_info(), window).exec()
 
     return resultstext
 

@@ -52,7 +52,7 @@ def _hatcher(painter, pen, painterpath, spacing, hatchlist):
     # debugging
     # dumppath(painterpath)
 
-    painter.setClipPath(painterpath, qt.Qt.IntersectClip)
+    painter.setClipPath(painterpath, qt.Qt.ClipOperation.IntersectClip)
 
     # this is the bounding box of the path
     bb = painter.clipPath().boundingRect()
@@ -169,14 +169,14 @@ _hatchmap = {
 
 # convert qt-specific fill styles into qt styles
 _fillcnvt = {
-    'solid': qt.Qt.SolidPattern,
-    '94% dense': qt.Qt.Dense1Pattern,
-    '88% dense': qt.Qt.Dense2Pattern,
-    '63% dense': qt.Qt.Dense3Pattern,
-    '50% dense': qt.Qt.Dense4Pattern,
-    '37% dense': qt.Qt.Dense5Pattern,
-    '12% dense': qt.Qt.Dense6Pattern,
-    '6% dense': qt.Qt.Dense7Pattern
+    'solid': qt.Qt.BrushStyle.SolidPattern,
+    '94% dense': qt.Qt.BrushStyle.Dense1Pattern,
+    '88% dense': qt.Qt.BrushStyle.Dense2Pattern,
+    '63% dense': qt.Qt.BrushStyle.Dense3Pattern,
+    '50% dense': qt.Qt.BrushStyle.Dense4Pattern,
+    '37% dense': qt.Qt.BrushStyle.Dense5Pattern,
+    '12% dense': qt.Qt.BrushStyle.Dense6Pattern,
+    '6% dense': qt.Qt.BrushStyle.Dense7Pattern
 }
 
 def brushExtFillPath(painter, extbrush, path, ignorehide=False,

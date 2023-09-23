@@ -279,8 +279,8 @@ class PaintHelper:
 
             pixmap = qt.QPixmap(origpix)
             painter = qt.QPainter(pixmap)
-            painter.setRenderHint(qt.QPainter.Antialiasing, antialias)
-            painter.setRenderHint(qt.QPainter.TextAntialiasing, antialias)
+            painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing, antialias)
+            painter.setRenderHint(qt.QPainter.RenderHint.TextAntialiasing, antialias)
             # this makes the small image draw from x-box->x+box, y-box->y+box
             # translate would get overriden by coordinate system playback
             painter.setWindow(int(x-box), int(y-box), int(box*2+1), int(box*2+1))

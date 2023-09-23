@@ -47,7 +47,7 @@ class ErrorBarDraw:
 
     def plot(self, painter, xmin, xmax, ymin, ymax, xplt, yplt, clip):
         pen = self.linestyle.makeQPenWHide(painter)
-        pen.setCapStyle(qt.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
 
         painter.setPen(pen)
         for function in self.error_functions[self.style]:
@@ -791,7 +791,7 @@ class PointPlotter(GenericPlotter):
             if not s.MarkerLine.hide:
                 painter.setPen( s.MarkerLine.makeQPen(painter) )
             else:
-                painter.setPen( qt.QPen( qt.Qt.NoPen ) )
+                painter.setPen( qt.QPen( qt.Qt.PenStyle.NoPen ) )
 
             utils.plotMarker(painter, x+width/2, yp, s.marker, markersize)
 
@@ -976,7 +976,7 @@ class PointPlotter(GenericPlotter):
                     painter.setPen( s.MarkerLine.makeQPen(painter) )
                 else:
                     # invisible pen
-                    painter.setPen( qt.QPen(qt.Qt.NoPen) )
+                    painter.setPen( qt.QPen(qt.Qt.PenStyle.NoPen) )
 
                 # thin datapoints as required
                 if s.thinfactor <= 1:

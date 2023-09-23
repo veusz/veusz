@@ -31,7 +31,7 @@ def checkValidator(combo):
     """Is this validator ok?"""
     valid = combo.validator()
     state, s, x = valid.validate(combo.currentText(), 0)
-    return state == qt.QValidator.Acceptable
+    return state == qt.QValidator.State.Acceptable
 
 class ManualBinModel(qt.QAbstractListModel):
     """Model to store a list of floating point values in a list."""
@@ -39,17 +39,17 @@ class ManualBinModel(qt.QAbstractListModel):
         qt.QAbstractListModel.__init__(self)
         self.thedata = thedata
     def data(self, index, role):
-        if role == qt.Qt.DisplayRole and index.isValid():
+        if role == qt.Qt.ItemDataRole.DisplayRole and index.isValid():
             return float(self.thedata[index.row()])
         return None
     def rowCount(self, parent):
         return len(self.thedata)
     def flags(self, index):
         return (
-            qt.Qt.ItemIsSelectable | qt.Qt.ItemIsEnabled |
-            qt.Qt.ItemIsEditable )
+            qt.Qt.ItemFlag.ItemIsSelectable | qt.Qt.ItemFlag.ItemIsEnabled |
+            qt.Qt.ItemFlag.ItemIsEditable )
     def setData(self, index, value, role):
-        if role == qt.Qt.EditRole:
+        if role == qt.Qt.ItemDataRole.EditRole:
             try:
                 val = float(value)
             except ValueError:
@@ -73,9 +73,9 @@ class HistoDataDialog(VeuszDialog):
         validator = qt.QRegExpValidator(regexp, self)
         self.minval.setValidator(validator)
         self.maxval.setValidator(validator)
-        self.buttonBox.button(qt.QDialogButtonBox.Apply).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Apply).clicked.connect(
             self.applyClicked )
-        self.buttonBox.button(qt.QDialogButtonBox.Reset).clicked.connect(
+        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Reset).clicked.connect(
             self.resetClicked )
         self.bingenerate.clicked.connect(self.generateManualBins)
         self.binadd.clicked.connect(self.addManualBins)

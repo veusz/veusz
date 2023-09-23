@@ -23,7 +23,7 @@
 
 #include "Python.h"
 
-#include <QVector>
+#include <QList>
 
 #define DEBUG false
 
@@ -38,12 +38,12 @@ public:
   ~Tuple2Ptrs();
 
   // data in tuple are stored here
-  QVector<const double*> data;
-  QVector<int> dims;
+  QList<const double*> data;
+  QList<int> dims;
 
 private:
   // these are the python objects made by PyArray_AsCArray
-  QVector<PyObject*> _arrays;
+  QList<PyObject*> _arrays;
 };
 
 // class for converting numpy array to an array

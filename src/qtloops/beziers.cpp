@@ -27,7 +27,7 @@
 #define SP_HUGE 1e5
 //#define BEZIER_DEBUG
 
-#include <QVector>
+#include <QList>
 #include <QPolygonF>
 
 #include <stdio.h>
@@ -275,7 +275,7 @@ sp_bezier_fit_cubic_full(QPointF bezier[], int split_points[],
   unsigned splitPoint;   /* Point to split point set at. */
   bool is_corner;
   {
-    QVector<double> u(len);
+    QList<double> u(len);
     chord_length_parameterize(data, u.data(), len);
     if ( u[len - 1] == 0.0 ) {
       /* Zero-length path: every point in data[] is the same.

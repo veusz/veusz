@@ -43,11 +43,11 @@ class EMFPaintEngine(qt.QPaintEngine):
     def __init__(self, width_in, height_in, dpi=75):
         qt.QPaintEngine.__init__(
             self,
-            qt.QPaintEngine.Antialiasing |
-            qt.QPaintEngine.PainterPaths |
-            qt.QPaintEngine.PrimitiveTransform |
-            qt.QPaintEngine.PaintOutsidePaintEvent |
-            qt.QPaintEngine.PatternBrush
+            qt.QPaintEngine.PaintEngineFeature.Antialiasing |
+            qt.QPaintEngine.PaintEngineFeature.PainterPaths |
+            qt.QPaintEngine.PaintEngineFeature.PrimitiveTransform |
+            qt.QPaintEngine.PaintEngineFeature.PaintOutsidePaintEvent |
+            qt.QPaintEngine.PaintEngineFeature.PatternBrush
         )
         self.width = width_in
         self.height = height_in
@@ -75,13 +75,13 @@ class EMFPaintEngine(qt.QPaintEngine):
         # print "Polygon"
         pts = [(int(p.x()*scale), int(p.y()*scale)) for p in points]
 
-        if mode == qt.QPaintEngine.PolylineMode:
+        if mode == qt.QPaintEngine.PolygonDrawMode.PolylineMode:
             self.emf.Polyline(pts)
         else:
             self.emf.SetPolyFillMode({
-                qt.QPaintEngine.WindingMode: pyemf3.WINDING,
-                qt.QPaintEngine.OddEvenMode: pyemf3.ALTERNATE,
-                qt.QPaintEngine.ConvexMode: pyemf3.WINDING
+                qt.QPaintEngine.PolygonDrawMode.WindingMode: pyemf3.WINDING,
+                qt.QPaintEngine.PolygonDrawMode.OddEvenMode: pyemf3.ALTERNATE,
+                qt.QPaintEngine.PolygonDrawMode.ConvexMode: pyemf3.WINDING
             })
             self.emf.Polygon(pts)
 
@@ -114,7 +114,7 @@ class EMFPaintEngine(qt.QPaintEngine):
         # convert pixmap to BMP format
         bytearr = qt.QByteArray()
         buf = qt.QBuffer(bytearr)
-        buf.open(qt.QIODevice.WriteOnly)
+        buf.open(qt.QIODevice.OpenModeFlag.WriteOnly)
         pixmap.save(buf, "BMP")
 
         bmp = bytes(buf.data())
@@ -134,13 +134,13 @@ class EMFPaintEngine(qt.QPaintEngine):
         #print "Start path"
         while i < count:
             e = path.elementAt(i)
-            if e.type == qt.QPainterPath.MoveToElement:
+            if e.type == qt.QPainterPath.ElementType.MoveToElement:
                 self.emf.MoveTo( int(e.x*scale), int(e.y*scale) )
                 #print "M", e.x*scale, e.y*scale
-            elif e.type == qt.QPainterPath.LineToElement:
+            elif e.type == qt.QPainterPath.ElementType.LineToElement:
                 self.emf.LineTo( int(e.x*scale), int(e.y*scale) )
                 #print "L", e.x*scale, e.y*scale
-            elif e.type == qt.QPainterPath.CurveToElement:
+            elif e.type == qt.QPainterPath.ElementType.CurveToElement:
                 e1 = path.elementAt(i+1)
                 e2 = path.elementAt(i+2)
                 params = (
@@ -196,29 +196,29 @@ class EMFPaintEngine(qt.QPaintEngine):
 
         # line style
         style = {
-            qt.Qt.NoPen: pyemf3.PS_NULL,
-            qt.Qt.SolidLine: pyemf3.PS_SOLID,
-            qt.Qt.DashLine: pyemf3.PS_DASH,
-            qt.Qt.DotLine: pyemf3.PS_DOT,
-            qt.Qt.DashDotLine: pyemf3.PS_DASHDOT,
-            qt.Qt.DashDotDotLine: pyemf3.PS_DASHDOTDOT,
-            qt.Qt.CustomDashLine: pyemf3.PS_USERSTYLE,
+            qt.Qt.PenStyle.NoPen: pyemf3.PS_NULL,
+            qt.Qt.PenStyle.SolidLine: pyemf3.PS_SOLID,
+            qt.Qt.PenStyle.DashLine: pyemf3.PS_DASH,
+            qt.Qt.PenStyle.DotLine: pyemf3.PS_DOT,
+            qt.Qt.PenStyle.DashDotLine: pyemf3.PS_DASHDOT,
+            qt.Qt.PenStyle.DashDotDotLine: pyemf3.PS_DASHDOTDOT,
+            qt.Qt.PenStyle.CustomDashLine: pyemf3.PS_USERSTYLE,
         }[pen.style()]
 
         if style != pyemf3.PS_NULL:
             # set cap style
             style |= {
-                qt.Qt.FlatCap: pyemf3.PS_ENDCAP_FLAT,
-                qt.Qt.SquareCap: pyemf3.PS_ENDCAP_SQUARE,
-                qt.Qt.RoundCap: pyemf3.PS_ENDCAP_ROUND,
+                qt.Qt.PenCapStyle.FlatCap: pyemf3.PS_ENDCAP_FLAT,
+                qt.Qt.PenCapStyle.SquareCap: pyemf3.PS_ENDCAP_SQUARE,
+                qt.Qt.HighDpiScaleFactorRoundingPolicy.RoundCap: pyemf3.PS_ENDCAP_ROUND,
             }[pen.capStyle()]
 
             # set join style
             style |= {
-                qt.Qt.MiterJoin: pyemf3.PS_JOIN_MITER,
-                qt.Qt.BevelJoin: pyemf3.PS_JOIN_BEVEL,
-                qt.Qt.RoundJoin: pyemf3.PS_JOIN_ROUND,
-                qt.Qt.SvgMiterJoin: pyemf3.PS_JOIN_MITER,
+                qt.Qt.PenJoinStyle.MiterJoin: pyemf3.PS_JOIN_MITER,
+                qt.Qt.PenJoinStyle.BevelJoin: pyemf3.PS_JOIN_BEVEL,
+                qt.Qt.HighDpiScaleFactorRoundingPolicy.RoundJoin: pyemf3.PS_JOIN_ROUND,
+                qt.Qt.PenJoinStyle.SvgMiterJoin: pyemf3.PS_JOIN_MITER,
             }[pen.joinStyle()]
 
             # use proper widths of lines
@@ -229,7 +229,7 @@ class EMFPaintEngine(qt.QPaintEngine):
         color = (qc.red(), qc.green(), qc.blue())
         self.pencolor = color
 
-        if pen.style() == qt.Qt.CustomDashLine:
+        if pen.style() == qt.Qt.PenStyle.CustomDashLine:
             # custom dash pattern
             dash = [int(pen.widthF()*scale*f) for f in pen.dashPattern()]
         else:
@@ -250,19 +250,19 @@ class EMFPaintEngine(qt.QPaintEngine):
         qc = brush.color()
         color = (qc.red(), qc.green(), qc.blue())
         # print "brush", color
-        if style == qt.Qt.SolidPattern:
+        if style == qt.Qt.BrushStyle.SolidPattern:
             newbrush = self.emf.CreateSolidBrush(color)
-        elif style == qt.Qt.NoBrush:
+        elif style == qt.Qt.BrushStyle.NoBrush:
             newbrush = self.emf.GetStockObject(pyemf3.NULL_BRUSH)
         else:
             try:
                 hatch = {
-                    qt.Qt.HorPattern: pyemf3.HS_HORIZONTAL,
-                    qt.Qt.VerPattern: pyemf3.HS_VERTICAL,
-                    qt.Qt.CrossPattern: pyemf3.HS_CROSS,
-                    qt.Qt.BDiagPattern: pyemf3.HS_BDIAGONAL,
-                    qt.Qt.FDiagPattern: pyemf3.HS_FDIAGONAL,
-                    qt.Qt.DiagCrossPattern: pyemf3.HS_DIAGCROSS
+                    qt.Qt.BrushStyle.HorPattern: pyemf3.HS_HORIZONTAL,
+                    qt.Qt.BrushStyle.VerPattern: pyemf3.HS_VERTICAL,
+                    qt.Qt.BrushStyle.CrossPattern: pyemf3.HS_CROSS,
+                    qt.Qt.BrushStyle.BDiagPattern: pyemf3.HS_BDIAGONAL,
+                    qt.Qt.BrushStyle.FDiagPattern: pyemf3.HS_FDIAGONAL,
+                    qt.Qt.BrushStyle.DiagCrossPattern: pyemf3.HS_DIAGCROSS
                 }[brush.style()]
             except KeyError:
                 newbrush = self.emf.CreateSolidBrush(color)
@@ -277,11 +277,11 @@ class EMFPaintEngine(qt.QPaintEngine):
     def _updateClipPath(self, path, operation):
         """Update clipping path."""
         # print "clip"
-        if operation != qt.Qt.NoClip:
+        if operation != qt.Qt.ClipOperation.NoClip:
             self._createPath(path)
             clipmode = {
-                 qt.Qt.ReplaceClip: pyemf3.RGN_COPY,
-                 qt.Qt.IntersectClip: pyemf3.RGN_AND,
+                 qt.Qt.ClipOperation.ReplaceClip: pyemf3.RGN_COPY,
+                 qt.Qt.ClipOperation.IntersectClip: pyemf3.RGN_AND,
             }[operation]
         else:
             # is this the only wave to get rid of clipping?
@@ -308,21 +308,21 @@ class EMFPaintEngine(qt.QPaintEngine):
     def updateState(self, state):
         """Examine what has changed in state and call apropriate function."""
         ss = state.state()
-        if ss & qt.QPaintEngine.DirtyPen:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyPen:
             self._updatePen(state.pen())
-        if ss & qt.QPaintEngine.DirtyBrush:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyBrush:
             self._updateBrush(state.brush())
-        if ss & qt.QPaintEngine.DirtyTransform:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyTransform:
             self._updateTransform(state.transform())
-        if ss & qt.QPaintEngine.DirtyClipPath:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyClipPath:
             self._updateClipPath(state.clipPath(), state.clipOperation())
-        if ss & qt.QPaintEngine.DirtyClipRegion:
+        if ss & qt.QPaintEngine.DirtyFlag.DirtyClipRegion:
             path = qt.QPainterPath()
             path.addRegion(state.clipRegion())
             self._updateClipPath(path, state.clipOperation())
 
     def type(self):
-        return qt.QPaintEngine.PostScript
+        return qt.QPaintEngine.Type.PostScript
 
 class EMFPaintDevice(qt.QPaintDevice):
     """Paint device for EMF paint engine."""
@@ -336,27 +336,27 @@ class EMFPaintDevice(qt.QPaintDevice):
 
     def metric(self, m):
         """Return the metrics of the painter."""
-        if m == qt.QPaintDevice.PdmWidth:
+        if m == qt.QPaintDevice.PaintDeviceMetric.PdmWidth:
             return int(self.engine.width * self.engine.dpi)
-        elif m == qt.QPaintDevice.PdmHeight:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmHeight:
             return int(self.engine.height * self.engine.dpi)
-        elif m == qt.QPaintDevice.PdmWidthMM:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmWidthMM:
             return int(self.engine.width * inch_mm)
-        elif m == qt.QPaintDevice.PdmHeightMM:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmHeightMM:
             return int(self.engine.height * inch_mm)
-        elif m == qt.QPaintDevice.PdmNumColors:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmNumColors:
             return 2147483647
-        elif m == qt.QPaintDevice.PdmDepth:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDepth:
             return 24
-        elif m == qt.QPaintDevice.PdmDpiX:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDpiX:
             return int(self.engine.dpi)
-        elif m == qt.QPaintDevice.PdmDpiY:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDpiY:
             return int(self.engine.dpi)
-        elif m == qt.QPaintDevice.PdmPhysicalDpiX:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmPhysicalDpiX:
             return int(self.engine.dpi)
-        elif m == qt.QPaintDevice.PdmPhysicalDpiY:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmPhysicalDpiY:
             return int(self.engine.dpi)
-        elif m == qt.QPaintDevice.PdmDevicePixelRatio:
+        elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDevicePixelRatio:
             return 1
 
         # Qt >= 5.6

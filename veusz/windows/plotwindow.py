@@ -48,14 +48,14 @@ class PickerCrosshairItem( qt.QGraphicsPathItem ):
         path.lineTo(0, 8)
 
         qt.QGraphicsPathItem.__init__(self, path, parent)
-        self.setBrush(qt.QBrush(qt.Qt.black))
-        self.setFlags(self.flags() | qt.QGraphicsItem.ItemIsFocusable)
+        self.setBrush(qt.QBrush(qt.Qt.GlobalColor.black))
+        self.setFlags(self.flags() | qt.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
 
     def paint(self, painter, option, widget):
         """Override this to enforce the global antialiasing setting"""
         aa = setting.settingdb['plot_antialias']
         painter.save()
-        painter.setRenderHint(qt.QPainter.Antialiasing, aa)
+        painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing, aa)
         qt.QGraphicsPathItem.paint(self, painter, option, widget)
         painter.restore()
 
@@ -90,12 +90,8 @@ class RenderControl(qt.QObject):
     def updateNumberThreads(self, num=None):
         """Changes the number of rendering threads."""
         if num is None:
-            if qt.QFontDatabase.supportsThreadedFontRendering():
-                # use number of threads in preference
-                num = setting.settingdb['plot_numthreads']
-            else:
-                # disable threads
-                num = 0
+            # use number of threads in preference
+            num = setting.settingdb['plot_numthreads']
 
         if self.threads:
             # delete old ones
@@ -133,13 +129,13 @@ class RenderControl(qt.QObject):
         if lastadded == jobid:
             img = qt.QImage(
                 int(helper.rawpagesize[0]), int(helper.rawpagesize[1]),
-                qt.QImage.Format_ARGB32_Premultiplied)
+                qt.QImage.Format.Format_ARGB32_Premultiplied)
             img.fill( setting.settingdb.color('page').rgb() )
 
             painter = qt.QPainter(img)
             aa = self.plotwindow.antialias
-            painter.setRenderHint(qt.QPainter.Antialiasing, aa)
-            painter.setRenderHint(qt.QPainter.TextAntialiasing, aa)
+            painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing, aa)
+            painter.setRenderHint(qt.QPainter.RenderHint.TextAntialiasing, aa)
             helper.renderToPainter(painter)
             painter.end()
 
@@ -243,7 +239,7 @@ class PlotWindow( qt.QGraphicsView ):
         """
 
         qt.QGraphicsView.__init__(self, parent)
-        self.setBackgroundRole(qt.QPalette.Dark)
+        self.setBackgroundRole(qt.QPalette.ColorRole.Dark)
         self.scene = qt.QGraphicsScene()
         self.setScene(self.scene)
 
@@ -264,7 +260,7 @@ class PlotWindow( qt.QGraphicsView ):
 
         # zoom rectangle for zooming into graph (not shown normally)
         self.zoomrect = self.scene.addRect(
-            0, 0, 100, 100, qt.QPen(qt.Qt.DotLine))
+            0, 0, 100, 100, qt.QPen(qt.Qt.PenStyle.DotLine))
         self.zoomrect.setZValue(2.)
         self.zoomrect.hide()
 
@@ -335,7 +331,7 @@ class PlotWindow( qt.QGraphicsView ):
         self.antialias = setting.settingdb['plot_antialias']
 
         # allow window to get focus, to allow context menu
-        self.setFocusPolicy(qt.Qt.StrongFocus)
+        self.setFocusPolicy(qt.Qt.FocusPolicy.StrongFocus)
 
         # get mouse move events if mouse is not pressed
         self.setMouseTracking(True)
@@ -369,7 +365,7 @@ class PlotWindow( qt.QGraphicsView ):
         self.viewtoolbar.setIconSize(qt.QSize(iconsize, iconsize))
         self.viewtoolbar.hide()
         if parent:
-            parent.addToolBar(qt.Qt.TopToolBarArea, self.viewtoolbar)
+            parent.addToolBar(qt.Qt.ToolBarArea.TopToolBarArea, self.viewtoolbar)
 
         if parent and hasattr(parent, 'vzactions'):
             # share actions with parent if possible
@@ -768,7 +764,7 @@ class PlotWindow( qt.QGraphicsView ):
         we turn the click into a scrolling click."""
 
         if self.currentclickmode == 'select':
-            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.SizeAllCursor))
+            qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.CursorShape.SizeAllCursor))
             self.currentclickmode = 'scroll'
 
     def mousePressEvent(self, event):
@@ -786,7 +782,7 @@ class PlotWindow( qt.QGraphicsView ):
             self.painthelper is None
         )
 
-        if event.button() == qt.Qt.LeftButton and not self.ignoreclick:
+        if event.button() == qt.Qt.MouseButton.LeftButton and not self.ignoreclick:
 
             # need to copy position, otherwise it gets reused!
             self.winpos = qt.QPoint(event.pos())
@@ -801,12 +797,12 @@ class PlotWindow( qt.QGraphicsView ):
 
             elif self.clickmode == 'pick':
                 self.pickeritem.show()
-                self.pickeritem.setFocus(qt.Qt.MouseFocusReason)
+                self.pickeritem.setFocus(qt.Qt.FocusReason.MouseFocusReason)
                 self.doPick(event.pos())
 
             elif self.clickmode == 'scroll':
                 qt.QApplication.setOverrideCursor(
-                    qt.QCursor(qt.Qt.SizeAllCursor))
+                    qt.QCursor(qt.Qt.CursorShape.SizeAllCursor))
 
             elif self.clickmode == 'graphzoom':
                 self.zoomrect.setRect(
@@ -868,7 +864,7 @@ class PlotWindow( qt.QGraphicsView ):
         if self.painthelper is None:
             return
 
-        if event.button() == qt.Qt.LeftButton and not self.ignoreclick:
+        if event.button() == qt.Qt.MouseButton.LeftButton and not self.ignoreclick:
             event.accept()
             self.scrolltimer.stop()
             if self.currentclickmode == 'select':
@@ -900,10 +896,10 @@ class PlotWindow( qt.QGraphicsView ):
         if self.pickeritem.hasFocus():
 
             k = event.key()
-            if k == qt.Qt.Key_Left or k == qt.Qt.Key_Right:
+            if k == qt.Qt.Key.Key_Left or k == qt.Qt.Key.Key_Right:
                 # navigate to the previous or next point on the curve
                 event.accept()
-                dir = 'right' if k == qt.Qt.Key_Right else 'left'
+                dir = 'right' if k == qt.Qt.Key.Key_Right else 'left'
                 ix = self.pickerinfo.index
                 pickinfo = self.pickerinfo.widget.pickIndex(
                     ix, dir, self.painthelper.widgetBounds(
@@ -913,7 +909,7 @@ class PlotWindow( qt.QGraphicsView ):
                     self.emitPicked(pickinfo)
                 return
 
-            elif k == qt.Qt.Key_Up or k == qt.Qt.Key_Down:
+            elif k == qt.Qt.Key.Key_Up or k == qt.Qt.Key.Key_Down:
                 # navigate to the next plot up or down on the screen
                 event.accept()
                 p = self.pickeritem.pos()
@@ -940,8 +936,8 @@ class PlotWindow( qt.QGraphicsView ):
                     # take the new point which is closest vertically to the current
                     # one and either above or below it as appropriate
                     if abs(dy) < dist and (
-                            (k == qt.Qt.Key_Up and dy > 0) or
-                            (k == qt.Qt.Key_Down and dy < 0) ):
+                            (k == qt.Qt.Key.Key_Up and dy > 0) or
+                            (k == qt.Qt.Key.Key_Down and dy < 0) ):
                         pickinfo = pi
                         dist = abs(dy)
 
@@ -961,7 +957,7 @@ class PlotWindow( qt.QGraphicsView ):
     def wheelEvent(self, event):
         """For zooming in or moving."""
 
-        if event.modifiers() & qt.Qt.ControlModifier:
+        if event.modifiers() & qt.Qt.KeyboardModifier.ControlModifier:
             # zoom in/out with ctrl held down
             d = event.angleDelta()
             delta = d.x() if d.x() != 0 else d.y()
@@ -973,7 +969,7 @@ class PlotWindow( qt.QGraphicsView ):
                 self.slotViewZoomIn()
                 self.sumwheeldelta -= 120
             event.accept()
-        elif event.modifiers() & qt.Qt.ShiftModifier:
+        elif event.modifiers() & qt.Qt.KeyboardModifier.ShiftModifier:
             # scroll horizontally if shift is held down
             d = event.pixelDelta()
             if d.isNull():
@@ -1001,9 +997,9 @@ class PlotWindow( qt.QGraphicsView ):
 
         # tell connected objects that widget was clicked
         if widget is not None:
-            if modifier & qt.Qt.ControlModifier:
+            if modifier & qt.Qt.KeyboardModifier.ControlModifier:
                 mode = 'toggle'
-            elif modifier & qt.Qt.ShiftModifier:
+            elif modifier & qt.Qt.KeyboardModifier.ShiftModifier:
                 mode = 'add'
             else:
                 mode = 'new'
@@ -1092,7 +1088,7 @@ class PlotWindow( qt.QGraphicsView ):
                 d = exceptiondialog.ExceptionDialog(sys.exc_info(), self)
                 self.oldzoom = self.zoomfactor
                 self.docchangeset = self.document.changeset
-                d.exec_()
+                d.exec()
 
             self.painthelper = phelper
             self.rendercontrol.addJob(phelper)
@@ -1170,7 +1166,7 @@ class PlotWindow( qt.QGraphicsView ):
         act.setCheckable(True)
         act.setChecked(self.antialias)
 
-        menu.exec_(qt.QCursor.pos())
+        menu.exec(qt.QCursor.pos())
 
     def actionForceUpdate(self):
         """Force an update for the graph."""
@@ -1322,16 +1318,16 @@ class PlotWindow( qt.QGraphicsView ):
             self.pixmapitem.unsetCursor()
         elif self.clickmode in (
                 'graphzoom', 'graphzoomout', 'graphrecenter', 'graphreset'):
-            self.pixmapitem.setCursor(qt.Qt.CrossCursor)
+            self.pixmapitem.setCursor(qt.Qt.CursorShape.CrossCursor)
         elif self.clickmode == 'pick':
-            self.pixmapitem.setCursor(qt.Qt.CrossCursor)
+            self.pixmapitem.setCursor(qt.Qt.CursorShape.CrossCursor)
             self.sigPickerEnabled.emit(True)
 
     def getClick(self):
         """Return a click point from the graph."""
 
         # wait for click from user
-        qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.CrossCursor))
+        qt.QApplication.setOverrideCursor(qt.QCursor(qt.Qt.CursorShape.CrossCursor))
         oldmode = self.clickmode
         self.clickmode = 'viewgetclick'
         while self.clickmode == 'viewgetclick':
@@ -1405,7 +1401,7 @@ class FullScreenPlotWindow(qt.QScrollArea):
 
     def __init__(self, document, pagenumber):
         qt.QScrollArea.__init__(self)
-        self.setFrameShape(qt.QFrame.NoFrame)
+        self.setFrameShape(qt.QFrame.Shape.NoFrame)
         self.setWidgetResizable(True)
 
         # window which shows plot
@@ -1448,7 +1444,7 @@ class FullScreenPlotWindow(qt.QScrollArea):
     def keyPressEvent(self, event):
 
         k = event.key()
-        if k == qt.Qt.Key_Escape:
+        if k == qt.Qt.Key.Key_Escape:
             event.accept()
             self.close()
             return

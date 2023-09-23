@@ -349,7 +349,7 @@ class BoxPlot(GenericPlotter):
 
         # draw whisker top to bottom
         p = s.Whisker.makeQPenWHide(painter)
-        p.setCapStyle(qt.Qt.FlatCap)
+        p.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
         painter.setPen(p)
         swapline(painter, boxposn, topwhisplt, boxposn, botwhisplt, horz)
         # draw ends of whiskers
@@ -369,7 +369,7 @@ class BoxPlot(GenericPlotter):
 
         # draw line across box
         p = s.Whisker.makeQPenWHide(painter)
-        p.setCapStyle(qt.Qt.FlatCap)
+        p.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
         painter.setPen(p)
         swapline(
             painter, boxposn-width/2, medplt,

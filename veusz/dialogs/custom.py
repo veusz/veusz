@@ -84,7 +84,7 @@ class CustomItemModel(qt.QAbstractTableModel):
 
     def data(self, index, role):
         """Lookup data in document.evaluate.customs list."""
-        if role in (qt.Qt.DisplayRole, qt.Qt.EditRole):
+        if role in (qt.Qt.ItemDataRole.DisplayRole, qt.Qt.ItemDataRole.EditRole):
             try:
                 defn = self._getCustoms()[index.row()]
             except IndexError:
@@ -95,7 +95,7 @@ class CustomItemModel(qt.QAbstractTableModel):
                 return repr(defn[col])
             else:
                 return defn[col]
-        elif role == qt.Qt.ToolTipRole:
+        elif role == qt.Qt.ItemDataRole.ToolTipRole:
             # tooltip on row for new entries on last row
             if index.row() == len(self._getCustoms()):
                 return self.tooltips[self.ctype][index.column()]
@@ -105,13 +105,13 @@ class CustomItemModel(qt.QAbstractTableModel):
     def flags(self, index):
         """Items are editable"""
         return (
-            qt.Qt.ItemIsSelectable | qt.Qt.ItemIsEditable |
-            qt.Qt.ItemIsEnabled )
+            qt.Qt.ItemFlag.ItemIsSelectable | qt.Qt.ItemFlag.ItemIsEditable |
+            qt.Qt.ItemFlag.ItemIsEnabled )
 
     def headerData(self, section, orientation, role):
         """Return the headers at the top of the view."""
-        if role == qt.Qt.DisplayRole:
-            if orientation == qt.Qt.Horizontal:
+        if role == qt.Qt.ItemDataRole.DisplayRole:
+            if orientation == qt.Qt.Orientation.Horizontal:
                 # columns defined in headers
                 return self.headers[self.ctype][section]
             else:
@@ -145,7 +145,7 @@ class CustomItemModel(qt.QAbstractTableModel):
 
     def setData(self, index, value, role):
         """Edit an item."""
-        if index.isValid() and role == qt.Qt.EditRole:
+        if index.isValid() and role == qt.Qt.ItemDataRole.EditRole:
             col = index.column()
             row = index.row()
 

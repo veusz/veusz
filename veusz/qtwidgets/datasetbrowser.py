@@ -76,9 +76,9 @@ class DatasetNode(TMNode):
             return None
 
         pixmap = qt.QPixmap(*size)
-        pixmap.fill(qt.Qt.transparent)
+        pixmap.fill(qt.Qt.GlobalColor.transparent)
         p = qt.QPainter(pixmap)
-        p.setRenderHint(qt.QPainter.Antialiasing)
+        p.setRenderHint(qt.QPainter.RenderHint.Antialiasing)
 
         # calculate data points
         try:
@@ -98,11 +98,11 @@ class DatasetNode(TMNode):
 
             poly = qt.QPolygonF()
             utils.addNumpyToPolygonF(poly, x, size[1]-y)
-            p.setPen( qt.QPen(qt.Qt.blue) )
+            p.setPen( qt.QPen(qt.Qt.GlobalColor.blue) )
             p.drawPolyline(poly)
 
             # draw x axis if span 0
-            p.setPen( qt.QPen(qt.Qt.black) )
+            p.setPen( qt.QPen(qt.Qt.GlobalColor.black) )
             if minval <= 0 and maxval > 0:
                 y0 = size[1] - (0-minval)/(maxval-minval)*size[1]
                 p.drawLine(qt.QLineF(x[0], y0, x[-1], y0))
@@ -343,10 +343,10 @@ class DatasetRelationModel(TreeModel):
             col = idx.column()
             if not self.readonly and col == 0:
                 # renameable dataset
-                f |= qt.Qt.ItemIsEditable
+                f |= qt.Qt.ItemFlag.ItemIsEditable
             elif obj.cols[col] == "check":
                 # checkable dataset
-                f |= qt.Qt.ItemIsUserCheckable
+                f |= qt.Qt.ItemFlag.ItemIsUserCheckable
         return f
 
     def setData(self, idx, val, role):
@@ -418,10 +418,10 @@ class DatasetsNavigatorTree(qt.QTreeView):
             checkable=checkable)
 
         self.setModel(self.model)
-        self.setSelectionMode(qt.QTreeView.ExtendedSelection)
-        self.setSelectionBehavior(qt.QTreeView.SelectRows)
+        self.setSelectionMode(qt.QTreeView.SelectionMode.ExtendedSelection)
+        self.setSelectionBehavior(qt.QTreeView.SelectionBehavior.SelectRows)
         self.setUniformRowHeights(True)
-        self.setContextMenuPolicy(qt.Qt.CustomContextMenu)
+        self.setContextMenuPolicy(qt.Qt.ContextMenuPolicy.CustomContextMenu)
         if not readonly:
             self.customContextMenuRequested.connect(self.showContextMenu)
         self.model.refresh()
@@ -430,9 +430,9 @@ class DatasetsNavigatorTree(qt.QTreeView):
         # stretch of columns
         hdr = self.header()
         hdr.setStretchLastSection(False)
-        hdr.setSectionResizeMode(0, qt.QHeaderView.Stretch)
+        hdr.setSectionResizeMode(0, qt.QHeaderView.ResizeMode.Stretch)
         for col in range(1, 3):
-            hdr.setSectionResizeMode(col, qt.QHeaderView.ResizeToContents)
+            hdr.setSectionResizeMode(col, qt.QHeaderView.ResizeMode.ResizeToContents)
 
         # when documents have finished opening, expand all nodes
         if mainwin is not None:
@@ -461,15 +461,15 @@ class DatasetsNavigatorTree(qt.QTreeView):
 
         matches = self.model.match(
             self.model.index(0, 0, qt.QModelIndex()),
-            qt.Qt.DisplayRole, dsname, -1,
-            qt.Qt.MatchFixedString | qt.Qt.MatchCaseSensitive |
-            qt.Qt.MatchRecursive )
+            qt.Qt.ItemDataRole.DisplayRole, dsname, -1,
+            qt.Qt.MatchFlag.MatchFixedString | qt.Qt.MatchFlag.MatchCaseSensitive |
+            qt.Qt.MatchFlag.MatchRecursive )
         for idx in matches:
             if isinstance(self.model.objFromIndex(idx), DatasetNode):
                 self.selectionModel().setCurrentIndex(
-                    idx, qt.QItemSelectionModel.SelectCurrent |
-                    qt.QItemSelectionModel.Clear |
-                    qt.QItemSelectionModel.Rows )
+                    idx, qt.QItemSelectionModel.SelectionFlag.SelectionFlag.SelectCurrent |
+                    qt.QItemSelectionModel.SelectionFlag.SelectionFlag.Clear |
+                    qt.QItemSelectionModel.SelectionFlag.SelectionFlag.SelectionFlag.Rows )
 
     def showContextMenu(self, pt):
         """Context menu for nodes."""
@@ -510,7 +510,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
             menu.addAction(_("Paste"), _paste)
 
         if len( menu.actions() ) != 0:
-            menu.exec_(self.mapToGlobal(pt))
+            menu.exec(self.mapToGlobal(pt))
 
     def datasetContextMenu(self, dsnodes, menu):
         """Return context menu for datasets."""
@@ -658,7 +658,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
 
     def keyPressEvent(self, event):
         """Enter key selects widget."""
-        if event.key() in (qt.Qt.Key_Return, qt.Qt.Key_Enter):
+        if event.key() in (qt.Qt.Key.Key_Return, qt.Qt.Key.Key_Enter):
             self.updateitem.emit()
             return
         qt.QTreeView.keyPressEvent(self, event)
@@ -819,8 +819,8 @@ class DatasetBrowserPopup(DatasetBrowser):
         DatasetBrowser.__init__(
             self, document, None, parent, readonly=True,
             filterdims=filterdims, filterdtype=filterdtype)
-        self.setWindowFlags(qt.Qt.Popup)
-        self.setAttribute(qt.Qt.WA_DeleteOnClose)
+        self.setWindowFlags(qt.Qt.WindowType.Popup)
+        self.setAttribute(qt.Qt.WindowType.WindowType.WidgetAttribute.WA_DeleteOnClose)
         self.spacing = self.fontMetrics().height()
 
         utils.positionFloatingPopup(self, parent)
@@ -834,7 +834,7 @@ class DatasetBrowserPopup(DatasetBrowser):
     def eventFilter(self, node, event):
         """Grab clicks outside this window to close it."""
         if ( isinstance(event, qt.QMouseEvent) and
-             event.buttons() != qt.Qt.NoButton ):
+             event.buttons() != qt.Qt.MouseButton.NoButton ):
             frame = qt.QRect(0, 0, self.width(), self.height())
             if not frame.contains(event.pos()):
                 self.close()

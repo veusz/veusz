@@ -46,7 +46,7 @@ Licenced under the GPL (version 2 or greater)
 
 def handleIntSignal(signum, frame):
     '''Ask windows to close if Ctrl+C pressed.'''
-    qt.qApp.closeAllWindows()
+    qt.QApplication.instance().closeAllWindows()
 
 def makeSplash(app):
     '''Make a splash screen logo.'''
@@ -58,13 +58,13 @@ def makeSplash(app):
     layout = qt.QVBoxLayout(splash)
     logo = qt.QLabel()
     logo.setPixmap(utils.getPixmap('logo.png'))
-    logo.setAlignment(qt.Qt.AlignCenter)
+    logo.setAlignment(qt.Qt.AlignmentFlag.AlignCenter)
     layout.addWidget(logo)
 
     # add copyright text
     message = qt.QLabel()
     message.setText(splashcopyr % utils.version())
-    message.setAlignment(qt.Qt.AlignCenter)
+    message.setAlignment(qt.Qt.AlignmentFlag.AlignCenter)
     # increase size of font
     font = message.font()
     font.setPointSizeF(font.pointSize()*1.5)
@@ -75,7 +75,7 @@ def makeSplash(app):
 
     # Center the spash screen
     splash.setGeometry(5, 5, 100, 100)
-    screen = qt.QDesktopWidget().screenGeometry()
+    screen = app.screenAt(qt.QPoint()).size()
     splash.move(
         (screen.width()-layout.sizeHint().width())//2,
         (screen.height()-layout.sizeHint().height())//2
@@ -92,8 +92,9 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
 
     # exception dialog doesnt work if not in main thread, so we send
     # the exception to the application to display
-    if qt.qApp.thread() is not qt.QThread.currentThread():
-        qt.qApp.signalException.emit(excepttype, exceptvalue, tracebackobj)
+    app = qt.QGuiApplication.instance()
+    if app.thread is not qt.QThread.currentThread():
+        app.signalException.emit(excepttype, exceptvalue, tracebackobj)
         return
 
     sys.setrecursionlimit(sys.getrecursionlimit()+1000)
@@ -103,7 +104,7 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
         # next exception is ignored to clear out the stack frame of the
         # previous exception - yuck
         d = ExceptionDialog((excepttype, exceptvalue, tracebackobj), None)
-        d.exec_()
+        d.exec()
 
 def listen(docs, quiet):
     '''For running with --listen option.'''
@@ -255,7 +256,7 @@ class VeuszApp(qt.QApplication):
         """Handle events. This is the only way to get the FileOpen event.
         FileOpen is used by MacOS to open files.
         """
-        if event.type() == qt.QEvent.FileOpen:
+        if event.type() == qt.QEvent.Type.FileOpen:
             self.openeventfiles.append(event.file())
             # need to wait until startup has finished
             qt.QTimer.singleShot(100, self.openPendingFiles)
@@ -354,15 +355,15 @@ class VeuszApp(qt.QApplication):
             # next exception is ignored to clear out the stack frame of the
             # previous exception - yuck
             d = ExceptionDialog((excepttype, exceptvalue, tracebackobj), None)
-            d.exec_()
+            d.exec()
 
 def run():
     '''Run the main application.'''
 
     # high DPI support
     try:
-        qt.QApplication.setAttribute(qt.Qt.AA_EnableHighDpiScaling, True)
-        qt.QApplication.setAttribute(qt.Qt.AA_UseHighDpiPixmaps, True)
+        qt.QApplication.setAttribute(qt.Qt.ApplicationAttribute.AA_EnableHighDpiScaling, True)
+        qt.QApplication.setAttribute(qt.Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
         qt.QApplication.setHighDpiScaleFactorRoundingPolicy(
             qt.QApplication.highDpiScaleFactorRoundingPolicy().PassThrough)
     except AttributeError:
@@ -378,7 +379,7 @@ def run():
     # start me up
     app = VeuszApp()
     app.startup()
-    app.exec_()
+    app.exec()
 
 # if ran as a program
 if __name__ == '__main__':

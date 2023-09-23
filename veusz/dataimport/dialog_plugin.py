@@ -222,7 +222,7 @@ class ImportTabPlugins(importdialog.ImportTab):
             for p in plugins.importpluginregistry:
                 if ftype in p.file_extensions:
                     plugin = p.name
-            idx = self.pluginType.findText(plugin, qt.Qt.MatchExactly)
+            idx = self.pluginType.findText(plugin, qt.Qt.MatchFlag.MatchExactly)
             self.pluginType.setCurrentIndex(idx)
             self.pluginChanged(-1)
 

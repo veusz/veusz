@@ -156,7 +156,7 @@ class ImportTabHDF5(importdialog.ImportTab):
         self.datanodes = []
 
         valid = qt.QDoubleValidator(self)
-        valid.setNotation(qt.QDoubleValidator.ScientificNotation)
+        valid.setNotation(qt.QDoubleValidator.Notation.ScientificNotation)
         for w in (self.hdftwodminx, self.hdftwodminy,
                   self.hdftwodmaxx, self.hdftwodmaxy):
             w.setValidator(valid)

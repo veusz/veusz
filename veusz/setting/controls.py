@@ -51,7 +51,7 @@ class DotDotButton(qt.QPushButton):
             maximumWidth=16, maximumHeight=16)
         if tooltip:
             self.setToolTip(tooltip)
-        self.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
+        self.setSizePolicy(qt.QSizePolicy.Policy.Maximum, qt.QSizePolicy.Policy.Maximum)
         self.setStyleSheet('QPushButton { padding: 0; }')
 
 class AddButton(qt.QPushButton):
@@ -117,8 +117,8 @@ class _EditBox(qt.QTextEdit):
         """Make a popup, framed widget containing a text editor."""
 
         qt.QTextEdit.__init__(self, parent)
-        self.setWindowFlags(qt.Qt.Popup)
-        self.setAttribute(qt.Qt.WA_DeleteOnClose)
+        self.setWindowFlags(qt.Qt.WindowType.Popup)
+        self.setAttribute(qt.Qt.WidgetAttribute.WA_DeleteOnClose)
 
         self.spacing = self.fontMetrics().height()
 
@@ -126,7 +126,7 @@ class _EditBox(qt.QTextEdit):
         self.setPlainText(origtext)
 
         cursor = self.textCursor()
-        cursor.movePosition(qt.QTextCursor.End)
+        cursor.movePosition(qt.QTextCursor.MoveOperation.End)
         self.setTextCursor(cursor)
 
         if readonly:
@@ -139,7 +139,7 @@ class _EditBox(qt.QTextEdit):
     def eventFilter(self, obj, event):
         """Grab clicks outside this window to close it."""
         if ( isinstance(event, qt.QMouseEvent) and
-             event.buttons() != qt.Qt.NoButton ):
+             event.buttons() != qt.Qt.MouseButton.NoButton ):
             frame = qt.QRect(0, 0, self.width(), self.height())
             if not frame.contains(event.pos()):
                 self.close()
@@ -151,11 +151,11 @@ class _EditBox(qt.QTextEdit):
         qt.QTextEdit.keyPressEvent(self, event)
 
         key = event.key()
-        if key == qt.Qt.Key_Escape:
+        if key == qt.Qt.Key.Key_Escape:
             # restore original content
             self.setPlainText(self.origtext)
             self.close()
-        elif key == qt.Qt.Key_Return:
+        elif key == qt.Qt.Key.Key_Return:
             # keep changes
             self.close()
 
@@ -294,12 +294,12 @@ class FloatSlider(qt.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
 
-        s = self.slider = qt.QSlider(qt.Qt.Horizontal)
+        s = self.slider = qt.QSlider(qt.Qt.Orientation.Horizontal)
         s.setMinimum(int(setting.minval/setting.scale))
         s.setMaximum(int(setting.maxval/setting.scale))
         s.setPageStep(int(setting.step/setting.scale))
         s.setTickInterval(int(setting.tick/setting.scale))
-        s.setTickPosition(qt.QSlider.TicksAbove)
+        s.setTickPosition(qt.QSlider.TickPosition.TicksAbove)
         layout.addWidget(self.slider)
 
         self.edit = qt.QLineEdit()
@@ -340,7 +340,7 @@ class Bool(qt.QCheckBox):
         qt.QCheckBox.__init__(self, parent)
 
         self.setSizePolicy( qt.QSizePolicy(
-            qt.QSizePolicy.MinimumExpanding, qt.QSizePolicy.Fixed) )
+            qt.QSizePolicy.Policy.MinimumExpanding, qt.QSizePolicy.Policy.Fixed) )
 
         self.ignorechange = False
         self.setting = setting
@@ -406,7 +406,7 @@ class Choice(qt.QComboBox):
 
         # stops combobox readjusting in size to fit contents
         self.setSizeAdjustPolicy(
-            qt.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            qt.QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 
         # whether to show ui text to replace some items
         toadd = uilist if uilist is not None else vallist
@@ -422,7 +422,7 @@ class Choice(qt.QComboBox):
         # use tooltip descriptions if requested
         if descriptions is not None:
             for i, descr in enumerate(descriptions):
-                self.setItemData(i, descr, qt.Qt.ToolTipRole)
+                self.setItemData(i, descr, qt.Qt.ItemDataRole.ToolTipRole)
 
         # choose the correct setting
         try:
@@ -435,7 +435,7 @@ class Choice(qt.QComboBox):
             self.setEditText( setting.toUIText() )
 
         # if a different item is selected
-        self.activated[str].connect(self.slotActivated)
+        self.textActivated[str].connect(self.slotActivated)
 
         self.setting.setOnModified(self.onModified)
 
@@ -444,7 +444,7 @@ class Choice(qt.QComboBox):
 
         # make completion case sensitive (to help fix case typos)
         if self.completer():
-            self.completer().setCaseSensitivity(qt.Qt.CaseSensitive)
+            self.completer().setCaseSensitivity(qt.Qt.CaseSensitivity.CaseSensitive)
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
@@ -545,7 +545,7 @@ class FillStyleExtended(ChoiceSwitch):
             pix = qt.QPixmap(size, size)
             pix.fill()
             painter = document.DirectPainter(pix)
-            painter.setRenderHint(qt.QPainter.Antialiasing)
+            painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing)
             painter.updateMetaData(phelper)
             brush.style = f
             utils.brushExtFillPath(painter, brush, path)
@@ -563,7 +563,7 @@ class MultiLine(qt.QTextEdit):
         qt.QTextEdit.__init__(self, parent)
         self.setting = setting
 
-        self.setWordWrapMode(qt.QTextOption.NoWrap)
+        self.setWordWrapMode(qt.QTextOption.WrapMode.NoWrap)
         self.setTabChangesFocus(True)
 
         # set the text of the widget to the
@@ -615,7 +615,7 @@ class Notes(MultiLine):
 
     def __init__(self, setting, parent):
         MultiLine.__init__(self, setting, parent)
-        self.setWordWrapMode(qt.QTextOption.WordWrap)
+        self.setWordWrapMode(qt.QTextOption.WrapMode.WordWrap)
 
 class Distance(Choice):
     """For editing distance settings."""
@@ -845,7 +845,7 @@ class FillStyle(Choice):
             pix = qt.QPixmap(size, size)
             pix.fill()
             painter = qt.QPainter(pix)
-            painter.setRenderHint(qt.QPainter.Antialiasing)
+            painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing)
             brush = qt.QBrush(c, cls._fillcnvt[f])
             painter.fillRect(0, 0, size, size, brush)
             painter.end()
@@ -873,12 +873,12 @@ class Marker(Choice):
         size = 16
         icons = []
         brush = qt.QBrush( qt.QColor('darkgrey') )
-        pen = qt.QPen( qt.QBrush(qt.Qt.black), 1. )
+        pen = qt.QPen( qt.QBrush(qt.Qt.GlobalColor.black), 1. )
         for marker in utils.MarkerCodes:
             pix = qt.QPixmap(size, size)
             pix.fill()
             painter = qt.QPainter(pix)
-            painter.setRenderHint(qt.QPainter.Antialiasing)
+            painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing)
             painter.setBrush(brush)
             painter.setPen(pen)
             utils.plotMarker(painter, size*0.5, size*0.5, marker, size*0.33)
@@ -906,13 +906,13 @@ class Arrow(Choice):
     def _generateIcons(cls):
         size = 16
         icons = []
-        brush = qt.QBrush(qt.Qt.black)
-        pen = qt.QPen( qt.QBrush(qt.Qt.black), 1. )
+        brush = qt.QBrush(qt.Qt.GlobalColor.black)
+        pen = qt.QPen( qt.QBrush(qt.Qt.GlobalColor.black), 1. )
         for arrow in utils.ArrowCodes:
             pix = qt.QPixmap(size, size)
             pix.fill()
             painter = qt.QPainter(pix)
-            painter.setRenderHint(qt.QPainter.Antialiasing)
+            painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing)
             painter.setBrush(brush)
             painter.setPen(pen)
             utils.plotLineArrow(
@@ -965,7 +965,7 @@ class LineStyle(Choice):
             pix.fill()
 
             painter = document.DirectPainter(pix)
-            painter.setRenderHint(qt.QPainter.Antialiasing)
+            painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing)
 
             phelper = document.PaintHelper(doc, (1, 1))
             painter.updateMetaData(phelper)
@@ -1003,12 +1003,12 @@ class Color(qt.QWidget):
         # combo box
         c = self.combo = qt.QComboBox()
         c.setEditable(True)
-        c.activated[str].connect(self.slotActivated)
+        c.textActivated[str].connect(self.slotActivated)
 
         # button for selecting colors
         b = self.button = qt.QPushButton()
         b.setFlat(True)
-        b.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
+        b.setSizePolicy(qt.QSizePolicy.Policy.Maximum, qt.QSizePolicy.Policy.Maximum)
         b.setMaximumHeight(24)
         b.setMaximumWidth(24)
         b.clicked.connect(self.slotButtonClicked)
@@ -1056,7 +1056,7 @@ class Color(qt.QWidget):
 
         self.combo.setCurrentIndex(index)
 
-        icon = self.combo.itemData(index, qt.Qt.DecorationRole)
+        icon = self.combo.itemData(index, qt.Qt.ItemDataRole.DecorationRole)
         self.button.setIcon(icon)
 
     @qt.pyqtSlot()
@@ -1157,7 +1157,7 @@ class ListSet(qt.QFrame):
         """
 
         qt.QFrame.__init__(self, parent)
-        self.setFrameStyle(qt.QFrame.Box)
+        self.setFrameStyle(qt.QFrame.Shape.Box)
         self.defaultval = defaultval
         self.setting = setting
         self.controls = []
@@ -1267,7 +1267,7 @@ class ListSet(qt.QFrame):
         """Add a color button to the list at the position specified."""
         wcolor = qt.QPushButton()
         wcolor.setFlat(True)
-        wcolor.setSizePolicy(qt.QSizePolicy.Maximum, qt.QSizePolicy.Maximum)
+        wcolor.setSizePolicy(qt.QSizePolicy.Policy.Maximum, qt.QSizePolicy.Policy.Maximum)
         wcolor.setMaximumHeight(24)
         wcolor.setMaximumWidth(24)
         wcolor.setToolTip(tooltip)
@@ -1347,7 +1347,7 @@ class ListSet(qt.QFrame):
             qcolor,
             self,
             "Choose color",
-            qt.QColorDialog.ShowAlphaChannel )
+            qt.QColorDialog.ColorDialogOption.ShowAlphaChannel )
         if color.isValid():
             # change setting
             # this is a bit irritating, as have to do lots of
@@ -1431,8 +1431,8 @@ class _FillBox(qt.QScrollArea):
         """
 
         qt.QScrollArea.__init__(self, parent)
-        self.setWindowFlags(qt.Qt.Popup)
-        self.setAttribute(qt.Qt.WA_DeleteOnClose)
+        self.setWindowFlags(qt.Qt.WindowType.Popup)
+        self.setAttribute(qt.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.parent = parent
         self.row = row
         self.setting = thesetting
@@ -1483,7 +1483,7 @@ class _FillBox(qt.QScrollArea):
     def eventFilter(self, obj, event):
         """Grab clicks outside this window to close it."""
         if ( isinstance(event, qt.QMouseEvent) and
-             event.buttons() != qt.Qt.NoButton ):
+             event.buttons() != qt.Qt.MouseButton.NoButton ):
             frame = qt.QRect(0, 0, self.width(), self.height())
             if not frame.contains(event.pos()):
                 self.close()
@@ -1495,7 +1495,7 @@ class _FillBox(qt.QScrollArea):
         qt.QScrollArea.keyPressEvent(self, event)
 
         key = event.key()
-        if key == qt.Qt.Key_Escape:
+        if key == qt.Qt.Key.Key_Escape:
             self.close()
 
     def closeEvent(self, event):
@@ -1610,7 +1610,7 @@ class MultiSettingWidget(qt.QWidget):
 
     def eventFilter(self, obj, event):
         """Capture loss of focus by controls."""
-        if event.type() == qt.QEvent.FocusOut:
+        if event.type() == qt.QEvent.Type.FocusOut:
             for row, c in enumerate(self.controls):
                 if c[0] is obj:
                     self.dataChanged(row)
@@ -1698,7 +1698,7 @@ class Datasets(MultiSettingWidget):
         combo.setEditable(True)
         combo.lineEdit().editingFinished.connect(lambda: self.dataChanged(row))
         # if a different item is selected
-        combo.activated[str].connect(lambda x: self.dataChanged(row))
+        combo.textActivated[str].connect(lambda x: self.dataChanged(row))
         utils.populateCombo(combo, self.getDatasets())
         return combo
 
@@ -1858,19 +1858,19 @@ class FontFamily(qt.QFontComboBox):
 
         qt.QFontComboBox.__init__(self, parent)
         self.setting = setting
-        self.setFontFilters( qt.QFontComboBox.ScalableFonts )
+        self.setFontFilters( qt.QFontComboBox.FontFilter.ScalableFonts )
 
         # set initial value
         self.onModified()
 
         # stops combobox readjusting in size to fit contents
         self.setSizeAdjustPolicy(
-            qt.QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            qt.QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
 
         self.setting.setOnModified(self.onModified)
 
         # if a different item is selected
-        self.activated[str].connect(self.slotActivated)
+        self.textActivated[str].connect(self.slotActivated)
 
     def focusOutEvent(self, *args):
         """Allows us to check the contents of the widget."""
@@ -1907,7 +1907,7 @@ class FontStyle(qt.QComboBox):
         self.familysetting.setOnModified(self.onModified)
 
         # if a different item is selected
-        self.activated[str].connect(self.slotActivated)
+        self.textActivated[str].connect(self.slotActivated)
 
     def slotActivated(self, val):
         """Update setting if a different item is chosen."""
@@ -1921,7 +1921,7 @@ class FontStyle(qt.QComboBox):
         """Make control reflect chosen setting."""
 
         styles = [self.deftext] + sorted(
-            qt.QFontDatabase().styles(self.familysetting.get()))
+            qt.QFontDatabase.styles(self.familysetting.get()))
 
         val = self.setting.get().strip()
         if not val:
@@ -1997,7 +1997,7 @@ class Colormap(Choice):
                 if val is None:
                     # empty icon
                     pixmap = qt.QPixmap(*size)
-                    pixmap.fill(qt.Qt.transparent)
+                    pixmap.fill(qt.Qt.GlobalColor.transparent)
                 else:
                     # generate icon
                     image = utils.applyColorMap(

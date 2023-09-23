@@ -78,7 +78,7 @@ class DatasetTableModel1D(qt.QAbstractTableModel):
             # select correct part of dataset
             data = getattr(ds, ds.columns[index.column()])
         if ds is not None and data is not None and role in (
-            qt.Qt.DisplayRole, qt.Qt.EditRole):
+            qt.Qt.ItemDataRole.DisplayRole, qt.Qt.ItemDataRole.EditRole):
             # blank row at end of data
             if index.row() == len(data):
                 return None
@@ -98,8 +98,8 @@ class DatasetTableModel1D(qt.QAbstractTableModel):
         except KeyError:
             return None
 
-        if role == qt.Qt.DisplayRole:
-            if orientation == qt.Qt.Horizontal:
+        if role == qt.Qt.ItemDataRole.DisplayRole:
+            if orientation == qt.Qt.Orientation.Horizontal:
                 # column names
                 return ds.column_descriptions[section]
             else:
@@ -116,9 +116,9 @@ class DatasetTableModel1D(qt.QAbstractTableModel):
             f = qt.QAbstractTableModel.flags(self, index)
             ds = self.document.data.get(self.dsname)
             if ds is not None and ds.editable:
-                f |= qt.Qt.ItemIsEditable
+                f |= qt.Qt.ItemFlag.ItemIsEditable
             return f
-        return qt.Qt.ItemIsEnabled
+        return qt.Qt.ItemFlag.ItemIsEnabled
 
     def removeRows(self, row, count):
         """Remove rows."""
@@ -133,7 +133,7 @@ class DatasetTableModel1D(qt.QAbstractTableModel):
     def setData(self, index, value, role):
         """Called to set the data."""
 
-        if not index.isValid() or role != qt.Qt.EditRole:
+        if not index.isValid() or role != qt.Qt.ItemDataRole.EditRole:
             return False
 
         row = index.row()
@@ -239,7 +239,7 @@ class DatasetTableModelMulti(qt.QAbstractTableModel):
         ds = self.document.data[dsname]
         data = getattr(ds, colname)
 
-        if role == qt.Qt.DisplayRole:
+        if role == qt.Qt.ItemDataRole.DisplayRole:
             if index.row() < self.rowcounts[dsidx]-1:
                 # convert data to Data
                 d = data[index.row()]
@@ -251,8 +251,8 @@ class DatasetTableModelMulti(qt.QAbstractTableModel):
     def headerData(self, section, orientation, role):
         """Return row numbers or column names."""
 
-        if role == qt.Qt.DisplayRole:
-            if orientation == qt.Qt.Horizontal:
+        if role == qt.Qt.ItemDataRole.DisplayRole:
+            if orientation == qt.Qt.Orientation.Horizontal:
                 # column names
                 dsname, colname, dsidx, colidx = self.colattrs[section]
                 ds = self.document.data[dsname]
@@ -274,14 +274,14 @@ class DatasetTableModelMulti(qt.QAbstractTableModel):
             dsname, colname, dsidx, colidx = self.colattrs[index.column()]
             ds = self.document.data.get(dsname)
             if ds is not None and ds.editable:
-                f |= qt.Qt.ItemIsEditable
+                f |= qt.Qt.ItemFlag.ItemIsEditable
             return f
-        return qt.Qt.ItemIsEnabled
+        return qt.Qt.ItemFlag.ItemIsEnabled
 
     def setData(self, index, value, role):
         """Validate and set data in dataset."""
 
-        if not index.isValid() or role != qt.Qt.EditRole:
+        if not index.isValid() or role != qt.Qt.ItemDataRole.EditRole:
             return False
 
         row = index.row()
@@ -374,7 +374,7 @@ class DatasetTableModel2D(qt.QAbstractTableModel):
             return 0
 
     def data(self, index, role):
-        if role == qt.Qt.DisplayRole:
+        if role == qt.Qt.ItemDataRole.DisplayRole:
             # get data (note y is reversed, sigh)
             try:
                 data = self.document.data[self.dsname].data
@@ -396,16 +396,16 @@ class DatasetTableModel2D(qt.QAbstractTableModel):
         if ds.dimensions != 2:
             return None
 
-        xaxis = orientation == qt.Qt.Horizontal
+        xaxis = orientation == qt.Qt.Orientation.Horizontal
 
         # note: y coordinates are upside down (high y is at top)
-        if ds is not None and role == qt.Qt.DisplayRole:
+        if ds is not None and role == qt.Qt.ItemDataRole.DisplayRole:
             v = self.xcent[section] if xaxis else self.ycent[
                 len(self.ycent)-section-1]
             return '%i (%s)' % (
                 len(self.ycent)-section, setting.ui_floattostring(v, maxdp=4))
 
-        elif ds is not None and role == qt.Qt.ToolTipRole:
+        elif ds is not None and role == qt.Qt.ItemDataRole.ToolTipRole:
             v1 = self.xedge[section] if xaxis else self.yedge[
                 len(self.yedge)-section-2]
             v2 = self.xedge[section+1] if xaxis else self.yedge[
@@ -418,12 +418,12 @@ class DatasetTableModel2D(qt.QAbstractTableModel):
     def flags(self, index):
         """Update flags to say that items are editable."""
         if not index.isValid():
-            return qt.Qt.ItemIsEnabled
+            return qt.Qt.ItemFlag.ItemIsEnabled
         else:
             f = qt.QAbstractTableModel.flags(self, index)
             ds = self.document.data.get(self.dsname)
             if ds is not None and ds.editable:
-                f |= qt.Qt.ItemIsEditable
+                f |= qt.Qt.ItemFlag.ItemIsEditable
             return f
 
     def slotDocumentModified(self):
@@ -434,7 +434,7 @@ class DatasetTableModel2D(qt.QAbstractTableModel):
     def setData(self, index, value, role):
         """Called to set the data."""
 
-        if not index.isValid() or role != qt.Qt.EditRole:
+        if not index.isValid() or role != qt.Qt.ItemDataRole.EditRole:
             return False
 
         ds = self.document.data[self.dsname]
@@ -482,7 +482,7 @@ class DatasetTableModelND(qt.QAbstractTableModel):
 
     def data(self, index, role):
         """Items in array."""
-        if role == qt.Qt.DisplayRole:
+        if role == qt.Qt.ItemDataRole.DisplayRole:
             try:
                 data = self.document.data[self.dsname].data
             except KeyError:
@@ -502,8 +502,8 @@ class DatasetTableModelND(qt.QAbstractTableModel):
         if ds is None:
             return None
 
-        if ds is not None and role == qt.Qt.DisplayRole:
-            if orientation == qt.Qt.Horizontal:
+        if ds is not None and role == qt.Qt.ItemDataRole.DisplayRole:
+            if orientation == qt.Qt.Orientation.Horizontal:
                 return _('Value')
             else:
                 idx = N.unravel_index(section, ds.data.shape)
@@ -560,15 +560,15 @@ class DataEditDialog(VeuszDialog):
             act = qt.QAction(text, self)
             act.triggered.connect(slot)
             self.datatableview.addAction(act)
-        self.datatableview.setContextMenuPolicy( qt.Qt.ActionsContextMenu )
+        self.datatableview.setContextMenuPolicy( qt.Qt.ContextMenuPolicy.ActionsContextMenu )
 
         # layout edit dialog improvement
         self.splitter.setStretchFactor(0, 3)
         self.splitter.setStretchFactor(1, 4)
 
         # don't want text to look editable or special
-        self.linkedlabel.setFrameShape(qt.QFrame.NoFrame)
-        self.linkedlabel.viewport().setBackgroundRole(qt.QPalette.Window)
+        self.linkedlabel.setFrameShape(qt.QFrame.Shape.NoFrame)
+        self.linkedlabel.viewport().setBackgroundRole(qt.QPalette.ColorRole.Window)
 
         # document changes
         document.signalModified.connect(self.slotDocumentModified)

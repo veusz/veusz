@@ -81,7 +81,7 @@ class Line(Settings):
     def makeQPenWHide(self, painter):
         """Make a pen, taking account of hide attribute."""
         if self.hide or self.transparency == 100:
-            return qt.QPen(qt.Qt.NoPen)
+            return qt.QPen(qt.Qt.PenStyle.NoPen)
         else:
             return self.makeQPen(painter)
 
@@ -390,9 +390,9 @@ class Text(Settings):
         '''Return a qt.QFont object corresponding to the settings.'''
 
         size = self.get('size').convertPts(painthelper)
-        weight = qt.QFont.Normal
+        weight = qt.QFont.Weight.Normal
         if self.bold:
-            weight = qt.QFont.Bold
+            weight = qt.QFont.Weight.Bold
 
         f = qt.QFont(self.font, int(size), weight, self.italic)
         if self.underline:
@@ -401,7 +401,7 @@ class Text(Settings):
         if style:
             f.setStyleName(style)
         else:
-            f.setStyleHint(qt.QFont.Times)
+            f.setStyleHint(qt.QFont.StyleHint.Times)
 
         return f
 
@@ -502,7 +502,7 @@ class Line3D(Settings):
 
         width = self.width
         if self.hide or width == 0.:
-            style, dash = qt.Qt.NoPen, None
+            style, dash = qt.Qt.PenStyle.NoPen, None
         else:
             style, dash = setting.LineStyle._linecnvt[self.style]
 

@@ -146,7 +146,7 @@ def pixmapAsHtml(pix):
     """Get QPixmap as html image text."""
     ba = qt.QByteArray()
     buf = qt.QBuffer(ba)
-    buf.open(qt.QIODevice.WriteOnly)
+    buf.open(qt.QIODevice.OpenModeFlag.WriteOnly)
     pix.toImage().save(buf, "PNG")
     b64 = bytes(buf.data().toBase64()).decode('ascii')
     return '<img src="data:image/png;base64,%s">' % b64
@@ -411,13 +411,13 @@ def populateCombo(combo, items):
 def positionFloatingPopup(popup, widget):
     """Position a popped up window (popup) to side and below widget given."""
     pos = widget.parentWidget().mapToGlobal( widget.pos() )
-    desktop = qt.QApplication.desktop()
+    size = widget.screen().geometry()
 
     # recalculates out position so that size is correct below
     popup.adjustSize()
 
     # is there room to put this widget besides the widget?
-    if pos.y() + popup.height() + 1 < desktop.height():
+    if pos.y() + popup.height() + 1 < size.height():
         # put below
         y = pos.y() + 1
     else:
@@ -425,8 +425,8 @@ def positionFloatingPopup(popup, widget):
         y = pos.y() - popup.height() - 1
 
     # is there room to the left for us?
-    if ( (pos.x() + widget.width() + popup.width() < desktop.width()) or
-         (pos.x() + widget.width() < desktop.width()/2) ):
+    if ( (pos.x() + widget.width() + popup.width() < size.width()) or
+         (pos.x() + widget.width() < size.width()/2) ):
         # put left justified with widget
         x = pos.x() + widget.width()
     else:
@@ -652,7 +652,7 @@ class SvgWidgetFixedAspect(qt.QWidget):
 class OverrideCursor:
     """A context manager to handle changing the mouse cursor temporarily."""
 
-    def __init__(self, cursor=qt.Qt.WaitCursor):
+    def __init__(self, cursor=qt.Qt.CursorShape.WaitCursor):
         self.cursor = cursor
 
     def __enter__(self):
@@ -681,7 +681,7 @@ class DisabledIconEngine(qt.QIconEngine):
         return str(id(self))
 
     def paint(self, painter, rect, mode, state):
-        self.icon.paint(painter, rect, qt.Qt.AlignCenter, qt.QIcon.Disabled, state)
+        self.icon.paint(painter, rect, qt.Qt.AlignmentFlag.AlignCenter, qt.QIcon.Mode.Disabled, state)
 
     def pixmap(self, size, mode, state):
-        return self.icon.pixmap(size, qt.QIcon.Disabled, state)
+        return self.icon.pixmap(size, qt.QIcon.Mode.Disabled, state)

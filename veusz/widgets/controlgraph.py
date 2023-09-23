@@ -95,8 +95,8 @@ class _ShapeCorner(qt.QGraphicsRectItem, _ScaledShape):
         else:
             self.setBrush(qt.QBrush(setting.settingdb.color('cntrlcorner')) )
             self.setRect(-5, -5, 10, 10)
-        self.setPen(qt.QPen(qt.Qt.NoPen))
-        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
+        self.setPen(qt.QPen(qt.Qt.PenStyle.NoPen))
+        self.setFlag(qt.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
         self.setZValue(3.)
 
     def mouseMoveEvent(self, event):
@@ -113,7 +113,7 @@ class _ShapeCorner(qt.QGraphicsRectItem, _ScaledShape):
 
 def controlLinePen():
     """Get pen for lines around shapes."""
-    return qt.QPen(setting.settingdb.color('cntrlline'), 2, qt.Qt.DotLine)
+    return qt.QPen(setting.settingdb.color('cntrlline'), 2, qt.Qt.PenStyle.DotLine)
 
 class _EdgeLine(qt.QGraphicsLineItem, _ScaledShape):
     """Line used for edges of resizing box."""
@@ -123,8 +123,8 @@ class _EdgeLine(qt.QGraphicsLineItem, _ScaledShape):
         self.setZValue(2.)
         self.params = params
         if ismovable:
-            self.setFlag(qt.QGraphicsItem.ItemIsMovable)
-            self.setCursor(qt.Qt.SizeAllCursor)
+            self.setFlag(qt.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
+            self.setCursor(qt.Qt.CursorShape.SizeAllCursor)
 
     def mouseMoveEvent(self, event):
         """Notify parent on move."""
@@ -268,10 +268,10 @@ class _GraphMarginBox(qt.QGraphicsItem):
         par = self.params
         pos = par.posn
         # update cursors
-        self.corners[0].setCursor(qt.Qt.SizeFDiagCursor)
-        self.corners[1].setCursor(qt.Qt.SizeBDiagCursor)
-        self.corners[2].setCursor(qt.Qt.SizeBDiagCursor)
-        self.corners[3].setCursor(qt.Qt.SizeFDiagCursor)
+        self.corners[0].setCursor(qt.Qt.CursorShape.SizeFDiagCursor)
+        self.corners[1].setCursor(qt.Qt.CursorShape.SizeBDiagCursor)
+        self.corners[2].setCursor(qt.Qt.CursorShape.SizeBDiagCursor)
+        self.corners[3].setCursor(qt.Qt.CursorShape.SizeFDiagCursor)
 
         # trim box to maximum size
         pos[0] = max(pos[0], par.maxposn[0])
@@ -396,10 +396,10 @@ class _GraphResizableBox(qt.QGraphicsItem):
 
         # create child graphicsitem for each corner
         self.corners = [_ShapeCorner(self, params) for i in range(4)]
-        self.corners[0].setCursor(qt.Qt.SizeFDiagCursor)
-        self.corners[1].setCursor(qt.Qt.SizeBDiagCursor)
-        self.corners[2].setCursor(qt.Qt.SizeBDiagCursor)
-        self.corners[3].setCursor(qt.Qt.SizeFDiagCursor)
+        self.corners[0].setCursor(qt.Qt.CursorShape.SizeFDiagCursor)
+        self.corners[1].setCursor(qt.Qt.CursorShape.SizeBDiagCursor)
+        self.corners[2].setCursor(qt.Qt.CursorShape.SizeBDiagCursor)
+        self.corners[3].setCursor(qt.Qt.CursorShape.SizeFDiagCursor)
         for c in self.corners:
             c.setToolTip(_('Hold shift to resize symmetrically'))
 
@@ -411,7 +411,7 @@ class _GraphResizableBox(qt.QGraphicsItem):
         self.rotator = None
         if params.allowrotate:
             self.rotator = _ShapeCorner(self, params, rotator=True)
-            self.rotator.setCursor(qt.Qt.CrossCursor)
+            self.rotator.setCursor(qt.Qt.CursorShape.CrossCursor)
 
         self.updateCorners()
 
@@ -430,7 +430,7 @@ class _GraphResizableBox(qt.QGraphicsItem):
             tx = x*c-y*s
             ty = x*s+y*c
 
-            if event.modifiers() & qt.Qt.ShiftModifier:
+            if event.modifiers() & qt.Qt.KeyboardModifier.ShiftModifier:
                 # expand around centre
                 par.dims[0] = abs(tx*2)
                 par.dims[1] = abs(ty*2)
@@ -546,7 +546,7 @@ class _GraphMovableBox(_GraphMarginBox):
     def __init__(self, parent, params):
         _GraphMarginBox.__init__(self, parent, params)
         self.cross = _ShapeCorner(self, params)
-        self.cross.setCursor(qt.Qt.SizeAllCursor)
+        self.cross.setCursor(qt.Qt.CursorShape.SizeAllCursor)
         self.updateCornerPosns()
 
     def updateCornerPosns(self):
@@ -594,17 +594,17 @@ class _GraphLine(qt.QGraphicsLineItem, _ScaledShape):
         self.params = params
         l = self.params.line
         self.setScaledLine(l[0], l[1], l[2], l[3])
-        self.setCursor(qt.Qt.SizeAllCursor)
-        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
+        self.setCursor(qt.Qt.CursorShape.SizeAllCursor)
+        self.setFlag(qt.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
         self.setPen(controlLinePen())
         self.setZValue(1.)
 
         self.p0 = _ShapeCorner(self, params, rotator=True)
         self.p0.setScaledPos(params.line[0], params.line[1])
-        self.p0.setCursor(qt.Qt.CrossCursor)
+        self.p0.setCursor(qt.Qt.CursorShape.CrossCursor)
         self.p1 = _ShapeCorner(self, params, rotator=True)
         self.p1.setScaledPos(params.line[2], params.line[3])
-        self.p1.setCursor(qt.Qt.CrossCursor)
+        self.p1.setCursor(qt.Qt.CursorShape.CrossCursor)
 
     def updateFromCorner(self, corner, event):
         """Take position and update ends of line."""
@@ -636,7 +636,7 @@ class _AxisGraphicsLineItem(qt.QGraphicsLineItem, _ScaledShape):
 
         self.setPen(controlLinePen())
         self.setZValue(2.)
-        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
+        self.setFlag(qt.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
 
     def mouseReleaseEvent(self, event):
         """Notify finished."""
@@ -692,12 +692,12 @@ class _GraphAxisLine(qt.QGraphicsItem):
 
     # cursors to use
     curs = {
-        True: qt.Qt.SizeVerCursor,
-        False: qt.Qt.SizeHorCursor
+        True: qt.Qt.CursorShape.SizeVerCursor,
+        False: qt.Qt.CursorShape.SizeHorCursor
     }
     curs_zoom = {
-        True: qt.Qt.SplitVCursor,
-        False: qt.Qt.SplitHCursor
+        True: qt.Qt.CursorShape.SplitVCursor,
+        False: qt.Qt.CursorShape.SplitHCursor
     }
 
     def __init__(self, parent, params):
@@ -855,7 +855,7 @@ class _SvgRotItem(qt.QGraphicsSvgItem, _ScaledShape):
     def __init__(self, filename, parent, mode):
         qt.QGraphicsSvgItem.__init__(
             self, os.path.join(utils.imagedir, filename), parent)
-        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
+        self.setFlag(qt.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
         self.setZValue(3.)
         self.mode = mode
 
@@ -921,25 +921,25 @@ class _SceneRotationItem(qt.QGraphicsItem):
         bx, by = posn[0]*s, posn[1]*s
 
         cntrl = _SvgRotItem("veusz-arrow-nesw.svg", self, "xy")
-        cntrl.setCursor(qt.Qt.SizeAllCursor)
+        cntrl.setCursor(qt.Qt.CursorShape.SizeAllCursor)
         cntrl.setPos(bx, by)
         cntrl.setToolTip(_(
             "Click and drag to rotate in x and y (hold Ctrl for x and z)"))
 
         cntrl = _SvgRotItem("veusz-arrow-ns.svg", self, "y")
-        cntrl.setCursor(qt.Qt.SizeVerCursor)
+        cntrl.setCursor(qt.Qt.CursorShape.SizeVerCursor)
         cntrl.setPos(bx+20, by)
         cntrl.setToolTip(_(
             "Click and drag to rotate in y"))
 
         cntrl = _SvgRotItem("veusz-arrow-ew.svg", self, "x")
-        cntrl.setCursor(qt.Qt.SizeHorCursor)
+        cntrl.setCursor(qt.Qt.CursorShape.SizeHorCursor)
         cntrl.setPos(bx+40, by)
         cntrl.setToolTip(_(
             "Click and drag to rotate in x"))
 
         cntrl = _SvgRotItem("veusz-arrow-circ.svg", self, "z")
-        cntrl.setCursor(qt.Qt.SizeBDiagCursor)
+        cntrl.setCursor(qt.Qt.CursorShape.SizeBDiagCursor)
         cntrl.setPos(bx+68, by)
         cntrl.setToolTip(_(
             "Click and drag to rotate in z"))
@@ -992,7 +992,7 @@ class _SceneRotationItem(qt.QGraphicsItem):
         delta = newpos-oldpos
 
         if mode == 'xy':
-            if (int(event.modifiers()) & qt.Qt.ControlModifier) == 0:
+            if (int(event.modifiers()) & qt.Qt.KeyboardModifier.ControlModifier) == 0:
                 # rotate in x,y axes on screen
                 deltaM = threed.rotate3M4(
                     -delta.y()*DEG2RAD, -delta.x()*DEG2RAD, 0)

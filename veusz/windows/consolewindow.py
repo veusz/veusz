@@ -91,7 +91,7 @@ class _CommandEdit(qt.QLineEdit):
         # tell the console we have a command
         self.sigEnter.emit(command)
 
-    historykeys = (qt.Qt.Key_Up, qt.Qt.Key_Down)
+    historykeys = (qt.Qt.Key.Key_Up, qt.Qt.Key.Key_Down)
 
     def keyPressEvent(self, key):
         """ Overridden to handle history. """
@@ -110,9 +110,9 @@ class _CommandEdit(qt.QLineEdit):
             else:
                 text = self.entered_text
 
-            if code == qt.Qt.Key_Up:
+            if code == qt.Qt.Key.Key_Up:
                 step = -1
-            elif code == qt.Qt.Key_Down:
+            elif code == qt.Qt.Key.Key_Down:
                 step = 1
 
             newpos = self.history_posn + step
@@ -235,7 +235,7 @@ class ConsoleWindow(qt.QDockWidget):
             color = None
 
         cursor = self._outputdisplay.textCursor()
-        cursor.movePosition(qt.QTextCursor.End)
+        cursor.movePosition(qt.QTextCursor.MoveOperation.End)
         cursor.insertText(text, self._makeTextFormat(cursor, color))
         self._outputdisplay.setTextCursor(cursor)
         self._outputdisplay.ensureCursorVisible()

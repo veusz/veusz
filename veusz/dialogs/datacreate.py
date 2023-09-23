@@ -50,12 +50,12 @@ class DataCreateDialog(VeuszDialog):
 
         # connect create button
         self.createbutton = self.buttonBox.addButton(
-            _("C&reate"), qt.QDialogButtonBox.ApplyRole )
+            _("C&reate"), qt.QDialogButtonBox.StandardButton.ApplyRole )
         self.replacebutton = self.buttonBox.addButton(
-            _("&Replace"), qt.QDialogButtonBox.ApplyRole )
+            _("&Replace"), qt.QDialogButtonBox.StandardButton.ApplyRole )
 
         self.buttonBox.button(
-            qt.QDialogButtonBox.Reset).clicked.connect(self.resetButtonClicked)
+            qt.QDialogButtonBox.StandardButton.Reset).clicked.connect(self.resetButtonClicked)
 
         self.createbutton.clicked.connect(self.createButtonClicked)
         self.replacebutton.clicked.connect(self.createButtonClicked)
@@ -287,7 +287,7 @@ class DataCreateDialog(VeuszDialog):
 
             vals[key] = (minval, maxval)
 
-        linked = self.linkcheckbox.checkState() == qt.Qt.Checked
+        linked = self.linkcheckbox.checkState() == qt.Qt.CheckState.Checked
         return document.OperationDatasetCreateRange(
             name, numsteps, vals, linked=linked)
 
@@ -310,7 +310,7 @@ class DataCreateDialog(VeuszDialog):
             if text:
                 vals[key] = text
 
-        linked = self.linkcheckbox.checkState() == qt.Qt.Checked
+        linked = self.linkcheckbox.checkState() == qt.Qt.CheckState.Checked
         return document.OperationDatasetCreateParameteric(
             name, t0, t1, numsteps, vals, linked=linked)
 
@@ -324,7 +324,7 @@ class DataCreateDialog(VeuszDialog):
             if text:
                 vals[key] = text
 
-        link = self.linkcheckbox.checkState() == qt.Qt.Checked
+        link = self.linkcheckbox.checkState() == qt.Qt.CheckState.Checked
         op = document.OperationDatasetCreateExpression(name, vals, link)
         if not op.validateExpression(self.document):
             raise _DSException()

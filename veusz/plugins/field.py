@@ -163,7 +163,7 @@ class _WidgetCombo(qt.QComboBox):
 
         # set tool tip for each entry which is the path
         for i, path in enumerate(self.paths):
-            self.setItemData(i, path, qt.Qt.ToolTipRole)
+            self.setItemData(i, path, qt.Qt.ItemDataRole.ToolTipRole)
 
     def getWidgetPath(self):
         """Get path of selected widget."""

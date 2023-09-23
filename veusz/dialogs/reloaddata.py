@@ -63,11 +63,11 @@ class ReloadData(VeuszDialog):
 
         # manual reload
         self.reloadbutton = self.buttonBox.addButton(
-            "&Reload again", qt.QDialogButtonBox.ApplyRole)
+            "&Reload again", qt.QDialogButtonBox.StandardButton.ApplyRole)
         self.reloadbutton.clicked.connect(self.reloadData)
 
         # close by default, not reload
-        self.buttonBox.button(qt.QDialogButtonBox.Close).setDefault(True)
+        self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Close).setDefault(True)
 
     def statLinkedFiles(self):
         """Stat linked files.

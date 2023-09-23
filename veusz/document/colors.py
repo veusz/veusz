@@ -290,7 +290,7 @@ class ColorModel(qt.QAbstractListModel):
         qcolor = self.colors.get(color)
         if color.lower() in ('auto', 'transparent'):
             # make a checkerboard pattern for special colors
-            image = qt.QImage(xw, yw, qt.QImage.Format_RGB32)
+            image = qt.QImage(xw, yw, qt.QImage.Format.Format_RGB32)
             if color.lower() == 'auto':
                 cnames = ['orange', 'skyblue', 'green']
             else:
@@ -314,9 +314,9 @@ class ColorModel(qt.QAbstractListModel):
             return None
 
         color = self.colorlist[index.row()]
-        if role == qt.Qt.DisplayRole or role == qt.Qt.EditRole:
+        if role == qt.Qt.ItemDataRole.DisplayRole or role == qt.Qt.ItemDataRole.EditRole:
             return color
-        elif role == qt.Qt.DecorationRole:
+        elif role == qt.Qt.ItemDataRole.DecorationRole:
             # icons are cached using rgba as index
             rgba = self.colors.get(color).rgba()
             if rgba not in self.iconcache:
@@ -327,12 +327,12 @@ class ColorModel(qt.QAbstractListModel):
 
     def flags(self, index):
         if not index.isValid():
-            return qt.Qt.ItemIsEnabled
+            return qt.Qt.ItemFlag.ItemIsEnabled
         return (
-            qt.QAbstractListModel.flags(self, index) | qt.Qt.ItemIsEditable)
+            qt.QAbstractListModel.flags(self, index) | qt.Qt.ItemFlag.ItemIsEditable)
 
     def setData(self, index, value, role):
-        if role == qt.Qt.EditRole or role == qt.Qt.DisplayRole:
+        if role == qt.Qt.ItemDataRole.EditRole or role == qt.Qt.ItemDataRole.DisplayRole:
             row = index.row()
             if row>=0 and row<len(self.colorlist):
                 self.colorlist[row] = value

@@ -36,7 +36,7 @@ class AboutDialog(VeuszDialog):
         # draw logo in dialog
         logo = utils.SvgWidgetFixedAspect(os.path.join(utils.imagedir, 'logo.svg'))
         self.logolayout.addWidget(logo)
-        self.logoframe.setBackgroundRole(qt.QPalette.Base)
+        self.logoframe.setBackgroundRole(qt.QPalette.ColorRole.Base)
         self.logoframe.setAutoFillBackground(True)
 
         # add version to copyright text
@@ -49,11 +49,11 @@ class AboutDialog(VeuszDialog):
 
     def licenseClicked(self):
         """Show the license."""
-        LicenseDialog(self).exec_()
+        LicenseDialog(self).exec()
 
     def versionsClicked(self):
         """Show software versions."""
-        SoftwareVersionsDialog(self).exec_()
+        SoftwareVersionsDialog(self).exec()
 
 class LicenseDialog(VeuszDialog):
     """About license dialog."""

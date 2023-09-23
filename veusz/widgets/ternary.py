@@ -434,7 +434,7 @@ class Ternary(NonOrthGraph):
         if not tickSetn.hide:
             # draw ticks themselves
             pen = tickSetn.makeQPen(painter)
-            pen.setCapStyle(qt.Qt.FlatCap)
+            pen.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
             painter.setPen(pen)
             utils.plotLinesToPainter(painter, *tickbotline)
             utils.plotLinesToPainter(painter, *tickleftline)

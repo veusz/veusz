@@ -83,7 +83,7 @@ class CaptureDialog(VeuszDialog):
 
         # user starts capture
         self.captureButton = self.buttonBox.addButton(
-            _("Ca&pture"), qt.QDialogButtonBox.ApplyRole )
+            _("Ca&pture"), qt.QDialogButtonBox.StandardButton.ApplyRole )
 
         self.captureButton.clicked.connect(self.slotCaptureClicked)
 
@@ -126,10 +126,10 @@ class CaptureDialog(VeuszDialog):
         """Browse for a data file."""
 
         fd = qt.QFileDialog(self, 'Browse data file or socket')
-        fd.setFileMode( qt.QFileDialog.ExistingFile )
+        fd.setFileMode( qt.QFileDialog.FileMode.ExistingFile )
 
         # update filename if changed
-        if fd.exec_() == qt.QDialog.Accepted:
+        if fd.exec() == qt.QDialog.DialogCode.Accepted:
             self.filenameEdit.replaceAndAddHistory( fd.selectedFiles()[0] )
 
     def slotCaptureClicked(self):
@@ -232,7 +232,7 @@ class CapturingDialog(VeuszDialog):
         self.starttime.start()
 
         # sort tree by dataset name
-        self.datasetTreeWidget.sortItems(0, qt.Qt.AscendingOrder)
+        self.datasetTreeWidget.sortItems(0, qt.Qt.SortOrder.AscendingOrder)
 
         # timer for updating display
         self.displaytimer = qt.QTimer(self)
@@ -273,7 +273,7 @@ class CapturingDialog(VeuszDialog):
 
         # iterate over each dataset
         for name, length in cts.items():
-            find = tree.findItems(name, qt.Qt.MatchExactly, 0)
+            find = tree.findItems(name, qt.Qt.MatchFlag.MatchExactly, 0)
             if find:
                 # if already in tree, update number of counts
                 find[0].setText(1, str(length))

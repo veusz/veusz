@@ -850,7 +850,7 @@ class Axis(widget.Widget):
         """Draw the line of the axis."""
 
         pen = self.settings.get('Line').makeQPen(painter)
-        pen.setCapStyle(qt.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
         painter.setPen(pen)
         self.swapline(
             painter,
@@ -864,7 +864,7 @@ class Axis(widget.Widget):
         s = self.settings
         mt = s.get('MinorTicks')
         pen = mt.makeQPen(painter)
-        pen.setCapStyle(qt.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
         painter.setPen(pen)
         delta = mt.getLength(painter)
 
@@ -888,7 +888,7 @@ class Axis(widget.Widget):
         s = self.settings
         mt = s.get('MajorTicks')
         pen = mt.makeQPen(painter)
-        pen.setCapStyle(qt.Qt.FlatCap)
+        pen.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
         painter.setPen(pen)
         startdelta = mt.getLength(painter)
         delta = startdelta

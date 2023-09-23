@@ -1037,7 +1037,7 @@ def getColormapArray(cmap, nvals):
     img = makeColorbarImage(0, 1, 'linear', cmap, 0, barsize=nvals)
 
     # ensure data are stored in the correct order
-    fmt = qt.QImage.Format_ARGB32
+    fmt = qt.QImage.Format.Format_ARGB32
     if img.format() != fmt:
         img = img.convertToFormat(fmt)
 

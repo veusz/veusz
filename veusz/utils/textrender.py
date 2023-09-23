@@ -27,7 +27,7 @@ import numpy as N
 from .. import qtall as qt
 from . import points
 
-from ..helpers import qtmml
+#from ..helpers import qtmml
 from ..helpers import recordpaint
 from ..helpers.qtloops import RotatedRectangle
 
@@ -628,7 +628,7 @@ class PartText(Part):
     def render(self, state):
         """Render some text."""
 
-        width = state.fontMetrics().width(self.text)
+        width = state.fontMetrics().horizontalAdvance(self.text)
 
         # actually write the text if requested
         if state.actually_render:
@@ -977,7 +977,7 @@ class PartDot(Part):
         painter.save()
         circsize = state.getPixelsPerPt()
         painter.setBrush( qt.QBrush(painter.pen().color()) )
-        painter.setPen( qt.QPen(qt.Qt.NoPen) )
+        painter.setPen( qt.QPen(qt.Qt.PenStyle.NoPen) )
 
         x = 0.5*(initx + state.x)
         y = state.y-height + circsize
@@ -1002,7 +1002,7 @@ class PartDDot(Part):
         painter.save()
         circsize = state.getPixelsPerPt()
         painter.setBrush( qt.QBrush(painter.pen().color()) )
-        painter.setPen( qt.QPen(qt.Qt.NoPen) )
+        painter.setPen( qt.QPen(qt.Qt.PenStyle.NoPen) )
 
         x1 = initx + 0.25*(state.x-initx)
         x2 = initx + 0.75*(state.x-initx)
@@ -1032,7 +1032,7 @@ class PartTilde(Part):
         state.painter.setFont(font)
 
         # set x and y positions for tilde
-        tildew = state.fontMetrics().width('~')
+        tildew = state.fontMetrics().horizontalAdvance('~')
 
         if not font.italic() or (state.x-initx) >= 2*tildew:
             over_pos = state.x - (state.x - initx)*0.5 - tildew*0.5
@@ -1571,7 +1571,7 @@ class _MmlRenderer(_Renderer):
             p.setPen(qt.QPen(qt.QColor("red")))
             p.drawText(
                 qt.QRectF(self.xi, self.yi, 200, 200),
-                qt.Qt.AlignLeft | qt.Qt.AlignTop | qt.Qt.TextWordWrap,
+                qt.Qt.AlignmentFlag.AlignLeft | qt.Qt.AlignmentFlag.AlignTop | qt.Qt.TextFlag.TextWordWrap,
                 self.error )
         p.restore()
 

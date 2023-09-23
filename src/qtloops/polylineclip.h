@@ -24,7 +24,7 @@
 #include <QRectF>
 #include <QPainter>
 #include <QPolygonF>
-#include <QVector>
+#include <QList>
 #include <QSizeF>
 
 // clip a line made up of the points given, returning true
@@ -41,7 +41,7 @@ void plotClippedPolyline(QPainter& painter,
 
 // clip polyline to rectangle
 // return list of lines to plot
-QVector<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly);
+QList<QPolygonF> clipPolyline(QRectF clip, const QPolygonF& poly);
 
 // Do the polygons intersect?
 bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b);
@@ -49,7 +49,7 @@ bool doPolygonsIntersect(const QPolygonF& a, const QPolygonF& b);
 // class for describing a rectangle with a rotation angle
 struct RotatedRectangle
 {
-  // a lot of boilerplate so it can go in QVector
+  // a lot of boilerplate so it can go in QList
   RotatedRectangle()
     : cx(0), cy(0), xw(0), yw(0), angle(0)
   {}
@@ -90,7 +90,7 @@ public:
   void process();
 
   int getNumPolySets() const { return _polys.size(); };
-  QVector<QPolygonF> getPolySet(int i) const;
+  QList<QPolygonF> getPolySet(int i) const;
 
 private:
   RotatedRectangle findLinePosition(const QPolygonF& poly, double frac,
@@ -100,8 +100,8 @@ private:
   QRectF _cliprect;
   bool _rotatelabels;
 
-  QVector< QVector<QPolygonF> > _polys;
-  QVector<QSizeF> _textsizes;
+  QList< QList<QPolygonF> > _polys;
+  QList<QSizeF> _textsizes;
 };
 
 class RectangleOverlapTester
@@ -116,7 +116,7 @@ public:
   void debug(QPainter& painter) const;
 
 private:
-  QVector<RotatedRectangle> _rects;
+  QList<RotatedRectangle> _rects;
 };
 
 #endif

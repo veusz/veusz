@@ -119,7 +119,7 @@ class Root(widget.Widget):
             self.document.locale = qt.QLocale.c()
         else:
             self.document.locale = qt.QLocale()
-        self.document.locale.setNumberOptions(qt.QLocale.OmitGroupSeparator)
+        self.document.locale.setNumberOptions(qt.QLocale.NumberOption.OmitGroupSeparator)
 
     def changeColorTheme(self):
         """Change color theme used by document."""

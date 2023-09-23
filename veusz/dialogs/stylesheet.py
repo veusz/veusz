@@ -51,7 +51,7 @@ class StylesheetDialog(VeuszDialog):
         self.stylesListWidget.setCurrentRow(0)
 
         # we disable default buttons as they keep grabbing the enter key
-        close = self.buttonBox.button(qt.QDialogButtonBox.Close)
+        close = self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Close)
         close.setDefault(False)
         close.setAutoDefault(False)
 

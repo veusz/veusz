@@ -65,7 +65,7 @@ class ImportTab2D(importdialog.ImportTab):
 
     def slotGridAtEdgeChanged(self, state):
         """Enable/disable widgets depending on grid at edge."""
-        nogridatedge = state == qt.Qt.Unchecked
+        nogridatedge = state == qt.Qt.CheckState.Unchecked
         for w in self.rangeedits:
             w.setEnabled(nogridatedge)
             if not nogridatedge:

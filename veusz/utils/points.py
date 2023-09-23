@@ -301,9 +301,9 @@ def _calcAreaScales():
 
         # draw marker with large size
         painter = qt.QPainter(pix)
-        painter.setRenderHint(qt.QPainter.Antialiasing, False)
+        painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing, False)
         painter.translate(c,c)
-        painter.fillPath(path, qt.QBrush(qt.Qt.SolidPattern))
+        painter.fillPath(path, qt.QBrush(qt.Qt.BrushStyle.SolidPattern))
         painter.end()
 
         # count pixels
@@ -467,7 +467,7 @@ def squareRoundedPath(path, size, linewidth):
     """A square with rounded corners."""
     path.addRoundedRect(
         qt.QRectF(-size, -size, size*2, size*2),
-        50, 50, qt.Qt.RelativeSize)
+        50, 50, qt.Qt.SizeMode.RelativeSize)
 
 def dotPath(path, size, linewidth):
     """Draw a dot."""
@@ -476,13 +476,13 @@ def dotPath(path, size, linewidth):
 
 def bullseyePath(path, size, linewidth):
     """A filled circle inside a filled circle."""
-    path.setFillRule(qt.Qt.WindingFill)
+    path.setFillRule(qt.Qt.FillRule.WindingFill)
     circlePath(path, size, linewidth)
     circlePath(path, size*0.5, linewidth)
 
 def circleDotPath(path, size, linewidth):
     """A dot inside a circle."""
-    path.setFillRule(qt.Qt.WindingFill)
+    path.setFillRule(qt.Qt.FillRule.WindingFill)
     circlePath(path, size, linewidth)
     dotPath(path, size, linewidth)
 
@@ -606,7 +606,7 @@ def plotMarkers(painter, xpos, ypos, markername, markersize, scaling=None,
 
     # get sharper angles and more exact positions using these settings
     pen = painter.pen()
-    pen.setJoinStyle( qt.Qt.MiterJoin )
+    pen.setJoinStyle( qt.Qt.PenJoinStyle.MiterJoin )
     painter.setPen(pen)
 
     # get path to draw and whether to fill
@@ -687,7 +687,7 @@ def plotLineArrow(painter, xpos, ypos, length, angle,
 
     linepen = qt.QPen(painter.pen())
     arrowpen = painter.pen()
-    arrowpen.setStyle(qt.Qt.SolidLine)
+    arrowpen.setStyle(qt.Qt.PenStyle.SolidLine)
     painter.setPen(arrowpen)
 
     # plot marker at one end of line
@@ -697,7 +697,7 @@ def plotLineArrow(painter, xpos, ypos, length, angle,
     painter.scale(-1, 1)
     plotMarker(painter, 0, 0, arrow_translate[arrowleft], arrowsize)
 
-    linepen.setCapStyle(qt.Qt.FlatCap)
+    linepen.setCapStyle(qt.Qt.PenCapStyle.FlatCap)
     painter.setPen(linepen)
     painter.scale(-1, 1)
     painter.drawLine(qt.QPointF(0, 0), qt.QPointF(length, 0))

@@ -73,7 +73,7 @@ StyleSheet.register(StylesheetLine)
 
 def _registerFontStyleSheet():
     """Get fonts, and register default with StyleSheet and Text class."""
-    families = qt.QFontDatabase().families()
+    families = qt.QFontDatabase.families()
 
     deffont = None
     for f in (
@@ -93,7 +93,7 @@ def _registerFontStyleSheet():
         families = ['Serif']
     elif deffont is None:
         print("Warning: did not find a default font. Choosing Qt default font.")
-        deffont = qt.QFontDatabase.systemFont(qt.QFontDatabase.GeneralFont).family()
+        deffont = qt.QFontDatabase.systemFont(qt.QFontDatabase.SystemFont.GeneralFont).family()
 
     collections.Text.defaultfamily = deffont
     collections.Text.families = families

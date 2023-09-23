@@ -51,7 +51,7 @@ class DataCreate2DDialog(VeuszDialog):
         self.document = document
 
         self.createbutton = self.buttonBox.addButton(
-            _("C&reate"), qt.QDialogButtonBox.ApplyRole )
+            _("C&reate"), qt.QDialogButtonBox.StandardButton.ApplyRole )
         self.createbutton.clicked.connect(self.createButtonClickedSlot)
 
         self.fromxyfunc.toggled.connect(self.fromxyfuncSlot)
@@ -190,7 +190,7 @@ class DataCreate2DDialog(VeuszDialog):
         for name in ('xexpr', 'yexpr', 'zexpr', 'name'):
             text[name] = getattr(self, name+'combo').currentText().strip()
 
-        link = self.linkcheckbox.checkState() == qt.Qt.Checked
+        link = self.linkcheckbox.checkState() == qt.Qt.CheckState.Checked
 
         # create and apply operation, catching evaluation errors
         try:

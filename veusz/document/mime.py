@@ -129,7 +129,7 @@ def getClipboardWidgetMime():
         else:
             ba = qt.QByteArray()
             buffer = qt.QBuffer(ba)
-            buffer.open(qt.QIODevice.WriteOnly)
+            buffer.open(qt.QIODevice.OpenModeFlag.WriteOnly)
             qimage.save(buffer, 'png')
             return convertImgtoWidgetMime(ba, 'image/png')
 

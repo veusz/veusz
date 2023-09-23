@@ -1382,20 +1382,20 @@ class FillStyle(Choice):
     ]
 
     _fillcnvt = {
-        'solid': qt.Qt.SolidPattern,
-        'horizontal': qt.Qt.HorPattern,
-        'vertical': qt.Qt.VerPattern,
-        'cross': qt.Qt.CrossPattern,
-        'forward diagonals': qt.Qt.FDiagPattern,
-        'backward diagonals': qt.Qt.BDiagPattern,
-        'diagonal cross': qt.Qt.DiagCrossPattern,
-        '94% dense': qt.Qt.Dense1Pattern,
-        '88% dense': qt.Qt.Dense2Pattern,
-        '63% dense': qt.Qt.Dense3Pattern,
-        '50% dense': qt.Qt.Dense4Pattern,
-        '37% dense': qt.Qt.Dense5Pattern,
-        '12% dense': qt.Qt.Dense6Pattern,
-        '6% dense': qt.Qt.Dense7Pattern,
+        'solid': qt.Qt.BrushStyle.SolidPattern,
+        'horizontal': qt.Qt.BrushStyle.HorPattern,
+        'vertical': qt.Qt.BrushStyle.VerPattern,
+        'cross': qt.Qt.BrushStyle.CrossPattern,
+        'forward diagonals': qt.Qt.BrushStyle.FDiagPattern,
+        'backward diagonals': qt.Qt.BrushStyle.BDiagPattern,
+        'diagonal cross': qt.Qt.BrushStyle.DiagCrossPattern,
+        '94% dense': qt.Qt.BrushStyle.Dense1Pattern,
+        '88% dense': qt.Qt.BrushStyle.Dense2Pattern,
+        '63% dense': qt.Qt.BrushStyle.Dense3Pattern,
+        '50% dense': qt.Qt.BrushStyle.Dense4Pattern,
+        '37% dense': qt.Qt.BrushStyle.Dense5Pattern,
+        '12% dense': qt.Qt.BrushStyle.Dense6Pattern,
+        '6% dense': qt.Qt.BrushStyle.Dense7Pattern,
     }
 
     controls.FillStyle._fills = _fillstyles
@@ -1432,26 +1432,26 @@ class LineStyle(Choice):
 
     # convert from line styles to Qt constants and a custom pattern (if any)
     _linecnvt = {
-        'solid': (qt.Qt.SolidLine, None),
-        'dashed': (qt.Qt.DashLine, None),
-        'dotted': (qt.Qt.DotLine, None),
-        'dash-dot': (qt.Qt.DashDotLine, None),
-        'dash-dot-dot': (qt.Qt.DashDotDotLine, None),
-        'dotted-fine': (qt.Qt.CustomDashLine, [2, 4]),
-        'dashed-fine': (qt.Qt.CustomDashLine, [8, 4]),
-        'dash-dot-fine': (qt.Qt.CustomDashLine, [8, 4, 2, 4]),
-        'dot1': (qt.Qt.CustomDashLine, [0.1, 2]),
-        'dot2': (qt.Qt.CustomDashLine, [0.1, 4]),
-        'dot3': (qt.Qt.CustomDashLine, [0.1, 6]),
-        'dot4': (qt.Qt.CustomDashLine, [0.1, 8]),
-        'dash1': (qt.Qt.CustomDashLine, [4, 4]),
-        'dash2': (qt.Qt.CustomDashLine, [4, 8]),
-        'dash3': (qt.Qt.CustomDashLine, [8, 8]),
-        'dash4': (qt.Qt.CustomDashLine, [16, 8]),
-        'dash5': (qt.Qt.CustomDashLine, [16, 16]),
-        'dashdot1': (qt.Qt.CustomDashLine, [0.1, 4, 4, 4]),
-        'dashdot2': (qt.Qt.CustomDashLine, [0.1, 4, 8, 4]),
-        'dashdot3': (qt.Qt.CustomDashLine, [0.1, 2, 4, 2]),
+        'solid': (qt.Qt.PenStyle.SolidLine, None),
+        'dashed': (qt.Qt.PenStyle.DashLine, None),
+        'dotted': (qt.Qt.PenStyle.DotLine, None),
+        'dash-dot': (qt.Qt.PenStyle.DashDotLine, None),
+        'dash-dot-dot': (qt.Qt.PenStyle.DashDotDotLine, None),
+        'dotted-fine': (qt.Qt.PenStyle.CustomDashLine, [2, 4]),
+        'dashed-fine': (qt.Qt.PenStyle.CustomDashLine, [8, 4]),
+        'dash-dot-fine': (qt.Qt.PenStyle.CustomDashLine, [8, 4, 2, 4]),
+        'dot1': (qt.Qt.PenStyle.CustomDashLine, [0.1, 2]),
+        'dot2': (qt.Qt.PenStyle.CustomDashLine, [0.1, 4]),
+        'dot3': (qt.Qt.PenStyle.CustomDashLine, [0.1, 6]),
+        'dot4': (qt.Qt.PenStyle.CustomDashLine, [0.1, 8]),
+        'dash1': (qt.Qt.PenStyle.CustomDashLine, [4, 4]),
+        'dash2': (qt.Qt.PenStyle.CustomDashLine, [4, 8]),
+        'dash3': (qt.Qt.PenStyle.CustomDashLine, [8, 8]),
+        'dash4': (qt.Qt.PenStyle.CustomDashLine, [16, 8]),
+        'dash5': (qt.Qt.PenStyle.CustomDashLine, [16, 16]),
+        'dashdot1': (qt.Qt.PenStyle.CustomDashLine, [0.1, 4, 4, 4]),
+        'dashdot2': (qt.Qt.PenStyle.CustomDashLine, [0.1, 4, 8, 4]),
+        'dashdot3': (qt.Qt.PenStyle.CustomDashLine, [0.1, 2, 4, 2]),
     }
 
     controls.LineStyle._lines = _linestyles
@@ -1645,7 +1645,7 @@ class LineSet(Setting):
         """
 
         if len(self.val) == 0:
-            return qt.QPen(qt.Qt.NoPen)
+            return qt.QPen(qt.Qt.PenStyle.NoPen)
         else:
             row = row % len(self.val)
             v = self.val[row]
@@ -1659,7 +1659,7 @@ class LineSet(Setting):
                 pen.setDashPattern(dashpattern)
 
             if hide:
-                pen.setStyle(qt.Qt.NoPen)
+                pen.setStyle(qt.Qt.PenStyle.NoPen)
             return pen
 
 class FillSet(Setting):

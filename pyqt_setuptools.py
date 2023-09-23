@@ -68,7 +68,7 @@ class sip_build_ext(build_ext):
             build_cmd.qmake_exe or
             os.environ.get('QMAKE_EXE') or
             find_on_path(
-                ('qmake-qt5', 'qmake5', 'qmake', 'qmake5.exe', 'qmake.exe'),
+                ('qmake-qt6', 'qmake6', 'qmake', 'qmake6.exe', 'qmake.exe'),
                 'qmake')
         )
 
@@ -172,16 +172,16 @@ class sip_build_ext(build_ext):
                 ]
             else:
                 extension.libraries = [
-                    'Qt5Gui'+libinfix,
-                    'Qt5Core'+libinfix,
-                    'Qt5Xml'+libinfix,
-                    'Qt5Widgets'+libinfix,
+                    'Qt6Gui'+libinfix,
+                    'Qt6Core'+libinfix,
+                    'Qt6Xml'+libinfix,
+                    'Qt6Widgets'+libinfix,
                 ]
             extension.library_dirs = [lib_dir]
 
             # may cause problems with compilers which don't allow this
             if self.compiler.compiler_type == 'unix':
-                extension.extra_compile_args.append('-std=c++11')
+                extension.extra_compile_args.append('-std=c++17')
 
         depends = extension.depends
 
@@ -226,12 +226,12 @@ class sip_build_ext(build_ext):
     def _sip_compile(self, source, sip_builddir):
         """Compile sip file to sources."""
 
-        pyqt5_include_dir = os.path.join(
-            get_path('platlib'), 'PyQt5', 'bindings')
-        pyqt5_toml = os.path.join(pyqt5_include_dir, 'QtCore', 'QtCore.toml')
-        with open(pyqt5_toml, 'rb') as fin:
-            pyqt5_cfg = tomli.load(fin)
-        abi_version = pyqt5_cfg.get('sip-abi-version')
+        pyqt6_include_dir = os.path.join(
+            get_path('platlib'), 'PyQt6', 'bindings')
+        pyqt6_toml = os.path.join(pyqt6_include_dir, 'QtCore', 'QtCore.toml')
+        with open(pyqt6_toml, 'rb') as fin:
+            pyqt6_cfg = tomli.load(fin)
+        abi_version = pyqt6_cfg.get('sip-abi-version')
 
         modulename = os.path.splitext(os.path.basename(source))[0]
         srcdir = os.path.abspath(os.path.dirname(source))
@@ -253,10 +253,10 @@ build-backend="sipbuild.api"
 name="{modulename}"
 
 [tool.sip.project]
-sip-include-dirs=[{toml_esc(pyqt5_include_dir)}]
+sip-include-dirs=[{toml_esc(pyqt6_include_dir)}]
 abi-version="{abi_version}"
 build-dir={toml_esc(output_dir)}
-sip-module="PyQt5.sip"
+sip-module="PyQt6.sip"
 sip-files-dir={toml_esc(srcdir)}
 
 [tool.sip.bindings.{modulename}]

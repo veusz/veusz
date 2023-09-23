@@ -153,9 +153,10 @@ class _SettingDB:
         if val[0]:
             default = self.color_defaults[name]
             if default == 'LightBase':
-                base = qt.qApp.palette().color(qt.QPalette.Base)
+                base = qt.QGuiApplication.palette().color(
+                    qt.QPalette.ColorRole.Base)
                 if base.value() < 127:
-                    base = qt.QColor(qt.Qt.white)
+                    base = qt.QColor(qt.Qt.GlobalColor.white)
                 return base
 
             return qt.QColor(default)
@@ -254,7 +255,7 @@ def updateUILocale():
         uilocale = qt.QLocale.c()
     else:
         uilocale = qt.QLocale.system()
-    uilocale.setNumberOptions(qt.QLocale.OmitGroupSeparator)
+    uilocale.setNumberOptions(qt.QLocale.NumberOption.OmitGroupSeparator)
 
     qt.QLocale.setDefault(uilocale)
 

@@ -180,8 +180,8 @@ class ExceptionDialog(VeuszDialog):
         self.errortextedit.setPlainText(self.backtrace)
 
         # set critical pixmap to left of dialog
-        icon = qt.qApp.style().standardIcon(
-            qt.QStyle.SP_MessageBoxCritical, None, self)
+        icon = qt.QApplication.instance().style().standardIcon(
+            qt.QStyle.StandardPixmap.SP_MessageBoxCritical, None, self)
         self.erroriconlabel.setPixmap(icon.pixmap(32))
 
         self.ignoreSessionButton.clicked.connect(self.ignoreSessionSlot)
@@ -219,7 +219,7 @@ class ExceptionDialog(VeuszDialog):
     def accept(self):
         """Accept by opening send dialog."""
         d = ExceptionSendDialog(self.backtrace, self)
-        if d.exec_() == qt.QDialog.Accepted:
+        if d.exec() == qt.QDialog.DialogCode.Accepted:
             VeuszDialog.accept(self)
 
     def ignoreSessionSlot(self):
@@ -236,10 +236,10 @@ class ExceptionDialog(VeuszDialog):
 
             self.close()
 
-    def exec_(self):
+    def exec(self):
         """Exec dialog if exception is not ignored."""
         if self.fmtexcept not in ExceptionDialog.ignore_exceptions:
-            VeuszDialog.exec_(self)
+            VeuszDialog.exec(self)
 
         # send another exception shortly - this clears out the current one
         # so the stack frame of the current exception is released

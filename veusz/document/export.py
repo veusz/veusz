@@ -102,12 +102,12 @@ class ExportBitmapRunnable(ExportRunnable):
             # transparent output
             image = qt.QImage(
                 int(size[0]), int(size[1]),
-                qt.QImage.Format_ARGB32_Premultiplied)
+                qt.QImage.Format.Format_ARGB32_Premultiplied)
         else:
             # non transparent output
             image = qt.QImage(
                 int(size[0]), int(size[1]),
-                qt.QImage.Format_RGB32)
+                qt.QImage.Format.Format_RGB32)
             backqcolor.setAlpha(255)
 
         image.setDotsPerMeterX(int(self.phelpers[0].dpi[0]*m_inch))
@@ -119,8 +119,8 @@ class ExportBitmapRunnable(ExportRunnable):
 
         # paint to the image
         painter = qt.QPainter(image)
-        painter.setRenderHint(qt.QPainter.Antialiasing, self.aexport.antialias)
-        painter.setRenderHint(qt.QPainter.TextAntialiasing, self.aexport.antialias)
+        painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing, self.aexport.antialias)
+        painter.setRenderHint(qt.QPainter.RenderHint.TextAntialiasing, self.aexport.antialias)
         self.phelpers[0].renderToPainter(painter)
         painter.end()
 
@@ -156,8 +156,8 @@ class ExportPDFRunnable(ExportRunnable):
         printer.setResolution(self.aexport.pdfdpi)
         printer.setFullPage(True)
         printer.setColorMode(
-            qt.QPrinter.Color if self.aexport.color else qt.QPrinter.GrayScale)
-        printer.setOutputFormat(qt.QPrinter.PdfFormat)
+            qt.QPrinter.ColorMode.Color if self.aexport.color else qt.QPrinter.ColorMode.ColorMode.GrayScale)
+        printer.setOutputFormat(qt.QPrinter.OutputFormat.PdfFormat)
         printer.setOutputFileName(self.filename)
         printer.setCreator('Veusz %s' % utils.version())
 
@@ -165,9 +165,9 @@ class ExportPDFRunnable(ExportRunnable):
             """Update page size in QPrinter"""
             sizeinchx, sizeinchy = ph.pagesize[0]/ph.dpi[0], ph.pagesize[1]/ph.dpi[1]
             pagesize = qt.QPageSize(
-                qt.QSizeF(sizeinchx, sizeinchy), qt.QPageSize.Inch)
+                qt.QSizeF(sizeinchx, sizeinchy), qt.QPageSize.Unit.Inch)
             layout = qt.QPageLayout(
-                pagesize, qt.QPageLayout.Portrait, qt.QMarginsF())
+                pagesize, qt.QPageLayout.Orientation.Portrait, qt.QMarginsF())
             printer.setPageLayout(layout)
 
         updateSize(self.phelpers[0])
@@ -495,9 +495,9 @@ def printPages(doc, printer, pages, scaling=1., antialias=False, setsizes=False)
             # update paper size on printer
             sizeinchx, sizeinchy = size[0]/dpi[0], size[1]/dpi[1]
             pagesize = qt.QPageSize(
-                qt.QSizeF(sizeinchx, sizeinchy), qt.QPageSize.Inch)
+                qt.QSizeF(sizeinchx, sizeinchy), qt.QPageSize.Unit.Inch)
             layout = qt.QPageLayout(
-                pagesize, qt.QPageLayout.Portrait, qt.QMarginsF())
+                pagesize, qt.QPageLayout.Orientation.Portrait, qt.QMarginsF())
             printer.setPageLayout(layout)
         return size
 
@@ -505,8 +505,8 @@ def printPages(doc, printer, pages, scaling=1., antialias=False, setsizes=False)
 
     painter = painthelper.DirectPainter(printer)
     if antialias:
-        painter.setRenderHint(qt.QPainter.Antialiasing, True)
-        painter.setRenderHint(qt.QPainter.TextAntialiasing, True)
+        painter.setRenderHint(qt.QPainter.RenderHint.Antialiasing, True)
+        painter.setRenderHint(qt.QPainter.RenderHint.TextAntialiasing, True)
 
     # This all assumes that only pages can go into the root widget
     visible = set(doc.getVisiblePages())
@@ -534,17 +534,17 @@ def printDialog(parentwindow, document, filename=None):
             parentwindow, _("Error - Veusz"), _("No pages to print"))
         return
 
-    prnt = qt.QPrinter(qt.QPrinter.HighResolution)
-    prnt.setColorMode(qt.QPrinter.Color)
+    prnt = qt.QPrinter(qt.QPrinter.PrinterMode.HighResolution)
+    prnt.setColorMode(qt.QPrinter.ColorMode.Color)
     prnt.setCreator(_('Veusz %s') % utils.version())
     if filename:
         prnt.setDocName(filename)
 
     dialog = qt.QPrintDialog(prnt, parentwindow)
     dialog.setMinMax(1, document.getNumberPages())
-    if dialog.exec_():
+    if dialog.exec():
         # get page range
-        if dialog.printRange() == qt.QAbstractPrintDialog.PageRange:
+        if dialog.printRange() == qt.QAbstractPrintDialog.PrintRange.PageRange:
             # page range
             minval, maxval = dialog.fromPage(), dialog.toPage()
         else:
@@ -556,7 +556,7 @@ def printDialog(parentwindow, document, filename=None):
         maxval -= 1
 
         # reverse or forward order
-        if prnt.pageOrder() == qt.QPrinter.FirstPageFirst:
+        if prnt.pageOrder() == qt.QPrinter.PageOrder.FirstPageFirst:
             pages = list(range(minval, maxval+1))
         else:
             pages = list(range(maxval, minval-1, -1))

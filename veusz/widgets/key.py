@@ -71,10 +71,10 @@ class _GraphControlKey(qt.QGraphicsRectItem, controlgraph._ScaledShape):
             params.dims[0], params.dims[1]
         )
 
-        self.setCursor(qt.Qt.SizeAllCursor)
+        self.setCursor(qt.Qt.CursorShape.SizeAllCursor)
         self.setZValue(1.)
-        self.setFlag(qt.QGraphicsItem.ItemIsMovable)
-        self.highlightpen = qt.QPen(qt.Qt.red, 2, qt.Qt.DotLine)
+        self.setFlag(qt.QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
+        self.highlightpen = qt.QPen(qt.Qt.GlobalColor.red, 2, qt.Qt.PenStyle.DotLine)
 
         pposn, dims = params.parentposn, params.dims
         th = params.textheight
