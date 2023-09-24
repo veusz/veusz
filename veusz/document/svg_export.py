@@ -336,7 +336,7 @@ class SVGPaintEngine(qt.QPaintEngine):
             vals['stroke-linejoin'] = {
                 qt.Qt.PenJoinStyle.MiterJoin: 'miter',
                 qt.Qt.PenJoinStyle.SvgMiterJoin: 'miter',
-                qt.Qt.HighDpiScaleFactorRoundingPolicy.RoundJoin: 'round',
+                qt.Qt.PenJoinStyle.RoundJoin: 'round',
                 qt.Qt.PenJoinStyle.BevelJoin: 'bevel'
             }[p.joinStyle()]
         # - cap style
@@ -344,7 +344,7 @@ class SVGPaintEngine(qt.QPaintEngine):
             vals['stroke-linecap'] = {
                 qt.Qt.PenCapStyle.FlatCap: 'butt',
                 qt.Qt.PenCapStyle.SquareCap: 'square',
-                qt.Qt.HighDpiScaleFactorRoundingPolicy.RoundCap: 'round'
+                qt.Qt.PenCapStyle.RoundCap: 'round'
             }[p.capStyle()]
         # - width
         w = p.widthF()
@@ -575,7 +575,7 @@ class SVGPaintEngine(qt.QPaintEngine):
 
     def type(self):
         """A random number for the engine."""
-        return qt.QPaintEngine.Type.User + 11
+        return qt.QPaintEngine.Type(qt.QPaintEngine.Type.User.value + 11)
 
 class SVGPaintDevice(qt.QPaintDevice):
     """Paint device for SVG paint engine.
