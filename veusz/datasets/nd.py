@@ -76,8 +76,8 @@ class DatasetND(DatasetNDBase):
 
         if isinstance(data, N.ndarray):
             self.data = data.astype(N.float64)
-        elif isinstance(data, list) or isinstance(data, tuple):
-            self.data = N.array(dtype=N.float64)
+        elif isinstance(data, (list, tuple)):
+            self.data = N.array(data, dtype=N.float64)
         else:
             raise ValueError("Could not convert data to nD numpy array.")
 
