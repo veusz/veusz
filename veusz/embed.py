@@ -249,6 +249,7 @@ class Embedded:
                         close_fds=False,
                         stdin=subprocess.PIPE,
                         stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE
                     )
                     return
                 except OSError:
