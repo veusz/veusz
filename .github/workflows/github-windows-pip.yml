@@ -30,7 +30,7 @@ jobs:
         python -V
         python -m pip install --upgrade pip
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         cached: ${{ steps.cache-qt.outputs.cache-hit }}
         modules: 'qtsvg'
