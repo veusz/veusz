@@ -27,9 +27,8 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         cache: 'true'
-        version: 5.15.2
+        version: '5.15.2'
         setup-python: false
-        archives: 'qtsvg'
     - name: Install Python dependencies
       run: |
         pip install -r requirements.txt
