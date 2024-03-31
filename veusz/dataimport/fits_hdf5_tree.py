@@ -69,12 +69,11 @@ class GenericTreeModel(qt.QAbstractItemModel):
         return node.setData(self, index, value, role)
 
     def flags(self, index):
-        defflags = qt.QAbstractItemModel.flags(self, index)
-        if not index.isValid():
-            return defflags
-        else:
+        flags = qt.QAbstractItemModel.flags(self, index)
+        if index.isValid():
             node = index.internalPointer()
-            return node.flags(index.column(), defflags)
+            flags = node.flags(index.column(), flags)
+        return flags
 
     def columnCount(self, parent):
         return len(self.columnheads)
@@ -238,7 +237,7 @@ class FileGroupNode(FileNode):
         column = index.column()
         if column == _ColToImport and role == qt.Qt.ItemDataRole.CheckStateRole:
             # import check has changed
-            self.grpimport = value == qt.Qt.CheckState.Checked
+            self.grpimport = value != 0
 
             # disable importing of child nodes
             def recursivedisable(node):
@@ -252,7 +251,10 @@ class FileGroupNode(FileNode):
             if self.grpimport:
                 recursivedisable(self)
 
-            self._updateRow(model, index)
+            idx1 = model.index(0, 0, index)
+            idx2 = model.index(
+                len(self.children)-1, model.columnCount(index)-1, index)
+            model.dataChanged.emit(idx1, idx2)
             return True
 
         return False
@@ -418,7 +420,7 @@ class FileDataNode(FileNode):
         column = index.column()
         if column == _ColToImport and role == qt.Qt.ItemDataRole.CheckStateRole:
             # import check has changed
-            self.toimport = value == qt.Qt.CheckState.Checked
+            self.toimport = value != 0
             if not self.toimport:
                 self.importname = ''
 
@@ -440,7 +442,6 @@ class FileDataNode(FileNode):
         return False
 
     def flags(self, column, defflags):
-
         if ( column == _ColToImport and self.datatypevalid and
              not self.grpImport() and self.dimsOkForImport() ):
             # allow import column to be clicked
