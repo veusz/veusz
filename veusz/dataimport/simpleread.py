@@ -795,7 +795,8 @@ class SimpleRead2D:
         # transpose matrix if requested
         if self.params.transpose:
             self.data = N.transpose(self.data).copy()
-            self.xedge, self.yedge = self.xedge, self.yedge
+            self.xedge, self.yedge = self.yedge, self.xedge
+            self.xcent, self.ycent = self.ycent, self.xcent
 
         # check orders of coords - flip if wrong
         for attr in 'xedge', 'xcent', 'yedge', 'ycent':
