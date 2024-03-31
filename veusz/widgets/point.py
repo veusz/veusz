@@ -382,8 +382,8 @@ class PointPlotter(GenericPlotter):
             'nanHandling',
             ('break-on', 'ignore'),
             'break-on',
-            descr=_('Effect of NaN values in input datasets'),
-            usertext=_('NaN handling'),
+            descr=_('Effect of gaps or NaN values in input datasets'),
+            usertext=_('Data gaps'),
             descriptions=(
                 _('NaN values are used to break datasets into parts at their locations'),
                 _('NaN values cause data in their locations to be ignored'),

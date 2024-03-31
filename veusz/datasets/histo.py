@@ -124,7 +124,7 @@ class DatasetHistoGenerator:
 
         # calculate scaling values for error bars
         if self.method == 'density':
-            ratio = 1. / (hist.size*(edges[1]-edges[0]))
+            ratio = 1. / (hist.size*(edges[1:]-edges[:-1]))
         elif self.method == 'fractions':
             ratio = 1. / data.size
         else:

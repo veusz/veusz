@@ -68,6 +68,9 @@ class DocSuspend:
     def __exit__(self, type, value, traceback):
         self.doc.enableUpdates()
 
+class PluginLoadError(RuntimeError):
+    pass
+
 class Document(qt.QObject):
     """Document class for holding the graph data.
     """
@@ -92,9 +95,9 @@ class Document(qt.QObject):
         """Initialise the document."""
         qt.QObject.__init__( self )
 
+        # load plugins if not already loaded
         if not Document.pluginsloaded:
             Document.loadPlugins()
-            Document.pluginsloaded = True
 
         # change tracking of document as a whole
         self.changeset = 0            # increased when the document changes
@@ -352,6 +355,10 @@ class Document(qt.QObject):
     @classmethod
     def loadPlugins(kls, pluginlist=None):
         """Load plugins and catch exceptions."""
+
+        # set early, so we don't repeatedly load faulty plugins
+        kls.pluginsloaded = True
+
         if pluginlist is None:
             pluginlist = setting.settingdb.get('plugins', [])
 
@@ -362,7 +369,7 @@ class Document(qt.QObject):
             except Exception:
                 err = _('Error loading plugin %s\n\n%s') % (
                     plugin, traceback.format_exc())
-                raise RuntimeError(err)
+                raise PluginLoadError(err)
 
     def paintTo(self, painthelper, page):
         """Paint page specified to the paint helper."""

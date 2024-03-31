@@ -413,7 +413,7 @@ class Histo(GenericPlotter):
         if retn is None:
             return
 
-        self.hist, self.perr, self.nerr, self.edges = retn
+        self.hist, self.perrs, self.nerrs, self.edges = retn
 
     def affectsAxisRange(self):
         """Which axes are affected by this plotter?"""
@@ -436,10 +436,10 @@ class Histo(GenericPlotter):
         else:
             # these are the bin heights
             dhi = dlo = self.hist
-            if self.perr is not None:
-                dhi = dhi + self.perr
-            if self.nerr is not None:
-                dlo = dlo + self.nerr
+            if self.perrs is not None:
+                dhi = dhi + self.perrs
+            if self.nerrs is not None:
+                dlo = dlo + self.nerrs
 
         minv = maxv = None
         if axis.settings.log:
@@ -586,9 +586,9 @@ class Histo(GenericPlotter):
 
         # any error bars
         markersize = s.get('markerSize').convert(painter)
-        if s.errorStyle != 'none' and self.perr is not None:
-            minv = ctaxis.dataToPlotterCoords(posn, self.hist+self.nerr)
-            maxv = ctaxis.dataToPlotterCoords(posn, self.hist+self.perr)
+        if s.errorStyle != 'none' and self.perrs is not None and self.nerrs is not None:
+            minv = ctaxis.dataToPlotterCoords(posn, self.hist+self.nerrs)
+            maxv = ctaxis.dataToPlotterCoords(posn, self.hist+self.perrs)
             if vert:
                 ymin, ymax = minv, maxv
                 xmin = xmax = None

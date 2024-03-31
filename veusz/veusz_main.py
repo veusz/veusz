@@ -44,6 +44,10 @@ Copyright (C) Jeremy Sanders 2003-2023 and contributors<br>
 Licenced under the GPL (version 2 or greater)
 '''
 
+def _(text, disambiguation=None, context='Application'):
+    """Translate text."""
+    return qt.QCoreApplication.translate(context, text, disambiguation)
+
 def handleIntSignal(signum, frame):
     '''Ask windows to close if Ctrl+C pressed.'''
     qt.QApplication.instance().closeAllWindows()
@@ -227,6 +231,7 @@ class VeuszApp(qt.QApplication):
     def openMainWindow(self, docs):
         """Open the main window with any loaded files."""
         from veusz.windows.mainwindow import MainWindow
+        from veusz.document import Document, PluginLoadError
 
         emptywins = []
         for w in self.topLevelWidgets():
@@ -319,12 +324,14 @@ class VeuszApp(qt.QApplication):
                 setting.settingdb['external_pythonpath'])
             sys.path += list(parts)
 
-        # load any requested plugins
-        if args.veusz_plugin:
-            try:
+        try:
+            # load plugins from settings
+            document.Document.loadPlugins()
+            if args.veusz_plugin:
+                # load plugins on command line
                 document.Document.loadPlugins(pluginlist=args.veusz_plugin)
-            except RuntimeError as e:
-                startuperrors.append(str(e))
+        except document.PluginLoadError as e:
+            startuperrors.append(str(e))
 
         # different modes
         if args.listen:
@@ -346,7 +353,7 @@ class VeuszApp(qt.QApplication):
         # this has to be displayed after the main window is created,
         # otherwise it never gets shown
         for error in startuperrors:
-            qt.QMessageBox.critical(None, "Veusz", error)
+            qt.QMessageBox.critical(None, _("Error starting - Veusz"), error)
 
     def showException(self, excepttype, exceptvalue, tracebackobj):
         """Show an exception dialog (raised from another thread)."""

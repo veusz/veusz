@@ -57,14 +57,24 @@ def generateValidDatasetParts(datasets, breakds=True):
       Yields single, filtered dataset
     """
 
-    # find NaNs and INFs in input dataset
-    invalid = datasets[0].invalidDataPoints()
-    minlen = invalid.shape[0]
-    for ds in datasets[1:]:
+    # get lengths of datasets and combine invalid parts
+    minlen = None
+    invalid = None
+    for ds in datasets:
         if isinstance(ds, DatasetBase) and not ds.empty():
-            nextinvalid = ds.invalidDataPoints()
-            minlen = min(nextinvalid.shape[0], minlen)
-            invalid = N.logical_or(invalid[:minlen], nextinvalid[:minlen])
+            thisinvalid = ds.invalidDataPoints()
+            dslen = thisinvalid.shape[0]
+            if minlen is None:
+                minlen = dslen
+                invalid = thisinvalid
+            else:
+                minlen = min(minlen, dslen)
+                invalid = N.logical_or(invalid[:minlen], thisinvalid[:minlen])
+
+    if minlen is None:
+        # all empty
+        yield []
+        return
 
     if breakds:
         # return multiple datasets, breaking at invalid values
@@ -105,8 +115,10 @@ def generateValidDatasetParts(datasets, breakds=True):
         valid = N.logical_not(invalid)
         retn = []
         for ds in datasets:
-            if ds is None:
+            if ds is None or not isinstance(ds, DatasetBase) or ds.empty():
                 retn.append(None)
             else:
-                retn.append(ds[valid])
+                thisvalid = N.concatenate((
+                    valid, N.zeros(len(ds)-minlen, dtype=bool)))
+                retn.append(ds[thisvalid])
         yield retn

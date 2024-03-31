@@ -14,26 +14,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
-    - name: Cache Qt
-      id: cache-qt
-      uses: actions/cache@v1
-      with:
-        path: ../Qt
-        key: ${{ runner.os }}-QtCache
+        python-version: '3.10'
+    - name: Upgrade pip
+      run : |
+        python -V
+        python -m pip install --upgrade pip
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
-        cached: ${{ steps.cache-qt.outputs.cache-hit }}
-        modules: 'qtsvg'
+        cache: 'true'
+        cache-key-prefix: 'qt-ubuntu-v1'
+        version: '5.15.2'
         setup-python: false
     - name: Install Python dependencies
       run: |
-        python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build extensions
       run: |

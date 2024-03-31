@@ -74,17 +74,18 @@ class Embedded:
 
     remote = None
 
-    def __init__(self, name='Veusz', copyof=None, hidden=False, compatlevel=0):
+    def __init__(self, name='Veusz', copyof=None, hidden=False, compatlevel=0, debug=False):
         """Initialse the embedded veusz window.
 
         name is the name of the window to show.
         copyof duplicates a view of the document in the Embedded instance given
         hidden makes a hidden window (useful for batch scripting)
         compatlevel is the compatibility level to use (-1 is latest)
+        debug prints debugging messages from remote process if set
         """
 
         if not Embedded.remote:
-            Embedded.startRemote()
+            Embedded.startRemote(debug)
 
         if not copyof:
             retval = self.sendCommand(
@@ -177,7 +178,7 @@ class Embedded:
         return (sock, sendtext.encode('ascii'), waitaccept)
 
     @classmethod
-    def makeRemoteProcess(cls):
+    def makeRemoteProcess(cls, debug):
         """Try to find veusz process for remote program."""
 
         # here's where to look for embed_remote.py
@@ -248,7 +249,8 @@ class Embedded:
                         shell=False, bufsize=0,
                         close_fds=False,
                         stdin=subprocess.PIPE,
-                        stdout=subprocess.PIPE,
+                        stdout=subprocess.DEVNULL,
+                        stderr=None if debug else subprocess.DEVNULL,
                     )
                     return
                 except OSError:
@@ -257,11 +259,11 @@ class Embedded:
         raise RuntimeError('Unable to find a veusz executable on system path')
 
     @classmethod
-    def startRemote(cls):
+    def startRemote(cls, debug):
         """Start remote process."""
         cls.serv_socket, sendtext, waitaccept = cls.makeSockets()
 
-        cls.makeRemoteProcess()
+        cls.makeRemoteProcess(debug)
         stdin = cls.remote.stdin
 
         # send socket number over pipe
