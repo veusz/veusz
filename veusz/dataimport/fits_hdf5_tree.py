@@ -100,6 +100,26 @@ class Node:
     def setData(self, model, index, value, role):
         return False
 
+    def _updateRow(self, model, index):
+        """Helper to tell model to update view of index given."""
+        par = model.parent(index)
+        row = index.row()
+        idx1 = model.index(row, 0, par)
+        idx2 = model.index(row, model.columnCount(index)-1, par)
+        model.dataChanged.emit(idx1, idx2)
+
+    def _recursiveUpdate(self, model, rootindex):
+        """Recursively tell model to update view starting from index."""
+        def recurse(idx):
+            nc = model.rowCount(idx)
+            if nc > 0:
+                idx1 = model.index(0, 0, idx)
+                idx2 = model.index(nc-1, model.columnCount(idx)-1, idx)
+                model.dataChanged.emit(idx1, idx2)
+                for i in range(nc):
+                    recurse(model.index(i, 0, idx))
+        recurse(rootindex)
+
 class ErrorNode(Node):
     """Node for showing error messages."""
 
@@ -198,13 +218,6 @@ class FileNode(Node):
             p = p.parent
         return False
 
-    def _updateRow(self, model, index):
-        """This is messy - inform view that this row has changed."""
-        par = model.parent(index)
-        row = index.row()
-        idx1 = model.index(row, 0, par)
-        idx2 = model.index(row, model.columnCount(index)-1, par)
-        model.dataChanged.emit(idx1, idx2)
 
 class FileGroupNode(FileNode):
     def __init__(self, parent, name, dispname):
@@ -251,10 +264,7 @@ class FileGroupNode(FileNode):
             if self.grpimport:
                 recursivedisable(self)
 
-            idx1 = model.index(0, 0, index)
-            idx2 = model.index(
-                len(self.children)-1, model.columnCount(index)-1, index)
-            model.dataChanged.emit(idx1, idx2)
+            self._recursiveUpdate(model, index)
             return True
 
         return False
