@@ -1,13 +1,13 @@
 Reading data
 ============
 
-Currently Veusz supports reading data from files with text, CSV, HDF5,
-FITS, 2D text or CSV, QDP, binary and NPY/NPZ formats. Use the
-:menuselection:`Data --> Import` dialog to read data, or the importing
-commands in the API can be used.  In addition, the user can load or
-write import plugins in Python which load data into Veusz in an
-arbitrary format. At the moment QDP, binary and NPY/NPZ files are
-supported with this method. The HDF5 file format is the most
+Veusz can read data from files or the clipboard. Currently supported 
+formats are text, CSV, HDF5, FITS, 2D text or CSV, QDP, binary and 
+NPY/NPZ. Use the :menuselection:`Data --> Import` dialog to read data, 
+or the importing commands in the API can be used.  In addition, the 
+user can load or write import plugins in Python which load data into 
+Veusz in an arbitrary format. At the moment QDP, binary and NPY/NPZ 
+files are supported with this method. The HDF5 file format is the most
 sophisticated, and is recommended for complex datasets.
 
 By default, data are "linked" to the file imported from. This means
@@ -458,8 +458,8 @@ Reading data from the clipboard
 -------------------------------
 
 Data can be imported into Veusz from the clipboard via 
-`Data --> Import` (or pressing the corresponding button) and then 
-pressing the button at the top right corner 
+:menuselection:`Data --> Import` (or pressing the corresponding 
+button) and then pressing the button at the top right corner 
 (or by entering {clipboard} in the field for the Filename). 
 The data in the clipboard appears below in the chosen tab 
 (Standard, CSV, 2D, etc.). The CSV tab gives you various options 
