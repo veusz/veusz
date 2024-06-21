@@ -65,5 +65,6 @@
         <release version="3.3.1" date="2020-12-06">
         </release>
     </releases>
-  <updatecontact>jeremy@jeremysanders.net</updatecontact>
+  <developer_name>Veusz developers</developer_name>
+  <update_contact>jeremy@jeremysanders.net</update_contact>
 </component>
