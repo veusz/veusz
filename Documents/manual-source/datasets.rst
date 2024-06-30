@@ -1,13 +1,13 @@
 Reading data
 ============
 
-Currently Veusz supports reading data from files with text, CSV, HDF5,
-FITS, 2D text or CSV, QDP, binary and NPY/NPZ formats. Use the
-:menuselection:`Data --> Import` dialog to read data, or the importing
-commands in the API can be used.  In addition, the user can load or
-write import plugins in Python which load data into Veusz in an
-arbitrary format. At the moment QDP, binary and NPY/NPZ files are
-supported with this method. The HDF5 file format is the most
+Veusz can read data from files or the clipboard. Currently supported 
+formats are text, CSV, HDF5, FITS, 2D text or CSV, QDP, binary and 
+NPY/NPZ. Use the :menuselection:`Data --> Import` dialog to read data, 
+or the importing commands in the API can be used.  In addition, the 
+user can load or write import plugins in Python which load data into 
+Veusz in an arbitrary format. At the moment QDP, binary and NPY/NPZ 
+files are supported with this method. The HDF5 file format is the most
 sophisticated, and is recommended for complex datasets.
 
 By default, data are "linked" to the file imported from. This means
@@ -453,6 +453,37 @@ also places symmetric errors of 0.1 on the x dataset.
         y.append(parts[1])
     SetData('x', x, symerr=0.1)
     SetData('y', y)
+
+Reading data from the clipboard
+-------------------------------
+
+Data can be imported into Veusz from the clipboard via 
+:menuselection:`Data --> Import` (or pressing the corresponding 
+button) and then pressing the button at the top right corner 
+(or by entering {clipboard} in the field for the Filename). 
+The data in the clipboard appears below in the chosen tab 
+(Standard, CSV, 2D, etc.). The CSV tab gives you various options 
+about how the clipboard is interpreted. Finally, you press the 
+import button so the data appears in the Data panel. There remains 
+no link to the file.
+
+There is a convenient and quick way of importing data via the 
+clipboard from spreadsheets like MS Excel, where you can choose a 
+number of columns at once. Highlight the data in multiple columns 
+you like to import. If the columns have different number of rows of 
+data, just highlight so many rows that all the data is contained in 
+the highlighted area. You may include the first row containing the 
+names. Then copy. Switch to Veusz, (if it is the first time you need 
+to press the button at the top right corner) and use the CSV tab, 
+because there you have the option to choose the Column Delimiter 
+{tab}, so all data columns appear (if you only import a single 
+column, the delimiter does not matter). You also have the option to 
+define the first row as Header mode. Then press import. Each column 
+of data will appear as separate entity in the data panel. Next time 
+you copy data from a spread sheet, you need only press the Import 
+button in Veusz because the importing settings stay alive.
+
+.. image:: _images/importdialog_clipboard.png
 
 Manipulating datasets
 =====================
