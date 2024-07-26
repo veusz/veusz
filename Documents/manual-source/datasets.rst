@@ -174,7 +174,7 @@ Descriptor examples
 CSV files
 ---------
 
-CVS (comma separated variable) files are often written from other
+CSV (comma separated variable) files are often written from other
 programs, such as spreadsheets, including Excel and Gnumeric. Veusz
 supports reading from these files.
 
