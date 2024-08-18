@@ -24,7 +24,7 @@ jobs:
         python -V
         python -m pip install --upgrade pip
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         cache: 'true'
         cache-key-prefix: 'qt-windows-v1'
