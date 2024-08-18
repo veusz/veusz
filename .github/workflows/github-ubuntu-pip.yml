@@ -32,7 +32,9 @@ jobs:
         setup-python: false
     - name: Install Python dependencies
       run: |
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # force older PyQt5
+        pip install numpy PyQt5==5.15.10 sip astropy h5py tomli
     - name: Build extensions
       run: |
         python setup.py build_ext --inplace
