@@ -1217,12 +1217,19 @@ class MainWindow(qt.QMainWindow):
                 msgbox.setText(
                     _("Could not import data from file '%s':\n\n %s") % (
                         filename, error))
-                msgbox.setInformativeText(_("Do you want to look for another file?"))
-                msgbox.setStandardButtons(qt.QMessageBox.Yes | qt.QMessageBox.Cancel)
+                msgbox.setInformativeText(
+                    _("Do you want to look for another file?"))
+                msgbox.setStandardButtons(
+                    qt.QMessageBox.Yes | qt.QMessageBox.Cancel |
+                    qt.QMessageBox.Ignore )
                 filename = None
-                if msgbox.exec_() == qt.QMessageBox.Yes:
-                    filename = qt.QFileDialog.getOpenFileName(self, "Choose data file")
+                res = msgbox.exec_()
+                if res == qt.QMessageBox.Yes:
+                    filename = qt.QFileDialog.getOpenFileName(
+                        self, "Choose data file")
                     filename = filename[0] if filename else None
+                elif res == qt.QMessageBox.Ignore:
+                    filename = False
             return filename
 
         # save stdout and stderr, then redirect to console
