@@ -41,6 +41,7 @@ class HistoryCombo(qt.QComboBox):
         self.setDuplicatesEnabled(False)
         self.setSizePolicy( qt.QSizePolicy(
             qt.QSizePolicy.Policy.MinimumExpanding, qt.QSizePolicy.Policy.Fixed) )
+        self.completer().setCaseSensitivity(qt.Qt.CaseSensitivity.CaseSensitive)
 
         # stops combobox readjusting in size to fit contents
         self.setSizeAdjustPolicy(
