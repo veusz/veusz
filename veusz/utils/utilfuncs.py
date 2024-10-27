@@ -51,6 +51,10 @@ def _getVeuszDirectory():
     if hasattr(sys, 'frozen'):
         # for pyinstaller compatability
         resdir = os.path.dirname(os.path.abspath(sys.executable))
+        if not os.path.exists(os.path.join(resdir, 'VERSION')):
+            # MacOS pyinstaller
+            resdir = os.path.join(resdir, '..', 'Resources')
+
     else:
         # standard installation
         resdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
