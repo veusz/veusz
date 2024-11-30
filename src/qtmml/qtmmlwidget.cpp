@@ -4227,8 +4227,10 @@ MmlTextNode::MmlTextNode(const QString &text, MmlDocument *document)
 {
     m_text = text;
     // Trim whitespace from ends, but keep nbsp and thinsp
-    m_text.remove(QRegularExpression("^[^\\S\\x00a0\\x2009]+"));
-    m_text.remove(QRegularExpression("[^\\S\\x00a0\\x2009]+$"));
+    static const QRegularExpression leadingWhitespace("^[^\\S\\x00a0\\x2009]+");
+    static const QRegularExpression trailingWhitespace("[^\\S\\x00a0\\x2009]+$");
+    m_text.remove(leadingWhitespace);
+    m_text.remove(trailingWhitespace);
 
     if (m_text == QString(QChar(0x62, 0x20))	     // &InvisibleTimes;
 	    || m_text == QString(QChar(0x63, 0x20))  // &InvisibleComma;
