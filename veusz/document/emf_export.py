@@ -322,7 +322,8 @@ class EMFPaintEngine(qt.QPaintEngine):
             self._updateClipPath(path, state.clipOperation())
 
     def type(self):
-        return qt.QPaintEngine.Type.PostScript
+        """A random number for the engine."""
+        return qt.QPaintEngine.Type(qt.QPaintEngine.Type.User.value + 11)
 
 class EMFPaintDevice(qt.QPaintDevice):
     """Paint device for EMF paint engine."""

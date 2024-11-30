@@ -572,8 +572,7 @@ class SVGPaintEngine(qt.QPaintEngine):
         SVGElement(self.celement, 'image', ''.join(attrb))
 
     def type(self):
-        """A random number for the engine."""
-        return qt.QPaintEngine.Type(qt.QPaintEngine.Type.User.value + 11)
+        return qt.QPaintEngine.Type.SVG
 
 class SVGPaintDevice(qt.QPaintDevice):
     """Paint device for SVG paint engine.
