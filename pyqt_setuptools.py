@@ -182,6 +182,10 @@ class sip_build_ext(build_ext):
             # may cause problems with compilers which don't allow this
             if self.compiler.compiler_type == 'unix':
                 extension.extra_compile_args.append('-std=c++17')
+            elif self.compiler.compiler_type == 'msvc':
+                extension.extra_compile_args.append('/permissive-')
+                extension.extra_compile_args.append('/Zc:__cplusplus')
+                extension.extra_compile_args.append('/std:c++17')
 
         depends = extension.depends
 
@@ -246,7 +250,7 @@ class sip_build_ext(build_ext):
 
         toml_text=f'''
 [build-system]
-requires=["sip >= 5.5.0, <7"]
+requires=["sip >= 6.8, <7"]
 build-backend="sipbuild.api"
 
 [tool.sip.metadata]

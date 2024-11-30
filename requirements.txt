@@ -1,6 +1,6 @@
 numpy >= 1.10
-PyQt5 >= 5.5.1
-sip >= 5
+PyQt6 >= 6.7, <7
+sip >= 6.8, <7
 astropy >= 2.0
 h5py >= 2.6.0
 tomli
