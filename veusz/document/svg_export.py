@@ -250,8 +250,6 @@ class SVGPaintEngine(qt.QPaintEngine):
             self.clippath = clippath
         elif clipoperation == qt.Qt.ClipOperation.IntersectClip:
             self.clippath = self.clippath.intersected(clippath)
-        elif clipoperation == qt.Qt.UniteClip:
-            self.clippath = self.clippath.united(clippath)
         else:
             assert False
 
@@ -559,7 +557,7 @@ class SVGPaintEngine(qt.QPaintEngine):
         # convert pixmap to textual data
         data = qt.QByteArray()
         buf = qt.QBuffer(data)
-        buf.open(qt.QBuffer.ReadWrite)
+        buf.open(qt.QBuffer.OpenModeFlag.ReadWrite)
         pixmap.save(buf, self.imageformat.upper(), 0)
         buf.close()
 

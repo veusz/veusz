@@ -124,7 +124,7 @@ struct LineProp
   RGBVec rgbs;
   bool hide;
   Qt::PenStyle style;
-  QVector<qreal> dashpattern;
+  QList<qreal> dashpattern;
 
   // used to reference count usages by Object() instances
   mutable unsigned _ref_cnt;

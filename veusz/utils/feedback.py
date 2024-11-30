@@ -152,7 +152,7 @@ class FeedbackCheckThread(qt.QThread):
             'platform-machine': platform.machine(),
             'windows-version': winver,
             'numpy-version': N.__version__,
-            'qt-version': qt.qVersion(),
+            'qt-version': qt.QT_VERSION_STR,
             'pyqt-version': qt.PYQT_VERSION_STR,
             'sip-version': qt.sip.SIP_VERSION_STR,
             'locale': qt.QLocale().name(),

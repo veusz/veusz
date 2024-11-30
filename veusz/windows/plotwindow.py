@@ -1331,7 +1331,7 @@ class PlotWindow( qt.QGraphicsView ):
         oldmode = self.clickmode
         self.clickmode = 'viewgetclick'
         while self.clickmode == 'viewgetclick':
-            qt.qApp.processEvents()
+            qt.QApplication.instance().processEvents()
         self.clickmode = oldmode
         qt.QApplication.restoreOverrideCursor()
 

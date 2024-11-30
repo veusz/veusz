@@ -824,7 +824,7 @@ class DatasetBrowserPopup(DatasetBrowser):
             self, document, None, parent, readonly=True,
             filterdims=filterdims, filterdtype=filterdtype)
         self.setWindowFlags(qt.Qt.WindowType.Popup)
-        self.setAttribute(qt.Qt.WindowType.WindowType.WidgetAttribute.WA_DeleteOnClose)
+        self.setAttribute(qt.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.spacing = self.fontMetrics().height()
 
         utils.positionFloatingPopup(self, parent)

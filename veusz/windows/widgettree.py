@@ -417,7 +417,7 @@ class WidgetTreeView(qt.QTreeView):
         hdr = self.header()
         hdr.setStretchLastSection(False)
         hdr.setSectionResizeMode(0, qt.QHeaderView.ResizeMode.Stretch)
-        hdr.setSectionResizeMode(1, qt.QHeaderView.ResizeMode.Custom)
+        hdr.setSectionResizeMode(1, qt.QHeaderView.ResizeMode.Fixed)
 
         # setup drag and drop
         self.setSelectionMode(qt.QAbstractItemView.SelectionMode.ExtendedSelection)
@@ -427,7 +427,7 @@ class WidgetTreeView(qt.QTreeView):
 
     def testModifier(self, e):
         """Look for keyboard modifier for copy or move."""
-        if e.keyboardModifiers() & qt.Qt.KeyboardModifier.ControlModifier:
+        if e.modifiers() & qt.Qt.KeyboardModifier.ControlModifier:
             e.setDropAction(qt.Qt.DropAction.CopyAction)
         else:
             e.setDropAction(qt.Qt.DropAction.MoveAction)
@@ -439,11 +439,11 @@ class WidgetTreeView(qt.QTreeView):
         event.setDropAction(qt.Qt.DropAction.IgnoreAction)
         event.ignore()
 
-        if not self.viewport().rect().contains(event.pos()):
+        if not self.viewport().rect().contains(event.position().toPoint()):
             return
 
         # get widget at event position
-        index = self.indexAt(event.pos())
+        index = self.indexAt(event.position().toPoint())
         if not index.isValid():
             index = self.rootIndex()
 

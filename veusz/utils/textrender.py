@@ -27,7 +27,7 @@ import numpy as N
 from .. import qtall as qt
 from . import points
 
-#from ..helpers import qtmml
+from ..helpers import qtmml
 from ..helpers import recordpaint
 from ..helpers.qtloops import RotatedRectangle
 
@@ -1530,7 +1530,7 @@ class _MmlRenderer(_Renderer):
         # different zoom factors (I hate this code).
         upscale = 5.
 
-        doc.setFontName( qtmml.QtMmlWidget.NormalFont, self.font.family() )
+        doc.setFontName( qtmml.QtMmlWidget.MmlFont.NormalFont, self.font.family() )
 
         ptsize = self.font.pointSizeF()
         if ptsize < 0:

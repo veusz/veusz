@@ -56,7 +56,7 @@ def versionHeader():
 Python version: {sys.version}
 Python platform: {sys.platform}
 Numpy version: {numpy.__version__}
-Qt version: {qt.qVersion()}
+Qt version: {qt.QT_VERSION_STR}
 PyQt version: {qt.PYQT_VERSION_STR}
 sip version: {qt.sip.SIP_VERSION_STR}'''
 

@@ -20,7 +20,7 @@
 #define RECORD_PAINT_DEVICE__H
 
 #include <QPaintDevice>
-#include <QVector>
+#include <QList>
 #include "paintelement.h"
 #include "recordpaintengine.h"
 
@@ -51,7 +51,7 @@ private:
 private:
   int _width, _height, _dpix, _dpiy;
   RecordPaintEngine* _engine;
-  QVector<PaintElement*> _elements;
+  QList<PaintElement*> _elements;
 };
 
 #endif

@@ -210,14 +210,14 @@ class EMFPaintEngine(qt.QPaintEngine):
             style |= {
                 qt.Qt.PenCapStyle.FlatCap: pyemf3.PS_ENDCAP_FLAT,
                 qt.Qt.PenCapStyle.SquareCap: pyemf3.PS_ENDCAP_SQUARE,
-                qt.Qt.HighDpiScaleFactorRoundingPolicy.RoundCap: pyemf3.PS_ENDCAP_ROUND,
+                qt.Qt.PenCapStyle.RoundCap: pyemf3.PS_ENDCAP_ROUND,
             }[pen.capStyle()]
 
             # set join style
             style |= {
                 qt.Qt.PenJoinStyle.MiterJoin: pyemf3.PS_JOIN_MITER,
                 qt.Qt.PenJoinStyle.BevelJoin: pyemf3.PS_JOIN_BEVEL,
-                qt.Qt.HighDpiScaleFactorRoundingPolicy.RoundJoin: pyemf3.PS_JOIN_ROUND,
+                qt.Qt.PenJoinStyle.RoundJoin: pyemf3.PS_JOIN_ROUND,
                 qt.Qt.PenJoinStyle.SvgMiterJoin: pyemf3.PS_JOIN_MITER,
             }[pen.joinStyle()]
 
