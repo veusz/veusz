@@ -30,8 +30,8 @@ jobs:
         setup-python: false
     - name: Install Python dependencies
       run: |
-        pip3 -v install Cython ninja
-        pip3 -v install --no-binary :all: numpy
+        pip3 -v install Cython ninja meson-python
+        pip3 -v install -Csetup-args=-Dblas-order= --no-binary :all: numpy
         pip3 -v install --config-settings --confirm-license= --no-binary :all: PyQt6
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip3 install pyinstaller
