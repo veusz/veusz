@@ -30,6 +30,7 @@ jobs:
         setup-python: false
     - name: Install Python dependencies
       run: |
+        pip3 -v install --config-settings --confirm-license= --no-binary :all: numpy
         pip3 -v install --config-settings --confirm-license= --no-binary :all: PyQt6
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip3 install pyinstaller
