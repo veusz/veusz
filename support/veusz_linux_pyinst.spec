@@ -1,9 +1,8 @@
 # -*- mode: python -*-
-import glob
-import os.path
+
 # linux pyinstaller file
 
-#thisdir=os.path.dirname(os.path.abspath(__file__))
+import glob
 
 a = Analysis(
     ['../veusz/veusz_main.py'],
@@ -38,22 +37,23 @@ binaries += [
     ]
 
 # add various required files to distribution
-for f in ( glob.glob('icons/*.png')  + glob.glob('icons/*.ico') +
-	   glob.glob('icons/*.svg') +
-           glob.glob('examples/*.vsz') +
-           glob.glob('examples/*.dat') + glob.glob('examples/*.csv') +
-           glob.glob('examples/*.py') +
-           glob.glob('ui/*.ui') ):
-    binaries.append( (f, f, 'DATA') )
+data_glob = [
+    'icons/*.png',
+    'icons/*.ico',
+    'icons/*.svg',
+    'examples/*.vsz',
+    'examples/*.dat',
+    'examples/*.csv',
+    'examples/*.py',
+    'ui/*.ui',
+]
+
+for pattern in data_glob:
+    for fn in glob.glob(pattern):
+        binaries.append((fn, fn, 'DATA'))
 
 excludes = set([
-        #'libXi.so.6', 'libX11-xcb.so.1', 'libX11.so.6',
-        #'libXext.so.6', 'libXau.so.6', 'libICE.so.6',
-        #'libreadline.so.6', 'readline.so',
-        #'_curses.so', 'libncursesw.so.5',
-        #'termios.so', 'libtinfo.so.5',
-        #'libz.so.1',
-        ])
+])
 # remove libraries in the set above
 binaries[:] = [b for b in binaries if b[0] not in excludes]
 
