@@ -91,11 +91,13 @@ symlink = [
 for fn in symlink:
     os.symlink(f'_internal/{fn}', f'dist/{outdir}/{fn}')
 
+# make a highly compressed tar file
+print(f'Creating tar file')
 tardir = 'tar'
 tarfn = f'{tardir}/veusz-{version}-linux-x86_64.tar.xz'
-print(f'Creating tar file {tarfn}')
 os.makedirs(tardir, exist_ok=True)
 cmd = f'tar -C dist/ --owner=0 --group=0 -cf - veusz-{version} | xz -9 -c - > {tarfn}'
+print(cmd)
 retn = os.system(cmd)
 if retn != 0:
     raise RuntimeError('tar failed')
