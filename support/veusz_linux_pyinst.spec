@@ -3,6 +3,7 @@
 # linux pyinstaller file
 
 import glob
+import os
 
 # get version
 with open('VERSION') as fin:
@@ -25,9 +26,9 @@ exe = EXE(
     exclude_binaries=True,
     name='veusz',
     debug=False,
-    strip=True,
+    strip=True, # note this breaks std numpy wheel
     upx=False,
-    console=False,
+    console=True,
 )
 
 # add necessary documentation, licence
@@ -35,8 +36,8 @@ data_glob = [
     'VERSION',
     'ChangeLog',
     'AUTHORS',
-    'README',
-    'INSTALL',
+    'README.md',
+    'INSTALL.md',
     'COPYING',
     'icons/*.png',
     'icons/*.ico',
@@ -65,6 +66,7 @@ excludes = set([
 analysis.binaries[:] = [b for b in analysis.binaries if b[0] not in excludes]
 
 # collect together results
+outdir = f'veusz-{version}'
 coll = COLLECT(
     exe,
     analysis.binaries,
@@ -72,5 +74,28 @@ coll = COLLECT(
     datas,
     strip=True,
     upx=False,
-    name=f'veusz-{version}',
+    name=outdir,
 )
+
+# make symlinks to make it easier to find files
+print('Making symlinks')
+symlink = [
+    'ChangeLog',
+    'AUTHORS',
+    'README.md',
+    'INSTALL.md',
+    'embed.py',
+    'COPYING',
+    'examples',
+]
+for fn in symlink:
+    os.symlink(f'_internal/{fn}', f'dist/{outdir}/{fn}')
+
+tardir = 'tar'
+tarfn = f'{tardir}/veusz-{version}-linux-x86_64.tar.xz'
+print(f'Creating tar file {tarfn}')
+os.makedirs(tardir, exist_ok=True)
+cmd = f'tar -C dist/ --owner=0 --group=0 -cf - veusz-{version} | xz -9 -c - > {tarfn}'
+retn = os.system(cmd)
+if retn != 0:
+    raise RuntimeError('tar failed')
