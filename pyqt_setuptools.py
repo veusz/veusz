@@ -180,11 +180,14 @@ class sip_build_ext(build_ext):
             extension.library_dirs = [lib_dir]
 
             # may cause problems with compilers which don't allow this
-            print('compiler_type', repr(self.compiler.compiler_type))
             if self.compiler.compiler_type == 'unix':
                 extension.extra_compile_args.append('-std=c++17')
             elif self.compiler.compiler_type == 'msvc':
-                extension.extra_compile_args.append('/Zc:__cplusplus')
+                extension.extra_compile_args += [
+                    '/std:c++17',
+                    '/Zc:__cplusplus',
+                ]
+            print('compiler_arrgs', repr(extension.extra_compile_args))
 
         depends = extension.depends
 
