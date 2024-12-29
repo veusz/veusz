@@ -4,7 +4,11 @@
 
 import glob
 
-a = Analysis(
+# get version
+with open('VERSION') as fin:
+    version = fin.read().strip()
+
+analysis = Analysis(
     ['../veusz/veusz_main.py'],
     pathex=[],
     hiddenimports=[
@@ -13,31 +17,27 @@ a = Analysis(
         ],
     hookspath=None,
     runtime_hooks=None)
-pyz = PYZ(a.pure)
+pyz = PYZ(analysis.pure)
 
 exe = EXE(
     pyz,
-    a.scripts,
+    analysis.scripts,
     exclude_binaries=True,
-    name='veusz.exe',
+    name='veusz',
     debug=False,
     strip=True,
     upx=False,
-    console=True,
-    )
+    console=False,
+)
 
 # add necessary documentation, licence
-binaries = a.binaries
-for bin in ('VERSION', 'ChangeLog', 'AUTHORS', 'README', 'INSTALL', 'COPYING'):
-    binaries += [ (bin, bin, 'DATA') ]
-
-binaries += [
-    ('embed.py', 'veusz/embed.py', 'DATA'),
-    ('__init__.py', 'veusz/__init__.py', 'DATA'),
-    ]
-
-# add various required files to distribution
 data_glob = [
+    'VERSION',
+    'ChangeLog',
+    'AUTHORS',
+    'README',
+    'INSTALL',
+    'COPYING',
     'icons/*.png',
     'icons/*.ico',
     'icons/*.svg',
@@ -48,20 +48,29 @@ data_glob = [
     'ui/*.ui',
 ]
 
+datas = analysis.datas
 for pattern in data_glob:
     for fn in glob.glob(pattern):
-        binaries.append((fn, fn, 'DATA'))
+        datas.append((fn, fn, 'DATA'))
 
+# add API files
+datas += [
+    ('embed.py', 'veusz/embed.py', 'DATA'),
+    ('__init__.py', 'veusz/__init__.py', 'DATA'),
+]
+
+# exclude files listed (currently unused)
 excludes = set([
 ])
-# remove libraries in the set above
-binaries[:] = [b for b in binaries if b[0] not in excludes]
+analysis.binaries[:] = [b for b in analysis.binaries if b[0] not in excludes]
 
+# collect together results
 coll = COLLECT(
     exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
+    analysis.binaries,
+    analysis.zipfiles,
+    datas,
     strip=True,
     upx=False,
-    name='veusz')
+    name=f'veusz-{version}',
+)
