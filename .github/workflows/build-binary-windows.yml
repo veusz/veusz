@@ -39,14 +39,14 @@ jobs:
         pip3 -v install --config-settings --confirm-license= --no-binary :all: PyQt6
     - name: Install other modules
       run: |
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip3 install -r requirements.txt
         pip3 install iminuit
         pip3 install https://github.com/jeremysanders/pyemf3/archive/master.zip
         pip3 install pyinstaller
     - name: Build Veusz extensions
       run: |
         python3 setup.py build_ext --inplace
-        cp -p build/lib*/veusz/helpers/*.so veusz/helpers
+        copy build/lib*/veusz/helpers/*.dll veusz/helpers
     - name: Build binary with pyinstaller
       run: |
         pyinstaller support/veusz_windows_pyinst.spec
@@ -54,4 +54,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: windows-binary
-        path: dist.
+        path: dist
