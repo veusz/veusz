@@ -30,15 +30,13 @@ jobs:
         cache-key-prefix: 'qt-windows-binary-v1'
         version: '6.7.3'
         setup-python: false
-#        pip3 -v install -Csetup-args=-Dblas= -Csetup-args=-Dlapack= --no-binary 
     - name: Install numpy
       run: |
         pip3 -v install Cython ninja meson-python
-        pip3 -v install numpy
-#        pip3 -v install --config-settings --confirm-license= --no-binary :all: PyQt6
+        pip3 -v install -Csetup-args=-Dblas= -Csetup-args=-Dlapack= --no-binary numpy
     - name: Install PyQt
       run: |
-        pip3 -v install PyQt6
+        pip3 -v install --config-settings --confirm-license= --no-binary :all: PyQt6
     - name: Install other modules
       run: |
         pip3 install -r requirements.txt
