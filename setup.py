@@ -94,6 +94,7 @@ if os.name == 'nt':
     cpp_compile_args = [
         '/std:c++17',
         '/Zc:__cplusplus',
+        '/permissive-',
     ]
 else:
     cpp_compile_args = [
