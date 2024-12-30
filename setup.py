@@ -24,7 +24,7 @@ see the file INSTALL.md for details on how to install Veusz
 """
 
 import glob
-import os.path
+import os
 import numpy
 
 from setuptools import setup, Extension
@@ -88,6 +88,18 @@ def findData(dirname, extns):
     files.sort()
     return (dirname, files)
 
+# extra compiler options for C++17
+if os.name == 'nt':
+    # assume MSVC - these need to be defined here
+    cpp_compile_args = [
+        '/std:c++17',
+        '/Zc:__cplusplus',
+    ]
+else:
+    cpp_compile_args = [
+        '-std=c++17',
+    ]
+
 setup(
     data_files = [
         ('', ['VERSION', 'AUTHORS', 'ChangeLog', 'COPYING']),
@@ -116,6 +128,7 @@ setup(
             include_dirs=[
                 'src/threed', numpy.get_include()
             ],
+            extra_compile_args=cpp_compile_args,
         ),
 
         # mathml widget
@@ -127,6 +140,7 @@ setup(
             ],
             language="c++",
             include_dirs=['src/qtmml'],
+            extra_compile_args=cpp_compile_args,
         ),
 
         # device to record paint commands
@@ -139,6 +153,7 @@ setup(
             ],
             language="c++",
             include_dirs=['src/recordpaint'],
+            extra_compile_args=cpp_compile_args,
         ),
 
         # contour plotting library
@@ -168,6 +183,7 @@ setup(
                 'src/qtloops',
                 numpy.get_include()
             ],
+            extra_compile_args=cpp_compile_args,
         ),
     ],
 

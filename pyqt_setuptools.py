@@ -179,15 +179,6 @@ class sip_build_ext(build_ext):
                 ]
             extension.library_dirs = [lib_dir]
 
-            # may cause problems with compilers which don't allow this
-            if self.compiler.compiler_type == 'unix':
-                extension.extra_compile_args.append('-std=c++17')
-            elif self.compiler.compiler_type == 'msvc':
-                extension.extra_preargs += [
-                    '/std:c++17',
-                    '/Zc:__cplusplus',
-                ]
-
         depends = extension.depends
 
         # Filter dependencies list: we are interested only in .sip files,
