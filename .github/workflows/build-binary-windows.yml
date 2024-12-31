@@ -31,7 +31,7 @@ jobs:
         cd bootloader
         python3 ./waf distclean all
         cd ..
-        python3 setup.py install
+        pip3 install .
         cd ..
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -52,7 +52,6 @@ jobs:
         pip3 install -r requirements.txt
         pip3 install iminuit
         pip3 install https://github.com/jeremysanders/pyemf3/archive/master.zip
-        pip3 install pyinstaller
     - name: Build Veusz extensions
       run: |
         python3 setup.py build_ext --inplace
