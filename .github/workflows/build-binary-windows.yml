@@ -25,6 +25,7 @@ jobs:
         python3 -m pip install --upgrade pip
     - name: Build pyinstaller
       run: |
+        pip3 -v install setuptools
         git clone https://github.com/pyinstaller/pyinstaller
         cd pyinstaller
         cd bootloader
