@@ -23,6 +23,15 @@ jobs:
     - name: Upgrade pip
       run : |
         python3 -m pip install --upgrade pip
+    - name: Build pyinstaller
+      run: |
+        git clone https://github.com/pyinstaller/pyinstaller
+        cd pyinstaller
+        cd bootloader
+        python3 ./waf distclean all
+        cd ..
+        python3 setup.py install
+        cd ..
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
