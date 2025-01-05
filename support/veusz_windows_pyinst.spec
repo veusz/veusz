@@ -1,4 +1,7 @@
 # -*- mode: python -*-
+
+# windows pyinstaller file
+
 import glob
 import os.path
 
@@ -6,8 +9,7 @@ icon = os.path.abspath('icons\\veusz.ico')
 
 analysis = Analysis(
     ['..\\veusz\\veusz_main.py'],
-    hiddenimports=[
-    ],
+    hiddenimports=[],
     hookspath=[],
     runtime_hooks=[])
 
@@ -23,6 +25,7 @@ exe = EXE(
     strip=None,
     upx=False,
     console=False,
+    contents_directory='.', # do not use _internal
     icon=icon)
 
 # add necessary documentation, licence

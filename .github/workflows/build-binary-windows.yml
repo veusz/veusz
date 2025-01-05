@@ -59,8 +59,15 @@ jobs:
     - name: Build binary with pyinstaller
       run: |
         pyinstaller support/veusz_windows_pyinst.spec
+    - name: Generate NSI file
+      run: |
+        python3 support/veusz_windows_make_nsi.py install.nsi
+    - name: Use NSIS to make installer
+      run: |
+        mkdir installer_out
+        "C:\Program Files (x86)\NSIS\makensis.exe" install.nsi
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: windows-binary
-        path: dist
+        name: windows-installer
+        path: installler_out
