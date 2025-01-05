@@ -7,8 +7,6 @@ icon = os.path.abspath('icons\\veusz.ico')
 analysis = Analysis(
     ['..\\veusz\\veusz_main.py'],
     hiddenimports=[
-        'iminuit.iminuit_warnings', 'iminuit.latex', 'iminiuit._libiminuit',
-        'iminuit._minuit_methods'
     ],
     hookspath=[],
     runtime_hooks=[])
