@@ -19,7 +19,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.13'
-        # cache: 'pip'
+        cache: 'pip'
     - name: Upgrade pip
       run : |
         python3 -m pip install --upgrade pip
@@ -44,7 +44,7 @@ jobs:
       run: |
         python3 -m pip -v install setuptools wheel packaging pyproject-metadata
         python3 -m pip -v install Cython ninja meson-python
-        python3 -m pip -v install -Csetup-args=-Dblas= -Csetup-args=-Dlapack= --no-binary :all: numpy
+        python3 -m pip -v install -Csetup-args=-Dblas= -Csetup-args=-Dlapack= --no-binary :all: https://github.com/numpy/numpy/archive/master.zip
     - name: Install PyQt
       run: |
         python3 -m pip -v install --config-settings --confirm-license= --no-binary :all: PyQt6
