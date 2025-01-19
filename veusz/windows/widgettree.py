@@ -427,7 +427,7 @@ class WidgetTreeView(qt.QTreeView):
 
     def testModifier(self, e):
         """Look for keyboard modifier for copy or move."""
-        if e.keyboardModifiers() & qt.Qt.KeyboardModifier.ControlModifier:
+        if e.modifiers() & qt.Qt.KeyboardModifier.ControlModifier:
             e.setDropAction(qt.Qt.DropAction.CopyAction)
         else:
             e.setDropAction(qt.Qt.DropAction.MoveAction)
@@ -439,11 +439,12 @@ class WidgetTreeView(qt.QTreeView):
         event.setDropAction(qt.Qt.DropAction.IgnoreAction)
         event.ignore()
 
-        if not self.viewport().rect().contains(event.pos()):
+        pos = event.position().toPoint()
+        if not self.viewport().rect().contains(pos):
             return
 
         # get widget at event position
-        index = self.indexAt(event.pos())
+        index = self.indexAt(pos)
         if not index.isValid():
             index = self.rootIndex()
 
