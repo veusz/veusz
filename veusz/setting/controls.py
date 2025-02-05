@@ -1920,8 +1920,14 @@ class FontStyle(qt.QComboBox):
     def onModified(self):
         """Make control reflect chosen setting."""
 
-        styles = [self.deftext] + sorted(
-            qt.QFontDatabase().styles(self.familysetting.get()))
+        try:
+            # PyQt6
+            styles = [self.deftext] + sorted(
+                qt.QFontDatabase.styles(self.familysetting.get()))
+        except TypeError:
+            # PyQt5
+            styles = [self.deftext] + sorted(
+                qt.QFontDatabase().styles(self.familysetting.get()))
 
         val = self.setting.get().strip()
         if not val:

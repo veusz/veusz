@@ -73,7 +73,10 @@ StyleSheet.register(StylesheetLine)
 
 def _registerFontStyleSheet():
     """Get fonts, and register default with StyleSheet and Text class."""
-    families = qt.QFontDatabase().families()
+    try:
+        families = qt.QFontDatabase.families()  # PyQt6
+    except TypeError:
+        families = qt.QFontDatabase().families()  # PyQt5
 
     deffont = None
     for f in (
