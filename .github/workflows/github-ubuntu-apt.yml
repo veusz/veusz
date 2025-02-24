@@ -21,8 +21,7 @@ jobs:
         sudo apt-get -y install \
           libqt5core5a libqt5dbus5 libqt5gui5 libqt5svg5 libqt5widgets5 libqt5xml5 \
           python3-all python3-astropy python3-h5py python3-pyqt5 python3-pyqt5.qtsvg \
-          python3-setuptools python3-all-dev python3-numpy python3-sip-dev \
-          pyqt5-dev pyqt5-dev-tools qt5-qmake qtbase5-dev qt5-default
+          python3-setuptools python3-numpy python3-qtpy qt5-qmake qt5-default
     - name: Build extensions
       run: |
         python3 setup.py build_ext --inplace
