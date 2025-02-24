@@ -54,6 +54,7 @@ you will need to disable quarantine for it to run. Please see
 
 * [Python](https://www.python.org/) >= 3.10
 * [Qt](https://www.qt.io/developers/) >= 5.5
+* [QtPy](https://github.com/spyder-ide/qtpy) >= 2.4.3
 * [PyQt](https://www.riverbankcomputing.co.uk/software/pyqt/) >= 5.3
 * [numpy](https://numpy.org/) >= 1.7
 
