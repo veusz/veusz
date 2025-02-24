@@ -1,6 +1,8 @@
 numpy >= 1.10
-PyQt5 >= 5.5.1
-sip >= 5
+scipy
+qtpy >= 2.4.0
+packaging
+# PyQt5 >= 5.5.1 or PyQt6
 astropy >= 2.0
 h5py >= 2.6.0
-tomli
+iminuit

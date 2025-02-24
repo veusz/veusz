@@ -1,4 +1,4 @@
-# [Veusz 3.6.2](https://veusz.github.io/)
+# [Veusz 3.6.3](https://veusz.github.io/)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -9,6 +9,9 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 3.6.3:
+  * Port to PyQt6
 
 Changes in 3.6.2:
   * Fix broken resource symlink handling

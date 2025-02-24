@@ -1,3 +1,6 @@
+Changes in 3.6.3:
+  * Port to PyQt6
+
 Changes in 3.6.2:
   * Fix broken resource symlink handling
 

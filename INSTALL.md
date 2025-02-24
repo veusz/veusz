@@ -52,9 +52,8 @@ you will need to disable quarantine for it to run. Please see
 
 ### Requirements
 
-* [Python](https://www.python.org/) >= 3.3
+* [Python](https://www.python.org/) >= 3.10
 * [Qt](https://www.qt.io/developers/) >= 5.5
-* [SIP](https://www.riverbankcomputing.co.uk/software/sip/) >= 5
 * [PyQt](https://www.riverbankcomputing.co.uk/software/pyqt/) >= 5.3
 * [numpy](https://numpy.org/) >= 1.7
 
@@ -72,7 +71,7 @@ you will need to disable quarantine for it to run. Please see
 
 Veusz provides a standard setuptools `setup.py` file. If installing
 this locally, it may be better to create a Python virtual environment
-so that it is self contained and does not interfere with existing
+so that it is self-contained and does not interfere with existing
 Python dependencies and packages.
 
 ### Building and running inside a virtual environment
@@ -81,11 +80,11 @@ An example use of a virtual environment to build veusz would be
 
     $ python3 -m venv /path/to/virtual/environment      [setup environment]
     $ source /path/to/virtual/environment/bin/activate  [activate it]
-    $ pip3 install numpy PyQt5 sip astropy h5py tomli   [install necessary requirements]
+    $ pip3 install numpy qtpy PyQt6 astropy h5py        [install necessary requirements]
     $ pip3 install h5py astropy iminuit                 [install optional requirements]
     $ pip3 install https://github.com/jeremysanders/pyemf3.git [optional, for EMF output]
-    $ tar xf veusz-3.5.tar.gz                           [unpack veusz source]
-    $ cd veusz-3.5
+    $ tar xf veusz-3.6.tar.gz                           [unpack veusz source]
+    $ cd veusz-3.6
     $ pip3 install -v .                                 [build and install veusz from current directory]
 
 However, for the above to work requires a working Qt5 development
@@ -97,27 +96,38 @@ installer.
 
 ### Installing into system Python directories
 
-This needs write premissions into the destination directory, so `sudo`
+This needs to write permissions into the destination directory, so `sudo`
 may be required.
 
-    $ tar xf veusz-3.5.tar.gz                           [unpack veusz source]
-    $ cd veusz-3.5
+    $ tar xf veusz-3.6.tar.gz                           [unpack veusz source]
+    $ cd veusz-3.6
     $ pip3 install -v .                                 [build and install veusz from current directory]
 
 On Ubuntu/Debian systems the following packages are necessary:
 
-    $ apt install libqt5core5a libqt5gui5 libqt5svg5 libqt5widgets5 \
-        python3-all python3-all-dev python3-astropy python3-h5py \
-        python3-numpy python3-pyqt5 python3-pyqt5.qtsvg \
-        python3-sipbuild python3-tomli \
-        pyqt5-dev pyqt5-dev-tools qt5-qmake qtbase5-dev sip-tools
+    $ apt install python3-all python3-astropy python3-h5py \
+        python3-numpy python3-qtpy
+
+And either
+
+    $ apt install python3-pyqt6 python3-pyqt6.qtsvg
+
+or
+
+    $ apt install python3-pyqt5 python3-pyqt5.qtsvg
 
 On Fedora the following are required:
 
-    $ dnf install python3-devel python3-setuptools \
-        python3-numpy qt5-qtbase-devel qt5-qtsvg-devel \
-        python3-qt5 python3-qt5-devel python3-pyqt5-sip \
-        python3-h5py python3-tomli
+    $ dnf install python3-setuptools python3-astropy \
+        python3-numpy python3-h5py python3-qtpy
+
+And either
+
+    $ dnf install python3-qt6
+
+or
+
+    $ dnf install python3-qt5
 
 Other Unix or Linux systems will likely contain the needed packages.
 
@@ -131,8 +141,8 @@ of the `runselftest.py` script is the number of tests that have failed
 (0 for success).
 
 On Unix/Linux, Qt requires the `DISPLAY` environment to be set to an
-X11 server for the self test to run. Packagers can use Xvfb in a non
-graphical environment to create a hidden X11 server:
+X11 server for the self test to run. Packagers can use Xvfb in a
+non-graphical environment to create a hidden X11 server:
 
     $ xvfb-run -a --server-args "-screen 0 640x480x24" \
         python3 tests/runselftest.py
@@ -155,9 +165,8 @@ can currently be run from its own directory. Before this can work, the
 location.
 
     $ tar xzf veusz-3.6.tar.gz                [change version here]
-    $ cd veusz-3.6
-    $ python3 setup.py build
-    $ cp build/*/veusz/helpers/*.so veusz/helpers/
+    $ cd veusz-3.6/veusz/scripts              [change version here]
+    $ python3 veusz
 
 ### Notes for packagers
 
@@ -175,7 +184,7 @@ location.
   using the setup.py option `--veusz-resource-dir` (for example with
   `/usr/share/veusz`). If you do this, then you need to tell veusz
   where these resources are at runtime or when testing. This can be
-  done by using a symlink `resources` in the the veusz module
+  done by using a symlink `resources` in the veusz module
   directory which points to the location of these files and
   directories. Alternatively, the environment variable
   `VEUSZ_RESOURCE_DIR` can be set.
@@ -187,16 +196,13 @@ location.
   suggested that an `examples` symlink is added to the resources
   directory to point to the location of the example files.
 
-- Veusz is mostly platform-independent python code and data files with
-  a separate `helpers` module containing platform-dependent code. It
-  may save space in repositories to separate out the helpers
-  sub-module.
+- Veusz is a platform-independent python code and data files.
 
 - Veusz includes a man page in `Documents/man-page/veusz.1`. This is
   not automatically installed by setuptools.
 
 - A manual in HTML and PDF format can be found in `Documents/manual/`.
-  This and the the man page can be regenerated using the Makefile in
+  This and the man page can be regenerated using the Makefile in
   Documents, if Sphinx is installed (`make clean; make`).
 
 - Veusz also includes freedesktop mime, desktop and appdata files in

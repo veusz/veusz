@@ -1,13 +1,8 @@
 # files Git should always ignore
 
 *.pyc
-build/
-veusz/helpers/*.pyd
-veusz/helpers/*.so
 *~
 MANIFEST
-*.so
-*.o
 dist/
 
 # generated manual files
