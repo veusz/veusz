@@ -35,8 +35,8 @@ SetCompressor /solid lzma
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "${INSTDIR}\veusz.exe"
-!define MUI_FINISHPAGE_SHOWREADME "${INSTDIR}\README.md"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\veusz.exe"
+!define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README.md"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION ShowReadme
 !insertmacro MUI_PAGE_FINISH
 
@@ -60,7 +60,7 @@ FunctionEnd
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "installer_out\veusz-${PRODUCT_VERSION}-x64-windows-setup.exe"
-InstallDir "${PROGRAMFILES64}\Veusz"
+InstallDir "$PROGRAMFILES64\Veusz"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
@@ -97,7 +97,7 @@ Function UninstallPrevious
     DetailPrint "Removing previous installation (64 bit)."
 
     ; Run the uninstaller
-    ExecWait '"$R0" _?=${INSTDIR}'
+    ExecWait '"$R0" _?=$INSTDIR'
 
     Done:
 
@@ -112,33 +112,33 @@ Section "MainSection" SEC01
 @@COPY_FILES@@
 
 ; install shortcut
-  CreateDirectory "${SMPROGRAMS}\Veusz"
-  CreateShortCut "${SMPROGRAMS}\Veusz\Veusz.lnk" "${INSTDIR}\veusz.exe"
-  CreateShortCut "${DESKTOP}\Veusz.lnk" "${INSTDIR}\veusz.exe"
+  CreateDirectory "$SMPROGRAMS\Veusz"
+  CreateShortCut "$SMPROGRAMS\Veusz\Veusz.lnk" "$INSTDIR\veusz.exe"
+  CreateShortCut "$DESKTOP\Veusz.lnk" "$INSTDIR\veusz.exe"
 
 ; setup associations
   WriteRegStr HKCR ".vsz" "" "Veusz.Document"
   WriteRegStr HKCR "Veusz.Document" "" "Veusz document"
-  WriteRegStr HKCR "Veusz.Document\shell\open\command" "" '"${INSTDIR}\veusz.exe" "%1"'
-  WriteRegStr HKCR "Veusz.Document\DefaultIcon" "" '"${INSTDIR}\icons\veusz.ico"'
+  WriteRegStr HKCR "Veusz.Document\shell\open\command" "" '"$INSTDIR\veusz.exe" "%1"'
+  WriteRegStr HKCR "Veusz.Document\DefaultIcon" "" '"$INSTDIR\icons\veusz.ico"'
 SectionEnd
 
 Section -AdditionalIcons
   SetRegView 64
 
-  WriteIniStr "${INSTDIR}\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "${SMPROGRAMS}\Veusz\Website.lnk" "${INSTDIR}\${PRODUCT_NAME}.url"
-  CreateShortCut "${SMPROGRAMS}\Veusz\Uninstall.lnk" "${INSTDIR}\uninst.exe"
+  WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
+  CreateShortCut "$SMPROGRAMS\Veusz\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
+  CreateShortCut "$SMPROGRAMS\Veusz\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 Section -Post
   SetRegView 64
 
-  WriteUninstaller "${INSTDIR}\uninst.exe"
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "${INSTDIR}\veusz.exe"
+  WriteUninstaller "$INSTDIR\uninst.exe"
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\veusz.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "${INSTDIR}\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "${INSTDIR}\veusz.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\veusz.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
@@ -155,22 +155,22 @@ Function un.onInit
 FunctionEnd
 
 Function ShowReadme
-  Exec "notepad.exe ${INSTDIR}\README.md"
+  Exec "notepad.exe $INSTDIR\README.md"
 FunctionEnd
 
 Section Uninstall
   SetRegView 64
 
-  Delete "${INSTDIR}\${PRODUCT_NAME}.url"
-  Delete "${INSTDIR}\uninst.exe"
+  Delete "$INSTDIR\${PRODUCT_NAME}.url"
+  Delete "$INSTDIR\uninst.exe"
 
 @@DELETE_FILES@@
 
-  Delete "${SMPROGRAMS}\Veusz\Uninstall.lnk"
-  Delete "${SMPROGRAMS}\Veusz\Website.lnk"
-  Delete "${DESKTOP}\Veusz.lnk"
-  Delete "${SMPROGRAMS}\Veusz\Veusz.lnk"
-  RMDir "${SMPROGRAMS}\Veusz"
+  Delete "$SMPROGRAMS\Veusz\Uninstall.lnk"
+  Delete "$SMPROGRAMS\Veusz\Website.lnk"
+  Delete "$DESKTOP\Veusz.lnk"
+  Delete "$SMPROGRAMS\Veusz\Veusz.lnk"
+  RMDir "$SMPROGRAMS\Veusz"
 
   ; clean up registry
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
