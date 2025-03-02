@@ -48,7 +48,7 @@ jobs:
       run: |
         python3 -m pip -v install setuptools wheel packaging pyproject-metadata
         python3 -m pip -v install Cython meson meson-python ninja
-        python3 -m pip -v install -Csetup-args=-Dblas= -Csetup-args=-Dlapack= --no-binary :all: https://github.com/numpy/numpy/archive/master.zip
+        python3 -m pip -v install numpy
     - name: Install PyQt
       run: |
         python3 -m pip -v install --config-settings --confirm-license= --no-binary :all: PyQt6
