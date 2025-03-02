@@ -46,11 +46,11 @@ def main():
     copy_files = []
     delete_files = []
     for dirname in sorted(files):
-        copy_files.append(f'  SetOutPath "$INSTDIR\\{dirname}"')
-        delete_files.append(f'  RMDir "$INSTDIR\\{dirname}"')
+        copy_files.append(f'  SetOutPath "${{INSTDIR}}\\{dirname}"')
+        delete_files.append(f'  RMDir "${{INSTDIR}}\\{dirname}"')
         for fname in files[dirname]:
-            copy_files.append(f'  File "$PYINST_DIR\\{fname}"')
-            delete_files.append(f'  Delete "$INSTDIR\\{fname}"')
+            copy_files.append(f'  File "${{PYINST_DIR}}\\{fname}"')
+            delete_files.append(f'  Delete "${{INSTDIR}}\\{fname}"')
         copy_files.append('')
         delete_files.append('')
 
@@ -65,6 +65,10 @@ def main():
             ('DELETE_FILES', delete_files),
             ):
         templ = templ.replace(f'@@{search}@@', replace)
+
+    # debug
+    for line in templ.split('\n'):
+        print(line)
 
     print(f'Writing {outfname}')
     with open(outfname, 'w') as fout:
