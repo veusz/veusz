@@ -20,6 +20,10 @@ jobs:
       with:
         python-version: '3.13'
         cache: 'pip'
+    - name: Make TMPDIR
+      run: |
+        mkdir C:\vtmp
+        echo "TMPDIR=C:\vtmp" >> $GITHUB_ENV
     - name: Upgrade pip
       run : |
         python3 -m pip install --upgrade pip
