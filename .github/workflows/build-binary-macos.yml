@@ -51,8 +51,12 @@ jobs:
     - name: Build binary with pyinstaller
       run: |
         pyinstaller support/veusz_mac_pyinst.spec
+    - name: Make tar file
+      run: |
+        mkdir tar
+        tar -czf tar/macos.tar.gz dist/
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: macos-binary
-        path: dist/
+        path: tar/
