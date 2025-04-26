@@ -559,7 +559,7 @@ class SVGPaintEngine(qt.QPaintEngine):
         # convert pixmap to textual data
         data = qt.QByteArray()
         buf = qt.QBuffer(data)
-        buf.open(qt.QBuffer.ReadWrite)
+        buf.open(qt.QIODeviceBase.OpenModeFlag.ReadWrite)
         pixmap.save(buf, self.imageformat.upper(), 0)
         buf.close()
 

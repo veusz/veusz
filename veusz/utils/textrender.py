@@ -27,7 +27,7 @@ import numpy as N
 from .. import qtall as qt
 from . import points
 
-#from ..helpers import qtmml
+from ..helpers import qtmml
 from ..helpers import recordpaint
 from ..helpers.qtloops import RotatedRectangle
 
