@@ -1,4 +1,4 @@
-name: Manual build binary on MacOS
+name: Manual build binary on MacOS (arm64)
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: 'macos-13'
+    runs-on: 'macos-14'
 
     env:
       MACOSX_DEPLOYMENT_TARGET: '11.0'
@@ -54,5 +54,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: macos-binary
+        name: macos-arm-binary
         path: installer/
