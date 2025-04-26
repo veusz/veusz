@@ -1,9 +1,6 @@
 name: Manual build binary on Windows (x86-64)
 
 on:
-  push:
-    branches:
-      - 'qt6'
   workflow_dispatch:
 
 jobs:

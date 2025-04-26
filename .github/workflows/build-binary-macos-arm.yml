@@ -1,9 +1,6 @@
 name: Manual build binary on MacOS (arm64)
 
 on:
-  push:
-    branches:
-      - 'qt6'
   workflow_dispatch:
 
 jobs:
