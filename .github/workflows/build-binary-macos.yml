@@ -48,15 +48,11 @@ jobs:
       run: |
         python3 setup.py build_ext --inplace
         cp -p build/lib*/veusz/helpers/*.so veusz/helpers
-    - name: Build binary with pyinstaller
+    - name: Build installer
       run: |
-        pyinstaller support/veusz_mac_pyinst.spec
-    - name: Make tar file
-      run: |
-        mkdir tar
-        tar -czf tar/macos.tar.gz dist/
+        sh support/veusz_macos_make_image.sh
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: macos-binary
-        path: tar/
+        path: installer/
