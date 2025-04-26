@@ -24,21 +24,23 @@ jobs:
         python -V
         python -m pip install --upgrade pip
     - name: Install Qt
-      uses: jurplel/install-qt-action@v3
+      uses: jurplel/install-qt-action@v4
       with:
         cache: 'true'
-        cache-key-prefix: 'qt-ubuntu-v1'
+        cache-key-prefix: 'qt-ubuntu-v2'
         version: '5.15.2'
         setup-python: false
     - name: Install Python dependencies
       run: |
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # force older PyQt5
+        pip install numpy PyQt5==5.15.10 sip astropy h5py tomli
     - name: Build extensions
       run: |
         python setup.py build_ext --inplace
     - name: Run tests
       env:
-        LD_LIBRARY_PATH: ${{ env.Qt5_DIR }}/lib:{{ env.LD_LIBRARY_PATH }}
+        LD_LIBRARY_PATH: ${{ env.QT_ROOT_DIR }}/lib:{{ env.LD_LIBRARY_PATH }}
         QT_QPA_PLATFORM: minimal
         VEUSZ_INPLACE_TEST: 1
       run: |
