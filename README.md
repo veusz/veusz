@@ -80,7 +80,7 @@ Changes in 4.0:
 Please see the file `INSTALL.md` included in the distribution for installation details, or go to the [download page](https://veusz.github.io/download/).
 
 ## License
-Veusz is Copyright (C) 2003-2023 Jeremy Sanders
+Veusz is Copyright (C) 2003-2025 Jeremy Sanders
  and contributors. It is licensed under the [GPL version 2 or greater](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
 
 ## Source code
