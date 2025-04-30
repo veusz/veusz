@@ -65,7 +65,13 @@ def _importcaller(interface, name, callbackimporterror):
                 if callbackimporterror:
                     # used by mainwindow to show dialog and get new filename
                     fname = callbackimporterror(filename, errmsg)
-                    if fname:
+                    if fname is None:
+                        # cancel
+                        pass
+                    elif fname is False:
+                        # ignore
+                        break
+                    else:
                         # put new filename into function argument list
                         args = list(args)
                         args[fnameidx] = fname

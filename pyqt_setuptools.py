@@ -169,6 +169,7 @@ class sip_build_ext(build_ext):
                 ]
                 extension.extra_compile_args = [
                     '-F', lib_dir,
+                    '-std=c++17',
                 ]
             else:
                 extension.libraries = [

@@ -1,0 +1,58 @@
+name: Manual build binary on MacOS (arm64)
+
+on:
+  push:
+    branches:
+      - 'qt6'
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: 'macos-14'
+
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '11.0'
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+    - name: Upgrade pip
+      run : |
+        python3 -m pip install --upgrade pip
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        cache: 'true'
+        cache-key-prefix: 'qt-macos-binary-v1'
+        version: '6.7.3'
+        setup-python: false
+    - name: Install numpy
+      run: |
+        pip3 -v install Cython ninja meson-python
+        pip3 -v install -Csetup-args=-Dblas= -Csetup-args=-Dlapack= --no-binary :all: numpy
+    - name: Install PyQt
+      run: |
+        pip3 -v install --config-settings --confirm-license= --no-binary :all: PyQt6
+    - name: Install other modules
+      run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip3 install iminuit
+        pip3 install https://github.com/jeremysanders/pyemf3/archive/master.zip
+        pip3 install pyinstaller
+    - name: Build Veusz extensions
+      run: |
+        python3 setup.py build_ext --inplace
+        cp -p build/lib*/veusz/helpers/*.so veusz/helpers
+    - name: Build installer
+      run: |
+        sh support/veusz_macos_make_image.sh
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-arm-binary
+        path: installer/

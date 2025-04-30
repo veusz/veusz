@@ -1,3 +1,5 @@
+# Veusz build using PyPI packages on Ubuntu
+
 name: Ubuntu build using pip packages
 
 on:
@@ -8,43 +10,37 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
-    steps:
-    
-    - name: Checkout code
-      uses: actions/checkout@v2
 
-    - name: Set up Python 3.12
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
-
+        python-version: '3.10'
     - name: Upgrade pip
       run : |
         python -V
         python -m pip install --upgrade pip
-      
-    - name: Install system dependencies for Qt6
-      run: |
-        sudo apt update
-        sudo apt install -y \
-          build-essential qmake6 \
-          libxcb1-dev libx11-dev libxext-dev \
-          qt6-base-dev qt6-declarative-dev qt6-webengine-dev
-        dpkg -l | grep qt6
-
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        cache: 'true'
+        cache-key-prefix: 'qt-ubuntu-v2'
+        version: '5.15.2'
+        setup-python: false
     - name: Install Python dependencies
       run: |
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        pip list
-
+        # if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # force older PyQt5
+        pip install numpy PyQt5==5.15.10 sip astropy h5py tomli
     - name: Build extensions
       run: |
         python setup.py build_ext --inplace
-  
     - name: Run tests
       env:
-        LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}
+        LD_LIBRARY_PATH: ${{ env.QT_ROOT_DIR }}/lib:{{ env.LD_LIBRARY_PATH }}
         QT_QPA_PLATFORM: minimal
         VEUSZ_INPLACE_TEST: 1
       run: |

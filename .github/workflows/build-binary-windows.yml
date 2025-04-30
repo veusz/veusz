@@ -1,0 +1,83 @@
+name: Manual build binary on Windows (x86-64)
+
+on:
+  push:
+    branches:
+      - 'qt6'
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: 'windows-2022'
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup build environment
+      uses: ilammy/msvc-dev-cmd@v1
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+    - name: Make TMPDIR
+      run: mkdir C:\vtmp
+    - name: Modify TMPDIR in environment
+      run: echo "TMPDIR=C:\vtmp" >> $env:GITHUB_ENV
+    - name: Upgrade pip
+      run : |
+        python3 -m pip install --upgrade pip
+    - name: Build pyinstaller
+      run: |
+        python3 -m pip -v install setuptools
+        git clone https://github.com/pyinstaller/pyinstaller
+        cd pyinstaller
+        cd bootloader
+        python3 ./waf distclean all
+        cd ..
+        python3 -m pip install .
+        cd ..
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        cache: 'true'
+        cache-key-prefix: 'qt-windows-binary-v1'
+        version: '6.7.3'
+        setup-python: false
+    - name: Install numpy
+      run: |
+        python3 -m pip -v install setuptools wheel packaging pyproject-metadata
+        python3 -m pip -v install Cython meson meson-python ninja
+        python3 -m pip -v install numpy
+    - name: Install PyQt
+      run: |
+        python3 -m pip -v install --config-settings --confirm-license= --no-binary :all: PyQt6
+    - name: Install other modules
+      run: |
+        python3 -m pip install -r requirements.txt
+        python3 -m pip install iminuit
+        python3 -m pip install https://github.com/jeremysanders/pyemf3/archive/master.zip
+    - name: Build Veusz extensions
+      run: |
+        python3 setup.py build_ext --inplace
+        copy build/lib*/veusz/helpers/*.dll veusz/helpers
+    - name: Build binary with pyinstaller
+      run: |
+        pyinstaller support/veusz_windows_pyinst.spec
+    - name: Generate NSI file
+      run: |
+        python3 support/veusz_windows_make_nsi.py install.nsi
+        mkdir installer_out
+    - name: Use NSIS to make installer
+      run: |
+        & "C:\Program Files (x86)\NSIS\makensis.exe" install.nsi
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-installer
+        path: installer_out
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: pyinstfiles
+    #     path: dist

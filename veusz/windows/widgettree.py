@@ -417,7 +417,7 @@ class WidgetTreeView(qt.QTreeView):
         hdr = self.header()
         hdr.setStretchLastSection(False)
         hdr.setSectionResizeMode(0, qt.QHeaderView.ResizeMode.Stretch)
-        hdr.setSectionResizeMode(1, qt.QHeaderView.ResizeMode.Fixed)
+        hdr.setSectionResizeMode(1, qt.QHeaderView.ResizeMode.Custom)
 
         # setup drag and drop
         self.setSelectionMode(qt.QAbstractItemView.SelectionMode.ExtendedSelection)
@@ -439,11 +439,12 @@ class WidgetTreeView(qt.QTreeView):
         event.setDropAction(qt.Qt.DropAction.IgnoreAction)
         event.ignore()
 
-        if not self.viewport().rect().contains(event.position().toPoint()):
+        pos = event.position().toPoint()
+        if not self.viewport().rect().contains(pos):
             return
 
         # get widget at event position
-        index = self.indexAt(event.position().toPoint())
+        index = self.indexAt(pos)
         if not index.isValid():
             index = self.rootIndex()
 

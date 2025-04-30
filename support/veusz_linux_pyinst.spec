@@ -1,11 +1,15 @@
 # -*- mode: python -*-
-import glob
-import os.path
+
 # linux pyinstaller file
 
-#thisdir=os.path.dirname(os.path.abspath(__file__))
+import glob
+import os
 
-a = Analysis(
+# get version
+with open('VERSION') as fin:
+    version = fin.read().strip()
+
+analysis = Analysis(
     ['../veusz/veusz_main.py'],
     pathex=[],
     hiddenimports=[
@@ -14,54 +18,86 @@ a = Analysis(
         ],
     hookspath=None,
     runtime_hooks=None)
-pyz = PYZ(a.pure)
+pyz = PYZ(analysis.pure)
 
 exe = EXE(
     pyz,
-    a.scripts,
+    analysis.scripts,
     exclude_binaries=True,
-    name='veusz.exe',
+    name='veusz',
     debug=False,
-    strip=True,
+    strip=True, # note this breaks std numpy wheel
     upx=False,
     console=True,
-    )
+)
 
 # add necessary documentation, licence
-binaries = a.binaries
-for bin in ('VERSION', 'ChangeLog', 'AUTHORS', 'README', 'INSTALL', 'COPYING'):
-    binaries += [ (bin, bin, 'DATA') ]
+data_glob = [
+    'VERSION',
+    'ChangeLog',
+    'AUTHORS',
+    'README.md',
+    'INSTALL.md',
+    'COPYING',
+    'icons/*.png',
+    'icons/*.ico',
+    'icons/*.svg',
+    'examples/*.vsz',
+    'examples/*.dat',
+    'examples/*.csv',
+    'examples/*.py',
+    'ui/*.ui',
+]
 
-binaries += [
+datas = analysis.datas
+for pattern in data_glob:
+    for fn in glob.glob(pattern):
+        datas.append((fn, fn, 'DATA'))
+
+# add API files
+datas += [
     ('embed.py', 'veusz/embed.py', 'DATA'),
     ('__init__.py', 'veusz/__init__.py', 'DATA'),
-    ]
+]
 
-# add various required files to distribution
-for f in ( glob.glob('icons/*.png')  + glob.glob('icons/*.ico') +
-	   glob.glob('icons/*.svg') +
-           glob.glob('examples/*.vsz') +
-           glob.glob('examples/*.dat') + glob.glob('examples/*.csv') +
-           glob.glob('examples/*.py') +
-           glob.glob('ui/*.ui') ):
-    binaries.append( (f, f, 'DATA') )
-
+# exclude files listed (currently unused)
 excludes = set([
-        #'libXi.so.6', 'libX11-xcb.so.1', 'libX11.so.6',
-        #'libXext.so.6', 'libXau.so.6', 'libICE.so.6',
-        #'libreadline.so.6', 'readline.so',
-        #'_curses.so', 'libncursesw.so.5',
-        #'termios.so', 'libtinfo.so.5',
-        #'libz.so.1',
-        ])
-# remove libraries in the set above
-binaries[:] = [b for b in binaries if b[0] not in excludes]
+])
+analysis.binaries[:] = [b for b in analysis.binaries if b[0] not in excludes]
 
+# collect together results
+outdir = f'veusz-{version}'
 coll = COLLECT(
     exe,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
+    analysis.binaries,
+    analysis.zipfiles,
+    datas,
     strip=True,
     upx=False,
-    name='veusz')
+    name=outdir,
+)
+
+# make symlinks to make it easier to find files
+print('Making symlinks')
+symlink = [
+    'ChangeLog',
+    'AUTHORS',
+    'README.md',
+    'INSTALL.md',
+    'embed.py',
+    'COPYING',
+    'examples',
+]
+for fn in symlink:
+    os.symlink(f'_internal/{fn}', f'dist/{outdir}/{fn}')
+
+# make a highly compressed tar file
+print(f'Creating tar file')
+tardir = 'tar'
+tarfn = f'{tardir}/veusz-{version}-linux-x86_64.tar.xz'
+os.makedirs(tardir, exist_ok=True)
+cmd = f'tar -C dist/ --owner=0 --group=0 -cf - veusz-{version} | xz -9 -c - > {tarfn}'
+print(cmd)
+retn = os.system(cmd)
+if retn != 0:
+    raise RuntimeError('tar failed')

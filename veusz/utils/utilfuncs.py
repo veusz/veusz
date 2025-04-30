@@ -49,11 +49,15 @@ def _getVeuszDirectory():
     """Get resource and examples directories for Veusz."""
 
     if hasattr(sys, 'frozen'):
-        # for pyinstaller compatability
-        resdir = os.path.dirname(os.path.abspath(sys.executable))
-        if not os.path.exists(os.path.join(resdir, 'VERSION')):
-            # MacOS pyinstaller
-            resdir = os.path.join(resdir, '..', 'Resources')
+        # pyinstaller or similar things
+        exedir = os.path.dirname(os.path.abspath(sys.executable))
+        resdir = exedir
+        for place in (
+                os.path.join(exedir, '..', 'Resources'),
+                os.path.join(exedir, '_internal'),
+            ):
+            if os.path.isfile(os.path.join(place, 'VERSION')):
+                resdir = place
 
     else:
         # standard installation

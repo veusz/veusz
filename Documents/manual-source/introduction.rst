@@ -56,7 +56,7 @@ Widget
 ------
 
 A document and its graphs are built up from widgets.  These widgets
-can often by placed within each other, depending on the type of the
+can often be placed within each other, depending on the type of the
 widget. A widget has children (those widgets placed within it) and its
 parent. The widgets have a number of different settings which modify
 their behaviour. These settings are divided into properties, which

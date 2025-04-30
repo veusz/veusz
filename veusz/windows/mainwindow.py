@@ -1232,6 +1232,8 @@ class MainWindow(qt.QMainWindow):
                 if msgbox.exec() == qt.QMessageBox.StandardButton.Yes:
                     filename = qt.QFileDialog.getOpenFileName(self, "Choose data file")
                     filename = filename[0] if filename else None
+                elif res == qt.QMessageBox.Ignore:
+                    filename = False
             return filename
 
         # save stdout and stderr, then redirect to console

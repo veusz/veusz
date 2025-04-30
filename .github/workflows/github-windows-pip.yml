@@ -8,43 +8,34 @@ on:
 
 jobs:
   build:
-    runs-on: windows-2022
-    steps:
-    
-    - name: Checkout code
-      uses: actions/checkout@v4
 
-    - name: Set up Python 3.12
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    - name: Set up Python 3.10
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
-    
+        python-version: '3.10'
     - name: Upgrade pip
       run : |
         python -V
         python -m pip install --upgrade pip
-    
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
-      
-    - name: Install Qt6
+    - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        arch: 'win64_msvc2022_64'
         cache: 'true'
-        cache-key-prefix: 'install-qt-action'
-        version: '6.8.*'
+        cache-key-prefix: 'qt-windows-v1'
+        version: '5.15.2'
         setup-python: false
-    
     - name: Install Python dependencies
       run: |
-        if (Test-Path "requirements.txt") { pip install -r requirements.txt }
-        pip list
-    
+        pip install -r requirements.txt
     - name: Build
       run: |
         python setup.py build_ext --inplace
-    
     - name: Run tests
       run: |
         set QT_QPA_PLATFORM=minimal
