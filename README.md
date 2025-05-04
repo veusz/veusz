@@ -1,4 +1,4 @@
-# [Veusz 3.6.2](https://veusz.github.io/)
+# [Veusz 4.0](https://veusz.github.io/)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -10,24 +10,18 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 3.6.2:
-  * Fix broken resource symlink handling
-
-Changes in 3.6.1:
-  * Fix appdata file
-  * Fix issue in setup.cfg
-
-Changes in 3.6:
-  * Interactive rotation of 3D plots
-  * Add 12-bit rainbow colormap
-  * Fix crash in contour key values
-  * Fix breakage with recent numpy versions due to removal of bool
-  * Fix error in colormap sequence
-  * About dialog shows software versions
-  * Rewrite install instructions in INSTALL.md
-  * Fix for Python 3.11 due to opening with universal newlines
-  * Remove use of distutils
-  * Fix MacOS binary
+Changes in 4.0:
+  * Update to using Qt6
+  * Documentation updates
+  * Bug fixes:
+     * HDF5 import
+     * 3D rotation
+     * Swap attributes for 2D data if transposing
+     * Hide stderr from embedded usage unless debug=True
+     * Fix histogram2d fro normed to density
+     * Fix for datasets of different lengths if using gap_handling='ignore'
+     * Rename nan_handling to gap_handling
+     * Continue loading if error in plugins
 
 ## Features of package:
 
@@ -86,7 +80,7 @@ Changes in 3.6:
 Please see the file `INSTALL.md` included in the distribution for installation details, or go to the [download page](https://veusz.github.io/download/).
 
 ## License
-Veusz is Copyright (C) 2003-2023 Jeremy Sanders
+Veusz is Copyright (C) 2003-2025 Jeremy Sanders
  and contributors. It is licensed under the [GPL version 2 or greater](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
 
 ## Source code

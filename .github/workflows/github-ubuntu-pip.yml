@@ -15,10 +15,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.10
+    - name: Set up Python 3.13
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.13'
     - name: Upgrade pip
       run : |
         python -V
@@ -27,14 +27,12 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         cache: 'true'
-        cache-key-prefix: 'qt-ubuntu-v2'
-        version: '5.15.2'
+        cache-key-prefix: 'qt-ubuntu-v3'
+        version: '6.9.0'
         setup-python: false
     - name: Install Python dependencies
       run: |
-        # if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        # force older PyQt5
-        pip install numpy PyQt5==5.15.10 sip astropy h5py tomli
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Build extensions
       run: |
         python setup.py build_ext --inplace

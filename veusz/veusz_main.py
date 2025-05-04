@@ -34,13 +34,13 @@ if sys.version_info[0] < 3:
 
 copyr='''Veusz %s
 
-Copyright (C) Jeremy Sanders 2003-2023 <jeremy@jeremysanders.net>
+Copyright (C) Jeremy Sanders 2003-2025 <jeremy@jeremysanders.net>
  and contributors
 Licenced under the GNU General Public Licence (version 2 or greater)
 '''
 
 splashcopyr='''<b><font color="purple">Veusz %s<br></font></b>
-Copyright (C) Jeremy Sanders 2003-2023 and contributors<br>
+Copyright (C) Jeremy Sanders 2003-2025 and contributors<br>
 Licenced under the GPL (version 2 or greater)
 '''
 
