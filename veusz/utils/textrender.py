@@ -27,7 +27,7 @@ import numpy as N
 from .. import qtall as qt
 from . import points
 
-#from ..helpers import qtmml
+from ..helpers import qtmml
 from ..helpers import recordpaint
 from ..helpers.qtloops import RotatedRectangle
 
@@ -1516,13 +1516,16 @@ class _MmlRenderer(_Renderer):
         # for other DPIs. We then repaint the output to the real
         # device, scaling to make the size correct.
 
-        screendev = qt.QApplication.desktop()
+        screendev = qt.QApplication.primaryScreen()
         self.record = recordpaint.RecordPaintDevice(
-            1024, 1024, screendev.logicalDpiX(), screendev.logicalDpiY())
+            1024, 1024, 
+            int(screendev.logicalDotsPerInchX()),
+            int(screendev.logicalDotsPerInchY())
+        )
 
         rpaint = qt.QPainter(self.record)
         # painting code relies on these attributes of the painter
-        rpaint.pixperpt = screendev.logicalDpiY() / 72.
+        rpaint.pixperpt = screendev.logicalDotsPerInchY() / 72.
         rpaint.scaling = 1.0
 
         # Upscale any drawing by this factor, then scale back when
@@ -1530,7 +1533,7 @@ class _MmlRenderer(_Renderer):
         # different zoom factors (I hate this code).
         upscale = 5.
 
-        doc.setFontName( qtmml.QtMmlWidget.NormalFont, self.font.family() )
+        doc.setFontName( qtmml.QtMmlWidget.MmlFont.NormalFont, self.font.family() )
 
         ptsize = self.font.pointSizeF()
         if ptsize < 0:
@@ -1540,7 +1543,7 @@ class _MmlRenderer(_Renderer):
 
         # the output will be painted finally scaled
         self.drawscale = (
-            self.painter.dpi / screendev.logicalDpiY()
+            self.painter.dpi / screendev.logicalDotsPerInchY()
             / upscale )
         self.size = doc.size() * self.drawscale
 

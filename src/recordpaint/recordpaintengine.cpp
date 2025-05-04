@@ -20,7 +20,7 @@
 #include <QImage>
 #include <QRectF>
 #include <QLineF>
-#include <QVector>
+#include <QList>
 #include <QPaintEngine>
 
 #include "paintelement.h"
@@ -87,7 +87,7 @@ namespace {
     }
 
   private:
-    QVector<T> _lines;
+    QList<T> _lines;
   };
   // specific Line and LineF variants
   typedef lineElement<QLine> LineElement;
@@ -201,7 +201,7 @@ namespace {
     }
 
   private:
-    QVector<T> _rects;
+    QList<T> _rects;
   };
   typedef rectElement<QRect> RectElement;
   typedef rectElement<QRectF> RectFElement;

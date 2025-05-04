@@ -156,7 +156,7 @@ class ExportPDFRunnable(ExportRunnable):
         printer.setResolution(self.aexport.pdfdpi)
         printer.setFullPage(True)
         printer.setColorMode(
-            qt.QPrinter.ColorMode.Color if self.aexport.color else qt.QPrinter.ColorMode.ColorMode.GrayScale)
+            qt.QPrinter.ColorMode.Color if self.aexport.color else qt.QPrinter.ColorMode.GrayScale)
         printer.setOutputFormat(qt.QPrinter.OutputFormat.PdfFormat)
         printer.setOutputFileName(self.filename)
         printer.setCreator('Veusz %s' % utils.version())

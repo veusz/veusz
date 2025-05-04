@@ -3177,7 +3177,7 @@ bool MmlDocument::setContent(QString text, QString *errorMsg,
 {
     clear();
 
-    QString prefix = "<?xml version=\"2.0\"?>\n";
+    QString prefix = "<?xml version=\"1.0\"?>\n";
     prefix.append(entityDeclarations());
 
     uint prefix_lines = 0;
@@ -4227,8 +4227,10 @@ MmlTextNode::MmlTextNode(const QString &text, MmlDocument *document)
 {
     m_text = text;
     // Trim whitespace from ends, but keep nbsp and thinsp
-    m_text.remove(QRegularExpression("^[^\\S\\x00a0\\x2009]+"));
-    m_text.remove(QRegularExpression("[^\\S\\x00a0\\x2009]+$"));
+    static const QRegularExpression leadingWhitespace("^[^\\S\\x00a0\\x2009]+");
+    static const QRegularExpression trailingWhitespace("[^\\S\\x00a0\\x2009]+$");
+    m_text.remove(leadingWhitespace);
+    m_text.remove(trailingWhitespace);
 
     if (m_text == QString(QChar(0x62, 0x20))	     // &InvisibleTimes;
 	    || m_text == QString(QChar(0x63, 0x20))  // &InvisibleComma;
@@ -5777,7 +5779,7 @@ static QString decodeEntityValue(QString literal)
 	    return QString();
 	}
 
-	literal = literal.right(literal.length() - 2);
+    literal = literal.mid(2);
 
 	int i = literal.indexOf(';');
 	if (i == -1) {
@@ -5786,32 +5788,34 @@ static QString decodeEntityValue(QString literal)
 	}
 
 	QString char_code = literal.left(i);
-	literal = literal.right(literal.length() - i - 1);
+	literal = literal.mid(i + 1);
 
 	if (char_code.isEmpty()) {
 	    qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
 	    return QString();
 	}
 
-	if (char_code.at(0) == 'x') {
-	    char_code = char_code.right(char_code.length() - 1);
-	    bool ok;
-	    unsigned c = char_code.toUInt(&ok, 16);
-	    if (!ok) {
-	        qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
-		return QString();
-	    }
-	    result += QChar(c);
-	}
-	else {
-	    bool ok;
-	    unsigned c = char_code.toUInt(&ok, 10);
-	    if (!ok) {
-	        qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
-		return QString();
-	    }
-	    result += QChar(c);
-	}
+    bool ok;
+    unsigned int c;
+    if (char_code.startsWith('x')) {
+        char_code = char_code.mid(1);
+        c = char_code.toUInt(&ok, 16);
+    } else {
+        c = char_code.toUInt(&ok, 10);
+    }
+
+    if (!ok || c > 0x10FFFF) {
+        qWarning("decodeEntityValue(): bad entity literal: \"%s\"", literal.toLatin1().data());
+        return QString();
+    }
+
+    if (c <= 0xFFFF) {
+        result += QChar(c);
+    } else {
+        c -= 0x10000;
+        result += QChar(0xD800 + (c >> 10));
+        result += QChar(0xDC00 + (c & 0x3FF));
+    }
     }
 
     return result;

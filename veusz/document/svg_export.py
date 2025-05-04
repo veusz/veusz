@@ -250,8 +250,6 @@ class SVGPaintEngine(qt.QPaintEngine):
             self.clippath = clippath
         elif clipoperation == qt.Qt.ClipOperation.IntersectClip:
             self.clippath = self.clippath.intersected(clippath)
-        elif clipoperation == qt.Qt.UniteClip:
-            self.clippath = self.clippath.united(clippath)
         else:
             assert False
 
@@ -559,7 +557,7 @@ class SVGPaintEngine(qt.QPaintEngine):
         # convert pixmap to textual data
         data = qt.QByteArray()
         buf = qt.QBuffer(data)
-        buf.open(qt.QBuffer.ReadWrite)
+        buf.open(qt.QBuffer.OpenModeFlag.ReadWrite)
         pixmap.save(buf, self.imageformat.upper(), 0)
         buf.close()
 
@@ -574,8 +572,7 @@ class SVGPaintEngine(qt.QPaintEngine):
         SVGElement(self.celement, 'image', ''.join(attrb))
 
     def type(self):
-        """A random number for the engine."""
-        return qt.QPaintEngine.Type(qt.QPaintEngine.Type.User.value + 11)
+        return qt.QPaintEngine.Type.SVG
 
 class SVGPaintDevice(qt.QPaintDevice):
     """Paint device for SVG paint engine.

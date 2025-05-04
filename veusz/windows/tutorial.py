@@ -762,7 +762,7 @@ class TutorialDock(qt.QDockWidget):
 
     def __init__(self, document, mainwin, *args):
         qt.QDockWidget.__init__(self, *args)
-        self.setAttribute(qt.Qt.WindowType.WindowType.WidgetAttribute.WA_DeleteOnClose)
+        self.setAttribute(qt.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setMinimumHeight(300)
         self.setWindowTitle('Tutorial - Veusz')
         self.setObjectName('veusztutorialwindow')

@@ -123,7 +123,7 @@ class StupidFontMetrics:
     def height(self):
         return self.device.logicalDpiY() * (self.font.pointSizeF()/72.)
 
-    def width(self, text):
+    def horizontalAdvance(self, text):
         return len(text)*self.height()*0.5
 
     def ascent(self):

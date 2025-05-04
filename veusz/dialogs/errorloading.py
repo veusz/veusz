@@ -37,6 +37,6 @@ class ErrorLoadingDialog(VeuszDialog):
         self.errortextedit.setPlainText(traceback)
 
         # set warning pixmap to left of dialog
-        icon = qt.qApp.style().standardIcon(
+        icon = qt.QCoreApplication.instance().style().standardIcon(
             qt.QStyle.StandardPixmap.SP_MessageBoxWarning, None, self)
         self.iconlabel.setPixmap(icon.pixmap(32))

@@ -1,0 +1,60 @@
+name: Ubuntu build using aqtinstall
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install aqtinstall
+      run : |
+        python -V
+        python -m pip install --upgrade pip
+        pip install aqtinstall
+
+    - name: Install Qt
+      env:
+        QT_VER: 6.7.3
+      run: |
+        aqt install-qt linux desktop $QT_VER linux_gcc_64
+        QMAKE_EXE=$(pwd)/$QT_VER/gcc_64/bin/qmake
+        echo "QMAKE_EXE=$QMAKE_EXE" >> $GITHUB_ENV
+        QT_LIBRARY_DIR=$($QMAKE_EXE -query QT_INSTALL_LIBS)
+        echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QT_LIBRARY_DIR" >> $GITHUB_ENV
+        
+    - name: Install Python dependencies
+      run: |
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip list
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y libegl1
+
+    - name: Build extensions
+      env:
+        QMAKE_EXE: ${{ env.QMAKE_EXE }}
+      run: |
+        python setup.py build_ext --inplace
+  
+    - name: Run tests
+      env:
+        LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}
+        QT_QPA_PLATFORM: minimal
+        VEUSZ_INPLACE_TEST: 1
+      run: |
+        tests/runselftest.py
