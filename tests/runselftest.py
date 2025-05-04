@@ -126,9 +126,6 @@ class StupidFontMetrics:
     def horizontalAdvance(self, text):
         return len(text)*self.height()*0.5
 
-    def horizontalAdvance(self, text):
-        return self.width(text)
-
     def ascent(self):
         return 0.1*self.height()
 
