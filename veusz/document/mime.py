@@ -49,6 +49,7 @@ def generateWidgetsMime(widgets):
 
     header = [str(len(widgets))]
     savetext = []
+    mimedata = qt.QMimeData()
 
     for widget in widgets:
         header.append(widget.typename)
@@ -58,10 +59,28 @@ def generateWidgetsMime(widgets):
         header.append( str(save.count('\n')) )
         savetext.append(save)
 
+        if widget.typename == 'svgfile':
+            data = None
+            s = widget.settings
+            if s.filename == '{embedded}':
+                data = qt.QByteArray.fromBase64(s.embeddedSVGData.encode('ascii'))
+            else :
+                # get data from external file
+                try:
+                    with open(s.filename, 'rb') as f:
+                        data = f.read()
+                except EnvironmentError:
+                    print("Could not find image file. Not copying.")
+            if data is not None:
+                mimedata.setData(svgmime, qt.QByteArray(data))
+        elif widget.typename =='imagefile':
+            data = widget.cacheimage
+            if data is not None:
+                mimedata.setImageData(data)
+
     header.append('')
     text = ('\n'.join(header) + ''.join(savetext)).encode('utf-8')
 
-    mimedata = qt.QMimeData()
     mimedata.setData(widgetmime, qt.QByteArray(text))
     return mimedata
 
