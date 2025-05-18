@@ -11,8 +11,9 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Changes in 4.0:
-  * Update to using Qt6
+  * Update to using Qt6 (thanks to korintje)
   * Documentation updates
+  * Copying SVG or image widgets copies image data (from slowphil)
   * Bug fixes:
      * HDF5 import
      * 3D rotation
@@ -20,8 +21,9 @@ Changes in 4.0:
      * Hide stderr from embedded usage unless debug=True
      * Fix histogram2d fro normed to density
      * Fix for datasets of different lengths if using gap_handling='ignore'
-     * Rename nan_handling to gap_handling
+     * Rename nan\_handling to gap\_handling
      * Continue loading if error in plugins
+  * Binaries now built using GitHub actions
 
 ## Features of package:
 
