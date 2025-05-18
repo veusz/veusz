@@ -233,7 +233,16 @@ class sip_build_ext(build_ext):
 
         pyqt6_include_dir = os.path.join(
             get_path('platlib'), 'PyQt6', 'bindings')
+        if not os.path.isdir(pyqt6_include_dir):
+            # debian doesn't put the files in platlib
+            import PyQt6
+            pyqt6_include_dir = os.path.join(
+                os.path.dirname(PyQt6.__file__), 'bindings')
+            if not os.path.isdir(pyqt6_include_dir):
+                raise RuntimeError('Could not find PyQt6 bindings directory')
+
         pyqt6_toml = os.path.join(pyqt6_include_dir, 'QtCore', 'QtCore.toml')
+
         with open(pyqt6_toml, 'rb') as fin:
             pyqt6_cfg = tomli.load(fin)
         abi_version = pyqt6_cfg.get('sip-abi-version')

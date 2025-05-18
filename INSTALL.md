@@ -34,8 +34,8 @@ Unpack the provided tar file and run the `veusz.exe` file inside
 (please note that the `.exe` extension does not mean a Windows
 executable here!):
 
-    $ tar xf veusz-3.6-linux-x86_64.tar.xz   [change version here]
-    $ cd veusz-3.6-linux-x86_64
+    $ tar xf veusz-4.0-linux-x86_64.tar.xz   [change version here]
+    $ cd veusz-4.0-linux-x86_64
     $ ./veusz.exe
 
 Note that this may not work on all distributions due to glibc or other
@@ -53,10 +53,10 @@ you will need to disable quarantine for it to run. Please see
 ### Requirements
 
 * [Python](https://www.python.org/) >= 3.3
-* [Qt](https://www.qt.io/developers/) >= 5.5
-* [SIP](https://www.riverbankcomputing.co.uk/software/sip/) >= 5
-* [PyQt](https://www.riverbankcomputing.co.uk/software/pyqt/) >= 5.3
-* [numpy](https://numpy.org/) >= 1.7
+* [Qt](https://www.qt.io/developers/) >= 6.3
+* [SIP](https://www.riverbankcomputing.co.uk/software/sip/) >= 6.5
+* [PyQt](https://www.riverbankcomputing.co.uk/software/pyqt/) >= 6.3
+* [numpy](https://numpy.org/) >= 1.10
 
 ### Optional requirements
 
@@ -81,14 +81,14 @@ An example use of a virtual environment to build veusz would be
 
     $ python3 -m venv /path/to/virtual/environment      [setup environment]
     $ source /path/to/virtual/environment/bin/activate  [activate it]
-    $ pip3 install numpy PyQt5 sip astropy h5py tomli   [install necessary requirements]
+    $ pip3 install numpy PyQt6 sip astropy h5py tomli   [install necessary requirements]
     $ pip3 install h5py astropy iminuit                 [install optional requirements]
     $ pip3 install https://github.com/jeremysanders/pyemf3.git [optional, for EMF output]
-    $ tar xf veusz-3.5.tar.gz                           [unpack veusz source]
-    $ cd veusz-3.5
+    $ tar xf veusz-4.0.tar.gz                           [unpack veusz source]
+    $ cd veusz-4.0
     $ pip3 install -v .                                 [build and install veusz from current directory]
 
-However, for the above to work requires a working Qt5 development
+However, for the above to work requires a working Qt6 development
 installation. This can be your Linux distribution's Qt packages,
 binaries download from the Qt website, or a Qt build from source. A
 quick way to install Qt binaries on different platforms can be using
@@ -100,17 +100,18 @@ installer.
 This needs write premissions into the destination directory, so `sudo`
 may be required.
 
-    $ tar xf veusz-3.5.tar.gz                           [unpack veusz source]
-    $ cd veusz-3.5
+    $ tar xf veusz-4.0.tar.gz                           [unpack veusz source]
+    $ cd veusz-4.0
     $ pip3 install -v .                                 [build and install veusz from current directory]
 
-On Ubuntu/Debian systems the following packages are necessary:
+On Ubuntu/Debian systems the following packages are necessary. Ubuntu 24.04 or later is required.
 
-    $ apt install libqt5core5a libqt5gui5 libqt5svg5 libqt5widgets5 \
+    $ apt install qt6-base-dev qt6-svg-dev \
         python3-all python3-all-dev python3-astropy python3-h5py \
-        python3-numpy python3-pyqt5 python3-pyqt5.qtsvg \
-        python3-sipbuild python3-tomli \
-        pyqt5-dev pyqt5-dev-tools qt5-qmake qtbase5-dev sip-tools
+        python3-numpy python3-sipbuild python3-tomli \
+        python3-pyqt6 python3-pyqt6.qtsvg \
+        pyqt6-dev pyqt6-dev-tools qmake \
+        sip-dev sip-tools
 
 On Fedora the following are required:
 
@@ -154,8 +155,8 @@ can currently be run from its own directory. Before this can work, the
 `helpers` modules must be compiled and copied into the appropriate
 location.
 
-    $ tar xzf veusz-3.6.tar.gz                [change version here]
-    $ cd veusz-3.6
+    $ tar xzf veusz-4.0.tar.gz                [change version here]
+    $ cd veusz-4.0
     $ python3 setup.py build
     $ cp build/*/veusz/helpers/*.so veusz/helpers/
 
