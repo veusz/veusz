@@ -73,7 +73,7 @@ coll = COLLECT(
     analysis.binaries,
     analysis.zipfiles,
     datas,
-    strip=True,
+    strip=False,
     upx=False,
     name='veusz_main'
 )

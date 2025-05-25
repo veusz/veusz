@@ -11,7 +11,7 @@ manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
 Changes in 4.0:
-  * Update to using Qt6 (thanks to korintje)
+  * Update to using Qt6 (jeremysanders/korintje)
   * Documentation updates
   * Copying SVG or image widgets copies image data (from slowphil)
   * Bug fixes:
