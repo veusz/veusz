@@ -273,7 +273,10 @@ class VeuszApp(qt.QApplication):
         if not (self.args.listen or self.args.export):
             # show the splash screen on normal start
             self.splash = makeSplash(self)
+            # this seems necessary on MacOS
+            self.splash.resize(self.splash.sizeHint())
             self.splash.show()
+            self.splash.raise_()
 
         self.thread = ImportThread()
         self.thread.finished.connect(self.slotStartApplication)
