@@ -2,7 +2,7 @@
 
 ## Installation methods
 
-1. Provided binaries for x86-64 Linux, Windows and MacOS - please go
+1. Provided binaries for x86-64 Linux, x86-64 Windows and x86-64/ARM MacOS - please go
    to the [download page](https://veusz.github.io/download/). See also
    below for further information.
 
@@ -52,7 +52,7 @@ you will need to disable quarantine for it to run. Please see
 
 ### Requirements
 
-* [Python](https://www.python.org/) >= 3.3
+* [Python](https://www.python.org/) >= 3.8
 * [Qt](https://www.qt.io/developers/) >= 6.3
 * [SIP](https://www.riverbankcomputing.co.uk/software/sip/) >= 6.5
 * [PyQt](https://www.riverbankcomputing.co.uk/software/pyqt/) >= 6.3

@@ -8,7 +8,7 @@ Veusz documentation
 
 Jeremy Sanders
 
-Copyright 2021
+Copyright 2025
 
 This document is licensed under the GNU General Public
 License, version 2 or greater. Please see the file COPYING for

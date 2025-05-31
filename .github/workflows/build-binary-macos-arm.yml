@@ -46,6 +46,13 @@ jobs:
       run: |
         python3 setup.py build_ext --inplace
         cp -p build/lib*/veusz/helpers/*.so veusz/helpers
+    - name: Run tests
+      env:
+        LD_LIBRARY_PATH: ${{ env.QT_ROOT_DIR }}/lib:{{ env.LD_LIBRARY_PATH }}
+        QT_QPA_PLATFORM: minimal
+        VEUSZ_INPLACE_TEST: 1
+      run: |
+        tests/runselftest.py
     - name: Build installer
       run: |
         sh support/veusz_macos_make_image.sh
