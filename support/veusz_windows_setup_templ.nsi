@@ -59,7 +59,7 @@ Function .onInit
 FunctionEnd
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
-OutFile "installer_out\veusz-${PRODUCT_VERSION}-x64-windows-setup.exe"
+OutFile "installer_out\veusz-${PRODUCT_VERSION}-windows-x64-setup.exe"
 InstallDir "$PROGRAMFILES64\Veusz"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
