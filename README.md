@@ -23,6 +23,7 @@ Changes in 4.0:
      * Fix for datasets of different lengths if using gap_handling='ignore'
      * Rename nan\_handling to gap\_handling
      * Continue loading if error in plugins
+     * Fix overlapping formatting dock on Mac (korintje)
   * Binaries now built using GitHub actions
 
 ## Features of package:
