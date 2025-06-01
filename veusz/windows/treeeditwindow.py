@@ -701,6 +701,12 @@ class FormatDock(qt.QDockWidget):
         self.document = document
         self.tabwidget = None
 
+        self.container = qt.QWidget()
+        self.layout = qt.QVBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.container.setLayout(self.layout)
+        self.setWidget(self.container)
+
         # update our view when the tree edit window selection changes
         treeedit.widgetsSelected.connect(self.selectedWidgets)
 
@@ -719,7 +725,7 @@ class FormatDock(qt.QDockWidget):
             self.tabwidget = None
 
         self.tabwidget = TabbedFormatting(self.document, setnsproxy)
-        self.setWidget(self.tabwidget)
+        self.layout.addWidget(self.tabwidget)
 
         # wrap tab from zero to max number
         tab = max( min(self.tabwidget.count()-1, tab), 0 )
