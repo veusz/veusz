@@ -164,6 +164,9 @@ class VeuszApp(qt.QApplication):
         self.lastWindowClosed.connect(self.quit)
         self.signalException.connect(self.showException)
 
+        # Bind desktop file to display icon in wayland
+        qt.QGuiApplication.setDesktopFileName("veusz")
+
         # register a signal handler to catch ctrl+C
         signal.signal(signal.SIGINT, handleIntSignal)
 
