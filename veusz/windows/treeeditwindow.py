@@ -720,9 +720,13 @@ class FormatDock(qt.QDockWidget):
             tab = 0
 
         # delete old tabwidget
-        if self.tabwidget:
-            self.tabwidget.deleteLater()
-            self.tabwidget = None
+        oldItem = self.layout.takeAt(0)
+        if oldItem:
+            oldWidget = oldItem.widget()
+            if oldWidget:
+                oldWidget.setParent(None)
+                oldWidget.deleteLater()
+                self.tabwidget = None
 
         self.tabwidget = TabbedFormatting(self.document, setnsproxy)
         self.layout.addWidget(self.tabwidget)
