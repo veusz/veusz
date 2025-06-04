@@ -337,10 +337,11 @@ class VeuszApp(qt.QApplication):
 
         # color theme
         scheme = setting.settingdb['color_darkmode']
-        if scheme == 1:
-            self.styleHints().setColorScheme(qt.Qt.ColorScheme.Light)
-        elif scheme == 2:
-            self.styleHints().setColorScheme(qt.Qt.ColorScheme.Dark)
+        if scheme > 0 and hasattr(self.styleHints(), 'setColorScheme'):
+            if scheme == 1:
+                self.styleHints().setColorScheme(qt.Qt.ColorScheme.Light)
+            elif scheme == 2:
+                self.styleHints().setColorScheme(qt.Qt.ColorScheme.Dark)
 
         # different modes
         if args.listen:
