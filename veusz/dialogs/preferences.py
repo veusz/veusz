@@ -139,6 +139,11 @@ class PreferencesDialog(VeuszDialog):
 
         setdb = setting.settingdb
 
+        # dark mode
+        self.colorDarkModeCombo.setCurrentIndex(setdb['color_darkmode'])
+        if not hasattr(qt.QStyleHints, 'setColorScheme'):
+            self.colorDarkModeCombo.setEnabled(False)
+
         # theme
         themes = sorted(list(document.colors.colorthemes))
         self.colorThemeDefCombo.addItems(themes)
@@ -176,7 +181,7 @@ class PreferencesDialog(VeuszDialog):
             button.clicked.connect(getcolclick(colname))
             layout.addWidget(button, row, 2)
 
-        self.colorGroup.setLayout(layout)
+        self.colorUIWidget.setLayout(layout)
 
         self.updateButtonColors()
 
@@ -243,6 +248,7 @@ class PreferencesDialog(VeuszDialog):
         setdb['colortheme_default'] = self.colorThemeDefCombo.currentText()
 
         # UI colors
+        setdb['color_darkmode'] = self.colorDarkModeCombo.currentIndex()
         for name, color in self.chosencolors.items():
             isdefault = self.colordefaultcheck[name].isChecked()
             colorname = color.name()
