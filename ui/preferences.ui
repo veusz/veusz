@@ -353,8 +353,46 @@ to be loaded.</string>
        <item>
         <widget class="QGroupBox" name="colorGroup">
          <property name="title">
-          <string>Colors used by the Veusz user interface</string>
+          <string>User interface colors</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Dark or light mode</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="colorDarkModeCombo">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Needs restart to take effect&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <item>
+               <property name="text">
+                <string>Use system settings</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Force light mode</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Force dark mode</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QWidget" name="colorUIWidget" native="true"/>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
