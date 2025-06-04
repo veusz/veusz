@@ -160,6 +160,7 @@ class VeuszApp(qt.QApplication):
 
     def __init__(self):
         qt.QApplication.__init__(self, sys.argv)
+        self.styleHints().setColorScheme(qt.Qt.ColorScheme.Light)
 
         self.lastWindowClosed.connect(self.quit)
         self.signalException.connect(self.showException)
