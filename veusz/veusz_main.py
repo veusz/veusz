@@ -78,7 +78,7 @@ def makeSplash(app):
     layout.setContentsMargins(h,h,h,h)
 
     # Center the spash screen
-    screen = app.screenAt(qt.QPoint()).size()
+    screen = splash.screen().size()
     splash.move(
         (screen.width()-layout.sizeHint().width())//2,
         (screen.height()-layout.sizeHint().height())//2
