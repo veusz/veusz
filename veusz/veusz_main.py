@@ -335,13 +335,6 @@ class VeuszApp(qt.QApplication):
         except document.PluginLoadError as e:
             startuperrors.append(str(e))
 
-        # color theme
-        scheme = setting.settingdb['color_darkmode']
-        if scheme == 1:
-            self.styleHints().setColorScheme(qt.Qt.ColorScheme.Light)
-        elif scheme == 2:
-            self.styleHints().setColorScheme(qt.Qt.ColorScheme.Dark)
-
         # different modes
         if args.listen:
             # listen to incoming commands
