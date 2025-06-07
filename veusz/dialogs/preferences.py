@@ -40,6 +40,24 @@ color_names = {
         _('Control corner'), _('Color of corners controlling widgets')),
 }
 
+# color schemes - map number in list to internal name
+color_schemes = {
+    0: 'default',
+    1: 'system-light',
+    2: 'system-dark',
+    3: 'breeze-light',
+    4: 'breeze-dark',
+}
+
+# list of color schemes and system names
+color_schemes = [
+    ('default', _('System default')),
+    ('system-light', _('System light mode')),
+    ('system-dark', _('System dark mode')),
+    ('breeze-light', _('Breeze light')),
+    ('breeze-dark', _('Breeze dark')),
+]
+
 class PreferencesDialog(VeuszDialog):
     """Preferences dialog."""
 
@@ -140,9 +158,13 @@ class PreferencesDialog(VeuszDialog):
         setdb = setting.settingdb
 
         # dark mode
-        self.colorDarkModeCombo.setCurrentIndex(setdb['color_darkmode'])
-        if not hasattr(qt.QStyleHints, 'setColorScheme'):
-            self.colorDarkModeCombo.setEnabled(False)
+        scheme = setdb['color_scheme']
+        idx = 0
+        for i, (name, usertext) in enumerate(color_schemes):
+            self.colorSchemeCombo.addItem(usertext)
+            if name == scheme:
+                idx = i
+        self.colorSchemeCombo.setCurrentIndex(idx)
 
         # theme
         themes = sorted(list(document.colors.colorthemes))
@@ -248,7 +270,9 @@ class PreferencesDialog(VeuszDialog):
         setdb['colortheme_default'] = self.colorThemeDefCombo.currentText()
 
         # UI colors
-        setdb['color_darkmode'] = self.colorDarkModeCombo.currentIndex()
+        idx = self.colorSchemeCombo.currentIndex()
+        setdb['color_scheme'] = color_schemes[idx][0]
+
         for name, color in self.chosencolors.items():
             isdefault = self.colordefaultcheck[name].isChecked()
             colorname = color.name()

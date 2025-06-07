@@ -336,12 +336,18 @@ class VeuszApp(qt.QApplication):
             startuperrors.append(str(e))
 
         # color theme
-        scheme = setting.settingdb['color_darkmode']
-        if scheme > 0 and hasattr(self.styleHints(), 'setColorScheme'):
-            if scheme == 1:
-                self.styleHints().setColorScheme(qt.Qt.ColorScheme.Light)
-            elif scheme == 2:
-                self.styleHints().setColorScheme(qt.Qt.ColorScheme.Dark)
+        scheme = setting.settingdb['color_scheme']
+        hascolorscheme = hasattr(self.styleHints(), 'setColorScheme') # qt>=6.5
+        if scheme == 'default':
+            pass
+        elif scheme == 'system-light' and hascolorscheme:
+            self.styleHints().setColorScheme(qt.Qt.ColorScheme.Light)
+        elif scheme == 'system-dark' and hascolorscheme:
+            self.styleHints().setColorScheme(qt.Qt.ColorScheme.Dark)
+        else:
+            pal = utils.getPalette(scheme)
+            if pal is not None:
+                self.setPalette(pal)
 
         # different modes
         if args.listen:

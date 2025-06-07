@@ -54,7 +54,7 @@ defaultValues = {
     'custom_default': '',
 
     # colors (isdefault, 'notdefaultcolor')
-    'color_darkmode': 0,
+    'color_scheme': 'default',
     'color_page': (True, 'white'),
     'color_error': (True, 'red'),
     'color_command': (True, 'blue'),

@@ -361,30 +361,15 @@ to be loaded.</string>
             <item>
              <widget class="QLabel" name="label_15">
               <property name="text">
-               <string>Dark or light mode</string>
+               <string>Color scheme</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="colorDarkModeCombo">
+             <widget class="QComboBox" name="colorSchemeCombo">
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Needs restart to take effect&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Needs restart to take effect. System dark or light has no effect if undefined by the platform (e.g. Linux currently).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
-              <item>
-               <property name="text">
-                <string>Use system settings</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Force light mode</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Force dark mode</string>
-               </property>
-              </item>
              </widget>
             </item>
            </layout>

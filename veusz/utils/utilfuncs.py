@@ -693,3 +693,109 @@ class DisabledIconEngine(qt.QIconEngine):
 
     def pixmap(self, size, mode, state):
         return self.icon.pixmap(size, qt.QIcon.Mode.Disabled, state)
+
+
+def dumpPalette(pal):
+    """Dump a palette to a string."""
+
+    cg = qt.QPalette.ColorGroup
+    cr = qt.QPalette.ColorRole
+    lines = []
+    for role in (
+            cr.Window,
+            cr.WindowText,
+            cr.Base,
+            cr.AlternateBase,
+            cr.ToolTipBase,
+            cr.ToolTipText,
+            cr.ToolTipText,
+            cr.PlaceholderText,
+            cr.Text,
+            cr.Button,
+            cr.ButtonText,
+            cr.BrightText,
+            cr.Light,
+            cr.Midlight,
+            cr.Dark,
+            cr.Mid,
+            cr.Shadow,
+            cr.Highlight,
+            cr.HighlightedText,
+            cr.Link,
+            cr.LinkVisited,
+            ):
+        v = []
+        for group in cg.Disabled, cg.Active, cg.Inactive:
+            v.append( pal.color(group, role).name() )
+
+        lines.append(f'  ({role.value:2}, "{v[0]}", "{v[1]}", "{v[2]}"),\n')
+
+    out = '[\n' + ''.join(lines) + ']\n'
+    return out
+
+def getPalette(name):
+    """Get a dumped palette."""
+
+    # these are dumped using the dumpPalette function above
+    palettes = {
+        # dumped from KDE on plasma version 5.27.12
+        'breeze-light': [
+            (10, "#fcfcfc", "#eff0f1", "#eff0f1"),
+            ( 0, "#7e7e7e", "#232629", "#232629"),
+            ( 9, "#fcfcfc", "#ffffff", "#ffffff"),
+            (16, "#f7f7f7", "#f7f7f7", "#f7f7f7"),
+            (18, "#f7f7f7", "#f7f7f7", "#f7f7f7"),
+            (19, "#232629", "#232629", "#232629"),
+            (19, "#232629", "#232629", "#232629"),
+            (20, "#000000", "#000000", "#000000"),
+            ( 6, "#7e7e7e", "#232629", "#232629"),
+            ( 1, "#fcfcfc", "#fcfcfc", "#fcfcfc"),
+            ( 8, "#7e7e7e", "#232629", "#232629"),
+            ( 7, "#ffffff", "#ffffff", "#ffffff"),
+            ( 2, "#ffffff", "#ffffff", "#ffffff"),
+            ( 3, "#ffffff", "#ffffff", "#ffffff"),
+            ( 4, "#7e7e7e", "#7e7e7e", "#7e7e7e"),
+            ( 5, "#a8a8a8", "#a8a8a8", "#a8a8a8"),
+            (11, "#b1b1b1", "#767676", "#767676"),
+            (12, "#a8a8a8", "#3daee9", "#3daee9"),
+            (13, "#ffffff", "#ffffff", "#ffffff"),
+            (14, "#2980b9", "#2980b9", "#2980b9"),
+            (15, "#9b59b6", "#9b59b6", "#9b59b6"),
+        ],
+        # dumped from KDE on plasma version 5.27.12
+        'breeze-dark': [
+            (10, "#31363b", "#2a2e32", "#2a2e32"),
+            ( 0, "#626c76", "#fcfcfc", "#fcfcfc"),
+            ( 9, "#31363b", "#1b1e20", "#1b1e20"),
+            (16, "#232629", "#232629", "#232629"),
+            (18, "#31363b", "#31363b", "#31363b"),
+            (19, "#fcfcfc", "#fcfcfc", "#fcfcfc"),
+            (19, "#fcfcfc", "#fcfcfc", "#fcfcfc"),
+            (20, "#f0f0f0", "#f0f0f0", "#f0f0f0"),
+            ( 6, "#626c76", "#fcfcfc", "#fcfcfc"),
+            ( 1, "#31363b", "#31363b", "#31363b"),
+            ( 8, "#626c76", "#fcfcfc", "#fcfcfc"),
+            ( 7, "#ffffff", "#4b4b4b", "#4b4b4b"),
+            ( 2, "#181b1d", "#181b1d", "#181b1d"),
+            ( 3, "#25292c", "#25292c", "#25292c"),
+            ( 4, "#626c76", "#626c76", "#626c76"),
+            ( 5, "#41484e", "#41484e", "#41484e"),
+            (11, "#252525", "#191919", "#191919"),
+            (12, "#41484e", "#3daee9", "#3daee9"),
+            (13, "#25292c", "#fcfcfc", "#fcfcfc"),
+            (14, "#1d99f3", "#1d99f3", "#1d99f3"),
+            (15, "#9b59b6", "#9b59b6", "#9b59b6"),
+        ],
+    }
+
+    pal = qt.QPalette()
+
+    if name not in palettes:
+        return None
+
+    for role, disabled, active, inactive in palettes[name]:
+        role = pal.ColorRole(role)
+        pal.setColor(pal.ColorGroup.Disabled, role, qt.QColor(disabled))
+        pal.setColor(pal.ColorGroup.Active, role, qt.QColor(active))
+        pal.setColor(pal.ColorGroup.Inactive, role, qt.QColor(inactive))
+    return pal
