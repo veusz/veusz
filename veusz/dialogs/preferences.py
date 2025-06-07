@@ -40,15 +40,6 @@ color_names = {
         _('Control corner'), _('Color of corners controlling widgets')),
 }
 
-# color schemes - map number in list to internal name
-color_schemes = {
-    0: 'default',
-    1: 'system-light',
-    2: 'system-dark',
-    3: 'breeze-light',
-    4: 'breeze-dark',
-}
-
 # list of color schemes and system names
 color_schemes = [
     ('default', _('System default')),
