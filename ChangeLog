@@ -1,3 +1,11 @@
+Changes in 4.1:
+  * Much improved icons for dark mode
+  * Provide preference for forcing dark/light mode or setting other
+    color themes (includes breeze light and dark)
+  * Fix for formatting dock when deleting widgets (korintje)
+  * Bind icon to desktop file on Wayland (antohami)
+  * Fix for dual monitors under Wayland
+
 Changes in 4.0:
   * Update to using Qt6 (jeremysanders/korintje)
   * Documentation updates

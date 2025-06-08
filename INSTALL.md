@@ -34,8 +34,8 @@ Unpack the provided tar file and run the `veusz.exe` file inside
 (please note that the `.exe` extension does not mean a Windows
 executable here!):
 
-    $ tar xf veusz-4.0-linux-x86_64.tar.xz   [change version here]
-    $ cd veusz-4.0-linux-x86_64
+    $ tar xf veusz-4.1-linux-x86_64.tar.xz   [change version here]
+    $ cd veusz-4.1-linux-x86_64
     $ ./veusz.exe
 
 Note that this may not work on all distributions due to glibc or other
@@ -84,8 +84,8 @@ An example use of a virtual environment to build veusz would be
     $ pip3 install numpy PyQt6 sip astropy h5py tomli   [install necessary requirements]
     $ pip3 install h5py astropy iminuit                 [install optional requirements]
     $ pip3 install https://github.com/jeremysanders/pyemf3.git [optional, for EMF output]
-    $ tar xf veusz-4.0.tar.gz                           [unpack veusz source]
-    $ cd veusz-4.0
+    $ tar xf veusz-4.1.tar.gz                           [unpack veusz source]
+    $ cd veusz-4.1
     $ pip3 install -v .                                 [build and install veusz from current directory]
 
 However, for the above to work requires a working Qt6 development
@@ -100,8 +100,8 @@ installer.
 This needs write premissions into the destination directory, so `sudo`
 may be required.
 
-    $ tar xf veusz-4.0.tar.gz                           [unpack veusz source]
-    $ cd veusz-4.0
+    $ tar xf veusz-4.1.tar.gz                           [unpack veusz source]
+    $ cd veusz-4.1
     $ pip3 install -v .                                 [build and install veusz from current directory]
 
 On Ubuntu/Debian systems the following packages are necessary. Ubuntu 24.04 or later is required.
@@ -155,8 +155,8 @@ can currently be run from its own directory. Before this can work, the
 `helpers` modules must be compiled and copied into the appropriate
 location.
 
-    $ tar xzf veusz-4.0.tar.gz                [change version here]
-    $ cd veusz-4.0
+    $ tar xzf veusz-4.1.tar.gz                [change version here]
+    $ cd veusz-4.1
     $ python3 setup.py build
     $ cp build/*/veusz/helpers/*.so veusz/helpers/
 

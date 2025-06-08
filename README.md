@@ -1,4 +1,4 @@
-# [Veusz 4.0](https://veusz.github.io/)
+# [Veusz 4.1](https://veusz.github.io/)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -9,6 +9,14 @@ Veusz provides GUI, Python module, command line, scripting, DBUS and
 SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
+
+Changes in 4.1:
+  * Much improved icons for dark mode
+  * Provide preference for forcing dark/light mode or setting other
+    color themes (includes breeze light and dark)
+  * Fix for formatting doct when deleting widgets (korintje)
+  * Bind icon to desktop file on Wayland (antohami)
+  * Fix for dual monitors under Wayland
 
 Changes in 4.0:
   * Update to using Qt6 (jeremysanders/korintje)
