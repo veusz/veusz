@@ -5562,7 +5562,7 @@ static int interpretSpacing(QString value, int em, int ex, bool *ok)
 	bool float_ok;
 	float factor = value.toFloat(&float_ok);
 	if (float_ok && factor >= 0) {
-            QScreen *screen = qApp->screenAt(QPoint());
+            QScreen *screen = qApp->primaryScreen();
             Q_ASSERT(screen != 0);
             return (int)(factor*10*screen->size().width()/screen->physicalSize().width());
 	}
@@ -5579,7 +5579,7 @@ static int interpretSpacing(QString value, int em, int ex, bool *ok)
 	bool float_ok;
 	float factor = value.toFloat(&float_ok);
 	if (float_ok && factor >= 0) {
-            QScreen *screen = qApp->screenAt(QPoint());
+            QScreen *screen = qApp->primaryScreen();
             Q_ASSERT(screen != 0);
             return (int)(factor*screen->size().width()/screen->physicalSize().width());
 	}
@@ -5596,7 +5596,7 @@ static int interpretSpacing(QString value, int em, int ex, bool *ok)
 	bool float_ok;
 	float factor = value.toFloat(&float_ok);
 	if (float_ok && factor >= 0) {
-            QScreen *screen = qApp->screenAt(QPoint());
+            QScreen *screen = qApp->primaryScreen();
             Q_ASSERT(screen != 0);
             return (int)(factor*10*screen->size().width()/(2.54*screen->physicalSize().width()));
 	}
