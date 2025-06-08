@@ -18,6 +18,7 @@ Changes in 4.1:
   * Bind icon to desktop file on Wayland (antohami)
   * Fix for dual monitors under Wayland
   * Provide portable zip executable for Windows
+  * Add missing TIF image format in binaries
 
 Changes in 4.0:
   * Update to using Qt6 (jeremysanders/korintje)

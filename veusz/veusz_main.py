@@ -350,6 +350,8 @@ class VeuszApp(qt.QApplication):
         else:
             pal = utils.getPalette(scheme)
             if pal is not None:
+                # palettes only work typically in fusion style
+                self.setStyle("fusion")
                 self.setPalette(pal)
 
         # different modes

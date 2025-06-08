@@ -23,7 +23,8 @@ jobs:
       with:
         cache: 'true'
         cache-key-prefix: 'qt-ubuntu-binary-v1'
-        version: '6.9.0'
+        version: '6.9.1'
+        modules: 'qtimageformats'
         setup-python: false
     - name: Install PyQt
       run: |
