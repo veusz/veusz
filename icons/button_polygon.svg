@@ -2,21 +2,21 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="16"
    height="16"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.48.5 r10040"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
    version="1.0"
    sodipodi:docname="button_polygon.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs7" />
   <sodipodi:namedview
@@ -30,17 +30,21 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="20.594485"
-     inkscape:cx="1.0196905"
-     inkscape:cy="8.8934836"
+     inkscape:cx="-2.3549994"
+     inkscape:cy="8.9587091"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1023"
-     inkscape:window-height="768"
-     inkscape:window-x="201"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
      inkscape:window-y="0"
      showguides="true"
-     inkscape:guide-bbox="true" />
+     inkscape:guide-bbox="true"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -70,7 +74,23 @@
      id="layer1">
     <path
        sodipodi:type="star"
-       style="fill:#4ebc27;fill-opacity:1;stroke:#000000;stroke-width:0.01685422;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.04951269;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path2394-5"
+       sodipodi:sides="5"
+       sodipodi:cx="-11.459379"
+       sodipodi:cy="-1.480408"
+       sodipodi:r1="0.10857606"
+       sodipodi:r2="0.087839872"
+       sodipodi:arg1="0.46364761"
+       sodipodi:arg2="1.0919661"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="m -11.362266,-1.4318513 -0.113284,0.058809 -0.09094,-0.089567 0.05708,-0.1141637 0.126216,0.01901 z"
+       transform="matrix(55.400461,27.535102,-26.975391,52.85951,602.96529,402.60093)" />
+    <path
+       sodipodi:type="star"
+       style="fill:#4ebc27;fill-opacity:1;stroke:#000000;stroke-width:0.01650423;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path2394"
        sodipodi:sides="5"
        sodipodi:cx="-11.459379"
@@ -82,7 +102,7 @@
        inkscape:flatsided="true"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       d="M -11.362266,-1.4318513 L -11.47555,-1.3730428 L -11.566486,-1.4626093 L -11.509405,-1.576773 L -11.383189,-1.5577634 L -11.362266,-1.4318513 z"
-       transform="matrix(53.892976,27.141955,-26.241372,52.104781,586.93409,396.54311)" />
+       d="m -11.362266,-1.4318513 -0.113284,0.058809 -0.09094,-0.089567 0.05708,-0.1141637 0.126216,0.01901 z"
+       transform="matrix(55.400461,27.535102,-26.975391,52.85951,602.96529,402.60093)" />
   </g>
 </svg>

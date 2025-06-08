@@ -1540,12 +1540,13 @@ class SettingLabel(qt.QWidget):
     def updateHighlight(self):
         """Show drop down arrow if item has focus."""
         if self.inmouse or self.infocus or self.inmenu:
-            pixmap = 'downarrow.png'
+            pixmap = 'veusz-dropdown.svg'
         else:
             if self.setting.isReference() and not self.setting.isDefault():
-                pixmap = 'link.png'
+                pixmap = 'veusz-dropdown-link.svg'
             else:
-                pixmap = 'downarrow_blank.png'
+                pixmap = 'veusz-dropdown-blank.svg'
+
         self.iconlabel.setPixmap(utils.getPixmap(pixmap))
 
     def enterEvent(self, event):
