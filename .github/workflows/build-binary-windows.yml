@@ -82,11 +82,8 @@ jobs:
       with:
         name: windows-installer
         path: installer_out
-    - name: Rename distribution file
-      shell: cmd
-      run: ren 'dist\veusz_main' 'veusz'
     - name: Upload zip artifact
       uses: actions/upload-artifact@v4
       with:
         name: portable-zip
-        path: dist
+        path: 'dist\veusz_main'
