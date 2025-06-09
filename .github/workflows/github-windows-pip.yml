@@ -28,7 +28,7 @@ jobs:
       with:
         cache: 'true'
         cache-key-prefix: 'qt-windows-v2'
-        version: '6.9.0'
+        version: '6.9.1'
         setup-python: false
     - name: Install Python dependencies
       run: |
