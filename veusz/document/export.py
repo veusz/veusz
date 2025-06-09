@@ -333,15 +333,25 @@ class AsyncExport(qt.QObject):
     @classmethod
     def getFormats(klass):
         """Return list of formats in form of tuples of extension and description."""
-        formats = [
-            (["bmp"], _("Windows bitmap")),
-            (["jpg"], _("Jpeg bitmap")),
-            (["pdf"], _("Portable Document Format")),
-            (["png"], _("Portable Network Graphics")),
-            (["svg"], _("Scalable Vector Graphics")),
-            (["tiff"], _("Tagged Image File Format bitmap")),
-            (["xpm"], _("X Pixmap")),
-        ]
+
+        # supported formats by qt
+        supported = {
+            bytes(fmt).decode('utf8')
+            for fmt in qt.QImageReader.supportedImageFormats() }
+
+        formats = []
+        for fmt in [
+                (["bmp"], _("Windows bitmap")),
+                (["jpg"], _("Jpeg bitmap")),
+                (["pdf"], _("Portable Document Format")),
+                (["png"], _("Portable Network Graphics")),
+                (["svg"], _("Scalable Vector Graphics")),
+                (["tiff"], _("Tagged Image File Format bitmap")),
+                (["xpm"], _("X Pixmap")),
+                (["webp"], _("WebP")),
+            ]:
+            if fmt[0][0] in supported:
+                formats.append(fmt)
 
         if hasemf:
             formats.append( (["emf"], _("Windows Enhanced Metafile")) )
@@ -414,7 +424,7 @@ class AsyncExport(qt.QObject):
         if ext in {'.pdf', '.eps', '.ps'}:
             return (self.pdfdpi, self.pdfdpi)
 
-        elif ext in {'.png', '.jpg', '.jpeg', '.bmp', '.tiff', '.xpm'}:
+        elif ext in {'.png', '.jpg', '.jpeg', '.bmp', '.tiff', '.xpm', '.webp'}:
             return (self.bitmapdpi, self.bitmapdpi)
 
         elif ext == '.svg':
@@ -465,6 +475,7 @@ class AsyncExport(qt.QObject):
             '.bmp': ExportBitmapRunnable,
             '.tiff': ExportBitmapRunnable,
             '.xpm': ExportBitmapRunnable,
+            '.webp': ExportBitmapRunnable,
 
             '.pdf': ExportPDFRunnable,
             '.ps': ExportPostscriptRunnable,

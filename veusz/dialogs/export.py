@@ -46,6 +46,7 @@ formatradio = (
     ('jpg', 'radioFormatJPG'),
     ('tiff', 'radioFormatTIFF'),
     ('xpm', 'radioFormatXPM'),
+    ('webp', 'radioFormatWebP'),
 )
 
 class ExportDialog(VeuszDialog):

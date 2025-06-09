@@ -19,6 +19,8 @@ Changes in 4.1:
   * Fix for dual monitors under Wayland
   * Provide portable zip executable for Windows
   * Add missing TIF image format in binaries
+  * Disable export formats if not supported by built Qt
+  * Add WebP export image format
 
 Changes in 4.0:
   * Update to using Qt6 (jeremysanders/korintje)
