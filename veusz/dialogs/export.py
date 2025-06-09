@@ -121,7 +121,7 @@ class ExportDialog(VeuszDialog):
         self.exportQuality.setValue(setdb['export_quality'])
 
         # validate and set DPIs
-        dpis = ('72', '75', '90', '96', '100', '150', '200', '300')
+        dpis = ('72', '75', '90', '96', '100', '150', '200', '300', '600')
         for cntrl in self.exportDPI, self.exportDPISVG, self.exportDPIPDF:
             cntrl.addItems(dpis)
             cntrl.setValidator(qt.QIntValidator(10, 10000, self))
