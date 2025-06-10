@@ -339,13 +339,14 @@ class AsyncExport(qt.QObject):
             bytes(fmt).decode('utf8')
             for fmt in qt.QImageReader.supportedImageFormats() }
 
-        formats = []
+        formats = [
+            (["pdf"], _("Portable Document Format")),
+            (["svg"], _("Scalable Vector Graphics")),
+        ]
         for fmt in [
                 (["bmp"], _("Windows bitmap")),
                 (["jpg"], _("Jpeg bitmap")),
-                (["pdf"], _("Portable Document Format")),
                 (["png"], _("Portable Network Graphics")),
-                (["svg"], _("Scalable Vector Graphics")),
                 (["tiff"], _("Tagged Image File Format bitmap")),
                 (["xpm"], _("X Pixmap")),
                 (["webp"], _("WebP")),
