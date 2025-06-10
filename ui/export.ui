@@ -333,14 +333,14 @@ This is recommended for most purposes.</string>
       <item row="5" column="0">
        <widget class="QLabel" name="labelQuality">
         <property name="text">
-         <string>Jpeg quality</string>
+         <string>Quality</string>
         </property>
        </widget>
       </item>
       <item row="5" column="1">
        <widget class="QSpinBox" name="exportQuality">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose Jpeg quality setting. Lower values give poorer quality results and are more compressed, but have smaller file sizes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Quality of output for lossy formats. Lower values give poorer quality results and are more compressed, but have smaller file sizes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="minimum">
          <number>0</number>

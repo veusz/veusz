@@ -32,7 +32,7 @@ def _(text, disambiguation=None, context='ExportDialog'):
 # formats which can have multiple pages
 multipageformats = set(('ps', 'pdf'))
 
-bitmapformats = set(('png', 'bmp', 'jpg', 'tiff', 'xpm'))
+bitmapformats = set(('png', 'bmp', 'jpg', 'tiff', 'xpm', 'webp'))
 
 # map formats to names of radio buttons
 formatradio = (
@@ -174,7 +174,7 @@ class ExportDialog(VeuszDialog):
             c.setVisible(fmt in ('pdf', 'ps', 'eps'))
 
         for c in (self.exportQuality, self.labelQuality):
-            c.setVisible(fmt == 'jpg')
+            c.setVisible(fmt == 'jpg' or fmt == 'webp')
 
         for c in (self.exportSVGTextAsText, self.labelSVGTextAsText,
                   self.exportDPISVG, self.labelDPISVG):
