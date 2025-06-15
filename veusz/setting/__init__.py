@@ -22,3 +22,4 @@ from .setting import *
 from .settings import *
 from .collections import *
 from .stylesheet import *
+from .controls import Dataset as ControlDataset

@@ -747,6 +747,12 @@ class DatasetBrowser(qt.QWidget):
         self.grouping = setting.settingdb.get("navtree_grouping", "filename")
         self.grpact = qt.QActionGroup(self)
         self.grpact.setExclusive(True)
+
+        buttonwidth = self.fontMetrics().horizontalAdvance(_("Group")) + 20
+        buttonheight = self.fontMetrics().height() + 10
+        self.grpbutton.setMinimumWidth(buttonwidth)
+        self.grpbutton.setMinimumHeight(buttonheight)
+
         for name in self.grpnames:
             a = self.grpmenu.addAction(self.grpentries[name])
             a.grpname = name
@@ -810,6 +816,7 @@ class DatasetBrowserPopup(DatasetBrowser):
 
     closing = qt.pyqtSignal()
     newdataset = qt.pyqtSignal(str)
+    newdatasets = qt.pyqtSignal(list)
 
     def __init__(self, document, dsname, parent,
                  filterdims=None, filterdtype=None):
@@ -823,6 +830,18 @@ class DatasetBrowserPopup(DatasetBrowser):
         DatasetBrowser.__init__(
             self, document, None, parent, readonly=True,
             filterdims=filterdims, filterdtype=filterdtype)
+        
+        self.applybutton = qt.QPushButton(_("Apply"))
+        self.applybutton.clicked.connect(self.slotUpdateItem)
+        buttonwidth = self.fontMetrics().horizontalAdvance(_("Apply")) + 20
+        buttonheight = self.fontMetrics().height() + 10
+        self.applybutton.setMinimumWidth(buttonwidth)
+        self.applybutton.setMinimumHeight(buttonheight)
+        footerlayout = qt.QHBoxLayout()
+        footerlayout.addStretch()
+        footerlayout.addWidget(self.applybutton)
+        self.layout.addLayout(footerlayout)
+
         self.setWindowFlags(qt.Qt.WindowType.Popup)
         self.setAttribute(qt.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.spacing = self.fontMetrics().height()
@@ -856,9 +875,16 @@ class DatasetBrowserPopup(DatasetBrowser):
 
     def slotUpdateItem(self):
         """Emit new dataset signal."""
-        selected = self.navtree.selectionModel().currentIndex()
-        if selected.isValid():
-            n = self.navtree.model.objFromIndex(selected)
-            if isinstance(n, DatasetNode):
-                self.newdataset.emit(n.data[0])
-                self.close()
+        selected_idxs = self.navtree.selectionModel().selectedIndexes()
+        datasets = []
+        for idx in selected_idxs:
+            if idx.isValid() and idx.column() == 0:
+                n = self.navtree.model.objFromIndex(idx)
+                if isinstance(n, DatasetNode):
+                    datasets.append(n.data[0])
+        if datasets:
+            if len(datasets) == 1:
+                self.newdataset.emit(datasets[0])
+            else:
+                self.newdatasets.emit(datasets)
+            self.close()
