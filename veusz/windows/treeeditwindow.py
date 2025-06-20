@@ -56,6 +56,9 @@ class SettingsProxy:
     def onSettingChanged(self, control, setting, val):
         """Called when a setting has been modified."""
 
+    def onSettingChangedIteratively(self, control, setting, vals):
+        """Called when a setting has been modified with multiple values."""
+
     def onAction(self, action, console):
         """Called if action pressed. Console window is given."""
 
@@ -121,6 +124,11 @@ class SettingsProxySingle(SettingsProxy):
         if setting.val != val:
             self.document.applyOperation(
                 document.OperationSettingSet(setting, val))
+            
+    def onSettingChangedIteratively(self, control, setting, vals):
+        """Change setting iteratively with multiple input values."""
+        val = vals[0]
+        self.onSettingChanged(control, setting, val)
 
     def onAction(self, action, console):
         """Run action on console."""
@@ -252,6 +260,22 @@ class SettingsProxyMulti(SettingsProxy):
             sname = self._root + '/' + sname
         for w in self.widgets:
             s = self.document.resolveSettingPath(None, w.path+'/'+sname)
+            if s.val != val:
+                ops.append(document.OperationSettingSet(s, val))
+        # apply all operations
+        if ops:
+            self.document.applyOperation(
+                document.OperationMultiple(ops, descr=_('change settings')))
+            
+    def onSettingChangedIteratively(self, control, setting, vals):
+        """Change a setting of widgets iteratively with multiple values."""
+        ops = []
+        sname = setting.name
+        if self._root:
+            sname = self._root + '/' + sname
+        for i, w in enumerate(self.widgets):
+            val = vals[i % len(vals)]
+            s = self.document.resolveSettingPath(None, w.path + '/' + sname)
             if s.val != val:
                 ops.append(document.OperationSettingSet(s, val))
         # apply all operations
@@ -392,8 +416,11 @@ class PropertyList(qt.QWidget):
             lab = SettingLabel(self.document, setn, setnsproxy)
             self.layout.addWidget(lab, row, 0)
             self.childlist.append(lab)
-
+            
             cntrl.sigSettingChanged.connect(setnsproxy.onSettingChanged)
+            if isinstance(cntrl, setting.ControlDataset):
+                cntrl.sigSettingChangedIteratively.connect(
+                    setnsproxy.onSettingChangedIteratively)
             self.layout.addWidget(cntrl, row, 1)
             self.childlist.append(cntrl)
             self.setncntrls[setn.name] = (lab, cntrl)
