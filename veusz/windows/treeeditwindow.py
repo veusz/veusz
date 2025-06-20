@@ -56,7 +56,7 @@ class SettingsProxy:
     def onSettingChanged(self, control, setting, val):
         """Called when a setting has been modified."""
 
-    def onIterativeSettingChanged(self, control, setting, vals):
+    def onSettingChangedIteratively(self, control, setting, vals):
         """Called when a setting has been modified with multiple values."""
 
     def onAction(self, action, console):
@@ -125,7 +125,7 @@ class SettingsProxySingle(SettingsProxy):
             self.document.applyOperation(
                 document.OperationSettingSet(setting, val))
             
-    def onIterativeSettingChanged(self, control, setting, vals):
+    def onSettingChangedIteratively(self, control, setting, vals):
         """Change setting iteratively with multiple input values."""
         val = vals[0]
         self.onSettingChanged(control, setting, val)
@@ -267,7 +267,7 @@ class SettingsProxyMulti(SettingsProxy):
             self.document.applyOperation(
                 document.OperationMultiple(ops, descr=_('change settings')))
             
-    def onIterativeSettingChanged(self, control, setting, vals):
+    def onSettingChangedIteratively(self, control, setting, vals):
         """Change a setting of widgets iteratively with multiple values."""
         ops = []
         sname = setting.name
@@ -418,7 +418,7 @@ class PropertyList(qt.QWidget):
             self.childlist.append(lab)
             cntrl.sigSettingChanged.connect(setnsproxy.onSettingChanged)
             if isinstance(cntrl, setting.ControlDataset):
-                cntrl.sigIterativeSettingChanged.connect(setnsproxy.onIterativeSettingChanged)
+                cntrl.sigSettingChangedIteratively.connect(setnsproxy.onSettingChangedIteratively)
             self.layout.addWidget(cntrl, row, 1)
             self.childlist.append(cntrl)
             self.setncntrls[setn.name] = (lab, cntrl)
