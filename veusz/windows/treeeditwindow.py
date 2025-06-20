@@ -416,9 +416,11 @@ class PropertyList(qt.QWidget):
             lab = SettingLabel(self.document, setn, setnsproxy)
             self.layout.addWidget(lab, row, 0)
             self.childlist.append(lab)
+            
             cntrl.sigSettingChanged.connect(setnsproxy.onSettingChanged)
             if isinstance(cntrl, setting.ControlDataset):
-                cntrl.sigSettingChangedIteratively.connect(setnsproxy.onSettingChangedIteratively)
+                cntrl.sigSettingChangedIteratively.connect(
+                    setnsproxy.onSettingChangedIteratively)
             self.layout.addWidget(cntrl, row, 1)
             self.childlist.append(cntrl)
             self.setncntrls[setn.name] = (lab, cntrl)
