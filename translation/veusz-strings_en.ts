@@ -1163,8 +1163,8 @@
     </message>
     <message>
       <location filename="./ui/capture.ui" line="87"/>
-      <source>...</source>
-      <translation>...</translation>
+      <source>…</source>
+      <translation>…</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/capturedialog.py" line="88"/>
@@ -1981,8 +1981,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="120"/>
-      <source>Define colormaps as (C1, C2, ...) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</source>
-      <translation>Define colormaps as (C1, C2, ...) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</translation>
+      <source>Define colormaps as (C1, C2, …) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</source>
+      <translation>Define colormaps as (C1, C2, …) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</translation>
     </message>
     <message>
       <location filename="./ui/custom.ui" line="162"/>
@@ -2006,8 +2006,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="190"/>
-      <source>Save...</source>
-      <translation>Save...</translation>
+      <source>Save…</source>
+      <translation>Save…</translation>
     </message>
     <message>
       <location filename="./ui/custom.ui" line="197"/>
@@ -2016,8 +2016,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="200"/>
-      <source>Load...</source>
-      <translation>Load...</translation>
+      <source>Load…</source>
+      <translation>Load…</translation>
     </message>
     <message>
       <location filename="./ui/custom.ui" line="207"/>
@@ -2333,13 +2333,13 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="147"/>
-      <source>Crea&amp;te...</source>
-      <translation>Crea&amp;te...</translation>
+      <source>Crea&amp;te…</source>
+      <translation>Crea&amp;te…</translation>
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="154"/>
-      <source>&amp;Import...</source>
-      <translation>&amp;Import...</translation>
+      <source>&amp;Import…</source>
+      <translation>&amp;Import…</translation>
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="177"/>
@@ -2549,8 +2549,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="609"/>
-      <source>Add...</source>
-      <translation>Add...</translation>
+      <source>Add…</source>
+      <translation>Add…</translation>
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="612"/>
@@ -3513,8 +3513,8 @@ Assumes x dataset increases in value.</translation>
     </message>
     <message>
       <location filename="./ui/export.ui" line="36"/>
-      <source>Browse...</source>
-      <translation>Browse...</translation>
+      <source>Browse…</source>
+      <translation>Browse…</translation>
     </message>
     <message>
       <location filename="./ui/export.ui" line="47"/>
@@ -4118,8 +4118,8 @@ This Veusz only supports document version %i.</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/export.py" line="473"/>
-      <source>Processing...</source>
-      <translation>Processing...</translation>
+      <source>Processing…</source>
+      <translation>Processing…</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/export.py" line="491"/>
@@ -6846,8 +6846,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="466"/>
-      <source>&amp;Open...</source>
-      <translation>&amp;Open...</translation>
+      <source>&amp;Open…</source>
+      <translation>&amp;Open…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="470"/>
@@ -6856,8 +6856,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="471"/>
-      <source>Reload...</source>
-      <translation>Reload...</translation>
+      <source>Reload…</source>
+      <translation>Reload…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="473"/>
@@ -6876,8 +6876,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="478"/>
-      <source>Save &amp;As...</source>
-      <translation>Save &amp;As...</translation>
+      <source>Save &amp;As…</source>
+      <translation>Save &amp;As…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="481"/>
@@ -6886,8 +6886,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="481"/>
-      <source>Trust...</source>
-      <translation>Trust...</translation>
+      <source>Trust…</source>
+      <translation>Trust…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="484"/>
@@ -6896,8 +6896,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="484"/>
-      <source>&amp;Print...</source>
-      <translation>&amp;Print...</translation>
+      <source>&amp;Print…</source>
+      <translation>&amp;Print…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="488"/>
@@ -6906,8 +6906,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="488"/>
-      <source>&amp;Export...</source>
-      <translation>&amp;Export...</translation>
+      <source>&amp;Export…</source>
+      <translation>&amp;Export…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="492"/>
@@ -6946,8 +6946,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="509"/>
-      <source>Preferences...</source>
-      <translation>Preferences...</translation>
+      <source>Preferences…</source>
+      <translation>Preferences…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="514"/>
@@ -6956,8 +6956,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="515"/>
-      <source>Custom definitions...</source>
-      <translation>Custom definitions...</translation>
+      <source>Custom definitions…</source>
+      <translation>Custom definitions…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="521"/>
@@ -6966,8 +6966,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="522"/>
-      <source>Default styles...</source>
-      <translation>Default styles...</translation>
+      <source>Default styles…</source>
+      <translation>Default styles…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="526"/>
@@ -7076,8 +7076,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="558"/>
-      <source>&amp;Import...</source>
-      <translation>&amp;Import...</translation>
+      <source>&amp;Import…</source>
+      <translation>&amp;Import…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="561"/>
@@ -7086,8 +7086,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="561"/>
-      <source>&amp;Editor...</source>
-      <translation>&amp;Editor...</translation>
+      <source>&amp;Editor…</source>
+      <translation>&amp;Editor…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="564"/>
@@ -7096,8 +7096,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="564"/>
-      <source>&amp;Create...</source>
-      <translation>&amp;Create...</translation>
+      <source>&amp;Create…</source>
+      <translation>&amp;Create…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="567"/>
@@ -7106,8 +7106,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="567"/>
-      <source>Create &amp;2D...</source>
-      <translation>Create &amp;2D...</translation>
+      <source>Create &amp;2D…</source>
+      <translation>Create &amp;2D…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="570"/>
@@ -7116,8 +7116,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="570"/>
-      <source>Ca&amp;pture...</source>
-      <translation>Ca&amp;pture...</translation>
+      <source>Ca&amp;pture…</source>
+      <translation>Ca&amp;pture…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="573"/>
@@ -7126,8 +7126,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="573"/>
-      <source>&amp;Filter...</source>
-      <translation>&amp;Filter...</translation>
+      <source>&amp;Filter…</source>
+      <translation>&amp;Filter…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="576"/>
@@ -7136,8 +7136,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="576"/>
-      <source>&amp;Histogram...</source>
-      <translation>&amp;Histogram...</translation>
+      <source>&amp;Histogram…</source>
+      <translation>&amp;Histogram…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="579"/>
@@ -7191,8 +7191,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="596"/>
-      <source>About...</source>
-      <translation>About...</translation>
+      <source>About…</source>
+      <translation>About…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="601"/>
@@ -8900,8 +8900,8 @@ Set to 0 to disable threads.</translation>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="139"/>
-      <source>Browse...</source>
-      <translation>Browse...</translation>
+      <source>Browse…</source>
+      <translation>Browse…</translation>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="149"/>
@@ -9126,8 +9126,8 @@ to be loaded.</translation>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="451"/>
-      <source>Add...</source>
-      <translation>Add...</translation>
+      <source>Add…</source>
+      <translation>Add…</translation>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="458"/>
@@ -10192,8 +10192,8 @@ to be loaded.</translation>
     </message>
     <message>
       <location filename="./ui/stylesheet.ui" line="94"/>
-      <source>Save...</source>
-      <translation>Save...</translation>
+      <source>Save…</source>
+      <translation>Save…</translation>
     </message>
     <message>
       <location filename="./ui/stylesheet.ui" line="104"/>
@@ -10212,8 +10212,8 @@ to be loaded.</translation>
     </message>
     <message>
       <location filename="./ui/stylesheet.ui" line="107"/>
-      <source>Load...</source>
-      <translation>Load...</translation>
+      <source>Load…</source>
+      <translation>Load…</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/stylesheet.py" line="116"/>
@@ -11476,7 +11476,7 @@ document.&lt;/p&gt;
 &lt;p&gt;Let us start by importing data.&lt;/p&gt;
 
 &lt;p class="usercmd"&gt;Click the flashing Data Import icon, or choose
-"Import..."  From the Data menu.&lt;/p&gt;
+"Import…"  From the Data menu.&lt;/p&gt;
 </source>
       <translation>
 &lt;h1&gt;Importing data&lt;/h1&gt;
@@ -11484,7 +11484,7 @@ document.&lt;/p&gt;
 &lt;p&gt;Let us start by importing data.&lt;/p&gt;
 
 &lt;p class="usercmd"&gt;Click the flashing Data Import icon, or choose
-"Import..."  From the Data menu.&lt;/p&gt;
+"Import…"  From the Data menu.&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11722,7 +11722,7 @@ option.&lt;/p&gt;
 &lt;h1&gt;Saving&lt;/h1&gt;
 
 &lt;p&gt;The document can be saved under the File menu, choosing "Save
-as...", or by clicking on the Save icon (flashing).&lt;/p&gt;
+as…", or by clicking on the Save icon (flashing).&lt;/p&gt;
 
 &lt;p&gt;Veusz documents are simple text files which can be easily modified
 outside the program.&lt;/p&gt;
@@ -11733,7 +11733,7 @@ outside the program.&lt;/p&gt;
 &lt;h1&gt;Saving&lt;/h1&gt;
 
 &lt;p&gt;The document can be saved under the File menu, choosing "Save
-as...", or by clicking on the Save icon (flashing).&lt;/p&gt;
+as…", or by clicking on the Save icon (flashing).&lt;/p&gt;
 
 &lt;p&gt;Veusz documents are simple text files which can be easily modified
 outside the program.&lt;/p&gt;
@@ -11749,7 +11749,7 @@ outside the program.&lt;/p&gt;
 &lt;p&gt;The document can be exported in scalable (EPS, PDF, SVG and EMF) or
 bitmap formats.&lt;/p&gt;
 
-&lt;p&gt;The "Export..." command under the File menu exports the selected
+&lt;p&gt;The "Export…" command under the File menu exports the selected
 page. Alternatively, click on the Export icon (flashing).&lt;/p&gt;
 
 &lt;p class="usercmd"&gt;Click Next to continue&lt;/p&gt;
@@ -11760,7 +11760,7 @@ page. Alternatively, click on the Export icon (flashing).&lt;/p&gt;
 &lt;p&gt;The document can be exported in scalable (EPS, PDF, SVG and EMF) or
 bitmap formats.&lt;/p&gt;
 
-&lt;p&gt;The "Export..." command under the File menu exports the selected
+&lt;p&gt;The "Export…" command under the File menu exports the selected
 page. Alternatively, click on the Export icon (flashing).&lt;/p&gt;
 
 &lt;p class="usercmd"&gt;Click Next to continue&lt;/p&gt;
@@ -12652,8 +12652,8 @@ separated by |</translation>
     </message>
     <message>
       <location filename="./ui/import.ui" line="45"/>
-      <source>&amp;Browse...</source>
-      <translation>&amp;Browse...</translation>
+      <source>&amp;Browse…</source>
+      <translation>&amp;Browse…</translation>
     </message>
     <message>
       <location filename="./ui/import.ui" line="52"/>
@@ -12991,7 +12991,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Oxygen-Sans'; font-size:10pt; font-weight:400; font-style:normal;"&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;File should consist of either:&lt;/p&gt;
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;1. A set of numbers, in free-form style, and the shape specified above or using the command &amp;quot;shape A B C...&amp;quot; in the file. Shapes should be positive integers, though one dimension can be -1 to automatically detect the length.&lt;/p&gt;
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;1. A set of numbers, in free-form style, and the shape specified above or using the command &amp;quot;shape A B C…&amp;quot; in the file. Shapes should be positive integers, though one dimension can be -1 to automatically detect the length.&lt;/p&gt;
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;2. A set of numbers arranged in rows and columns. 1D datasets are on a single row, 2D datasets are a set of 1D rows, 3D as a set of 2D datasets separated by blank rows, 4D as a set of 3D datasets separated by two blank rows, etc.&lt;/p&gt;
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;br /&gt;&lt;/p&gt;
@@ -13003,7 +13003,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Oxygen-Sans'; font-size:10pt; font-weight:400; font-style:normal;"&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;File should consist of either:&lt;/p&gt;
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;1. A set of numbers, in free-form style, and the shape specified above or using the command &amp;quot;shape A B C...&amp;quot; in the file. Shapes should be positive integers, though one dimension can be -1 to automatically detect the length.&lt;/p&gt;
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;1. A set of numbers, in free-form style, and the shape specified above or using the command &amp;quot;shape A B C…&amp;quot; in the file. Shapes should be positive integers, though one dimension can be -1 to automatically detect the length.&lt;/p&gt;
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;2. A set of numbers arranged in rows and columns. 1D datasets are on a single row, 2D datasets are a set of 1D rows, 3D as a set of 2D datasets separated by blank rows, 4D as a set of 3D datasets separated by two blank rows, etc.&lt;/p&gt;
 &lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;br /&gt;&lt;/p&gt;

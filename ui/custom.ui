@@ -117,7 +117,7 @@
        <item>
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Define colormaps as (C1, C2, ...) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</string>
+          <string>Define colormaps as (C1, C2, …) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -187,7 +187,7 @@
         <string>Save definitions to a vsz script file</string>
        </property>
        <property name="text">
-        <string>Save...</string>
+        <string>Save…</string>
        </property>
       </widget>
      </item>
@@ -197,7 +197,7 @@
         <string>Load definitions from a vsz script file</string>
        </property>
        <property name="text">
-        <string>Load...</string>
+        <string>Load…</string>
        </property>
       </widget>
      </item>

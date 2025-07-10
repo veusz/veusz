@@ -606,7 +606,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
                 if tag:
                     self.doc.applyOperation( document.OperationDataTag(
                         tag, dsnames) )
-        tagmenu.addAction(_("Add..."), addtag)
+        tagmenu.addAction(_("Add…"), addtag)
 
         # copy
         menu.addAction(_("Copy"), _copy)

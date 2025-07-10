@@ -136,7 +136,7 @@ class ImportTabCSV(importdialog.ImportTab):
                     row = next(reader)
                     rows.append(row)
                     numcols = max(numcols, len(row))
-                rows.append(['...'])
+                rows.append(['…'])
                 numcols = max(numcols, 1)
             except StopIteration:
                 pass

@@ -332,7 +332,7 @@ class DataImport(TutorialStep):
 <p>Let us start by importing data.</p>
 
 <p class="usercmd">Click the flashing Data Import icon, or choose
-"Import..."  From the Data menu.</p>
+"Import…"  From the Data menu.</p>
 '''), mainwin,
             flash=mainwin.datatoolbar.widgetForAction(
                 mainwin.vzactions['data.import']),
@@ -595,7 +595,7 @@ class File1(TutorialStep):
 <h1>Saving</h1>
 
 <p>The document can be saved under the File menu, choosing "Save
-as...", or by clicking on the Save icon (flashing).</p>
+as…", or by clicking on the Save icon (flashing).</p>
 
 <p>Veusz documents are simple text files which can be easily modified
 outside the program.</p>
@@ -615,7 +615,7 @@ class File2(TutorialStep):
 <p>The document can be exported in scalable (EPS, PDF, SVG and EMF) or
 bitmap formats.</p>
 
-<p>The "Export..." command under the File menu exports the selected
+<p>The "Export…" command under the File menu exports the selected
 page. Alternatively, click on the Export icon (flashing).</p>
 
 <p class="usercmd">Click Next to continue</p>

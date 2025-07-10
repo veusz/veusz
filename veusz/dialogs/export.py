@@ -470,7 +470,7 @@ class ExportDialog(VeuszDialog):
             setting.settingdb['dirname_export'] = dirname
 
         # format feedback
-        self.showMessage(_('Processing...'))
+        self.showMessage(_('Processing…'))
 
         self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Close).setEnabled(False)
         self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Save).setEnabled(False)
