@@ -1159,7 +1159,7 @@
     </message>
     <message>
       <location filename="./ui/capture.ui" line="87"/>
-      <source>...</source>
+      <source>…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -1936,7 +1936,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="120"/>
-      <source>Define colormaps as (C1, C2, ...) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</source>
+      <source>Define colormaps as (C1, C2, …) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -1961,7 +1961,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="190"/>
-      <source>Save...</source>
+      <source>Save…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -1971,7 +1971,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="200"/>
-      <source>Load...</source>
+      <source>Load…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -2284,12 +2284,12 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="147"/>
-      <source>Crea&amp;te...</source>
+      <source>Crea&amp;te…</source>
       <translation type="unfinished"/>
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="154"/>
-      <source>&amp;Import...</source>
+      <source>&amp;Import…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -2500,7 +2500,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="603"/>
-      <source>Add...</source>
+      <source>Add…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -3454,7 +3454,7 @@ Assumes x dataset increases in value.</source>
     </message>
     <message>
       <location filename="./ui/export.ui" line="36"/>
-      <source>Browse...</source>
+      <source>Browse…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -4041,7 +4041,7 @@ This Veusz only supports document version %i.</source>
     </message>
     <message>
       <location filename="./veusz/dialogs/export.py" line="470"/>
-      <source>Processing...</source>
+      <source>Processing…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6706,7 +6706,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="459"/>
-      <source>&amp;Open...</source>
+      <source>&amp;Open…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6716,7 +6716,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="464"/>
-      <source>Reload...</source>
+      <source>Reload…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6736,7 +6736,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="471"/>
-      <source>Save &amp;As...</source>
+      <source>Save &amp;As…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6746,7 +6746,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="474"/>
-      <source>Trust...</source>
+      <source>Trust…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6756,7 +6756,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="477"/>
-      <source>&amp;Print...</source>
+      <source>&amp;Print…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6766,7 +6766,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="481"/>
-      <source>&amp;Export...</source>
+      <source>&amp;Export…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6806,7 +6806,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="502"/>
-      <source>Preferences...</source>
+      <source>Preferences…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6816,7 +6816,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="508"/>
-      <source>Custom definitions...</source>
+      <source>Custom definitions…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6826,7 +6826,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="515"/>
-      <source>Default styles...</source>
+      <source>Default styles…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6936,7 +6936,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="551"/>
-      <source>&amp;Import...</source>
+      <source>&amp;Import…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6946,7 +6946,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="554"/>
-      <source>&amp;Editor...</source>
+      <source>&amp;Editor…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6956,7 +6956,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="557"/>
-      <source>&amp;Create...</source>
+      <source>&amp;Create…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6966,7 +6966,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="560"/>
-      <source>Create &amp;2D...</source>
+      <source>Create &amp;2D…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6976,7 +6976,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="563"/>
-      <source>Ca&amp;pture...</source>
+      <source>Ca&amp;pture…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6986,7 +6986,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="566"/>
-      <source>&amp;Filter...</source>
+      <source>&amp;Filter…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6996,7 +6996,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="569"/>
-      <source>&amp;Histogram...</source>
+      <source>&amp;Histogram…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -7051,7 +7051,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="589"/>
-      <source>About...</source>
+      <source>About…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -8725,7 +8725,7 @@ Set to 0 to disable threads.</source>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="493"/>
-      <source>Browse...</source>
+      <source>Browse…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -8938,7 +8938,7 @@ to be loaded.</source>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="536"/>
-      <source>Add...</source>
+      <source>Add…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -10004,7 +10004,7 @@ to be loaded.</source>
     </message>
     <message>
       <location filename="./ui/stylesheet.ui" line="94"/>
-      <source>Save...</source>
+      <source>Save…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -10024,7 +10024,7 @@ to be loaded.</source>
     </message>
     <message>
       <location filename="./ui/stylesheet.ui" line="107"/>
-      <source>Load...</source>
+      <source>Load…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -11162,7 +11162,7 @@ document.&lt;/p&gt;
 &lt;p&gt;Let us start by importing data.&lt;/p&gt;
 
 &lt;p class=&quot;usercmd&quot;&gt;Click the flashing Data Import icon, or choose
-&quot;Import...&quot;  From the Data menu.&lt;/p&gt;
+&quot;Import…&quot;  From the Data menu.&lt;/p&gt;
 </source>
       <translation type="unfinished"/>
     </message>
@@ -11319,7 +11319,7 @@ option.&lt;/p&gt;
 &lt;h1&gt;Saving&lt;/h1&gt;
 
 &lt;p&gt;The document can be saved under the File menu, choosing &quot;Save
-as...&quot;, or by clicking on the Save icon (flashing).&lt;/p&gt;
+as…&quot;, or by clicking on the Save icon (flashing).&lt;/p&gt;
 
 &lt;p&gt;Veusz documents are simple text files which can be easily modified
 outside the program.&lt;/p&gt;
@@ -11336,7 +11336,7 @@ outside the program.&lt;/p&gt;
 &lt;p&gt;The document can be exported in scalable (EPS, PDF, SVG and EMF) or
 bitmap formats.&lt;/p&gt;
 
-&lt;p&gt;The &quot;Export...&quot; command under the File menu exports the selected
+&lt;p&gt;The &quot;Export…&quot; command under the File menu exports the selected
 page. Alternatively, click on the Export icon (flashing).&lt;/p&gt;
 
 &lt;p class=&quot;usercmd&quot;&gt;Click Next to continue&lt;/p&gt;
@@ -12167,7 +12167,7 @@ separated by |</source>
     </message>
     <message>
       <location filename="./ui/import.ui" line="45"/>
-      <source>&amp;Browse...</source>
+      <source>&amp;Browse…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -12498,7 +12498,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Oxygen-Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;File should consist of either:&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. A set of numbers, in free-form style, and the shape specified above or using the command &amp;quot;shape A B C...&amp;quot; in the file. Shapes should be positive integers, though one dimension can be -1 to automatically detect the length.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. A set of numbers, in free-form style, and the shape specified above or using the command &amp;quot;shape A B C…&amp;quot; in the file. Shapes should be positive integers, though one dimension can be -1 to automatically detect the length.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. A set of numbers arranged in rows and columns. 1D datasets are on a single row, 2D datasets are a set of 1D rows, 3D as a set of 2D datasets separated by blank rows, 4D as a set of 3D datasets separated by two blank rows, etc.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;

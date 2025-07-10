@@ -1159,8 +1159,8 @@
     </message>
     <message>
       <location filename="./ui/capture.ui" line="87"/>
-      <source>...</source>
-      <translation>...</translation>
+      <source>…</source>
+      <translation>…</translation>
     </message>
     <message>
       <location filename="./ui/capture.ui" line="99"/>
@@ -1967,8 +1967,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="120"/>
-      <source>Define colormaps as (C1, C2, ...) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</source>
-      <translation>定义颜色表为(C1, C2, ...)，其中CX是一个由(R,G,B)或(R,G,B,A)定义的颜色。R,G,B和A是介于0和255之间的整数(红,绿,蓝和alpha)。使用(-1,0,0,0)作为第一个条目定义一个阶梯颜色表。</translation>
+      <source>Define colormaps as (C1, C2, …) where CX is a color specified as (R,G,B) or (R,G,B,A), where R,G,B and A are integers between 0 and 255 (red, green, blue and alpha). Specify a stepped colormap using (-1,0,0,0) as the first entry.</source>
+      <translation>定义颜色表为(C1, C2, …)，其中CX是一个由(R,G,B)或(R,G,B,A)定义的颜色。R,G,B和A是介于0和255之间的整数(红,绿,蓝和alpha)。使用(-1,0,0,0)作为第一个条目定义一个阶梯颜色表。</translation>
     </message>
     <message>
       <location filename="./ui/custom.ui" line="162"/>
@@ -1992,8 +1992,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="190"/>
-      <source>Save...</source>
-      <translation>保存...</translation>
+      <source>Save…</source>
+      <translation>保存…</translation>
     </message>
     <message>
       <location filename="./ui/custom.ui" line="197"/>
@@ -2002,8 +2002,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/custom.ui" line="200"/>
-      <source>Load...</source>
-      <translation>加载...</translation>
+      <source>Load…</source>
+      <translation>加载…</translation>
     </message>
     <message>
       <location filename="./ui/custom.ui" line="207"/>
@@ -2319,13 +2319,13 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="147"/>
-      <source>Crea&amp;te...</source>
-      <translation>创建(&amp;t)...</translation>
+      <source>Crea&amp;te…</source>
+      <translation>创建(&amp;t)…</translation>
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="154"/>
-      <source>&amp;Import...</source>
-      <translation>导入(&amp;I)...</translation>
+      <source>&amp;Import…</source>
+      <translation>导入(&amp;I)…</translation>
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="177"/>
@@ -2535,8 +2535,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="603"/>
-      <source>Add...</source>
-      <translation>添加...</translation>
+      <source>Add…</source>
+      <translation>添加…</translation>
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="606"/>
@@ -3498,8 +3498,8 @@ Assumes x dataset increases in value.</source>
     </message>
     <message>
       <location filename="./ui/export.ui" line="36"/>
-      <source>Browse...</source>
-      <translation>浏览...</translation>
+      <source>Browse…</source>
+      <translation>浏览…</translation>
     </message>
     <message>
       <location filename="./ui/export.ui" line="47"/>
@@ -4093,8 +4093,8 @@ This Veusz only supports document version %i.</source>
     </message>
     <message>
       <location filename="./veusz/dialogs/export.py" line="470"/>
-      <source>Processing...</source>
-      <translation>处理中...</translation>
+      <source>Processing…</source>
+      <translation>处理中…</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/export.py" line="488"/>
@@ -6791,8 +6791,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="459"/>
-      <source>&amp;Open...</source>
-      <translation>打开(&amp;O)...</translation>
+      <source>&amp;Open…</source>
+      <translation>打开(&amp;O)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="463"/>
@@ -6801,8 +6801,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="464"/>
-      <source>Reload...</source>
-      <translation>重新载入...</translation>
+      <source>Reload…</source>
+      <translation>重新载入…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="466"/>
@@ -6821,8 +6821,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="471"/>
-      <source>Save &amp;As...</source>
-      <translation>另存为(&amp;A)...</translation>
+      <source>Save &amp;As…</source>
+      <translation>另存为(&amp;A)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="474"/>
@@ -6831,7 +6831,7 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="474"/>
-      <source>Trust...</source>
+      <source>Trust…</source>
       <translation type="unfinished"/>
     </message>
     <message>
@@ -6841,8 +6841,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="477"/>
-      <source>&amp;Print...</source>
-      <translation>打印(&amp;P)...</translation>
+      <source>&amp;Print…</source>
+      <translation>打印(&amp;P)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="481"/>
@@ -6851,8 +6851,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="481"/>
-      <source>&amp;Export...</source>
-      <translation>导出(&amp;E)...</translation>
+      <source>&amp;Export…</source>
+      <translation>导出(&amp;E)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="485"/>
@@ -6891,8 +6891,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="502"/>
-      <source>Preferences...</source>
-      <translation>首选项...</translation>
+      <source>Preferences…</source>
+      <translation>首选项…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="507"/>
@@ -6901,8 +6901,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="508"/>
-      <source>Custom definitions...</source>
-      <translation>自定义描述...</translation>
+      <source>Custom definitions…</source>
+      <translation>自定义描述…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="514"/>
@@ -6911,8 +6911,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="515"/>
-      <source>Default styles...</source>
-      <translation>默认样式...</translation>
+      <source>Default styles…</source>
+      <translation>默认样式…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="519"/>
@@ -7021,8 +7021,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="551"/>
-      <source>&amp;Import...</source>
-      <translation>导入(&amp;I)...</translation>
+      <source>&amp;Import…</source>
+      <translation>导入(&amp;I)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="554"/>
@@ -7031,8 +7031,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="554"/>
-      <source>&amp;Editor...</source>
-      <translation>编辑器(&amp;E)...</translation>
+      <source>&amp;Editor…</source>
+      <translation>编辑器(&amp;E)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="557"/>
@@ -7041,8 +7041,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="557"/>
-      <source>&amp;Create...</source>
-      <translation>创建(&amp;C)...</translation>
+      <source>&amp;Create…</source>
+      <translation>创建(&amp;C)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="560"/>
@@ -7051,8 +7051,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="560"/>
-      <source>Create &amp;2D...</source>
-      <translation>创建&amp;2D...</translation>
+      <source>Create &amp;2D…</source>
+      <translation>创建&amp;2D…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="563"/>
@@ -7061,8 +7061,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="563"/>
-      <source>Ca&amp;pture...</source>
-      <translation>捕获(&amp;P）...</translation>
+      <source>Ca&amp;pture…</source>
+      <translation>捕获(&amp;P）…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="566"/>
@@ -7071,8 +7071,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="566"/>
-      <source>&amp;Filter...</source>
-      <translation>过滤(&amp;F)...</translation>
+      <source>&amp;Filter…</source>
+      <translation>过滤(&amp;F)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="569"/>
@@ -7081,8 +7081,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="569"/>
-      <source>&amp;Histogram...</source>
-      <translation>直方图(&amp;H)...</translation>
+      <source>&amp;Histogram…</source>
+      <translation>直方图(&amp;H)…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="572"/>
@@ -7136,8 +7136,8 @@ Example syntax: 2:20
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="589"/>
-      <source>About...</source>
-      <translation>关于...</translation>
+      <source>About…</source>
+      <translation>关于…</translation>
     </message>
     <message>
       <location filename="./veusz/windows/mainwindow.py" line="594"/>
@@ -8818,8 +8818,8 @@ Set to 0 to disable threads.</source>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="493"/>
-      <source>Browse...</source>
-      <translation>浏览...</translation>
+      <source>Browse…</source>
+      <translation>浏览…</translation>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="149"/>
@@ -9033,8 +9033,8 @@ to be loaded.</source>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="536"/>
-      <source>Add...</source>
-      <translation>添加...</translation>
+      <source>Add…</source>
+      <translation>添加…</translation>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="435"/>
@@ -10099,8 +10099,8 @@ to be loaded.</source>
     </message>
     <message>
       <location filename="./ui/stylesheet.ui" line="94"/>
-      <source>Save...</source>
-      <translation>保存...</translation>
+      <source>Save…</source>
+      <translation>保存…</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/stylesheet.py" line="121"/>
@@ -10119,8 +10119,8 @@ to be loaded.</source>
     </message>
     <message>
       <location filename="./ui/stylesheet.ui" line="107"/>
-      <source>Load...</source>
-      <translation>加载...</translation>
+      <source>Load…</source>
+      <translation>加载…</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/stylesheet.py" line="127"/>
@@ -11329,12 +11329,12 @@ document.&lt;/p&gt;
 &lt;p&gt;Let us start by importing data.&lt;/p&gt;
 
 &lt;p class=&quot;usercmd&quot;&gt;Click the flashing Data Import icon, or choose
-&quot;Import...&quot;  From the Data menu.&lt;/p&gt;
+&quot;Import…&quot;  From the Data menu.&lt;/p&gt;
 </source>
       <translation>
 &lt;h1&gt;导入数据&lt;/h1&gt;
 &lt;p&gt;让我们从导入数据开始。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击闪烁的数据导入图标，或从数据菜单中。选择 &quot;导入...&quot;  &lt;/p&gt;
+&lt;p class=&quot;usercmd&quot;&gt;点击闪烁的数据导入图标，或从数据菜单中。选择 &quot;导入…&quot;  &lt;/p&gt;
 
 </translation>
     </message>
@@ -11529,7 +11529,7 @@ option.&lt;/p&gt;
 &lt;h1&gt;Saving&lt;/h1&gt;
 
 &lt;p&gt;The document can be saved under the File menu, choosing &quot;Save
-as...&quot;, or by clicking on the Save icon (flashing).&lt;/p&gt;
+as…&quot;, or by clicking on the Save icon (flashing).&lt;/p&gt;
 
 &lt;p&gt;Veusz documents are simple text files which can be easily modified
 outside the program.&lt;/p&gt;
@@ -11538,7 +11538,7 @@ outside the program.&lt;/p&gt;
 </source>
       <translation>
 &lt;h1&gt;保存&lt;/h1&gt;
-&lt;p&gt;文件可以在 &quot;文件 &quot;菜单下选择 &quot;另存为......&quot;，或点击 &quot;保存 &quot;图标（闪烁）来保存。&lt;/p&gt;
+&lt;p&gt;文件可以在 &quot;文件 &quot;菜单下选择 &quot;另存为……&quot;，或点击 &quot;保存 &quot;图标（闪烁）来保存。&lt;/p&gt;
 &lt;p&gt;Veusz文件是简单的文本文件，可以很容易地在程序之外修改 。&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;点击 &quot;下一步 &quot;继续&lt;/p&gt;
 </translation>
@@ -11551,7 +11551,7 @@ outside the program.&lt;/p&gt;
 &lt;p&gt;The document can be exported in scalable (EPS, PDF, SVG and EMF) or
 bitmap formats.&lt;/p&gt;
 
-&lt;p&gt;The &quot;Export...&quot; command under the File menu exports the selected
+&lt;p&gt;The &quot;Export…&quot; command under the File menu exports the selected
 page. Alternatively, click on the Export icon (flashing).&lt;/p&gt;
 
 &lt;p class=&quot;usercmd&quot;&gt;Click Next to continue&lt;/p&gt;
@@ -11559,7 +11559,7 @@ page. Alternatively, click on the Export icon (flashing).&lt;/p&gt;
       <translation>
 &lt;h1&gt;导出&lt;/h1&gt;
 &lt;p&gt;文档可以导出为（EPS、PDF、SVG和EMF）或 位图格式。&lt;/p&gt;
-&lt;p&gt;在 &quot;文件 &quot;菜单下的 &quot;导出... &quot;命令可以导出所选的 的页面。或者，点击 &quot;导出 &quot;图标（闪烁）。&lt;/p&gt;
+&lt;p&gt;在 &quot;文件 &quot;菜单下的 &quot;导出… &quot;命令可以导出所选的 的页面。或者，点击 &quot;导出 &quot;图标（闪烁）。&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;点击 &quot;下一步 &quot;继续&lt;/p&gt;
 </translation>
     </message>
@@ -12430,8 +12430,8 @@ hh、h、mm、m、ss和s的组合</translation>
     </message>
     <message>
       <location filename="./ui/import.ui" line="45"/>
-      <source>&amp;Browse...</source>
-      <translation>浏览(&amp;B)...</translation>
+      <source>&amp;Browse…</source>
+      <translation>浏览(&amp;B)…</translation>
     </message>
     <message>
       <location filename="./ui/import.ui" line="52"/>
@@ -12769,7 +12769,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Oxygen-Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;File should consist of either:&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. A set of numbers, in free-form style, and the shape specified above or using the command &amp;quot;shape A B C...&amp;quot; in the file. Shapes should be positive integers, though one dimension can be -1 to automatically detect the length.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. A set of numbers, in free-form style, and the shape specified above or using the command &amp;quot;shape A B C…&amp;quot; in the file. Shapes should be positive integers, though one dimension can be -1 to automatically detect the length.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. A set of numbers arranged in rows and columns. 1D datasets are on a single row, 2D datasets are a set of 1D rows, 3D as a set of 2D datasets separated by blank rows, 4D as a set of 3D datasets separated by two blank rows, etc.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -12778,7 +12778,7 @@ p, li { white-space: pre-wrap; }
       <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 预留空白空间&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Oxygen-Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;文件应包括以下内容之一：&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. 一组数字，自由格式，以及上面指定的形状或使用文件中的&amp;quot;形状A B C...&amp;quot;命令。形状应该是正整数，尽管一个维度可以是-1，以自动检测长度。&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. 一组数字，自由格式，以及上面指定的形状或使用文件中的&amp;quot;形状A B C…&amp;quot;命令。形状应该是正整数，尽管一个维度可以是-1，以自动检测长度。&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. 一组数字按行和列排列。一维数据集在单行上，二维数据集是一组一维行，三维是一组由空白行分隔的二维数据集，四维是一组由两个空白行分隔的三维数据集，等等。&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;数据以C格式排序，最右边的索引增加得最快。可以用transpose选项来改变这个选项。这也可以在文件中包括一个包含&amp;quot;transpose&amp;quot;的单行。&lt;/p&gt;
