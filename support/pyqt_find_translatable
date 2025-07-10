@@ -106,7 +106,7 @@ class PythonMessageVisitor(ast.NodeVisitor):
 
         # convert arguments to text
         try:
-            args = [a.s for a in obj.args]
+            args = [a.value for a in obj.args]
             keywords = dict([(a.arg, a.value.s) for a in obj.keywords])
         except AttributeError:
             sys.stderr.write(
@@ -168,7 +168,7 @@ class PythonMessageVisitor(ast.NodeVisitor):
 
         contextidx = argids.index('context')
         try:
-            context = args.defaults[contextidx-1].s
+            context = args.defaults[contextidx-1].value
         except AttributeError:
             sys.stderr.write(
                 "WARNING: Translation function definition %s in "
@@ -228,7 +228,8 @@ class TSWriter:
 
         # blank translated text
         ntranslation = etree.SubElement(nmessage, 'translation')
-        ntranslation.set('type', 'unfinished')
+        ntranslation.text = message.string
+        #ntranslation.set('type', 'unfinished')
 
     def add_context_to_root(self, nroot, contextname, messages):
         '''Add a new context tag to the root node given.'''
