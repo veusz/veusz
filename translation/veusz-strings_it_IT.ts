@@ -1,10 +1,10 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.0" language="it_IT">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.0" language="it">
   <context>
     <name>AboutDialog</name>
     <message>
       <location filename="./ui/about.ui" line="14"/>
       <source>About Veusz</source>
-      <translation type="unfinished"/>
+      <translation>Informazioni su Veusz</translation>
     </message>
     <message>
       <location filename="./ui/about.ui" line="62"/>
@@ -14,7 +14,7 @@
     <message>
       <location filename="./ui/about.ui" line="108"/>
       <source>Show license</source>
-      <translation type="unfinished"/>
+      <translation>Consulta licenza</translation>
     </message>
     <message>
       <location filename="./ui/about.ui" line="118"/>
@@ -24,7 +24,7 @@
     <message>
       <location filename="./ui/about.ui" line="125"/>
       <source>OK</source>
-      <translation type="unfinished"/>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -32,167 +32,167 @@
     <message>
       <location filename="./veusz/widgets/axis.py" line="48"/>
       <source>Length of major ticks</source>
-      <translation type="unfinished"/>
+      <translation>Lunghezza graduazioni principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="75"/>
       <source>Length</source>
-      <translation type="unfinished"/>
+      <translation>Lunghezza</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="53"/>
       <source>Number of major ticks to aim for</source>
-      <translation type="unfinished"/>
+      <translation>Numero graduazioni principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="80"/>
       <source>Number</source>
-      <translation type="unfinished"/>
+      <translation>Numero</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="84"/>
       <source>List of tick values overriding defaults</source>
-      <translation type="unfinished"/>
+      <translation>Lista di valori di graduazione diversi dai predefiniti</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="85"/>
       <source>Manual ticks</source>
-      <translation type="unfinished"/>
+      <translation>Graduazione manuale</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="74"/>
       <source>Length of minor ticks</source>
-      <translation type="unfinished"/>
+      <translation>Lunghezza graduazioni minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="79"/>
       <source>Number of minor ticks to aim for</source>
-      <translation type="unfinished"/>
+      <translation>Numero di graduazioni minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="103"/>
       <source>Put grid lines on top of graph</source>
-      <translation type="unfinished"/>
+      <translation>Visualizza griglia sopra al grafico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="104"/>
       <source>On top</source>
-      <translation type="unfinished"/>
+      <translation>Sopra</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="123"/>
       <source>Place axis label close to edge of graph</source>
-      <translation type="unfinished"/>
+      <translation>Disponi etichetta asse a margine del grafico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="124"/>
       <source>At edge</source>
-      <translation type="unfinished"/>
+      <translation>Al margine</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="132"/>
       <source>Additional offset of axis label from axis tick labels</source>
-      <translation type="unfinished"/>
+      <translation>Scostamento tra etichetta asse e segni di graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="133"/>
       <source>Label offset</source>
-      <translation type="unfinished"/>
+      <translation>Scostamento etichetta</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="138"/>
       <source>Position of axis label</source>
-      <translation type="unfinished"/>
+      <translation>Posizione etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="139"/>
       <source>Position</source>
-      <translation type="unfinished"/>
+      <translation>Posizione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="146"/>
       <source>Automatic</source>
-      <translation type="unfinished"/>
+      <translation>Automatico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="147"/>
       <source>General numerical format</source>
-      <translation type="unfinished"/>
+      <translation>Formato numerico generale</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="148"/>
       <source>Scientific notation</source>
-      <translation type="unfinished"/>
+      <translation>Notazione scientifica</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="149"/>
       <source>Engineering suffix notation</source>
-      <translation type="unfinished"/>
+      <translation>Notazione suffisso ingegneristico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="150"/>
       <source>C-style general format</source>
-      <translation type="unfinished"/>
+      <translation>Formato generale in stile C</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="151"/>
       <source>C-style scientific notation</source>
-      <translation type="unfinished"/>
+      <translation>Notazione scientifica in stile C</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="152"/>
       <source>2 decimal places always shown</source>
-      <translation type="unfinished"/>
+      <translation>Visualizza sempre 2 cifre decimali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="159"/>
       <source>Angle by which to rotate label by</source>
-      <translation type="unfinished"/>
+      <translation>Angolo di rotazione etichetta</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="160"/>
       <source>Rotate</source>
-      <translation type="unfinished"/>
+      <translation>Ruota</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="165"/>
       <source>Format of the tick labels</source>
-      <translation type="unfinished"/>
+      <translation>Formato dei segni di graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="167"/>
       <source>Format</source>
-      <translation type="unfinished"/>
+      <translation>Formato</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="171"/>
       <source>A scale factor to apply to the values of the tick labels</source>
-      <translation type="unfinished"/>
+      <translation>Fattore di scala da applicare alla graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="416"/>
       <source>Scale</source>
-      <translation type="unfinished"/>
+      <translation>Scala</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="177"/>
       <source>Additional offset of axis tick labels from axis</source>
-      <translation type="unfinished"/>
+      <translation>Scostamento tra graduazione ed asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="178"/>
       <source>Tick offset</source>
-      <translation type="unfinished"/>
+      <translation>Scostamento segni di graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="229"/>
       <source>If axis range not specified, use range of data and this setting</source>
-      <translation type="unfinished"/>
+      <translation>Se l&apos;estensione dell&apos;asse è ignota, utilizza estensione dei dati e questa opzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="233"/>
       <source>Use exact data range</source>
-      <translation type="unfinished"/>
+      <translation>Utilizza estensione dati esatta</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="234"/>
@@ -257,7 +257,7 @@
     <message>
       <location filename="./veusz/widgets/axis.py" line="248"/>
       <source>Auto range</source>
-      <translation type="unfinished"/>
+      <translation>Estensione automatica</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="323"/>
@@ -267,217 +267,217 @@
     <message>
       <location filename="./veusz/widgets/axis.py" line="361"/>
       <source>Axis label text</source>
-      <translation type="unfinished"/>
+      <translation>Testo etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="362"/>
       <source>Label</source>
-      <translation type="unfinished"/>
+      <translation>Etichetta</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="365"/>
       <source>Minimum value of axis</source>
-      <translation type="unfinished"/>
+      <translation>Valore minimo dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="366"/>
       <source>Min</source>
-      <translation type="unfinished"/>
+      <translation>Min</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="369"/>
       <source>Maximum value of axis</source>
-      <translation type="unfinished"/>
+      <translation>Valore massimo dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="370"/>
       <source>Max</source>
-      <translation type="unfinished"/>
+      <translation>Max</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="373"/>
       <source>Whether axis is logarithmic</source>
-      <translation type="unfinished"/>
+      <translation>Imposta asse logaritmico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="374"/>
       <source>Log</source>
-      <translation type="unfinished"/>
+      <translation>Log</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="381"/>
       <source>Type of ticks to show on on axis</source>
-      <translation type="unfinished"/>
+      <translation>Tipo di segni di graduazione visualizzati sull&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="382"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="392"/>
       <source>Extend axis to zero if close (UNUSED)</source>
-      <translation type="unfinished"/>
+      <translation>Estendi asse a zero se vicino (NON USATO)</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="393"/>
       <source>Zero extend</source>
-      <translation type="unfinished"/>
+      <translation>Estendi a zero</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="399"/>
       <source>Place axis on opposite side of graph if none</source>
-      <translation type="unfinished"/>
+      <translation>Posiziona l&apos;asse sul lato opposto del grafico se vuoto</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="400"/>
       <source>Auto mirror</source>
-      <translation type="unfinished"/>
+      <translation>Rifletti automaticamente</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="404"/>
       <source>Place axis text and ticks on other side of axis</source>
-      <translation type="unfinished"/>
+      <translation>Disponi il testo dell&apos;asse e la graduazione sul lato opposto dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="405"/>
       <source>Reflect</source>
-      <translation type="unfinished"/>
+      <translation>Rifletti</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="409"/>
       <source>Place ticks on outside of graph</source>
-      <translation type="unfinished"/>
+      <translation>Posiziona segni di graduazione all&apos;esterno del grafico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="410"/>
       <source>Outer ticks</source>
-      <translation type="unfinished"/>
+      <translation>Segni di graduazione esterni</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="415"/>
       <source>Scale data plotted by this factor</source>
-      <translation type="unfinished"/>
+      <translation>Scala di questo fattore i dati visualizzati</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="422"/>
       <source>Direction of axis</source>
-      <translation type="unfinished"/>
+      <translation>Direzione dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="423"/>
       <source>Direction</source>
-      <translation type="unfinished"/>
+      <translation>Direzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="426"/>
       <source>Fractional position of lower end of axis on graph</source>
-      <translation type="unfinished"/>
+      <translation>Posizione frazionale del lato inferiore dell&apos;asse sul grafico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="427"/>
       <source>Min position</source>
-      <translation type="unfinished"/>
+      <translation>Posizione minima</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="430"/>
       <source>Fractional position of upper end of axis on graph</source>
-      <translation type="unfinished"/>
+      <translation>Posizione frazionale del lato superiore dell&apos;asse sul grafico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="431"/>
       <source>Max position</source>
-      <translation type="unfinished"/>
+      <translation>Posizione massima</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="434"/>
       <source>Fractional position of axis in its perpendicular direction</source>
-      <translation type="unfinished"/>
+      <translation>Posizione frazionale dell&apos;asse nella sua direzione perpendicolare</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="435"/>
       <source>Axis position</source>
-      <translation type="unfinished"/>
+      <translation>Posizione asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="439"/>
       <source>Match the scale of this axis to the axis specified</source>
-      <translation type="unfinished"/>
+      <translation>Accoppia la scala di quest&apos;asse con l&apos;asse specificato</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="440"/>
       <source>Match</source>
-      <translation type="unfinished"/>
+      <translation>Accoppia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="445"/>
       <source>Axis line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linea dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="446"/>
       <source>Axis line</source>
-      <translation type="unfinished"/>
+      <translation>Linea asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="450"/>
       <source>Axis label settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="451"/>
       <source>Axis label</source>
-      <translation type="unfinished"/>
+      <translation>Etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="455"/>
       <source>Tick label settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni etichetta graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="456"/>
       <source>Tick labels</source>
-      <translation type="unfinished"/>
+      <translation>Etichette di graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="460"/>
       <source>Major tick line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni segni di graduazione principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="461"/>
       <source>Major ticks</source>
-      <translation type="unfinished"/>
+      <translation>Segni di graduazione principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="465"/>
       <source>Minor tick line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni segni di graduazione minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="466"/>
       <source>Minor ticks</source>
-      <translation type="unfinished"/>
+      <translation>Segni di graduazione minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="470"/>
       <source>Grid line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linea griglia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="471"/>
       <source>Grid lines</source>
-      <translation type="unfinished"/>
+      <translation>Linee griglia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="475"/>
       <source>Minor grid line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linee griglia minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="476"/>
       <source>Grid lines for minor ticks</source>
-      <translation type="unfinished"/>
+      <translation>Linee griglia per graduazione minore</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="1365"/>
@@ -487,12 +487,12 @@
     <message>
       <location filename="./veusz/widgets/axis.py" line="1394"/>
       <source>zoom axis</source>
-      <translation type="unfinished"/>
+      <translation>zoom asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis.py" line="1422"/>
       <source>adjust axis</source>
-      <translation type="unfinished"/>
+      <translation>regola asse</translation>
     </message>
   </context>
   <context>
@@ -500,52 +500,52 @@
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="163"/>
       <source>Length of major ticks</source>
-      <translation type="unfinished"/>
+      <translation>Lunghezza graduazioni principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="186"/>
       <source>Length</source>
-      <translation type="unfinished"/>
+      <translation>Lunghezza</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="168"/>
       <source>Number of major ticks to aim for</source>
-      <translation type="unfinished"/>
+      <translation>Numero graduazioni principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="191"/>
       <source>Number</source>
-      <translation type="unfinished"/>
+      <translation>Numero</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="173"/>
       <source>List of tick values overriding defaults</source>
-      <translation type="unfinished"/>
+      <translation>Lista di valori di graduazione diversi dai predefiniti</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="174"/>
       <source>Manual ticks</source>
-      <translation type="unfinished"/>
+      <translation>Graduazione manuale</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="185"/>
       <source>Length of minor ticks</source>
-      <translation type="unfinished"/>
+      <translation>Lunghezza graduazioni minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="190"/>
       <source>Number of minor ticks to aim for</source>
-      <translation type="unfinished"/>
+      <translation>Numero di graduazioni minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="220"/>
       <source>Position of axis label</source>
-      <translation type="unfinished"/>
+      <translation>Posizione etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="221"/>
       <source>Position</source>
-      <translation type="unfinished"/>
+      <translation>Posizione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="235"/>
@@ -555,102 +555,102 @@
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="261"/>
       <source>Axis label text</source>
-      <translation type="unfinished"/>
+      <translation>Testo etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="262"/>
       <source>Label</source>
-      <translation type="unfinished"/>
+      <translation>Etichetta</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="265"/>
       <source>Minimum value of axis</source>
-      <translation type="unfinished"/>
+      <translation>Valore minimo dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="266"/>
       <source>Min</source>
-      <translation type="unfinished"/>
+      <translation>Min</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="269"/>
       <source>Maximum value of axis</source>
-      <translation type="unfinished"/>
+      <translation>Valore massimo dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="270"/>
       <source>Max</source>
-      <translation type="unfinished"/>
+      <translation>Max</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="273"/>
       <source>Whether axis is logarithmic</source>
-      <translation type="unfinished"/>
+      <translation>Imposta asse logaritmico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="274"/>
       <source>Log</source>
-      <translation type="unfinished"/>
+      <translation>Log</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="281"/>
       <source>Type of ticks to show on on axis</source>
-      <translation type="unfinished"/>
+      <translation>Tipo di segni di graduazione visualizzati sull&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="282"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="286"/>
       <source>Place axis on opposite side of graph if none</source>
-      <translation type="unfinished"/>
+      <translation>Posiziona l&apos;asse sul lato opposto del grafico se vuoto</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="287"/>
       <source>Auto mirror</source>
-      <translation type="unfinished"/>
+      <translation>Rifletti automaticamente</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="292"/>
       <source>Scale data plotted by this factor</source>
-      <translation type="unfinished"/>
+      <translation>Scala di questo fattore i dati visualizzati</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="293"/>
       <source>Scale</source>
-      <translation type="unfinished"/>
+      <translation>Scala</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="299"/>
       <source>Direction of axis</source>
-      <translation type="unfinished"/>
+      <translation>Direzione dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="300"/>
       <source>Direction</source>
-      <translation type="unfinished"/>
+      <translation>Direzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="303"/>
       <source>Fractional position of lower end of axis on graph</source>
-      <translation type="unfinished"/>
+      <translation>Posizione frazionale del lato inferiore dell&apos;asse sul grafico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="304"/>
       <source>Min position</source>
-      <translation type="unfinished"/>
+      <translation>Posizione minima</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="307"/>
       <source>Fractional position of upper end of axis on graph</source>
-      <translation type="unfinished"/>
+      <translation>Posizione frazionale del lato superiore dell&apos;asse sul grafico</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="308"/>
       <source>Max position</source>
-      <translation type="unfinished"/>
+      <translation>Posizione massima</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="311"/>
@@ -675,72 +675,72 @@
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="322"/>
       <source>Axis line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linea dell&apos;asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="323"/>
       <source>Axis line</source>
-      <translation type="unfinished"/>
+      <translation>Linea asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="326"/>
       <source>Axis label settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="327"/>
       <source>Axis label</source>
-      <translation type="unfinished"/>
+      <translation>Etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="330"/>
       <source>Tick label settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni etichetta graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="331"/>
       <source>Tick labels</source>
-      <translation type="unfinished"/>
+      <translation>Etichette di graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="334"/>
       <source>Major tick line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni segni di graduazione principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="335"/>
       <source>Major ticks</source>
-      <translation type="unfinished"/>
+      <translation>Segni di graduazione principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="338"/>
       <source>Minor tick line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni segni di graduazione minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="339"/>
       <source>Minor ticks</source>
-      <translation type="unfinished"/>
+      <translation>Segni di graduazione minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="342"/>
       <source>Grid line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linea griglia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="343"/>
       <source>Grid lines</source>
-      <translation type="unfinished"/>
+      <translation>Linee griglia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="346"/>
       <source>Minor grid line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linee griglia minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axis3d.py" line="347"/>
       <source>Grid lines for minor ticks</source>
-      <translation type="unfinished"/>
+      <translation>Linee griglia per graduazione minore</translation>
     </message>
   </context>
   <context>
@@ -748,67 +748,67 @@
     <message>
       <location filename="./veusz/widgets/bar.py" line="40"/>
       <source>Fill styles for dataset bars</source>
-      <translation type="unfinished"/>
+      <translation>Stili di riempimento per barre dati</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="41"/>
       <source>Fill styles</source>
-      <translation type="unfinished"/>
+      <translation>Stili di riempimento</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="50"/>
       <source>Line styles for dataset bars</source>
-      <translation type="unfinished"/>
+      <translation>Stili di linea per barre dati</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="51"/>
       <source>Line styles</source>
-      <translation type="unfinished"/>
+      <translation>Stili linea</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="68"/>
       <source>Plot bar charts</source>
-      <translation type="unfinished"/>
+      <translation>Disegna diagramma a barre</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="80"/>
       <source>Key text for each dataset</source>
-      <translation type="unfinished"/>
+      <translation>Legenda per ciascun dato</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="81"/>
       <source>Key text</source>
-      <translation type="unfinished"/>
+      <translation>Legenda</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="85"/>
       <source>Dataset or string to label bars</source>
-      <translation type="unfinished"/>
+      <translation>Dato o testo per etichette barre</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="86"/>
       <source>Labels</source>
-      <translation type="unfinished"/>
+      <translation>Etichette</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="91"/>
       <source>Show datasets grouped together or as a single bar</source>
-      <translation type="unfinished"/>
+      <translation>Visualizza dati raggruppati o come una barra singola</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="92"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="96"/>
       <source>Horizontal or vertical bar chart</source>
-      <translation type="unfinished"/>
+      <translation>Diagramma a barre orizzontale o verticale</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="97"/>
       <source>Direction</source>
-      <translation type="unfinished"/>
+      <translation>Direzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="100"/>
@@ -818,72 +818,72 @@
     <message>
       <location filename="./veusz/widgets/bar.py" line="101"/>
       <source>Positions</source>
-      <translation type="unfinished"/>
+      <translation>Posizioni</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="104"/>
       <source>Datasets containing lengths of bars</source>
-      <translation type="unfinished"/>
+      <translation>Dati contenenti lunghezza delle barre</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="105"/>
       <source>Lengths</source>
-      <translation type="unfinished"/>
+      <translation>Lunghezze</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="110"/>
       <source>Filling fraction of bars (between 0 and 1)</source>
-      <translation type="unfinished"/>
+      <translation>Frazione di riempimento delle barre (tra 0 e 1)</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="128"/>
       <source>Bar fill</source>
-      <translation type="unfinished"/>
+      <translation>Riempimento barra</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="116"/>
       <source>Filling fraction of groups of bars (between 0 and 1)</source>
-      <translation type="unfinished"/>
+      <translation>Frazione di riempimento di gruppi di barre (tra 0 e 1)</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="117"/>
       <source>Group fill</source>
-      <translation type="unfinished"/>
+      <translation>Riempimento gruppo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="123"/>
       <source>Error bar style to show</source>
-      <translation type="unfinished"/>
+      <translation>Stile barra di errore da visualizzare</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="124"/>
       <source>Error style</source>
-      <translation type="unfinished"/>
+      <translation>Stile errore</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="128"/>
       <source>Fill</source>
-      <translation type="unfinished"/>
+      <translation>Riempimento</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="130"/>
       <source>Bar line</source>
-      <translation type="unfinished"/>
+      <translation>Linea della barra</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="130"/>
       <source>Line</source>
-      <translation type="unfinished"/>
+      <translation>Linea</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="135"/>
       <source>Error bar line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linea della barra di errore</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="136"/>
       <source>Error bar line</source>
-      <translation type="unfinished"/>
+      <translation>Linea barra di errore</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/bar.py" line="144"/>
@@ -896,72 +896,72 @@
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="111"/>
       <source>Plot box plots</source>
-      <translation type="unfinished"/>
+      <translation>Disegna un diagramma a scatola</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="130"/>
       <source>Whisker mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo a baffi</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="135"/>
       <source>Horizontal or vertical boxes</source>
-      <translation type="unfinished"/>
+      <translation>Scatole orizzontali o verticali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="136"/>
       <source>Direction</source>
-      <translation type="unfinished"/>
+      <translation>Direzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="139"/>
       <source>Dataset or string to label bars</source>
-      <translation type="unfinished"/>
+      <translation>Dato o testo per etichette barre</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="140"/>
       <source>Labels</source>
-      <translation type="unfinished"/>
+      <translation>Etichette</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="143"/>
       <source>Dataset or list of values giving positions of boxes (optional)</source>
-      <translation type="unfinished"/>
+      <translation>Dato o lista di valori per le posizioni delle scatole (opzionale)</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="145"/>
       <source>Positions</source>
-      <translation type="unfinished"/>
+      <translation>Posizioni</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="150"/>
       <source>Datasets containing values to calculate statistics for</source>
-      <translation type="unfinished"/>
+      <translation>Dato contenente i valori di cui calcolare le statistiche</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="151"/>
       <source>Datasets</source>
-      <translation type="unfinished"/>
+      <translation>Serie di dati</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="156"/>
       <source>Dataset with whisker maxima or list of values</source>
-      <translation type="unfinished"/>
+      <translation>Dato con massimi dei baffi o lista di valori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="157"/>
       <source>Whisker max</source>
-      <translation type="unfinished"/>
+      <translation>Massimo del baffo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="160"/>
       <source>Dataset with whisker minima or list of values</source>
-      <translation type="unfinished"/>
+      <translation>Dato con minimi dei baffi o lista di valori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="161"/>
       <source>Whisker min</source>
-      <translation type="unfinished"/>
+      <translation>Minimo del baffo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="164"/>
@@ -991,7 +991,7 @@
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="173"/>
       <source>Median</source>
-      <translation type="unfinished"/>
+      <translation>Mediana</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="176"/>
@@ -1001,7 +1001,7 @@
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="205"/>
       <source>Mean</source>
-      <translation type="unfinished"/>
+      <translation>Media</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="182"/>
@@ -1011,7 +1011,7 @@
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="184"/>
       <source>Calculate</source>
-      <translation type="unfinished"/>
+      <translation>Calcola</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="194"/>
@@ -1046,7 +1046,7 @@
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="210"/>
       <source>Markers size</source>
-      <translation type="unfinished"/>
+      <translation>Dimensione dei simboli</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="215"/>
@@ -1066,22 +1066,22 @@
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="225"/>
       <source>Whisker line</source>
-      <translation type="unfinished"/>
+      <translation>Linea del baffo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="229"/>
       <source>Line around markers</source>
-      <translation type="unfinished"/>
+      <translation>Linea intorno ai simboli</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="230"/>
       <source>Markers border</source>
-      <translation type="unfinished"/>
+      <translation>Bordo dei simboli</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/boxplot.py" line="235"/>
       <source>Markers fill</source>
-      <translation type="unfinished"/>
+      <translation>Riempimento dei simboli</translation>
     </message>
   </context>
   <context>
@@ -1089,17 +1089,17 @@
     <message>
       <location filename="./veusz/widgets/axisbroken.py" line="57"/>
       <source>Pairs of values to start and stop breaks</source>
-      <translation type="unfinished"/>
+      <translation>Coppia di valori di inizio e fine dell&apos;interruzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axisbroken.py" line="58"/>
       <source>Break pairs</source>
-      <translation type="unfinished"/>
+      <translation>Coppie di interruzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axisbroken.py" line="62"/>
       <source>Positions (fractions) along axis where to break</source>
-      <translation type="unfinished"/>
+      <translation>Posizioni (frazioni) lungo l&apos;asse dove porre l&apos;interruzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/axisbroken.py" line="63"/>
@@ -1180,7 +1180,7 @@
     <message>
       <location filename="./ui/capture.ui" line="132"/>
       <source>TCP port to connect to</source>
-      <translation type="unfinished"/>
+      <translation>porta TCP a cui connettersi</translation>
     </message>
     <message>
       <location filename="./ui/capture.ui" line="144"/>
@@ -1190,12 +1190,12 @@
     <message>
       <location filename="./ui/capture.ui" line="153"/>
       <source>Command line:</source>
-      <translation type="unfinished"/>
+      <translation>Linea di comando:</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/capturedialog.py" line="164"/>
       <source>Invalid number</source>
-      <translation type="unfinished"/>
+      <translation>Numero non valido</translation>
     </message>
     <message>
       <location filename="./ui/capture.ui" line="171"/>
@@ -1236,7 +1236,7 @@
     <message>
       <location filename="./ui/capture.ui" line="243"/>
       <source>Only retain latest N values</source>
-      <translation type="unfinished"/>
+      <translation>Tieni solo gli ultimi N valori</translation>
     </message>
     <message>
       <location filename="./ui/capture.ui" line="250"/>
@@ -1327,7 +1327,7 @@
     <message>
       <location filename="./veusz/widgets/colorbar.py" line="77"/>
       <source>Width</source>
-      <translation type="unfinished"/>
+      <translation>Larghezza</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/colorbar.py" line="81"/>
@@ -1337,7 +1337,7 @@
     <message>
       <location filename="./veusz/widgets/colorbar.py" line="82"/>
       <source>Height</source>
-      <translation type="unfinished"/>
+      <translation>Altezza</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/colorbar.py" line="88"/>
@@ -1551,7 +1551,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/widgets/contour.py" line="93"/>
       <source>Fill styles</source>
-      <translation type="unfinished"/>
+      <translation>Stili di riempimento</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="97"/>
@@ -1571,12 +1571,12 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/widgets/contour.py" line="125"/>
       <source>Line styles</source>
-      <translation type="unfinished"/>
+      <translation>Stili linea</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="134"/>
       <source>Hide lines</source>
-      <translation type="unfinished"/>
+      <translation>Nascondi linee</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="124"/>
@@ -1591,22 +1591,22 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/widgets/contour.py" line="145"/>
       <source>Format of the tick labels</source>
-      <translation type="unfinished"/>
+      <translation>Formato dei segni di graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="146"/>
       <source>Format</source>
-      <translation type="unfinished"/>
+      <translation>Formato</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="149"/>
       <source>A scale factor to apply to the values of the tick labels</source>
-      <translation type="unfinished"/>
+      <translation>Fattore di scala da applicare alla graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="151"/>
       <source>Scale</source>
-      <translation type="unfinished"/>
+      <translation>Scala</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="155"/>
@@ -1616,12 +1616,12 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/widgets/contour.py" line="156"/>
       <source>Rotate</source>
-      <translation type="unfinished"/>
+      <translation>Ruota</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="166"/>
       <source>Plot a 2d dataset as contours</source>
-      <translation type="unfinished"/>
+      <translation>Grafica un insieme di dati 2d come isolinee</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="189"/>
@@ -1661,7 +1661,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/widgets/contour.py" line="203"/>
       <source>Number levels</source>
-      <translation type="unfinished"/>
+      <translation>Numero di livelli</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/contour.py" line="208"/>
@@ -1799,7 +1799,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/widgets/covariance.py" line="86"/>
       <source>Y data</source>
-      <translation type="unfinished"/>
+      <translation>dati su Y</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/covariance.py" line="89"/>
@@ -1809,12 +1809,12 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/widgets/covariance.py" line="90"/>
       <source>X data</source>
-      <translation type="unfinished"/>
+      <translation>dati su X</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/covariance.py" line="94"/>
       <source>Line</source>
-      <translation type="unfinished"/>
+      <translation>Linea</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/covariance.py" line="95"/>
@@ -1824,7 +1824,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/widgets/covariance.py" line="100"/>
       <source>Fill</source>
-      <translation type="unfinished"/>
+      <translation>Riempimento</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/covariance.py" line="101"/>
@@ -1947,7 +1947,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./ui/custom.ui" line="169"/>
       <source>Move down</source>
-      <translation type="unfinished"/>
+      <translation>Sposta sotto</translation>
     </message>
     <message>
       <location filename="./ui/custom.ui" line="176"/>
@@ -2237,7 +2237,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/dialogs/datacreate.py" line="285"/>
       <source>Invalid number</source>
-      <translation type="unfinished"/>
+      <translation>Numero non valido</translation>
     </message>
   </context>
   <context>
@@ -2436,7 +2436,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="490"/>
       <source>Datasets</source>
-      <translation type="unfinished"/>
+      <translation>Serie di dati</translation>
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="497"/>
@@ -2806,7 +2806,7 @@ Error bars are merged.</source>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="1233"/>
       <source>Datasets</source>
-      <translation type="unfinished"/>
+      <translation>Serie di dati</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="1011"/>
@@ -2846,7 +2846,7 @@ Error bars are merged.</source>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="1102"/>
       <source>Mean</source>
-      <translation type="unfinished"/>
+      <translation>Media</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="1104"/>
@@ -3308,7 +3308,7 @@ Assumes x dataset increases in value.</source>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="1916"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="1924"/>
@@ -3334,7 +3334,7 @@ Assumes x dataset increases in value.</source>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="2014"/>
       <source>Format</source>
-      <translation type="unfinished"/>
+      <translation>Formato</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="2037"/>
@@ -3369,7 +3369,7 @@ Assumes x dataset increases in value.</source>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="2099"/>
       <source>Log</source>
-      <translation type="unfinished"/>
+      <translation>Log</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/datasetplugin.py" line="2101"/>
@@ -3510,7 +3510,7 @@ Assumes x dataset increases in value.</source>
     <message>
       <location filename="./ui/export.ui" line="109"/>
       <source>Format</source>
-      <translation type="unfinished"/>
+      <translation>Formato</translation>
     </message>
     <message>
       <location filename="./ui/export.ui" line="115"/>
@@ -4206,7 +4206,7 @@ This Veusz only supports document version %i.</source>
     <message>
       <location filename="./veusz/widgets/fit.py" line="158"/>
       <source>X data</source>
-      <translation type="unfinished"/>
+      <translation>dati su X</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/fit.py" line="161"/>
@@ -4216,7 +4216,7 @@ This Veusz only supports document version %i.</source>
     <message>
       <location filename="./veusz/widgets/fit.py" line="162"/>
       <source>Y data</source>
-      <translation type="unfinished"/>
+      <translation>dati su Y</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/fit.py" line="165"/>
@@ -4501,7 +4501,7 @@ This Veusz only supports document version %i.</source>
     <message>
       <location filename="./veusz/widgets/function.py" line="72"/>
       <source>Min</source>
-      <translation type="unfinished"/>
+      <translation>Min</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/function.py" line="76"/>
@@ -4511,7 +4511,7 @@ This Veusz only supports document version %i.</source>
     <message>
       <location filename="./veusz/widgets/function.py" line="77"/>
       <source>Max</source>
-      <translation type="unfinished"/>
+      <translation>Max</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/function.py" line="81"/>
@@ -4579,7 +4579,7 @@ This Veusz only supports document version %i.</source>
     <message>
       <location filename="./veusz/widgets/function3d.py" line="127"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/function3d.py" line="132"/>
@@ -4644,7 +4644,7 @@ This Veusz only supports document version %i.</source>
     <message>
       <location filename="./veusz/widgets/function3d.py" line="160"/>
       <source>Grid line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linea griglia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/function3d.py" line="161"/>
@@ -5021,7 +5021,7 @@ by which to scale columns relative to each other.</source>
     <message>
       <location filename="./veusz/widgets/histo.py" line="190"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/histo.py" line="193"/>
@@ -5066,7 +5066,7 @@ by which to scale columns relative to each other.</source>
     <message>
       <location filename="./veusz/widgets/histo.py" line="264"/>
       <source>Calculate</source>
-      <translation type="unfinished"/>
+      <translation>Calcola</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/histo.py" line="275"/>
@@ -5116,7 +5116,7 @@ by which to scale columns relative to each other.</source>
     <message>
       <location filename="./veusz/widgets/histo.py" line="297"/>
       <source>Number</source>
-      <translation type="unfinished"/>
+      <translation>Numero</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/histo.py" line="301"/>
@@ -5146,7 +5146,7 @@ by which to scale columns relative to each other.</source>
     <message>
       <location filename="./veusz/widgets/histo.py" line="316"/>
       <source>Direction</source>
-      <translation type="unfinished"/>
+      <translation>Direzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/histo.py" line="321"/>
@@ -5196,7 +5196,7 @@ by which to scale columns relative to each other.</source>
     <message>
       <location filename="./veusz/widgets/histo.py" line="345"/>
       <source>Error style</source>
-      <translation type="unfinished"/>
+      <translation>Stile errore</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/histo.py" line="350"/>
@@ -5236,7 +5236,7 @@ by which to scale columns relative to each other.</source>
     <message>
       <location filename="./veusz/widgets/histo.py" line="382"/>
       <source>Error bar line</source>
-      <translation type="unfinished"/>
+      <translation>Linea barra di errore</translation>
     </message>
   </context>
   <context>
@@ -5254,7 +5254,7 @@ by which to scale columns relative to each other.</source>
     <message>
       <location filename="./ui/histodata.ui" line="27"/>
       <source>Datasets</source>
-      <translation type="unfinished"/>
+      <translation>Serie di dati</translation>
     </message>
     <message>
       <location filename="./ui/histodata.ui" line="33"/>
@@ -5354,7 +5354,7 @@ by which to scale columns relative to each other.</source>
     <message>
       <location filename="./ui/histodata.ui" line="192"/>
       <source>Calculate</source>
-      <translation type="unfinished"/>
+      <translation>Calcola</translation>
     </message>
     <message>
       <location filename="./ui/histodata.ui" line="198"/>
@@ -6477,7 +6477,7 @@ Example syntax: 2:20
     <message>
       <location filename="./ui/license.ui" line="71"/>
       <source>OK</source>
-      <translation type="unfinished"/>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -6495,7 +6495,7 @@ Example syntax: 2:20
     <message>
       <location filename="./veusz/widgets/line.py" line="62"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/line.py" line="69"/>
@@ -6505,7 +6505,7 @@ Example syntax: 2:20
     <message>
       <location filename="./veusz/widgets/line.py" line="70"/>
       <source>Lengths</source>
-      <translation type="unfinished"/>
+      <translation>Lunghezze</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/line.py" line="75"/>
@@ -6555,7 +6555,7 @@ Example syntax: 2:20
     <message>
       <location filename="./veusz/widgets/line.py" line="105"/>
       <source>Line</source>
-      <translation type="unfinished"/>
+      <translation>Linea</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/line.py" line="109"/>
@@ -7388,7 +7388,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/nonorthfunction.py" line="59"/>
       <source>Min</source>
-      <translation type="unfinished"/>
+      <translation>Min</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/nonorthfunction.py" line="63"/>
@@ -7398,7 +7398,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/nonorthfunction.py" line="64"/>
       <source>Max</source>
-      <translation type="unfinished"/>
+      <translation>Max</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/nonorthfunction.py" line="68"/>
@@ -7554,7 +7554,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/nonorthpoint.py" line="66"/>
       <source>Labels</source>
-      <translation type="unfinished"/>
+      <translation>Etichette</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/nonorthpoint.py" line="69"/>
@@ -7654,7 +7654,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/nonorthpoint.py" line="121"/>
       <source>Label</source>
-      <translation type="unfinished"/>
+      <translation>Etichetta</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/nonorthpoint.py" line="130"/>
@@ -8152,7 +8152,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/plotters.py" line="54"/>
       <source>Key text</source>
-      <translation type="unfinished"/>
+      <translation>Legenda</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/plotters.py" line="221"/>
@@ -8291,7 +8291,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/point3d.py" line="69"/>
       <source>Scale</source>
-      <translation type="unfinished"/>
+      <translation>Scala</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/point3d.py" line="82"/>
@@ -8316,7 +8316,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/point3d.py" line="96"/>
       <source>Y data</source>
-      <translation type="unfinished"/>
+      <translation>dati su Y</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/point3d.py" line="99"/>
@@ -8326,7 +8326,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/point3d.py" line="100"/>
       <source>X data</source>
-      <translation type="unfinished"/>
+      <translation>dati su X</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/point3d.py" line="107"/>
@@ -8429,7 +8429,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/polar.py" line="99"/>
       <source>Number</source>
-      <translation type="unfinished"/>
+      <translation>Numero</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/polar.py" line="98"/>
@@ -8499,7 +8499,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/polar.py" line="149"/>
       <source>Direction</source>
-      <translation type="unfinished"/>
+      <translation>Direzione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/polar.py" line="154"/>
@@ -8519,7 +8519,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/polar.py" line="159"/>
       <source>Log</source>
-      <translation type="unfinished"/>
+      <translation>Log</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/polar.py" line="164"/>
@@ -8557,7 +8557,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/polygon.py" line="50"/>
       <source>Line</source>
-      <translation type="unfinished"/>
+      <translation>Linea</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/polygon.py" line="54"/>
@@ -8567,7 +8567,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
       <location filename="./veusz/widgets/polygon.py" line="55"/>
       <source>Fill</source>
-      <translation type="unfinished"/>
+      <translation>Riempimento</translation>
     </message>
   </context>
   <context>
@@ -9284,7 +9284,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/setting/stylesheet.py" line="64"/>
       <source>Width</source>
-      <translation type="unfinished"/>
+      <translation>Larghezza</translation>
     </message>
     <message>
       <location filename="./veusz/setting/collections.py" line="480"/>
@@ -9324,7 +9324,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/setting/stylesheet.py" line="60"/>
       <source>Line</source>
-      <translation type="unfinished"/>
+      <translation>Linea</translation>
     </message>
     <message>
       <location filename="./veusz/setting/stylesheet.py" line="63"/>
@@ -9394,7 +9394,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/setting/collections.py" line="135"/>
       <source>Scale</source>
-      <translation type="unfinished"/>
+      <translation>Scala</translation>
     </message>
     <message>
       <location filename="./veusz/setting/stylesheet.py" line="136"/>
@@ -9822,7 +9822,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/widgets/shape.py" line="51"/>
       <source>Fill</source>
-      <translation type="unfinished"/>
+      <translation>Riempimento</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/shape.py" line="55"/>
@@ -9872,7 +9872,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/widgets/shape.py" line="88"/>
       <source>Rotate</source>
-      <translation type="unfinished"/>
+      <translation>Ruota</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/shape.py" line="198"/>
@@ -10072,7 +10072,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/widgets/surface3d.py" line="63"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/surface3d.py" line="67"/>
@@ -10097,7 +10097,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/widgets/surface3d.py" line="80"/>
       <source>Grid line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linea griglia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/surface3d.py" line="81"/>
@@ -10130,7 +10130,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="77"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="87"/>
@@ -10215,62 +10215,62 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="123"/>
       <source>Axis label settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="124"/>
       <source>Axis label</source>
-      <translation type="unfinished"/>
+      <translation>Etichetta asse</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="128"/>
       <source>Tick label settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni etichetta graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="129"/>
       <source>Tick labels</source>
-      <translation type="unfinished"/>
+      <translation>Etichette di graduazione</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="133"/>
       <source>Major tick line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni segni di graduazione principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="134"/>
       <source>Major ticks</source>
-      <translation type="unfinished"/>
+      <translation>Segni di graduazione principali</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="138"/>
       <source>Minor tick line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni segni di graduazione minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="139"/>
       <source>Minor ticks</source>
-      <translation type="unfinished"/>
+      <translation>Segni di graduazione minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="143"/>
       <source>Grid line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linea griglia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="144"/>
       <source>Grid lines</source>
-      <translation type="unfinished"/>
+      <translation>Linee griglia</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="148"/>
       <source>Minor grid line settings</source>
-      <translation type="unfinished"/>
+      <translation>Opzioni linee griglia minori</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="149"/>
       <source>Grid lines for minor ticks</source>
-      <translation type="unfinished"/>
+      <translation>Linee griglia per graduazione minore</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/ternary.py" line="164"/>
@@ -10293,7 +10293,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/widgets/textlabel.py" line="58"/>
       <source>Label</source>
-      <translation type="unfinished"/>
+      <translation>Etichetta</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/textlabel.py" line="63"/>
@@ -10490,7 +10490,7 @@ to be loaded.</source>
     <message>
       <location filename="./veusz/plugins/toolsplugin.py" line="153"/>
       <source>Match</source>
-      <translation type="unfinished"/>
+      <translation>Accoppia</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/toolsplugin.py" line="155"/>
@@ -11471,7 +11471,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/vectorfield.py" line="60"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/vectorfield.py" line="65"/>
@@ -11481,7 +11481,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/vectorfield.py" line="66"/>
       <source>Rotate</source>
-      <translation type="unfinished"/>
+      <translation>Ruota</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/vectorfield.py" line="69"/>
@@ -11561,7 +11561,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/vectorfield.py" line="106"/>
       <source>Line</source>
-      <translation type="unfinished"/>
+      <translation>Linea</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/vectorfield.py" line="110"/>
@@ -11609,7 +11609,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/volume3d.py" line="82"/>
       <source>Y data</source>
-      <translation type="unfinished"/>
+      <translation>dati su Y</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/volume3d.py" line="85"/>
@@ -11619,7 +11619,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/volume3d.py" line="86"/>
       <source>X data</source>
-      <translation type="unfinished"/>
+      <translation>dati su X</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/volume3d.py" line="94"/>
@@ -11761,7 +11761,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/point.py" line="365"/>
       <source>Y data</source>
-      <translation type="unfinished"/>
+      <translation>dati su Y</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/point.py" line="368"/>
@@ -11771,7 +11771,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/point.py" line="369"/>
       <source>X data</source>
-      <translation type="unfinished"/>
+      <translation>dati su X</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/point.py" line="372"/>
@@ -11781,7 +11781,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/point.py" line="373"/>
       <source>Labels</source>
-      <translation type="unfinished"/>
+      <translation>Etichette</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/point.py" line="376"/>
@@ -11871,7 +11871,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/point.py" line="428"/>
       <source>Error style</source>
-      <translation type="unfinished"/>
+      <translation>Stile errore</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/point.py" line="433"/>
@@ -11896,7 +11896,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/point.py" line="450"/>
       <source>Error bar line</source>
-      <translation type="unfinished"/>
+      <translation>Linea barra di errore</translation>
     </message>
     <message>
       <location filename="./veusz/widgets/point.py" line="456"/>
@@ -11921,7 +11921,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
       <location filename="./veusz/widgets/point.py" line="468"/>
       <source>Label</source>
-      <translation type="unfinished"/>
+      <translation>Etichetta</translation>
     </message>
   </context>
   <context>
@@ -12334,7 +12334,7 @@ or enter $FILENAME to have filename appended</source>
     <message>
       <location filename="./ui/import_2d.ui" line="86"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./ui/import_2d.ui" line="93"/>
@@ -12468,7 +12468,7 @@ or enter $FILENAME to have filename appended</source>
     <message>
       <location filename="./ui/import_nd.ui" line="82"/>
       <source>Mode</source>
-      <translation type="unfinished"/>
+      <translation>Modo</translation>
     </message>
     <message>
       <location filename="./ui/import_nd.ui" line="89"/>
