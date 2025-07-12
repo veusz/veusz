@@ -1440,11 +1440,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="./veusz/document/commandinterface.py" line="516"/>
-        <source> linked to expression = %s</source>
-        <translation>Verknüpft zu Ausdruck = %s</translation>
-    </message>
-    <message>
         <location filename="./veusz/document/commandinterface.py" line="527"/>
         <source>Set dataset (nD) &apos;%s&apos;:
  Values = %s
@@ -2290,16 +2285,6 @@ Values = %s</source>
         <translation>&amp;Schließen</translation>
     </message>
     <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="322"/>
-        <source>insert row(s)</source>
-        <translation>Reihe(n) einfügen</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="331"/>
-        <source>delete row(s)</source>
-        <translation>Reihe(n) löschen</translation>
-    </message>
-    <message>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="507"/>
         <source>Value</source>
         <translation>Wert</translation>
@@ -2338,16 +2323,6 @@ Values = %s</source>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="601"/>
         <source>Date/time dataset</source>
         <translation>Datum/Zeit-Datenreihe</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="669"/>
-        <source>delete dataset(s)</source>
-        <translation>Datenreihe(n) löschen</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="682"/>
-        <source>unlink dataset(s)</source>
-        <translation>Verknüpfung der Datenreihe(n) aufheben</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="698"/>
@@ -2439,16 +2414,6 @@ Values = %s</source>
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="510"/>
         <source>Paste</source>
         <translation>Einfügen</translation>
-    </message>
-    <message>
-        <location filename="./veusz/qtwidgets/datasetbrowser.py" line="538"/>
-        <source>delete dataset(s)</source>
-        <translation>Datenreihe(n) löschen</translation>
-    </message>
-    <message>
-        <location filename="./veusz/qtwidgets/datasetbrowser.py" line="554"/>
-        <source>unlink dataset(s)</source>
-        <translation>Verknüpfung der Datenreihe(n) aufheben</translation>
     </message>
     <message>
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="564"/>
@@ -4046,11 +4011,6 @@ This Veusz only supports document version %i.</source>
 
 %s</translation>
     </message>
-    <message>
-        <location filename="./veusz/dialogs/export.py" line="493"/>
-        <source>Exported %i page(s)</source>
-        <translation>Exportierte %i Seite(n)</translation>
-    </message>
 </context>
 <context>
     <name>FilterDialog</name>
@@ -4429,11 +4389,6 @@ This Veusz only supports document version %i.</source>
         <location filename="./ui/import_fits.ui" line="90"/>
         <source>x =</source>
         <translation>x =</translation>
-    </message>
-    <message>
-        <location filename="./ui/import_fits.ui" line="124"/>
-        <source>→ </source>
-        <translation>→</translation>
     </message>
     <message>
         <location filename="./ui/import_fits.ui" line="114"/>
@@ -5778,16 +5733,6 @@ data with error bars</source>
         <location filename="./veusz/plugins/importplugin.py" line="590"/>
         <source>Name: %s</source>
         <translation>Bezeichnung: %s</translation>
-    </message>
-    <message>
-        <location filename="./veusz/plugins/importplugin.py" line="591"/>
-        <source> Shape: %s</source>
-        <translation>Form: %s</translation>
-    </message>
-    <message>
-        <location filename="./veusz/plugins/importplugin.py" line="592"/>
-        <source> Datatype: %s (%s)</source>
-        <translation>Datentyp: %s (%s)</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/importplugin.py" line="611"/>
@@ -9020,11 +8965,6 @@ to be loaded.</source>
         <translation>Neu Laden bei Dateiänderung alle</translation>
     </message>
     <message>
-        <location filename="./ui/reloaddata.ui" line="52"/>
-        <source> s</source>
-        <translation>s</translation>
-    </message>
-    <message>
         <location filename="./veusz/dialogs/reloaddata.py" line="113"/>
         <source>Error reading file: %s</source>
         <translation>Fehler beim Lesen der Datei: %s</translation>
@@ -10653,19 +10593,9 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
         <translation>Zu ändernde Datenreihe 1</translation>
     </message>
     <message>
-        <location filename="./veusz/plugins/toolsplugin.py" line="447"/>
-        <source>Replacement(s) for dataset 1</source>
-        <translation>Ersetzung(en) für Datenreihe 1</translation>
-    </message>
-    <message>
         <location filename="./veusz/plugins/toolsplugin.py" line="449"/>
         <source>Dataset 2 to change (optional)</source>
         <translation>Zu ändernde Datenreihe 2 (optional)</translation>
-    </message>
-    <message>
-        <location filename="./veusz/plugins/toolsplugin.py" line="453"/>
-        <source>Replacement(s) for dataset 2</source>
-        <translation>Ersetzung(en) für Datenreihe 2</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/toolsplugin.py" line="455"/>
@@ -10822,11 +10752,6 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1002"/>
-        <source>Remove the selected widget</source>
-        <translation>Ausgewähltes Widget entfernen</translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1002"/>
         <source>&amp;Delete</source>
         <translation>&amp;Löschen</translation>
     </message>
@@ -10842,17 +10767,7 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
-        <source>Show selected widget(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
-        <source>Hide selected widget(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10888,16 +10803,6 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1204"/>
         <source>Error while exporting images</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1362"/>
-        <source>hide widget(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1374"/>
-        <source>show widget(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11702,11 +11607,6 @@ developers via the mailing list.&lt;/p&gt;
 </context>
 <context>
     <name>WidgetTree</name>
-    <message>
-        <location filename="./veusz/windows/widgettree.py" line="363"/>
-        <source>remove widget(s)</source>
-        <translation>Widget(s) entfernen</translation>
-    </message>
 </context>
 <context>
     <name>WorkerPluginDialog</name>
