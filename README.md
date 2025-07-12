@@ -102,3 +102,4 @@ Veusz is Copyright (C) 2003-2025 Jeremy Sanders
 
 ## Source code
 The latest source code can be found in [this GitHub repository](https://github.com/veusz/veusz).
+Translations are welcome to be made [using Weblate](https://hosted.weblate.org/projects/veusz/).
