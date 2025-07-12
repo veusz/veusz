@@ -1449,11 +1449,6 @@
         <translation>Où t prend la forme% g:% g en %i pas</translation>
     </message>
     <message>
-        <location filename="./veusz/document/commandinterface.py" line="516"/>
-        <source> linked to expression = %s</source>
-        <translation>lié à l&apos;expression = %s</translation>
-    </message>
-    <message>
         <location filename="./veusz/document/commandinterface.py" line="527"/>
         <source>Set dataset (nD) &apos;%s&apos;:
  Values = %s
@@ -2320,16 +2315,6 @@ Valeurs = %s</translation>
         <translation>&amp;Fermer</translation>
     </message>
     <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="322"/>
-        <source>insert row(s)</source>
-        <translation>insérer une(des) ligne(s)</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="331"/>
-        <source>delete row(s)</source>
-        <translation>supprimer une(des) ligne(s)</translation>
-    </message>
-    <message>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="507"/>
         <source>Value</source>
         <translation>Valeur</translation>
@@ -2368,16 +2353,6 @@ Valeurs = %s</translation>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="601"/>
         <source>Date/time dataset</source>
         <translation>Jeu de données horodatées</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="669"/>
-        <source>delete dataset(s)</source>
-        <translation>Supprimer un(des) jeu(x) de données</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="682"/>
-        <source>unlink dataset(s)</source>
-        <translation>dissocier un(des) jeu(x) de données</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="698"/>
@@ -2469,16 +2444,6 @@ Valeurs = %s</translation>
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="510"/>
         <source>Paste</source>
         <translation>Coller</translation>
-    </message>
-    <message>
-        <location filename="./veusz/qtwidgets/datasetbrowser.py" line="538"/>
-        <source>delete dataset(s)</source>
-        <translation>Supprimer un(des) jeu(x) de données</translation>
-    </message>
-    <message>
-        <location filename="./veusz/qtwidgets/datasetbrowser.py" line="554"/>
-        <source>unlink dataset(s)</source>
-        <translation>dissocier un(des) jeu(x) de données</translation>
     </message>
     <message>
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="564"/>
@@ -4071,11 +4036,6 @@ This Veusz only supports document version %i.</source>
 %s</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="./veusz/dialogs/export.py" line="493"/>
-        <source>Exported %i page(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>FilterDialog</name>
@@ -4448,11 +4408,6 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./ui/import_fits.ui" line="90"/>
         <source>x =</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./ui/import_fits.ui" line="124"/>
-        <source>→ </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5793,16 +5748,6 @@ data with error bars</source>
     <message>
         <location filename="./veusz/plugins/importplugin.py" line="590"/>
         <source>Name: %s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/plugins/importplugin.py" line="591"/>
-        <source> Shape: %s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/plugins/importplugin.py" line="592"/>
-        <source> Datatype: %s (%s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9020,11 +8965,6 @@ to be loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="./ui/reloaddata.ui" line="52"/>
-        <source> s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="./veusz/dialogs/reloaddata.py" line="113"/>
         <source>Error reading file: %s</source>
         <translation type="unfinished"></translation>
@@ -10653,18 +10593,8 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="./veusz/plugins/toolsplugin.py" line="447"/>
-        <source>Replacement(s) for dataset 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="./veusz/plugins/toolsplugin.py" line="449"/>
         <source>Dataset 2 to change (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/plugins/toolsplugin.py" line="453"/>
-        <source>Replacement(s) for dataset 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10822,11 +10752,6 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1002"/>
-        <source>Remove the selected widget</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1002"/>
         <source>&amp;Delete</source>
         <translation>&amp;Effacer</translation>
     </message>
@@ -10842,17 +10767,7 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
-        <source>Show selected widget(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
-        <source>Hide selected widget(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10888,16 +10803,6 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1204"/>
         <source>Error while exporting images</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1362"/>
-        <source>hide widget(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="./veusz/windows/treeeditwindow.py" line="1374"/>
-        <source>show widget(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11701,11 +11606,6 @@ developers via the mailing list.&lt;/p&gt;
 </context>
 <context>
     <name>WidgetTree</name>
-    <message>
-        <location filename="./veusz/windows/widgettree.py" line="363"/>
-        <source>remove widget(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>WorkerPluginDialog</name>
