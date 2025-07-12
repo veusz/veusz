@@ -57,7 +57,7 @@
       <item>
        <widget class="QRadioButton" name="from2dexpr">
         <property name="text">
-         <string>From expression based on existing &amp;2D dataset(s)</string>
+         <string>From expression based on existing &amp;2D datasets</string>
         </property>
        </widget>
       </item>

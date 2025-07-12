@@ -688,16 +688,17 @@ class DataEditDialog(VeuszDialog):
         ops = []
         for name in self.dsbrowser.navtree.getSelectedDatasets():
             # generate new name for dataset
-            newname = name + '_copy'
             index = 2
-            while newname in self.document.data:
-                newname = '%s_copy_%i' % (name, index)
+            while True:
+                newname = f'{name}_{index}'
+                if newname not in self.document.data:
+                    break
                 index += 1
             ops.append(
                 document.OperationDatasetDuplicate(name, newname))
         if ops:
             self.document.applyOperation(
-                document.OperationMultiple(ops, _('duplicate dataset(s)')))
+                document.OperationMultiple(ops, _('duplicate datasets')))
 
     def slotDatasetImport(self):
         """Show import dialog."""
