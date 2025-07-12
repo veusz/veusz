@@ -49,7 +49,7 @@
         <bool>false</bool>
        </property>
        <property name="suffix">
-        <string> s</string>
+        <string> sec</string>
        </property>
        <property name="minimum">
         <number>1</number>

@@ -144,8 +144,7 @@ class ReloadData(VeuszDialog):
             for var in sorted(datasets):
                 ds = self.document.data[var]
                 if ds.linked is link:
-                    lines.append( ' %s: %s' % (
-                        var, ds.description()) )
+                    lines.append( ' %s: %s' % (var, ds.description()) )
 
         if len(datasets) == 0:
             lines.append(_('Nothing to do. No linked datasets.'))

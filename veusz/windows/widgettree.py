@@ -362,7 +362,7 @@ class WidgetTreeModel(qt.QAbstractItemModel):
         deleteops = []
         for w in parent.children[row:row+count]:
             deleteops.append( document.OperationWidgetDelete(w) )
-        op = document.OperationMultiple(deleteops, descr=_("remove widget(s)"))
+        op = document.OperationMultiple(deleteops, descr=_("remove widgets"))
         self.document.applyOperation(op)
         return True
 

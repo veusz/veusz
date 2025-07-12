@@ -27,9 +27,9 @@ from .. import utils
 from .. import document
 from .veuszdialog import VeuszDialog
 
-def _(text, disambiguation=None, context='ExportDialog'):
+def _(text, disambiguation=None, context='ExportDialog', n=-1):
     """Translate text."""
-    return qt.QCoreApplication.translate(context, text, disambiguation)
+    return qt.QCoreApplication.translate(context, text, disambiguation, n)
 
 # formats which can have multiple pages
 multipageformats = set(('ps', 'pdf'))
@@ -493,7 +493,7 @@ class ExportDialog(VeuszDialog):
                     (fname, msg))
             else:
                 if pagecount[0] > 0:
-                    self.showMessage(_('Exported %i page(s)') % pagecount[0])
+                    self.showMessage(_('Exported %n page(s)', n=pagecount[0]))
 
             self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Close).setEnabled(True)
             self.buttonBox.button(qt.QDialogButtonBox.StandardButton.Save).setEnabled(True)

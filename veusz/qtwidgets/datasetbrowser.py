@@ -541,7 +541,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
             self.doc.applyOperation(
                 document.OperationMultiple(
                     [document.OperationDatasetDelete(n) for n in dsnames],
-                    descr=_('delete dataset(s)')))
+                    descr=_('delete datasets')))
         def _unlink_file():
             """Unlink dataset from file."""
             self.doc.applyOperation(
@@ -549,7 +549,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
                     [document.OperationDatasetUnlinkFile(n)
                      for d,n in zip(datasets,dsnames)
                      if d.canUnlink() and d.linked],
-                    descr=_('unlink dataset(s)')))
+                    descr=_('unlink datasets')))
         def _unlink_relation():
             """Unlink dataset from relation."""
             self.doc.applyOperation(
@@ -557,7 +557,7 @@ class DatasetsNavigatorTree(qt.QTreeView):
                     [document.OperationDatasetUnlinkRelation(n)
                      for d,n in zip(datasets,dsnames)
                      if d.canUnlink() and not d.linked],
-                    descr=_('unlink dataset(s)')))
+                    descr=_('unlink datasets')))
         def _copy():
             """Copy data to clipboard."""
             mime = document.generateDatasetsMime(dsnames, self.doc)

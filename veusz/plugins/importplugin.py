@@ -590,8 +590,8 @@ class ImportPluginNpz(ImportPlugin):
         for f in sorted(retn.files):
             a = retn[f]
             text.append(_('Name: %s') % f)
-            text.append(_(' Shape: %s') % str(a.shape))
-            text.append(_(' Datatype: %s (%s)') % (a.dtype.str, str(a.dtype)))
+            text.append(' ' + _('Shape: %s') % str(a.shape))
+            text.append(' ' + _('Datatype: %s (%s)') % (a.dtype.str, str(a.dtype)))
             text.append('')
         return '\n'.join(text), True
 

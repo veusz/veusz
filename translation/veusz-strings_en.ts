@@ -1462,8 +1462,8 @@
     </message>
     <message>
       <location filename="./veusz/document/commandinterface.py" line="518"/>
-      <source> linked to expression = %s</source>
-      <translation> linked to expression = %s</translation>
+      <source>linked to expression = %s</source>
+      <translation>linked to expression = %s</translation>
     </message>
     <message>
       <location filename="./veusz/document/commandinterface.py" line="529"/>
@@ -2327,14 +2327,14 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>New</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/dataeditdialog.py" line="147"/>
-      <source>set value</source>
-      <translation>set value</translation>
-    </message>
-    <message>
       <location filename="./ui/dataedit.ui" line="147"/>
       <source>Crea&amp;te…</source>
       <translation>Crea&amp;te…</translation>
+    </message>
+    <message>
+      <location filename="./veusz/dialogs/dataeditdialog.py" line="147"/>
+      <source>set value</source>
+      <translation>set value</translation>
     </message>
     <message>
       <location filename="./ui/dataedit.ui" line="154"/>
@@ -2348,13 +2348,13 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./veusz/dialogs/dataeditdialog.py" line="324"/>
-      <source>insert row(s)</source>
-      <translation>insert row(s)</translation>
+      <source>insert rows</source>
+      <translation>insert rows</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/dataeditdialog.py" line="333"/>
-      <source>delete row(s)</source>
-      <translation>delete row(s)</translation>
+      <source>delete rows</source>
+      <translation>delete rows</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/dataeditdialog.py" line="509"/>
@@ -2398,13 +2398,13 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./veusz/dialogs/dataeditdialog.py" line="671"/>
-      <source>delete dataset(s)</source>
-      <translation>delete dataset(s)</translation>
+      <source>delete datasets</source>
+      <translation>delete datasets</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/dataeditdialog.py" line="684"/>
-      <source>unlink dataset(s)</source>
-      <translation>unlink dataset(s)</translation>
+      <source>unlink datasets</source>
+      <translation>unlink datasets</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/dataeditdialog.py" line="700"/>
@@ -2499,13 +2499,13 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="544"/>
-      <source>delete dataset(s)</source>
-      <translation>delete dataset(s)</translation>
+      <source>delete datasets</source>
+      <translation>delete datasets</translation>
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="552"/>
-      <source>unlink dataset(s)</source>
-      <translation>unlink dataset(s)</translation>
+      <source>unlink datasets</source>
+      <translation>unlink datasets</translation>
     </message>
     <message>
       <location filename="./veusz/qtwidgets/datasetbrowser.py" line="570"/>
@@ -4135,10 +4135,12 @@ This Veusz only supports document version %i.</translation>
 
 %s</translation>
     </message>
-    <message>
+    <message numerus="yes">
       <location filename="./veusz/dialogs/export.py" line="496"/>
-      <source>Exported %i page(s)</source>
-      <translation>Exported %i page(s)</translation>
+      <source>Exported %n page(s)</source>
+      <translation type="unfinished">
+        <numerusform/>
+      </translation>
     </message>
   </context>
   <context>
@@ -4521,8 +4523,8 @@ This Veusz only supports document version %i.</translation>
     </message>
     <message>
       <location filename="./ui/import_fits.ui" line="100"/>
-      <source>→ </source>
-      <translation>→ </translation>
+      <source>→</source>
+      <translation>→</translation>
     </message>
     <message>
       <location filename="./ui/import_fits.ui" line="114"/>
@@ -5902,13 +5904,13 @@ data with error bars</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/importplugin.py" line="593"/>
-      <source> Shape: %s</source>
-      <translation> Shape: %s</translation>
+      <source>Shape: %s</source>
+      <translation>Shape: %s</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/importplugin.py" line="594"/>
-      <source> Datatype: %s (%s)</source>
-      <translation> Datatype: %s (%s)</translation>
+      <source>Datatype: %s (%s)</source>
+      <translation>Datatype: %s (%s)</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/importplugin.py" line="613"/>
@@ -8777,6 +8779,11 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>Commands in the console window color</translation>
     </message>
     <message>
+      <location filename="./ui/preferences.ui" line="40"/>
+      <source>Please restart Veusz after changing this option</source>
+      <translation>Please restart Veusz after changing this option</translation>
+    </message>
+    <message>
       <location filename="./veusz/dialogs/preferences.py" line="40"/>
       <source>Control line</source>
       <translation>Control line</translation>
@@ -8785,11 +8792,6 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <location filename="./veusz/dialogs/preferences.py" line="40"/>
       <source>Color of lines controlling widgets</source>
       <translation>Color of lines controlling widgets</translation>
-    </message>
-    <message>
-      <location filename="./ui/preferences.ui" line="40"/>
-      <source>Please restart Veusz after changing this option</source>
-      <translation>Please restart Veusz after changing this option</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/preferences.py" line="42"/>
@@ -8822,14 +8824,14 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>System dark mode</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/preferences.py" line="50"/>
-      <source>Breeze light</source>
-      <translation>Breeze light</translation>
-    </message>
-    <message>
       <location filename="./ui/preferences.ui" line="50"/>
       <source>Update interval</source>
       <translation>Update interval</translation>
+    </message>
+    <message>
+      <location filename="./veusz/dialogs/preferences.py" line="50"/>
+      <source>Breeze light</source>
+      <translation>Breeze light</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/preferences.py" line="51"/>
@@ -9080,14 +9082,14 @@ to be loaded.</translation>
       <translation>Choose ghostscript executable</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/preferences.py" line="356"/>
-      <source>Choose secure directory to add</source>
-      <translation>Choose secure directory to add</translation>
-    </message>
-    <message>
       <location filename="./ui/preferences.ui" line="356"/>
       <source>User interface colors</source>
       <translation>User interface colors</translation>
+    </message>
+    <message>
+      <location filename="./veusz/dialogs/preferences.py" line="356"/>
+      <source>Choose secure directory to add</source>
+      <translation>Choose secure directory to add</translation>
     </message>
     <message>
       <location filename="./ui/preferences.ui" line="364"/>
@@ -9204,8 +9206,8 @@ to be loaded.</translation>
     </message>
     <message>
       <location filename="./ui/reloaddata.ui" line="52"/>
-      <source> s</source>
-      <translation> s</translation>
+      <source> sec</source>
+      <translation> sec</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/reloaddata.py" line="115"/>
@@ -9228,7 +9230,7 @@ to be loaded.</translation>
       <translation>Linked to %s</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/reloaddata.py" line="151"/>
+      <location filename="./veusz/dialogs/reloaddata.py" line="150"/>
       <source>Nothing to do. No linked datasets.</source>
       <translation>Nothing to do. No linked datasets.</translation>
     </message>
@@ -10221,6 +10223,11 @@ to be loaded.</translation>
       <translation>Error - Veusz</translation>
     </message>
     <message>
+      <location filename="./ui/stylesheet.ui" line="117"/>
+      <source>Recent</source>
+      <translation>Recent</translation>
+    </message>
+    <message>
       <location filename="./veusz/dialogs/stylesheet.py" line="117"/>
       <source>Unable to save '%s'
 
@@ -10228,11 +10235,6 @@ to be loaded.</translation>
       <translation>Unable to save '%s'
 
 %s</translation>
-    </message>
-    <message>
-      <location filename="./ui/stylesheet.ui" line="117"/>
-      <source>Recent</source>
-      <translation>Recent</translation>
     </message>
     <message>
       <location filename="./veusz/dialogs/stylesheet.py" line="123"/>
@@ -10839,8 +10841,8 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
     </message>
     <message>
       <location filename="./veusz/plugins/toolsplugin.py" line="449"/>
-      <source>Replacement(s) for dataset 1</source>
-      <translation>Replacement(s) for dataset 1</translation>
+      <source>Replacements for dataset 1</source>
+      <translation>Replacements for dataset 1</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/toolsplugin.py" line="451"/>
@@ -10849,8 +10851,8 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
     </message>
     <message>
       <location filename="./veusz/plugins/toolsplugin.py" line="455"/>
-      <source>Replacement(s) for dataset 2</source>
-      <translation>Replacement(s) for dataset 2</translation>
+      <source>Replacements for dataset 2</source>
+      <translation>Replacements for dataset 2</translation>
     </message>
     <message>
       <location filename="./veusz/plugins/toolsplugin.py" line="457"/>
@@ -11007,8 +11009,8 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
-      <source>Remove the selected widget</source>
-      <translation>Remove the selected widget</translation>
+      <source>Remove selected widgets</source>
+      <translation>Remove selected widgets</translation>
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
@@ -11027,8 +11029,8 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1022"/>
-      <source>Show selected widget(s)</source>
-      <translation>Show selected widget(s)</translation>
+      <source>Show selected widgets</source>
+      <translation>Show selected widgets</translation>
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1022"/>
@@ -11037,8 +11039,8 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1026"/>
-      <source>Hide selected widget(s)</source>
-      <translation>Hide selected widget(s)</translation>
+      <source>Hide selected widgets</source>
+      <translation>Hide selected widgets</translation>
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1026"/>
@@ -11077,13 +11079,13 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1374"/>
-      <source>hide widget(s)</source>
-      <translation>hide widget(s)</translation>
+      <source>hide widgets</source>
+      <translation>hide widgets</translation>
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1386"/>
-      <source>show widget(s)</source>
-      <translation>show widget(s)</translation>
+      <source>show widgets</source>
+      <translation>show widgets</translation>
     </message>
     <message>
       <location filename="./veusz/windows/treeeditwindow.py" line="1442"/>
@@ -12169,8 +12171,8 @@ developers via the mailing list.&lt;/p&gt;
     <name>WidgetTree</name>
     <message>
       <location filename="./veusz/windows/widgettree.py" line="365"/>
-      <source>remove widget(s)</source>
-      <translation>remove widget(s)</translation>
+      <source>remove widgets</source>
+      <translation>remove widgets</translation>
     </message>
   </context>
   <context>
