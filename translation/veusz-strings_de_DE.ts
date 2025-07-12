@@ -1440,11 +1440,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="./veusz/document/commandinterface.py" line="516"/>
-        <source> linked to expression = %s</source>
-        <translation>Verknüpft zu Ausdruck = %s</translation>
-    </message>
-    <message>
         <location filename="./veusz/document/commandinterface.py" line="527"/>
         <source>Set dataset (nD) &apos;%s&apos;:
  Values = %s
@@ -4015,11 +4010,6 @@ This Veusz only supports document version %i.</source>
         <translation>Fehler beim Export in Datei &apos;%s&apos;
 
 %s</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/export.py" line="493"/>
-        <source>Exported %i page(s)</source>
-        <translation>Exportierte %i Seite(n)</translation>
     </message>
 </context>
 <context>
