@@ -12296,12 +12296,12 @@ or enter $FILENAME to have filename appended</source>
     <message>
         <location filename="./ui/import_2d.ui" line="238"/>
         <source>Datasets:</source>
-        <translation>X軸の最大座標値を入力（デフォルト: ファイル内の列数）</translation>
+        <translation>データセット:</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="245"/>
         <source>A space separated list of dataset names to import from the file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルからインポートするデータセット名リスト（スペース区切り）</translation>
     </message>
 </context>
 <context>
@@ -12309,7 +12309,7 @@ or enter $FILENAME to have filename appended</source>
     <message>
         <location filename="./ui/import_nd.ui" line="17"/>
         <source>File preview:</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルプレビュー:</translation>
     </message>
     <message>
         <location filename="./ui/import_nd.ui" line="38"/>
@@ -12324,7 +12324,7 @@ or enter $FILENAME to have filename appended</source>
     <message>
         <location filename="./ui/import_nd.ui" line="51"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;List of numerical entries (separated by space or comma), giving the dimensions of each axis. Use -1 to automatically detect axis length (only one axis can be -1). Auto means autodetect shape, based on number of blank lines.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;各軸の次元を指定する数値のリスト（スペースまたはカンマで区切り）。軸の長さを自動検出したい場合は -1 を使用（-1 を指定できるのは1つの軸のみ）。Autoを指定すると、空行の数に基づいて自動的に形状を検出。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/import_nd.ui" line="58"/>
@@ -12332,7 +12332,10 @@ or enter $FILENAME to have filename appended</source>
  System - what this computer is set to use
  English - format 123,456.78
  European - format 123.456,78</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル内の数値の桁区切り形式:
+ システム - このコンピュータでの設定値を使用
+ 英式 - 形式 123,456.78
+ 欧式 - 形式 123.456,78</translation>
     </message>
     <message>
         <location filename="./ui/import_nd.ui" line="68"/>
