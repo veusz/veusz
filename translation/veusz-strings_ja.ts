@@ -6,22 +6,27 @@
     <message>
         <location filename="./ui/about.ui" line="14"/>
         <source>About Veusz</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuszについて</translation>
     </message>
     <message>
         <location filename="./ui/about.ui" line="108"/>
         <source>Show license</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスを表示</translation>
     </message>
     <message>
         <location filename="./ui/about.ui" line="118"/>
         <source>Software versions</source>
-        <translation type="unfinished"></translation>
+        <translation>バージョン情報</translation>
     </message>
     <message>
         <location filename="./ui/about.ui" line="125"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="./ui/about.ui" line="62"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -69,7 +74,7 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="103"/>
         <source>Put grid lines on top of graph</source>
-        <translation type="unfinished"></translation>
+        <translation>グリッド線をグラフの前面に表示</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="104"/>
@@ -314,7 +319,7 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="392"/>
         <source>Extend axis to zero if close (UNUSED)</source>
-        <translation type="unfinished"></translation>
+        <translation>値が近ければ軸をゼロまで伸長（未使用）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="393"/>
@@ -324,7 +329,7 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="399"/>
         <source>Place axis on opposite side of graph if none</source>
-        <translation type="unfinished"></translation>
+        <translation>軸が無ければグラフの反対側に軸を置く</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="400"/>
@@ -479,17 +484,17 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="1365"/>
         <source>reset axis</source>
-        <translation type="unfinished"></translation>
+        <translation>軸をリセット</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="1394"/>
         <source>zoom axis</source>
-        <translation type="unfinished"></translation>
+        <translation>軸をズーム</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="1422"/>
         <source>adjust axis</source>
-        <translation type="unfinished"></translation>
+        <translation>軸を調整</translation>
     </message>
 </context>
 <context>
@@ -547,7 +552,7 @@
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="235"/>
         <source>3D axis</source>
-        <translation type="unfinished"></translation>
+        <translation>3D軸</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="261"/>
@@ -602,7 +607,7 @@
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="286"/>
         <source>Place axis on opposite side of graph if none</source>
-        <translation type="unfinished"></translation>
+        <translation>軸が無ければグラフの反対側に軸を置く</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="287"/>
@@ -657,7 +662,7 @@
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="313"/>
         <source>Axis position 1</source>
-        <translation type="unfinished"></translation>
+        <translation>軸位置1</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="316"/>
@@ -667,7 +672,7 @@
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="318"/>
         <source>Axis position 2</source>
-        <translation type="unfinished"></translation>
+        <translation>軸位置2</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="322"/>
@@ -12256,22 +12261,22 @@ or enter $FILENAME to have filename appended</source>
     <message>
         <location filename="./ui/import_2d.ui" line="148"/>
         <source>Range of X:</source>
-        <translation type="unfinished"></translation>
+        <translation>X範囲:</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="158"/>
         <source>Enter a number for the minimum coordinate of the X axis (default 0)</source>
-        <translation type="unfinished"></translation>
+        <translation>X軸の最小座標値を入力（デフォルト: 0）</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="200"/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>to</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="172"/>
         <source>Enter a value for a maximum coordinate of the X axis (default is number of columns in file)</source>
-        <translation type="unfinished"></translation>
+        <translation>X軸の最大座標値を入力（デフォルト: 0）</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="183"/>
@@ -12389,6 +12394,14 @@ p, li { white-space: pre-wrap; }
         <location filename="./ui/import_nd.ui" line="177"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dataset name to import&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Application</name>
+    <message>
+        <location filename="./veusz/veusz_main.py" line="379"/>
+        <source>Error starting - Veusz</source>
+        <translation>起動エラー - Veusz</translation>
     </message>
 </context>
 </TS>
