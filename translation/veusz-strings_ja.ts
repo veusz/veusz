@@ -12333,7 +12333,7 @@ or enter $FILENAME to have filename appended</source>
  English - format 123,456.78
  European - format 123.456,78</source>
         <translation>ファイル内の数値の桁区切り形式:
- システム - このコンピュータでの設定値を使用
+ システム - このコンピュータでの設定値
  英式 - 形式 123,456.78
  欧式 - 形式 123.456,78</translation>
     </message>
