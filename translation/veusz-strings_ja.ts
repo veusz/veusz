@@ -12276,27 +12276,27 @@ or enter $FILENAME to have filename appended</source>
     <message>
         <location filename="./ui/import_2d.ui" line="172"/>
         <source>Enter a value for a maximum coordinate of the X axis (default is number of columns in file)</source>
-        <translation>X軸の最大座標値を入力（デフォルト: 0）</translation>
+        <translation>X軸の最大座標値を入力（デフォルト: ファイル内のカラム数）</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="183"/>
         <source>Range of Y:</source>
-        <translation type="unfinished"></translation>
+        <translation>Y範囲:</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="193"/>
         <source>Enter a number for the minimum coordinate of the Y axis (default 0)</source>
-        <translation type="unfinished"></translation>
+        <translation>Y軸の最小座標値を入力（デフォルト: 0）</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="207"/>
         <source>Enter a number for the maximum coordinate of the Y axis (default number of rows in file)</source>
-        <translation type="unfinished"></translation>
+        <translation>X軸の最大座標値を入力（デフォルト: ファイル内の行数）</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="238"/>
         <source>Datasets:</source>
-        <translation type="unfinished"></translation>
+        <translation>X軸の最大座標値を入力（デフォルト: ファイル内の列数）</translation>
     </message>
     <message>
         <location filename="./ui/import_2d.ui" line="245"/>
