@@ -319,7 +319,7 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="393"/>
         <source>Zero extend</source>
-        <translation>延伸到0</translation>
+        <translation>0轴拓展</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="399"/>
@@ -1466,7 +1466,7 @@
  Range of positive error = %s
  Range of negative error = %s</source>
         <translation>基于范围设置数据集&apos;%s&apos;：
- 步数 = %s
+ 步进数 = %s
  数据范围 = %s
  对称误差范围 = %s
  正误差范围 = %s
@@ -1535,6 +1535,11 @@ Values = %s</source>
         <source>Filtered datasets %s using expression %s. Output prefix=%s, suffix=%s</source>
         <translation>对数据集%s使用表达式%s过滤，输出前缀 = %s，后缀 = %s</translation>
     </message>
+    <message>
+        <location filename="./veusz/document/commandinterface.py" line="518"/>
+        <source>linked to expression = %s</source>
+        <translation>链接到表达 = %s</translation>
+    </message>
 </context>
 <context>
     <name>ConsoleWindow</name>
@@ -1552,6 +1557,17 @@ Values = %s</source>
         <location filename="./veusz/windows/consolewindow.py" line="270"/>
         <source>This window will shortly disappear. You can bring it back by selecting View, Windows, Console Window on the menu.</source>
         <translation>此窗口将很快消失。您可通过在菜单上选择“查看”-&gt;“窗口”-&gt;“控制台窗口”来将其恢复。</translation>
+    </message>
+    <message>
+        <location filename="./veusz/windows/consolewindow.py" line="149"/>
+        <source>Welcome to &lt;b&gt;&lt;font color=&quot;#a000a0&quot;&gt;Veusz %s&lt;/font&gt;&lt;/b&gt; --- a scientific plotting application.&lt;br&gt;
+Copyright © 2003-2025 Jeremy Sanders &amp;lt;jeremy@jeremysanders.net&amp;gt; and contributors.&lt;br&gt;
+Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are&lt;br&gt;
+welcome to redistribute it under certain conditions. Enter &quot;GPL()&quot; for details.&lt;br&gt;
+This window is a Python command line console and acts as a calculator.&lt;br&gt;
+</source>
+        <translation>Veusz是免费软件，作者Jeremy Sanders，本软件不承担任何法律责任。免费软件需要使用者提供用户反馈，众人拾柴火焰高！
+</translation>
     </message>
 </context>
 <context>
@@ -2369,6 +2385,26 @@ Values = %s</source>
         <source>new dataset %i</source>
         <translation>新建数据集%i</translation>
     </message>
+    <message>
+        <location filename="./veusz/dialogs/dataeditdialog.py" line="684"/>
+        <source>unlink datasets</source>
+        <translation>取消数据集关联</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/dataeditdialog.py" line="671"/>
+        <source>delete datasets</source>
+        <translation>删除数据集</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/dataeditdialog.py" line="333"/>
+        <source>delete rows</source>
+        <translation>删除行</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/dataeditdialog.py" line="324"/>
+        <source>insert rows</source>
+        <translation>插入行</translation>
+    </message>
 </context>
 <context>
     <name>DataNavigator</name>
@@ -2539,6 +2575,16 @@ Values = %s</source>
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="763"/>
         <source>Search for dataset names</source>
         <translation>查找数据集名称</translation>
+    </message>
+    <message>
+        <location filename="./veusz/qtwidgets/datasetbrowser.py" line="544"/>
+        <source>delete datasets</source>
+        <translation>删除数据集</translation>
+    </message>
+    <message>
+        <location filename="./veusz/qtwidgets/datasetbrowser.py" line="552"/>
+        <source>unlink datasets</source>
+        <translation>数据集取消关联</translation>
     </message>
 </context>
 <context>
@@ -3690,6 +3736,21 @@ This is recommended for most purposes.</source>
         <source>label</source>
         <translation>标识</translation>
     </message>
+    <message>
+        <location filename="./ui/export.ui" line="220"/>
+        <source>WebP</source>
+        <translation>WebP格式</translation>
+    </message>
+    <message>
+        <location filename="./ui/export.ui" line="336"/>
+        <source>Quality</source>
+        <translation>质量</translation>
+    </message>
+    <message>
+        <location filename="./ui/export.ui" line="343"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Quality of output for lossy formats. Lower values give poorer quality results and are more compressed, but have smaller file sizes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Dialog&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;更高的压缩率会获得更小文件体积，但会损失图表质量。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>Document</name>
@@ -3985,6 +4046,11 @@ This Veusz only supports document version %i.</source>
         <source>Veusz %s</source>
         <translation>Veusz %s</translation>
     </message>
+    <message>
+        <location filename="./veusz/document/export.py" line="354"/>
+        <source>WebP</source>
+        <translation>WebP参数</translation>
+    </message>
 </context>
 <context>
     <name>ExportDialog</name>
@@ -4228,7 +4294,7 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/fit.py" line="173"/>
         <source>Minimum value at which to fit function</source>
-        <translation type="unfinished"></translation>
+        <translation>函数最小参数变量</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/fit.py" line="174"/>
@@ -4238,7 +4304,7 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/fit.py" line="177"/>
         <source>Maximum value at which to fit function</source>
-        <translation type="unfinished"></translation>
+        <translation>函数最大定义域范围</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/fit.py" line="178"/>
@@ -4436,6 +4502,11 @@ This Veusz only supports document version %i.</source>
         <source>y =</source>
         <translation>y =</translation>
     </message>
+    <message>
+        <location filename="./ui/import_fits.ui" line="100"/>
+        <source>→</source>
+        <translation>→</translation>
+    </message>
 </context>
 <context>
     <name>Function</name>
@@ -4545,12 +4616,12 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="111"/>
         <source>Number of steps to evaluate the function over for lines</source>
-        <translation type="unfinished"></translation>
+        <translation>用于评估线函数的步骤数</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="112"/>
         <source>Line steps</source>
-        <translation type="unfinished"></translation>
+        <translation>线条阶梯</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="118"/>
@@ -4560,12 +4631,12 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="121"/>
         <source>Surface steps</source>
-        <translation type="unfinished"></translation>
+        <translation>曲面阶梯</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="126"/>
         <source>Type of function to plot</source>
-        <translation type="unfinished"></translation>
+        <translation>图表函数类型</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="127"/>
@@ -4575,42 +4646,42 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="132"/>
         <source>Function for x coordinate</source>
-        <translation type="unfinished"></translation>
+        <translation>x函数协调</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="133"/>
         <source>X function</source>
-        <translation type="unfinished"></translation>
+        <translation>X 函数</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="136"/>
         <source>Function for y coordinate</source>
-        <translation type="unfinished"></translation>
+        <translation>Y 函数协调拟合</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="137"/>
         <source>Y function</source>
-        <translation type="unfinished"></translation>
+        <translation>Y 函数</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="140"/>
         <source>Function for z coordinate</source>
-        <translation type="unfinished"></translation>
+        <translation>Z 函数拟合</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="141"/>
         <source>Z function</source>
-        <translation type="unfinished"></translation>
+        <translation>Z 函数</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="144"/>
         <source>Function to give color (0-1)</source>
-        <translation type="unfinished"></translation>
+        <translation>函数颜色 （0-1）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="145"/>
         <source>Color function</source>
-        <translation type="unfinished"></translation>
+        <translation>函数颜色</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="150"/>
@@ -4625,7 +4696,7 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="155"/>
         <source>Line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>线条设置</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="156"/>
@@ -4640,17 +4711,17 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="161"/>
         <source>Grid line</source>
-        <translation type="unfinished"></translation>
+        <translation>网格线</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="165"/>
         <source>Surface fill settings</source>
-        <translation type="unfinished"></translation>
+        <translation>曲面填充设置</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="166"/>
         <source>Surface</source>
-        <translation type="unfinished"></translation>
+        <translation>曲面</translation>
     </message>
 </context>
 <context>
@@ -4844,42 +4915,42 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="43"/>
         <source>3d graph</source>
-        <translation type="unfinished"></translation>
+        <translation>3D 图形</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="80"/>
         <source>X size</source>
-        <translation type="unfinished"></translation>
+        <translation>X 大小</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="85"/>
         <source>Y size</source>
-        <translation type="unfinished"></translation>
+        <translation>Y 大小</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="90"/>
         <source>Z size</source>
-        <translation type="unfinished"></translation>
+        <translation>Z 大小</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="96"/>
         <source>X position</source>
-        <translation type="unfinished"></translation>
+        <translation>X 坐标</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="101"/>
         <source>Y position</source>
-        <translation type="unfinished"></translation>
+        <translation>Y 坐标</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="106"/>
         <source>Z position</source>
-        <translation type="unfinished"></translation>
+        <translation>Z 坐标</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="110"/>
         <source>Graph border</source>
-        <translation type="unfinished"></translation>
+        <translation>图表边框</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="111"/>
@@ -4889,7 +4960,7 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="115"/>
         <source>Graph back</source>
-        <translation type="unfinished"></translation>
+        <translation>图表背景</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="116"/>
@@ -5029,22 +5100,22 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="223"/>
         <source>Histogram of a dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>数据集的直方图</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="247"/>
         <source>Dataset to apply binning to</source>
-        <translation type="unfinished"></translation>
+        <translation>要应用分箱的数据集</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="248"/>
         <source>Bin dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>分箱数据集</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="252"/>
         <source>Optional weight applied to counts of data</source>
-        <translation type="unfinished"></translation>
+        <translation>应用于数据计数的可选权重</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="253"/>
@@ -5054,7 +5125,7 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="263"/>
         <source>Calculate when binning</source>
-        <translation type="unfinished"></translation>
+        <translation>分箱时计算</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="264"/>
@@ -5064,12 +5135,12 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="275"/>
         <source>Binning mode</source>
-        <translation type="unfinished"></translation>
+        <translation>分箱筛选模式</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="276"/>
         <source>Binning</source>
-        <translation type="unfinished"></translation>
+        <translation>分箱</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="280"/>
@@ -5094,17 +5165,17 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="291"/>
         <source>Data scaling before creating bins</source>
-        <translation type="unfinished"></translation>
+        <translation>创建分箱之前的数据尺度</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="292"/>
         <source>Bin scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Bin 缩放尺度</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="296"/>
         <source>Number of bins</source>
-        <translation type="unfinished"></translation>
+        <translation>分箱数量</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="297"/>
@@ -5114,7 +5185,7 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="301"/>
         <source>Manual binning edges</source>
-        <translation type="unfinished"></translation>
+        <translation>手动分箱边缘</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="302"/>
@@ -5124,17 +5195,17 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="308"/>
         <source>Error estimation</source>
-        <translation type="unfinished"></translation>
+        <translation>错误估计</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="309"/>
         <source>Uncertainty</source>
-        <translation type="unfinished"></translation>
+        <translation>不确定</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="315"/>
         <source>Bars direction</source>
-        <translation type="unfinished"></translation>
+        <translation>小棒指向</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="316"/>
@@ -5154,7 +5225,7 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="328"/>
         <source>Drawing style</source>
-        <translation type="unfinished"></translation>
+        <translation>绘图类型</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="329"/>
@@ -5199,22 +5270,22 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="355"/>
         <source>Fill under</source>
-        <translation type="unfinished"></translation>
+        <translation>填充</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="360"/>
         <source>Fill over</source>
-        <translation type="unfinished"></translation>
+        <translation>填充覆盖</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="365"/>
         <source>Post line</source>
-        <translation type="unfinished"></translation>
+        <translation>线条后</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="370"/>
         <source>Line around marker</source>
-        <translation type="unfinished"></translation>
+        <translation>线条靠近标记点</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="371"/>
@@ -5480,12 +5551,12 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/image.py" line="179"/>
         <source>Map image using pixels or bound coordinates</source>
-        <translation type="unfinished"></translation>
+        <translation>使用像素或绑定坐标映射图像</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/image.py" line="180"/>
         <source>Mapping</source>
-        <translation type="unfinished"></translation>
+        <translation>贴图</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/image.py" line="185"/>
@@ -5520,12 +5591,12 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/image.py" line="205"/>
         <source>Method for drawing output</source>
-        <translation type="unfinished"></translation>
+        <translation>绘图输出方法</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/image.py" line="206"/>
         <source>Draw Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>绘图模式</translation>
     </message>
 </context>
 <context>
@@ -5680,7 +5751,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="./veusz/plugins/importplugin.py" line="250"/>
         <source>Invalid 2D data in file</source>
-        <translation type="unfinished"></translation>
+        <translation>文件中有无效2维数据</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/importplugin.py" line="319"/>
@@ -5845,6 +5916,16 @@ data with error bars</source>
         <location filename="./veusz/plugins/importplugin.py" line="759"/>
         <source>Non-numeric data in file</source>
         <translation>非数值数据文件</translation>
+    </message>
+    <message>
+        <location filename="./veusz/plugins/importplugin.py" line="593"/>
+        <source>Shape: %s</source>
+        <translation>形状:%s</translation>
+    </message>
+    <message>
+        <location filename="./veusz/plugins/importplugin.py" line="594"/>
+        <source>Datatype: %s (%s)</source>
+        <translation>数据类型:%s (%s)</translation>
     </message>
 </context>
 <context>
@@ -6322,7 +6403,7 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/widgets/key.py" line="182"/>
         <source>Order</source>
-        <translation type="unfinished"></translation>
+        <translation>顺序</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="186"/>
@@ -6332,7 +6413,7 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/widgets/key.py" line="187"/>
         <source>Exclude</source>
-        <translation type="unfinished"></translation>
+        <translation>排除</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="191"/>
@@ -6457,12 +6538,12 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/widgets/key.py" line="272"/>
         <source>Reverse order of entries</source>
-        <translation type="unfinished"></translation>
+        <translation>倒序输入项目</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="273"/>
         <source>Reverse order</source>
-        <translation type="unfinished"></translation>
+        <translation>倒序</translation>
     </message>
 </context>
 <context>
@@ -6621,7 +6702,7 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="200"/>
         <source>Untrusted mode</source>
-        <translation type="unfinished"></translation>
+        <translation>不受信任的模式</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1168"/>
@@ -6669,12 +6750,12 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="435"/>
         <source>New graph document</source>
-        <translation type="unfinished"></translation>
+        <translation>新图形文档</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="436"/>
         <source>&amp;New graph document</source>
-        <translation type="unfinished"></translation>
+        <translation>新图形文档集</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="441"/>
@@ -7258,7 +7339,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1220"/>
         <source>Do you want to look for another file?</source>
-        <translation type="unfinished"></translation>
+        <translation>准备打开另一个文件吗？</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1242"/>
@@ -7343,7 +7424,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1501"/>
         <source>Add to trusted locations</source>
-        <translation type="unfinished"></translation>
+        <translation>添加到受信任的位置</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1503"/>
@@ -7873,7 +7954,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/page.py" line="310"/>
         <source>Background page fill</source>
-        <translation type="unfinished"></translation>
+        <translation>背景页面填充</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/page.py" line="311"/>
@@ -8053,7 +8134,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="431"/>
         <source>Click or draw a rectangle to zoom graph axes</source>
-        <translation type="unfinished"></translation>
+        <translation>单击或绘制矩形以缩放图形轴</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="432"/>
@@ -8063,27 +8144,27 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="437"/>
         <source>Click to zoom out of graph axes</source>
-        <translation type="unfinished"></translation>
+        <translation>单击以缩小图形轴</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="438"/>
         <source>Zoom out of graph</source>
-        <translation type="unfinished"></translation>
+        <translation>缩小图形</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="443"/>
         <source>Click to recenter graph axes</source>
-        <translation type="unfinished"></translation>
+        <translation>单击以重新居中图形轴</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="444"/>
         <source>Recenter graph</source>
-        <translation type="unfinished"></translation>
+        <translation>居中图表</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="449"/>
         <source>Click to reset graph axes</source>
-        <translation type="unfinished"></translation>
+        <translation>重置图表各轴</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="450"/>
@@ -8108,17 +8189,17 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="696"/>
         <source>recenter graph</source>
-        <translation type="unfinished"></translation>
+        <translation>重居中图表</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="698"/>
         <source>zoom into axes</source>
-        <translation type="unfinished"></translation>
+        <translation>放大轴</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="700"/>
         <source>zoom out of axes</source>
-        <translation type="unfinished"></translation>
+        <translation>缩小轴</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="722"/>
@@ -8244,7 +8325,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/plotters3d.py" line="61"/>
         <source>Name of Z-axis to use</source>
-        <translation type="unfinished"></translation>
+        <translation>要使用的 Z 轴的名称</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/plotters3d.py" line="62"/>
@@ -8280,7 +8361,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="42"/>
         <source>If color markers dataset is given, use this colormap for the line color</source>
-        <translation type="unfinished"></translation>
+        <translation>如果给出了颜色标记数据集，请使用此颜色图作为线条颜色</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="45"/>
@@ -8300,7 +8381,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="68"/>
         <source>Scale border with marker size</source>
-        <translation type="unfinished"></translation>
+        <translation>使用标记大小缩放边框</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="69"/>
@@ -8310,12 +8391,12 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="82"/>
         <source>3D points</source>
-        <translation type="unfinished"></translation>
+        <translation>3D 点</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="91"/>
         <source>Z values, given by dataset, expression or list of values</source>
-        <translation type="unfinished"></translation>
+        <translation>Z 值，由数据集、表达式或值列表给出</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="92"/>
@@ -8355,17 +8436,17 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="114"/>
         <source>Scale marker size using perspective</source>
-        <translation type="unfinished"></translation>
+        <translation>使用透视缩放标记大小</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="115"/>
         <source>Perspective</source>
-        <translation type="unfinished"></translation>
+        <translation>透视</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="120"/>
         <source>Size of markers (relative to plot)</source>
-        <translation type="unfinished"></translation>
+        <translation>标记的大小（相对于图）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="121"/>
@@ -8415,7 +8496,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="147"/>
         <source>Marker border settings</source>
-        <translation type="unfinished"></translation>
+        <translation>标记边框设置</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="148"/>
@@ -8425,12 +8506,12 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="152"/>
         <source>Error bar settings</source>
-        <translation type="unfinished"></translation>
+        <translation>误差线设置</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="153"/>
         <source>Error bar</source>
-        <translation type="unfinished"></translation>
+        <translation>误差线</translation>
     </message>
 </context>
 <context>
@@ -8746,7 +8827,7 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="155"/>
         <source>Document default directory</source>
-        <translation type="unfinished"></translation>
+        <translation>文档默认目录</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="241"/>
@@ -8776,7 +8857,7 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="181"/>
         <source>Add import paths</source>
-        <translation type="unfinished"></translation>
+        <translation>添加导入路径</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="191"/>
@@ -8786,7 +8867,7 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="197"/>
         <source>Multiple files</source>
-        <translation type="unfinished"></translation>
+        <translation>多个文件</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="204"/>
@@ -8801,22 +8882,22 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="218"/>
         <source>Single file</source>
-        <translation type="unfinished"></translation>
+        <translation>单个文件</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="228"/>
         <source>Export default directory</source>
-        <translation type="unfinished"></translation>
+        <translation>导出默认目录</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="234"/>
         <source>Document director&amp;y</source>
-        <translation type="unfinished"></translation>
+        <translation>文档目录文件夹</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="248"/>
         <source>Curren&amp;t working directory</source>
-        <translation type="unfinished"></translation>
+        <translation>当前工作文件目录</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="259"/>
@@ -8836,12 +8917,12 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="286"/>
         <source>Translation file (*.qm)</source>
-        <translation type="unfinished"></translation>
+        <translation>多国语言（*.qm)</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="286"/>
         <source>Choose translation file</source>
-        <translation type="unfinished"></translation>
+        <translation>选择语言文件</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="290"/>
@@ -8911,7 +8992,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="336"/>
         <source>Choose secure directory to add</source>
-        <translation type="unfinished"></translation>
+        <translation>选择安全路径加载</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="337"/>
@@ -9002,6 +9083,41 @@ to be loaded.</source>
         <location filename="./ui/preferences.ui" line="521"/>
         <source>Trust contents of documents in these directories or folders. Documents stored here or in subdirectories will be able to contain arbitrary Python code without warnings.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="47"/>
+        <source>System default</source>
+        <translation>系统默认设置</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="48"/>
+        <source>System light mode</source>
+        <translation>系统浅色设置</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="49"/>
+        <source>System dark mode</source>
+        <translation>系统深色设置</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="50"/>
+        <source>Breeze light</source>
+        <translation>闪耀光点</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="51"/>
+        <source>Breeze dark</source>
+        <translation>深色光斑</translation>
+    </message>
+    <message>
+        <location filename="./ui/preferences.ui" line="356"/>
+        <source>User interface colors</source>
+        <translation>用户界面配色</translation>
+    </message>
+    <message>
+        <location filename="./ui/preferences.ui" line="364"/>
+        <source>Color scheme</source>
+        <translation>配色方案</translation>
     </message>
 </context>
 <context>
@@ -9751,7 +9867,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="641"/>
         <source>Z position</source>
-        <translation type="unfinished"></translation>
+        <translation>Z 坐标位置</translation>
     </message>
     <message>
         <location filename="./veusz/setting/controls.py" line="716"/>
@@ -9806,12 +9922,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/controls.py" line="1824"/>
         <source>Choose SVG file</source>
-        <translation type="unfinished"></translation>
+        <translation>选择SVG文件</translation>
     </message>
     <message>
         <location filename="./veusz/setting/controls.py" line="1894"/>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>默认</translation>
     </message>
 </context>
 <context>
@@ -10113,12 +10229,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="85"/>
         <source>Surface fill settings</source>
-        <translation type="unfinished"></translation>
+        <translation>曲面填充设置</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="86"/>
         <source>Surface</source>
-        <translation type="unfinished"></translation>
+        <translation>3D曲面</translation>
     </message>
 </context>
 <context>
@@ -10686,6 +10802,16 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
         <source>Decrease font sizes by number of points given</source>
         <translation>按给定的点数减小字体大小</translation>
     </message>
+    <message>
+        <location filename="./veusz/plugins/toolsplugin.py" line="449"/>
+        <source>Replacements for dataset 1</source>
+        <translation>替换数据集 1</translation>
+    </message>
+    <message>
+        <location filename="./veusz/plugins/toolsplugin.py" line="455"/>
+        <source>Replacements for dataset 2</source>
+        <translation>替换数据集 2</translation>
+    </message>
 </context>
 <context>
     <name>TreeEditWindow</name>
@@ -10702,12 +10828,12 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="327"/>
         <source>Hidden (click to show; set hide to False)</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏（点击鼠标显示；取消设置隐藏）</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="330"/>
         <source>Visible (click to hide; set hide to True)</source>
-        <translation type="unfinished"></translation>
+        <translation>可见（点击鼠标隐藏；设置隐藏）</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="617"/>
@@ -11705,12 +11831,12 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="64"/>
         <source>3D volume</source>
-        <translation type="unfinished"></translation>
+        <translation>三维物体体积</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="73"/>
         <source>Transparency dataset, optional, 0-1</source>
-        <translation type="unfinished"></translation>
+        <translation>透明度数据集，可选，0-1</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="107"/>
@@ -11720,7 +11846,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="77"/>
         <source>Z dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Z 数据集</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="78"/>
@@ -11730,7 +11856,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="81"/>
         <source>Y dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Y 数据集</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="82"/>
@@ -11740,7 +11866,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="85"/>
         <source>X dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>X 数据集</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="86"/>
@@ -11775,22 +11901,22 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="115"/>
         <source>Reflectivity percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>反射率百分比</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="116"/>
         <source>Reflectivity</source>
-        <translation type="unfinished"></translation>
+        <translation>反射率</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="122"/>
         <source>Filling factor (0-1)</source>
-        <translation type="unfinished"></translation>
+        <translation>填充因子 (0-1)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="123"/>
         <source>Fill factor</source>
-        <translation type="unfinished"></translation>
+        <translation>填充因子</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="129"/>
@@ -11800,7 +11926,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="130"/>
         <source>Box line</source>
-        <translation type="unfinished"></translation>
+        <translation>箱体线条</translation>
     </message>
 </context>
 <context>
@@ -11862,12 +11988,12 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/point.py" line="345"/>
         <source>Use new marker sizes with equal area</source>
-        <translation type="unfinished"></translation>
+        <translation>使用具有相等面积的新标记大小</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="346"/>
         <source>New marker sizes</source>
-        <translation type="unfinished"></translation>
+        <translation>新的标记大小</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="354"/>
@@ -11917,12 +12043,12 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/point.py" line="388"/>
         <source>NaN values are used to break datasets into parts at their locations</source>
-        <translation type="unfinished"></translation>
+        <translation>NaN 值用于在其位置将数据集分成部分</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="389"/>
         <source>NaN values cause data in their locations to be ignored</source>
-        <translation type="unfinished"></translation>
+        <translation>NaN 值导致其位置的数据被忽略</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="396"/>
@@ -11992,7 +12118,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/point.py" line="438"/>
         <source>Line around marker</source>
-        <translation type="unfinished"></translation>
+        <translation>标记周围的线</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="439"/>
@@ -12034,6 +12160,16 @@ developers via the mailing list.&lt;/p&gt;
         <source>Label</source>
         <translation>标识</translation>
     </message>
+    <message>
+        <location filename="./veusz/widgets/point.py" line="387"/>
+        <source>Effect of gaps or NaN values in input datasets</source>
+        <translation>输入数据集中的缺口或NaN值的影响</translation>
+    </message>
+    <message>
+        <location filename="./veusz/widgets/point.py" line="388"/>
+        <source>Data gaps</source>
+        <translation>数据缺口间隙</translation>
+    </message>
 </context>
 <context>
     <name>controlgraph</name>
@@ -12055,27 +12191,27 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="926"/>
         <source>Click and drag to rotate in x and y (hold Ctrl for x and z)</source>
-        <translation type="unfinished"></translation>
+        <translation>点击并拖动以在x和y方向旋转（按住Ctrl以进行x和z旋转）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="932"/>
         <source>Click and drag to rotate in y</source>
-        <translation type="unfinished"></translation>
+        <translation>点击并拖动以在y轴上旋转</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="938"/>
         <source>Click and drag to rotate in x</source>
-        <translation type="unfinished"></translation>
+        <translation>点击并拖动以在x轴上旋转</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="944"/>
         <source>Click and drag to rotate in z</source>
-        <translation type="unfinished"></translation>
+        <translation>点击并拖动以在z轴上旋转</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="1028"/>
         <source>rotate scene</source>
-        <translation type="unfinished"></translation>
+        <translation>旋转场景</translation>
     </message>
 </context>
 <context>
@@ -12651,6 +12787,14 @@ p, li { white-space: pre-wrap; }
         <location filename="./ui/import_nd.ui" line="177"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dataset name to import&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;要导入的数据集&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>Application</name>
+    <message>
+        <location filename="./veusz/veusz_main.py" line="379"/>
+        <source>Error starting - Veusz</source>
+        <translation>Veusz 错误启动请联系作者反馈故障环境</translation>
     </message>
 </context>
 </TS>
