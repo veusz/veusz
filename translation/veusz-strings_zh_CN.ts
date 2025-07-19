@@ -9179,6 +9179,41 @@ to be loaded.</source>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Needs restart to take effect. System dark or light has no effect if undefined by the platform (e.g. Linux currently).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;需要重新启动才能生效。如果平台未定义（例如，目前是Linux），系统暗色或亮色将没有效果。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="47"/>
+        <source>System default</source>
+        <translation>系统默认设置</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="48"/>
+        <source>System light mode</source>
+        <translation>系统浅色设置</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="49"/>
+        <source>System dark mode</source>
+        <translation>系统深色设置</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="50"/>
+        <source>Breeze light</source>
+        <translation>闪耀光点</translation>
+    </message>
+    <message>
+        <location filename="./veusz/dialogs/preferences.py" line="51"/>
+        <source>Breeze dark</source>
+        <translation>深色光斑</translation>
+    </message>
+    <message>
+        <location filename="./ui/preferences.ui" line="356"/>
+        <source>User interface colors</source>
+        <translation>用户界面配色</translation>
+    </message>
+    <message>
+        <location filename="./ui/preferences.ui" line="364"/>
+        <source>Color scheme</source>
+        <translation>配色方案</translation>
+    </message>
 </context>
 <context>
     <name>ReloadDialog</name>
