@@ -9214,6 +9214,11 @@ to be loaded.</source>
         <source>Color scheme</source>
         <translation>配色方案</translation>
     </message>
+    <message>
+        <location filename="./ui/preferences.ui" line="371"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Needs restart to take effect. System dark or light has no effect if undefined by the platform (e.g. Linux currently).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;需要重新启动才能生效。如果平台未定义（例如，目前是Linux），系统暗色或亮色将没有效果。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>ReloadDialog</name>
