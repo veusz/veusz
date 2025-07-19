@@ -1538,7 +1538,7 @@ Values = %s</source>
     <message>
         <location filename="./veusz/document/commandinterface.py" line="518"/>
         <source>linked to expression = %s</source>
-        <translation>链接到表达 = %s</translation>
+        <translation>关联的表达式 = %s</translation>
     </message>
 </context>
 <context>
@@ -3371,7 +3371,8 @@ Assumes x dataset increases in value.</source>
         <location filename="./veusz/plugins/datasetplugin.py" line="1999"/>
         <source>Given a 1D numeric dataset, create a text dataset by applying formatting. Format string is in standard Veusz-extended C formatting, e.g.
  &quot;%Vg&quot; - general, &quot;%Ve&quot; - scientific, &quot;%VE&quot; - engineering suffix, &quot;%.2f&quot; - two decimal places and &quot;%e&quot; - C-style scientific</source>
-        <translation>给定1D数值数据集，通过应用格式创建文本数据集。格式字符串采用标准的Veusz扩展C格式，例如&quot;%Vg&quot;-常规，&quot;%Ve&quot;-科学计数，&quot;%VE&quot;-工程计数，&quot;%.2f&quot;-小数点后两位，&quot;%e&quot;-C样式科学计数</translation>
+        <translation>给定1D数值数据集，通过应用格式创建文本数据集。格式字符串采用标准的Veusz扩展C格式，例如 
+ &quot;%Vg&quot;-常规，&quot;%Ve&quot;-科学计数，&quot;%VE&quot;-工程计数，&quot;%.2f&quot;-小数点后两位，&quot;%e&quot;-C样式科学计数</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="2014"/>
@@ -3517,7 +3518,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="63"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>导出所有文档页面</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;导出所有页面&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="66"/>
@@ -3527,7 +3528,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="73"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export given pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>导出给定页面</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;导出给定页面&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="76"/>
@@ -3537,7 +3538,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="89"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter a comma-separated list of pages or page ranges (e.g. 1-2,4,5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>输入以逗号分隔的页面或页面范围列表（例如：1-2,4,5）&#xa0;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;输入以逗号分隔的页面或页面范围列表（例如：1-2,4,5）&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="96"/>
@@ -3694,7 +3695,7 @@ This is recommended for most purposes.</source>
     <message>
         <location filename="./ui/export.ui" line="302"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of dots per inch used for writing SVG files. Modern inkscape uses 96.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation> SVG 文件的分辨率，现代矢量绘图软件使用 96dpi。</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SVG 文件的分辨率，现代矢量绘图软件使用 96dpi。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="312"/>
@@ -5771,7 +5772,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="./veusz/plugins/importplugin.py" line="425"/>
         <source>Reads datasets from QDP files</source>
-        <translation>从QDP文件读取数据集。</translation>
+        <translation>从QDP文件读取数据集</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/importplugin.py" line="431"/>
@@ -6760,32 +6761,32 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="441"/>
         <source>New polar plot document</source>
-        <translation type="unfinished"></translation>
+        <translation>新建极坐标图文档</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="442"/>
         <source>New polar document</source>
-        <translation type="unfinished"></translation>
+        <translation>新建极坐标图文档</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="447"/>
         <source>New ternary plot document</source>
-        <translation type="unfinished"></translation>
+        <translation>新建三元图文档</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="448"/>
         <source>New ternary document</source>
-        <translation type="unfinished"></translation>
+        <translation>新建三元图文档</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="453"/>
         <source>New 3D plot document</source>
-        <translation type="unfinished"></translation>
+        <translation>新建3D绘图文档</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="454"/>
         <source>New 3D document</source>
-        <translation type="unfinished"></translation>
+        <translation>新建3D文档</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="459"/>
@@ -6830,12 +6831,12 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="474"/>
         <source>Trust document contents</source>
-        <translation type="unfinished"></translation>
+        <translation>信任文件内容</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="474"/>
         <source>Trust…</source>
-        <translation type="unfinished"></translation>
+        <translation>信任…</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="477"/>
@@ -7120,7 +7121,7 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="583"/>
         <source>Download latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>下载最新版本</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="586"/>
@@ -7234,7 +7235,7 @@ If not, you can access it later through the Help menu.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="919"/>
         <source>Version check</source>
-        <translation type="unfinished"></translation>
+        <translation>检查版本</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="920"/>
@@ -7259,7 +7260,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="979"/>
         <source>Veusz %s is available for download - see Help menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Veusz %s 可供下载 - 请参阅帮助菜单</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="982"/>
@@ -7327,14 +7328,16 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1216"/>
         <source>Import error</source>
-        <translation type="unfinished"></translation>
+        <translation>导入出错</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1218"/>
         <source>Could not import data from file &apos;%s&apos;:
 
  %s</source>
-        <translation type="unfinished"></translation>
+        <translation>无法从 &apos;%s&apos; 导入数据:
+
+ %s</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1220"/>
@@ -7409,12 +7412,12 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1485"/>
         <source>Potentially unsafe code in document</source>
-        <translation type="unfinished"></translation>
+        <translation>文档中可能存在不安全代码</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1486"/>
         <source>&lt;p&gt;&lt;b&gt;The document &apos;%s&apos; contains potentially unsafe code&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Directory: &apos;%s&apos;&lt;/p&gt;&lt;p&gt;This file could damage your computer or data as it can contain arbitrary code. Please check that the file was made by you or a trusted source.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;&lt;b&gt;文件“%s”包含可能不安全的代码&lt;/b&gt;&lt;/p&gt;&lt;p&gt;目录: &apos;%s&apos;&lt;/p&gt;&lt;p&gt;此文件可能会损坏您的计算机或数据，因为它可能包含任意代码。请确认该文件是由您或可信赖的来源创建的。&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1500"/>
@@ -8343,7 +8346,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/dialogs/plugin.py" line="180"/>
         <source>Created datasets: </source>
-        <translation>已创建的数据集：</translation>
+        <translation>已创建的数据集: </translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/plugin.py" line="182"/>
@@ -8812,7 +8815,7 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load an externally-provided translation file on startup&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;启动时加载外部提供的翻译文件&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="493"/>
@@ -8852,7 +8855,7 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="178"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If set, the document location is recorded when saved, so linked data can be loaded using relative paths later if the document is moved.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;如果设置，则在保存时记录文档位置，因此如果文档移动，以后可以使用相对路径加载链接数据。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="181"/>
@@ -8872,12 +8875,12 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="204"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Template filename when exorting to multiple files. This can include %DOCNAME% for the document name, %PAGENAME% for the page name and %PAGE% for the page number. %PAGE00% and %PAGE000% force two and three-character page numbers. An extension is automatically added.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;导出多个文件时的模板文件名。这可以包括 %DOCNAME% 用于文档名称，%PAGENAME% 用于页面名称和 %PAGE% 用于页码。%PAGE00% 和 %PAGE000% 强制使用两位和三位数的页码。将自动添加扩展名。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="211"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Template filename when written to a single file. This can include %DOCNAME% for the document name. A filename extension is automatically added.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;写入单个文件时的模板文件名。这可以包括 %DOCNAME% 用于文档名称。将自动添加文件扩展名。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="218"/>
@@ -8982,7 +8985,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="323"/>
         <source>Choose ghostscript executable</source>
-        <translation type="unfinished"></translation>
+        <translation>选择Ghostscript可执行文件</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="331"/>
@@ -9017,7 +9020,7 @@ to be loaded.</source>
     <message>
         <location filename="./ui/preferences.ui" line="386"/>
         <source>Number of significant figures to show</source>
-        <translation type="unfinished"></translation>
+        <translation>要显示的有效数字位数</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="406"/>
@@ -9052,17 +9055,17 @@ to be loaded.</source>
     <message>
         <location filename="./ui/preferences.ui" line="472"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter a colon-separated list of directories to be added to the beginning of the Python path. This can be used to find Python modules located in non-default locations. Changing this setting requires a restart.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;输入以冒号分隔的目录列表，以将其添加到Python路径的开头。这可以用来查找位于非默认位置的Python模块。更改此设置需要重启。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="479"/>
         <source>Ghostscript location</source>
-        <translation type="unfinished"></translation>
+        <translation>Ghostscript位置</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="486"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Location of the Ghostscript executable. Used for creating EPS files. On Linux/Unix the PATH will be searched if this is not set. Requires a restart after changing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ghostscript可执行文件的存放位置。用于创建EPS文件。在Linux/Unix系统中，如果没有设置，将会在PATH中进行搜索。更改后需要重启。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="500"/>
@@ -9077,12 +9080,12 @@ to be loaded.</source>
     <message>
         <location filename="./ui/preferences.ui" line="515"/>
         <source>Security</source>
-        <translation type="unfinished"></translation>
+        <translation>安全</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="521"/>
         <source>Trust contents of documents in these directories or folders. Documents stored here or in subdirectories will be able to contain arbitrary Python code without warnings.</source>
-        <translation type="unfinished"></translation>
+        <translation>信任这些目录或文件夹中的文档内容。存储在此处或子目录中的文档将能够包含任意Python代码而不会出现警告。</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="47"/>
@@ -9118,6 +9121,11 @@ to be loaded.</source>
         <location filename="./ui/preferences.ui" line="364"/>
         <source>Color scheme</source>
         <translation>配色方案</translation>
+    </message>
+    <message>
+        <location filename="./ui/preferences.ui" line="371"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Needs restart to take effect. System dark or light has no effect if undefined by the platform (e.g. Linux currently).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;需要重新启动才能生效。如果平台未定义（例如，目前是Linux），系统暗色或亮色将没有效果。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9161,6 +9169,11 @@ to be loaded.</source>
         <location filename="./veusz/dialogs/reloaddata.py" line="149"/>
         <source>Nothing to do. No linked datasets.</source>
         <translation>无操作。无关联数据集。</translation>
+    </message>
+    <message>
+        <location filename="./ui/reloaddata.ui" line="52"/>
+        <source> sec</source>
+        <translation> 秒</translation>
     </message>
 </context>
 <context>
@@ -9274,7 +9287,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="63"/>
         <source>X rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>X轴旋转</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="68"/>
@@ -9284,7 +9297,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="69"/>
         <source>Y rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Y轴旋转</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="74"/>
@@ -9294,7 +9307,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="75"/>
         <source>Z rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Z轴旋转</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="81"/>
@@ -9304,7 +9317,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="82"/>
         <source>Distance</source>
-        <translation type="unfinished"></translation>
+        <translation>距离</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="88"/>
@@ -9319,7 +9332,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="98"/>
         <source>Render method</source>
-        <translation type="unfinished"></translation>
+        <translation>渲染方式</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="99"/>
@@ -9369,17 +9382,17 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="129"/>
         <source>Lighting (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>光源(1)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="134"/>
         <source>Lighting (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>光源(2)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="139"/>
         <source>Lighting (3)</source>
-        <translation type="unfinished"></translation>
+        <translation>光源(3)</translation>
     </message>
 </context>
 <context>
@@ -9472,7 +9485,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="112"/>
         <source>Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>插值</translation>
     </message>
     <message>
         <location filename="./veusz/setting/stylesheet.py" line="113"/>
@@ -9517,7 +9530,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/stylesheet.py" line="136"/>
         <source>Default font style</source>
-        <translation type="unfinished"></translation>
+        <translation>默认字体样式</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="146"/>
@@ -9537,7 +9550,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="602"/>
         <source>Hide horz.</source>
-        <translation>隐藏水平</translation>
+        <translation>隐藏水平.</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="154"/>
@@ -9547,7 +9560,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="606"/>
         <source>Hide vert.</source>
-        <translation>隐藏垂直</translation>
+        <translation>隐藏垂直.</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="204"/>
@@ -9607,7 +9620,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="241"/>
         <source>Back trans.</source>
-        <translation>背景透明度</translation>
+        <translation>背景透明度.</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="246"/>
@@ -9662,7 +9675,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="363"/>
         <source>Font style</source>
-        <translation type="unfinished"></translation>
+        <translation>字体样式</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="367"/>
@@ -9777,7 +9790,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="529"/>
         <source>Color of surface</source>
-        <translation type="unfinished"></translation>
+        <translation>曲面颜色</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="543"/>
@@ -9807,17 +9820,17 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="601"/>
         <source>Hide horizontal lines</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏水平线</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="605"/>
         <source>Hide vertical lines</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏垂直线</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="616"/>
         <source>Enable lighting</source>
-        <translation type="unfinished"></translation>
+        <translation>启用光源</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="617"/>
@@ -9827,12 +9840,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="620"/>
         <source>Color of lighting</source>
-        <translation type="unfinished"></translation>
+        <translation>光源颜色</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="625"/>
         <source>Light intensity percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>光源强度百分比</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="626"/>
@@ -9847,7 +9860,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="631"/>
         <source>X position</source>
-        <translation type="unfinished"></translation>
+        <translation>X轴位置</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="635"/>
@@ -9857,7 +9870,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="636"/>
         <source>Y position</source>
-        <translation type="unfinished"></translation>
+        <translation>Y轴位置</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="640"/>
@@ -10070,22 +10083,22 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/shape.py" line="398"/>
         <source>Scalable vector graphic file</source>
-        <translation type="unfinished"></translation>
+        <translation>可缩放矢量图形文件</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="411"/>
         <source>Embed scalable vector graphic in Veusz document to remove dependency on external file</source>
-        <translation type="unfinished"></translation>
+        <translation>在Veusz文档中嵌入SVG图像以移除对外部文件的依赖</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="414"/>
         <source>Embed SVG</source>
-        <translation type="unfinished"></translation>
+        <translation>嵌入SVG</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="423"/>
         <source>SVG filename</source>
-        <translation type="unfinished"></translation>
+        <translation>SVG文件名</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="430"/>
@@ -10095,7 +10108,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/shape.py" line="471"/>
         <source>embed SVG</source>
-        <translation type="unfinished"></translation>
+        <translation>嵌入SVG</translation>
     </message>
 </context>
 <context>
@@ -10184,7 +10197,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="39"/>
         <source>3D surface</source>
-        <translation type="unfinished"></translation>
+        <translation>3D 曲面</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="62"/>
@@ -10214,7 +10227,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="75"/>
         <source>High res.</source>
-        <translation type="unfinished"></translation>
+        <translation>高分辨率.</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="80"/>
@@ -10224,7 +10237,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="81"/>
         <source>Grid line</source>
-        <translation type="unfinished"></translation>
+        <translation>网格线</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="85"/>
@@ -10898,12 +10911,12 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="986"/>
         <source>Copy the current page as svg image</source>
-        <translation type="unfinished"></translation>
+        <translation>复制当前页面为SVG图像</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="986"/>
         <source>&amp;Copy as Image</source>
-        <translation type="unfinished"></translation>
+        <translation>复制为图像(&amp;C)</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="990"/>
@@ -10953,7 +10966,7 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>显示</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
@@ -10988,7 +11001,7 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1204"/>
         <source>Error while exporting images</source>
-        <translation type="unfinished"></translation>
+        <translation>导出图片时出错</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1428"/>
@@ -11062,6 +11075,31 @@ Linked to: %s</source>
         <source>make default style</source>
         <translation>设置默认样式</translation>
     </message>
+    <message>
+        <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
+        <source>Remove selected widgets</source>
+        <translation>移除选定的部件</translation>
+    </message>
+    <message>
+        <location filename="./veusz/windows/treeeditwindow.py" line="1022"/>
+        <source>Show selected widgets</source>
+        <translation>显示选定的部件</translation>
+    </message>
+    <message>
+        <location filename="./veusz/windows/treeeditwindow.py" line="1374"/>
+        <source>hide widgets</source>
+        <translation>隐藏部件</translation>
+    </message>
+    <message>
+        <location filename="./veusz/windows/treeeditwindow.py" line="1386"/>
+        <source>show widgets</source>
+        <translation>显示部件</translation>
+    </message>
+    <message>
+        <location filename="./veusz/windows/treeeditwindow.py" line="1026"/>
+        <source>Hide selected widgets</source>
+        <translation>隐藏选定的部件</translation>
+    </message>
 </context>
 <context>
     <name>Tutorial</name>
@@ -11100,11 +11138,15 @@ and for plotting functions.&lt;/p&gt;
 inside it in a grid arrangement.&lt;/p&gt;
 </source>
         <translation>
-1组件1
-2的绘图由3组件集3构建，不同组件用于制作绘图的不同部分
-例如，有用于坐标轴、图形、绘制数据的组件并用于绘制函数图像。2
-4还有一些特殊的组件。网格组件排列图形使其在里面以网格排列。4
+&lt;h1&gt;部件&lt;/h1&gt;
 
+&lt;p&gt;Veusz中的绘图是由&lt;i&gt;部件&lt;/i&gt;构成的。  使用
+不同类型的部件来制作图表的不同部分。例如，
+有用于坐标轴、用于图、用于绘制数据和用于
+绘制函数的部件。&lt;/p&gt;
+
+&lt;p&gt;还有特殊的部件。网格部件将图表在其内部
+以网格排列。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11921,7 +11963,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="129"/>
         <source>Line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>线条设置</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="130"/>
@@ -11944,6 +11986,11 @@ developers via the mailing list.&lt;/p&gt;
 </context>
 <context>
     <name>WidgetTree</name>
+    <message>
+        <location filename="./veusz/windows/widgettree.py" line="365"/>
+        <source>remove widgets</source>
+        <translation>移除部件</translation>
+    </message>
 </context>
 <context>
     <name>WorkerPluginDialog</name>
@@ -12768,15 +12815,18 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Data are ordered in C format, with the rightmost index increasing most rapidly. The transpose option can be used to change the option. This can also be included in the file with a single row containing &amp;quot;transpose&amp;quot;.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-预留空白空间&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Oxygen-Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;文件应包括以下内容之一：&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Oxygen-Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;文件应包括以下内容之一：&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. 一组数字，自由格式，以及上面指定的形状或使用文件中的&amp;quot;形状A B C…&amp;quot;命令。形状应该是正整数，尽管一个维度可以是-1，以自动检测长度。&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. 一组数字按行和列排列。一维数据集在单行上，二维数据集是一组一维行，三维是一组由空白行分隔的二维数据集，四维是一组由两个空白行分隔的三维数据集，等等。&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;数据以C格式排序，最右边的索引增加得最快。可以用transpose选项来改变这个选项。这也可以在文件中包括一个包含&amp;quot;transpose&amp;quot;的单行。&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
-</translation>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;数据以C格式排序，最右边的索引增加得最快。可以用transpose选项来改变这个选项。这也可以在文件中包括一个包含&amp;quot;transpose&amp;quot;的单行。&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/import_nd.ui" line="170"/>
