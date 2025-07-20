@@ -23,6 +23,11 @@
         <source>OK</source>
         <translation>确定</translation>
     </message>
+    <message>
+        <location filename="./ui/about.ui" line="62"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz版本 %(version)s&lt;/span&gt;&lt;br/&gt; © 2003-2025 Jeremy Sanders 和参与贡献者&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;主要作者:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;参与者贡献者:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;包含以下外部代码和资源: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz 绝对没有安全保障. Veusz是免费软件, 并且您有权根据 GNU 公共许可证 （GPL） 的条款分发它. 有关详细信息，请参阅文件 COPYING，或单击 &amp;quot;展示授权文件&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>Axis</name>
@@ -1946,7 +1951,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     <message>
         <location filename="./ui/custom.ui" line="60"/>
         <source>Add external Python functions and constants using an import. Enter a module name and list of symbols to import (comma-separated or &quot;*&quot; for all symbols). A blank list of symbols will import the module with its name.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用导入添加外部 Python 函数和常量。输入模块名称和要导入的符号列表（所有符号以逗号分隔或“*”）。符号的空白列表将导入带有其名称的模块。</translation>
     </message>
     <message>
         <location filename="./ui/custom.ui" line="84"/>
@@ -3493,7 +3498,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="29"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of file to export. When exporting multiple pages to multiple files %PAGE% is the number of the page and %PAGENAME% is the name of the page. %PAGE00% and %PAGE000% are the page numbers prefixed with zeros to make two or three characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;要导出的文件名称. 将多个页面导出到多个文件时 %PAGE% 是文件页数 并且 %PAGENAME% 是文件页名称. %PAGE00% 和 %PAGE000% 页码是否以零为前缀组成两个或三个字符.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="36"/>
@@ -4119,6 +4124,13 @@ This Veusz only supports document version %i.</source>
 
 %s</translation>
     </message>
+    <message numerus="yes">
+        <location filename="./veusz/dialogs/export.py" line="496"/>
+        <source>Exported %n page(s)</source>
+        <translation>
+            <numerusform>输出对话框输出%n页</numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>FilterDialog</name>
@@ -4627,7 +4639,7 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="118"/>
         <source>Number of steps to evaluate the function over for surfaces in each direction</source>
-        <translation type="unfinished"></translation>
+        <translation>在每个方向上估计曲面函数的步骤数</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="121"/>
@@ -6399,7 +6411,7 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/widgets/key.py" line="181"/>
         <source>Override default item order (comma separated names)</source>
-        <translation type="unfinished"></translation>
+        <translation>覆盖默认项顺序（用逗号分隔的名称）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="182"/>
@@ -6409,7 +6421,7 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/widgets/key.py" line="186"/>
         <source>Exclude item from displaying (comma separated names)</source>
-        <translation type="unfinished"></translation>
+        <translation>从显示中排除项目（以逗号分隔的名称）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="187"/>
@@ -7243,19 +7255,19 @@ If not, you can access it later through the Help menu.</source>
 let you know if there is a new one available.
 
 Is this ok? This choice can be changed in Preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veusz将定期检查是否有新的Veusz版本，并在有新版本时通知您。这样可以吗？此选项可以在偏好设置中更改。</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="959"/>
         <source>Send automatic anonymous feedback</source>
-        <translation type="unfinished"></translation>
+        <translation>发送自动匿名反馈</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="960"/>
         <source>Veusz can automatically send anonymous feedback to the developers, with information about the version of software dependencies, the computer language and how often features are used.
 
 Is this ok? This choice can be changed in Preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veus需要匿名了解软件故障给开发者，涉及软件版本计算机用户语言以及使用功能模块频率，请允许我们改进提高。在设置中您可以选择。</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="979"/>
@@ -9277,12 +9289,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="51"/>
         <source>3d scene</source>
-        <translation type="unfinished"></translation>
+        <translation>3D 场景</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="62"/>
         <source>Rotation around x axis (°)</source>
-        <translation type="unfinished"></translation>
+        <translation>绕 x 轴旋转 （°）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="63"/>
@@ -9292,7 +9304,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="68"/>
         <source>Rotation around y axis (°)</source>
-        <translation type="unfinished"></translation>
+        <translation>绕 y轴旋转 （°）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="69"/>
@@ -9302,7 +9314,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="74"/>
         <source>Rotation around z axis (°)</source>
-        <translation type="unfinished"></translation>
+        <translation>绕 z轴旋转 （°）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="75"/>
@@ -9312,7 +9324,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="81"/>
         <source>Viewing distance</source>
-        <translation type="unfinished"></translation>
+        <translation>观察点距离</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="82"/>
@@ -9322,7 +9334,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="88"/>
         <source>Automatic or fixed graph size scaling value</source>
-        <translation type="unfinished"></translation>
+        <translation>自动或固定图形大小缩放值</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="89"/>
@@ -9337,7 +9349,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="99"/>
         <source>Method used to draw 3D plot</source>
-        <translation type="unfinished"></translation>
+        <translation>3D图片绘图方法</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="104"/>
@@ -9480,7 +9492,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="111"/>
         <source>Line style (linear/curved) to connect points</source>
-        <translation type="unfinished"></translation>
+        <translation>线条类型（直线/曲线）连接到点</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="112"/>
@@ -9745,7 +9757,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="444"/>
         <source>Use color value (0-1) in dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>在数据集中使用颜色值 （0-1）</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="449"/>
@@ -9780,12 +9792,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="539"/>
         <source>Reflectivity percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>反射率百分比</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="540"/>
         <source>Reflectivity</source>
-        <translation type="unfinished"></translation>
+        <translation>反射率</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="529"/>
@@ -9795,7 +9807,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="543"/>
         <source>Hide surface</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏曲面</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="584"/>
@@ -9850,12 +9862,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="626"/>
         <source>Intensity</source>
-        <translation type="unfinished"></translation>
+        <translation>强度</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="630"/>
         <source>X coordinate of light (positive is right)</source>
-        <translation type="unfinished"></translation>
+        <translation>光的X坐标（正值在右）</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="631"/>
@@ -9865,7 +9877,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="635"/>
         <source>Y coordinate of light (positive is below)</source>
-        <translation type="unfinished"></translation>
+        <translation>光的y坐标（正值在下）</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="636"/>
@@ -9875,7 +9887,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="640"/>
         <source>Z coordinate of light (positive is towards viewer)</source>
-        <translation type="unfinished"></translation>
+        <translation>光的z坐标（正值指向用户）</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="641"/>
@@ -10103,7 +10115,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/shape.py" line="430"/>
         <source>Embedded scalable vector graphic data, used if filename set to {embedded}</source>
-        <translation type="unfinished"></translation>
+        <translation>嵌入式可缩放矢量图形数据，如果文件名设置为 {embedded} 则使用</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="471"/>
@@ -10202,7 +10214,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="62"/>
         <source>Axes of plot surface</source>
-        <translation type="unfinished"></translation>
+        <translation>绘图表面的轴</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="63"/>
@@ -10222,7 +10234,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="74"/>
         <source>High resolution surface (accurate bin centres)</source>
-        <translation type="unfinished"></translation>
+        <translation>高分辨率表面（精确的料箱中心）</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="75"/>
@@ -11457,7 +11469,19 @@ can see datasets in more detail in the Data Edit dialog box.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;The flashing icon adds a point plotting (xy)
 widget. Click on this, or go to the Insert menu and choose &quot;Add xy&quot;.&lt;/p&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+&lt;h1&gt;图表数据&lt;/h1&gt;
+
+
+
+&lt;p&gt;点绘图小部件绘制在 Veusz 中加载的数据集。&lt;/p&gt;
+
+
+
+&lt;p class=&quot;usercmd&quot;&gt;闪烁的图标添加点绘图 （xy）
+
+控件。单击此按钮，或转到“插入”菜单并选择“添加 xy”。&lt;/p&gt;
+</translation>
     </message>
     <message>
         <location filename="./veusz/windows/tutorial.py" line="464"/>
