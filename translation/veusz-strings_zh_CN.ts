@@ -1571,7 +1571,11 @@ Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software, and you are&lt;
 welcome to redistribute it under certain conditions. Enter &quot;GPL()&quot; for details.&lt;br&gt;
 This window is a Python command line console and acts as a calculator.&lt;br&gt;
 </source>
-        <translation>Veusz是免费软件，作者Jeremy Sanders，本软件不承担任何法律责任。免费软件需要使用者提供用户反馈，众人拾柴火焰高！
+        <translation>欢迎使用 &lt;b&gt;&lt;font color=&quot;#a000a0&quot;&gt;Veusz %s&lt;/font&gt;&lt;/b&gt; --- 一款科学绘图应用程序。&lt;br&gt;
+版权所有© 2003-2025 Jeremy Sanders &amp;lt;jeremy@jeremysanders.net&amp;gt; 和其他贡献者。&lt;br&gt;
+Veusz 不承担任何形式的担保责任。 Veusz 是自由软件，并且很欢迎您在特定条件&lt;br&gt;
+重新分发它。输入 &quot;GPL()&quot; 查看详情。&lt;br&gt;
+这个窗口是一个Python命令行控制台，并充当计算器。&lt;br&gt;
 </translation>
     </message>
 </context>
@@ -11174,8 +11178,14 @@ grid. Several plotting widgets and axis widgets can be put in a
 graph.&lt;/p&gt;
 </source>
         <translation>
-1 小部件通常可以重叠放置。例如，一幅图的小组件可以放在图内部或者组件格内。绘图小组件都在绘图组件内。1
-2您可以拥有多个不同类型的小组件。比如，你页面上可以有几个图，可以随意排列成一个 网格。几个绘图小组件和轴小组件可以放在一个 图形中。2
+&lt;p&gt;部件通常可以嵌套放置。例如，一个图表部件
+可以放置在页面部件或网格部件中。绘图部件
+可以放置在图表部件中。&lt;/p&gt;
+
+&lt;p&gt;您可以在页面上拥有多种类型的多个部件。
+例如，您可以在页面上放置几个图表，这些图表
+可以排列成网格。可以在图表中放置多个绘图
+部件和坐标轴部件。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11190,9 +11200,13 @@ currently in the plot in a hierarchical tree. Each widget has a name
 &lt;p class=&quot;usercmd&quot;&gt;Press Next to continue.&lt;/p&gt;
 </source>
         <translation>
-1组件编辑1
-2动画窗口是编辑窗口，它以分层树的形式显示当前绘图中的部件。每个小组件都有一个名称(左栏)和一个类型(右栏)。2
-3按“下一步”继续。3
+&lt;h1&gt;部件编辑&lt;/h1&gt;
+
+&lt;p&gt;闪烁的窗口是编辑窗口，它以分层树的形式显示当前
+在图中显示的部件。每个部件都有一个名称（左侧列）
+和一个类型（右侧列）。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;按下一步继续。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11204,9 +11218,10 @@ currently in the plot in a hierarchical tree. Each widget has a name
 to its left in the editing window - and select the x axis widget.&lt;/p&gt;
 </source>
         <translation>
-1图形小组件是当前选定的小组件。1
-2展开图表小组件--在编辑窗口中点击箭头或加号然后选择X轴小组件。2
+&lt;p&gt;图形部件是当前选中的部件。&lt;/p&gt;
 
+&lt;p class=&quot;usercmd&quot;&gt;展开图形部件 - 在编辑窗口中点击
+其左侧的箭头或加号 - 然后选择X轴部件。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11222,10 +11237,14 @@ text edit box to the right of &quot;Label&quot;, typing some text and press the
 Enter key.&lt;/p&gt;
 </source>
         <translation>
-1小组件属性1
-2这个窗口显示了当前选定的小组件的属性，图形的X轴小组件。2
-3为该小组件输入一个新的标签，方法是点击 &quot;标签 &quot;右边的文本编辑框，输入一些文本并按下
-回车键。3
+&lt;h1&gt;部件属性&lt;/h1&gt;
+
+&lt;p&gt;此窗口显示当前所选部件的属性，即图表
+的x轴部件。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;通过点击“标签”右侧的
+文本编辑框，输入一些文本并按Enter键来
+为小部件输入新的标签。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11551,7 +11570,15 @@ Change the fill color of the plotted data.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Add a second point plotting (xy) widget using the
 flashing icon, or go to the Insert menu and choose &quot;Add xy&quot;.&lt;/p&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+&lt;h1&gt;添加第二个数据集&lt;/h1&gt;
+
+&lt;p&gt;现在我们将数据集 &lt;code&gt;alpha&lt;/code&gt; 和
+&lt;code&gt;gamma&lt;/code&gt; 绘制在同一张图上。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;使用闪烁的图标添加第二个点绘图（xy）
+部件，或者转到“插入”菜单并选择“添加xy”。&lt;/p&gt;
+</translation>
     </message>
     <message>
         <location filename="./veusz/windows/tutorial.py" line="549"/>
