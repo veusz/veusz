@@ -11746,11 +11746,10 @@ developers via the mailing list.&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;最后&lt;/h1&gt;
-&lt;p&gt;感谢你通过这个Veusz教程的工作。我们希望你喜欢使用Veusz!&lt;/p&gt;
+&lt;p&gt;感谢你完成这个Veusz导游过程。我们希望你喜欢使用Veusz!&lt;/p&gt;
 &lt;p&gt;请通过邮件列表向开发人员发送评论、错误报告和建议。&lt;/p&gt;
 &lt;p&gt;你可以从 &quot;帮助 &quot;菜单中再次尝试这个教程。
 &lt;/p&gt;
-
 </translation>
     </message>
 </context>
