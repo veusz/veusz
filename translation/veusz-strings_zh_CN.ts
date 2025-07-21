@@ -99,7 +99,7 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="133"/>
         <source>Label offset</source>
-        <translation>标识偏移</translation>
+        <translation>标识位移</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="138"/>
@@ -13020,7 +13020,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="./veusz/veusz_main.py" line="379"/>
         <source>Error starting - Veusz</source>
-        <translation>Veusz 错误启动请联系作者反馈故障环境</translation>
+        <translation>Veusz启动故障，请联系作者提供更多线索反馈故障环境。</translation>
     </message>
 </context>
 </TS>
