@@ -84,7 +84,7 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="123"/>
         <source>Place axis label close to edge of graph</source>
-        <translation>在图形边缘放置图标识</translation>
+        <translation>将轴标识放置在图形边缘附近</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="124"/>
@@ -1212,14 +1212,14 @@
     <message>
         <location filename="./veusz/dialogs/capturedialog.py" line="186"/>
         <source>Cannot open input</source>
-        <translation>无法打开所输入内容</translation>
+        <translation>无法打开输入文件</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/capturedialog.py" line="187"/>
         <source>Cannot open input:
  %s (error %i)</source>
-        <translation>无法打开所输入内容：
- %s(错误%i)</translation>
+        <translation>无法打开输入文件：
+ %s(error %i)</translation>
     </message>
     <message>
         <location filename="./ui/capture.ui" line="194"/>
@@ -1234,7 +1234,7 @@
     <message>
         <location filename="./ui/capture.ui" line="226"/>
         <source>Update document at intervals (s)</source>
-        <translation>定期更新文档</translation>
+        <translation>定期更新文档（秒）</translation>
     </message>
     <message>
         <location filename="./ui/capture.ui" line="243"/>
@@ -1262,7 +1262,7 @@
     <message>
         <location filename="./ui/capturing.ui" line="26"/>
         <source>%i bytes read in %i seconds</source>
-        <translation>读取%i字节需要%i秒</translation>
+        <translation>在 %i 秒内读取了 %i 字节</translation>
     </message>
     <message>
         <location filename="./ui/capturing.ui" line="40"/>
@@ -1649,7 +1649,7 @@ Veusz 不承担任何形式的担保责任。 Veusz 是自由软件，并且很�
     <message>
         <location filename="./veusz/widgets/contour.py" line="155"/>
         <source>Rotate labels to follow lines</source>
-        <translation>随线旋转标识</translation>
+        <translation>跟随线旋转标识</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/contour.py" line="156"/>
@@ -4019,7 +4019,7 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/document/export.py" line="342"/>
         <source>Tagged Image File Format bitmap</source>
-        <translation>标签图像文件格式</translation>
+        <translation>TIFF位图</translation>
     </message>
     <message>
         <location filename="./veusz/document/export.py" line="343"/>
@@ -5713,9 +5713,38 @@ p, li { white-space: pre-wrap; }
 &lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;The text &lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;nan&lt;/span&gt; or &lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;inf&lt;/span&gt; translates to the usual numerical values. These values aren&apos;t plotted in a plot, giving a break in the line.&lt;/li&gt;
 &lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;You can encode the descriptor describing the data in the file itself with a line &lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;descriptor XXX&lt;/span&gt; before the data. Leave the descriptor blank in the import dialog if you do this. Multiple descriptors can be placed in the file to store multiple sets of data. &lt;/li&gt;&lt;/ol&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;预留空白空间&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Arial&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Veusz假定数据以文本文件中的列的形式存储，用制表符或空格分隔。应该为从每一列读取的数据集输入名称，用空格或逗号隔开（在数据集名称或描述符框中）。如果你把描述符留空，将使用自动数据集名称（前缀+列+后缀，如果前缀和后缀为空，则为&amp;quot;colX&amp;quot;）。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;如果你想提供数据的误差或不确定性，可以在数据集栏后面的列中给出（对称误差为一列，不对称误差为两列）。要告诉Veusz一个数据集有误差，可以添加&amp;quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;+-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&amp;quot; 或 &amp;quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;+,-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;
-&amp;quot;到数据集名称中，分别指定对称或不对称误差。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;逗号或空格分隔数据集名称和误差条。它们是可以互换的，只是多个逗号会跳过一个输入列。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;例如&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;x y&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	x和y没有错误（2个数据集的2列）。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;x,+-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	具有对称误差的x（单一数据集的2列）。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;y，+-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	具有不对称误差的y（数据集的3列）。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;x[1:5]+,-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	x_1到x_5，每个都有不对称的误差（共15列）&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;x y +-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	没有错误的x，有对称错误的y（共3列）。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;,x,y,-,+3738	&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	跳过第一列，X没有错误，Y后面是负的，然后是正的误差条。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;数据类型&lt;/span&gt;&lt;/p&gt; &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;一个文件可以包含不同类型的数据。这种类型紧跟在数据集名称之后，用圆括号指定，例如：&amp;quot;x(float)&amp;quot;，&amp;quot;labs(text)&amp;quot;或者&amp;quot;y(float),+-&amp;quot;。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt; &lt;/p&gt; &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;只支持数字（使用浮点、数字或数值）和文本（使用文本或字符串）数据。如果一个文本列有空格，它应该用引号包围。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;&quot;&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;意见&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;
-如果任何一个&amp;quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;#&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&amp;quot;, &amp;quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;！&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&amp;quot;, &amp;quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;；&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&amp;quot; or &amp;quot;5758&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;%&lt;span style=&quot; font-size:10pt;&quot;&gt;如果发现&amp;quot;字符不在引号内，一行的其余部分将被忽略。使用这些字符可以在文件中添加注释。&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;&quot;&gt;&lt;/p&gt;&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;进一步说明&lt;/span&gt;&lt;/p&gt;&lt;ol style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;忽略列间多余的制表符或空格&lt;/li&gt;&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;行末的额外数据被忽略&lt;/li&gt;&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;文字&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;nan&lt;/span&gt;或&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;inf&lt;/span&gt;转化为通常的数值。这些值不在绘图中，给人一种断裂的感觉。&lt;/li&gt;&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;你可以用数据前的行&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;描述符XXX来编码文件本身中描述数据的描述符。如果你这样做，在导入对话框中把描述符留空。可以在文件中放置多个描述符来存储多组数据。&lt;/li&gt;&lt;/ol&gt;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Arial&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Veusz默认数据以制表符或空格分隔的文本文件列形式存储。读取每列数据集时应输入名称，用空格或逗号分隔（在数据集名称或描述框中）。若留空描述框，将自动生成数据集名称（前缀+列号+后缀，若前缀后缀均为空则使用&quot;colX&quot;）。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;如需提供数据误差或不确定度，可在数据集列后添加误差列（对称误差用1列，非对称误差用2列）。通过在数据集名称后添加&quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;+-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&quot;或&quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;+,-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&quot;分别指定对称或非对称误差。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;逗号或空格用于分隔数据集名称和误差条。二者可互换，但连续逗号会跳过输入列。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;示例&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;x y&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	无误差的x和y（2列对应2个数据集）&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;x,+-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	带对称误差的x（单数据集占2列）&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;y + -&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	带非对称误差的y（单数据集占3列）&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;x[1:5]+,-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	x_1至x_5，均带非对称误差（共15列）&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;x y +-&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	x无误差，y带对称误差（共3列）&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;,x,y,-,+&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;	跳过首列，x无误差，y后接负误差和正误差列&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;数据类型&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;文件可包含不同类型数据。类型在数据集名称后的圆括号内指定，如&quot;x(float)&quot;、&quot;labels(text)&quot;或&quot;y(float),+-&quot;。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;仅支持数值型（使用float/number/numeric）和文本型（使用text/string）数据。若文本列含空格需用引号包裹。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;注释&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;若发现未包含在引号内的&quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;#&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&quot;、&quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&quot;、&quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;;&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&quot;或&quot;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;; font-size:10pt;&quot;&gt;%&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&quot;字符，该行剩余内容将被忽略。可用这些字符添加文件注释。&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;补充说明&lt;/span&gt;&lt;/p&gt;
+&lt;ol style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;列间多余制表符或空格将被忽略&lt;/li&gt;
+&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;行末多余数据将被忽略&lt;/li&gt;
+&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;文本&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;nan&lt;/span&gt;或&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;inf&lt;/span&gt;将转换为常规数值。这些值不会在图中绘制，形成线条断点。&lt;/li&gt;
+&lt;li style=&quot; font-size:10pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;可在数据前添加&lt;span style=&quot; font-family:&apos;Courier New,courier&apos;;&quot;&gt;descriptor XXX&lt;/span&gt;行将数据描述编码到文件内。若如此操作，导入对话框中的描述框应留空。单个文件可包含多个描述以存储多组数据。&lt;/li&gt;&lt;/ol&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -6013,10 +6042,11 @@ Example syntax: 2:20
    :10,:,2:20
    1:10:5,::5</source>
         <translation>切分数据以创建要导入的子集。
-应为以逗号分隔的每个维度的范围
-可以是空(:)、半(:10)、
-满(4:10)，带步数(1:10:2)
-或负步数(::-1)。
+这应该是每个维度的范围，
+用逗号分隔。
+范围可以是空的(:)、一半的(:10)、
+ 完全的(4:10)，带步数的(1:10:2)
+ 或负步数的(::-1)。
 示例语法：2:20
    :10,:,2:20
    1:10:5,::5</translation>
@@ -7259,7 +7289,10 @@ If not, you can access it later through the Help menu.</source>
 let you know if there is a new one available.
 
 Is this ok? This choice can be changed in Preferences.</source>
-        <translation>Veusz将定期检查是否有新的Veusz版本，并在有新版本时通知您。这样可以吗？此选项可以在偏好设置中更改。</translation>
+        <translation>Veusz将定期检查是否有新的Veusz版本，
+并在有新版本时通知您。
+
+这样可以吗？此选项可以在偏好设置中更改。</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="959"/>
@@ -7271,7 +7304,9 @@ Is this ok? This choice can be changed in Preferences.</source>
         <source>Veusz can automatically send anonymous feedback to the developers, with information about the version of software dependencies, the computer language and how often features are used.
 
 Is this ok? This choice can be changed in Preferences.</source>
-        <translation>Veus需要匿名了解软件故障给开发者，涉及软件版本计算机用户语言以及使用功能模块频率，请允许我们改进提高。在设置中您可以选择。</translation>
+        <translation>Veusz可以自动向开发者发送匿名反馈，包括有关软件依赖版本、计算机语言以及功能使用频率的信息。
+
+这样可以吗？此选项可以在偏好设置中更改。</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="979"/>
@@ -8990,8 +9025,9 @@ Leave blank for no stylesheet to be loaded.</source>
         <source>A custom definiton file name specified here will be automatically
 loaded when creating a new document. Leave blank for no file
 to be loaded.</source>
-        <translation>创建新文档时将自动加载此处指定的自定义描述。
-留空则表示不加载自定义描述。</translation>
+        <translation>在此处指定的自定义文件名，
+将在创建新文档时自动加载。
+留空则不加载任何文件。</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="323"/>
@@ -11135,8 +11171,13 @@ menu.&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;欢迎来到Veusz！&lt;/h1&gt;
+
 &lt;p&gt;本教程旨在尽可能地让你快速上手Veusz。&lt;/p&gt;
-&lt;p&gt;您可以随时点击此面板右上角的“关闭”按钮关闭此教程。你也可以在“帮助”菜单中重新打开教程。&lt;/p&gt;
+
+&lt;p&gt;您可以随时点击此面板右上角的“关闭”
+按钮关闭此教程。你也可以在“帮助”菜单中
+重新打开教程。&lt;/p&gt;
+
 &lt;p class=&quot;usercmd&quot;&gt;按下一步进入下一页面。&lt;/p&gt;
 </translation>
     </message>
@@ -11263,8 +11304,11 @@ of the axis and whether the axis is logarithmic.&lt;/p&gt;
 &lt;p&gt;注意，你的绘图的X轴标签现在已经更新了。
 Veusz支持LaTeX风格的标签格式，所以你可以包括
 上标、下标和分数。&lt;/p&gt;
-&lt;p&gt;其他重要的轴属性包括最小值、最大值以及该轴是否为对数。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击 &quot;下一步 &quot;继续。&lt;/p&gt;
+
+&lt;p&gt;其他重要的轴属性包括最小值、最大值以及
+该轴是否为对数。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击下一步继续。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11282,13 +11326,16 @@ see a description of a widget type.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Press Next to continue.&lt;/p&gt;
 </source>
         <translation>
-&lt;h1&gt;添加组件&lt;/h1&gt;
+&lt;h1&gt;添加部件&lt;/h1&gt;
 
-&lt;p&gt;动画 &quot;添加组件 &quot;工具栏和 &quot;插入 &quot;菜单将组件添加到
-到文档中。新的小组件被插入到当前选择的小组件，如果可能的话，插入到它的父组件。&lt;/p&gt;
+&lt;p&gt;闪烁的“添加部件”工具栏和“插入”菜单可以将部件
+添加到文档中。如果可能，新部件将被插入到当前
+选中的部件中，或者其父级中。&lt;/p&gt;
 
-&lt;p&gt;将你的鼠标指针放在工具栏的一个按钮上，可以看到一个小组件类型的描述。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;按 &quot;下一步 &quot;继续。&lt;/p&gt;
+&lt;p&gt;将你的鼠标指针放在工具栏的一个按钮上，
+可以看到一个部件类型的描述。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;按下一步继续。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11304,8 +11351,12 @@ and choosing &quot;Add function&quot;.&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;添加一个函数&lt;/h1&gt;
-&lt;p&gt;我们现在将添加一个函数绘图的小组件到当前图中。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击动画图标，或进入插入菜单并选择 &quot;添加功能&quot;。&lt;/p&gt;
+
+&lt;p&gt;我们现在将添加一个函数绘图的组件
+到当前图中。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击动画图标，或进入插入菜单
+并选择 &quot;添加函数&quot;。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11321,9 +11372,14 @@ be &lt;code&gt;x**2&lt;/code&gt;, plotting x squared.&lt;/p&gt;
 is &lt;code&gt;**&lt;/code&gt;, rather than &lt;code&gt;^&lt;/code&gt;)&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;你现在已经在图形小组件中添加了一个函数小组件。默认情况下，函数部件会绘制y=x。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;转到函数属性，将函数改为&lt;code&gt;x**2&lt;/code&gt;，绘制x的平方。&lt;/p&gt;
-&lt;p&gt;(Veusz的函数使用Python语法，所以幂运算符是&lt;code&gt;**&lt;/code&gt;，而不是&lt;code&gt;^&lt;/code&gt;）&lt;/p&gt;
+&lt;p&gt;你现在已经在图形部件中添加了一个函数部件。
+默认情况下，函数部件会绘制 y=x。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;转到函数属性，将函数改为
+&lt;code&gt;x**2&lt;/code&gt;，绘制x的平方。&lt;/p&gt;
+
+&lt;p&gt;(Veusz的函数使用Python语法，所以幂运算符
+是&lt;code&gt;**&lt;/code&gt;，而不是&lt;code&gt;^&lt;/code&gt;)&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11339,9 +11395,12 @@ the function widget.&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;格式化&lt;/h1&gt;
-&lt;p&gt;小工具有许多格式化选项。格式化窗口
-(闪烁）显示了当前选择的小组件的选项，这里是功能小组件。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;按 &quot;下一步 &quot;继续&lt;/p&gt;
+
+&lt;p&gt;部件有许多格式化选项。格式化窗口
+(闪烁中）显示了当前选择的部件的选项，
+目前是函数部件。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;按下一步继续&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11354,8 +11413,11 @@ the flashing Line tab (%s).&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Click on the Line tab to continue.&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;不同类型的格式化属性被分组在不同的表格中。绘制功能线的选项被分组在动画线标签（%s）下。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击 &quot;线 &quot;标签继续。&lt;/p&gt;
+&lt;p&gt;不同类型的格式化属性被分组在
+不同的表格中。绘制功能线的选项
+被分组在动画线标签（%s）下。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击“线”标签继续。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11367,8 +11429,10 @@ function line.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Choose a new line color for the line.&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;Veusz让你从功能线中为功能线选择一个线条样式、厚度和颜色。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;为线条选择一个新的线条颜色。&lt;/p&gt;
+&lt;p&gt;Veusz 允许您为函数线选择线条样式、
+粗细和颜色。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;选择一个新的线条颜色。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11387,9 +11451,15 @@ document.&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;数据集&lt;/h1&gt;
-&lt;p&gt;Veusz中的许多部件都会绘制数据集。数据集可以从文件中导入，也可以手动输入，或者使用操作或表达式从现有数据集中创建。&lt;/p&gt;
-&lt;p&gt;导入的数据可以链接到一个外部文件或嵌入到文件中。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;按 &quot;下一步 &quot;继续&lt;/p&gt;
+
+&lt;p&gt;Veusz中的许多部件都会绘制数据集。数据集
+可以从文件中导入，也可以手动输入，或者
+使用运算或表达式从现有数据集中创建。&lt;/p&gt;
+
+&lt;p&gt;导入的数据可以链接到一个外部文件或
+嵌入到文件中。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;按下一步继续&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11404,9 +11474,11 @@ document.&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;导入数据&lt;/h1&gt;
-&lt;p&gt;让我们从导入数据开始。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击闪烁的数据导入图标，或从数据菜单中。选择 &quot;导入…&quot;  &lt;/p&gt;
 
+&lt;p&gt;让我们从导入数据开始。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击闪烁的数据导入图标，
+或从数据菜单中选择“导入…”&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11422,10 +11494,14 @@ and &lt;i&gt;gamma&lt;/i&gt;, entered as columns in the CSV file.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Press Next to continue&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;这就是数据导入对话框。在本教程中，我们选择了 一个CSV（逗号分隔值）文件的例子，但你通常会通过浏览以找到你的数据文件&lt;/p&gt;
-&lt;p&gt;这个例子文件定义了三个数据集，&lt;i&gt;测试&lt;/i&gt;，&lt;i&gt;测试版&lt;/i&gt;和&lt;i&gt;伽马&lt;/i&gt;，在CSV文件中作为列输入。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;按 &quot;下一步 &quot;继续&lt;/p&gt;
+&lt;p&gt;这就是数据导入对话框。在本教程中，我们
+选择了 一个CSV（逗号分隔值）文件的例子，
+但你通常会通过浏览找到你的数据文件。&lt;/p&gt;
 
+&lt;p&gt;这个例子文件定义了三个数据集，&lt;i&gt;alpha&lt;/i&gt;，&lt;i&gt;beta&lt;/i&gt;
+和&lt;i&gt;gamma&lt;/i&gt;，在CSV文件中作为列输入。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;按下一步继续&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11441,9 +11517,14 @@ to the original file.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Click the Import button in the dialog.&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;Veusz将尝试猜测数据类型--数字、文本或日期--来自文件中的数据。文件中的数据，或者你可以手动指定它。&lt;/p&gt;
-&lt;p&gt;Veusz支持几种不同的数据格式，并且插件 可以被定义为导入任何数据格式。链接选项将数据到原始文件。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击对话框中的 &quot;导入 &quot;按钮。&lt;/p&gt;
+&lt;p&gt;Veusz将尝试猜测文件中的数据类型 - 数字、文本或日期，
+或者你可以手动指定它。&lt;/p&gt;
+
+&lt;p&gt;Veusz支持多种不同的数据格式，并且可以定义插件
+以导入任何数据格式。链接选项可以将数据链接到
+原始文件。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击对话框中的“导入”按钮。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11456,9 +11537,11 @@ box or reopen it later.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Close the Import dialog box.&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;注意Veusz是如何从文件中加载三个不同的数据集的。你可以继续从导入对话框中导入新的数据集，或者以后重新打开它。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;关闭 &quot;导入 &quot;对话框。&lt;/p&gt;
+&lt;p&gt;注意Veusz是如何从文件中加载三个不同的数据集的。
+你可以继续从导入对话框中导入新的数据集，或者
+以后重新打开它。&lt;/p&gt;
 
+&lt;p class=&quot;usercmd&quot;&gt;关闭“导入”对话框。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11473,9 +11556,13 @@ can see datasets in more detail in the Data Edit dialog box.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Click Next to continue&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;数据查看窗口（动画）显示当前加载的 的数据集。&lt;/p&gt;
-&lt;p&gt;将鼠标悬停在数据集上，以获得关于它们的信息。你可以 你可以在 &quot;数据编辑 &quot;对话框中看到数据集的更多细节。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击 &quot;下一步 &quot;继续&lt;/p&gt;
+&lt;p&gt;数据查看窗口（闪烁中）显示当前
+加载的数据集。&lt;/p&gt;
+
+&lt;p&gt;将鼠标悬停在数据集上，以获得关于它们的信息。
+你可以在“数据编辑”对话框中看到数据集的更多细节。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击下一步继续&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11489,17 +11576,12 @@ can see datasets in more detail in the Data Edit dialog box.&lt;/p&gt;
 widget. Click on this, or go to the Insert menu and choose &quot;Add xy&quot;.&lt;/p&gt;
 </source>
         <translation>
-&lt;h1&gt;图表数据&lt;/h1&gt;
+&lt;h1&gt;绘制数据&lt;/h1&gt;
 
+&lt;p&gt;点绘图部件将绘制在Veusz中加载的数据集。&lt;/p&gt;
 
-
-&lt;p&gt;点绘图小部件绘制在 Veusz 中加载的数据集。&lt;/p&gt;
-
-
-
-&lt;p class=&quot;usercmd&quot;&gt;闪烁的图标添加点绘图 （xy）
-
-控件。单击此按钮，或转到“插入”菜单并选择“添加 xy”。&lt;/p&gt;
+&lt;p class=&quot;usercmd&quot;&gt;闪烁的图标会添加一个点绘图（xy）部件。
+点击此图标，或者转到“插入”菜单并选择“添加xy”。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11512,9 +11594,11 @@ widget. Click on this, or go to the Insert menu and choose &quot;Add xy&quot;.&l
 menu or type it.&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;要绘制的数据集在小组件的属性中。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;改变 &quot;X数据 &quot;的设置，使之成为
-&lt;code&gt;α&lt;/code&gt;数据集。你可以从下拉菜单中选择这个 菜单中选择或键入它。&lt;/p&gt;
+&lt;p&gt;要绘制的数据集在部件的属性中。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;改变“X数据”的设置，使之成为
+&lt;code&gt;alpha&lt;/code&gt;数据集。你可以从下拉菜单中选择
+或键入它。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11524,7 +11608,8 @@ menu or type it.&lt;/p&gt;
 &lt;code&gt;beta&lt;/code&gt; dataset.&lt;/p&gt;
 </source>
         <translation>
-&lt;p class=&quot;usercmd&quot;&gt;将 &quot;Y数据 &quot;设置改为 &lt;code&gt;β&lt;/code&gt;数据集。&lt;/p&gt;
+&lt;p class=&quot;usercmd&quot;&gt;将“Y数据”设置改为
+&lt;code&gt;beta&lt;/code&gt;数据集。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11540,9 +11625,14 @@ widget is selected.&lt;/p&gt;
 the bottom, to hide the line plotted between the data points.&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;Veusz现在已经在图上绘制了数据。你可以使用格式化设置来操纵数据的显示方式。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;确保该小组件的行格式化标签（%s）被选中。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击底部 &quot;隐藏 &quot;选项旁边的复选框。来隐藏数据点之间的线。&lt;/p&gt;
+&lt;p&gt;Veusz现在已经在图形上绘制了数据。你可以使用格式化
+设置来控制数据的显示方式。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;确保部件的线条格式化标签（%s）
+被选中。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击底部“隐藏”选项旁边的复选框，
+来隐藏数据点之间的线。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11555,8 +11645,9 @@ Change the fill color of the plotted data.&lt;/p&gt;
 </source>
         <translation>
 &lt;p&gt;现在我们要改变点的颜色。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击 &quot;标记填充（%s）&quot;格式化标签。改变绘图数据的填充颜色。&lt;/p&gt;
 
+&lt;p class=&quot;usercmd&quot;&gt;点击“标记填充（%s）”格式化标签。
+改变绘图数据的填充颜色。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11587,7 +11678,8 @@ flashing icon, or go to the Insert menu and choose &quot;Add xy&quot;.&lt;/p&gt;
 &lt;code&gt;alpha&lt;/code&gt; dataset.&lt;/p&gt;
 </source>
         <translation>
-&lt;p class=&quot;usercmd&quot;&gt;改变 &quot;X数据 &quot;的设置，使之成为&lt;code&gt; α&lt;/code&gt;数据集。&lt;/p&gt;
+&lt;p class=&quot;usercmd&quot;&gt;改变“X数据”的设置，使之成为
+&lt;code&gt; alpha&lt;/code&gt;数据集。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11597,7 +11689,8 @@ flashing icon, or go to the Insert menu and choose &quot;Add xy&quot;.&lt;/p&gt;
 &lt;code&gt;gamma&lt;/code&gt; dataset.&lt;/p&gt;
 </source>
         <translation>
-&lt;p class=&quot;usercmd&quot;&gt;接下来，将 &quot;Y数据 &quot;设置改为&lt;code&gt;γ&lt;/code&gt;数据集。&lt;/p&gt;
+&lt;p class=&quot;usercmd&quot;&gt;接下来，将“Y数据”设置改为
+&lt;code&gt;gamma&lt;/code&gt;数据集。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11610,8 +11703,11 @@ flashing icon, or go to the Insert menu and choose &quot;Add xy&quot;.&lt;/p&gt;
 option.&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;我们可以使用 &quot;格式化下面的填充 &quot;选项卡来填充绘图下的区域 (%s).&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;转到这个标签，取消选择 &quot;隐藏边缘填充&quot;。选项。&lt;/p&gt;
+&lt;p&gt;我们可以使用格式化标签（%s）下面的“填充”选项
+填充绘图下的区域。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;转到这个标签，取消选择
+“隐藏边缘填充”选项。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11629,9 +11725,14 @@ outside the program.&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;保存&lt;/h1&gt;
-&lt;p&gt;文件可以在 &quot;文件 &quot;菜单下选择 &quot;另存为……&quot;，或点击 &quot;保存 &quot;图标（闪烁）来保存。&lt;/p&gt;
-&lt;p&gt;Veusz文件是简单的文本文件，可以很容易地在程序之外修改 。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击 &quot;下一步 &quot;继续&lt;/p&gt;
+
+&lt;p&gt;文件可以在文件菜单下选择“另存为…”，
+或点击“保存”图标（闪烁中）来保存。&lt;/p&gt;
+
+&lt;p&gt;Veusz文件是简单的文本文件，可以
+很容易地在程序之外修改 。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击下一步继续&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11649,9 +11750,14 @@ page. Alternatively, click on the Export icon (flashing).&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;导出&lt;/h1&gt;
-&lt;p&gt;文档可以导出为（EPS、PDF、SVG和EMF）或 位图格式。&lt;/p&gt;
-&lt;p&gt;在 &quot;文件 &quot;菜单下的 &quot;导出… &quot;命令可以导出所选的 的页面。或者，点击 &quot;导出 &quot;图标（闪烁）。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击 &quot;下一步 &quot;继续&lt;/p&gt;
+
+&lt;p&gt;文档可以导出为（EPS、PDF、SVG和EMF）
+或 位图格式。&lt;/p&gt;
+
+&lt;p&gt;在文件菜单下的“导出…”命令可以导出所选页面。
+或者点击“导出”图标（闪烁中）。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击下一步继续&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11665,8 +11771,10 @@ page. Alternatively, click on the Export icon (flashing).&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;剪切和粘贴&lt;/h1&gt;
-&lt;p&gt;小工具可以通过剪切和粘贴来操作文件。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;在编辑窗口中选择 &quot;graph1 &quot;小组件。&lt;/p&gt;
+
+&lt;p&gt;可以通过剪切和粘贴部件来操作文档。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;在编辑窗口中选择“graph1”部件。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11679,8 +11787,11 @@ from the Edit menu.&lt;/p&gt;
 deletes it from the document.&lt;/p&gt;
 </source>
         <translation>
-&lt;p class=&quot;usercmd&quot;&gt;现在点击 &quot;剪切 &quot;图标（闪烁）或从 &quot;编辑 &quot;菜单中选择 &quot;剪切&quot;。&lt;/p&gt;
-&lt;p&gt;这将把当前选择的部件复制到剪贴板上，并从文档中删除。&lt;/p&gt;
+&lt;p class=&quot;usercmd&quot;&gt;现在点击“剪切”图标（闪烁中）
+或从“编辑”菜单中选择“剪切”。&lt;/p&gt;
+
+&lt;p&gt;这将把当前选择的部件复制到剪贴板上，
+并从文档中删除。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11694,9 +11805,12 @@ deletes it from the document.&lt;/p&gt;
 &quot;Add grid&quot; from the Insert menu.&lt;/p&gt;
 </source>
         <translation>
-&lt;h1&gt;添加一个网格&lt;/h1&gt;
-&lt;p&gt;现在我们将添加一个网格小部件，将图形粘贴回&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击闪烁的网格小部件图标，或从插入菜单中选择 &quot;添加网格&quot;。&lt;/p&gt;
+&lt;h1&gt;添加网格&lt;/h1&gt;
+
+&lt;p&gt;现在我们将添加一个网格部件，并将图形粘贴回&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击闪烁的网格部件图标，或从“插入”菜单
+中选择“添加网格”。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11708,9 +11822,10 @@ from the Edit menu.&lt;/p&gt;
 &lt;p&gt;This pastes back the widget from the clipboard.&lt;/p&gt;
 </source>
         <translation>
-&lt;p class=&quot;usercmd&quot;&gt;现在点击 &quot;粘贴 &quot;图标（闪烁）或从 &quot;编辑 &quot;菜单中选择 &quot;粘贴&quot;。&lt;/p&gt;
-&lt;p&gt;这是从剪贴板上粘贴回来的小组件。&lt;/p&gt;
+&lt;p class=&quot;usercmd&quot;&gt;现在点击“粘贴”图标（闪烁中）
+或从“编辑”菜单中选择“粘贴”。&lt;/p&gt;
 
+&lt;p&gt;这将从剪贴板上粘贴回部件。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11722,9 +11837,10 @@ or choose &quot;Paste&quot; from the Edit menu.&lt;/p&gt;
 &lt;p&gt;This adds a second copy of the original graph to the grid.&lt;/p&gt;
 </source>
         <translation>
-&lt;p class=&quot;usercmd&quot;&gt;第二次，点击 &quot;粘贴 &quot;图标（闪烁）或从 &quot;编辑 &quot;菜单中选择 &quot;粘贴&quot;。&lt;/p&gt;
-&lt;p&gt;这将在网格中加入原图的第二个副本。&lt;/p&gt;
+&lt;p class=&quot;usercmd&quot;&gt;第二次，点击“粘贴”图标（闪烁中），
+或从“编辑”菜单中选择“粘贴”。&lt;/p&gt;
 
+&lt;p&gt;这将在网格中加入原图的第二个副本。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11737,9 +11853,11 @@ change the graphs to be arranged in rows.&lt;/p&gt;
 number of columns to 1.&lt;/p&gt;
 </source>
         <translation>
-&lt;p&gt;把图表并排在一起看起来有点乱。我们想把图表改成成行排列。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;导航到网格1小组件的属性。将列的数量改为1。&lt;/p&gt;
+&lt;p&gt;把图形并排在一起看起来有点乱。
+我们想把图形改成行排列。&lt;/p&gt;
 
+&lt;p class=&quot;usercmd&quot;&gt;导航到“grid1”的属性，
+将列的数量改为1。&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11754,8 +11872,11 @@ into the grid widget. This shares the same axis scale for graphs.&lt;/p&gt;
 </source>
         <translation>
 &lt;p&gt;我们现在可以调整图形和网格的边距。&lt;/p&gt;
-&lt;p&gt;轴也可以由网格的图形共享，方法是把它们移到网格小部件中。这就为图形共享了相同的轴刻度。&lt;/p&gt;
-&lt;p class=&quot;usercmd&quot;&gt;点击 &quot;下一步 &quot;继续&lt;/p&gt;
+
+&lt;p&gt;轴也可以由网格中的图形共享，方法是把它们移到网格部件中。
+这样不同的图形将共享相同的轴刻度。&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;点击下一步继续&lt;/p&gt;
 </translation>
     </message>
     <message>
@@ -11773,10 +11894,14 @@ developers via the mailing list.&lt;/p&gt;
 </source>
         <translation>
 &lt;h1&gt;最后&lt;/h1&gt;
-&lt;p&gt;感谢你完成这个Veusz导游过程。我们希望你喜欢使用Veusz!&lt;/p&gt;
-&lt;p&gt;请通过邮件列表向开发人员发送评论、错误报告和建议。&lt;/p&gt;
-&lt;p&gt;你可以从 &quot;帮助 &quot;菜单中再次尝试这个教程。
-&lt;/p&gt;
+
+&lt;p&gt;感谢你完成这个Veusz教程。
+我们希望你喜欢使用Veusz！&lt;/p&gt;
+
+&lt;p&gt;请通过邮件列表向开发人员发送评论、
+错误报告和建议。&lt;/p&gt;
+
+&lt;p&gt;你可以从“帮助”菜单中再次尝试这个教程。&lt;/p&gt;
 </translation>
     </message>
 </context>
@@ -12419,7 +12544,8 @@ This will be combination of
 YYYY, YY, MM, M, DD, D, hh, h, mm, m, ss and s
 separated by |</source>
         <translation>文件中日期和时间的格式。
-由|分隔YYYY、YY、MM、M、DD、D、
+可以是由|分隔的
+YYYY、YY、MM、M、DD、D、
 hh、h、mm、m、ss和s的组合</translation>
     </message>
     <message>
