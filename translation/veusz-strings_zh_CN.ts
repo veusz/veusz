@@ -1609,12 +1609,12 @@ Veusz 不承担任何形式的担保责任。 Veusz 是自由软件，并且很�
     <message>
         <location filename="./veusz/widgets/contour.py" line="125"/>
         <source>Line styles</source>
-        <translation>线样式</translation>
+        <translation>线条样式</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/contour.py" line="134"/>
         <source>Hide lines</source>
-        <translation>隐藏线</translation>
+        <translation>隐藏线条</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/contour.py" line="124"/>
