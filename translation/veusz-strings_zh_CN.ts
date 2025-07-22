@@ -16,7 +16,7 @@
     <message>
         <location filename="./ui/about.ui" line="118"/>
         <source>Software versions</source>
-        <translation>软件版本</translation>
+        <translation>软件版本号</translation>
     </message>
     <message>
         <location filename="./ui/about.ui" line="125"/>
@@ -13020,7 +13020,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="./veusz/veusz_main.py" line="379"/>
         <source>Error starting - Veusz</source>
-        <translation>Veusz启动故障，请联系作者提供更多线索反馈故障环境。</translation>
+        <translation>Veusz启动故障，请提供更多线索反馈故障环境给作者。</translation>
     </message>
 </context>
 </TS>
