@@ -143,7 +143,7 @@ class ImportDialog(VeuszDialog):
 
         # further defaults
         self.encodingcombo.defaultlist = utils.encodings
-        self.encodingcombo.defaultval = 'utf_8'
+        self.encodingcombo.defaultval = 'utf_8_sig'
 
         # load icon for clipboard
         self.clipbutton.setIcon( utils.getIcon('kde-clipboard') )
