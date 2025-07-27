@@ -325,8 +325,9 @@ def removeBOMs(script):
     For example:
         "\ufeffAAAA" -> "AAAA"
         '\ufeffBBBB' -> 'BBBB'
+        `\ufeffCCCC` -> `CCCC`
     """
-    pattern = r"([\"'])\\ufeff(.*?)\1"
+    pattern = r"([\"'`])\\ufeff(.*?)\1"
     found = re.findall(pattern, script)
     if found:
         script = re.sub(pattern, lambda m: f"{m.group(1)}{m.group(2)}{m.group(1)}", script)
