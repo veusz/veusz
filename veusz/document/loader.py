@@ -24,6 +24,7 @@ import sys
 import os.path
 import traceback
 import io
+import re
 import numpy as N
 
 from .. import qtall as qt
@@ -257,6 +258,11 @@ def loadHDF5Doc(thedoc, filename,
 
         # load document
         script = hdffile['Veusz']['Document']['document'][0].decode('utf-8')
+
+        # Remove embedded BOM characters
+        script = remove_boms(script)
+
+        # execute script
         executeScript(
             thedoc, filename, script,
             callbackunsafe=callbackunsafe,
@@ -289,6 +295,9 @@ def loadDocument(thedoc, filename, mode='vsz',
             raise LoadError(
                 _("File '%s' is not a valid Veusz document") %
                 os.path.basename(filename) )
+        
+        # Remove embedded BOM characters
+        script = remove_boms(script)
 
         thedoc.wipe()
         thedoc.filename = filename
@@ -309,3 +318,17 @@ def loadDocument(thedoc, filename, mode='vsz',
 
     thedoc.setModified(False)
     thedoc.clearHistory()
+
+def remove_boms(script):
+    """
+    Remove BOM at the start of quoted strings (single or double quotes).
+    For example:
+        "\ufeffAAAA" -> "AAAA"
+        '\ufeffBBBB' -> 'BBBB'
+    Only affects BOM at the start of quoted strings.
+    """
+    pattern = r"([\"'])\\ufeff(.*?)\1"
+    found = re.findall(pattern, script)
+    if found:
+        script = re.sub(pattern, lambda m: f"{m.group(1)}{m.group(2)}{m.group(1)}", script)
+    return script
