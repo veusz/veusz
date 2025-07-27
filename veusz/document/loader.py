@@ -260,7 +260,7 @@ def loadHDF5Doc(thedoc, filename,
         script = hdffile['Veusz']['Document']['document'][0].decode('utf-8')
 
         # Remove embedded BOM characters
-        script = remove_boms(script)
+        script = removeBOMs(script)
 
         # execute script
         executeScript(
@@ -297,7 +297,7 @@ def loadDocument(thedoc, filename, mode='vsz',
                 os.path.basename(filename) )
         
         # Remove embedded BOM characters
-        script = remove_boms(script)
+        script = removeBOMs(script)
 
         thedoc.wipe()
         thedoc.filename = filename
@@ -319,13 +319,12 @@ def loadDocument(thedoc, filename, mode='vsz',
     thedoc.setModified(False)
     thedoc.clearHistory()
 
-def remove_boms(script):
+def removeBOMs(script):
     """
-    Remove BOM at the start of quoted strings (single or double quotes).
+    Remove BOM at the start of quoted strings.
     For example:
         "\ufeffAAAA" -> "AAAA"
         '\ufeffBBBB' -> 'BBBB'
-    Only affects BOM at the start of quoted strings.
     """
     pattern = r"([\"'])\\ufeff(.*?)\1"
     found = re.findall(pattern, script)
