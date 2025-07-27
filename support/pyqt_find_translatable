@@ -58,11 +58,12 @@ from lxml import etree
 
 class Message:
     '''A translatable string.'''
-    def __init__(self, string, filename=None, lineno=None, comment=None):
+    def __init__(self, string, filename=None, lineno=None, comment=None, n=False):
         self.string = string
         self.filename = filename
         self.lineno = lineno
         self.comment = comment
+        self.n = n
 
 class PythonMessageVisitor(ast.NodeVisitor):
     '''A visitor which visits function calls and definitions in source.'''
@@ -97,23 +98,27 @@ class PythonMessageVisitor(ast.NodeVisitor):
         if fn not in self.fn2context:
             return
 
-        if len(obj.args)+len(obj.keywords) not in (1,2,3) or len(obj.args) < 1:
+        if len(obj.args)+len(obj.keywords) not in (1,2,3,4) or len(obj.args) < 1:
             sys.stderr.write(
                 'WARNING: Translatable call to %s in %s:%i '
-                'requires 1 to 3 parameters\n' %
+                'requires 1 to 4 parameters\n' %
                 (repr(fn), self.filename, obj.lineno))
             return
 
-        # convert arguments to text
-        try:
-            args = [a.s for a in obj.args]
-            keywords = dict([(a.arg, a.value.s) for a in obj.keywords])
-        except AttributeError:
-            sys.stderr.write(
-                'WARNING: Parameter to translatable function '
-                '%s in %s:%i is not string\n' %
-                (repr(fn), self.filename, obj.lineno))
-            return
+        # convert arguments to text if possible
+        args = [a.value for a in obj.args]
+        keywords = {}
+        for a in obj.keywords:
+            if a.arg == 'context':
+                keywords[a.arg] = a.value.s
+            elif a.arg == 'disambiguation':
+                keywords[a.arg] = a.value.s
+            elif a.arg == 'n':
+                keywords[a.arg] = True
+            else:
+                sys.stderr.write(
+                    'WARNING: Invalid keyword %s to translatable call\n' % a.arg)
+                return
 
         # defaults
         text = args[0]
@@ -131,13 +136,14 @@ class PythonMessageVisitor(ast.NodeVisitor):
         # now look at named arguments which override defaults
         context = keywords.get('context', context)
         comment = keywords.get('disambiguation', comment)
+        n = 'n' in keywords
 
         # create new message
         if context not in self.messages:
             self.messages[context] = []
         self.messages[context].append(
             Message(text, filename=self.filename, lineno=obj.lineno,
-                    comment=comment) )
+                    comment=comment, n=n) )
 
         if self.verbose:
             sys.stdout.write(
@@ -158,17 +164,19 @@ class PythonMessageVisitor(ast.NodeVisitor):
 
         args = obj.args
         # want a three-parameter function with two default values
-        if len(args.args) != 3 or len(args.defaults) != 2:
+        if len(args.args) not in (3,4) or len(args.defaults) not in (2,3):
             return
 
         argids = [a.arg.lower() for a in args.args]
         # only functions with disambiguation and context as optional arguments
         if 'disambiguation' not in argids or 'context' not in argids:
             return
+        if len(args.defaults)==3 and 'n' not in argids:
+            return
 
         contextidx = argids.index('context')
         try:
-            context = args.defaults[contextidx-1].s
+            context = args.defaults[contextidx-1].value
         except AttributeError:
             sys.stderr.write(
                 "WARNING: Translation function definition %s in "
@@ -228,7 +236,15 @@ class TSWriter:
 
         # blank translated text
         ntranslation = etree.SubElement(nmessage, 'translation')
-        ntranslation.set('type', 'unfinished')
+
+        if message.n:
+            # blank numerus form
+            numerous = etree.SubElement(ntranslation, 'numerusform')
+            nmessage.set('numerus', 'yes')
+            ntranslation.set('type', 'unfinished')
+        else:
+            # make default translation input
+            ntranslation.text = message.string
 
     def add_context_to_root(self, nroot, contextname, messages):
         '''Add a new context tag to the root node given.'''
@@ -304,6 +320,19 @@ class TSWriter:
                 sys.stdout.write(
                     'Unmarking %s as obsolete\n' %
                     nmessage.find('source').text)
+
+        if message.n and nmessage.get('numerus', 'no')=='no':
+            # make numerus if previously not
+            nmessage.set('numerus', 'yes')
+            ntranslation.set('type', 'unfinished')
+            ntranslation.text = ''
+            numerous = etree.SubElement(ntranslation, 'numerusform')
+        elif not message.n and nmessage.get('numerus', 'no')=='yes':
+            # now not numerus
+            del nmessage.attrib['numerus']
+            ntranslation.set('type', 'unfinished')
+            ntranslation.text = ''
+            etree.strip_elements(ntranslation, 'numerusform')
 
     def write_new(self):
         '''Write a new output .ts file.'''

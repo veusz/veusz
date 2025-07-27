@@ -446,13 +446,13 @@ class WidgetsClone(ToolsPlugin):
                 default=''),
             field.FieldDatasetMulti(
                 'ds1repl',
-                descr=_("Replacement(s) for dataset 1")),
+                descr=_("Replacements for dataset 1")),
             field.FieldDataset(
                 'ds2', descr=_("Dataset 2 to change (optional)"),
                 default=''),
             field.FieldDatasetMulti(
                 'ds2repl',
-                descr=_("Replacement(s) for dataset 2")),
+                descr=_("Replacements for dataset 2")),
             field.FieldBool(
                 "names", descr=_("Build new names from datasets"),
                 default=True),

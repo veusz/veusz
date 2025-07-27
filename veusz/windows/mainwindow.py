@@ -401,7 +401,7 @@ class MainWindow(qt.QMainWindow):
             actname = menuname + '.' + '.'.join(pluginkls.menu)
             text = pluginkls.menu[-1]
             if pluginkls.has_parameters:
-                text += '...'
+                text += '…'
             actions[actname] = utils.makeAction(
                 self,
                 pluginkls.description_short,
@@ -463,29 +463,29 @@ class MainWindow(qt.QMainWindow):
                   icon='kde-document-new-graph3d'),
 
             'file.open':
-                a(self, _('Open a document'), _('&Open...'),
+                a(self, _('Open a document'), _('&Open…'),
                   self.slotFileOpen,
                   icon='kde-document-open', key='Ctrl+O'),
             'file.reload':
                 a(self, _('Reload document from saved version'),
-                  _('Reload...'), self.slotFileReload),
+                  _('Reload…'), self.slotFileReload),
             'file.save':
                 a(self, _('Save the document'), _('&Save'),
                   self.slotFileSave,
                   icon='kde-document-save', key='Ctrl+S'),
             'file.saveas':
                 a(self, _('Save the current document under a new name'),
-                  _('Save &As...'), self.slotFileSaveAs,
+                  _('Save &As…'), self.slotFileSaveAs,
                   icon='kde-document-save-as'),
             'file.trust':
-                a(self, _('Trust document contents'), _('Trust...'),
+                a(self, _('Trust document contents'), _('Trust…'),
                   self.slotFileTrust),
             'file.print':
-                a(self, _('Print the document'), _('&Print...'),
+                a(self, _('Print the document'), _('&Print…'),
                   self.slotFilePrint,
                   icon='kde-document-print', key='Ctrl+P'),
             'file.export':
-                a(self, _('Export to graphics formats'), _('&Export...'),
+                a(self, _('Export to graphics formats'), _('&Export…'),
                   self.slotFileExport,
                   icon='kde-document-export'),
             'file.close':
@@ -506,20 +506,20 @@ class MainWindow(qt.QMainWindow):
                   self.slotEditRedo,
                   icon='kde-edit-redo', key='Ctrl+Shift+Z'),
             'edit.prefs':
-                a(self, _('Edit preferences'), _('Preferences...'),
+                a(self, _('Edit preferences'), _('Preferences…'),
                   self.slotEditPreferences,
                   icon='veusz-edit-prefs'),
             'edit.custom':
                 a(self,
                   _('Edit custom functions, constants, colors and colormaps'),
-                  _('Custom definitions...'),
+                  _('Custom definitions…'),
                   self.slotEditCustom,
                   icon='veusz-edit-custom'),
 
             'edit.stylesheet':
                 a(self,
                   _('Edit stylesheet to change default widget settings'),
-                  _('Default styles...'),
+                  _('Default styles…'),
                   self.slotEditStylesheet, icon='settings_stylesheet'),
 
             'view.edit':
@@ -555,25 +555,25 @@ class MainWindow(qt.QMainWindow):
                   None, checkable=True),
 
             'data.import':
-                a(self, _('Import data into Veusz'), _('&Import...'),
+                a(self, _('Import data into Veusz'), _('&Import…'),
                   self.slotDataImport, icon='kde-vzdata-import', key='Ctrl+I'),
             'data.edit':
-                a(self, _('Edit and enter new datasets'), _('&Editor...'),
+                a(self, _('Edit and enter new datasets'), _('&Editor…'),
                   lambda: self.slotDataEdit(), icon='kde-edit-veuszedit', key='Ctrl+E'),
             'data.create':
-                a(self, _('Create new datasets using ranges, parametrically or as functions of existing datasets'), _('&Create...'),
+                a(self, _('Create new datasets using ranges, parametrically or as functions of existing datasets'), _('&Create…'),
                   self.slotDataCreate, icon='kde-dataset-new-veuszedit'),
             'data.create2d':
-                a(self, _('Create new 2D datasets from existing datasets, or as a function of x and y'), _('Create &2D...'),
+                a(self, _('Create new 2D datasets from existing datasets, or as a function of x and y'), _('Create &2D…'),
                   self.slotDataCreate2D, icon='kde-dataset2d-new-veuszedit'),
             'data.capture':
-                a(self, _('Capture remote data'), _('Ca&pture...'),
+                a(self, _('Capture remote data'), _('Ca&pture…'),
                   self.slotDataCapture, icon='veusz-capture-data'),
             'data.filter':
-                a(self, _('Filter data'), _('&Filter...'),
+                a(self, _('Filter data'), _('&Filter…'),
                   self.slotDataFilter, icon='kde-filter'),
             'data.histogram':
-                a(self, _('Histogram data'), _('&Histogram...'),
+                a(self, _('Histogram data'), _('&Histogram…'),
                   self.slotDataHistogram, icon='button_bar'),
             'data.reload':
                 a(self, _('Reload linked datasets'), _('&Reload'),
@@ -593,7 +593,7 @@ class MainWindow(qt.QMainWindow):
                 a(self, _('An interactive Veusz tutorial'),
                   _('Tutorial'), self.slotHelpTutorial),
             'help.about':
-                a(self, _('Displays information about the program'), _('About...'),
+                a(self, _('Displays information about the program'), _('About…'),
                   self.slotHelpAbout, icon='veusz')
         }
 

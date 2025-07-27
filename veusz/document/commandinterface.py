@@ -515,7 +515,7 @@ class CommandInterface(qt.QObject):
             )
             if parametric:
                 print(_(" Where t goes form %g:%g in %i steps") % parametric)
-            print(_(" linked to expression = %s") % repr(linked))
+            print(" " + _("linked to expression = %s") % repr(linked))
 
     def SetDataND(self, name, val):
         """Set n-dimensional dataset name with values."""

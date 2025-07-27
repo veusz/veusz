@@ -60,7 +60,7 @@ class ImportTabStandard(importdialog.ImportTab):
             text = ifile.read(4096)+'\n'
             if len(ifile.read(1)) != 0:
                 # if there is remaining data add ...
-                text += '...\n'
+                text += '…\n'
 
             self.previewedit.setPlainText(text)
             return True

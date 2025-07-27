@@ -92,7 +92,7 @@ def dsPreviewHelper(d):
     else:
         line1 = ', '.join(
             ['%.3g' % x for x in d[:3]] +
-            [ '...' ] +
+            [ '…' ] +
             ['%.3g' % x for x in d[-3:]]
         )
 

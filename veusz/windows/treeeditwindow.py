@@ -1038,7 +1038,7 @@ class TreeEditDock(qt.QDockWidget):
                 lambda: self.slotWidgetMove(1),
                 icon='kde-go-down', key='Ctrl+Shift+PgDown'),
             'edit.delete': a(
-                self, _('Remove the selected widget'), _('&Delete'),
+                self, _('Remove selected widgets'), _('&Delete'),
                 self.slotWidgetDelete,
                 icon='kde-edit-delete'),
             'edit.rename': a(
@@ -1046,11 +1046,11 @@ class TreeEditDock(qt.QDockWidget):
                 self.slotWidgetRename,
                 icon='kde-edit-rename'),
             'edit.show': a(
-                self, _('Show selected widget(s)'), _('Show'),
+                self, _('Show selected widgets'), _('Show'),
                 self.slotWidgetShow,
                 key='Ctrl+]'),
             'edit.hide': a(
-                self, _('Hide selected widget(s)'), _('Hide'),
+                self, _('Hide selected widgets'), _('Hide'),
                 self.slotWidgetHide,
                 key='Ctrl+['),
 
@@ -1398,7 +1398,7 @@ class TreeEditDock(qt.QDockWidget):
             if 'hide' in w.settings
         ]
         self.document.applyOperation(
-            document.OperationMultiple(ops, descr=_('hide widget(s)')))
+            document.OperationMultiple(ops, descr=_('hide widgets')))
         # update state of action after hiding
         self._enableCorrectButtons()
 
@@ -1410,7 +1410,7 @@ class TreeEditDock(qt.QDockWidget):
             if 'hide' in w.settings
         ]
         self.document.applyOperation(
-            document.OperationMultiple(ops, descr=_('show widget(s)')))
+            document.OperationMultiple(ops, descr=_('show widgets')))
         # update state of action after hiding
         self._enableCorrectButtons()
 

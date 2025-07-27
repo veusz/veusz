@@ -321,7 +321,7 @@ class DatasetTableModelMulti(qt.QAbstractTableModel):
                 ops.append(
                     document.OperationDatasetInsertRow(name, row, count))
         self.document.applyOperation(
-            document.OperationMultiple(ops, _('insert row(s)')))
+            document.OperationMultiple(ops, _('insert rows')))
 
     def removeRows(self, row, count):
         ops = []
@@ -330,7 +330,7 @@ class DatasetTableModelMulti(qt.QAbstractTableModel):
                 ops.append(
                     document.OperationDatasetDeleteRow(name, row, count))
         self.document.applyOperation(
-            document.OperationMultiple(ops, _('delete row(s)')))
+            document.OperationMultiple(ops, _('delete rows')))
 
 class DatasetTableModel2D(qt.QAbstractTableModel):
     """A 2D dataset model."""
@@ -668,7 +668,7 @@ class DataEditDialog(VeuszDialog):
         self.document.applyOperation(
             document.OperationMultiple(
                 [document.OperationDatasetDelete(n) for n in dsnames],
-                descr=_('delete dataset(s)')))
+                descr=_('delete datasets')))
 
     def slotDatasetUnlink(self):
         """Allow user to remove link to file or other datasets."""
@@ -681,23 +681,24 @@ class DataEditDialog(VeuszDialog):
                 ops.append(document.OperationDatasetUnlinkRelation(name))
         if ops:
             self.document.applyOperation(
-                document.OperationMultiple(ops, _('unlink dataset(s)')))
+                document.OperationMultiple(ops, _('unlink datasets')))
 
     def slotDatasetDuplicate(self):
         """Duplicate selected datasets."""
         ops = []
         for name in self.dsbrowser.navtree.getSelectedDatasets():
             # generate new name for dataset
-            newname = name + '_copy'
             index = 2
-            while newname in self.document.data:
-                newname = '%s_copy_%i' % (name, index)
+            while True:
+                newname = f'{name}_{index}'
+                if newname not in self.document.data:
+                    break
                 index += 1
             ops.append(
                 document.OperationDatasetDuplicate(name, newname))
         if ops:
             self.document.applyOperation(
-                document.OperationMultiple(ops, _('duplicate dataset(s)')))
+                document.OperationMultiple(ops, _('duplicate datasets')))
 
     def slotDatasetImport(self):
         """Show import dialog."""
