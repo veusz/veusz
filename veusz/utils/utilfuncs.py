@@ -337,6 +337,13 @@ def openEncoding(filename, encoding, mode='r'):
     If filename == '{clipboard}', then load the data from the clipboard
     instead.
     """
+
+    # Windows programs sometimes use a BOM at the start of files,
+    # causing problems reading a file. We force the below encoding to
+    # skip the BOM.
+    if encoding.lower() in ('utf_8', 'utf-8'):
+        encoding = 'utf_8_sig'
+
     if filename == '{clipboard}':
         text = qt.QApplication.clipboard().text()
         return io.StringIO(text)
@@ -376,13 +383,7 @@ def get_unicode_csv_reader(filename, dialect=csv.excel,
                            encoding='utf-8', **kwds):
     """Return an iterator to iterate over CSV file with encoding given."""
 
-    if filename != '{clipboard}':
-        f = open(filename, encoding=encoding, errors='ignore')
-    else:
-        # take the unicode clipboard and just put into utf-8 format
-        s = qt.QApplication.clipboard().text()
-        f = io.StringIO(s)
-
+    f = openEncoding(filename, encoding)
     reader = csv.reader(f, dialect=dialect, **kwds)
     return reader
 

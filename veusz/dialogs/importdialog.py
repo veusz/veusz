@@ -265,6 +265,7 @@ class ImportDialog(VeuszDialog):
         filename = self.filenameedit.text()
         linked = self.linkcheckbox.isChecked()
         encoding = str(self.encodingcombo.currentText())
+
         if filename == '{clipboard}':
             linked = False
         else:
