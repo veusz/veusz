@@ -323,12 +323,18 @@ def removeBOMs(script):
     """
     Remove BOM at the start of quoted strings.
     For example:
-        "\ufeffAAAA" -> "AAAA"
-        '\ufeffBBBB' -> 'BBBB'
-        `\ufeffCCCC` -> `CCCC`
+        "AA\ufeffAA" -> "AAAA"
+        'BB\ufeffBB' -> 'BBBB'
+        `CC\ufeffCC` -> `CCCC`
     """
-    pattern = r"([\"'`])\\ufeff(.*?)\1"
-    found = re.findall(pattern, script)
-    if found:
-        script = re.sub(pattern, lambda m: f"{m.group(1)}{m.group(2)}{m.group(1)}", script)
-    return script
+    pattern = r'([\'"`])(.*?)(\\+)ufeff(.*?)\1'
+    def replacer(m):
+        quote = m.group(1)
+        backslashes = m.group(3)
+        num_bs = len(backslashes)
+        if num_bs % 2 == 0:
+            return m.group(0)
+        else:
+            new_bs = "\\" * (num_bs - 1)
+            return f"{quote}{m.group(2)}{new_bs}{m.group(4)}{quote}"
+    return re.sub(pattern, replacer, script)
