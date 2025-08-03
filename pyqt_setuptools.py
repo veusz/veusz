@@ -8,7 +8,11 @@
 import os
 import shutil
 import subprocess
-import tomli
+
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
 
 from sysconfig import get_path
 from setuptools.command.build_ext import build_ext
@@ -244,7 +248,7 @@ class sip_build_ext(build_ext):
         pyqt6_toml = os.path.join(pyqt6_include_dir, 'QtCore', 'QtCore.toml')
 
         with open(pyqt6_toml, 'rb') as fin:
-            pyqt6_cfg = tomli.load(fin)
+            pyqt6_cfg = tomllib.load(fin)
         abi_version = pyqt6_cfg.get('sip-abi-version')
 
         modulename = os.path.splitext(os.path.basename(source))[0]
