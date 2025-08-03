@@ -703,12 +703,6 @@ class FormatDock(qt.QDockWidget):
         self.document = document
         self.tabwidget = None
 
-        self.container = qt.QWidget()
-        self.layout = qt.QVBoxLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.container.setLayout(self.layout)
-        self.setWidget(self.container)
-
         # update our view when the tree edit window selection changes
         treeedit.widgetsSelected.connect(self.selectedWidgets)
 
@@ -722,16 +716,21 @@ class FormatDock(qt.QDockWidget):
             tab = 0
 
         # delete old tabwidget
-        oldItem = self.layout.takeAt(0)
-        if oldItem:
-            oldWidget = oldItem.widget()
-            if oldWidget:
-                oldWidget.setParent(None)
-                oldWidget.deleteLater()
-                self.tabwidget = None
+        if self.tabwidget:
+            self.tabwidget.deleteLater()
+            self.tabwidget = None
 
         self.tabwidget = TabbedFormatting(self.document, setnsproxy)
-        self.layout.addWidget(self.tabwidget)
+
+        # this is a workaround for the tabs overlapping the title of
+        # the dock on MacOS (#749)
+        container = qt.QWidget()
+        layout = qt.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.tabwidget)
+        container.setLayout(layout)
+
+        self.setWidget(container)
 
         # wrap tab from zero to max number
         tab = max( min(self.tabwidget.count()-1, tab), 0 )
