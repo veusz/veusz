@@ -261,8 +261,7 @@ def loadHDF5Doc(thedoc, filename,
 
         # Remove embedded BOM characters
         script = removeBOMs(script)
-
-        # execute script
+        
         executeScript(
             thedoc, filename, script,
             callbackunsafe=callbackunsafe,
@@ -321,20 +320,16 @@ def loadDocument(thedoc, filename, mode='vsz',
 
 def removeBOMs(script):
     """
-    Remove BOM at the start of quoted strings.
+    Remove BOMs in the script unless they are escaped.
     For example:
         "AA\ufeffAA" -> "AAAA"
-        'BB\ufeffBB' -> 'BBBB'
-        `CC\ufeffCC` -> `CCCC`
+        'C:\\ufeff\\a.csv' -> 'C:\\ufeff\\a.csv'
     """
-    pattern = r'([\'"`])(.*?)(\\+)ufeff(.*?)\1'
+    pattern = r'(.*?)(\\+)ufeff(.*?)'
     def replacer(m):
-        quote = m.group(1)
-        backslashes = m.group(3)
-        num_bs = len(backslashes)
-        if num_bs % 2 == 0:
+        bs = m.group(2)
+        if len(bs) % 2 == 0:
             return m.group(0)
         else:
-            new_bs = "\\" * (num_bs - 1)
-            return f"{quote}{m.group(2)}{new_bs}{m.group(4)}{quote}"
+            return f"{m.group(1)}{bs[1:]}{m.group(3)}"
     return re.sub(pattern, replacer, script)
