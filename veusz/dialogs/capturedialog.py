@@ -232,7 +232,7 @@ class CapturingDialog(VeuszDialog):
         self.readtimer.timeout.connect(self.slotReadTimer)
 
         # record time capture started
-        self.starttime = qt.QTime()
+        self.starttime = qt.QElapsedTimer()
         self.starttime.start()
 
         # sort tree by dataset name
