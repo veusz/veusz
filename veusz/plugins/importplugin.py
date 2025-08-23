@@ -689,26 +689,30 @@ class ImportPluginBinary(ImportPlugin):
         if not name:
             raise ImportPluginException(_("Please provide a name for the dataset"))
 
+        # if count==-1, then all items
+        count = max(params.field_results["length"], -1)
+
         try:
-            f = open(params.filename, "rb")
-            f.seek( params.field_results["offset"] )
-            retn = f.read()
-            f.close()
+            with open(params.filename, "rb") as fin:
+                fin.seek( params.field_results["offset"] )
+
+                data = N.fromfile(
+                    fin,
+                    dtype=self.getNumpyDataType(params),
+                    count=count)
+
+            data = data.astype(N.float64)
+
         except EnvironmentError as e:
             raise ImportPluginException(
                 _("Error while reading file '%s'\n\n%s") %
                 (params.filename, e.strerror(e)))
 
-        try:
-            data = N.fromstring(
-                retn, dtype=self.getNumpyDataType(params),
-                count=params.field_results["length"])
         except ValueError as e:
             raise ImportPluginException(
                 _("Error converting data for file '%s'\n\n%s") %
                 (params.filename, str(e)))
 
-        data = data.astype(N.float64)
         return [ datasetplugin.Dataset1D(name, data) ]
 
 class ImportPluginGnuplot2D(ImportPlugin):
