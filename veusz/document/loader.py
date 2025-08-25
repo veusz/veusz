@@ -24,6 +24,7 @@ import sys
 import os.path
 import traceback
 import io
+import re
 import numpy as N
 
 from .. import qtall as qt
@@ -257,6 +258,10 @@ def loadHDF5Doc(thedoc, filename,
 
         # load document
         script = hdffile['Veusz']['Document']['document'][0].decode('utf-8')
+
+        # Remove embedded BOM characters
+        script = removeBOMs(script)
+        
         executeScript(
             thedoc, filename, script,
             callbackunsafe=callbackunsafe,
@@ -289,6 +294,9 @@ def loadDocument(thedoc, filename, mode='vsz',
             raise LoadError(
                 _("File '%s' is not a valid Veusz document") %
                 os.path.basename(filename) )
+        
+        # Remove embedded BOM characters
+        script = removeBOMs(script)
 
         thedoc.wipe()
         thedoc.filename = filename
@@ -309,3 +317,19 @@ def loadDocument(thedoc, filename, mode='vsz',
 
     thedoc.setModified(False)
     thedoc.clearHistory()
+
+def removeBOMs(script):
+    """
+    Remove BOMs in the script unless they are escaped.
+    For example:
+        "AA\ufeffAA" -> "AAAA"
+        'C:\\ufeff\\a.csv' -> 'C:\\ufeff\\a.csv'
+    """
+    pattern = r'(.*?)(\\+)ufeff(.*?)'
+    def replacer(m):
+        bs = m.group(2)
+        if len(bs) % 2 == 0:
+            return m.group(0)
+        else:
+            return f"{m.group(1)}{bs[1:]}{m.group(3)}"
+    return re.sub(pattern, replacer, script)
