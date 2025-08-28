@@ -702,6 +702,7 @@ class Dataset(qt.QWidget):
     """Allow the user to choose between the possible datasets."""
 
     sigSettingChanged = qt.pyqtSignal(qt.QObject, object, object)
+    sigSettingChangedIteratively = qt.pyqtSignal(qt.QObject, object, object)
 
     def __init__(self, setting, document, dimensions, datatype, parent):
         """Initialise the combobox. The list is populated with datasets.
@@ -774,6 +775,7 @@ class Dataset(qt.QWidget):
                 filterdtype=set((self.datatype,)) )
             d.closing.connect(self.boxClosing)
             d.newdataset.connect(self.newDataset)
+            d.newdatasets.connect(self.newDatasets)
             d.show()
 
     def boxClosing(self):
@@ -783,6 +785,10 @@ class Dataset(qt.QWidget):
     def newDataset(self, dsname):
         """New dataset selected."""
         self.sigSettingChanged.emit(self, self.choice.setting, dsname)
+
+    def newDatasets(self, dsnames):
+        """New datasets selected."""
+        self.sigSettingChangedIteratively.emit(self, self.choice.setting, dsnames)
 
 class DatasetOrString(Dataset):
     """Allow use to choose a dataset or enter some text."""
