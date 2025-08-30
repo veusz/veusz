@@ -698,6 +698,13 @@ class DistancePt(Choice):
         '''Initialise with blank list, then populate with sensible units.'''
         Choice.__init__(self, setting, True, DistancePt.points, parent)
 
+class DisplacementPt(DistancePt):
+    """For editing displacements with defaults in points."""
+
+    def __init__(self, setting, parent, allowauto=False):
+        '''Initialise with blank list, then populate with sensible units.'''
+        Choice.__init__(self, setting, True, DisplacementPt.points, parent)
+
 class Dataset(qt.QWidget):
     """Allow the user to choose between the possible datasets."""
 
