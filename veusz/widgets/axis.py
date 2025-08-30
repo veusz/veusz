@@ -128,7 +128,7 @@ class AxisLabel(setting.Text):
             'rotate', '0',
             descr='Angle by which to rotate label by',
             usertext='Rotate') )
-        self.add( setting.DistancePt(
+        self.add( setting.DisplacementPt(
             'offset',
             '0pt',
             descr=_('Additional offset of axis label from axis tick labels'),
@@ -173,7 +173,7 @@ class TickLabel(setting.Text):
             descr=_('A scale factor to apply to the values of the tick labels'),
             usertext=_('Scale') ) )
 
-        self.add( setting.DistancePt(
+        self.add( setting.DisplacementPt(
             'offset',
             '0pt',
             descr = _('Additional offset of axis tick labels from axis'),

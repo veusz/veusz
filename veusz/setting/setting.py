@@ -633,7 +633,7 @@ def _distRatio(match, painter):
 distre_expr = r'''^
  [ ]*                                # optional whitespace
 
- (\.?[0-9]+|[0-9]+\.[0-9]*)          # a floating point number
+ (\.?[0-9]+|[0-9]+\.[0-9]*)          # a floating point number (positive only)
 
  [ ]*                                # whitespace
 
@@ -795,6 +795,37 @@ class DistanceOrAuto(Distance):
 
     def makeControl(self, *args):
         return controls.Distance(self, allowauto=True, *args)
+
+# regular expression to match displacements
+dispre_expr = r'''^
+ [ ]*                                # optional whitespace
+
+ ([+-]?(?:\.?[0-9]+|[0-9]+\.[0-9]*)) # a floating point number (positive or negative)
+
+ [ ]*                                # whitespace
+
+ (cm|pt|mm|inch|in|"|%||             # ( unit, no unit,
+  (?P<slash>/) )                     # or / )
+
+ (?(slash)[ ]*                       # if it was a slash, match any whitespace
+  (\.?[0-9]+|[0-9]+\.[0-9]*))        # and match following fp number
+
+ [ ]*                                # optional whitespace
+$'''
+
+class Displacement(Distance):
+    """Subspecies of 'Distance' to allow negative numbers."""
+
+    typename = 'displacement'
+
+    # match a displacement
+    distre = re.compile(dispre_expr, re.VERBOSE)
+
+class DisplacementPt(Displacement):
+    """For a displacement in points."""
+
+    def makeControl(self, *args):
+        return controls.DisplacementPt(self, *args)
 
 class Choice(Setting):
     """One out of a list of strings."""
