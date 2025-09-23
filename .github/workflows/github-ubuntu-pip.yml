@@ -27,8 +27,8 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         cache: 'true'
-        cache-key-prefix: 'qt-ubuntu-v3'
-        version: '6.9.1'
+        cache-key-prefix: 'qt-ubuntu-v4'
+        version: '6.9.2'
         setup-python: false
     - name: Install Python dependencies
       run: |
