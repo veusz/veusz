@@ -216,16 +216,10 @@ void Scene::drawPath(QPainter* painter, const Fragment& frag,
   else
     {
       // scale point and relocate
-      QPainterPath path(*(pars->path));
-      int elementct = path.elementCount();
-      for(int i=0; i<elementct; ++i)
-        {
-          QPainterPath::Element el = path.elementAt(i);
-          path.setElementPositionAt(i,
-                                    el.x*scale+pt1.x(),
-                                    el.y*scale+pt1.y());
-        }
-      painter->drawPath(path);
+      QTransform t;
+      t.translate(pt1.x(), pt1.y());
+      t.scale(scale, scale);
+      painter->drawPath(t.map(*(pars->path)));
     }
 }
 
@@ -310,7 +304,10 @@ void Scene::doDrawing(QPainter* painter, const Mat3& screenM, double linescale,
                  ((frag.lineprop!=0 && frag.lineprop->hasRGBs())))
                 {
                   lline = frag.lineprop;
-                  painter->setPen(lineProp2QPen(frag, linescale));
+                const FragmentPathParameters* pars = 
+                  static_cast<const FragmentPathParameters*>(frag.params);
+                painter->setPen(lineProp2QPen(
+                  frag, pars && pars->scaleline ? 1.0 : linescale));
                 }
               if(ltype != frag.type || lsurf != frag.surfaceprop ||
                  (frag.surfaceprop!=0 && (frag.surfaceprop->hasRGBs() ||
