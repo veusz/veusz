@@ -39,7 +39,7 @@ jobs:
     - name: Run tests
       env:
         LD_LIBRARY_PATH: ${{ env.QT_ROOT_DIR }}/lib:{{ env.LD_LIBRARY_PATH }}
-        QT_QPA_PLATFORM: minimal
+        QT_QPA_PLATFORM: offscreen
         VEUSZ_INPLACE_TEST: 1
       run: |
         tests/runselftest.py
