@@ -1,4 +1,4 @@
-# [Veusz 4.1](https://veusz.github.io/)
+# [Veusz 4.2](https://veusz.github.io/)
 
 Veusz is a scientific plotting package.  It is designed to produce
 publication-ready PDF or SVG output. Graphs are built-up by combining
@@ -10,35 +10,17 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
-Changes in 4.1:
-  * Much improved icons for dark mode
-  * Provide preference for forcing dark/light mode or setting other
-    color themes (includes breeze light and dark)
-  * Provide portable zip executable for Windows
-  * Add WebP export image format
-  * Provide 600 DPI in list in export dialog
-  * Bug fixes
-     * Fix for formatting dock when deleting widgets (korintje)
-     * Bind icon to desktop file on Wayland (antohami)
-     * Fix for dual monitors under Wayland
-     * Disable export formats if not supported by built Qt
-     * Add missing TIF image format in binaries
-
-Changes in 4.0:
-  * Update to using Qt6 (jeremysanders/korintje)
-  * Documentation updates
-  * Copying SVG or image widgets copies image data (from slowphil)
-  * Bug fixes:
-     * HDF5 import
-     * 3D rotation
-     * Swap attributes for 2D data if transposing
-     * Hide stderr from embedded usage unless debug=True
-     * Fix histogram2d fro normed to density
-     * Fix for datasets of different lengths if using gap_handling='ignore'
-     * Rename nan\_handling to gap\_handling
-     * Continue loading if error in plugins
-     * Fix overlapping formatting dock on Mac (korintje)
-  * Binaries now built using GitHub actions
+Changes in 4.2:
+  * Fix for double scaled 3D point marker borders (Takuro Hosomi)
+  * Allow negative offsets for some labels (Takuro Hosomi)
+  * Allow iterative change of properties of multiple widgets (Takuro Hosomi)
+  * Strip BOMs from Veusz and imported files
+  * Fix binary import plugin
+  * Fix capture dialog
+  * Prefer tomllib on Python 3.11 (Alexandre Detiste)
+  * Clean up text for translation and document use of weblate in README
+  * Fix inactive 2D data import range
+  * Update GPL address
 
 ## Features of package:
 
