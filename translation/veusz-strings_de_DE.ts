@@ -2029,11 +2029,6 @@ Values = %s</source>
         <translation>Erstellen</translation>
     </message>
     <message>
-        <location filename="./ui/datacreate2d.ui" line="60"/>
-        <source>From expression based on existing &amp;2D dataset(s)</source>
-        <translation>Aus einem Ausdruck, basierend auf bestehender 2D-Datenrihe(n)</translation>
-    </message>
-    <message>
         <location filename="./ui/datacreate2d.ui" line="67"/>
         <source>From &amp;function of x and y</source>
         <translation>Aus einer Funktion von x und y</translation>
@@ -2323,11 +2318,6 @@ Values = %s</source>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="601"/>
         <source>Date/time dataset</source>
         <translation>Datum/Zeit-Datenreihe</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="698"/>
-        <source>duplicate dataset(s)</source>
-        <translation>Datenreihe(n) duplizieren</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="774"/>

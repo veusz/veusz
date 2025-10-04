@@ -23,11 +23,6 @@
         <source>OK</source>
         <translation>OK</translation>
     </message>
-    <message>
-        <location filename="./ui/about.ui" line="62"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
 </context>
 <context>
     <name>Axis</name>
@@ -2030,11 +2025,6 @@ Values = %s</source>
         <translation>作成(&amp;C)</translation>
     </message>
     <message>
-        <location filename="./ui/datacreate2d.ui" line="60"/>
-        <source>From expression based on existing &amp;2D dataset(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="./ui/datacreate2d.ui" line="67"/>
         <source>From &amp;function of x and y</source>
         <translation>xとyの関数から(&amp;F)</translation>
@@ -2324,11 +2314,6 @@ Values = %s</source>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="601"/>
         <source>Date/time dataset</source>
         <translation>日付/時刻データセット</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="698"/>
-        <source>duplicate dataset(s)</source>
-        <translation>データセットを複製</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="774"/>

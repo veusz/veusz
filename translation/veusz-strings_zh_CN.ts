@@ -23,11 +23,6 @@
         <source>OK</source>
         <translation>确定</translation>
     </message>
-    <message>
-        <location filename="./ui/about.ui" line="62"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz版本 %(version)s&lt;/span&gt;&lt;br/&gt; © 2003-2025 Jeremy Sanders 和参与贡献者&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;主要作者:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;参与者贡献者:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;包含以下外部代码和资源: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz 绝对没有安全保障. Veusz是免费软件, 并且您有权根据 GNU 公共许可证 （GPL） 的条款分发它. 有关详细信息，请参阅文件 COPYING，或单击 &amp;quot;展示授权文件&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
 </context>
 <context>
     <name>Axis</name>
@@ -2084,11 +2079,6 @@ Veusz 不承担任何形式的担保责任。 Veusz 是自由软件，并且很�
         <translation>创建(&amp;r)</translation>
     </message>
     <message>
-        <location filename="./ui/datacreate2d.ui" line="60"/>
-        <source>From expression based on existing &amp;2D dataset(s)</source>
-        <translation>基于现有2D数据集的表达式(&amp;2)</translation>
-    </message>
-    <message>
         <location filename="./ui/datacreate2d.ui" line="67"/>
         <source>From &amp;function of x and y</source>
         <translation>基于x和y函数(&amp;f)</translation>
@@ -2378,11 +2368,6 @@ Veusz 不承担任何形式的担保责任。 Veusz 是自由软件，并且很�
         <location filename="./veusz/dialogs/dataeditdialog.py" line="601"/>
         <source>Date/time dataset</source>
         <translation>日期/时间数据集</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="698"/>
-        <source>duplicate dataset(s)</source>
-        <translation>复制数据集</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="774"/>

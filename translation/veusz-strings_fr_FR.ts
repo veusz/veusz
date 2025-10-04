@@ -2059,11 +2059,6 @@ Valeurs = %s</translation>
         <translation>C&amp;réer</translation>
     </message>
     <message>
-        <location filename="./ui/datacreate2d.ui" line="60"/>
-        <source>From expression based on existing &amp;2D dataset(s)</source>
-        <translation>A partir d&apos;une expression basée sur un(des) jeu(x) de données existants &amp;2D</translation>
-    </message>
-    <message>
         <location filename="./ui/datacreate2d.ui" line="67"/>
         <source>From &amp;function of x and y</source>
         <translation>A partir d&apos;une &amp;fonction x et y</translation>
@@ -2353,11 +2348,6 @@ Valeurs = %s</translation>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="601"/>
         <source>Date/time dataset</source>
         <translation>Jeu de données horodatées</translation>
-    </message>
-    <message>
-        <location filename="./veusz/dialogs/dataeditdialog.py" line="698"/>
-        <source>duplicate dataset(s)</source>
-        <translation>dupliquer un(des) jeu(x) de données</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/dataeditdialog.py" line="774"/>
