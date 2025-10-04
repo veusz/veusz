@@ -9,8 +9,8 @@
     </message>
     <message>
       <location filename="./ui/about.ui" line="62"/>
-      <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:14pt; font-weight:600; color:#a000a0;"&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href="https://veusz.github.io/"&gt;&lt;span style=" text-decoration: underline; color:#0057ae;"&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-      <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:14pt; font-weight:600; color:#a000a0;"&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href="https://veusz.github.io/"&gt;&lt;span style=" text-decoration: underline; color:#0057ae;"&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, korintje, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+      <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:14pt; font-weight:600; color:#a000a0;"&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href="https://veusz.github.io/"&gt;&lt;span style=" text-decoration: underline; color:#0057ae;"&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, Takuro Hosomi, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+      <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-size:14pt; font-weight:600; color:#a000a0;"&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href="https://veusz.github.io/"&gt;&lt;span style=" text-decoration: underline; color:#0057ae;"&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, Takuro Hosomi, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
       <location filename="./ui/about.ui" line="108"/>
@@ -44,7 +44,7 @@
       <translation>Length of major ticks</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axis.py" line="51"/>
+      <location filename="./veusz/widgets/axis.py" line="77"/>
       <source>Length</source>
       <translation>Length</translation>
     </message>
@@ -54,17 +54,17 @@
       <translation>Number of major ticks to aim for</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axis.py" line="56"/>
+      <location filename="./veusz/widgets/axis.py" line="82"/>
       <source>Number</source>
       <translation>Number</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axis.py" line="60"/>
+      <location filename="./veusz/widgets/axis.py" line="86"/>
       <source>List of tick values overriding defaults</source>
       <translation>List of tick values overriding defaults</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axis.py" line="61"/>
+      <location filename="./veusz/widgets/axis.py" line="87"/>
       <source>Manual ticks</source>
       <translation>Manual ticks</translation>
     </message>
@@ -179,7 +179,7 @@
       <translation>A scale factor to apply to the values of the tick labels</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axis.py" line="174"/>
+      <location filename="./veusz/widgets/axis.py" line="418"/>
       <source>Scale</source>
       <translation>Scale</translation>
     </message>
@@ -269,7 +269,7 @@
       <translation>Auto range</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axis.py" line="287"/>
+      <location filename="./veusz/widgets/axis.py" line="325"/>
       <source>Invalid axis range '%s'</source>
       <translation>Invalid axis range '%s'</translation>
     </message>
@@ -512,7 +512,7 @@
       <translation>Length of major ticks</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axis3d.py" line="166"/>
+      <location filename="./veusz/widgets/axis3d.py" line="188"/>
       <source>Length</source>
       <translation>Length</translation>
     </message>
@@ -522,7 +522,7 @@
       <translation>Number of major ticks to aim for</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axis3d.py" line="171"/>
+      <location filename="./veusz/widgets/axis3d.py" line="193"/>
       <source>Number</source>
       <translation>Number</translation>
     </message>
@@ -845,7 +845,7 @@
       <translation>Filling fraction of bars (between 0 and 1)</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/bar.py" line="113"/>
+      <location filename="./veusz/widgets/bar.py" line="130"/>
       <source>Bar fill</source>
       <translation>Bar fill</translation>
     </message>
@@ -908,7 +908,7 @@
       <translation>Plot box plots</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/boxplot.py" line="131"/>
+      <location filename="./veusz/widgets/boxplot.py" line="132"/>
       <source>Whisker mode</source>
       <translation>Whisker mode</translation>
     </message>
@@ -1008,7 +1008,7 @@
       <translation>Dataset with means or list of values</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/boxplot.py" line="179"/>
+      <location filename="./veusz/widgets/boxplot.py" line="207"/>
       <source>Mean</source>
       <translation>Mean</translation>
     </message>
@@ -1058,7 +1058,7 @@
       <translation>Markers size</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/boxplot.py" line="216"/>
+      <location filename="./veusz/widgets/boxplot.py" line="217"/>
       <source>Box fill</source>
       <translation>Box fill</translation>
     </message>
@@ -1073,7 +1073,7 @@
       <translation>Box border</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/boxplot.py" line="226"/>
+      <location filename="./veusz/widgets/boxplot.py" line="227"/>
       <source>Whisker line</source>
       <translation>Whisker line</translation>
     </message>
@@ -1088,7 +1088,7 @@
       <translation>Markers border</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/boxplot.py" line="236"/>
+      <location filename="./veusz/widgets/boxplot.py" line="237"/>
       <source>Markers fill</source>
       <translation>Markers fill</translation>
     </message>
@@ -1418,7 +1418,7 @@
       <translation>No children found</translation>
     </message>
     <message>
-      <location filename="./veusz/document/commandinterface.py" line="422"/>
+      <location filename="./veusz/document/commandinterface.py" line="431"/>
       <source>Set setting '%s' to %s</source>
       <translation>Set setting '%s' to %s</translation>
     </message>
@@ -1604,7 +1604,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Hide fills</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/contour.py" line="100"/>
+      <location filename="./veusz/widgets/contour.py" line="137"/>
       <source>Hide</source>
       <translation>Hide</translation>
     </message>
@@ -1614,12 +1614,12 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Line styles to plot the contours using</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/contour.py" line="111"/>
+      <location filename="./veusz/widgets/contour.py" line="127"/>
       <source>Line styles</source>
       <translation>Line styles</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/contour.py" line="115"/>
+      <location filename="./veusz/widgets/contour.py" line="136"/>
       <source>Hide lines</source>
       <translation>Hide lines</translation>
     </message>
@@ -1759,7 +1759,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Contour labels</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/contour.py" line="238"/>
+      <location filename="./veusz/widgets/contour.py" line="239"/>
       <source>Contour lines</source>
       <translation>Contour lines</translation>
     </message>
@@ -1774,7 +1774,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Contour fills</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/contour.py" line="250"/>
+      <location filename="./veusz/widgets/contour.py" line="251"/>
       <source>Sub-contour lines</source>
       <translation>Sub-contour lines</translation>
     </message>
@@ -1895,12 +1895,12 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Define constants and functions for use in expressions. Functions should be specified as f(x,y) to specify arguments. Functions and constants are evaluated in order.</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/custom.py" line="37"/>
+      <location filename="./veusz/dialogs/custom.py" line="40"/>
       <source>Name</source>
       <translation>Name</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/custom.py" line="37"/>
+      <location filename="./veusz/dialogs/custom.py" line="40"/>
       <source>Definition</source>
       <translation>Definition</translation>
     </message>
@@ -2025,7 +2025,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Recent</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/custom.py" line="292"/>
+      <location filename="./veusz/dialogs/custom.py" line="308"/>
       <source>Veusz document (*.vsz)</source>
       <translation>Veusz document (*.vsz)</translation>
     </message>
@@ -2035,7 +2035,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Save custom definitions</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/custom.py" line="300"/>
+      <location filename="./veusz/dialogs/custom.py" line="314"/>
       <source>Error - Veusz</source>
       <translation>Error - Veusz</translation>
     </message>
@@ -2092,8 +2092,8 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
     </message>
     <message>
       <location filename="./ui/datacreate2d.ui" line="60"/>
-      <source>From expression based on existing &amp;2D dataset(s)</source>
-      <translation>From expression based on existing &amp;2D dataset(s)</translation>
+      <source>From expression based on existing &amp;2D datasets</source>
+      <translation>From expression based on existing &amp;2D datasets</translation>
     </message>
     <message>
       <location filename="./ui/datacreate2d.ui" line="67"/>
@@ -2332,7 +2332,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Crea&amp;te…</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/dataeditdialog.py" line="147"/>
+      <location filename="./veusz/dialogs/dataeditdialog.py" line="294"/>
       <source>set value</source>
       <translation>set value</translation>
     </message>
@@ -2407,17 +2407,17 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>unlink datasets</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/dataeditdialog.py" line="700"/>
-      <source>duplicate dataset(s)</source>
-      <translation>duplicate dataset(s)</translation>
+      <location filename="./veusz/dialogs/dataeditdialog.py" line="701"/>
+      <source>duplicate datasets</source>
+      <translation>duplicate datasets</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/dataeditdialog.py" line="776"/>
+      <location filename="./veusz/dialogs/dataeditdialog.py" line="777"/>
       <source>new dataset</source>
       <translation>new dataset</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/dataeditdialog.py" line="780"/>
+      <location filename="./veusz/dialogs/dataeditdialog.py" line="781"/>
       <source>new dataset %i</source>
       <translation>new dataset %i</translation>
     </message>
@@ -2443,17 +2443,17 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Tags: %s</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="208"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="333"/>
       <source>Dataset</source>
       <translation>Dataset</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="208"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="723"/>
       <source>Size</source>
       <translation>Size</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="208"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="722"/>
       <source>Type</source>
       <translation>Type</translation>
     </message>
@@ -2463,22 +2463,22 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>File</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="256"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="277"/>
       <source>Select</source>
       <translation>Select</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="257"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="278"/>
       <source>check</source>
       <translation>check</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="308"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="721"/>
       <source>Filename</source>
       <translation>Filename</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="330"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="720"/>
       <source>None</source>
       <translation>None</translation>
     </message>
@@ -2503,7 +2503,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>delete datasets</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="552"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="560"/>
       <source>unlink datasets</source>
       <translation>unlink datasets</translation>
     </message>
@@ -2533,7 +2533,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Unlink relation</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="586"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="724"/>
       <source>Tags</source>
       <translation>Tags</translation>
     </message>
@@ -2588,25 +2588,30 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Delete all</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="747"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="753"/>
       <source>Group</source>
       <translation>Group</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="761"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="767"/>
       <source>Group datasets with property given</source>
       <translation>Group datasets with property given</translation>
     </message>
     <message>
-      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="769"/>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="775"/>
       <source>Search for dataset names</source>
       <translation>Search for dataset names</translation>
+    </message>
+    <message>
+      <location filename="./veusz/qtwidgets/datasetbrowser.py" line="838"/>
+      <source>Apply</source>
+      <translation>Apply</translation>
     </message>
   </context>
   <context>
     <name>DatasetPlugin</name>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="339"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="379"/>
       <source>Unknown dataset '%s'</source>
       <translation>Unknown dataset '%s'</translation>
     </message>
@@ -2631,12 +2636,12 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Output dataset name is empty</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="522"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2204"/>
       <source>Invalid output dataset name</source>
       <translation>Invalid output dataset name</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="614"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1195"/>
       <source>Multiply</source>
       <translation>Multiply</translation>
     </message>
@@ -2656,7 +2661,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Multiply a dataset by a factor. Error bars are also scaled.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="623"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2196"/>
       <source>Input dataset</source>
       <translation>Input dataset</translation>
     </message>
@@ -2666,12 +2671,12 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Factor</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="625"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2017"/>
       <source>Output dataset name</source>
       <translation>Output dataset name</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="645"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1011"/>
       <source>Add</source>
       <translation>Add</translation>
     </message>
@@ -2701,7 +2706,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Other</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="672"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1854"/>
       <source>Reverse</source>
       <translation>Reverse</translation>
     </message>
@@ -2711,7 +2716,7 @@ This window is a Python command line console and acts as a calculator.&lt;br&gt;
       <translation>Reverse dataset</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="700"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="756"/>
       <source>Join</source>
       <translation>Join</translation>
     </message>
@@ -2733,17 +2738,17 @@ Error bars are merged.</source>
 Error bars are merged.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="709"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1357"/>
       <source>Input datasets</source>
       <translation>Input datasets</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="718"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1030"/>
       <source>Requires one or more input datasets</source>
       <translation>Requires one or more input datasets</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="756"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1475"/>
       <source>Element by element</source>
       <translation>Element by element</translation>
     </message>
@@ -2760,7 +2765,7 @@ Error bars are merged.</source>
 Error bars are merged.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="832"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1475"/>
       <source>Split</source>
       <translation>Split</translation>
     </message>
@@ -2780,7 +2785,7 @@ Error bars are merged.</translation>
       <translation>Chop out a section of a dataset. Give starting index of data and number of datapoints to take.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="843"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="924"/>
       <source>Starting index (from 1)</source>
       <translation>Starting index (from 1)</translation>
     </message>
@@ -2805,7 +2810,7 @@ Error bars are merged.</translation>
       <translation>Split dataset into equal-size parts. The parts will differ in size if the dataset cannot be split equally.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="880"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1488"/>
       <source>Output datasets</source>
       <translation>Output datasets</translation>
     </message>
@@ -2835,7 +2840,7 @@ Error bars are merged.</translation>
       <translation>Interval between data points</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="948"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2144"/>
       <source>Compute</source>
       <translation>Compute</translation>
     </message>
@@ -2855,7 +2860,7 @@ Error bars are merged.</translation>
       <translation>Compute mean of multiple datasets to create a single dataset.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1011"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1235"/>
       <source>Datasets</source>
       <translation>Datasets</translation>
     </message>
@@ -2870,7 +2875,7 @@ Error bars are merged.</translation>
       <translation>Add datasets together to make a single dataset. Error bars are combined.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1051"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1167"/>
       <source>Subtract</source>
       <translation>Subtract</translation>
     </message>
@@ -2885,12 +2890,12 @@ Error bars are merged.</translation>
       <translation>Subtract two datasets. Combined error bars are also calculated.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1060"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1247"/>
       <source>Input dataset 1</source>
       <translation>Input dataset 1</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1061"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1248"/>
       <source>Input dataset 2</source>
       <translation>Input dataset 2</translation>
     </message>
@@ -2915,7 +2920,7 @@ Error bars are merged.</translation>
       <translation>Divide by standard deviation</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1139"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2048"/>
       <source>Minimum</source>
       <translation>Minimum</translation>
     </message>
@@ -2930,7 +2935,7 @@ Error bars are merged.</translation>
       <translation>Subtract the minimum value from a dataset</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1167"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2050"/>
       <source>Maximum</source>
       <translation>Maximum</translation>
     </message>
@@ -2955,7 +2960,7 @@ Error bars are merged.</translation>
       <translation>Multiply two or more datasets. Combined error bars are also calculated.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1235"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1311"/>
       <source>Divide</source>
       <translation>Divide</translation>
     </message>
@@ -3057,7 +3062,7 @@ Default behaviour is to accumulate from start.</translation>
       <translation>Compute cumulative value from end</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1446"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2199"/>
       <source>Output dataset</source>
       <translation>Output dataset</translation>
     </message>
@@ -3079,7 +3084,7 @@ e.g. 1, 2, 3, 4, 5, 6 could be converted to 1, 3, 5 and 2, 4, 6.</translation>
       <translation>Requires at least one output dataset</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1520"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2185"/>
       <source>Convert</source>
       <translation>Convert</translation>
     </message>
@@ -3173,7 +3178,7 @@ Error bars are ignored.</translation>
       <translation>Error filtering dataset: '%s')</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1624"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1702"/>
       <source>Filtering</source>
       <translation>Filtering</translation>
     </message>
@@ -3224,12 +3229,12 @@ Given datasets for y = f(x), compute y' = f(x'), using linear interpolation.
 Assumes x dataset increases in value.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1673"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1903"/>
       <source>Input dataset x</source>
       <translation>Input dataset x</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1674"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1910"/>
       <source>Input dataset y</source>
       <translation>Input dataset y</translation>
     </message>
@@ -3304,7 +3309,7 @@ Assumes x dataset increases in value.</translation>
       <translation>Sort a dataset</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="1818"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="1853"/>
       <source>Sort by (optional)</source>
       <translation>Sort by (optional)</translation>
     </message>
@@ -3441,7 +3446,7 @@ Assumes x dataset increases in value.</translation>
       <translation>Compute logarithm of data with arbitrary base</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="2110"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2153"/>
       <source>Base</source>
       <translation>Base</translation>
     </message>
@@ -3451,7 +3456,7 @@ Assumes x dataset increases in value.</translation>
       <translation>Exponential</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/datasetplugin.py" line="2146"/>
+      <location filename="./veusz/plugins/datasetplugin.py" line="2147"/>
       <source>Compute exponential of data</source>
       <translation>Compute exponential of data</translation>
     </message>
@@ -3739,7 +3744,7 @@ This is recommended for most purposes.</translation>
       <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Quality of output for lossy formats. Lower values give poorer quality results and are more compressed, but have smaller file sizes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="./ui/export.ui" line="359"/>
+      <location filename="./ui/export.ui" line="370"/>
       <source>Color</source>
       <translation>Color</translation>
     </message>
@@ -3784,7 +3789,7 @@ This is recommended for most purposes.</translation>
   <context>
     <name>DocumentLoader</name>
     <message>
-      <location filename="./veusz/document/loader.py" line="84"/>
+      <location filename="./veusz/document/loader.py" line="85"/>
       <source>Error reading file '%s':
 
 %s</source>
@@ -3793,29 +3798,29 @@ This is recommended for most purposes.</translation>
 %s</translation>
     </message>
     <message>
-      <location filename="./veusz/document/loader.py" line="123"/>
+      <location filename="./veusz/document/loader.py" line="145"/>
       <source>Unsafe command in script</source>
       <translation>Unsafe command in script</translation>
     </message>
     <message>
-      <location filename="./veusz/document/loader.py" line="232"/>
+      <location filename="./veusz/document/loader.py" line="233"/>
       <source>No HDF5 support as h5py module is missing</source>
       <translation>No HDF5 support as h5py module is missing</translation>
     </message>
     <message>
-      <location filename="./veusz/document/loader.py" line="246"/>
+      <location filename="./veusz/document/loader.py" line="247"/>
       <source>HDF5 file '%s' is not a Veusz saved document</source>
       <translation>HDF5 file '%s' is not a Veusz saved document</translation>
     </message>
     <message>
-      <location filename="./veusz/document/loader.py" line="252"/>
+      <location filename="./veusz/document/loader.py" line="253"/>
       <source>This document version (%i) is not supported. It was written by Veusz %s.
 This Veusz only supports document version %i.</source>
       <translation>This document version (%i) is not supported. It was written by Veusz %s.
 This Veusz only supports document version %i.</translation>
     </message>
     <message>
-      <location filename="./veusz/document/loader.py" line="286"/>
+      <location filename="./veusz/document/loader.py" line="291"/>
       <source>Cannot open document '%s'
 
 %s</source>
@@ -3824,7 +3829,7 @@ This Veusz only supports document version %i.</translation>
 %s</translation>
     </message>
     <message>
-      <location filename="./veusz/document/loader.py" line="290"/>
+      <location filename="./veusz/document/loader.py" line="295"/>
       <source>File '%s' is not a valid Veusz document</source>
       <translation>File '%s' is not a valid Veusz document</translation>
     </message>
@@ -4112,7 +4117,7 @@ This Veusz only supports document version %i.</translation>
       <translation>The file %s already exists</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/export.py" line="461"/>
+      <location filename="./veusz/dialogs/export.py" line="464"/>
       <source>none</source>
       <translation>none</translation>
     </message>
@@ -4244,7 +4249,7 @@ This Veusz only supports document version %i.</translation>
       <translation>Fitting via Minuit:</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/fit.py" line="116"/>
+      <location filename="./veusz/widgets/fit.py" line="123"/>
       <source>Fit results:
 </source>
       <translation>Fit results:
@@ -4266,7 +4271,7 @@ This Veusz only supports document version %i.</translation>
       <translation>Fit a function to data</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/fit.py" line="144"/>
+      <location filename="./veusz/widgets/fit.py" line="145"/>
       <source>Fit function</source>
       <translation>Fit function</translation>
     </message>
@@ -4437,12 +4442,12 @@ This Veusz only supports document version %i.</translation>
   <context>
     <name>Form</name>
     <message>
-      <location filename="./ui/import_fits.ui" line="14"/>
+      <location filename="./ui/import_hdf5.ui" line="14"/>
       <source>Form</source>
       <translation>Form</translation>
     </message>
     <message>
-      <location filename="./ui/import_fits.ui" line="30"/>
+      <location filename="./ui/import_hdf5.ui" line="91"/>
       <source>2D options</source>
       <translation>2D options</translation>
     </message>
@@ -4452,12 +4457,12 @@ This Veusz only supports document version %i.</translation>
       <translation>Text options</translation>
     </message>
     <message>
-      <location filename="./ui/import_fits.ui" line="36"/>
+      <location filename="./ui/import_hdf5.ui" line="97"/>
       <source>Import as 1D dataset with error bars</source>
       <translation>Import as 1D dataset with error bars</translation>
     </message>
     <message>
-      <location filename="./ui/import_hdf5.ui" line="36"/>
+      <location filename="./ui/import_hdf5.ui" line="62"/>
       <source>Import as date/time</source>
       <translation>Import as date/time</translation>
     </message>
@@ -4512,22 +4517,22 @@ This Veusz only supports document version %i.</translation>
       <translation>Unix format (seconds since start of 1970)</translation>
     </message>
     <message>
-      <location filename="./ui/import_fits.ui" line="83"/>
+      <location filename="./ui/import_hdf5.ui" line="106"/>
       <source>Range:</source>
       <translation>Range:</translation>
     </message>
     <message>
-      <location filename="./ui/import_fits.ui" line="90"/>
+      <location filename="./ui/import_hdf5.ui" line="126"/>
       <source>x =</source>
       <translation>x =</translation>
     </message>
     <message>
-      <location filename="./ui/import_fits.ui" line="100"/>
+      <location filename="./ui/import_hdf5.ui" line="169"/>
       <source>→</source>
       <translation>→</translation>
     </message>
     <message>
-      <location filename="./ui/import_fits.ui" line="114"/>
+      <location filename="./ui/import_hdf5.ui" line="159"/>
       <source>y =</source>
       <translation>y =</translation>
     </message>
@@ -4776,7 +4781,7 @@ This Veusz only supports document version %i.</translation>
       <translation>Constant function</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axisfunction.py" line="121"/>
+      <location filename="./veusz/widgets/axisfunction.py" line="141"/>
       <source>No solution found</source>
       <translation>No solution found</translation>
     </message>
@@ -4836,7 +4841,7 @@ This Veusz only supports document version %i.</translation>
       <translation>Error in axis-function (%s): '%s'</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/axisfunction.py" line="414"/>
+      <location filename="./veusz/widgets/axisfunction.py" line="473"/>
       <source>Not a monotonic function</source>
       <translation>Not a monotonic function</translation>
     </message>
@@ -4942,32 +4947,32 @@ This Veusz only supports document version %i.</translation>
       <translation>3d graph</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/graph3d.py" line="81"/>
+      <location filename="./veusz/widgets/graph3d.py" line="82"/>
       <source>X size</source>
       <translation>X size</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/graph3d.py" line="86"/>
+      <location filename="./veusz/widgets/graph3d.py" line="87"/>
       <source>Y size</source>
       <translation>Y size</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/graph3d.py" line="91"/>
+      <location filename="./veusz/widgets/graph3d.py" line="92"/>
       <source>Z size</source>
       <translation>Z size</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/graph3d.py" line="97"/>
+      <location filename="./veusz/widgets/graph3d.py" line="98"/>
       <source>X position</source>
       <translation>X position</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/graph3d.py" line="102"/>
+      <location filename="./veusz/widgets/graph3d.py" line="103"/>
       <source>Y position</source>
       <translation>Y position</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/graph3d.py" line="107"/>
+      <location filename="./veusz/widgets/graph3d.py" line="108"/>
       <source>Z position</source>
       <translation>Z position</translation>
     </message>
@@ -5107,7 +5112,7 @@ by which to scale columns relative to each other.</translation>
   <context>
     <name>Histo</name>
     <message>
-      <location filename="./veusz/widgets/histo.py" line="191"/>
+      <location filename="./veusz/widgets/histo.py" line="192"/>
       <source>Mode</source>
       <translation>Mode</translation>
     </message>
@@ -5287,22 +5292,22 @@ by which to scale columns relative to each other.</translation>
       <translation>Error style</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/histo.py" line="351"/>
+      <location filename="./veusz/widgets/histo.py" line="352"/>
       <source>Plot line</source>
       <translation>Plot line</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/histo.py" line="356"/>
+      <location filename="./veusz/widgets/histo.py" line="357"/>
       <source>Fill under</source>
       <translation>Fill under</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/histo.py" line="361"/>
+      <location filename="./veusz/widgets/histo.py" line="362"/>
       <source>Fill over</source>
       <translation>Fill over</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/histo.py" line="366"/>
+      <location filename="./veusz/widgets/histo.py" line="367"/>
       <source>Post line</source>
       <translation>Post line</translation>
     </message>
@@ -5317,12 +5322,12 @@ by which to scale columns relative to each other.</translation>
       <translation>Marker border</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/histo.py" line="377"/>
+      <location filename="./veusz/widgets/histo.py" line="378"/>
       <source>Marker fill</source>
       <translation>Marker fill</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/histo.py" line="383"/>
+      <location filename="./veusz/widgets/histo.py" line="384"/>
       <source>Error bar line</source>
       <translation>Error bar line</translation>
     </message>
@@ -5654,27 +5659,27 @@ by which to scale columns relative to each other.</translation>
       <translation>All files (*)</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/importdialog.py" line="287"/>
+      <location filename="./veusz/dialogs/importdialog.py" line="288"/>
       <source>Veusz</source>
       <translation>Veusz</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/importdialog.py" line="287"/>
+      <location filename="./veusz/dialogs/importdialog.py" line="288"/>
       <source>Could not read file</source>
       <translation>Could not read file</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/importdialog.py" line="296"/>
+      <location filename="./veusz/dialogs/importdialog.py" line="297"/>
       <source>Imported data for datasets:</source>
       <translation>Imported data for datasets:</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/importdialog.py" line="301"/>
+      <location filename="./veusz/dialogs/importdialog.py" line="302"/>
       <source>%s: %s</source>
       <translation>%s: %s</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/importdialog.py" line="306"/>
+      <location filename="./veusz/dialogs/importdialog.py" line="307"/>
       <source>Datasets were linked to file "%s"</source>
       <translation>Datasets were linked to file "%s"</translation>
     </message>
@@ -5762,7 +5767,7 @@ p, li { white-space: pre-wrap; }
       <translation>Reads a list of numbers in a text file</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="105"/>
+      <location filename="./veusz/plugins/importplugin.py" line="633"/>
       <source>Dataset name</source>
       <translation>Dataset name</translation>
     </message>
@@ -5847,14 +5852,14 @@ p, li { white-space: pre-wrap; }
       <translation>Reads a 1D/2D numeric dataset from a Numpy NPY file</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="513"/>
+      <location filename="./veusz/plugins/importplugin.py" line="569"/>
       <source>Treat 2 and 3 column 2D arrays as
 data with error bars</source>
       <translation>Treat 2 and 3 column 2D arrays as
 data with error bars</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="525"/>
+      <location filename="./veusz/plugins/importplugin.py" line="581"/>
       <source>Cannot read file</source>
       <translation>Cannot read file</translation>
     </message>
@@ -5878,12 +5883,12 @@ data with error bars</translation>
       <translation>Not an NPY file</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="542"/>
+      <location filename="./veusz/plugins/importplugin.py" line="690"/>
       <source>Please provide a name for the dataset</source>
       <translation>Please provide a name for the dataset</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="550"/>
+      <location filename="./veusz/plugins/importplugin.py" line="608"/>
       <source>Error while reading file: %s</source>
       <translation>Error while reading file: %s</translation>
     </message>
@@ -5953,7 +5958,7 @@ data with error bars</translation>
       <translation>File length: %i bytes</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="699"/>
+      <location filename="./veusz/plugins/importplugin.py" line="708"/>
       <source>Error while reading file '%s'
 
 %s</source>
@@ -5962,7 +5967,7 @@ data with error bars</translation>
 %s</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="708"/>
+      <location filename="./veusz/plugins/importplugin.py" line="713"/>
       <source>Error converting data for file '%s'
 
 %s</source>
@@ -5971,12 +5976,12 @@ data with error bars</translation>
 %s</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="757"/>
+      <location filename="./veusz/plugins/importplugin.py" line="761"/>
       <source>Too few columns in file</source>
       <translation>Too few columns in file</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/importplugin.py" line="761"/>
+      <location filename="./veusz/plugins/importplugin.py" line="765"/>
       <source>Non-numeric data in file</source>
       <translation>Non-numeric data in file</translation>
     </message>
@@ -6225,7 +6230,7 @@ Example syntax: 2:20
       <translation>Cannot load fits module</translation>
     </message>
     <message>
-      <location filename="./veusz/dataimport/dialog_fits.py" line="153"/>
+      <location filename="./veusz/dataimport/dialog_fits.py" line="163"/>
       <source>Cannot open file</source>
       <translation>Cannot open file</translation>
     </message>
@@ -6291,7 +6296,7 @@ Example syntax: 2:20
       <translation>Cannot load h5py module</translation>
     </message>
     <message>
-      <location filename="./veusz/dataimport/dialog_hdf5.py" line="185"/>
+      <location filename="./veusz/dataimport/dialog_hdf5.py" line="195"/>
       <source>Cannot open file</source>
       <translation>Cannot open file</translation>
     </message>
@@ -6329,7 +6334,7 @@ Example syntax: 2:20
       <translation>CSV</translation>
     </message>
     <message>
-      <location filename="./veusz/dataimport/dialog_nd.py" line="44"/>
+      <location filename="./veusz/dataimport/dialog_nd.py" line="107"/>
       <source>Auto</source>
       <translation>Auto</translation>
     </message>
@@ -6759,7 +6764,7 @@ Example syntax: 2:20
       <translation>Untrusted mode</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/mainwindow.py" line="313"/>
+      <location filename="./veusz/windows/mainwindow.py" line="1177"/>
       <source>Error - Veusz</source>
       <translation>Error - Veusz</translation>
     </message>
@@ -6782,12 +6787,12 @@ Example syntax: 2:20
 %s</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/mainwindow.py" line="344"/>
+      <location filename="./veusz/windows/mainwindow.py" line="501"/>
       <source>Undo</source>
       <translation>Undo</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/mainwindow.py" line="351"/>
+      <location filename="./veusz/windows/mainwindow.py" line="505"/>
       <source>Redo</source>
       <translation>Redo</translation>
     </message>
@@ -6797,7 +6802,7 @@ Example syntax: 2:20
       <translation>New document</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/mainwindow.py" line="437"/>
+      <location filename="./veusz/windows/mainwindow.py" line="634"/>
       <source>New</source>
       <translation>New</translation>
     </message>
@@ -7172,7 +7177,7 @@ Example syntax: 2:20
       <translation>Suggestions and bugs</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/mainwindow.py" line="589"/>
+      <location filename="./veusz/windows/mainwindow.py" line="590"/>
       <source>Download latest version</source>
       <translation>Download latest version</translation>
     </message>
@@ -7433,7 +7438,7 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>Open File %s</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/mainwindow.py" line="1366"/>
+      <location filename="./veusz/windows/mainwindow.py" line="1375"/>
       <source>Reload file</source>
       <translation>Reload file</translation>
     </message>
@@ -7493,7 +7498,7 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>Skip</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/mainwindow.py" line="1528"/>
+      <location filename="./veusz/windows/mainwindow.py" line="1557"/>
       <source>Are you sure?</source>
       <translation>Are you sure?</translation>
     </message>
@@ -7835,12 +7840,12 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>rename</translation>
     </message>
     <message>
-      <location filename="./veusz/document/operations.py" line="208"/>
+      <location filename="./veusz/document/operations.py" line="235"/>
       <source>delete</source>
       <translation>delete</translation>
     </message>
     <message>
-      <location filename="./veusz/document/operations.py" line="281"/>
+      <location filename="./veusz/document/operations.py" line="310"/>
       <source>move</source>
       <translation>move</translation>
     </message>
@@ -7870,7 +7875,7 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>duplicate dataset</translation>
     </message>
     <message>
-      <location filename="./veusz/document/operations.py" line="545"/>
+      <location filename="./veusz/document/operations.py" line="563"/>
       <source>unlink dataset</source>
       <translation>unlink dataset</translation>
     </message>
@@ -8311,22 +8316,22 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>Key text</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/plotters.py" line="59"/>
+      <location filename="./veusz/widgets/plotters.py" line="223"/>
       <source>Name of X-axis to use</source>
       <translation>Name of X-axis to use</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/plotters.py" line="60"/>
+      <location filename="./veusz/widgets/plotters.py" line="224"/>
       <source>X axis</source>
       <translation>X axis</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/plotters.py" line="63"/>
+      <location filename="./veusz/widgets/plotters.py" line="227"/>
       <source>Name of Y-axis to use</source>
       <translation>Name of Y-axis to use</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/plotters.py" line="64"/>
+      <location filename="./veusz/widgets/plotters.py" line="228"/>
       <source>Y axis</source>
       <translation>Y axis</translation>
     </message>
@@ -8583,7 +8588,7 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>Number of spokes to use</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/polar.py" line="89"/>
+      <location filename="./veusz/widgets/polar.py" line="101"/>
       <source>Number</source>
       <translation>Number</translation>
     </message>
@@ -8678,17 +8683,17 @@ Is this ok? This choice can be changed in Preferences.</translation>
       <translation>Log</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/polar.py" line="165"/>
+      <location filename="./veusz/widgets/polar.py" line="166"/>
       <source>Radial tick labels</source>
       <translation>Radial tick labels</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/polar.py" line="173"/>
+      <location filename="./veusz/widgets/polar.py" line="174"/>
       <source>Spoke line</source>
       <translation>Spoke line</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/polar.py" line="179"/>
+      <location filename="./veusz/widgets/polar.py" line="180"/>
       <source>Radii line</source>
       <translation>Radii line</translation>
     </message>
@@ -8901,7 +8906,7 @@ Set to 0 to disable threads.</translation>
       <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load an externally-provided translation file on startup&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-      <location filename="./ui/preferences.ui" line="139"/>
+      <location filename="./ui/preferences.ui" line="516"/>
       <source>Browse…</source>
       <translation>Browse…</translation>
     </message>
@@ -8916,7 +8921,7 @@ Set to 0 to disable threads.</translation>
       <translation>Document default directory</translation>
     </message>
     <message>
-      <location filename="./ui/preferences.ui" line="164"/>
+      <location filename="./ui/preferences.ui" line="241"/>
       <source>Previous session</source>
       <translation>Previous session</translation>
     </message>
@@ -9127,7 +9132,7 @@ to be loaded.</translation>
       <translation>Plugins</translation>
     </message>
     <message>
-      <location filename="./ui/preferences.ui" line="451"/>
+      <location filename="./ui/preferences.ui" line="559"/>
       <source>Add…</source>
       <translation>Add…</translation>
     </message>
@@ -9137,7 +9142,7 @@ to be loaded.</translation>
       <translation>Add entries here to load Veusz import plugins. Entries should consist of a Python file to load.</translation>
     </message>
     <message>
-      <location filename="./ui/preferences.ui" line="474"/>
+      <location filename="./ui/preferences.ui" line="569"/>
       <source>Remove</source>
       <translation>Remove</translation>
     </message>
@@ -9278,7 +9283,7 @@ to be loaded.</translation>
       <translation>English locale</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/root.py" line="97"/>
+      <location filename="./veusz/widgets/root.py" line="98"/>
       <source>Color theme</source>
       <translation>Color theme</translation>
     </message>
@@ -9439,17 +9444,17 @@ to be loaded.</translation>
       <translation>Bottom margin</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/scene3d.py" line="130"/>
+      <location filename="./veusz/widgets/scene3d.py" line="131"/>
       <source>Lighting (1)</source>
       <translation>Lighting (1)</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/scene3d.py" line="135"/>
+      <location filename="./veusz/widgets/scene3d.py" line="136"/>
       <source>Lighting (2)</source>
       <translation>Lighting (2)</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/scene3d.py" line="140"/>
+      <location filename="./veusz/widgets/scene3d.py" line="141"/>
       <source>Lighting (3)</source>
       <translation>Lighting (3)</translation>
     </message>
@@ -9457,47 +9462,47 @@ to be loaded.</translation>
   <context>
     <name>Setting</name>
     <message>
-      <location filename="./veusz/setting/collections.py" line="42"/>
+      <location filename="./veusz/setting/collections.py" line="473"/>
       <source>Color of line</source>
       <translation>Color of line</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="43"/>
+      <location filename="./veusz/setting/stylesheet.py" line="133"/>
       <source>Color</source>
       <translation>Color</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="47"/>
+      <location filename="./veusz/setting/collections.py" line="478"/>
       <source>Width of line</source>
       <translation>Width of line</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="48"/>
+      <location filename="./veusz/setting/stylesheet.py" line="66"/>
       <source>Width</source>
       <translation>Width</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="51"/>
+      <location filename="./veusz/setting/collections.py" line="482"/>
       <source>Line style</source>
       <translation>Line style</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="52"/>
+      <location filename="./veusz/setting/stylesheet.py" line="139"/>
       <source>Style</source>
       <translation>Style</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="55"/>
+      <location filename="./veusz/setting/collections.py" line="536"/>
       <source>Transparency percentage</source>
       <translation>Transparency percentage</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="56"/>
+      <location filename="./veusz/setting/collections.py" line="537"/>
       <source>Transparency</source>
       <translation>Transparency</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="61"/>
+      <location filename="./veusz/setting/collections.py" line="496"/>
       <source>Hide the line</source>
       <translation>Hide the line</translation>
     </message>
@@ -9507,7 +9512,7 @@ to be loaded.</translation>
       <translation>Default line style for document</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="62"/>
+      <location filename="./veusz/setting/collections.py" line="546"/>
       <source>Hide</source>
       <translation>Hide</translation>
     </message>
@@ -9552,7 +9557,7 @@ to be loaded.</translation>
       <translation>Default font for document</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/stylesheet.py" line="116"/>
+      <location filename="./veusz/setting/stylesheet.py" line="123"/>
       <source>Font</source>
       <translation>Font</translation>
     </message>
@@ -9607,7 +9612,7 @@ to be loaded.</translation>
       <translation>Hide horizontal errors</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="153"/>
+      <location filename="./veusz/setting/collections.py" line="604"/>
       <source>Hide horz.</source>
       <translation>Hide horz.</translation>
     </message>
@@ -9617,22 +9622,22 @@ to be loaded.</translation>
       <translation>Hide vertical errors</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="157"/>
+      <location filename="./veusz/setting/collections.py" line="608"/>
       <source>Hide vert.</source>
       <translation>Hide vert.</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="167"/>
+      <location filename="./veusz/setting/collections.py" line="206"/>
       <source>Fill colour</source>
       <translation>Fill colour</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="171"/>
+      <location filename="./veusz/setting/collections.py" line="210"/>
       <source>Fill style</source>
       <translation>Fill style</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="181"/>
+      <location filename="./veusz/setting/collections.py" line="215"/>
       <source>Hide the fill</source>
       <translation>Hide the fill</translation>
     </message>
@@ -9837,12 +9842,12 @@ to be loaded.</translation>
       <translation>Scaling</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="492"/>
+      <location filename="./veusz/setting/collections.py" line="541"/>
       <source>Reflectivity percentage</source>
       <translation>Reflectivity percentage</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="493"/>
+      <location filename="./veusz/setting/collections.py" line="542"/>
       <source>Reflectivity</source>
       <translation>Reflectivity</translation>
     </message>
@@ -9857,22 +9862,22 @@ to be loaded.</translation>
       <translation>Hide surface</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="567"/>
+      <location filename="./veusz/setting/collections.py" line="586"/>
       <source>If color markers dataset is given, use this colormap instead of the fill color</source>
       <translation>If color markers dataset is given, use this colormap instead of the fill color</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="570"/>
+      <location filename="./veusz/setting/collections.py" line="589"/>
       <source>Color map</source>
       <translation>Color map</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="574"/>
+      <location filename="./veusz/setting/collections.py" line="593"/>
       <source>Invert color map</source>
       <translation>Invert color map</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/collections.py" line="575"/>
+      <location filename="./veusz/setting/collections.py" line="594"/>
       <source>Invert map</source>
       <translation>Invert map</translation>
     </message>
@@ -9942,62 +9947,62 @@ to be loaded.</translation>
       <translation>Z position</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="718"/>
+      <location filename="./veusz/setting/controls.py" line="726"/>
       <source>Select using dataset browser</source>
       <translation>Select using dataset browser</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1391"/>
+      <location filename="./veusz/setting/controls.py" line="1404"/>
       <source>Line color</source>
       <translation>Line color</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1394"/>
+      <location filename="./veusz/setting/controls.py" line="1407"/>
       <source>Hide line</source>
       <translation>Hide line</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1531"/>
+      <location filename="./veusz/setting/controls.py" line="1544"/>
       <source>Fill color</source>
       <translation>Fill color</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1534"/>
+      <location filename="./veusz/setting/controls.py" line="1547"/>
       <source>Hide fill</source>
       <translation>Hide fill</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1537"/>
+      <location filename="./veusz/setting/controls.py" line="1550"/>
       <source>More options</source>
       <translation>More options</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1795"/>
+      <location filename="./veusz/setting/controls.py" line="1808"/>
       <source>Browse for file</source>
       <translation>Browse for file</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1817"/>
+      <location filename="./veusz/setting/controls.py" line="1830"/>
       <source>Choose file</source>
       <translation>Choose file</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1818"/>
+      <location filename="./veusz/setting/controls.py" line="1831"/>
       <source>All files (*)</source>
       <translation>All files (*)</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1820"/>
+      <location filename="./veusz/setting/controls.py" line="1833"/>
       <source>Choose image</source>
       <translation>Choose image</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1826"/>
+      <location filename="./veusz/setting/controls.py" line="1839"/>
       <source>Choose SVG file</source>
       <translation>Choose SVG file</translation>
     </message>
     <message>
-      <location filename="./veusz/setting/controls.py" line="1896"/>
+      <location filename="./veusz/setting/controls.py" line="1909"/>
       <source>default</source>
       <translation>default</translation>
     </message>
@@ -10110,7 +10115,7 @@ to be loaded.</translation>
       <translation>Image filename</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/shape.py" line="273"/>
+      <location filename="./veusz/widgets/shape.py" line="426"/>
       <source>Filename</source>
       <translation>Filename</translation>
     </message>
@@ -10120,17 +10125,17 @@ to be loaded.</translation>
       <translation>Embedded base 64-encoded image data, used if filename set to {embedded}</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/shape.py" line="282"/>
+      <location filename="./veusz/widgets/shape.py" line="435"/>
       <source>Embedded data</source>
       <translation>Embedded data</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/shape.py" line="287"/>
+      <location filename="./veusz/widgets/shape.py" line="440"/>
       <source>Preserve aspect ratio</source>
       <translation>Preserve aspect ratio</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/shape.py" line="288"/>
+      <location filename="./veusz/widgets/shape.py" line="441"/>
       <source>Preserve aspect</source>
       <translation>Preserve aspect</translation>
     </message>
@@ -10203,7 +10208,7 @@ to be loaded.</translation>
       <translation>Load definitions from a vsz script file</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/stylesheet.py" line="106"/>
+      <location filename="./veusz/dialogs/stylesheet.py" line="123"/>
       <source>Veusz stylesheet (*.vst)</source>
       <translation>Veusz stylesheet (*.vst)</translation>
     </message>
@@ -10218,7 +10223,7 @@ to be loaded.</translation>
       <translation>Load…</translation>
     </message>
     <message>
-      <location filename="./veusz/dialogs/stylesheet.py" line="116"/>
+      <location filename="./veusz/dialogs/stylesheet.py" line="129"/>
       <source>Error - Veusz</source>
       <translation>Error - Veusz</translation>
     </message>
@@ -10613,7 +10618,7 @@ to be loaded.</translation>
       <translation>Base plugin</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="78"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="321"/>
       <source>Colors</source>
       <translation>Colors</translation>
     </message>
@@ -10633,7 +10638,7 @@ to be loaded.</translation>
       <translation>Randomize the colors used in plotting markers, lines or error bars. Random colors in hue, saturation and luminosity (HSV) are chosen between the two colors given.</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="87"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="559"/>
       <source>Start from widget</source>
       <translation>Start from widget</translation>
     </message>
@@ -10648,12 +10653,12 @@ to be loaded.</translation>
       <translation>Randomize function plotters</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="96"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="224"/>
       <source>Start of color range</source>
       <translation>Start of color range</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="99"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="227"/>
       <source>End of color range</source>
       <translation>End of color range</translation>
     </message>
@@ -10673,12 +10678,12 @@ to be loaded.</translation>
       <translation>Give new colors to each widget in a sequence using a colormap. Match can be set to match names of widgets (e.g. "xy*").</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="151"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="218"/>
       <source>Color xy plotters</source>
       <translation>Color xy plotters</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="153"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="221"/>
       <source>Color function plotters</source>
       <translation>Color function plotters</translation>
     </message>
@@ -10733,7 +10738,7 @@ to be loaded.</translation>
       <translation>Searches for a color and replaces it with a different color</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="283"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="562"/>
       <source>Change references and defaults</source>
       <translation>Change references and defaults</translation>
     </message>
@@ -10773,7 +10778,7 @@ to be loaded.</translation>
       <translation>Second color</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="374"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="620"/>
       <source>General</source>
       <translation>General</translation>
     </message>
@@ -10865,7 +10870,7 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
       <translation>Change by value</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="611"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="613"/>
       <source>Increase font sizes</source>
       <translation>Increase font sizes</translation>
     </message>
@@ -10875,7 +10880,7 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
       <translation>Increase font sizes by number of points given</translation>
     </message>
     <message>
-      <location filename="./veusz/plugins/toolsplugin.py" line="620"/>
+      <location filename="./veusz/plugins/toolsplugin.py" line="622"/>
       <source>Decrease font sizes</source>
       <translation>Decrease font sizes</translation>
     </message>
@@ -10888,274 +10893,274 @@ Hint: Use a "*" in the name of a replacement dataset to match multiple datasets,
   <context>
     <name>TreeEditWindow</name>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="260"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="284"/>
       <source>change settings</source>
       <translation>change settings</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="302"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="326"/>
       <source>reset to default</source>
       <translation>reset to default</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="329"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="353"/>
       <source>Hidden (click to show; set hide to False)</source>
       <translation>Hidden (click to show; set hide to False)</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="332"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="356"/>
       <source>Visible (click to hide; set hide to True)</source>
       <translation>Visible (click to hide; set hide to True)</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="619"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="646"/>
       <source>Main</source>
       <translation>Main</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="620"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="647"/>
       <source>Main formatting</source>
       <translation>Main formatting</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="700"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="727"/>
       <source>Formatting - Veusz</source>
       <translation>Formatting - Veusz</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="745"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="772"/>
       <source>Properties - Veusz</source>
       <translation>Properties - Veusz</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="776"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="803"/>
       <source>Editing - Veusz</source>
       <translation>Editing - Veusz</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="796"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="823"/>
       <source>Insert toolbar - Veusz</source>
       <translation>Insert toolbar - Veusz</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="802"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="829"/>
       <source>Edit toolbar - Veusz</source>
       <translation>Edit toolbar - Veusz</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="983"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
       <source>Add %s</source>
       <translation>Add %s</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="990"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1017"/>
       <source>Cut the selected widget</source>
       <translation>Cut the selected widget</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="990"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1017"/>
       <source>Cu&amp;t</source>
       <translation>Cu&amp;t</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="994"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1021"/>
       <source>Copy the selected widget</source>
       <translation>Copy the selected widget</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="994"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1021"/>
       <source>&amp;Copy</source>
       <translation>&amp;Copy</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="998"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1025"/>
       <source>Copy the current page as svg image</source>
       <translation>Copy the current page as svg image</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="998"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1025"/>
       <source>&amp;Copy as Image</source>
       <translation>&amp;Copy as Image</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1002"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1029"/>
       <source>Paste widget from the clipboard</source>
       <translation>Paste widget from the clipboard</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1002"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1029"/>
       <source>&amp;Paste</source>
       <translation>&amp;Paste</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1006"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1033"/>
       <source>Move the selected widget up</source>
       <translation>Move the selected widget up</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1006"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1033"/>
       <source>Move &amp;up</source>
       <translation>Move &amp;up</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1037"/>
       <source>Move the selected widget down</source>
       <translation>Move the selected widget down</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1037"/>
       <source>Move d&amp;own</source>
       <translation>Move d&amp;own</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1041"/>
       <source>Remove selected widgets</source>
       <translation>Remove selected widgets</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1041"/>
       <source>&amp;Delete</source>
       <translation>&amp;Delete</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1018"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1045"/>
       <source>Renames the selected widget</source>
       <translation>Renames the selected widget</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1018"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1045"/>
       <source>&amp;Rename</source>
       <translation>&amp;Rename</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1022"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1049"/>
       <source>Show selected widgets</source>
       <translation>Show selected widgets</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1022"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1049"/>
       <source>Show</source>
       <translation>Show</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1026"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1053"/>
       <source>Hide selected widgets</source>
       <translation>Hide selected widgets</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1026"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1053"/>
       <source>Hide</source>
       <translation>Hide</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1031"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1058"/>
       <source>Add a shape to the plot</source>
       <translation>Add a shape to the plot</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1031"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1058"/>
       <source>Shape</source>
       <translation>Shape</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1036"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1063"/>
       <source>Add an axis to the plot</source>
       <translation>Add an axis to the plot</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1036"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1063"/>
       <source>Axis</source>
       <translation>Axis</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1216"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1243"/>
       <source>Error - Veusz</source>
       <translation>Error - Veusz</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1216"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1243"/>
       <source>Error while exporting images</source>
       <translation>Error while exporting images</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1374"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1401"/>
       <source>hide widgets</source>
       <translation>hide widgets</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1386"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1413"/>
       <source>show widgets</source>
       <translation>show widgets</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1442"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1469"/>
       <source>All '%s' widgets</source>
       <translation>All '%s' widgets</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1445"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1472"/>
       <source>Siblings of '%s' with type '%s'</source>
       <translation>Siblings of '%s' with type '%s'</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1448"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1475"/>
       <source>All '%s' widgets called '%s'</source>
       <translation>All '%s' widgets called '%s'</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1451"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1478"/>
       <source>All widgets called '%s'</source>
       <translation>All widgets called '%s'</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1455"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1482"/>
       <source>All widgets called '%s' on page '%s'</source>
       <translation>All widgets called '%s' on page '%s'</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1532"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1559"/>
       <source>
 Linked to: %s</source>
       <translation>
 Linked to: %s</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1640"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1667"/>
       <source>Reset to default</source>
       <translation>Reset to default</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1646"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1673"/>
       <source>Copy to</source>
       <translation>Copy to</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1648"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1675"/>
       <source>all '%s' widgets</source>
       <translation>all '%s' widgets</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1651"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1678"/>
       <source>'%s' siblings</source>
       <translation>'%s' siblings</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1654"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1681"/>
       <source>'%s' widgets called '%s'</source>
       <translation>'%s' widgets called '%s'</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1660"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1687"/>
       <source>Use as default style</source>
       <translation>Use as default style</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1667"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1694"/>
       <source>Unlink setting</source>
       <translation>Unlink setting</translation>
     </message>
     <message>
-      <location filename="./veusz/windows/treeeditwindow.py" line="1719"/>
+      <location filename="./veusz/windows/treeeditwindow.py" line="1746"/>
       <source>make default style</source>
       <translation>make default style</translation>
     </message>
@@ -12064,7 +12069,7 @@ developers via the mailing list.&lt;/p&gt;
       <translation>Transparency dataset, optional, 0-1</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/volume3d.py" line="76"/>
+      <location filename="./veusz/widgets/volume3d.py" line="109"/>
       <source>Transparency</source>
       <translation>Transparency</translation>
     </message>
@@ -12351,7 +12356,7 @@ developers via the mailing list.&lt;/p&gt;
       <translation>Error style</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/point.py" line="434"/>
+      <location filename="./veusz/widgets/point.py" line="435"/>
       <source>Plot line</source>
       <translation>Plot line</translation>
     </message>
@@ -12366,12 +12371,12 @@ developers via the mailing list.&lt;/p&gt;
       <translation>Marker border</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/point.py" line="445"/>
+      <location filename="./veusz/widgets/point.py" line="446"/>
       <source>Marker fill</source>
       <translation>Marker fill</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/point.py" line="451"/>
+      <location filename="./veusz/widgets/point.py" line="452"/>
       <source>Error bar line</source>
       <translation>Error bar line</translation>
     </message>
@@ -12386,7 +12391,7 @@ developers via the mailing list.&lt;/p&gt;
       <translation>Fill 1</translation>
     </message>
     <message>
-      <location filename="./veusz/widgets/point.py" line="464"/>
+      <location filename="./veusz/widgets/point.py" line="465"/>
       <source>Fill 2</source>
       <translation>Fill 2</translation>
     </message>
@@ -12882,7 +12887,7 @@ or enter $FILENAME to have filename appended</translation>
       <translation>Enter a number for the minimum coordinate of the X axis (default 0)</translation>
     </message>
     <message>
-      <location filename="./ui/import_2d.ui" line="165"/>
+      <location filename="./ui/import_2d.ui" line="200"/>
       <source>to</source>
       <translation>to</translation>
     </message>
