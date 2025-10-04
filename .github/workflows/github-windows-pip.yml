@@ -16,9 +16,9 @@ jobs:
     - name: Setup build environment
       uses: ilammy/msvc-dev-cmd@v1
     - name: Set up Python 3.13
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
-        python-version: '3.13.3'
+        python-version: '3.13'
     - name: Upgrade pip
       run : |
         python -V
@@ -28,7 +28,7 @@ jobs:
       with:
         cache: 'true'
         cache-key-prefix: 'qt-windows-v2'
-        version: '6.9.1'
+        version: '6.9.3'
         setup-python: false
     - name: Install Python dependencies
       run: |
