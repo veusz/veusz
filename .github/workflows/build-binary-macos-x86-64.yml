@@ -12,11 +12,11 @@ jobs:
       MACOSX_DEPLOYMENT_TARGET: '11.0'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
-        python-version: '3.13.3'
+        python-version: '3.13'
         cache: 'pip'
     - name: Upgrade pip
       run : |
@@ -26,7 +26,7 @@ jobs:
       with:
         cache: 'true'
         cache-key-prefix: 'qt-macos-binary-v1'
-        version: '6.9.1'
+        version: '6.9.3'
         modules: 'qtimageformats'
         setup-python: false
     - name: Install PyQt

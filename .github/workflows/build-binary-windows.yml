@@ -9,13 +9,13 @@ jobs:
     runs-on: 'windows-2022'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup build environment
       uses: ilammy/msvc-dev-cmd@v1
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
-        python-version: '3.13.3'
+        python-version: '3.13'
         cache: 'pip'
     - name: Make TMPDIR
       run: mkdir C:\vtmp
@@ -39,7 +39,7 @@ jobs:
       with:
         cache: 'true'
         cache-key-prefix: 'qt-windows-binary-v1'
-        version: '6.9.1'
+        version: '6.9.3'
         modules: 'qtimageformats'
         setup-python: false
     - name: Install PyQt

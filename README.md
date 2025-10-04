@@ -17,7 +17,7 @@ Changes in 4.2:
   * Strip BOMs from Veusz and imported files
   * Fix binary import plugin
   * Fix capture dialog
-  * Prefer tomllib on Python 3.11 (Alexandre Detiste)
+  * Prefer tomllib on Python 3.11+ (Alexandre Detiste)
   * Clean up text for translation and document use of weblate in README
   * Fix inactive 2D data import range
   * Update GPL address

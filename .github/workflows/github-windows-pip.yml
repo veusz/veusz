@@ -12,7 +12,7 @@ jobs:
     runs-on: 'windows-2022'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Setup build environment
       uses: ilammy/msvc-dev-cmd@v1
     - name: Set up Python 3.13
