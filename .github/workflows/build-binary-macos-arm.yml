@@ -25,8 +25,8 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         cache: 'true'
-        cache-key-prefix: 'qt-macos-binary-v1'
-        version: '6.9.3'
+        cache-key-prefix: 'qt-macos-binary-v2'
+        version: '6.8.3'
         modules: 'qtimageformats'
         setup-python: false
     - name: Install PyQt
