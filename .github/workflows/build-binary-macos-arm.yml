@@ -26,7 +26,7 @@ jobs:
       with:
         cache: 'true'
         cache-key-prefix: 'qt-macos-binary-v2'
-        version: '6.5.3'
+        version: '6.10.0'
         modules: 'qtimageformats'
         setup-python: false
     - name: Install PyQt
