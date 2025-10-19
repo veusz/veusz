@@ -34,7 +34,7 @@ def _(text, disambiguation=None, context="Preferences"):
 defaultValues = {
     # export options
     'export_DPI': 100,
-    'export_DPI_PDF': 150,
+    'export_DPI_PDF2': 72,
     'export_DPI_SVG': 96,
     'export_color': True,
     'export_antialias': True,

@@ -1248,7 +1248,7 @@ class TreeEditDock(qt.QDockWidget):
         export = document.AsyncExport(
             self.document,
             bitmapdpi=setdb['export_DPI'],
-            pdfdpi=setdb['export_DPI_PDF'],
+            pdfdpi=setdb['export_DPI_PDF2'],
             antialias=setdb['export_antialias'],
             color=setdb['export_color'],
             quality=setdb['export_quality'],

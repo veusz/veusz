@@ -129,7 +129,7 @@ class ExportDialog(VeuszDialog):
             cntrl.setValidator(qt.QIntValidator(10, 10000, self))
         self.exportDPI.setEditText(str(setdb['export_DPI']))
         self.exportDPISVG.setEditText(str(setdb['export_DPI_SVG']))
-        self.exportDPIPDF.setEditText(str(setdb['export_DPI_PDF']))
+        self.exportDPIPDF.setEditText(str(setdb['export_DPI_PDF2']))
 
         # button to change bitmap background
         self.exportBackgroundButton.clicked.connect(
@@ -390,7 +390,7 @@ class ExportDialog(VeuszDialog):
         # FIXME: requires some sort of visual notification of validator
         for cntrl, setn in (
                 (self.exportDPI, 'export_DPI'),
-                (self.exportDPIPDF, 'export_DPI_PDF'),
+                (self.exportDPIPDF, 'export_DPI_PDF2'),
                 (self.exportDPISVG, 'export_DPI_SVG')):
             try:
                 text = cntrl.currentText()
@@ -403,7 +403,7 @@ class ExportDialog(VeuszDialog):
         export = document.AsyncExport(
             self.document,
             bitmapdpi=setdb['export_DPI'],
-            pdfdpi=setdb['export_DPI_PDF'],
+            pdfdpi=setdb['export_DPI_PDF2'],
             antialias=setdb['export_antialias'],
             color=setdb['export_color'],
             quality=setdb['export_quality'],

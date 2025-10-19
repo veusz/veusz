@@ -155,11 +155,11 @@ class ExportPDFRunnable(ExportRunnable):
     def doExport(self):
         """Do the export."""
         printer = qt.QPrinter()
+        printer.setOutputFormat(qt.QPrinter.OutputFormat.PdfFormat)
         printer.setResolution(self.aexport.pdfdpi)
         printer.setFullPage(True)
         printer.setColorMode(
             qt.QPrinter.ColorMode.Color if self.aexport.color else qt.QPrinter.ColorMode.GrayScale)
-        printer.setOutputFormat(qt.QPrinter.OutputFormat.PdfFormat)
         printer.setOutputFileName(self.filename)
         printer.setCreator('Veusz %s' % utils.version())
 
@@ -370,7 +370,7 @@ class AsyncExport(qt.QObject):
 
     def __init__(self, doc, color=True, bitmapdpi=100,
                  antialias=True, quality=85, backcolor='#ffffff00',
-                 pdfdpi=150, svgdpi=96, svgtextastext=False):
+                 pdfdpi=72, svgdpi=96, svgtextastext=False):
         """Initialise export class. Parameters are:
         doc: document to write
         color: use color or try to use monochrome
@@ -425,7 +425,19 @@ class AsyncExport(qt.QObject):
         """Get DPI to use for filename extension."""
 
         if ext in {'.pdf', '.eps', '.ps'}:
-            return (self.pdfdpi, self.pdfdpi)
+            # find closest resolution to supported resolution (usually 72)
+            printer = qt.QPrinter()
+            printer.setOutputFormat(qt.QPrinter.OutputFormat.PdfFormat)
+            res = None
+            delta = 9e99
+            for dpi in printer.supportedResolutions():
+                d = abs(dpi-self.pdfdpi)
+                if d<delta:
+                    delta = d
+                    res = dpi
+            if res is None:
+                res = 72
+            return (res, res)
 
         elif ext in {'.png', '.jpg', '.jpeg', '.bmp', '.tiff', '.xpm', '.webp'}:
             return (self.bitmapdpi, self.bitmapdpi)

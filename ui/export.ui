@@ -289,7 +289,7 @@ This is recommended for most purposes.</string>
       <item row="2" column="1">
        <widget class="QComboBox" name="exportDPIPDF">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of dots per inch used for writing PDF and EPS files. As these are vector formats, this does not make much difference to the output, but larger values improve the placement of characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of dots per inch used for writing PDF and EPS files. Values other than 72 may not work in recent Qt versions.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="editable">
          <bool>true</bool>
