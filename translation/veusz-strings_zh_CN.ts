@@ -23,6 +23,11 @@
         <source>OK</source>
         <translation>确定</translation>
     </message>
+    <message>
+        <location filename="./ui/about.ui" line="62"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, Takuro Hosomi, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;版权所有 © 2003-2025 Jeremy Sanders 及贡献者&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;主要作者：&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;其他作者及贡献者：&lt;br/&gt;Graham Bell, James Graham, Takuro Hosomi, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;包含以下外部代码和资源：Danny Allen（图标），John D. Hunter（等值线），Nokia Corporation（MathML），Philip J. Schneider（贝塞尔拟合）&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz 绝对不提供任何保证。Veusz 是自由软件，您有权根据 GNU 通用公共许可证 (GPL) 的条款进行分发。详情请参阅文件 COPYING，或点击&amp;quot;“显示许可证” &amp;quot;。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
 </context>
 <context>
     <name>Axis</name>
@@ -2123,6 +2128,11 @@ Veusz 不承担任何形式的担保责任。 Veusz 是自由软件，并且很�
         <source>Created dataset &apos;%s&apos;</source>
         <translation>创建数据集&apos;%s&apos;</translation>
     </message>
+    <message>
+        <location filename="./ui/datacreate2d.ui" line="60"/>
+        <source>From expression based on existing &amp;2D datasets</source>
+        <translation>从基于现有&amp;2D数据集的表达式</translation>
+    </message>
 </context>
 <context>
     <name>DataCreateDialog</name>
@@ -2399,6 +2409,11 @@ Veusz 不承担任何形式的担保责任。 Veusz 是自由软件，并且很�
         <source>insert rows</source>
         <translation>插入行</translation>
     </message>
+    <message>
+        <location filename="./veusz/dialogs/dataeditdialog.py" line="701"/>
+        <source>duplicate datasets</source>
+        <translation>复制数据集</translation>
+    </message>
 </context>
 <context>
     <name>DataNavigator</name>
@@ -2579,6 +2594,11 @@ Veusz 不承担任何形式的担保责任。 Veusz 是自由软件，并且很�
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="552"/>
         <source>unlink datasets</source>
         <translation>数据集取消关联</translation>
+    </message>
+    <message>
+        <location filename="./veusz/qtwidgets/datasetbrowser.py" line="838"/>
+        <source>Apply</source>
+        <translation>应用</translation>
     </message>
 </context>
 <context>
@@ -11199,6 +11219,7 @@ menu.&lt;/p&gt;
 
 &lt;p&gt;本教程旨在尽可能地让你快速上手Veusz。&lt;/p&gt;
 
+
 &lt;p&gt;您可以随时点击此面板右上角的“关闭”
 按钮关闭此教程。你也可以在“帮助”菜单中
 重新打开教程。&lt;/p&gt;
@@ -13045,7 +13066,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="./veusz/veusz_main.py" line="379"/>
         <source>Error starting - Veusz</source>
-        <translation>Veusz启动故障，请提供更多线索反馈故障环境给作者。</translation>
+        <translation>启动时出错 - Veusz</translation>
     </message>
 </context>
 </TS>
