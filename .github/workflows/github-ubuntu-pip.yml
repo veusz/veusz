@@ -28,7 +28,7 @@ jobs:
       with:
         cache: 'true'
         cache-key-prefix: 'qt-ubuntu-v4'
-        version: '6.10.0'
+        version: '6.10.2'
         setup-python: false
     - name: Install Python dependencies
       run: |
