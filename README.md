@@ -10,6 +10,13 @@ SAMP interfaces to its plotting facilities. It also allows for
 manipulation and editing of datasets. Data can be captured from
 external sources such as Internet sockets or other programs.
 
+Changes in 4.2.1:
+  * Change tutorial highlight color to magenta
+  * Fix missing icon in tutorial
+  * Move data settings to top in fit widget
+  * Fix silent uninstallation
+  * Fix wrong size output PDF on MacOS
+
 Changes in 4.2:
   * Fix for double scaled 3D point marker borders (Takuro Hosomi)
   * Allow negative offsets for some labels (Takuro Hosomi)

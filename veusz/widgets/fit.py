@@ -149,19 +149,19 @@ class Fit(FunctionPlotter):
         """Construct list of settings."""
         FunctionPlotter.addSettings(s)
 
+        s.add( setting.DatasetExtended(
+            'xData', 'x',
+            descr=_('X data to fit (dataset name, list of values or expression)'),
+            usertext=_('X data')), 0 )
+        s.add( setting.DatasetExtended(
+            'yData', 'y',
+            descr=_('Y data to fit (dataset name, list of values or expression)'),
+            usertext=_('Y data')), 1 )
         s.add( setting.FloatDict(
             'values',
             {'a': 0.0, 'b': 1.0},
             descr=_('Variables and fit values'),
-            usertext=_('Parameters')), 1 )
-        s.add( setting.DatasetExtended(
-            'xData', 'x',
-            descr=_('X data to fit (dataset name, list of values or expression)'),
-            usertext=_('X data')), 2 )
-        s.add( setting.DatasetExtended(
-            'yData', 'y',
-            descr=_('Y data to fit (dataset name, list of values or expression)'),
-            usertext=_('Y data')), 3 )
+            usertext=_('Parameters')), 3 )
         s.add( setting.Choice(
             'defErrType', ['absolute', 'relative'], 'absolute',
             descr=_('Default error type'),

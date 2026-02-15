@@ -576,11 +576,12 @@ class AddXY2nd_4(TutorialStep):
         TutorialStep.__init__(
             self, _('''
 <p>We can fill regions under plots using the Fill Below Formatting tab
-(%s).</p>
+(%s). If this tab is hidden, click the right arrow button in the tabs,
+or make the window wider.</p>
 
 <p class="usercmd">Go to this tab, and unselect the "Hide edge fill"
 option.</p>
-''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotfillbelow.png')),
+''') % utils.pixmapAsHtml(utils.getPixmap('settings_plotfillbelow.svg')),
             mainwin,
             disablenext=True,
             nextonsetting = (
@@ -862,7 +863,7 @@ class TutorialDock(qt.QDockWidget):
         if self.flash is not None and not qt.sip.isdeleted(self.flash):
             # set flash state and toggle variable
             if self.flashon:
-                self.flash.setStyleSheet('background: yellow;')
+                self.flash.setStyleSheet('background: magenta;')
             else:
                 self.flash.setStyleSheet('')
             self.flashon = not self.flashon
