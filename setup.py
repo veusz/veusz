@@ -27,11 +27,15 @@ see the file INSTALL.md for details on how to install Veusz
 
 import glob
 import os
+import sys
+
 import numpy
 
 from setuptools import setup, Extension
 from setuptools.command.install import install as orig_install
 
+# when run using pip, need this to import from this directory
+sys.path.append( os.path.abspath(os.path.dirname(__file__)) )
 # code taken from distutils for installing data that was removed in
 # setuptools
 from install_data import install_data

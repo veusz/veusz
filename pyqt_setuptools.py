@@ -221,6 +221,8 @@ class sip_build_ext(build_ext):
             # files get put in sip_builddir + modulename
             modulename = os.path.splitext(os.path.basename(sip))[0]
             dirname = os.path.join(sip_builddir, 'output', modulename)
+            if not os.path.exists(dirname) or self.force:
+                os.makedirs(dirname, exist_ok=True)
 
             source_files = [
                 os.path.join(dirname, fn)
