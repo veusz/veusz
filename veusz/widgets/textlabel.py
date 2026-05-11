@@ -144,6 +144,7 @@ class TextLabel(plotters.FreePlotter):
         painter = phelper.painter(self, posn, clip=clip)
         with painter:
             textpen = s.get('Text').makeQPen(painter)
+            textcolorauto = s.Text.textColorIsAuto()
             painter.setPen(textpen)
             font = s.get('Text').makeQFont(painter)
             margin = s.get('margin').convert(painter)
@@ -168,6 +169,9 @@ class TextLabel(plotters.FreePlotter):
                     TextLabel.cnvtalignhorz[s.alignHorz],
                     TextLabel.cnvtalignvert[s.alignVert],
                     s.angle,
+                    usetex=s.Text.useTeX,
+                    textpen=textpen,
+                    texpreservecolors=textcolorauto,
                     doc=d
                 )
 

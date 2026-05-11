@@ -376,6 +376,14 @@ class MainWindow(qt.QMainWindow):
         self.showDialog(dialog)
         return dialog
 
+    def slotEditDocumentSettings(self):
+        """Show the document root settings."""
+        self.treeedit.selectWidget(self.document.basewidget)
+        self.propdock.show()
+        self.propdock.raise_()
+        self.propdock.activateWindow()
+        return self.propdock
+
     def slotEditCustom(self):
         from ..dialogs.custom import CustomDialog
         dialog = CustomDialog(self, self.document)
@@ -516,6 +524,13 @@ class MainWindow(qt.QMainWindow):
                   self.slotEditCustom,
                   icon='veusz-edit-custom'),
 
+            'edit.documentsettings':
+                a(self,
+                  _('Edit document-wide TeX and page settings'),
+                  _('Document settings…'),
+                  self.slotEditDocumentSettings,
+                  icon='settings_main'),
+
             'edit.stylesheet':
                 a(self,
                   _('Edit stylesheet to change default widget settings'),
@@ -654,7 +669,8 @@ class MainWindow(qt.QMainWindow):
             '',
             ['edit.select', _('&Select'), []],
             '',
-            'edit.prefs', 'edit.stylesheet', 'edit.custom',
+            'edit.prefs', 'edit.documentsettings',
+            'edit.stylesheet', 'edit.custom',
             ''
         ]
         viewwindowsmenu = [

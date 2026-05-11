@@ -387,6 +387,7 @@ class Key(widget.Widget):
         s = self.settings
         font = s.get('Text').makeQFont(painter)
         textpen = s.get('Text').makeQPen(painter)
+        textcolorauto = s.Text.textColorIsAuto()
 
         painter.setFont(font)
         height = utils.FontMetrics(font, painter.device()).height()
@@ -407,6 +408,9 @@ class Key(widget.Widget):
             titlewidth, titleheight = utils.Renderer(
                 painter, titlefont,
                 0, 0, s.title,
+                usetex=s.Text.useTeX,
+                textpen=textpen,
+                texpreservecolors=textcolorauto,
                 doc=self.document).getDimensions()
             titleheight += 0.5*margin
 
@@ -444,6 +448,9 @@ class Key(widget.Widget):
                     w, h = utils.Renderer(
                         painter, font, 0, 0,
                         c.getKeyText(i),
+                        usetex=s.Text.useTeX,
+                        textpen=textpen,
+                        texpreservecolors=textcolorauto,
                         doc=self.document).getDimensions()
                     maxwidth = max(maxwidth, w)
                     lines = max(1, math.ceil(h/height))
@@ -511,7 +518,11 @@ class Key(widget.Widget):
             xpos = x + (totalwidth-titlewidth)/2
             utils.Renderer(
                 painter, titlefont, xpos, y, s.title,
-                alignvert=1, doc=self.document).render()
+                alignvert=1,
+                usetex=s.Text.useTeX,
+                textpen=textpen,
+                texpreservecolors=textcolorauto,
+                doc=self.document).render()
             y += titleheight
 
         # centres key below title
@@ -555,6 +566,9 @@ class Key(widget.Widget):
                     lx, ypos,
                     plotter.getKeyText(num),
                     alignx, 1,
+                    usetex=s.Text.useTeX,
+                    textpen=textpen,
+                    texpreservecolors=textcolorauto,
                     doc=self.document).render()
 
         phelper.setControlGraph(

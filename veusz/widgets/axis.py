@@ -1007,6 +1007,9 @@ class Axis(widget.Widget):
             r = utils.Renderer(
                 painter, font, x, y, text, alignhorz=ax,
                 alignvert=ay, angle=angle,
+                usetex=tl.useTeX,
+                textpen=pen,
+                texpreservecolors=tl.textColorIsAuto(),
                 doc=self.document)
 
             if outerbounds is not None:
@@ -1042,6 +1045,7 @@ class Axis(widget.Widget):
         s = self.settings
         sl = s.Label
         label = s.get('Label')
+        labelpen = label.makeQPen(painter)
         font = label.makeQFont(painter)
         painter.setFont(font)
         fm = utils.FontMetrics(font, painter.device())
@@ -1120,6 +1124,9 @@ class Axis(widget.Widget):
             painter, font, x, y, text,
             ax, ay, angle,
             usefullheight=True,
+            usetex=sl.useTeX,
+            textpen=labelpen,
+            texpreservecolors=sl.textColorIsAuto(),
             doc=self.document)
 
         # make sure text is in plot rectangle
@@ -1129,7 +1136,7 @@ class Axis(widget.Widget):
                 miny=outerbounds[1], maxy=outerbounds[3]
             )
 
-        texttorender.insert(0, (r, s.get('Label').makeQPen(painter)) )
+        texttorender.insert(0, (r, labelpen) )
 
     def chooseName(self):
         """Get default name for axis. Make x and y axes, then axisN."""

@@ -69,6 +69,7 @@ class PainterRoot(qt.QPainter):
         self.pagesize = helper.pagesize
         self.maxdim = max(*self.pagesize)
         self.textrects = helper.textrects
+        self.interactive = helper.interactive
 
     def docColor(self, name):
         """Return color from document."""
@@ -115,7 +116,7 @@ class PaintHelper:
 
     def __init__(self, document, pagesize,
                  scaling=1, devicepixelratio=1, dpi=(100, 100),
-                 directpaint=None):
+                 directpaint=None, interactive=False):
         """
         pagesize: tuple (pixelw, pixelh), which can be float.
          This is the page size in the coordinates presented to graph drawing.
@@ -124,6 +125,7 @@ class PaintHelper:
         dpi: tuple of X and Y dpi for graph coordinates
         directpaint: use this painter directly, rather than using RecordPainter
           to store each widget painting
+        interactive: whether this paint pass is for interactive GUI rendering
         """
 
         self.document = document
@@ -149,6 +151,7 @@ class PaintHelper:
 
         # whether to directly render to a painter or make new layers
         self.directpaint = directpaint
+        self.interactive = interactive
 
         # state for root widget
         self.rootstate = None
