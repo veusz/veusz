@@ -107,6 +107,9 @@ excluded_tests = set([
         # don't expect this to work
         'mathml.vsz',
 
+        # fails on more up to date Qt versions
+        'vectorfield.vsz',
+
         # 3d rendering needs more work
         '3d_errors.vsz',
         '3d_function.vsz',
