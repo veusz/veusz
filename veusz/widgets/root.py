@@ -104,6 +104,12 @@ class Root(widget.Widget):
             descr=_('User-defined notes'),
             usertext=_('Notes')
         ) )
+        s.add( setting.TeX(
+            'TeX',
+            descr=_('Document-wide TeX rendering settings'),
+            usertext=_('TeX'),
+            pixmap='settings_axislabel'
+        ) )
 
     @classmethod
     def allowedParentTypes(klass):
@@ -179,6 +185,8 @@ class Root(widget.Widget):
                 for name in classset.setnames:
                     # might become recursive
                     if name == 'StyleSheet':
+                        continue
+                    if klass == Root and name == 'TeX':
                         continue
 
                     sett = classset.setdict[name]

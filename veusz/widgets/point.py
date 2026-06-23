@@ -814,6 +814,7 @@ class PointPlotter(GenericPlotter):
 
         # make font and len
         textpen = lab.makeQPen(painter)
+        textcolorauto = lab.textColorIsAuto()
         painter.setPen(textpen)
         font = lab.makeQFont(painter)
         angle = lab.angle
@@ -823,6 +824,9 @@ class PointPlotter(GenericPlotter):
             utils.Renderer(
                 painter, font, x, y, t,
                 alignhorz, alignvert, angle,
+                usetex=lab.useTeX,
+                textpen=textpen,
+                texpreservecolors=textcolorauto,
                 doc=self.document).render()
 
     def getAxisLabels(self, direction):

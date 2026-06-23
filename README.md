@@ -51,6 +51,7 @@ Changes in 4.2:
   * Plot labels
   * Shapes and arrows on plots
   * LaTeX-like formatting for text
+* Optional TeX-backed rendering for TeX text in labels
   * Multiple axes
   * Axes with steps in axis scale (broken axes)
   * Axis scales using functional forms
@@ -85,6 +86,62 @@ Changes in 4.2:
 
 ## Installation
 Please see the file `INSTALL.md` included in the distribution for installation details, or go to the [download page](https://veusz.github.io/download/).
+
+## Development note: TeX integration
+This tree can optionally render selected text objects through either
+[MicroTeX](https://github.com/NanoMichael/MicroTeX) or a system TeX
+installation. The bundled MicroTeX source is shipped in this repository
+as a git submodule under `third_party/MicroTeX`.
+
+Supported text settings expose a `Use TeX` checkbox plus a document-wide
+`TeX engine` choice. `MicroTeX` is the bundled default, while `latex`,
+`pdflatex`, `xelatex` and `lualatex` are available as system engine
+choices, and the engine field can also take an explicit executable path.
+The document settings also allow a custom preamble.
+The engines are expected to produce similar math, but not identical
+glyph metrics, spacing, or outlines.
+
+When the TeX option is enabled in the GUI, Veusz will:
+
+* use the bundled `third_party/MicroTeX` checkout by default
+* or use the system TeX toolchain when the selected engine is one of the system choices
+* build `build-microtex/<platform MicroTeX static library>` automatically during the normal Veusz build
+* build `build-microtexbridge/<platform microtexbridge library>` automatically during the normal Veusz build
+* package the MicroTeX resource tree and bridge into installed wheels under `veusz/microtex`
+* render the TeX source through the selected TeX engine
+* convert the generated SVG primitives into Veusz drawing paths for GUI and export output
+* keep the output engine-specific rather than forcing pixel-identical
+  equivalence between MicroTeX and the system TeX engines
+
+After cloning, the submodule must be initialized:
+
+    $ git clone <veusz-repository>
+    $ cd veusz
+    $ git submodule update --init --recursive
+
+The normal bundled MicroTeX build also requires a local C++ compiler
+toolchain together with CMake and a working Qt6 development
+installation. The system TeX choices require a TeX distribution that
+provides the selected engine plus `dvisvgm` on `PATH`; supported engine
+choices include `latex`, `pdflatex`, `xelatex` and `lualatex`, with a
+custom engine path also allowed in the document settings.
+
+MicroTeX support is a built-in math subset, not a full LaTeX engine.
+It supports common mathematical notation, matrices, align-style
+layouts, text styles and some local macro definitions, but not general
+`\usepackage{...}` workflows or arbitrary external LaTeX packages.
+The system TeX choices behave like normal LaTeX-to-SVG pipelines and
+can use packages installed in that TeX distribution. Because the
+engines are different, MicroTeX and the system TeX engines should be
+treated as compatible rendering choices, not as bitwise-identical
+implementations.
+
+If you intentionally want to skip the bundled MicroTeX build during
+installation, set `VEUSZ_SKIP_MICROTEX_BUILD=1` before running the
+build command.
+
+Please see `INSTALL.md` for the development setup requirements, build
+steps and optional environment variables used by this integration.
 
 ## License
 Veusz is Copyright (C) 2003-2025 Jeremy Sanders

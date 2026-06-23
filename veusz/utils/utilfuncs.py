@@ -55,6 +55,8 @@ def _getVeuszDirectory():
         exedir = os.path.dirname(os.path.abspath(sys.executable))
         resdir = exedir
         for place in (
+                os.path.join(exedir, '..', 'Resources', 'veusz'),
+                os.path.join(exedir, '_internal', 'veusz'),
                 os.path.join(exedir, '..', 'Resources'),
                 os.path.join(exedir, '_internal'),
             ):

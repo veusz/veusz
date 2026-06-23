@@ -788,7 +788,17 @@ class PropertiesDock(qt.QDockWidget):
 
     def slotWidgetsSelected(self, widgets, setnsproxy):
         """Update properties when selected widgets change."""
-        self.proplist.updateProperties(setnsproxy, showformatting=False)
+        oldwidget = self.scroll.takeWidget()
+        if oldwidget is not None:
+            oldwidget.deleteLater()
+
+        self.proplist = PropertyList(
+            self.document,
+            showformatsettings=False)
+        self.scroll.setWidget(self.proplist)
+        self.proplist.updateProperties(
+            setnsproxy,
+            showformatting=False)
 
 class TreeEditDock(qt.QDockWidget):
     """A dock window presenting widgets as a tree."""

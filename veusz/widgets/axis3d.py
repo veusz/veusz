@@ -104,12 +104,18 @@ class _AxisLabels(threed.AxisLabels):
 
         font = self.ticklabelsprop.makeQFont(painter)
         painter.setFont(font)
+        pen = self.ticklabelsprop.makeQPen(painter)
+        textcolorauto = self.ticklabelsprop.textColorIsAuto()
 
         label = self.ticklabels[index]
         renderer = utils.Renderer(
             painter, font, 0, 0, label,
             alignhorz=0, alignvert=valign,
-            usefullheight=True)
+            usefullheight=True,
+            usetex=self.ticklabelsprop.useTeX,
+            textpen=pen,
+            texpreservecolors=textcolorauto,
+            doc=self.document)
 
         # get text bounds
         rect = renderer.getTightBounds()
@@ -118,7 +124,6 @@ class _AxisLabels(threed.AxisLabels):
 
         # draw text if it doesn't overlap with existing text
         if not painter.textrects.willOverlap(rect):
-            pen = self.ticklabelsprop.makeQPen(painter)
             painter.setPen(pen)
             renderer.render()
             painter.textrects.addRect(rect)
@@ -145,12 +150,17 @@ class _AxisLabels(threed.AxisLabels):
         font = self.axislabelprop.makeQFont(painter)
         painter.setFont(font)
         pen = self.axislabelprop.makeQPen(painter)
+        textcolorauto = self.axislabelprop.textColorIsAuto()
         painter.setPen(pen)
 
         renderer = utils.Renderer(
             painter, font, 0, deltay, self.axislabel,
             alignhorz=halign, alignvert=valign,
-            usefullheight=True)
+            usefullheight=True,
+            usetex=self.axislabelprop.useTeX,
+            textpen=pen,
+            texpreservecolors=textcolorauto,
+            doc=self.document)
         renderer.render()
 
 class MajorTick(setting.Line3D):

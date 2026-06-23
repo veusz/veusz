@@ -1,48 +1,53 @@
 # automate building the binary installer on windows
 
-import shutil
 import os.path
 import os
 import subprocess
 import glob
+import shutil
+import sys
+from pathlib import Path
 
-root = r'c:\build\veusz'
-nsisexe = r'c:\Program Files (x86)\NSIS\makensis.exe'
-verpatch = r'c:\build\verpatch\verpatch.exe'
+ROOT = Path(__file__).resolve().parents[1]
+NSISEXE = os.environ.get('NSIS_EXE', r'c:\Program Files (x86)\NSIS\makensis.exe')
+VERPATCH = os.environ.get('VERPATCH_EXE', r'c:\build\verpatch\verpatch.exe')
 
 def call(args):
+    args = [str(arg) for arg in args]
     print(' '.join(args))
-    subprocess.check_call(args)
+    subprocess.check_call(args, cwd=str(ROOT))
 
-os.chdir(root)
 for d in ('build', 'dist'):
     try:
-        shutil.rmtree(d)
+        shutil.rmtree(ROOT / d)
     except EnvironmentError:
         pass
 
-call(['python', 'setup.py', 'build'])
+call([sys.executable, 'setup.py', 'build'])
 
-for ext in glob.glob('build/lib.win-amd64-*/veusz/helpers/*.pyd'):
+for ext in glob.glob(str(ROOT / 'build' / 'lib.win-amd64-*' / 'veusz' / 'helpers' / '*.pyd')):
     print('copying', ext)
-    shutil.copy2(ext, 'veusz/helpers/')
+    shutil.copy2(ext, ROOT / 'veusz' / 'helpers')
 
-os.environ['PYTHONPATH'] = root
-os.environ['VEUSZ_RESOURCE_DIR'] = root
-call(['python', 'tests/runselftest.py'])
+os.environ['PYTHONPATH'] = str(ROOT)
+os.environ['VEUSZ_RESOURCE_DIR'] = str(ROOT)
+call([sys.executable, 'tests/runselftest.py'])
 
 del os.environ['PYTHONPATH']
 del os.environ['VEUSZ_RESOURCE_DIR']
 
-call(['pyinstaller', r'support\veusz_windows_pyinst.spec'])
+call([sys.executable, '-m', 'PyInstaller', ROOT / 'support' / 'veusz_windows_pyinst.spec'])
 
-version=open('VERSION').read().strip()
+generated_nsi = ROOT / 'build' / 'veusz_windows_setup.nsi'
+call([sys.executable, ROOT / 'support' / 'veusz_windows_make_nsi.py', generated_nsi])
+
+version = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
 ver4 = version
 while len(ver4.split('.'))<4:
     ver4 += '.0'
 
-call([verpatch, os.path.join(root, 'dist', 'veusz_main', 'veusz.exe'),
+call([VERPATCH, ROOT / 'dist' / 'veusz_main' / 'veusz.exe',
       ver4, '/va', '/pv', ver4, '/s', 'description', 'Veusz scientific plotting',
       '/s', 'product', 'Veusz', '/s', 'copyright', 'Jeremy Sanders and contributers'])
 
-call([nsisexe, '/DPRODUCT_VERSION='+version, r'support\veusz_windows_setup.nsi'])
+call([NSISEXE, '/DPRODUCT_VERSION='+version, generated_nsi])

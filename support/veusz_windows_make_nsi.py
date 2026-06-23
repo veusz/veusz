@@ -66,9 +66,8 @@ def main():
             ):
         templ = templ.replace(f'@@{search}@@', replace)
 
-    # debug
-    for line in templ.split('\n'):
-        print(line)
+    if os.environ.get('VEUSZ_DEBUG_NSI'):
+        print(templ)
 
     print(f'Writing {outfname}')
     with open(outfname, 'w') as fout:

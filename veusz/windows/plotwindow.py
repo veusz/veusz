@@ -31,6 +31,7 @@ from .. import setting
 from ..dialogs import exceptiondialog
 from .. import document
 from .. import utils
+from ..utils import textrender
 from .. import widgets
 
 def _(text, disambiguation=None, context='PlotWindow'):
@@ -283,6 +284,8 @@ class PlotWindow( qt.QGraphicsView ):
         self.docchangeset = -100
         self.oldpagenumber = -1
         self.document.signalModified.connect(self.slotDocModified)
+        textrender.texRenderManager().sigCacheUpdated.connect(
+            self.slotTexCacheUpdated)
 
         # state of last plot from painthelper
         self.painthelper = None
@@ -1036,6 +1039,22 @@ class PlotWindow( qt.QGraphicsView ):
         if ismodified and self.interval == -1:
             self.checkPlotUpdate()
 
+    @qt.pyqtSlot()
+    def slotTexCacheUpdated(self):
+        """Update the plot when async TeX rendering finishes."""
+        if not hasattr(self, 'texcachetimer'):
+            self.texcachetimer = qt.QTimer(self)
+            self.texcachetimer.setSingleShot(True)
+            self.texcachetimer.timeout.connect(self.slotTexCacheRefresh)
+
+        if not self.texcachetimer.isActive():
+            self.texcachetimer.start(50)
+
+    @qt.pyqtSlot()
+    def slotTexCacheRefresh(self):
+        """Force a redraw after TeX cache updates."""
+        self.checkPlotUpdate(force=True)
+
     def getDevicePixelRatio(self):
         """Get device pixel ratio for window."""
         # ugly, as we have to get it from QWindow
@@ -1050,14 +1069,15 @@ class PlotWindow( qt.QGraphicsView ):
             widget = widget.parent()
         return 1
 
-    def checkPlotUpdate(self):
+    def checkPlotUpdate(self, force=False):
         """Check whether plot needs updating."""
 
         # no threads, so can't get interrupted here
         # draw data into background pixmap if modified
 
         # is an update required?
-        if ( self.zoomfactor == self.oldzoom and
+        if (not force and
+             self.zoomfactor == self.oldzoom and
              self.document.changeset == self.docchangeset and
              self.pagenumber == self.oldpagenumber ):
             return
@@ -1082,7 +1102,8 @@ class PlotWindow( qt.QGraphicsView ):
                     self.document, size,
                     scaling=scaling,
                     dpi=self.dpi,
-                    devicepixelratio=devicepixelratio)
+                    devicepixelratio=devicepixelratio,
+                    interactive=True)
                 self.document.paintTo(phelper, self.pagenumber)
 
             except Exception:
