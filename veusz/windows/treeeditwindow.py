@@ -855,7 +855,7 @@ class TreeEditDock(qt.QDockWidget):
         # actions on widget(s)
         for act in (
                 'edit.cut', 'edit.copy', 'edit.copy_as_image', 'edit.paste',
-                'edit.moveup', 'edit.movedown', 'edit.delete',
+                'edit.duplicate', 'edit.moveup', 'edit.movedown', 'edit.delete',
                 'edit.rename'
         ):
             m.addAction(self.vzactions[act])
@@ -1029,6 +1029,10 @@ class TreeEditDock(qt.QDockWidget):
                 self, _('Paste widget from the clipboard'), _('&Paste'),
                 self.slotWidgetPaste,
                 icon='kde-edit-paste', key='Ctrl+V'),
+            'edit.duplicate': a(
+                self, _('Duplicate widget'), _('&Duplicate'),
+                self.slotWidgetDuplicate,
+                key='Ctrl+D'),
             'edit.moveup': a(
                 self, _('Move the selected widget up'), _('Move &up'),
                 lambda: self.slotWidgetMove(-1),
@@ -1126,6 +1130,7 @@ class TreeEditDock(qt.QDockWidget):
                 'edit.copy',
                 'edit.copy_as_image',
                 'edit.paste',
+                'edit.duplicate',
                 'edit.delete',
                 'edit.rename',
                 'edit.moveup',
@@ -1293,15 +1298,29 @@ class TreeEditDock(qt.QDockWidget):
                 w = c
         self.selectWidget(w)
 
-    def slotWidgetPaste(self):
+    def slotWidgetPaste(self, append_name=None):
         """Paste something from the clipboard"""
 
         data = document.getClipboardWidgetMime()
         if data:
-            op = document.OperationWidgetPaste(self.selwidgets[0], data)
+            new_names = None
+
+            # update names, if requested to do so (used for duplication)
+            if append_name is not None:
+              new_names = [w.name + append_name for w in self.selwidgets]
+            op = document.OperationWidgetPaste(
+              self.selwidgets[0], data, -1, new_names
+            )
+
             widgets = self.document.applyOperation(op)
             if widgets:
                 self.selectWidget(widgets[0])
+
+    def slotWidgetDuplicate(self):
+        """Duplicate selected widget"""
+
+        self.slotWidgetCopy()
+        self.slotWidgetPaste(append_name=" - copy")
 
     def slotWidgetDelete(self):
         """Delete the widget selected."""
