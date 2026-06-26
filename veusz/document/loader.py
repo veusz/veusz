@@ -24,7 +24,6 @@ import sys
 import os.path
 import traceback
 import io
-import re
 import numpy as N
 
 from .. import qtall as qt
@@ -318,18 +317,41 @@ def loadDocument(thedoc, filename, mode='vsz',
     thedoc.setModified(False)
     thedoc.clearHistory()
 
-def removeBOMs(script):
+def removeBOMs(text):
     """
-    Remove BOMs in the script unless they are escaped.
-    For example:
-        "AA\ufeffAA" -> "AAAA"
-        'C:\\ufeff\\a.csv' -> 'C:\\ufeff\\a.csv'
+    Remove occurrences of the literal sequence "\ufeff" when they are
+    preceded by an odd number of backslashes.
+
+    Examples
+    --------
+    r"AA\ufeffAA"   -> "AAAA"
+    r"C:\\ufeff\\a" -> r"C:\\ufeff\\a"
     """
-    pattern = r'(.*?)(\\+)ufeff(.*?)'
-    def replacer(m):
-        bs = m.group(2)
-        if len(bs) % 2 == 0:
-            return m.group(0)
+
+    needle = "ufeff"
+    needle_len = len(needle)
+
+    i = 0
+    out = []
+
+    while True:
+        j = text.find(needle, i)
+        if j < 0:
+            out.append(text[i:])
+            break
+        
+        k = j
+        while k > i and text[k - 1] == "\\":
+            k -= 1
+
+        bs_count = j - k
+
+        if bs_count % 2 == 1:
+            out.append(text[i:k])
+            out.append("\\" * (bs_count - 1))
         else:
-            return f"{m.group(1)}{bs[1:]}{m.group(3)}"
-    return re.sub(pattern, replacer, script)
+            out.append(text[i:j + needle_len])
+
+        i = j + needle_len
+
+    return "".join(out)
