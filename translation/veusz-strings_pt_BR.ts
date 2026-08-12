@@ -6,22 +6,27 @@
     <message>
         <location filename="./ui/about.ui" line="14"/>
         <source>About Veusz</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobre Veusz</translation>
     </message>
     <message>
         <location filename="./ui/about.ui" line="108"/>
         <source>Show license</source>
-        <translation type="unfinished"></translation>
+        <translation>Exibir licença</translation>
     </message>
     <message>
         <location filename="./ui/about.ui" line="118"/>
         <source>Software versions</source>
-        <translation type="unfinished"></translation>
+        <translation>Versões do software</translation>
     </message>
     <message>
         <location filename="./ui/about.ui" line="125"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="./ui/about.ui" line="62"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders and contributors&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Main author:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Other authors and contributors:&lt;br/&gt;Graham Bell, James Graham, Takuro Hosomi, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contains the following external code and resources: Danny Allen (icons), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (bezier fitting)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Veusz comes with ABSOLUTELY NO WARRANTY. Veusz is Free Software and you are entitled to distribute it under the terms of the GNU Public License (GPL). See the file COPYING for details, or click &amp;quot;Show license&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#a000a0;&quot;&gt;Veusz %(version)s&lt;/span&gt;&lt;br/&gt;Copyright © 2003-2025 Jeremy Sanders e contribuidores&lt;br/&gt;&lt;a href=&quot;https://veusz.github.io/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://veusz.github.io/&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;Autor principal:&lt;br/&gt;Jeremy Sanders&lt;br/&gt;&lt;br/&gt;Outros autores e contribuidores:&lt;br/&gt;Graham Bell, James Graham, Takuro Hosomi, Bryan Harris, Dave Hughes, Sebastian Koenig, Valerio Mussi, Benjamin K. Stuhl&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Contém os seguintes códigos e recursos externos: Danny Allen (ícones), John D. Hunter (contouring), Nokia Corporation (MathML), Philip J. Schneider (ajuste bezier)&lt;/p&gt;&lt;p&gt;&lt;br/&gt;NÃO HÁ ABSOLUTAMENTE NENHUMA GARANTIA PARA Veusz. Veusz É Software Livre e você tem o direito de distribuí-lo sob os termos da licença Pública Geral GNU (GPL: Gnu Public License). Veja o arquivo COPYING para detalhes, ou clique em &amp;quot;Exibir licença&amp;quot;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -29,467 +34,467 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="48"/>
         <source>Length of major ticks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comprimento dos marcadores principais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="75"/>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprimento</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="53"/>
         <source>Number of major ticks to aim for</source>
-        <translation type="unfinished"></translation>
+        <translation>Número de marcadores principais a se obter</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="80"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Número</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="84"/>
         <source>List of tick values overriding defaults</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lista de valores de marcadores sobrepondo os padrões</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="85"/>
         <source>Manual ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcadores manuais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="74"/>
         <source>Length of minor ticks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comprimento dos marcadores secundários</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="79"/>
         <source>Number of minor ticks to aim for</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Número de marcadores secundários a se obter</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="103"/>
         <source>Put grid lines on top of graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Colocar linhas de grade sobre o gráfico</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="104"/>
         <source>On top</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No topo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="123"/>
         <source>Place axis label close to edge of graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Posicionar rótulos dos eixos próximo à borda do gráfico</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="124"/>
         <source>At edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Na borda</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="132"/>
         <source>Additional offset of axis label from axis tick labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Deslocamento adicional entre o rótulo do eixo e os rótulos dos marcadores dos eixos</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="133"/>
         <source>Label offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Deslocamento do rótulo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="138"/>
         <source>Position of axis label</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição do rótulo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="139"/>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="146"/>
         <source>Automatic</source>
-        <translation type="unfinished"></translation>
+        <translation>Automático</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="147"/>
         <source>General numerical format</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato numérico geral</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="148"/>
         <source>Scientific notation</source>
-        <translation type="unfinished"></translation>
+        <translation>Notação científica</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="149"/>
         <source>Engineering suffix notation</source>
-        <translation type="unfinished"></translation>
+        <translation>Notação de sufixo de engenharia</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="150"/>
         <source>C-style general format</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato geral estilo C</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="151"/>
         <source>C-style scientific notation</source>
-        <translation type="unfinished"></translation>
+        <translation>Notação científica estilo C</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="152"/>
         <source>2 decimal places always shown</source>
-        <translation type="unfinished"></translation>
+        <translation>sempre exibir 2 casas decimais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="159"/>
         <source>Angle by which to rotate label by</source>
-        <translation type="unfinished"></translation>
+        <translation>Ângulo pelo qual rotacionar o rótulo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="160"/>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotacionar</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="165"/>
         <source>Format of the tick labels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Formato dos rótulos de marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="167"/>
         <source>Format</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="171"/>
         <source>A scale factor to apply to the values of the tick labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Um fator de escala a se aplicar aos valores dos rótulos de marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="416"/>
         <source>Scale</source>
-        <translation type="unfinished"></translation>
+        <translation>Escala</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="177"/>
         <source>Additional offset of axis tick labels from axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Deslocamento adicional dos rótulos de marcadores ao eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="178"/>
         <source>Tick offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Deslocamento de marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="229"/>
         <source>If axis range not specified, use range of data and this setting</source>
-        <translation type="unfinished"></translation>
+        <translation>Se o intervalo do eixo não for especificado, usar intervalo dos dados e esta configuração</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="233"/>
         <source>Use exact data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar intervalo de dados exato</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="234"/>
         <source>Round up to tick marks from data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Arredondar para cima do intervalo de dados até o marcador</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="235"/>
         <source>Expand 2% beyond data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Expandir 2% além do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="236"/>
         <source>Expand 5% beyond data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Expandir 5% além do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="237"/>
         <source>Expand 10% beyond data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Expandir 10% além do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="238"/>
         <source>Expand 15% beyond data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Expandir 15% além do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="239"/>
         <source>Shrink 2% inside data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Reduzir 2% para dentro do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="240"/>
         <source>Shrink 5% inside data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Reduzir 5% para dentro do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="241"/>
         <source>Shrink 10% inside data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Reduzir 10% para dentro do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="242"/>
         <source>Shrink 15% inside data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Reduzir 15% para dentro do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="243"/>
         <source>20 to 80% of the data range</source>
-        <translation type="unfinished"></translation>
+        <translation>20 a 80% do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="244"/>
         <source>Up to 20% of the data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Até 20% do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="245"/>
         <source>Above 80% of the data range</source>
-        <translation type="unfinished"></translation>
+        <translation>Acima de 80% do intervalo de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="248"/>
         <source>Auto range</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalo automático</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="323"/>
         <source>Invalid axis range &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervalo de eixo inválido &apos;%s&apos;</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="361"/>
         <source>Axis label text</source>
-        <translation type="unfinished"></translation>
+        <translation>Texto do rótulo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="362"/>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Rótulo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="365"/>
         <source>Minimum value of axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Valor mínimo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="366"/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation>Min</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="369"/>
         <source>Maximum value of axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Valor máximo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="370"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation>Máx</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="373"/>
         <source>Whether axis is logarithmic</source>
-        <translation type="unfinished"></translation>
+        <translation>Escala logarítmica</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="374"/>
         <source>Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Log</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="381"/>
         <source>Type of ticks to show on on axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de marcadores a exibir no eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="382"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="392"/>
         <source>Extend axis to zero if close (UNUSED)</source>
-        <translation type="unfinished"></translation>
+        <translation>Extender eixo ao zero se estiver próximo (não usado)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="393"/>
         <source>Zero extend</source>
-        <translation type="unfinished"></translation>
+        <translation>Extender a zero</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="399"/>
         <source>Place axis on opposite side of graph if none</source>
-        <translation type="unfinished"></translation>
+        <translation>Posicionar eixo no lado oposto ao gráfico se nenhum</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="400"/>
         <source>Auto mirror</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto espelhar</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="404"/>
         <source>Place axis text and ticks on other side of axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Posicionar texto do eixo e marcadores no lado oposto do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="405"/>
         <source>Reflect</source>
-        <translation type="unfinished"></translation>
+        <translation>Refletir</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="409"/>
         <source>Place ticks on outside of graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Posicionar marcadores por fora do gráfico</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="410"/>
         <source>Outer ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcadores externos?</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="415"/>
         <source>Scale data plotted by this factor</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplicar dados plotados por este fator</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="422"/>
         <source>Direction of axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Direção do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="423"/>
         <source>Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Direção</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="426"/>
         <source>Fractional position of lower end of axis on graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição fracionária da extremidade inferior do eixo no gráfico</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="427"/>
         <source>Min position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição Mínima</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="430"/>
         <source>Fractional position of upper end of axis on graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição fracionária da extremidade superior do eixo no gráfico</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="431"/>
         <source>Max position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição máxima</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="434"/>
         <source>Fractional position of axis in its perpendicular direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição fracionária do eixo na direção perpendicular</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="435"/>
         <source>Axis position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="439"/>
         <source>Match the scale of this axis to the axis specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Igualar a escala deste eixo com o eixo especificado</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="440"/>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Igualar</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="445"/>
         <source>Axis line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações da linha do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="446"/>
         <source>Axis line</source>
-        <translation type="unfinished"></translation>
+        <translation>Linha do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="450"/>
         <source>Axis label settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações do rótulo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="451"/>
         <source>Axis label</source>
-        <translation type="unfinished"></translation>
+        <translation>Rótulo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="455"/>
         <source>Tick label settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações do rótulo dos marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="456"/>
         <source>Tick labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Rótulos de marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="460"/>
         <source>Major tick line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de traço dos marcadores principais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="461"/>
         <source>Major ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcadores principais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="465"/>
         <source>Minor tick line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de traço dos marcadores secundários</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="466"/>
         <source>Minor ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcadores secundários</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="470"/>
         <source>Grid line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de linhas de grade</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="471"/>
         <source>Grid lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Linhas de Grade</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="475"/>
         <source>Minor grid line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de linhas de grade secundárias</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="476"/>
         <source>Grid lines for minor ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Linhas de grade para marcadores secundários</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="1365"/>
         <source>reset axis</source>
-        <translation type="unfinished"></translation>
+        <translation>reiniciar eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="1394"/>
         <source>zoom axis</source>
-        <translation type="unfinished"></translation>
+        <translation>ampliar eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="1422"/>
         <source>adjust axis</source>
-        <translation type="unfinished"></translation>
+        <translation>ajustar eixo</translation>
     </message>
 </context>
 <context>
@@ -497,247 +502,247 @@
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="163"/>
         <source>Length of major ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprimento dos marcadores principais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="186"/>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprimento</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="168"/>
         <source>Number of major ticks to aim for</source>
-        <translation type="unfinished"></translation>
+        <translation>Número de marcadores principais a se obter</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="191"/>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Número</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="173"/>
         <source>List of tick values overriding defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista de valores de marcadores sobrepondo os padrões</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="174"/>
         <source>Manual ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcadores manuais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="185"/>
         <source>Length of minor ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprimento dos marcadores ecundários</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="190"/>
         <source>Number of minor ticks to aim for</source>
-        <translation type="unfinished"></translation>
+        <translation>Número de marcadores secundários a se obter</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="220"/>
         <source>Position of axis label</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição do rótulo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="221"/>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="235"/>
         <source>3D axis</source>
-        <translation type="unfinished"></translation>
+        <translation>eixo 3D</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="261"/>
         <source>Axis label text</source>
-        <translation type="unfinished"></translation>
+        <translation>Texto do rótulo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="262"/>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Rótulo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="265"/>
         <source>Minimum value of axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Valor mínimo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="266"/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation>Min</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="269"/>
         <source>Maximum value of axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Valor máximo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="270"/>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation>Máx</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="273"/>
         <source>Whether axis is logarithmic</source>
-        <translation type="unfinished"></translation>
+        <translation>Escala logarítmica</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="274"/>
         <source>Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Log</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="281"/>
         <source>Type of ticks to show on on axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de marcadores a mostrar no eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="282"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="286"/>
         <source>Place axis on opposite side of graph if none</source>
-        <translation type="unfinished"></translation>
+        <translation>Posicionar eixo no lado oposto do gráfico se nenhum</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="287"/>
         <source>Auto mirror</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto espelhar</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="292"/>
         <source>Scale data plotted by this factor</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiplicar dados plotados por este fator</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="293"/>
         <source>Scale</source>
-        <translation type="unfinished"></translation>
+        <translation>Escala</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="299"/>
         <source>Direction of axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Direção do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="300"/>
         <source>Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Direção</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="303"/>
         <source>Fractional position of lower end of axis on graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição fracionária da extremidade inferior do eixo no gráfico</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="304"/>
         <source>Min position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição Mínima</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="307"/>
         <source>Fractional position of upper end of axis on graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição fracionária da extremidade superior do eixo no gráfico</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="308"/>
         <source>Max position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição Máxima</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="311"/>
         <source>Fractional position of axis in its perpendicular direction 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição fracionária do eixo em sua direção perpendicular 1</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="313"/>
         <source>Axis position 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição do eixo 1</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="316"/>
         <source>Fractional position of axis in its perpendicular direction 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição fracionária do eixo em sua direção perpendicular 2</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="318"/>
         <source>Axis position 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição do eixo 2</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="322"/>
         <source>Axis line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de traço do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="323"/>
         <source>Axis line</source>
-        <translation type="unfinished"></translation>
+        <translation>Traço do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="326"/>
         <source>Axis label settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de rótulo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="327"/>
         <source>Axis label</source>
-        <translation type="unfinished"></translation>
+        <translation>Rótulo do eixo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="330"/>
         <source>Tick label settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de rótulo de marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="331"/>
         <source>Tick labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Rótulos de marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="334"/>
         <source>Major tick line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de traço de marcadores principais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="335"/>
         <source>Major ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcadores principais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="338"/>
         <source>Minor tick line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de traço de marcadores secundários</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="339"/>
         <source>Minor ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcadores secundários</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="342"/>
         <source>Grid line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de linhas de grade</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="343"/>
         <source>Grid lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Linhas de grade</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="346"/>
         <source>Minor grid line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de linhas de grade secundárias</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="347"/>
         <source>Grid lines for minor ticks</source>
-        <translation type="unfinished"></translation>
+        <translation>Linhas de grades para marcadores secundários</translation>
     </message>
 </context>
 <context>
@@ -745,147 +750,147 @@
     <message>
         <location filename="./veusz/widgets/bar.py" line="40"/>
         <source>Fill styles for dataset bars</source>
-        <translation type="unfinished"></translation>
+        <translation>Estilos de preenchimento para barras de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="41"/>
         <source>Fill styles</source>
-        <translation type="unfinished"></translation>
+        <translation>Estilos de preenchimento</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="50"/>
         <source>Line styles for dataset bars</source>
-        <translation type="unfinished"></translation>
+        <translation>Estilo de linha para barras de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="51"/>
         <source>Line styles</source>
-        <translation type="unfinished"></translation>
+        <translation>Estilos de linha</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="68"/>
         <source>Plot bar charts</source>
-        <translation type="unfinished"></translation>
+        <translation>Plotar gráficos de barras</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="80"/>
         <source>Key text for each dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Texto da legenda para cada conjunto de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="81"/>
         <source>Key text</source>
-        <translation type="unfinished"></translation>
+        <translation>Texto da legenda</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="85"/>
         <source>Dataset or string to label bars</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conjunto de dados ou string para rotular barras</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="86"/>
         <source>Labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Rótulos</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="91"/>
         <source>Show datasets grouped together or as a single bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar conjuntos de dados agrupados ou como uma única barra</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="92"/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Modo</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="96"/>
         <source>Horizontal or vertical bar chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Gráfico de barras horizontais ou verticais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="97"/>
         <source>Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Direção</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="100"/>
         <source>Position of bars, dataset or expression (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Posição das barras, conjunto de dados ou expressão (opcional)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="101"/>
         <source>Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Posições</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="104"/>
         <source>Datasets containing lengths of bars</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjuntos de dados contendo comprimentos das barras</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="105"/>
         <source>Lengths</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprimentos</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="110"/>
         <source>Filling fraction of bars (between 0 and 1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fração de preenchimento das barras (entre 0 e 1)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="128"/>
         <source>Bar fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Preenchimento das barras</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="116"/>
         <source>Filling fraction of groups of bars (between 0 and 1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fração de preenchimento de grupos de barras (entre 0 e 1)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="117"/>
         <source>Group fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Preenchimento de grupos</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="123"/>
         <source>Error bar style to show</source>
-        <translation type="unfinished"></translation>
+        <translation>Estilo de barras de erros</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="124"/>
         <source>Error style</source>
-        <translation type="unfinished"></translation>
+        <translation>Estilo de erro</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="128"/>
         <source>Fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Preenchimento</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="130"/>
         <source>Bar line</source>
-        <translation type="unfinished"></translation>
+        <translation>Linha da barra</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="130"/>
         <source>Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Linha</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="135"/>
         <source>Error bar line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações de traço de barra de erro</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="136"/>
         <source>Error bar line</source>
-        <translation type="unfinished"></translation>
+        <translation>Traço de barra de erro</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="144"/>
         <source>lengths=&apos;%s&apos;, position=&apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>comprimentos=&apos;%s&apos;, posição=&apos;%s&apos;</translation>
     </message>
 </context>
 <context>
@@ -893,192 +898,192 @@
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="111"/>
         <source>Plot box plots</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plotar gráfico de caixas</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="130"/>
         <source>Whisker mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modo de pavios</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="135"/>
         <source>Horizontal or vertical boxes</source>
-        <translation type="unfinished"></translation>
+        <translation>Caixas horizontais ou verticais</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="136"/>
         <source>Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Direção</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="139"/>
         <source>Dataset or string to label bars</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjunto de dados ou string para rotular barras</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="140"/>
         <source>Labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Rótulos</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="143"/>
         <source>Dataset or list of values giving positions of boxes (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjunto de dados ou lista de valores dando posições das caixas (opcional)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="145"/>
         <source>Positions</source>
-        <translation type="unfinished"></translation>
+        <translation>Posições</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="150"/>
         <source>Datasets containing values to calculate statistics for</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjuntos de dados contendo valores para os quais calcular estatísticas</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="151"/>
         <source>Datasets</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjuntos de dados</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="156"/>
         <source>Dataset with whisker maxima or list of values</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjunto de dados ou lista de valores com máximos dos pavios</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="157"/>
         <source>Whisker max</source>
-        <translation type="unfinished"></translation>
+        <translation>Máximos dos pavios</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="160"/>
         <source>Dataset with whisker minima or list of values</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjunto de dados ou lista de valores com mínimos dos pavios</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="161"/>
         <source>Whisker min</source>
-        <translation type="unfinished"></translation>
+        <translation>Míniimos de pavios</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="164"/>
         <source>Dataset with box maxima or list of values</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjunto de dados ou lista de valores com máximos das caixas</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="165"/>
         <source>Box max</source>
-        <translation type="unfinished"></translation>
+        <translation>Máximos das caixas</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="168"/>
         <source>Dataset with box minima or list of values</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjunto de dados ou lista de valores com mínimos das caixas</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="169"/>
         <source>Box min</source>
-        <translation type="unfinished"></translation>
+        <translation>Mínimos das caixas</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="172"/>
         <source>Dataset with medians or list of values</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjunto de dados ou lista de valores com medianas</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="173"/>
         <source>Median</source>
-        <translation type="unfinished"></translation>
+        <translation>Mediana</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="176"/>
         <source>Dataset with means or list of values</source>
-        <translation type="unfinished"></translation>
+        <translation>Conjunto de dados ou listas de valores com médias</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="205"/>
         <source>Mean</source>
-        <translation type="unfinished"></translation>
+        <translation>Médias</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="182"/>
         <source>Calculate statistics from datasets rather than given manually</source>
-        <translation type="unfinished"></translation>
+        <translation>Calculas estatísticas a partir do conjunto de dados em vez de fornecer manualmente</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="184"/>
         <source>Calculate</source>
-        <translation type="unfinished"></translation>
+        <translation>Calcular</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="194"/>
         <source>Fill fraction of boxes</source>
-        <translation type="unfinished"></translation>
+        <translation>Fração de preenchimento de caixas</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="195"/>
         <source>Fill fraction</source>
-        <translation type="unfinished"></translation>
+        <translation>Fração de preenchimento</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="199"/>
         <source>Marker for outliers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Marcador para outliers</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="200"/>
         <source>Outliers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Outliers</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="204"/>
         <source>Marker for mean</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcador para média</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="209"/>
         <source>Size of markers to plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamanho dos marcadores a se plotar</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="210"/>
         <source>Markers size</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamanho dos marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="215"/>
         <source>Box fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Preenchimento da caixa</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="219"/>
         <source>Box border line</source>
-        <translation type="unfinished"></translation>
+        <translation>Traço da borda da caixa</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="220"/>
         <source>Box border</source>
-        <translation type="unfinished"></translation>
+        <translation>Borda da caixa</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="225"/>
         <source>Whisker line</source>
-        <translation type="unfinished"></translation>
+        <translation>Traço do pavio</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="229"/>
         <source>Line around markers</source>
-        <translation type="unfinished"></translation>
+        <translation>Traço em torno dos marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="230"/>
         <source>Markers border</source>
-        <translation type="unfinished"></translation>
+        <translation>Morda dos marcadores</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="235"/>
         <source>Markers fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Preenchimento dos marcadores</translation>
     </message>
 </context>
 <context>
@@ -12362,6 +12367,14 @@ p, li { white-space: pre-wrap; }
         <location filename="./ui/import_nd.ui" line="177"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dataset name to import&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Application</name>
+    <message>
+        <location filename="./veusz/veusz_main.py" line="379"/>
+        <source>Error starting - Veusz</source>
+        <translation>Erro ao iniciar - Veusz</translation>
     </message>
 </context>
 </TS>
