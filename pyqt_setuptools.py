@@ -269,7 +269,7 @@ class sip_build_ext(build_ext):
 requires=["sip >= 6.8, <7"]
 build-backend="sipbuild.api"
 
-[tool.sip.metadata]
+[project]
 name="{modulename}"
 
 [tool.sip.project]
