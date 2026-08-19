@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="531.4px" height="531.4px" version="1.1"
+<svg width="425.197pt" height="425.197pt" viewBox="0 0 531.496 531.496" version="1.1"
     xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink">
 <desc>Veusz output document</desc>
@@ -2225,7 +2225,7 @@
 </g>
 <g fill="#ffffff" stroke="#ffffff" stroke-linejoin="miter" stroke-width="1.2">
 <g transform="matrix(-0.4472 0.8944 0.8944 0.4472 274.6 256.8)">
-<path d="m0,0l0,0l0,0l0,0l0,0"/>
+<path d="m0,0l0,0l0,0l0,0"/>
 </g>
 </g>
 <g fill="#ffffff" stroke="#ffffff" stroke-linecap="butt" stroke-width="1.2">

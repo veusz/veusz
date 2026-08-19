@@ -167,15 +167,20 @@ class SVGPaintEngine(qt.QPaintEngine):
         self.transform = qt.QTransform()
 
         # svg root element for qt defaults
+        width_pt = self.device.width_in * inch_pt
+        height_pt = self.device.height_in * inch_pt
+        width = self.device.width_in * self.device.sdpi * self.scale
+        height = self.device.height_in * self.device.sdpi * self.scale
+
         self.rootelement = SVGElement(
             None, 'svg',
             (
-                'width="%spx" height="%spx" version="1.1"\n'
+                f'width="{width_pt:.3f}pt" height="{height_pt:.3f}pt"'
+                f' viewBox="0 0 {width:.3f} {height:.3f}"'
+                ' version="1.1"\n'
                 '    xmlns="http://www.w3.org/2000/svg"\n'
-                '    xmlns:xlink="http://www.w3.org/1999/xlink"') % (
-                    fltStr(self.device.width*self.device.sdpi*self.scale),
-                    fltStr(self.device.height*self.device.sdpi*self.scale),
-                )
+                '    xmlns:xlink="http://www.w3.org/1999/xlink"'
+            )
         )
         SVGElement(self.rootelement, 'desc', '', 'Veusz output document')
 
@@ -579,16 +584,21 @@ class SVGPaintEngine(qt.QPaintEngine):
 class SVGPaintDevice(qt.QPaintDevice):
     """Paint device for SVG paint engine.
 
-    dpi is the real output DPI (unscaled)
-    scale is a scaling value to apply to outputted values
+    This paint device/engine is intended to work at a higher
+    (internal) DPI than the output file. The output DPI is given by
+    dpi, while the internal DPI is dpi/scale.
+
+    dpi: real output SVG DPI (unscaled)
+    scale: scaling value to apply to outputted values and page size
+
     """
 
     def __init__(self, fileobj, width_in, height_in,
                  writetextastext=False, dpi=90, scale=0.1):
         qt.QPaintDevice.__init__(self)
         self.fileobj = fileobj
-        self.width = width_in
-        self.height = height_in
+        self.width_in = width_in
+        self.height_in = height_in
         self.scale = scale
         self.sdpi = dpi/scale
         self.engine = SVGPaintEngine(writetextastext=writetextastext)
@@ -600,17 +610,17 @@ class SVGPaintDevice(qt.QPaintDevice):
         """Return the metrics of the painter."""
 
         if m == qt.QPaintDevice.PaintDeviceMetric.PdmWidth:
-            return int(self.width*self.sdpi)
+            return int(self.width_in*self.sdpi)
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmHeight:
-            return int(self.height*self.sdpi)
+            return int(self.height_in*self.sdpi)
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmWidthMM:
-            return int(self.engine.width*inch_mm)
+            return int(self.width_in*inch_mm)
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmHeightMM:
-            return int(self.engine.height*inch_mm)
+            return int(self.height_in*inch_mm)
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmNumColors:
-            return 2147483647
+            return 0
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDepth:
-            return 24
+            return 32
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDpiX:
             return int(self.sdpi)
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDpiY:
@@ -620,10 +630,6 @@ class SVGPaintDevice(qt.QPaintDevice):
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmPhysicalDpiY:
             return int(self.sdpi)
         elif m == qt.QPaintDevice.PaintDeviceMetric.PdmDevicePixelRatio:
-            return 1
-
-        # Qt >= 5.6
-        elif m == getattr(qt.QPaintDevice, 'PdmDevicePixelRatioScaled', -1):
             return 1
 
         else:
