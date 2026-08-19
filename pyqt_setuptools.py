@@ -8,6 +8,7 @@
 import os
 import shutil
 import subprocess
+import sys
 
 try:
     import tomllib
@@ -16,6 +17,15 @@ except ImportError:
 
 from sysconfig import get_path
 from setuptools.command.build_ext import build_ext
+from setuptools.command.install import install as orig_install
+
+# Setuptools loads this module directly while expanding pyproject.toml, which
+# does not necessarily put the source directory on the import path.
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+# code taken from distutils for installing data that was removed in
+# setuptools
+from install_data import install_data
 
 ##################################################################
 
@@ -65,6 +75,21 @@ class sip_build_ext(build_ext):
         self.qt_include_dir = None
         self.qt_library_dir = None
         self.qt_libinfix = None
+
+    def finalize_options(self):
+        build_ext.finalize_options(self)
+
+        # numpy's include path is environment-specific, so it cannot be
+        # represented by a static include-dirs entry in pyproject.toml.
+        import numpy
+        numpy_extensions = {
+            'veusz.helpers.threed',
+            'veusz.helpers._nc_cntr',
+            'veusz.helpers.qtloops',
+        }
+        for extension in self.extensions:
+            if extension.name in numpy_extensions:
+                extension.include_dirs.append(numpy.get_include())
 
     def _get_qmake(self, build_cmd):
         """Get qmake executable."""
@@ -265,24 +290,24 @@ class sip_build_ext(build_ext):
             return '"'+s+'"'
 
         toml_text=f'''
-[build-system]
-requires=["sip >= 6.8, <7"]
-build-backend="sipbuild.api"
+            [build-system]
+            requires=["sip >= 6.8, <7"]
+            build-backend="sipbuild.api"
 
-[tool.sip.metadata]
-name="{modulename}"
+            [project]
+            name="{modulename}"
 
-[tool.sip.project]
-sip-include-dirs=[{toml_esc(pyqt6_include_dir)}]
-abi-version="{abi_version}"
-build-dir={toml_esc(output_dir)}
-sip-module="PyQt6.sip"
-sip-files-dir={toml_esc(srcdir)}
+            [tool.sip.project]
+            sip-include-dirs=[{toml_esc(pyqt6_include_dir)}]
+            abi-version="{abi_version}"
+            build-dir={toml_esc(output_dir)}
+            sip-module="PyQt6.sip"
+            sip-files-dir={toml_esc(srcdir)}
 
-[tool.sip.bindings.{modulename}]
-pep484-pyi=false
-protected-is-public=false
-'''
+            [tool.sip.bindings.{modulename}]
+            pep484-pyi=false
+            protected-is-public=false
+        '''
 
         pyproject_fname = os.path.join(sip_builddir, 'pyproject.toml')
         with open(pyproject_fname, 'w') as fout:
@@ -299,3 +324,45 @@ protected-is-public=false
             os.path.join(output_dir, 'sip.h'),
             os.path.join(output_dir, modulename, 'sip.h')
         )
+
+
+class veusz_install(orig_install):
+
+    user_options = orig_install.user_options + [
+        (
+            'veusz-resource-dir=', None,
+            'override veusz resource directory location'
+        ),
+        (
+            'disable-install-examples', None,
+            'do not install examples files'
+        ),
+    ]
+    boolean_options = orig_install.boolean_options + [
+        'disable-install-examples',
+    ]
+
+    def initialize_options(self):
+        orig_install.initialize_options(self)
+        self.veusz_resource_dir = None
+        self.disable_install_examples = False
+
+
+class smart_install_data(install_data):
+
+    def run(self):
+        install_cmd = self.get_finalized_command('install')
+        if install_cmd.veusz_resource_dir:
+            # override location with veusz-resource-dir option
+            self.install_dir = install_cmd.veusz_resource_dir
+        else:
+            # change self.install_dir to the library dir + veusz by default
+            self.install_dir = os.path.join(install_cmd.install_lib, 'veusz')
+
+        # disable examples install if requested
+        if install_cmd.disable_install_examples:
+            self.data_files = [
+                f for f in self.data_files if f[0][-8:] != 'examples'
+            ]
+
+        return install_data.run(self)
