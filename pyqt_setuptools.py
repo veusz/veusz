@@ -249,8 +249,13 @@ class sip_build_ext(build_ext):
 
         pyqt6_toml = os.path.join(pyqt6_include_dir, 'QtCore', 'QtCore.toml')
 
+        print('debug', pyqt6_toml)
+
         with open(pyqt6_toml, 'rb') as fin:
             pyqt6_cfg = tomllib.load(fin)
+
+        print('debug2', pyqt6_cfg)
+
         abi_version = pyqt6_cfg.get('sip-abi-version')
 
         modulename = os.path.splitext(os.path.basename(source))[0]
