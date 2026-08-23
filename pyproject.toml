@@ -2,8 +2,141 @@
 requires = [
     "setuptools>=61",
     "wheel",
-    "numpy",
-    "sip",
-    "PyQt6",
+    "numpy>=1.20",
+    "sip>=6.8,<7",
+    "PyQt6>=6.3",
+    "tomli>=1.1; python_version < '3.11'",
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "veusz"
+dynamic = ["version"]
+description = "A scientific plotting package"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "COPYING" }
+authors = [
+    { name = "Jeremy Sanders", email = "jeremy@jeremysanders.net" },
+]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+dependencies = [
+    "numpy>=1.20",
+    "PyQt6>=6.3",
+]
+
+[project.urls]
+Homepage = "https://veusz.github.io/"
+Documentation = "https://veusz.github.io/docs/manual/"
+Repository = "https://github.com/veusz/veusz"
+Issues = "https://github.com/veusz/veusz/issues"
+Changelog = "https://github.com/veusz/veusz/blob/master/ChangeLog"
+Download = "https://veusz.github.io/download"
+Examples = "https://veusz.github.io/examples/"
+Features = "https://veusz.github.io/features/"
+Screenshots = "https://veusz.github.io/screenshots/"
+Support = "https://veusz.github.io/help-support/"
+News = "https://veusz.github.io/news/"
+
+[project.optional-dependencies]
+hdf5 = ["h5py>=2.6"]
+fits = [
+    "astropy>=2",
+    "pyvo>=1.9",
+]
+emf = ["pyemf3>=3.3"]
+fitting = ["iminuit>=2"]
+dbus = ["dbus-python"]
+all = ["veusz[hdf5,fits,emf,fitting,dbus]"]
+
+[project.gui-scripts]
+veusz = "veusz.veusz_main:run"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["veusz*"]
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.setuptools.data-files]
+"." = ["VERSION", "AUTHORS", "ChangeLog", "COPYING"]
+ui = ["ui/*.ui"]
+icons = ["icons/*.png", "icons/*.svg"]
+examples = ["examples/*.vsz", "examples/*.py", "examples/*.csv", "examples/*.dat"]
+
+[tool.setuptools.cmdclass]
+build_ext = "pyqt_setuptools.sip_build_ext"
+install_data = "pyqt_setuptools.smart_install_data"
+install = "pyqt_setuptools.veusz_install"
+
+[[tool.setuptools.ext-modules]]
+name = "veusz.helpers.threed"
+sources = [
+    "src/threed/camera.cpp",
+    "src/threed/mmaths.cpp",
+    "src/threed/objects.cpp",
+    "src/threed/scene.cpp",
+    "src/threed/fragment.cpp",
+    "src/threed/numpy_helpers.cpp",
+    "src/threed/clipcontainer.cpp",
+    "src/threed/bsp.cpp",
+    "src/threed/twod.cpp",
+    "src/threed/threed.sip",
+]
+include-dirs = ["src/threed"]
+language = "c++"
+
+[[tool.setuptools.ext-modules]]
+name = "veusz.helpers.qtmml"
+sources = [
+    "src/qtmml/qtmmlwidget.cpp",
+    "src/qtmml/qtmml.sip",
+]
+include-dirs = ["src/qtmml"]
+language = "c++"
+
+[[tool.setuptools.ext-modules]]
+name = "veusz.helpers.recordpaint"
+sources = [
+    "src/recordpaint/recordpaintdevice.cpp",
+    "src/recordpaint/recordpaintengine.cpp",
+    "src/recordpaint/recordpaint.sip",
+]
+include-dirs = ["src/recordpaint"]
+language = "c++"
+
+[[tool.setuptools.ext-modules]]
+name = "veusz.helpers._nc_cntr"
+sources = ["src/nc_cntr/_nc_cntr.c"]
+
+[[tool.setuptools.ext-modules]]
+name = "veusz.helpers.qtloops"
+sources = [
+    "src/qtloops/qtloops.cpp",
+    "src/qtloops/qtloops_helpers.cpp",
+    "src/qtloops/polygonclip.cpp",
+    "src/qtloops/polylineclip.cpp",
+    "src/qtloops/beziers.cpp",
+    "src/qtloops/beziers_qtwrap.cpp",
+    "src/qtloops/numpyfuncs.cpp",
+    "src/qtloops/qtloops.sip",
+]
+include-dirs = ["src/qtloops"]
+language = "c++"

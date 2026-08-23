@@ -70,10 +70,11 @@ you will need to disable quarantine for it to run. Please see
 
 ### Installation with setuptools
 
-Veusz provides a standard setuptools `setup.py` file. If installing
-this locally, it may be better to create a Python virtual environment
-so that it is self contained and does not interfere with existing
-Python dependencies and packages.
+Veusz uses the setuptools build backend, configured in `pyproject.toml`.
+A minimal `setup.py` compatibility entry point is retained for packagers.
+If installing this locally, it may be better to create a Python virtual
+environment so that it is self contained and does not interfere with
+existing Python dependencies and packages.
 
 ### Building and running inside a virtual environment
 
