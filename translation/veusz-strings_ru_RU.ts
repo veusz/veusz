@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru">
+<TS version="2.1" language="ru">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -16,7 +16,7 @@
     <message>
         <location filename="./ui/about.ui" line="118"/>
         <source>Software versions</source>
-        <translation type="unfinished"></translation>
+        <translation>Версии ПО</translation>
     </message>
     <message>
         <location filename="./ui/about.ui" line="125"/>
@@ -314,7 +314,7 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="392"/>
         <source>Extend axis to zero if close (UNUSED)</source>
-        <translation>Продлить ось до нуля при приближении к 0  (НЕ ИСПОЛЬЗУЕТСЯ)</translation>
+        <translation>Продлить ось до нуля при приближении к 0 (НЕ ИСПОЛЬЗУЕТСЯ)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="393"/>
@@ -479,7 +479,7 @@
     <message>
         <location filename="./veusz/widgets/axis.py" line="1365"/>
         <source>reset axis</source>
-        <translation type="unfinished"></translation>
+        <translation>сбросить настройки оси</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis.py" line="1394"/>
@@ -547,7 +547,7 @@
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="235"/>
         <source>3D axis</source>
-        <translation type="unfinished"></translation>
+        <translation>3D ось</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="261"/>
@@ -652,22 +652,22 @@
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="311"/>
         <source>Fractional position of axis in its perpendicular direction 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Дробное положение оси в перпендикулярном ей направлении 1</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="313"/>
         <source>Axis position 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Положение оси 1</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="316"/>
         <source>Fractional position of axis in its perpendicular direction 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Дробное положение оси в перпендикулярном ей направлении 2</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="318"/>
         <source>Axis position 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Положение оси 2</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/axis3d.py" line="322"/>
@@ -810,7 +810,7 @@
     <message>
         <location filename="./veusz/widgets/bar.py" line="100"/>
         <source>Position of bars, dataset or expression (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Положение столбцов, набор данных или выражение (необязательно)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="101"/>
@@ -875,12 +875,12 @@
     <message>
         <location filename="./veusz/widgets/bar.py" line="135"/>
         <source>Error bar line settings</source>
-        <translation>Настройки линии панели ошибок</translation>
+        <translation>Настройки линии полосы погрешностей</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="136"/>
         <source>Error bar line</source>
-        <translation>Линия панели ошибок</translation>
+        <translation>Линия полосы погрешностей</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/bar.py" line="144"/>
@@ -1053,12 +1053,12 @@
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="219"/>
         <source>Box border line</source>
-        <translation>Линия границы ящика</translation>
+        <translation>Линия границы бокса</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="220"/>
         <source>Box border</source>
-        <translation>Граница ящика</translation>
+        <translation>Граница бокса</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/boxplot.py" line="225"/>
@@ -1752,7 +1752,7 @@ Values = %s</source>
     <message>
         <location filename="./veusz/widgets/covariance.py" line="41"/>
         <source>Number of line steps to draw</source>
-        <translation type="unfinished"></translation>
+        <translation>Количество сегментов линии для отрисовки</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/covariance.py" line="42"/>
@@ -1930,7 +1930,7 @@ Values = %s</source>
     <message>
         <location filename="./ui/custom.ui" line="60"/>
         <source>Add external Python functions and constants using an import. Enter a module name and list of symbols to import (comma-separated or &quot;*&quot; for all symbols). A blank list of symbols will import the module with its name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавьте внешние функции и константы Python с помощью импорта. Введите имя модуля и список символов для импорта (через запятую или &quot;*&quot; для всех символов). Пустой список символов импортирует модуль с его именем.</translation>
     </message>
     <message>
         <location filename="./ui/custom.ui" line="84"/>
@@ -2468,12 +2468,12 @@ Values = %s</source>
     <message>
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="597"/>
         <source>New tag</source>
-        <translation>Новый тег</translation>
+        <translation>Новый тэг</translation>
     </message>
     <message>
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="597"/>
         <source>Enter new tag</source>
-        <translation>Введите новый тег</translation>
+        <translation>Введите новый тэг</translation>
     </message>
     <message>
         <location filename="./veusz/qtwidgets/datasetbrowser.py" line="603"/>
@@ -2556,7 +2556,7 @@ Values = %s</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="418"/>
         <source>Output dataset name is empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя выходного набора данных пусто</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="2202"/>
@@ -2626,7 +2626,7 @@ Values = %s</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="670"/>
         <source>Other</source>
-        <translation type="unfinished"></translation>
+        <translation>Другое</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1852"/>
@@ -2636,7 +2636,7 @@ Values = %s</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="672"/>
         <source>Reverse dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Обратить набор данных</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="754"/>
@@ -2658,7 +2658,7 @@ Values = %s</source>
         <source>Concatenate datasets into single dataset.
 Error bars are merged.</source>
         <translation>Соединить наборы данных в один набор.
-Панели ошибок соединяются.</translation>
+Линии погрешностей соединяются.</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1355"/>
@@ -2685,7 +2685,7 @@ Error bars are merged.</source>
         <source>Join datasets, interleaving element by element.
 Error bars are merged.</source>
         <translation>Объединить наборы данных, чередуя элемент за элементом.
-Панели ошибок соединяются.</translation>
+Линии погрешностей соединяются.</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1473"/>
@@ -2745,7 +2745,7 @@ Error bars are merged.</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="911"/>
         <source>Thin</source>
-        <translation>Тонкий</translation>
+        <translation>Проредить</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="913"/>
@@ -2795,7 +2795,7 @@ Error bars are merged.</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1012"/>
         <source>Add datasets together to make a single dataset. Error bars are combined.</source>
-        <translation>Соединить наборы данных в один набор данных. Панели ошибок объединяются.</translation>
+        <translation>Соединить наборы данных в один набор данных. Линии погрешностей объединяются.</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1165"/>
@@ -2810,7 +2810,7 @@ Error bars are merged.</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1052"/>
         <source>Subtract two datasets. Combined error bars are also calculated.</source>
-        <translation>Вычесть один набор данных из другого. Панели ошибок объединяются.</translation>
+        <translation>Вычесть один набор данных из другого. Линии погрешностей объединяются.</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1245"/>
@@ -2865,12 +2865,12 @@ Error bars are merged.</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1167"/>
         <source>Subtract maximum from dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Вычесть максимум из набора данных</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1168"/>
         <source>Subtract the maximum value from a dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Вычесть значение максимума из набора данных</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1195"/>
@@ -2880,7 +2880,7 @@ Error bars are merged.</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1196"/>
         <source>Multiply two or more datasets. Combined error bars are also calculated.</source>
-        <translation>Перемножить два или более наборов данных. Комбинированные панели ошибок также вычисляются.</translation>
+        <translation>Перемножить два или более наборов данных. Комбинированные линии погрешностей также вычисляются.</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1309"/>
@@ -2940,7 +2940,7 @@ Error bars are merged.</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1356"/>
         <source>Include error bars</source>
-        <translation>Включить панели ошибок</translation>
+        <translation>Включить полосы погрешностей</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1357"/>
@@ -2955,7 +2955,7 @@ Error bars are merged.</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1359"/>
         <source>Output range as error bars in dataset (optional)</source>
-        <translation>Выходной диапазон как панели ошибок в наборе данных (опционально)</translation>
+        <translation>Выходной диапазон как линии погрешностей в наборе данных (опционально)</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1377"/>
@@ -2976,7 +2976,7 @@ Error bars are merged.</source>
         <location filename="./veusz/plugins/datasetplugin.py" line="1434"/>
         <source>Compute the cumulative value of a dataset.  Error bars are combined.
 Default behaviour is to accumulate from start.</source>
-        <translation>Вычислить накопленное значение набора данных. Панели ошибок объединяются.
+        <translation>Вычислить накопленное значение набора данных. Линии погрешностей объединяются.
 Накопление идет с начала по умолчанию.</translation>
     </message>
     <message>
@@ -3025,7 +3025,7 @@ e.g. 1, 2, 3, 4, 5, 6 could be converted to 1, 3, 5 and 2, 4, 6.</source>
         <source>Convert r,theta coordinates to x,y coordinates.
 Error bars are ignored.</source>
         <translation>Преобразовать координаты r,theta в координаты x,y. 
-Панели ошибок игнорируются.</translation>
+Линии погрешностей игнорируются.</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="1528"/>
@@ -3350,7 +3350,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="2050"/>
         <source>Clip error bars</source>
-        <translation>Обрезать панели ошибок</translation>
+        <translation>Обрезать линии погрешностей</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/datasetplugin.py" line="2099"/>
@@ -3426,7 +3426,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/softwareversions.ui" line="14"/>
         <source>Software versions</source>
-        <translation type="unfinished"></translation>
+        <translation>Версии ПО</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="22"/>
@@ -3436,7 +3436,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="29"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Name of file to export. When exporting multiple pages to multiple files %PAGE% is the number of the page and %PAGENAME% is the name of the page. %PAGE00% and %PAGE000% are the page numbers prefixed with zeros to make two or three characters.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Имя файла для экспорта. При экспорте нескольких страниц в несколько файлов %PAGE% — это номер страницы, а %PAGENAME% — имя страницы. %PAGE00% и %PAGE000% — это номера страниц с нулями в начале, чтобы получилось два или три символа.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="36"/>
@@ -3456,32 +3456,32 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="56"/>
         <source>S&amp;ingle</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Одиночный</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="63"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Экспортировать все страницы&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="66"/>
         <source>A&amp;ll</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Все</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="73"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export given pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Экспортировать заданные страницы&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="76"/>
         <source>P&amp;ages</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Страницы</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="89"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter a comma-separated list of pages or page ranges (e.g. 1-2,4,5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Введите список страниц или диапазонов страниц, разделенных запятыми (например, 1-2,4,5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="96"/>
@@ -3521,7 +3521,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="137"/>
         <source>SV&amp;G</source>
-        <translation type="unfinished"></translation>
+        <translation>SV&amp;G</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="144"/>
@@ -3551,7 +3551,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="167"/>
         <source>E&amp;MF</source>
-        <translation type="unfinished"></translation>
+        <translation>E&amp;MF</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="176"/>
@@ -3561,7 +3561,7 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="185"/>
         <source>P&amp;NG</source>
-        <translation type="unfinished"></translation>
+        <translation>P&amp;NG</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="192"/>
@@ -3571,17 +3571,17 @@ Assumes x dataset increases in value.</source>
     <message>
         <location filename="./ui/export.ui" line="199"/>
         <source>&amp;JPG</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;JPG</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="206"/>
         <source>&amp;TIFF</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;TIFF</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="213"/>
         <source>&amp;XPM</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;XPM</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="227"/>
@@ -3633,12 +3633,12 @@ This is recommended for most purposes.</source>
     <message>
         <location filename="./ui/export.ui" line="295"/>
         <source>SVG DPI</source>
-        <translation type="unfinished"></translation>
+        <translation>SVG DPI</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="302"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The number of dots per inch used for writing SVG files. Modern inkscape uses 96.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Количество точек на дюйм, используемое для записи файлов SVG. Современный Inkscape использует 96.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/export.ui" line="312"/>
@@ -3700,7 +3700,9 @@ This is recommended for most purposes.</source>
         <source>Error reading file &apos;%s&apos;:
 
 %s</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка чтения файла &apos;%s&apos;:
+
+%s</translation>
     </message>
     <message>
         <location filename="./veusz/document/loader.py" line="136"/>
@@ -3772,12 +3774,12 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/document/evaluate.py" line="213"/>
         <source>Failed to import module &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось импортировать модуль &apos;%s&apos;</translation>
     </message>
     <message>
         <location filename="./veusz/document/evaluate.py" line="218"/>
         <source>Did not import module &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Не импортирован модуль &apos;%s&apos;</translation>
     </message>
     <message>
         <location filename="./veusz/document/evaluate.py" line="220"/>
@@ -3989,22 +3991,22 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/dialogs/export.py" line="337"/>
         <source>Error: invalid list of pages</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка: неверный список страниц</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/export.py" line="341"/>
         <source>Error: pages out of range</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка: страницы вне диапазона</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/export.py" line="348"/>
         <source>Error: no visible pages in document</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка: нет видимых страниц в документе</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/export.py" line="358"/>
         <source>Error: page name or number must be in filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка: имя или номер страницы должны быть в имени файла</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/export.py" line="416"/>
@@ -4019,12 +4021,12 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/dialogs/export.py" line="461"/>
         <source>none</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/export.py" line="470"/>
         <source>Processing…</source>
-        <translation type="unfinished"></translation>
+        <translation>Обработка...</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/export.py" line="488"/>
@@ -4201,22 +4203,22 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/fit.py" line="165"/>
         <source>Default error type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип ошибки по умолчанию</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/fit.py" line="166"/>
         <source>Def. error type</source>
-        <translation type="unfinished"></translation>
+        <translation>Определить тип ошибки</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/fit.py" line="170"/>
         <source>Default error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка по умолчанию</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/fit.py" line="173"/>
         <source>Minimum value at which to fit function</source>
-        <translation type="unfinished"></translation>
+        <translation>Минимальное значение для аппроксимации функции</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/fit.py" line="174"/>
@@ -4226,7 +4228,7 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/fit.py" line="177"/>
         <source>Maximum value at which to fit function</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимальное значение для аппроксимации функции</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/fit.py" line="178"/>
@@ -4528,32 +4530,32 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="50"/>
         <source>3D function</source>
-        <translation type="unfinished"></translation>
+        <translation>3D функция</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="111"/>
         <source>Number of steps to evaluate the function over for lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Количество шагов для оценки функции по линиям</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="112"/>
         <source>Line steps</source>
-        <translation type="unfinished"></translation>
+        <translation>Шаги линии</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="118"/>
         <source>Number of steps to evaluate the function over for surfaces in each direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Количество шагов для оценки функции по поверхностям в каждом направлении</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="121"/>
         <source>Surface steps</source>
-        <translation type="unfinished"></translation>
+        <translation>Шаги поверхности</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="126"/>
         <source>Type of function to plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип функции для печати</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="127"/>
@@ -4563,42 +4565,42 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="132"/>
         <source>Function for x coordinate</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция для координаты X</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="133"/>
         <source>X function</source>
-        <translation type="unfinished"></translation>
+        <translation>X функция</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="136"/>
         <source>Function for y coordinate</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция для координаты Y</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="137"/>
         <source>Y function</source>
-        <translation type="unfinished"></translation>
+        <translation>Y функция</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="140"/>
         <source>Function for z coordinate</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция для координаты Z</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="141"/>
         <source>Z function</source>
-        <translation type="unfinished"></translation>
+        <translation>Z функция</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="144"/>
         <source>Function to give color (0-1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция для задания цвета (0-1)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="145"/>
         <source>Color function</source>
-        <translation type="unfinished"></translation>
+        <translation>Цветовая функция</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="150"/>
@@ -4613,7 +4615,7 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="155"/>
         <source>Line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки линии</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="156"/>
@@ -4628,17 +4630,17 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="161"/>
         <source>Grid line</source>
-        <translation type="unfinished"></translation>
+        <translation>Линии сетки</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="165"/>
         <source>Surface fill settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройка заполнения поверхности</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/function3d.py" line="166"/>
         <source>Surface</source>
-        <translation type="unfinished"></translation>
+        <translation>Поверхность</translation>
     </message>
 </context>
 <context>
@@ -4832,42 +4834,42 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="43"/>
         <source>3d graph</source>
-        <translation type="unfinished"></translation>
+        <translation>3D график</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="80"/>
         <source>X size</source>
-        <translation type="unfinished"></translation>
+        <translation>Размер по X</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="85"/>
         <source>Y size</source>
-        <translation type="unfinished"></translation>
+        <translation>Размер по Y</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="90"/>
         <source>Z size</source>
-        <translation type="unfinished"></translation>
+        <translation>Размер по Z</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="96"/>
         <source>X position</source>
-        <translation type="unfinished"></translation>
+        <translation>Позиция X</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="101"/>
         <source>Y position</source>
-        <translation type="unfinished"></translation>
+        <translation>Позиция Y</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="106"/>
         <source>Z position</source>
-        <translation type="unfinished"></translation>
+        <translation>Позиция Z</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="110"/>
         <source>Graph border</source>
-        <translation type="unfinished"></translation>
+        <translation>Граница графика</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="111"/>
@@ -4877,12 +4879,12 @@ This Veusz only supports document version %i.</source>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="115"/>
         <source>Graph back</source>
-        <translation type="unfinished"></translation>
+        <translation>Фон графика</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/graph3d.py" line="116"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Фон</translation>
     </message>
 </context>
 <context>
@@ -5016,32 +5018,32 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="223"/>
         <source>Histogram of a dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Гистограмма набора данных</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="247"/>
         <source>Dataset to apply binning to</source>
-        <translation type="unfinished"></translation>
+        <translation>Набор данных для биннинга</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="248"/>
         <source>Bin dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Группировать набор данных</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="252"/>
         <source>Optional weight applied to counts of data</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительный вес, применяемый к подсчетам данных</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="253"/>
         <source>Weights</source>
-        <translation type="unfinished"></translation>
+        <translation>Веса</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="263"/>
         <source>Calculate when binning</source>
-        <translation type="unfinished"></translation>
+        <translation>Рассчитать при биннинге</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="264"/>
@@ -5051,17 +5053,17 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="275"/>
         <source>Binning mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим биннинга</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="276"/>
         <source>Binning</source>
-        <translation type="unfinished"></translation>
+        <translation>Биннинг</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="280"/>
         <source>Minimum of range</source>
-        <translation type="unfinished"></translation>
+        <translation>Минимум диапазона</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="281"/>
@@ -5071,7 +5073,7 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="284"/>
         <source>Maximum of range</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимум диапазона</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="285"/>
@@ -5081,17 +5083,17 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="291"/>
         <source>Data scaling before creating bins</source>
-        <translation type="unfinished"></translation>
+        <translation>Масштабирование данных перед созданием бинов</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="292"/>
         <source>Bin scaling</source>
-        <translation type="unfinished"></translation>
+        <translation>Масштабирование бинов</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="296"/>
         <source>Number of bins</source>
-        <translation type="unfinished"></translation>
+        <translation>Количество бинов</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="297"/>
@@ -5101,27 +5103,27 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="301"/>
         <source>Manual binning edges</source>
-        <translation type="unfinished"></translation>
+        <translation>Ручной биннинг краев</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="302"/>
         <source>Manual</source>
-        <translation type="unfinished"></translation>
+        <translation>Вручную</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="308"/>
         <source>Error estimation</source>
-        <translation type="unfinished"></translation>
+        <translation>Оценка ошибки</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="309"/>
         <source>Uncertainty</source>
-        <translation type="unfinished"></translation>
+        <translation>Неопределенность</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="315"/>
         <source>Bars direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Направление линий</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="316"/>
@@ -5141,7 +5143,7 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="328"/>
         <source>Drawing style</source>
-        <translation type="unfinished"></translation>
+        <translation>Стиль отрисовки</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="329"/>
@@ -5186,22 +5188,22 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/histo.py" line="355"/>
         <source>Fill under</source>
-        <translation type="unfinished"></translation>
+        <translation>Заполнить ниже</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="360"/>
         <source>Fill over</source>
-        <translation type="unfinished"></translation>
+        <translation>Заполнить выше</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="365"/>
         <source>Post line</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="370"/>
         <source>Line around marker</source>
-        <translation type="unfinished"></translation>
+        <translation>Линия около маркера</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/histo.py" line="371"/>
@@ -5467,12 +5469,12 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/image.py" line="179"/>
         <source>Map image using pixels or bound coordinates</source>
-        <translation type="unfinished"></translation>
+        <translation>Отображение изображения с использованием пикселей или заданных координат</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/image.py" line="180"/>
         <source>Mapping</source>
-        <translation type="unfinished"></translation>
+        <translation>Сопоставление</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/image.py" line="185"/>
@@ -5507,12 +5509,12 @@ by which to scale columns relative to each other.</source>
     <message>
         <location filename="./veusz/widgets/image.py" line="205"/>
         <source>Method for drawing output</source>
-        <translation type="unfinished"></translation>
+        <translation>Метод вывода изображения</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/image.py" line="206"/>
         <source>Draw Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим отрисовки</translation>
     </message>
 </context>
 <context>
@@ -5696,7 +5698,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="./veusz/plugins/importplugin.py" line="250"/>
         <source>Invalid 2D data in file</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимые 2D данные в файле</translation>
     </message>
     <message>
         <location filename="./veusz/plugins/importplugin.py" line="319"/>
@@ -6334,22 +6336,22 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/widgets/key.py" line="181"/>
         <source>Override default item order (comma separated names)</source>
-        <translation type="unfinished"></translation>
+        <translation>Переопределить порядок элементов по умолчанию (имена через запятую)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="182"/>
         <source>Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Порядок</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="186"/>
         <source>Exclude item from displaying (comma separated names)</source>
-        <translation type="unfinished"></translation>
+        <translation>Исключить элемент из отображения (имена через запятую)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="187"/>
         <source>Exclude</source>
-        <translation type="unfinished"></translation>
+        <translation>Исключить</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="191"/>
@@ -6474,12 +6476,12 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/widgets/key.py" line="272"/>
         <source>Reverse order of entries</source>
-        <translation type="unfinished"></translation>
+        <translation>Обратить порядок записей</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/key.py" line="273"/>
         <source>Reverse order</source>
-        <translation type="unfinished"></translation>
+        <translation>Обратить порядок</translation>
     </message>
 </context>
 <context>
@@ -6638,7 +6640,7 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="200"/>
         <source>Untrusted mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Недоверенный режим</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1168"/>
@@ -6686,42 +6688,42 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="435"/>
         <source>New graph document</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый документ с графиком</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="436"/>
         <source>&amp;New graph document</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Новый документ с графиком</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="441"/>
         <source>New polar plot document</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый документ с полярной диаграммой</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="442"/>
         <source>New polar document</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый документ с полярной диаграммой</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="447"/>
         <source>New ternary plot document</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый документ с тройной диаграммой</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="448"/>
         <source>New ternary document</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый документ с тройной диаграммой</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="453"/>
         <source>New 3D plot document</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый документ с 3D графикой</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="454"/>
         <source>New 3D document</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый документ с 3D графикой</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="459"/>
@@ -6766,12 +6768,12 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="474"/>
         <source>Trust document contents</source>
-        <translation type="unfinished"></translation>
+        <translation>Доверять содержимому документа</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="474"/>
         <source>Trust…</source>
-        <translation type="unfinished"></translation>
+        <translation>Доверять...</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="477"/>
@@ -7056,7 +7058,7 @@ Example syntax: 2:20
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="583"/>
         <source>Download latest version</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить последнюю версию</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="586"/>
@@ -7170,7 +7172,7 @@ If not, you can access it later through the Help menu.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="919"/>
         <source>Version check</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверка версии</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="920"/>
@@ -7178,29 +7180,34 @@ If not, you can access it later through the Help menu.</source>
 let you know if there is a new one available.
 
 Is this ok? This choice can be changed in Preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veusz будет периодически проверять наличие новых версий Veusz и
+сообщать вам, если таковая доступна.
+
+Вы согласны? Этот выбор можно изменить в настройках.</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="959"/>
         <source>Send automatic anonymous feedback</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправлять автоматические анонимные отзывы</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="960"/>
         <source>Veusz can automatically send anonymous feedback to the developers, with information about the version of software dependencies, the computer language and how often features are used.
 
 Is this ok? This choice can be changed in Preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veusz может автоматически отправлять анонимные отзывы разработчикам, содержащие информацию о версии программных зависимостей, языке компьютера и частоте использования функций.
+
+Вы согласны? Этот выбор можно изменить в настройках.</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="979"/>
         <source>Veusz %s is available for download - see Help menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Veusz %s доступен для скачивания - см. меню &quot;Справка&quot;</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="982"/>
         <source>Download new Veusz %s</source>
-        <translation type="unfinished"></translation>
+        <translation>Загрузить новый Veusz %s</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1002"/>
@@ -7263,19 +7270,21 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1216"/>
         <source>Import error</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка импортирования</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1218"/>
         <source>Could not import data from file &apos;%s&apos;:
 
  %s</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось импортировать данные из файла «%s»:
+
+%s</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1220"/>
         <source>Do you want to look for another file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Хотите поискать другой файл?</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1242"/>
@@ -7345,12 +7354,12 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1485"/>
         <source>Potentially unsafe code in document</source>
-        <translation type="unfinished"></translation>
+        <translation>Потенциально небезопасный код в документе</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1486"/>
         <source>&lt;p&gt;&lt;b&gt;The document &apos;%s&apos; contains potentially unsafe code&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Directory: &apos;%s&apos;&lt;/p&gt;&lt;p&gt;This file could damage your computer or data as it can contain arbitrary code. Please check that the file was made by you or a trusted source.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;Документ «%s» содержит потенциально небезопасный код&lt;/p&gt;&lt;p&gt;Каталог: «%s»&lt;/p&gt;&lt;p&gt;Этот файл может повредить ваш компьютер или данные, так как он может содержать произвольный код. Пожалуйста, убедитесь, что файл был создан вами или доверенным источником.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1500"/>
@@ -7360,27 +7369,27 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1501"/>
         <source>Add to trusted locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить в доверенные расположения</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1503"/>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Пропустить</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1543"/>
         <source>Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены?</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1516"/>
         <source>Are you really sure that you want to add directory &apos;%s&apos; to the list of trusted locations. Any file loaded from this directory will be trusted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы действительно хотите добавить каталог &apos;%s&apos; в список надежных расположений? Любой файл, загруженный из этого каталога, будет считаться доверенным.</translation>
     </message>
     <message>
         <location filename="./veusz/windows/mainwindow.py" line="1544"/>
         <source>Are you sure that you want to trust the document contents, including any potentially dangerous code? Only trust documents with a trusted source.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы уверены, что хотите доверять содержимому документа, включая любой потенциально опасный код? Доверяйте только документам из надежного источника.</translation>
     </message>
 </context>
 <context>
@@ -7890,7 +7899,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/page.py" line="310"/>
         <source>Background page fill</source>
-        <translation type="unfinished"></translation>
+        <translation>Заполнить фон страницы</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/page.py" line="311"/>
@@ -8071,7 +8080,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="431"/>
         <source>Click or draw a rectangle to zoom graph axes</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите или нарисуйте прямоугольник, чтобы увеличить оси графика</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="432"/>
@@ -8081,32 +8090,32 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="437"/>
         <source>Click to zoom out of graph axes</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите, чтобы уменьшить масштаб осей графика</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="438"/>
         <source>Zoom out of graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Уменьшить масштаб графика</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="443"/>
         <source>Click to recenter graph axes</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите, чтобы перецентрировать оси графика</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="444"/>
         <source>Recenter graph</source>
-        <translation type="unfinished"></translation>
+        <translation>Перецентрировать график</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="449"/>
         <source>Click to reset graph axes</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите, чтобы сбросить оси графика</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="450"/>
         <source>Reset axes</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить оси</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="454"/>
@@ -8126,22 +8135,22 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="696"/>
         <source>recenter graph</source>
-        <translation type="unfinished"></translation>
+        <translation>перецентрировать график</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="698"/>
         <source>zoom into axes</source>
-        <translation type="unfinished"></translation>
+        <translation>увеличить оси</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="700"/>
         <source>zoom out of axes</source>
-        <translation type="unfinished"></translation>
+        <translation>уменьшить оси</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="722"/>
         <source>reset axes</source>
-        <translation type="unfinished"></translation>
+        <translation>сбросить оси</translation>
     </message>
     <message>
         <location filename="./veusz/windows/plotwindow.py" line="1145"/>
@@ -8262,12 +8271,12 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/plotters3d.py" line="61"/>
         <source>Name of Z-axis to use</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя оси Z для использования</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/plotters3d.py" line="62"/>
         <source>Z axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Ось Z</translation>
     </message>
 </context>
 <context>
@@ -8298,7 +8307,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="42"/>
         <source>If color markers dataset is given, use this colormap for the line color</source>
-        <translation type="unfinished"></translation>
+        <translation>Если задан набор данных цветовых маркеров, используйте эту цветовую карту для цвета линии</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="45"/>
@@ -8318,7 +8327,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="68"/>
         <source>Scale border with marker size</source>
-        <translation type="unfinished"></translation>
+        <translation>Масштабировать границу с размером маркера</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="69"/>
@@ -8328,17 +8337,17 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="82"/>
         <source>3D points</source>
-        <translation type="unfinished"></translation>
+        <translation>3D точки</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="91"/>
         <source>Z values, given by dataset, expression or list of values</source>
-        <translation type="unfinished"></translation>
+        <translation>Значения Z, заданные набором данных, выражением или списком значений</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="92"/>
         <source>Z data</source>
-        <translation type="unfinished"></translation>
+        <translation>Данные Z</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="95"/>
@@ -8373,17 +8382,17 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="114"/>
         <source>Scale marker size using perspective</source>
-        <translation type="unfinished"></translation>
+        <translation>Масштабирование размера маркера с использованием перспективы</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="115"/>
         <source>Perspective</source>
-        <translation type="unfinished"></translation>
+        <translation>Перспектива</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="120"/>
         <source>Size of markers (relative to plot)</source>
-        <translation type="unfinished"></translation>
+        <translation>Размер маркеров (относительно графика)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="121"/>
@@ -8433,7 +8442,7 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="147"/>
         <source>Marker border settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки границ маркера</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="148"/>
@@ -8443,12 +8452,12 @@ Is this ok? This choice can be changed in Preferences.</source>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="152"/>
         <source>Error bar settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки полосы погрешностей</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point3d.py" line="153"/>
         <source>Error bar</source>
-        <translation type="unfinished"></translation>
+        <translation>Полоса погрешностей</translation>
     </message>
 </context>
 <context>
@@ -8744,12 +8753,12 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="123"/>
         <source>Translation</source>
-        <translation type="unfinished"></translation>
+        <translation>Перевод</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load an externally-provided translation file on startup&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Загрузить внешний файл перевода при запуске&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="493"/>
@@ -8764,7 +8773,7 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="155"/>
         <source>Document default directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Каталог документов по умолчанию</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="241"/>
@@ -8789,52 +8798,52 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./ui/preferences.ui" line="178"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If set, the document location is recorded when saved, so linked data can be loaded using relative paths later if the document is moved.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Если включено, местоположение документа записывается при сохранении, так что связанные данные могут быть загружены с использованием относительных путей позже, если документ будет перемещен.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="181"/>
         <source>Add import paths</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить пути импорта</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="191"/>
         <source>Export filename templates</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт шаблонов имени файла</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="197"/>
         <source>Multiple files</source>
-        <translation type="unfinished"></translation>
+        <translation>Несколько файлов</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="204"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Template filename when exorting to multiple files. This can include %DOCNAME% for the document name, %PAGENAME% for the page name and %PAGE% for the page number. %PAGE00% and %PAGE000% force two and three-character page numbers. An extension is automatically added.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Имя файла шаблона при экспорте в несколько файлов. Может включать %DOCNAME% для имени документа, %PAGENAME% для имени страницы и %PAGE% для номера страницы. %PAGE00% и %PAGE000% принудительно задают двух- и трехзначные номера страниц. Расширение добавляется автоматически.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="211"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Template filename when written to a single file. This can include %DOCNAME% for the document name. A filename extension is automatically added.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Имя файла шаблона при экспорте в несколько файлов. Может включать %DOCNAME% для имени документа, %PAGENAME% для имени страницы и %PAGE% для номера страницы. %PAGE00% и %PAGE000% принудительно задают двух- и трехзначные номера страниц. Расширение добавляется автоматически.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="218"/>
         <source>Single file</source>
-        <translation type="unfinished"></translation>
+        <translation>Один файл</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="228"/>
         <source>Export default directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт каталога по умолчанию</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="234"/>
         <source>Document director&amp;y</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Каталог документа</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="248"/>
         <source>Curren&amp;t working directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущий &amp;рабочий каталог</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="259"/>
@@ -8854,12 +8863,12 @@ Set to 0 to disable threads.</source>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="286"/>
         <source>Translation file (*.qm)</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл перевода (*.qm)</translation>
     </message>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="286"/>
         <source>Choose translation file</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать файл перевода</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="290"/>
@@ -8918,7 +8927,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="323"/>
         <source>Choose ghostscript executable</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите исполняемый файл Ghostscript</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="331"/>
@@ -8928,7 +8937,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/dialogs/preferences.py" line="336"/>
         <source>Choose secure directory to add</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите безопасный каталог для добавления</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="337"/>
@@ -8953,7 +8962,7 @@ to be loaded.</source>
     <message>
         <location filename="./ui/preferences.ui" line="386"/>
         <source>Number of significant figures to show</source>
-        <translation type="unfinished"></translation>
+        <translation>Количество значащих цифр для отображения</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="406"/>
@@ -8988,37 +8997,37 @@ to be loaded.</source>
     <message>
         <location filename="./ui/preferences.ui" line="472"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter a colon-separated list of directories to be added to the beginning of the Python path. This can be used to find Python modules located in non-default locations. Changing this setting requires a restart.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Введите список каталогов, разделенных двоеточиями, которые будут добавлены в начало пути Python. Это можно использовать для поиска модулей Python, расположенных в нестандартных местах. Изменение этого параметра требует перезапуска.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="479"/>
         <source>Ghostscript location</source>
-        <translation type="unfinished"></translation>
+        <translation>Расположение Ghostscript</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="486"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Location of the Ghostscript executable. Used for creating EPS files. On Linux/Unix the PATH will be searched if this is not set. Requires a restart after changing.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Расположение исполняемого файла Ghostscript. Используется для создания файлов EPS. В Linux/Unix будет выполнен поиск по PATH, если этот параметр не установлен. Требуется перезапуск после изменения.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="500"/>
         <source>Disable new version checks</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключить проверку новых версий</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="507"/>
         <source>Disable sending automatic feedback</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключить отправку автоматических отзывов</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="515"/>
         <source>Security</source>
-        <translation type="unfinished"></translation>
+        <translation>Безопасность</translation>
     </message>
     <message>
         <location filename="./ui/preferences.ui" line="521"/>
         <source>Trust contents of documents in these directories or folders. Documents stored here or in subdirectories will be able to contain arbitrary Python code without warnings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Доверяйте содержимому документов в этих каталогах или папках. Документы, хранящиеся здесь или в подкаталогах, смогут содержать произвольный код Python без предупреждений.</translation>
     </message>
 </context>
 <context>
@@ -9165,52 +9174,52 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="51"/>
         <source>3d scene</source>
-        <translation type="unfinished"></translation>
+        <translation>3D сцена</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="62"/>
         <source>Rotation around x axis (°)</source>
-        <translation type="unfinished"></translation>
+        <translation>Вращение вокруг оси X (°)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="63"/>
         <source>X rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Поворот по X</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="68"/>
         <source>Rotation around y axis (°)</source>
-        <translation type="unfinished"></translation>
+        <translation>Вращение вокруг оси Y (°)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="69"/>
         <source>Y rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Поворот по Y</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="74"/>
         <source>Rotation around z axis (°)</source>
-        <translation type="unfinished"></translation>
+        <translation>Вращение вокруг оси Z (°)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="75"/>
         <source>Z rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Поворот по Z</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="81"/>
         <source>Viewing distance</source>
-        <translation type="unfinished"></translation>
+        <translation>Расстояние просмотра</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="82"/>
         <source>Distance</source>
-        <translation type="unfinished"></translation>
+        <translation>Расстояние</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="88"/>
         <source>Automatic or fixed graph size scaling value</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматическое или фиксированное значение масштабирования размера графика</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="89"/>
@@ -9220,12 +9229,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="98"/>
         <source>Render method</source>
-        <translation type="unfinished"></translation>
+        <translation>Метод рендеринга</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="99"/>
         <source>Method used to draw 3D plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Метод, используемый для построения 3D-графика</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="104"/>
@@ -9270,17 +9279,17 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="129"/>
         <source>Lighting (1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Освещение (1)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="134"/>
         <source>Lighting (2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Освещение (2)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/scene3d.py" line="139"/>
         <source>Lighting (3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Освещение (3)</translation>
     </message>
 </context>
 <context>
@@ -9368,12 +9377,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="111"/>
         <source>Line style (linear/curved) to connect points</source>
-        <translation type="unfinished"></translation>
+        <translation>Стиль линии (прямая/кривая) для соединения точек</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="112"/>
         <source>Interpolation</source>
-        <translation type="unfinished"></translation>
+        <translation>Интерполяция</translation>
     </message>
     <message>
         <location filename="./veusz/setting/stylesheet.py" line="113"/>
@@ -9418,7 +9427,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/stylesheet.py" line="136"/>
         <source>Default font style</source>
-        <translation type="unfinished"></translation>
+        <translation>Стиль шрифта по умолчанию</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="146"/>
@@ -9563,7 +9572,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="363"/>
         <source>Font style</source>
-        <translation type="unfinished"></translation>
+        <translation>Стиль шрифта</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="367"/>
@@ -9633,7 +9642,7 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="444"/>
         <source>Use color value (0-1) in dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Используйте значение цвета (0-1) в наборе данных</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="449"/>
@@ -9668,22 +9677,22 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="539"/>
         <source>Reflectivity percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Процент отражательности</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="540"/>
         <source>Reflectivity</source>
-        <translation type="unfinished"></translation>
+        <translation>Отражательность</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="529"/>
         <source>Color of surface</source>
-        <translation type="unfinished"></translation>
+        <translation>Цвет поверхности</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="543"/>
         <source>Hide surface</source>
-        <translation type="unfinished"></translation>
+        <translation>Спрятать поверхность</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="584"/>
@@ -9708,67 +9717,67 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/collections.py" line="601"/>
         <source>Hide horizontal lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть горизонтальные линии</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="605"/>
         <source>Hide vertical lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть вертикальные линии</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="616"/>
         <source>Enable lighting</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить освещение</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="617"/>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="620"/>
         <source>Color of lighting</source>
-        <translation type="unfinished"></translation>
+        <translation>Цвет освещения</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="625"/>
         <source>Light intensity percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Процент интенсивности света</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="626"/>
         <source>Intensity</source>
-        <translation type="unfinished"></translation>
+        <translation>Интенсивность</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="630"/>
         <source>X coordinate of light (positive is right)</source>
-        <translation type="unfinished"></translation>
+        <translation>Координата X света (положительная — вправо)</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="631"/>
         <source>X position</source>
-        <translation type="unfinished"></translation>
+        <translation>Позиция X</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="635"/>
         <source>Y coordinate of light (positive is below)</source>
-        <translation type="unfinished"></translation>
+        <translation>Координата Y света (положительная — ниже)</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="636"/>
         <source>Y position</source>
-        <translation type="unfinished"></translation>
+        <translation>Позиция Y</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="640"/>
         <source>Z coordinate of light (positive is towards viewer)</source>
-        <translation type="unfinished"></translation>
+        <translation>Координата Z света (положительная — к наблюдателю)</translation>
     </message>
     <message>
         <location filename="./veusz/setting/collections.py" line="641"/>
         <source>Z position</source>
-        <translation type="unfinished"></translation>
+        <translation>Позиция Z</translation>
     </message>
     <message>
         <location filename="./veusz/setting/controls.py" line="716"/>
@@ -9823,12 +9832,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/setting/controls.py" line="1824"/>
         <source>Choose SVG file</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите файл SVG</translation>
     </message>
     <message>
         <location filename="./veusz/setting/controls.py" line="1894"/>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>по умолчанию</translation>
     </message>
 </context>
 <context>
@@ -9971,32 +9980,32 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/shape.py" line="398"/>
         <source>Scalable vector graphic file</source>
-        <translation type="unfinished"></translation>
+        <translation>Масштабируемый векторный графический файл</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="411"/>
         <source>Embed scalable vector graphic in Veusz document to remove dependency on external file</source>
-        <translation type="unfinished"></translation>
+        <translation>Встроить масштабируемую векторную графику в документ Veusz, чтобы устранить зависимость от внешнего файла</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="414"/>
         <source>Embed SVG</source>
-        <translation type="unfinished"></translation>
+        <translation>Встроить SVG</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="423"/>
         <source>SVG filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя файла SVG</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="430"/>
         <source>Embedded scalable vector graphic data, used if filename set to {embedded}</source>
-        <translation type="unfinished"></translation>
+        <translation>Встроенные масштабируемые векторные графические данные, используются, если имя файла установлено {embedded}</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/shape.py" line="471"/>
         <source>embed SVG</source>
-        <translation type="unfinished"></translation>
+        <translation>встроить SVG</translation>
     </message>
 </context>
 <context>
@@ -10085,12 +10094,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="39"/>
         <source>3D surface</source>
-        <translation type="unfinished"></translation>
+        <translation>3D поверхность</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="62"/>
         <source>Axes of plot surface</source>
-        <translation type="unfinished"></translation>
+        <translation>Оси поверхности</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="63"/>
@@ -10110,12 +10119,12 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="74"/>
         <source>High resolution surface (accurate bin centres)</source>
-        <translation type="unfinished"></translation>
+        <translation>Поверхность высокого разрешения (точные центры бинов)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="75"/>
         <source>High res.</source>
-        <translation type="unfinished"></translation>
+        <translation>Высокое разр.</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="80"/>
@@ -10125,17 +10134,17 @@ to be loaded.</source>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="81"/>
         <source>Grid line</source>
-        <translation type="unfinished"></translation>
+        <translation>Линии сетки</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="85"/>
         <source>Surface fill settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройка заполнения поверхности</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/surface3d.py" line="86"/>
         <source>Surface</source>
-        <translation type="unfinished"></translation>
+        <translation>Поверхность</translation>
     </message>
 </context>
 <context>
@@ -10719,12 +10728,12 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="327"/>
         <source>Hidden (click to show; set hide to False)</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыто (нажмите, чтобы показать; установите hide в False)</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="330"/>
         <source>Visible (click to hide; set hide to True)</source>
-        <translation type="unfinished"></translation>
+        <translation>Видимый (нажмите, чтобы скрыть; установите hide в True)</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="617"/>
@@ -10789,12 +10798,12 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="986"/>
         <source>Copy the current page as svg image</source>
-        <translation type="unfinished"></translation>
+        <translation>Скопировать текущую страницу как изображение SVG</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="986"/>
         <source>&amp;Copy as Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать как &amp;Изображение</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="990"/>
@@ -10844,7 +10853,7 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1010"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1014"/>
@@ -10879,7 +10888,7 @@ Hint: Use a &quot;*&quot; in the name of a replacement dataset to match multiple
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1204"/>
         <source>Error while exporting images</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при экспорте изображений</translation>
     </message>
     <message>
         <location filename="./veusz/windows/treeeditwindow.py" line="1428"/>
@@ -11340,7 +11349,13 @@ can see datasets in more detail in the Data Edit dialog box.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;The flashing icon adds a point plotting (xy)
 widget. Click on this, or go to the Insert menu and choose &quot;Add xy&quot;.&lt;/p&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+&lt;h1&gt;Построение графиков данных&lt;/h1&gt;
+
+&lt;p&gt;Виджет построения точек отображает наборы данных, загруженные в Veusz.&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;Мигающий значок добавляет виджет построения точек (xy).
+Нажмите на него или перейдите в меню «Вставка» и выберите «Добавить xy».&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="./veusz/windows/tutorial.py" line="464"/>
@@ -11413,7 +11428,14 @@ Change the fill color of the plotted data.&lt;/p&gt;
 &lt;p class=&quot;usercmd&quot;&gt;Add a second point plotting (xy) widget using the
 flashing icon, or go to the Insert menu and choose &quot;Add xy&quot;.&lt;/p&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+&lt;h1&gt;Добавление второго набора данных&lt;/h1&gt;
+
+&lt;p&gt;Теперь мы построим график набора данных &lt;code&gt;alpha&lt;/code&gt; относительно
+&lt;code&gt;gamma&lt;/code&gt; на том же графике.&lt;/p&gt;
+
+&lt;p class=&quot;usercmd&quot;&gt;Добавьте второй виджет для построения точек (xy), используя
+мигающий значок, или перейдите в меню «Вставка» и выберите «Добавить xy».&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="./veusz/windows/tutorial.py" line="549"/>
@@ -11788,12 +11810,12 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="64"/>
         <source>3D volume</source>
-        <translation type="unfinished"></translation>
+        <translation>3D объем</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="73"/>
         <source>Transparency dataset, optional, 0-1</source>
-        <translation type="unfinished"></translation>
+        <translation>Набор данных прозрачности, необязательно, 0-1</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="107"/>
@@ -11803,17 +11825,17 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="77"/>
         <source>Z dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Набор данных Z</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="78"/>
         <source>Z data</source>
-        <translation type="unfinished"></translation>
+        <translation>Данные Z</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="81"/>
         <source>Y dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Набор данных Y</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="82"/>
@@ -11823,7 +11845,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="85"/>
         <source>X dataset</source>
-        <translation type="unfinished"></translation>
+        <translation>Набор данных X</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="86"/>
@@ -11858,32 +11880,32 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="115"/>
         <source>Reflectivity percentage</source>
-        <translation type="unfinished"></translation>
+        <translation>Процент отражательности</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="116"/>
         <source>Reflectivity</source>
-        <translation type="unfinished"></translation>
+        <translation>Отражательность</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="122"/>
         <source>Filling factor (0-1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Коэффициент заполнения (0-1)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="123"/>
         <source>Fill factor</source>
-        <translation type="unfinished"></translation>
+        <translation>Коэффициент заполнения</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="129"/>
         <source>Line settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки линии</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/volume3d.py" line="130"/>
         <source>Box line</source>
-        <translation type="unfinished"></translation>
+        <translation>Линия бокса</translation>
     </message>
 </context>
 <context>
@@ -11898,9 +11920,6 @@ developers via the mailing list.&lt;/p&gt;
         <source>Hide</source>
         <translation>Скрыть</translation>
     </message>
-</context>
-<context>
-    <name>WidgetTree</name>
 </context>
 <context>
     <name>WorkerPluginDialog</name>
@@ -11945,12 +11964,12 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/point.py" line="345"/>
         <source>Use new marker sizes with equal area</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать новые размеры маркеров с равной площадью</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="346"/>
         <source>New marker sizes</source>
-        <translation type="unfinished"></translation>
+        <translation>Новые размеры маркеров</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="354"/>
@@ -12000,12 +12019,12 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/point.py" line="388"/>
         <source>NaN values are used to break datasets into parts at their locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Значения NaN используются для разделения наборов данных на части по их местоположениям</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="389"/>
         <source>NaN values cause data in their locations to be ignored</source>
-        <translation type="unfinished"></translation>
+        <translation>Значения NaN приводят к игнорированию данных в их местоположениях</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="396"/>
@@ -12075,7 +12094,7 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/point.py" line="438"/>
         <source>Line around marker</source>
-        <translation type="unfinished"></translation>
+        <translation>Линия около маркера</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/point.py" line="439"/>
@@ -12138,27 +12157,27 @@ developers via the mailing list.&lt;/p&gt;
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="926"/>
         <source>Click and drag to rotate in x and y (hold Ctrl for x and z)</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите и перетащите для вращения по осям X и Y (удерживайте Ctrl для осей X и Z)</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="932"/>
         <source>Click and drag to rotate in y</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите и перетащите для вращения по оси Y</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="938"/>
         <source>Click and drag to rotate in x</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите и перетащите для вращения по оси X</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="944"/>
         <source>Click and drag to rotate in z</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите и перетащите для вращения по оси Z</translation>
     </message>
     <message>
         <location filename="./veusz/widgets/controlgraph.py" line="1028"/>
         <source>rotate scene</source>
-        <translation type="unfinished"></translation>
+        <translation>повернуть сцену</translation>
     </message>
 </context>
 <context>
