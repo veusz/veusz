@@ -425,19 +425,14 @@ class AsyncExport(qt.QObject):
         """Get DPI to use for filename extension."""
 
         if ext in {'.pdf', '.eps', '.ps'}:
-            # find closest resolution to supported resolution (usually 72)
+            # Use the same resolution as ExportPDFRunnable. The PDF engine's
+            # supportedResolutions() reports only 72 DPI, even though it accepts
+            # other resolutions. Snapping to that list would record drawing at
+            # a different DPI from the output device and change its physical size.
             printer = qt.QPrinter()
             printer.setOutputFormat(qt.QPrinter.OutputFormat.PdfFormat)
-            res = None
-            delta = 9e99
-            for dpi in printer.supportedResolutions():
-                d = abs(dpi-self.pdfdpi)
-                if d<delta:
-                    delta = d
-                    res = dpi
-            if res is None:
-                res = 72
-            return (res, res)
+            printer.setResolution(self.pdfdpi)
+            return (printer.logicalDpiX(), printer.logicalDpiY())
 
         elif ext in {'.png', '.jpg', '.jpeg', '.bmp', '.tiff', '.xpm', '.webp'}:
             return (self.bitmapdpi, self.bitmapdpi)
