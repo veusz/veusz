@@ -107,8 +107,169 @@ class Edit(qt.QLineEdit):
         """called when the setting is changed remotely"""
         self.setText( self.setting.toUIText() )
 
-class _EditBox(qt.QTextEdit):
-    """A popup edit box to support editing long text sections.
+class GridPaletteMenu(qt.QMenu):
+    """A popup menu displaying a grid of clickable character buttons."""
+
+    def __init__(self, title, items, on_select, parent=None, cols=8):
+        qt.QMenu.__init__(self, title, parent)
+        self.on_select = on_select
+
+        widget = qt.QWidget(self)
+        grid = qt.QGridLayout(widget)
+        grid.setContentsMargins(4, 4, 4, 4)
+        grid.setSpacing(2)
+
+        for i, (display_char, insert_val, tooltip) in enumerate(items):
+            btn = qt.QPushButton(display_char)
+            btn.setFixedSize(28, 26)
+            btn.setToolTip(f"{tooltip} ({insert_val})")
+            btn.setStyleSheet("QPushButton { padding: 0; font-size: 11pt; }")
+            btn.clicked.connect(lambda _, val=insert_val: self._itemClicked(val))
+            grid.addWidget(btn, i // cols, i % cols)
+
+        action = qt.QWidgetAction(self)
+        action.setDefaultWidget(widget)
+        self.addAction(action)
+
+    def _itemClicked(self, val):
+        self.close()
+        self.on_select(val)
+
+class TextFormatToolbar(qt.QWidget):
+    """A compact formatting toolbar (LabPlot style) for LaTeX-like text markup."""
+
+    def __init__(self, textwidget=None, parent=None):
+        qt.QWidget.__init__(self, parent)
+        self.textwidget = textwidget
+
+        layout = qt.QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(2)
+        self.setLayout(layout)
+
+        btn_style = (
+            "QPushButton { min-width: 22px; max-width: 26px; height: 22px; padding: 0px; font-size: 9pt; }"
+        )
+
+        def addBtn(text, tooltip, callback, bold=False, italic=False, underline=False):
+            btn = qt.QPushButton(text)
+            btn.setToolTip(tooltip)
+            font = btn.font()
+            if bold:
+                font.setBold(True)
+            if italic:
+                font.setItalic(True)
+            if underline:
+                font.setUnderline(True)
+            btn.setFont(font)
+            btn.setStyleSheet(btn_style)
+            btn.clicked.connect(callback)
+            layout.addWidget(btn)
+            return btn
+
+        addBtn("B", _("Bold (\\bold{...}) [Ctrl+B]"), lambda: self.wrapSelection(r"\bold{", "}"), bold=True)
+        addBtn("I", _("Italic (\\italic{...}) [Ctrl+I]"), lambda: self.wrapSelection(r"\italic{", "}"), italic=True)
+        addBtn("U", _("Underline (\\underline{...}) [Ctrl+U]"), lambda: self.wrapSelection(r"\underline{", "}"), underline=True)
+        addBtn("x²", _("Superscript (^{...})"), lambda: self.wrapSelection("^{", "}"))
+        addBtn("x₂", _("Subscript (_{...})"), lambda: self.wrapSelection("_{", "}"))
+        addBtn("a/b", _("Fraction (\\frac{...}{...})"), lambda: self.wrapSelection(r"\frac{", "}{}"))
+
+        line = qt.QFrame()
+        line.setFrameShape(qt.QFrame.Shape.VLine)
+        line.setFrameShadow(qt.QFrame.Shadow.Sunken)
+        layout.addWidget(line)
+
+        greek_btn = qt.QPushButton("α▾")
+        greek_btn.setToolTip(_("Insert Greek character"))
+        greek_btn.setStyleSheet(btn_style)
+        self.greek_menu = self._buildGreekMenu()
+        greek_btn.setMenu(self.greek_menu)
+        layout.addWidget(greek_btn)
+
+        sym_btn = qt.QPushButton("±▾")
+        sym_btn.setToolTip(_("Insert mathematical / scientific symbol"))
+        sym_btn.setStyleSheet(btn_style)
+        self.sym_menu = self._buildSymbolMenu()
+        sym_btn.setMenu(self.sym_menu)
+        layout.addWidget(sym_btn)
+
+        layout.addStretch()
+
+    def setTextWidget(self, widget):
+        self.textwidget = widget
+
+    def wrapSelection(self, prefix, suffix="}"):
+        w = self.textwidget
+        if isinstance(w, qt.QTextEdit):
+            cursor = w.textCursor()
+            if cursor.hasSelection():
+                selected = cursor.selectedText()
+                cursor.insertText(f"{prefix}{selected}{suffix}")
+            else:
+                pos = cursor.position()
+                cursor.insertText(f"{prefix}{suffix}")
+                cursor.setPosition(pos + len(prefix))
+                w.setTextCursor(cursor)
+            w.setFocus()
+        elif isinstance(w, qt.QLineEdit):
+            if w.hasSelectedText():
+                start = w.selectionStart()
+                length = w.selectionLength()
+                selected = w.selectedText()
+                full_text = w.text()
+                new_text = full_text[:start] + f"{prefix}{selected}{suffix}" + full_text[start+length:]
+                w.setText(new_text)
+                w.setCursorPosition(start + len(prefix) + len(selected) + len(suffix))
+            else:
+                pos = w.cursorPosition()
+                full_text = w.text()
+                new_text = full_text[:pos] + f"{prefix}{suffix}" + full_text[pos:]
+                w.setText(new_text)
+                w.setCursorPosition(pos + len(prefix))
+            w.setFocus()
+
+    def insertText(self, text):
+        w = self.textwidget
+        if isinstance(w, qt.QTextEdit):
+            w.textCursor().insertText(text)
+            w.setFocus()
+        elif isinstance(w, qt.QLineEdit):
+            w.insert(text)
+            w.setFocus()
+
+    def _buildGreekMenu(self):
+        items = [
+            ("α", r"\alpha", "alpha"), ("β", r"\beta", "beta"), ("γ", r"\gamma", "gamma"),
+            ("δ", r"\delta", "delta"), ("ε", r"\epsilon", "epsilon"), ("ζ", r"\zeta", "zeta"),
+            ("η", r"\eta", "eta"), ("θ", r"\theta", "theta"), ("ι", r"\iota", "iota"),
+            ("κ", r"\kappa", "kappa"), ("λ", r"\lambda", "lambda"), ("μ", r"\mu", "mu"),
+            ("ν", r"\nu", "nu"), ("ξ", r"\xi", "xi"), ("π", r"\pi", "pi"),
+            ("ρ", r"\rho", "rho"), ("σ", r"\sigma", "sigma"), ("τ", r"\tau", "tau"),
+            ("υ", r"\upsilon", "upsilon"), ("φ", r"\phi", "phi"), ("χ", r"\chi", "chi"),
+            ("ψ", r"\psi", "psi"), ("ω", r"\omega", "omega"),
+            ("Γ", r"\Gamma", "Gamma"), ("Δ", r"\Delta", "Delta"), ("Θ", r"\Theta", "Theta"),
+            ("Λ", r"\Lambda", "Lambda"), ("Ξ", r"\Xi", "Xi"), ("Π", r"\Pi", "Pi"),
+            ("Σ", r"\Sigma", "Sigma"), ("Φ", r"\Phi", "Phi"), ("Ψ", r"\Psi", "Psi"),
+            ("Ω", r"\Omega", "Omega"),
+        ]
+        return GridPaletteMenu(_("Greek Letters"), items, self.insertText, self, cols=8)
+
+    def _buildSymbolMenu(self):
+        items = [
+            ("±", r"\pm", "plus-minus"), ("∓", r"\mp", "minus-plus"), ("×", r"\times", "multiply"),
+            ("·", r"\cdot", "center dot"), ("÷", r"\divide", "divide"), ("°", r"\deg", "degree"),
+            ("≤", r"\le", "less or equal"), ("≥", r"\ge", "greater or equal"), ("≠", r"\neq", "not equal"),
+            ("≈", r"\approx", "approximately"), ("≡", r"\equiv", "equivalent"), ("∝", r"\propto", "proportional"),
+            ("∞", r"\infty", "infinity"), ("√", r"\sqrt{}", "square root"), ("Å", r"\AA", "Angstrom"),
+            ("→", r"\to", "right arrow"), ("←", r"\leftarrow", "left arrow"), ("↑", r"\uparrow", "up arrow"),
+            ("↓", r"\downarrow", "down arrow"), ("↔", r"\leftrightarrow", "left-right arrow"),
+            ("∇", r"\nabla", "nabla"), ("∂", r"\partial", "partial"), ("∫", r"\int", "integral"),
+            ("∑", r"\sum", "sum"),
+        ]
+        return GridPaletteMenu(_("Symbols"), items, self.insertText, self, cols=8)
+
+class _EditBox(qt.QFrame):
+    """A popup edit box with a formatting toolbar (LabPlot style).
 
     Emits closing(text) when the box closes
     """
@@ -116,61 +277,81 @@ class _EditBox(qt.QTextEdit):
     closing = qt.pyqtSignal(str)
 
     def __init__(self, origtext, readonly, parent):
-        """Make a popup, framed widget containing a text editor."""
-
-        qt.QTextEdit.__init__(self, parent)
+        qt.QFrame.__init__(self, parent)
         self.setWindowFlags(qt.Qt.WindowType.Popup)
         self.setAttribute(qt.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.setFrameShape(qt.QFrame.Shape.StyledPanel)
+        self.setFrameShadow(qt.QFrame.Shadow.Raised)
 
         self.spacing = self.fontMetrics().height()
-
         self.origtext = origtext
-        self.setPlainText(origtext)
 
-        cursor = self.textCursor()
+        layout = qt.QVBoxLayout()
+        layout.setContentsMargins(4, 4, 4, 4)
+        layout.setSpacing(4)
+        self.setLayout(layout)
+
+        self.toolbar = TextFormatToolbar(parent=self)
+        layout.addWidget(self.toolbar)
+
+        self.textedit = qt.QTextEdit(self)
+        self.textedit.setPlainText(origtext)
+        self.toolbar.setTextWidget(self.textedit)
+        layout.addWidget(self.textedit)
+
+        cursor = self.textedit.textCursor()
         cursor.movePosition(qt.QTextCursor.MoveOperation.End)
-        self.setTextCursor(cursor)
+        self.textedit.setTextCursor(cursor)
 
         if readonly:
-            self.setReadOnly(True)
+            self.textedit.setReadOnly(True)
 
         utils.positionFloatingPopup(self, parent)
 
         self.installEventFilter(self)
+        self.textedit.installEventFilter(self)
 
     def eventFilter(self, obj, event):
-        """Grab clicks outside this window to close it."""
+        """Grab clicks outside this window to close it, and handle shortcuts."""
+        if obj is self.textedit and event.type() == qt.QEvent.Type.KeyPress:
+            key = event.key()
+            modifiers = event.modifiers()
+            if modifiers & qt.Qt.KeyboardModifier.ControlModifier:
+                if key == qt.Qt.Key.Key_B:
+                    self.toolbar.wrapSelection(r"\bold{", "}")
+                    return True
+                elif key == qt.Qt.Key.Key_I:
+                    self.toolbar.wrapSelection(r"\italic{", "}")
+                    return True
+                elif key == qt.Qt.Key.Key_U:
+                    self.toolbar.wrapSelection(r"\underline{", "}")
+                    return True
+
+            if key == qt.Qt.Key.Key_Escape:
+                self.textedit.setPlainText(self.origtext)
+                self.close()
+                return True
+            elif key in (qt.Qt.Key.Key_Return, qt.Qt.Key.Key_Enter):
+                if not (modifiers & qt.Qt.KeyboardModifier.ShiftModifier):
+                    self.close()
+                    return True
+
         if ( isinstance(event, qt.QMouseEvent) and
              event.buttons() != qt.Qt.MouseButton.NoButton ):
             frame = qt.QRect(0, 0, self.width(), self.height())
             if not frame.contains(event.pos()):
                 self.close()
                 return True
-        return qt.QTextEdit.eventFilter(self, obj, event)
 
-    def keyPressEvent(self, event):
-        """Close if escape or return is pressed."""
-        qt.QTextEdit.keyPressEvent(self, event)
-
-        key = event.key()
-        if key == qt.Qt.Key.Key_Escape:
-            # restore original content
-            self.setPlainText(self.origtext)
-            self.close()
-        elif key == qt.Qt.Key.Key_Return:
-            # keep changes
-            self.close()
+        return qt.QFrame.eventFilter(self, obj, event)
 
     def sizeHint(self):
-        """A reasonable size for the text editor."""
-        return qt.QSize(self.spacing*40, self.spacing*3)
+        """A reasonable size for the text editor popup."""
+        return qt.QSize(self.spacing*40, self.spacing*5)
 
     def closeEvent(self, event):
-        """Tell the calling widget that we are closing, and provide
-        the new text."""
-
-        text = self.toPlainText()
-        text = text.replace('\n', '')
+        """Tell the calling widget that we are closing, and provide the new text."""
+        text = self.textedit.toPlainText().replace('\n', '')
         self.closing.emit(text)
         event.accept()
 
@@ -198,12 +379,50 @@ class String(qt.QWidget):
         self.edit.setText( setting.toUIText() )
 
         self.edit.editingFinished.connect(self.validateAndSet)
+        self.edit.installEventFilter(self)
         b.toggled.connect(self.buttonToggled)
 
         self.setting.setOnModified(self.onModified)
 
         if setting.readonly:
             self.edit.setReadOnly(True)
+
+    def eventFilter(self, obj, event):
+        """Support Ctrl+B, Ctrl+I, Ctrl+U shortcuts in the line edit."""
+        if obj is self.edit and event.type() == qt.QEvent.Type.KeyPress:
+            key = event.key()
+            modifiers = event.modifiers()
+            if modifiers & qt.Qt.KeyboardModifier.ControlModifier:
+                if key == qt.Qt.Key.Key_B:
+                    self._wrapLineEdit(r"\bold{", "}")
+                    return True
+                elif key == qt.Qt.Key.Key_I:
+                    self._wrapLineEdit(r"\italic{", "}")
+                    return True
+                elif key == qt.Qt.Key.Key_U:
+                    self._wrapLineEdit(r"\underline{", "}")
+                    return True
+        return qt.QWidget.eventFilter(self, obj, event)
+
+    def _wrapLineEdit(self, prefix, suffix="}"):
+        if self.setting.readonly:
+            return
+        w = self.edit
+        if w.hasSelectedText():
+            start = w.selectionStart()
+            length = w.selectionLength()
+            selected = w.selectedText()
+            full_text = w.text()
+            new_text = full_text[:start] + f"{prefix}{selected}{suffix}" + full_text[start+length:]
+            w.setText(new_text)
+            w.setCursorPosition(start + len(prefix) + len(selected) + len(suffix))
+        else:
+            pos = w.cursorPosition()
+            full_text = w.text()
+            new_text = full_text[:pos] + f"{prefix}{suffix}" + full_text[pos:]
+            w.setText(new_text)
+            w.setCursorPosition(pos + len(prefix))
+        self.validateAndSet()
 
     def buttonToggled(self, on):
         """Button is pressed to bring popup up / down."""
