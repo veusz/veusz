@@ -249,6 +249,10 @@ class MainWindow(qt.QMainWindow):
         # has the document already been setup
         self.documentsetup = False
 
+        # Ensure copy as image shortcut is active window-wide
+        if 'edit.copy_as_image' in self.vzactions:
+            self.addAction(self.vzactions['edit.copy_as_image'])
+
     def updateStatusbar(self, text):
         '''Display text for a set period.'''
         self.statusBar().showMessage(text, 2000)

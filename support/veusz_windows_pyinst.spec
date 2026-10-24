@@ -7,9 +7,13 @@ import os.path
 
 icon = os.path.abspath('icons\\veusz.ico')
 
+from PyInstaller.utils.hooks import collect_all
+pyemf3_datas, pyemf3_binaries, pyemf3_hiddenimports = collect_all('pyemf3')
+
 analysis = Analysis(
     ['..\\veusz\\veusz_main.py'],
-    hiddenimports=[],
+    datas=pyemf3_datas,
+    hiddenimports=['pyemf3', 'veusz.document.emf_export', 'veusz.utils.windows_clipboard'] + pyemf3_hiddenimports,
     hookspath=[],
     runtime_hooks=[])
 

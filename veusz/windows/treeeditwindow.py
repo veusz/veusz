@@ -22,6 +22,7 @@
 and formatting properties."""
 
 import os
+import sys
 import tempfile
 
 from .. import qtall as qt
@@ -1022,9 +1023,10 @@ class TreeEditDock(qt.QDockWidget):
                 self.slotWidgetCopy,
                 icon='kde-edit-copy', key='Ctrl+C'),
             'edit.copy_as_image': a(
-                self, _('Copy the current page as svg image'), _('&Copy as Image'),
+                self, _('Copy current page to clipboard as image (EMF on Windows)'),
+                _('&Copy as Image'),
                 self.slotWidgetCopyAsImage,
-                icon='kde-edit-copy', key='Ctrl+Alt+C'),
+                icon='kde-edit-copy', key='Ctrl+Shift+C'),
             'edit.paste': a(
                 self, _('Paste widget from the clipboard'), _('&Paste'),
                 self.slotWidgetPaste,
@@ -1214,29 +1216,56 @@ class TreeEditDock(qt.QDockWidget):
                 'bmp': ['image/x-bmp'],
                 }
 
+        # On Windows, include EMF if pyemf3 is available
+        export_emf = (sys.platform == 'win32' and document.hasemf)
+        if export_emf:
+            exts['emf'] = ['image/x-emf']
+
         def checkDone(export, exts):
             """Check whether exporting pages as images has finished."""
             if not export.haveDone():
                 return
             try:
                 export.finish()
-                clipboard = qt.QApplication.clipboard()
-                data = qt.QMimeData()
+                # Read generated image bytes
+                img_bytes = {}
+                for ext in exts:
+                    fname = os.path.join(tmpdir.name, 'tmp.{}'.format(ext))
+                    if os.path.isfile(fname):
+                        try:
+                            with open(fname, 'rb') as fo:
+                                img_bytes[ext] = fo.read()
+                        except Exception:
+                            pass
 
-                # set images to QMimeData
-                for ext, mimes in exts.items():
+                # On Windows, use native Windows clipboard for maximum application compatibility
+                # (CF_ENHMETAFILE for MS Office vector, CF_DIB for Paint, PNG for modern apps)
+                copied_native = False
+                if sys.platform == 'win32':
                     try:
-                        fname = os.path.join(tmpdir.name, 'tmp.{}'.format(ext))
-                        with open(fname, 'rb') as fo:
-                            bs = fo.read()
-                        for mime in mimes:
-                            data.setData(mime, bs)
-                        os.remove(fname)
-                    except:
-                        pass
+                        from ..utils import windows_clipboard
+                        copied_native = windows_clipboard.copy_images_to_clipboard(
+                            emf_bytes=img_bytes.get('emf'),
+                            png_bytes=img_bytes.get('png'),
+                            bmp_bytes=img_bytes.get('bmp')
+                        )
+                    except Exception:
+                        copied_native = False
 
-                # set QMimeData to clipboard
-                clipboard.setMimeData(data)
+                # Fallback or non-Windows: use standard Qt QMimeData
+                if not copied_native:
+                    clipboard = qt.QApplication.clipboard()
+                    data = qt.QMimeData()
+                    for ext, mimes in exts.items():
+                        bs = img_bytes.get(ext)
+                        if bs:
+                            for mime in mimes:
+                                data.setData(mime, bs)
+                    png_fname = os.path.join(tmpdir.name, 'tmp.png')
+                    if os.path.isfile(png_fname):
+                        data.setImageData(qt.QImage(png_fname))
+                    clipboard.setMimeData(data)
+
                 tmpdir.cleanup()
 
             except:

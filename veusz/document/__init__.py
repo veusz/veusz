@@ -28,6 +28,6 @@ from .commandinterpreter import *
 from .operations import *
 from .mime import *
 from .painthelper import *
-from .export import AsyncExport, printDialog
+from .export import AsyncExport, printDialog, hasemf
 from .dbusinterface import *
 from .loader import loadDocument, executeScript, LoadError

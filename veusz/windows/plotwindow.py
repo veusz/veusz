@@ -953,6 +953,13 @@ class PlotWindow( qt.QGraphicsView ):
 
                 return
 
+        # handle Ctrl+C or Ctrl+Shift+C to copy graph as image/EMF
+        if (event.modifiers() & qt.Qt.KeyboardModifier.ControlModifier) and event.key() == qt.Qt.Key.Key_C:
+            if self.vzactions and 'edit.copy_as_image' in self.vzactions:
+                self.vzactions['edit.copy_as_image'].trigger()
+                event.accept()
+                return
+
         # handle up-stream
         qt.QGraphicsView.keyPressEvent(self, event)
 
@@ -1133,6 +1140,10 @@ class PlotWindow( qt.QGraphicsView ):
         menu = qt.QMenu(self)
 
         # add some useful entries
+        if self.vzactions and 'edit.copy_as_image' in self.vzactions:
+            menu.addAction( self.vzactions['edit.copy_as_image'] )
+            menu.addSeparator()
+
         menu.addAction( self.vzactions['view.zoommenu'] )
         menu.addSeparator()
         menu.addAction( self.vzactions['view.prevpage'] )
