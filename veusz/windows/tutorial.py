@@ -767,7 +767,7 @@ class TutorialDock(qt.QDockWidget):
         qt.QDockWidget.__init__(self, *args)
         self.setAttribute(qt.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setMinimumHeight(300)
-        self.setWindowTitle('Tutorial - Veusz')
+        self.setWindowTitle(_('Tutorial - Veusz'))
         self.setObjectName('veusztutorialwindow')
 
         self.setStyleSheet('background: lightyellow; color: black;')
@@ -790,7 +790,7 @@ class TutorialDock(qt.QDockWidget):
 
         self.buttonbox = qt.QDialogButtonBox()
         self.nextb = self.buttonbox.addButton(
-            'Next', qt.QDialogButtonBox.ButtonRole.ActionRole)
+            _('Next'), qt.QDialogButtonBox.ButtonRole.ActionRole)
         self.nextb.clicked.connect(self.slotNext)
 
         l.addWidget(self.buttonbox)
@@ -842,7 +842,7 @@ class TutorialDock(qt.QDockWidget):
         # add a close button if requested
         if self.step.closestep:
             closeb = self.buttonbox.addButton(
-                'Close', qt.QDialogButtonBox.ButtonRole.ActionRole)
+                _('Close'), qt.QDialogButtonBox.ButtonRole.ActionRole)
             closeb.clicked.connect(self.close)
 
     # work around C/C++ object deleted

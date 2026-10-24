@@ -396,15 +396,22 @@ class MainWindow(qt.QMainWindow):
                 handlePlugin(self, self.document, pluginkls)
             return _loadPlugin
 
+        def _tr(s):
+            for ctx in ('ToolsPlugin', 'Plugins', 'MainWindow'):
+                res = qt.QCoreApplication.translate(ctx, s)
+                if res and res != s:
+                    return res
+            return s
+
         menu = []
         for pluginkls in pluginlist:
             actname = menuname + '.' + '.'.join(pluginkls.menu)
-            text = pluginkls.menu[-1]
+            text = _tr(pluginkls.menu[-1])
             if pluginkls.has_parameters:
                 text += '…'
             actions[actname] = utils.makeAction(
                 self,
-                pluginkls.description_short,
+                _tr(pluginkls.description_short),
                 text,
                 getLoadDialog(pluginkls))
 
@@ -420,7 +427,7 @@ class MainWindow(qt.QMainWindow):
                         menulook = c[2]
                         break
                 else:
-                    menulook.append( [name, cmpt, []] )
+                    menulook.append( [name, _tr(cmpt), []] )
                     menulook = menulook[-1][2]
 
             menulook.append(actname)

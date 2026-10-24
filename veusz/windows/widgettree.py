@@ -293,7 +293,7 @@ class WidgetTreeModel(qt.QAbstractItemModel):
         """Return the header of the tree."""
 
         if orientation == qt.Qt.Orientation.Horizontal and role == qt.Qt.ItemDataRole.DisplayRole:
-            val = ('Name', 'Type')[section]
+            val = (_('Name'), _('Type'))[section]
             return val
         return None
 
